@@ -58,20 +58,18 @@ class FeedItemStoreTest : DIAware {
         }
 
         coVerify {
-            dao.markAsReadAndNotified(5L)
+            dao.markAsReadAndNotified(5L, any())
         }
     }
 
     @Test
     fun markAsUnread() {
         runBlocking {
-            store.markAsUnread(5L, true)
-            store.markAsUnread(6L, false)
+            store.markAsUnread(5L)
         }
 
         coVerify {
-            dao.markAsRead(5L, true)
-            dao.markAsRead(6L, false)
+            dao.markAsUnread(5L)
         }
     }
 
@@ -126,7 +124,7 @@ class FeedItemStoreTest : DIAware {
         }
 
         coVerify {
-            dao.markAllAsRead(5L)
+            dao.markAllAsRead(5L, any())
         }
     }
 
@@ -137,7 +135,7 @@ class FeedItemStoreTest : DIAware {
         }
 
         coVerify {
-            dao.markAllAsRead("sfz")
+            dao.markAllAsRead("sfz", any())
         }
     }
 
@@ -148,7 +146,7 @@ class FeedItemStoreTest : DIAware {
         }
 
         coVerify {
-            dao.markAllAsRead()
+            dao.markAllAsRead(readTime = any())
         }
     }
 

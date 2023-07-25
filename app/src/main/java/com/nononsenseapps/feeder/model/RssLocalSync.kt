@@ -243,7 +243,8 @@ class RssLocalSync(override val di: DI) : DIAware {
                         feedItemSql.feedId = feedSql.id
 
                         if (feedItemSql.guid in alreadyReadGuids) {
-                            feedItemSql.unread = false
+                            // TODO get read time from sync service
+                            feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
                             feedItemSql.notified = true
                         }
 

@@ -190,10 +190,6 @@
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
-    <service
-      android:name=".model.FeederService"
-      android:exported="true" />
-
     <provider
       android:name=".contentprovider.RSSContentProvider"
       android:authorities="com.nononsenseapps.feeder.rssprovider"

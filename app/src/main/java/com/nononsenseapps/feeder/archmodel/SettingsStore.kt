@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.update
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsStore(override val di: DI) : DIAware {
@@ -46,17 +47,45 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setShowOnlyUnread(value: Boolean) {
         sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
         _showOnlyUnread.value = value
+        _minReadTime.value = when (value) {
+            true -> Instant.now()
+            false -> Instant.EPOCH
+        }
+    }
+
+    private val _minReadTime: MutableStateFlow<Instant> = MutableStateFlow(
+        // by design - min read time is never written to disk
+        when (_showOnlyUnread.value) {
+            true -> Instant.now()
+            false -> Instant.EPOCH
+        }
+    )
+    val minReadTime: StateFlow<Instant> = _minReadTime.asStateFlow()
+    fun setMinReadTime(value: Instant) {
+        if (showOnlyUnread.value) {
+            _minReadTime.value = value
+        }
     }
 
     private val _currentFeedAndTag = MutableStateFlow(
         sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_FEED_TAG, null) ?: ""),
     )
     val currentFeedAndTag = _currentFeedAndTag.asStateFlow()
-    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
-        _currentFeedAndTag.value = feedId to tag
-        sp.edit().putLong(PREF_LAST_FEED_ID, feedId).apply()
-        sp.edit().putString(PREF_LAST_FEED_TAG, tag).apply()
-    }
+
+    /**
+     * Returns true if the parameters were different from current state
+     */
+    fun setCurrentFeedAndTag(feedId: Long, tag: String): Boolean =
+        if (_currentFeedAndTag.value.first != feedId ||
+            _currentFeedAndTag.value.second != tag
+        ) {
+            _currentFeedAndTag.value = feedId to tag
+            sp.edit().putLong(PREF_LAST_FEED_ID, feedId).apply()
+            sp.edit().putString(PREF_LAST_FEED_TAG, tag).apply()
+            true
+        } else {
+            false
+        }
 
     private val _currentArticle = MutableStateFlow(
         sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET),

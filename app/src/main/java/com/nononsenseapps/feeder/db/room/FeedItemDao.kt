@@ -138,7 +138,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND unread in (1, :unread)
+          AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
@@ -146,7 +146,7 @@ interface FeedItemDao {
     )
     fun pagingUnreadPreviewsDesc(
         feedId: Long,
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -156,7 +156,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-          AND unread in (1, :unread)
+          AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
@@ -164,7 +164,7 @@ interface FeedItemDao {
     )
     fun pagingUnreadPreviewsDesc(
         tag: String,
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -173,14 +173,14 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE unread in (1, :unread)
+        WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
     fun pagingUnreadPreviewsDesc(
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -190,7 +190,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND unread in (1, :unread)
+          AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
@@ -198,7 +198,7 @@ interface FeedItemDao {
     )
     fun pagingUnreadPreviewsAsc(
         feedId: Long,
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -208,7 +208,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag 
-          AND unread in (1, :unread)
+          AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
@@ -216,7 +216,7 @@ interface FeedItemDao {
     )
     fun pagingUnreadPreviewsAsc(
         tag: String,
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -225,14 +225,14 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE unread in (1, :unread)
+        WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
     fun pagingUnreadPreviewsAsc(
-        unread: Boolean,
+        minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
 
@@ -241,22 +241,22 @@ interface FeedItemDao {
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IN (:feedIds) AND notified IS 0 AND unread IS 1
+        WHERE feed_id IN (:feedIds) AND notified IS 0 AND read_time is null
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
     suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
 
-    @Query("UPDATE feed_items SET unread = 0, notified = 1")
-    suspend fun markAllAsRead()
+    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1")
+    suspend fun markAllAsRead(readTime: Instant = Instant.now())
 
-    @Query("UPDATE feed_items SET unread = 0, notified = 1 WHERE feed_id IS :feedId")
-    suspend fun markAllAsRead(feedId: Long?)
+    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE feed_id IS :feedId")
+    suspend fun markAllAsRead(feedId: Long?, readTime: Instant = Instant.now())
 
     @Query(
         """
         UPDATE feed_items
-        SET unread = 0, notified = 1
+        SET read_time = coalesce(read_time, :readTime), notified = 1
         WHERE id IN (
           SELECT feed_items.id
           FROM feed_items
@@ -264,13 +264,16 @@ interface FeedItemDao {
           WHERE tag IS :tag
         )""",
     )
-    suspend fun markAllAsRead(tag: String)
+    suspend fun markAllAsRead(tag: String, readTime: Instant = Instant.now())
 
-    @Query("UPDATE feed_items SET unread = :unread, notified = 1 WHERE id IS :id")
-    suspend fun markAsRead(id: Long, unread: Boolean = false)
+    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IS :id")
+    suspend fun markAsRead(id: Long, readTime: Instant = Instant.now())
 
-    @Query("UPDATE feed_items SET unread = :unread, notified = 1 WHERE id IN (:ids)")
-    suspend fun markAsRead(ids: List<Long>, unread: Boolean = false)
+    @Query("UPDATE feed_items SET read_time = null WHERE id IS :id")
+    suspend fun markAsUnread(id: Long)
+
+    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IN (:ids)")
+    suspend fun markAsRead(ids: List<Long>, readTime: Instant = Instant.now())
 
     @Query("UPDATE feed_items SET bookmarked = :bookmarked WHERE id IS :id")
     suspend fun setBookmarked(id: Long, bookmarked: Boolean)
@@ -297,16 +300,17 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET notified = :notified")
     suspend fun markAllAsNotified(notified: Boolean = true)
 
-    @Query("UPDATE feed_items SET unread = 0, notified = 1 WHERE id IS :id")
-    suspend fun markAsReadAndNotified(id: Long)
+    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IS :id")
+    suspend fun markAsReadAndNotified(id: Long, readTime: Instant = Instant.now())
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -318,20 +322,22 @@ interface FeedItemDao {
         """,
     )
     suspend fun markAsReadDesc(
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -343,20 +349,23 @@ interface FeedItemDao {
         """,
     )
     suspend fun markAsReadAsc(
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE feed_id = :feedId AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE feed_id = :feedId
+                and (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -369,20 +378,23 @@ interface FeedItemDao {
     )
     suspend fun markAsReadDesc(
         feedId: Long,
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE feed_id = :feedId AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE feed_id = :feedId
+                and (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -395,21 +407,24 @@ interface FeedItemDao {
     )
     suspend fun markAsReadAsc(
         feedId: Long,
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE tag IS :tag
+                and (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -422,21 +437,24 @@ interface FeedItemDao {
     )
     suspend fun markAsReadDesc(
         tag: String,
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
         """
-            UPDATE feed_items SET unread = 0, notified = 1
+            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag and unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                WHERE tag IS :tag
+                and (read_time is null or read_time >= :queryReadTime)
+                and bookmarked in (1, :onlyBookmarked)
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
                 -- this version of sqlite doesn't seem to support tuple comparisons
                 and (
@@ -449,11 +467,12 @@ interface FeedItemDao {
     )
     suspend fun markAsReadAsc(
         tag: String,
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         onlyBookmarked: Boolean,
         primarySortTime: Instant,
         pubDate: ZonedDateTime?,
         id: Long,
+        markReadTime: Instant = Instant.now(),
     )
 
     @Query(
@@ -511,12 +530,12 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE
-              unread in (1, :unread)
+              (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
               and NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(unread: Boolean, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(minReadTime: Instant, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """
@@ -524,31 +543,31 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.tag IS :tag
-              and unread in (1, :unread)
+              and (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(tag: String, unread: Boolean, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(tag: String, minReadTime: Instant, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.feed_id IS :feedId
-              and unread in (1, :unread)
+              and (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(feedId: Long, unread: Boolean, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(feedId: Long, minReadTime: Instant, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """
             SELECT fi.id
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
-            WHERE f.notify IS 1 AND fi.notified IS 0 AND fi.unread is 1
+            WHERE f.notify IS 1 AND fi.notified IS 0 AND fi.read_time is null
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
