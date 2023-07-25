@@ -915,9 +915,9 @@ fun RadioButtonSetting(
     onClick: () -> Unit,
 ) {
     val stateLabel = if (selected) {
-        stringResource(R.string.selected)
+        stringResource(androidx.compose.ui.R.string.selected)
     } else {
-        stringResource(R.string.not_selected)
+        stringResource(androidx.compose.ui.R.string.not_selected)
     }
     val dimens = LocalDimens.current
     Row(
@@ -969,9 +969,9 @@ fun SwitchSetting(
     onCheckedChanged: (Boolean) -> Unit,
 ) {
     val stateLabel = if (checked) {
-        stringResource(R.string.on)
+        stringResource(androidx.compose.ui.R.string.on)
     } else {
-        stringResource(R.string.off)
+        stringResource(androidx.compose.ui.R.string.off)
     }
     val dimens = LocalDimens.current
     Row(

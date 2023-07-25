@@ -939,6 +939,9 @@ fun FeedListContent(
                     key = { itemIndex ->
                         pagedFeedItems.itemSnapshotList.items[itemIndex].id
                     },
+                    contentType = { itemIndex ->
+                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(viewState.feedItemStyle)
+                    },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
@@ -1105,6 +1108,9 @@ fun FeedGridContent(
                     pagedFeedItems.itemCount,
                     key = { itemIndex ->
                         pagedFeedItems.itemSnapshotList.items[itemIndex].id
+                    },
+                    contentType = { itemIndex ->
+                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(viewState.feedItemStyle)
                     },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]

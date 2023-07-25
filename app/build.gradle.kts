@@ -136,6 +136,11 @@ android {
         jvmTarget = "1.8"
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -265,8 +270,6 @@ dependencies {
     // RSS
     implementation(libs.rome)
     implementation(libs.rome.modules)
-    // JSONFeed
-    implementation(project(":jsonfeed-parser"))
 
     // Includes conscrypt
     implementation(libs.bundles.okhttp.android)

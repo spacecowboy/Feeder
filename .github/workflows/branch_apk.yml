@@ -1,0 +1,51 @@
+name: Signed APKs
+
+on:
+  push:
+    branches:
+      - upgrades
+
+jobs:
+  signed_apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: perform the checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      # Verify the SHA-sum
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: prepare for build
+        shell: bash
+        run: ./prepare_for_build.sh
+        env:
+          SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+          KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+          KEYALIAS: ${{ secrets.KEYALIAS }}
+
+      - name: gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assemble
+
+      - name: upload the generated files
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          retention-days: 7
+          name: artifacts
+          path: app/build/outputs/apk

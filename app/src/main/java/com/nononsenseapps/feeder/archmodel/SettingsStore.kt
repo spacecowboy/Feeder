@@ -363,7 +363,7 @@ class SettingsStore(override val di: DI) : DIAware {
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
                 when (replace) {
-                    true -> ExistingPeriodicWorkPolicy.REPLACE
+                    true -> ExistingPeriodicWorkPolicy.UPDATE
                     false -> ExistingPeriodicWorkPolicy.KEEP
                 },
                 syncWork,

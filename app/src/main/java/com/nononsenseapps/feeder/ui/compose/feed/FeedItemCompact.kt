@@ -40,6 +40,7 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
@@ -269,6 +270,17 @@ data class FeedListItem(
             override val primarySortTime: Instant = this@FeedListItem.primarySortTime
             override val pubDate: ZonedDateTime? = this@FeedListItem.rawPubDate
             override val id: Long = this@FeedListItem.id
+        }
+
+    /**
+     * Used so lazylist/grid can re-use items.
+     *
+     * Type will depend on having images as that will influence visible items
+     */
+    fun contentType(feedItemStyle: FeedItemStyle): String = when {
+            imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
+            feedImageUrl != null -> "$feedItemStyle/feedImage"
+            else -> "$feedItemStyle/textonly"
         }
 }
 

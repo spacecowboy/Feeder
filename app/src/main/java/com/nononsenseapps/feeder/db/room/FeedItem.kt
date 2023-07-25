@@ -107,7 +107,7 @@ data class FeedItem @Ignore constructor(
 
         val absoluteImage = when {
             feed.feed_url != null && safeImage != null -> {
-                relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), safeImage)
+                relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
             }
             else -> safeImage
         }

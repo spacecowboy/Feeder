@@ -103,9 +103,9 @@ fun DeleteFeedDialog(
                     key = { feed -> feed.id },
                 ) { feed ->
                     val stateLabel = if (isChecked(feed.id)) {
-                        stringResource(R.string.selected)
+                        stringResource(androidx.compose.ui.R.string.selected)
                     } else {
-                        stringResource(R.string.not_selected)
+                        stringResource(androidx.compose.ui.R.string.not_selected)
                     }
                     Row(
                         horizontalArrangement = Arrangement.Start,
