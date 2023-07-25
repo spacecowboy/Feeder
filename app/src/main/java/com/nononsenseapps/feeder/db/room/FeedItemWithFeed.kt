@@ -18,9 +18,9 @@ import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
 import com.nononsenseapps.feeder.db.COL_PUBDATE
+import com.nononsenseapps.feeder.db.COL_READ_TIME
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
-import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
@@ -28,12 +28,13 @@ import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
 import java.net.URL
+import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
 
 const val feedItemColumnsWithFeed = """
     $FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE,
     $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK,
-    $COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_UNREAD, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID,
+    $COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_READ_TIME, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID,
     $FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE,
     $FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE,
     $FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL,
@@ -54,7 +55,7 @@ data class FeedItemWithFeed @Ignore constructor(
     @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
     override var link: String? = null,
     var tag: String = "",
-    var unread: Boolean = true,
+    @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
     @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
     @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",

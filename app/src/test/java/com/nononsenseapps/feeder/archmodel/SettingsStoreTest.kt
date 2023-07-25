@@ -8,12 +8,14 @@ import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import io.mockk.MockKAnnotations
+import io.mockk.clearMocks
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +24,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import org.threeten.bp.Instant
 
 class SettingsStoreTest : DIAware {
     private val store: SettingsStore by instance()
@@ -55,7 +58,7 @@ class SettingsStoreTest : DIAware {
         every {
             sp.getString(
                 PREF_SWIPE_AS_READ,
-                SwipeAsRead.ONLY_FROM_END.name
+                SwipeAsRead.ONLY_FROM_END.name,
             )
         } returns SwipeAsRead.DISABLED.name
     }
@@ -89,12 +92,18 @@ class SettingsStoreTest : DIAware {
         assertEquals(
             SwipeAsRead.ONLY_FROM_END,
             store.swipeAsRead.value,
-            "Expected bad value to be ignored"
+            "Expected bad value to be ignored",
         )
     }
 
     @Test
-    fun showOnlyUnread() {
+    fun showOnlyUnreadFalse() {
+        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns true
+
+        assertTrue {
+            store.minReadTime.value > Instant.EPOCH
+        }
+
         store.setShowOnlyUnread(false)
 
         verify {
@@ -102,6 +111,25 @@ class SettingsStoreTest : DIAware {
         }
 
         assertEquals(false, store.showOnlyUnread.value, "Expected get to match mock")
+        assertEquals(Instant.EPOCH, store.minReadTime.value)
+    }
+
+    @Test
+    fun showOnlyUnreadTrue() {
+        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns false
+
+        assertEquals(Instant.EPOCH, store.minReadTime.value)
+
+        store.setShowOnlyUnread(true)
+
+        verify {
+            sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, true).apply()
+        }
+
+        assertEquals(true, store.showOnlyUnread.value, "Expected get to match mock")
+        assertTrue {
+            Instant.EPOCH < store.minReadTime.value
+        }
     }
 
     @Test
@@ -294,7 +322,7 @@ class SettingsStoreTest : DIAware {
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
-                any()
+                any(),
             )
         }
 
@@ -315,5 +343,39 @@ class SettingsStoreTest : DIAware {
             blocklistDao.insertSafely("att\\ack")
         }
         confirmVerified(blocklistDao)
+    }
+
+    @Test
+    fun minReadTimeOnlyUnread() {
+        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns true
+
+        assertTrue {
+            store.minReadTime.value > Instant.EPOCH
+        }
+
+        val value = Instant.ofEpochSecond(1691013971)
+
+        clearMocks(sp)
+
+        store.setMinReadTime(value)
+        assertEquals(value, store.minReadTime.value)
+
+        confirmVerified(sp)
+    }
+
+    @Test
+    fun minReadTimeNotOnlyUnread() {
+        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns false
+
+        assertEquals(Instant.EPOCH, store.minReadTime.value)
+
+        val value = Instant.ofEpochSecond(1691013971)
+
+        clearMocks(sp)
+
+        store.setMinReadTime(value)
+        assertEquals(Instant.EPOCH, store.minReadTime.value)
+
+        confirmVerified(sp)
     }
 }

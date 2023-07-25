@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.db
 
+import org.threeten.bp.Instant
+
 const val FEEDS_TABLE_NAME = "feeds"
 const val FEED_ITEMS_TABLE_NAME = "feed_items"
 const val SYNC_REMOTE_TABLE_NAME = "sync_remote"
@@ -19,7 +21,6 @@ const val COL_ENCLOSURELINK = "enclosure_link"
 const val COL_LINK = "link"
 const val COL_AUTHOR = "author"
 const val COL_PUBDATE = "pub_date"
-const val COL_UNREAD = "unread"
 const val COL_NOTIFIED = "notified"
 const val COL_FEEDID = "feed_id"
 const val COL_FEEDTITLE = "feed_title"
@@ -43,3 +44,7 @@ const val COL_LAST_FEEDS_REMOTE_HASH = "last_feeds_remote_hash"
 const val COL_BOOKMARKED = "bookmarked"
 const val COL_GLOB_PATTERN = "glob_pattern"
 const val COL_FULLTEXT_DOWNLOADED = "fulltext_downloaded"
+const val COL_READ_TIME = "read_time"
+
+// year 5000
+val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

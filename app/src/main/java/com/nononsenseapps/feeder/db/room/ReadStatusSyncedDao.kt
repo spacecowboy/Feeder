@@ -43,7 +43,7 @@ interface ReadStatusSyncedDao {
             FROM feed_items fi
             JOIN feeds f ON f.id = fi.feed_id
             WHERE
-                fi.unread IS 0 AND
+                fi.read_time is not null AND
                 fi.id NOT IN (
                     SELECT feed_item
                     FROM read_status_synced
@@ -67,7 +67,7 @@ interface ReadStatusSyncedDao {
             FROM feed_items fi
             JOIN feeds f ON f.id = fi.feed_id
             WHERE
-                fi.unread IS 0 AND
+                fi.read_time is not null and
                 fi.id NOT IN (
                     SELECT feed_item
                     FROM read_status_synced
@@ -88,7 +88,7 @@ interface ReadStatusSyncedDao {
             FROM feed_items fi
             JOIN feeds f ON f.id = fi.feed_id
             WHERE
-                fi.unread IS 0 AND
+                fi.read_time is not null and
                 fi.id NOT IN (
                     SELECT feed_item
                     FROM read_status_synced

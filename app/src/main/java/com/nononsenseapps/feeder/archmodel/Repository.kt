@@ -86,6 +86,9 @@ class Repository(override val di: DI) : DIAware {
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
 
+    val minReadTime: StateFlow<Instant> = settingsStore.minReadTime
+    fun setMinReadTime(value: Instant) = settingsStore.setMinReadTime(value)
+
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
         if (feedId > ID_UNSET) {
@@ -101,7 +104,9 @@ class Repository(override val di: DI) : DIAware {
                 }
             }
         }
-        settingsStore.setCurrentFeedAndTag(feedId, tag)
+        if (settingsStore.setCurrentFeedAndTag(feedId, tag)) {
+            settingsStore.setMinReadTime(Instant.now())
+        }
     }
 
     val isArticleOpen: StateFlow<Boolean> = settingsStore.isArticleOpen
@@ -201,20 +206,20 @@ class Repository(override val di: DI) : DIAware {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
-        showOnlyUnread,
+        minReadTime,
         currentSorting,
-    ) { showOnlyUnread, currentSorting ->
+    ) { minReadTime, currentSorting ->
         FeedListArgs(
             feedId = feedId,
             tag = tag,
-            onlyUnread = showOnlyUnread,
+            minReadTime = minReadTime,
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
             feedId = it.feedId,
             tag = it.tag,
-            onlyUnread = it.onlyUnread,
+            minReadTime = it.minReadTime,
             newestFirst = it.newestFirst,
         )
     }
@@ -222,16 +227,16 @@ class Repository(override val di: DI) : DIAware {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> = combine(
         currentFeedAndTag,
-        showOnlyUnread,
+        minReadTime,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, currentSorting ->
+    ) { feedAndTag, minReadTime, currentSorting ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
             tag = tag,
-            onlyUnread = when (feedId) {
-                ID_SAVED_ARTICLES -> false
-                else -> showOnlyUnread
+            minReadTime = when (feedId) {
+                ID_SAVED_ARTICLES -> Instant.EPOCH
+                else -> minReadTime
             },
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
         )
@@ -239,7 +244,7 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.getPagedFeedItems(
             feedId = it.feedId,
             tag = it.tag,
-            onlyUnread = it.onlyUnread,
+            minReadTime = it.minReadTime,
             newestFirst = it.newestFirst,
         )
     }
@@ -247,16 +252,16 @@ class Repository(override val di: DI) : DIAware {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListVisibleItemCount(): Flow<Int> = combine(
         currentFeedAndTag,
-        showOnlyUnread,
+        minReadTime,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, _ ->
+    ) { feedAndTag, minReadTime, _ ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
             tag = tag,
-            onlyUnread = when (feedId) {
-                ID_SAVED_ARTICLES -> false
-                else -> showOnlyUnread
+            minReadTime = when (feedId) {
+                ID_SAVED_ARTICLES -> Instant.EPOCH
+                else -> minReadTime
             },
             newestFirst = false,
         )
@@ -264,7 +269,7 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.getFeedItemCount(
             feedId = it.feedId,
             tag = it.tag,
-            onlyUnread = it.onlyUnread,
+            minReadTime = it.minReadTime,
         )
     }
 
@@ -297,13 +302,9 @@ class Repository(override val di: DI) : DIAware {
         scheduleSendRead()
     }
 
-    suspend fun markAsUnread(itemId: Long, unread: Boolean = true) {
-        feedItemStore.markAsUnread(itemId, unread)
-        if (unread) {
-            syncRemoteStore.setNotSynced(itemId)
-        } else {
-            scheduleSendRead()
-        }
+    suspend fun markAsUnread(itemId: Long) {
+        feedItemStore.markAsUnread(itemId)
+        syncRemoteStore.setNotSynced(itemId)
     }
 
     suspend fun getTextToDisplayForItem(itemId: Long): TextToDisplay =
@@ -379,7 +380,7 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.markAsRead(
             feedId = feedId,
             tag = tag,
-            onlyUnread = showOnlyUnread.value,
+            queryReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
         )
@@ -390,7 +391,7 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.markAsRead(
             feedId = feedId,
             tag = tag,
-            onlyUnread = showOnlyUnread.value,
+            queryReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
         )
@@ -406,7 +407,7 @@ class Repository(override val di: DI) : DIAware {
         get() = feedItemStore.getFeedItemCount(
             feedId = ID_SAVED_ARTICLES,
             tag = "",
-            onlyUnread = true,
+            minReadTime = null,
         )
 
     fun getVisibleFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
@@ -630,7 +631,7 @@ private data class FeedListArgs(
     val feedId: Long,
     val tag: String,
     val newestFirst: Boolean,
-    val onlyUnread: Boolean,
+    val minReadTime: Instant,
 )
 
 // Wrapper class because flow combine doesn't like nulls

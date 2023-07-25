@@ -21,8 +21,8 @@ import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.COL_PUBDATE
+import com.nononsenseapps.feeder.db.COL_READ_TIME
 import com.nononsenseapps.feeder.db.COL_TITLE
-import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
@@ -63,8 +63,7 @@ data class FeedItem @Ignore constructor(
     override var id: Long = ID_UNSET,
     @ColumnInfo(name = COL_GUID) var guid: String = "",
     @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
-    @ColumnInfo(name = COL_TITLE)
-    var title: String = "",
+    @ColumnInfo(name = COL_TITLE) var title: String = "",
     @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
     @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
@@ -72,19 +71,23 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
     @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) override var pubDate: ZonedDateTime? = null,
     @ColumnInfo(name = COL_LINK) override var link: String? = null,
-    @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
+    @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.", replaceWith = ReplaceWith("readTime"))
+    @ColumnInfo(name = "unread") var oldUnread: Boolean = true,
     @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
     @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) override var primarySortTime: Instant = Instant.EPOCH,
     @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.")
-    @ColumnInfo(name = "pinned")
-    var pinned: Boolean = false,
+    @ColumnInfo(name = "pinned") var oldPinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
     @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
+    @ColumnInfo(name = COL_READ_TIME, typeAffinity = ColumnInfo.INTEGER) var readTime: Instant? = null,
 ) : FeedItemForFetching, FeedItemCursor {
 
     constructor() : this(id = ID_UNSET)
+
+    val unread: Boolean
+        get() = readTime == null
 
     fun updateFromParsedEntry(
         entry: Item,

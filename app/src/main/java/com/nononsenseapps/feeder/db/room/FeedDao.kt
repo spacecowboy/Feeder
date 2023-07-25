@@ -105,7 +105,7 @@ interface FeedDao {
         FROM feeds
         LEFT JOIN (SELECT COUNT(1) AS unread_count, feed_id
           FROM feed_items
-          WHERE unread IS 1
+          WHERE read_time is null
             AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
           GROUP BY feed_id
         )

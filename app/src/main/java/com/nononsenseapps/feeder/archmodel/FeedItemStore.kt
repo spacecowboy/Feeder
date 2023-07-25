@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.nononsenseapps.feeder.db.FAR_FUTURE
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
@@ -28,33 +30,33 @@ class FeedItemStore(override val di: DI) : DIAware {
     fun getFeedItemCount(
         feedId: Long,
         tag: String,
-        onlyUnread: Boolean,
+        minReadTime: Instant?,
     ): Flow<Int> =
         when {
             feedId > ID_UNSET -> dao.getFeedItemCount(
                 feedId = feedId,
-                unread = onlyUnread,
+                minReadTime = minReadTime ?: FAR_FUTURE,
                 bookmarked = false,
             )
 
             tag.isNotEmpty() -> dao.getFeedItemCount(
                 tag = tag,
-                unread = onlyUnread,
+                minReadTime = minReadTime ?: FAR_FUTURE,
                 bookmarked = false,
             )
 
             feedId == ID_SAVED_ARTICLES -> dao.getFeedItemCount(
-                unread = onlyUnread,
+                minReadTime = minReadTime ?: FAR_FUTURE,
                 bookmarked = true,
             )
 
-            else -> dao.getFeedItemCount(unread = onlyUnread, bookmarked = false)
+            else -> dao.getFeedItemCount(minReadTime = minReadTime ?: FAR_FUTURE, bookmarked = false)
         }
 
     fun getPagedFeedItems(
         feedId: Long,
         tag: String,
-        onlyUnread: Boolean,
+        minReadTime: Instant,
         newestFirst: Boolean,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
@@ -69,18 +71,18 @@ class FeedItemStore(override val di: DI) : DIAware {
                     when {
                         feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(
                             feedId = feedId,
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
 
                         tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(
                             tag = tag,
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
 
                         else -> dao.pagingUnreadPreviewsDesc(
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
                     }
@@ -90,18 +92,18 @@ class FeedItemStore(override val di: DI) : DIAware {
                     when {
                         feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(
                             feedId = feedId,
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
 
                         tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(
                             tag = tag,
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
 
                         else -> dao.pagingUnreadPreviewsAsc(
-                            unread = onlyUnread,
+                            minReadTime = minReadTime,
                             bookmarked = onlyBookmarks,
                         )
                     }
@@ -124,8 +126,8 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsReadAndNotified(itemId)
     }
 
-    suspend fun markAsUnread(itemId: Long, unread: Boolean) {
-        dao.markAsRead(itemId, unread)
+    suspend fun markAsUnread(itemId: Long) {
+        dao.markAsUnread(itemId)
     }
 
     suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) {
@@ -167,7 +169,7 @@ class FeedItemStore(override val di: DI) : DIAware {
     suspend fun markAsRead(
         feedId: Long,
         tag: String,
-        onlyUnread: Boolean,
+        queryReadTime: Instant,
         descending: Boolean,
         cursor: FeedItemCursor,
     ) {
@@ -180,7 +182,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         pubDate = cursor.pubDate,
                         id = cursor.id,
                         feedId = feedId,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
 
@@ -189,7 +191,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         pubDate = cursor.pubDate,
                         id = cursor.id,
                         tag = tag,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
 
@@ -197,7 +199,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         primarySortTime = cursor.primarySortTime,
                         pubDate = cursor.pubDate,
                         id = cursor.id,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
                 }
@@ -210,7 +212,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         pubDate = cursor.pubDate,
                         id = cursor.id,
                         feedId = feedId,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
 
@@ -219,7 +221,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         pubDate = cursor.pubDate,
                         id = cursor.id,
                         tag = tag,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
 
@@ -227,7 +229,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                         primarySortTime = cursor.primarySortTime,
                         pubDate = cursor.pubDate,
                         id = cursor.id,
-                        onlyUnread = onlyUnread,
+                        queryReadTime = queryReadTime,
                         onlyBookmarked = onlyBookmarks,
                     )
                 }
@@ -273,7 +275,7 @@ private fun PreviewItem.toFeedListItem() =
         title = plainTitle,
         snippet = plainSnippet,
         feedTitle = feedDisplayTitle,
-        unread = unread,
+        unread = readTime == null,
         pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
         imageUrl = imageUrl,
         link = link,

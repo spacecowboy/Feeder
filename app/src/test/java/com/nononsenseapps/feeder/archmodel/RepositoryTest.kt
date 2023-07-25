@@ -89,6 +89,7 @@ class RepositoryTest : DIAware {
         every { settingsStore.syncOnlyWhenCharging } returns MutableStateFlow(false)
         every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
         every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
+        every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
     }
 
     @Test
@@ -144,9 +145,10 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun setCurrentFeedAndTagFeedReportsShortcut() {
+    fun setCurrentFeedAndTagFeedReportsShortcutAndUpdatesMinReadTime() {
         coEvery { feedStore.getDisplayTitle(10L) } returns "fooFeed"
-        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } just Runs
+        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } returns true
+        coEvery { settingsStore.setMinReadTime(any()) } just Runs
 
         mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
 
@@ -159,6 +161,22 @@ class RepositoryTest : DIAware {
                 null,
             )
             application.reportShortcutToFeedUsed(10L)
+            settingsStore.setMinReadTime(any())
+        }
+    }
+
+    @Test
+    fun setCurrentFeedAndTagToSameDoesntChangeMinReadTime() {
+        coEvery { feedStore.getDisplayTitle(10L) } returns "fooFeed"
+        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } returns false
+        coEvery { settingsStore.setMinReadTime(any()) } just Runs
+
+        mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
+
+        repository.setCurrentFeedAndTag(10L, "")
+
+        coVerify(exactly = 0, timeout = 500L) {
+            settingsStore.setMinReadTime(any())
         }
     }
 
@@ -380,7 +398,7 @@ class RepositoryTest : DIAware {
             feedItemStore.getFeedItemId(URL("https://foo"), "guid")
             syncRemoteStore.addRemoteReadMark(feedUrl = URL("https://foo"), articleGuid = "guid")
             syncRemoteStore.setSynced(5L)
-            feedItemStore.markAsReadAndNotified(5L)
+            feedItemStore.markAsReadAndNotified(5L, any())
         }
         confirmVerified(feedItemStore, syncRemoteStore)
     }
@@ -392,7 +410,7 @@ class RepositoryTest : DIAware {
         }
 
         coVerify {
-            feedItemStore.markAsReadAndNotified(1L)
+            feedItemStore.markAsReadAndNotified(1L, any())
             workManager.enqueueUniqueWork(
                 SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
                 ExistingWorkPolicy.REPLACE,
