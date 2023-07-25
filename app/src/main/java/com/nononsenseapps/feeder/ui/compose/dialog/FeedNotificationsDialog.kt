@@ -84,9 +84,9 @@ fun FeedNotificationsDialog(
                             .heightIn(min = minimumTouchSize),
                     ) {
                         val stateLabel = if (item.notify) {
-                            stringResource(R.string.on)
+                            stringResource(androidx.compose.ui.R.string.on)
                         } else {
-                            stringResource(R.string.off)
+                            stringResource(androidx.compose.ui.R.string.off)
                         }
                         val dimens = LocalDimens.current
                         Row(

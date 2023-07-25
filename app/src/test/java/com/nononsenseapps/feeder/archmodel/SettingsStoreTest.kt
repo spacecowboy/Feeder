@@ -293,7 +293,7 @@ class SettingsStoreTest : DIAware {
             }
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 any()
             )
         }

@@ -22,11 +22,11 @@ jobs:
     - name: setup JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
 
     # This initializes gradle and sets up caching. Default version is the wrapper version.
     - name: gradle build
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: classes packageDebugAndroidTest :app:lint check
+        arguments: build packageDebugAndroidTest :app:lint check
