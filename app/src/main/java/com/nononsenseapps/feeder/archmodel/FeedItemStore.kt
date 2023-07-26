@@ -15,14 +15,18 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
-import com.nononsenseapps.feeder.ui.compose.feed.shortDateTimeFormat
 import java.net.URL
+import java.util.Locale
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
 
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
@@ -269,6 +273,12 @@ class FeedItemStore(override val di: DI) : DIAware {
     }
 }
 
+val mediumDateTimeFormat: DateTimeFormatter =
+    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
+
+val shortTimeFormat: DateTimeFormatter =
+    DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault())
+
 private fun PreviewItem.toFeedListItem() =
     FeedListItem(
         id = id,
@@ -276,7 +286,7 @@ private fun PreviewItem.toFeedListItem() =
         snippet = plainSnippet,
         feedTitle = feedDisplayTitle,
         unread = readTime == null,
-        pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
+        pubDate = pubDate?.toLocalDateTime()?.formatDynamically() ?: "",
         imageUrl = imageUrl,
         link = link,
         bookmarked = bookmarked,
@@ -284,3 +294,11 @@ private fun PreviewItem.toFeedListItem() =
         rawPubDate = pubDate,
         primarySortTime = primarySortTime,
     )
+
+private fun LocalDateTime.formatDynamically(): String {
+    val today = LocalDate.now().atStartOfDay()
+    return when {
+        this >= today -> format(shortTimeFormat)
+        else -> format(mediumDateTimeFormat)
+    }
+}
