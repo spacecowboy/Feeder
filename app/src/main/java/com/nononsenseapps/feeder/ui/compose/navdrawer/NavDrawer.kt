@@ -47,6 +47,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -617,13 +618,20 @@ private fun Feed(
         onItemClick = onItemClick,
         image = if (imageUrl != null) {
             {
+                val pixels = with(LocalDensity.current) {
+                    24.dp.roundToPx()
+                }
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imageUrl.toString()).listener(
                             onError = { a, b ->
                                 Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
                             },
-                        ).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
+                        )
+                        .scale(Scale.FIT)
+                        .size(pixels)
+                        .precision(Precision.INEXACT)
+                        .build(),
                     contentDescription = stringResource(id = R.string.feed_icon),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(24.dp),

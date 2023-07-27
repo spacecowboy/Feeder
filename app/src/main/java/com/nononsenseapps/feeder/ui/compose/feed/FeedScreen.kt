@@ -65,6 +65,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -127,9 +129,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
-import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
@@ -598,9 +598,9 @@ fun FeedScreen(
 
         val screenType by remember(windowSize) {
             derivedStateOf {
-                when (windowSize) {
-                    WindowSize.Compact -> FeedScreenType.FeedList
-                    WindowSize.CompactWide, WindowSize.Medium, WindowSize.Expanded -> FeedScreenType.FeedGrid
+                when {
+                    windowSize.widthSizeClass >= WindowWidthSizeClass.Medium && windowSize.heightSizeClass >= WindowHeightSizeClass.Medium -> FeedScreenType.FeedGrid
+                    else -> FeedScreenType.FeedList
                 }
             }
         }
@@ -918,9 +918,8 @@ fun FeedListContent(
                     ).run {
                         when (viewState.feedItemStyle) {
                             FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(
-                                start = LocalDimens.current.margin,
-                            )
+                            // No margin since dividers
+                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> this
                         }
                     }
                         .asPaddingValues()
@@ -977,7 +976,6 @@ fun FeedListContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
-                        newIndicator = !viewState.onlyUnread,
                         bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)
@@ -1054,6 +1052,7 @@ fun FeedGridContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
     val screenHeightPx = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
     }
@@ -1078,7 +1077,12 @@ fun FeedGridContent(
             )
         }
 
-        val arrangement = when (viewState.feedItemStyle) {
+        // Grid has hard-coded card
+        val feedItemStyle = remember {
+            FeedItemStyle.CARD
+        }
+
+        val arrangement = when (feedItemStyle) {
             FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
             FeedItemStyle.COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
             FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
@@ -1110,7 +1114,7 @@ fun FeedGridContent(
                         pagedFeedItems.itemSnapshotList.items[itemIndex].id
                     },
                     contentType = { itemIndex ->
-                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(viewState.feedItemStyle)
+                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(feedItemStyle)
                     },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]
@@ -1148,9 +1152,8 @@ fun FeedGridContent(
                         onlyUnread = viewState.onlyUnread,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,
-                        feedItemStyle = viewState.feedItemStyle,
+                        feedItemStyle = feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
-                        newIndicator = !viewState.onlyUnread,
                         bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)

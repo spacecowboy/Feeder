@@ -29,16 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
+import coil.size.Size
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
@@ -68,29 +71,32 @@ fun FeedItemCompact(
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
-    newIndicator: Boolean,
     bookmarkIndicator: Boolean,
+    imageWidth: Dp = 64.dp,
+    titleMaxLines: Int = 3,
+    snippetMaxLines: Int = 4,
     modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
-            .height(IntrinsicSize.Min),
+            .height(IntrinsicSize.Min)
+            .padding(start = LocalDimens.current.margin),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .weight(weight = 1.0f, fill = true)
                 .requiredHeightIn(min = minimumTouchSize)
-                .padding(vertical = 4.dp),
+                .padding(vertical = 8.dp),
         ) {
             WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
                     text = item.title,
                     style = FeedListItemTitleTextStyle(),
                     fontWeight = titleFontWeight(item.unread),
+                    maxLines = titleMaxLines,
                     modifier = Modifier
-                        .padding(start = 4.dp, end = 4.dp)
                         .fillMaxWidth(),
                 )
             }
@@ -117,8 +123,7 @@ fun FeedItemCompact(
                                 maxLines = 1,
                                 overflow = TextOverflow.Clip,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
+                                    .fillMaxWidth(),
                             )
                         }
                     }
@@ -185,57 +190,63 @@ fun FeedItemCompact(
                         text = item.snippet,
                         style = FeedListItemStyle(),
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = 4,
+                        maxLines = snippetMaxLines,
                         modifier = Modifier
-                            .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
                             .fillMaxWidth(),
                     )
                 }
             }
         }
 
-        val asUnread = item.unread && newIndicator
-        val asBookmarked = item.bookmarked && bookmarkIndicator
-        if (showThumbnail && (item.imageUrl != null || item.feedImageUrl != null) || asUnread || asBookmarked) {
+        if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.imageUrl != null || item.feedImageUrl != null)) {
             Box(
                 modifier = Modifier.fillMaxHeight(),
                 contentAlignment = Alignment.TopEnd,
             ) {
-                (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
-                    if (showThumbnail) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(imageUrl)
-                                .listener(
-                                    onError = { a, b ->
-                                        Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
-                                    },
-                                )
-                                .scale(Scale.FIT)
-                                .size(200)
-                                .precision(Precision.INEXACT)
-                                .build(),
-                            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
-                            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                            contentDescription = stringResource(id = R.string.article_image),
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .width(64.dp)
-                                .fillMaxHeight(),
-                        )
+                if (item.bookmarked && bookmarkIndicator) {
+                    FeedItemEitherIndicator(
+                        bookmarked = true,
+                        itemImage = null,
+                        feedImageUrl = null,
+                        size = 24.dp,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(64.dp),
+                    )
+                } else {
+                    (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
+                        if (showThumbnail) {
+                            val scale = if (item.imageUrl != null) {
+                                ContentScale.Crop
+                            } else {
+                                ContentScale.Fit
+                            }
+                            val pixels = with(LocalDensity.current) {
+                                Size(64.dp.roundToPx(), 96.dp.roundToPx())
+                            }
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(imageUrl)
+                                    .listener(
+                                        onError = { a, b ->
+                                            Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
+                                        },
+                                    )
+                                    .scale(Scale.FILL)
+                                    .size(pixels)
+                                    .precision(Precision.INEXACT)
+                                    .build(),
+                                placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+                                error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                contentDescription = stringResource(id = R.string.article_image),
+                                contentScale = scale,
+                                modifier = Modifier
+                                    .width(imageWidth)
+                                    .fillMaxHeight(),
+                            )
+                        }
                     }
                 }
-                FeedItemIndicatorColumn(
-                    unread = asUnread,
-                    bookmarked = asBookmarked,
-                    modifier = Modifier.padding(
-                        top = 4.dp,
-                        bottom = 4.dp,
-                        end = 4.dp,
-                    ),
-                    spacing = 4.dp,
-                    iconSize = 12.dp,
-                )
             }
         } else {
             // Taking Row spacing into account
@@ -272,10 +283,9 @@ data class FeedListItem(
      * Type will depend on having images as that will influence visible items
      */
     fun contentType(feedItemStyle: FeedItemStyle): String = when {
-            imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
-            feedImageUrl != null -> "$feedItemStyle/feedImage"
-            else -> "$feedItemStyle/textonly"
-        }
+        imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
+        else -> "$feedItemStyle/other"
+    }
 }
 
 @Composable
@@ -299,14 +309,14 @@ private fun PreviewRead() {
                     rawPubDate = null,
                 ),
                 showThumbnail = true,
+                bookmarkIndicator = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
-                newIndicator = true,
-                bookmarkIndicator = true,
+                imageWidth = 64.dp,
             )
         }
     }
@@ -327,20 +337,20 @@ private fun PreviewUnread() {
                     imageUrl = null,
                     link = null,
                     id = ID_UNSET,
-                    bookmarked = false,
+                    bookmarked = true,
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
                 ),
                 showThumbnail = true,
+                bookmarkIndicator = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
-                newIndicator = true,
-                bookmarkIndicator = true,
+                imageWidth = 64.dp,
             )
         }
     }
@@ -364,20 +374,20 @@ private fun PreviewWithImage() {
                         imageUrl = "blabla",
                         link = null,
                         id = ID_UNSET,
-                        bookmarked = true,
+                        bookmarked = false,
                         feedImageUrl = null,
                         primarySortTime = Instant.EPOCH,
                         rawPubDate = null,
                     ),
                     showThumbnail = true,
+                    bookmarkIndicator = true,
                     onMarkAboveAsRead = {},
                     onMarkBelowAsRead = {},
                     onShareItem = {},
                     onToggleBookmarked = {},
                     dropDownMenuExpanded = false,
                     onDismissDropdown = {},
-                    newIndicator = true,
-                    bookmarkIndicator = true,
+                    imageWidth = 64.dp,
                 )
             }
         }

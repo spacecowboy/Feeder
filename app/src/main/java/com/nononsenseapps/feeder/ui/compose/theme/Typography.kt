@@ -65,7 +65,7 @@ fun LinkTextStyle(): TextStyle =
 
 fun titleFontWeight(unread: Boolean) =
     if (unread) {
-        FontWeight.Bold
+        FontWeight.Black
     } else {
         FontWeight.Normal
     }
@@ -74,6 +74,14 @@ fun titleFontWeight(unread: Boolean) =
 fun FeedListItemTitleTextStyle(): TextStyle =
     MaterialTheme.typography.titleMedium.merge(
         TextStyle(lineBreak = LineBreak.Paragraph, hyphens = Hyphens.Auto),
+    )
+
+@Composable
+fun FeedListItemSnippetTextStyle(): TextStyle =
+    MaterialTheme.typography.titleSmall.merge(
+        TextStyle(
+            lineBreak = LineBreak.Paragraph, hyphens = Hyphens.Auto,
+        ),
     )
 
 @Composable
