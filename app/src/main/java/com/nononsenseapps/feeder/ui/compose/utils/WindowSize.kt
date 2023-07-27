@@ -35,6 +35,13 @@ fun isCompactLandscape(): Boolean {
         LocalWindowSize.current.heightSizeClass == WindowHeightSizeClass.Compact
 }
 
+@Composable
+fun isCompactDevice(): Boolean {
+    val windowSize = LocalWindowSize.current
+    return windowSize.heightSizeClass == WindowHeightSizeClass.Compact ||
+        windowSize.widthSizeClass == WindowWidthSizeClass.Compact
+}
+
 enum class ScreenType {
     DUAL,
     SINGLE,
