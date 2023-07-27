@@ -94,6 +94,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
+import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
@@ -364,14 +365,16 @@ fun SettingsList(
             onCheckedChanged = onShowFabChanged,
         )
 
-        MenuSetting(
-            title = stringResource(id = R.string.feed_item_style),
-            currentValue = feedItemStyleValue.asFeedItemStyleOption(),
-            values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
-            onSelection = {
-                onFeedItemStyleChanged(it.feedItemStyle)
-            },
-        )
+        if (isCompactDevice()) {
+            MenuSetting(
+                title = stringResource(id = R.string.feed_item_style),
+                currentValue = feedItemStyleValue.asFeedItemStyleOption(),
+                values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
+                onSelection = {
+                    onFeedItemStyleChanged(it.feedItemStyle)
+                },
+            )
+        }
 
         MenuSetting(
             title = stringResource(id = R.string.swipe_to_mark_as_read),

@@ -65,8 +65,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -128,8 +126,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
+import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
@@ -594,15 +592,9 @@ fun FeedScreen(
             }
         },
     ) { innerModifier ->
-        val windowSize = LocalWindowSize()
-
-        val screenType by remember(windowSize) {
-            derivedStateOf {
-                when {
-                    windowSize.widthSizeClass >= WindowWidthSizeClass.Medium && windowSize.heightSizeClass >= WindowHeightSizeClass.Medium -> FeedScreenType.FeedGrid
-                    else -> FeedScreenType.FeedList
-                }
-            }
+        val screenType = when (isCompactDevice()) {
+            true -> FeedScreenType.FeedList
+            false -> FeedScreenType.FeedGrid
         }
 
         when (screenType) {
@@ -1120,26 +1112,24 @@ fun FeedGridContent(
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
 
-                    // TODO
-                    // Because staggered items - it is horrible when hiding read items
-                    // Because the new tag moves the text to fit - it is horrible when showing read items
-//                    if (viewState.markAsReadOnScroll && previewItem.unread) {
-//                        val visible: Boolean by gridState.rememberIsItemVisible(
-//                            key = previewItem.id,
-//                        )
-//                        val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
-//                            key = previewItem.id,
-//                            screenHeightPx = screenHeightPx,
-//                        )
-//                        MarkItemAsReadOnScroll(
-//                            itemId = previewItem.id,
-//                            visible = visible,
-//                            mostlyVisible = mostlyVisible,
-//                            currentFeedOrTag = viewState.currentFeedOrTag,
-//                            coroutineScope = coroutineScope,
-//                            markAsRead = markAsUnread,
-//                        )
-//                    }
+                    // Very important that items don't change size or disappear when scrolling
+                    if (viewState.markAsReadOnScroll && previewItem.unread) {
+                        val visible: Boolean by gridState.rememberIsItemVisible(
+                            key = previewItem.id,
+                        )
+                        val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
+                            key = previewItem.id,
+                            screenHeightPx = screenHeightPx,
+                        )
+                        MarkItemAsReadOnScroll(
+                            itemId = previewItem.id,
+                            visible = visible,
+                            mostlyVisible = mostlyVisible,
+                            currentFeedOrTag = viewState.currentFeedOrTag,
+                            coroutineScope = coroutineScope,
+                            markAsRead = markAsUnread,
+                        )
+                    }
 
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
