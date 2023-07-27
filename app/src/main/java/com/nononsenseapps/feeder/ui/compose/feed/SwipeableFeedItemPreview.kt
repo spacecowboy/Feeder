@@ -53,6 +53,7 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
+import com.nononsenseapps.feeder.ui.compose.utils.isCompactLandscape
 import com.nononsenseapps.feeder.util.logDebug
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -76,7 +77,6 @@ fun SwipeableFeedItemPreview(
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
     swipeAsRead: SwipeAsRead,
-    newIndicator: Boolean,
     bookmarkIndicator: Boolean,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -234,24 +234,26 @@ fun SwipeableFeedItemPreview(
             }
         }
 
+        val compactLandscape = isCompactLandscape()
+
         when (feedItemStyle) {
             FeedItemStyle.CARD -> {
                 FeedItemCard(
                     item = item,
-                    showThumbnail = showThumbnail,
+                    showThumbnail = showThumbnail && !compactLandscape,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
                     onToggleBookmarked = onToggleBookmarked,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
-                    newIndicator = newIndicator,
                     bookmarkIndicator = bookmarkIndicator,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
                 )
             }
+
             FeedItemStyle.COMPACT -> {
                 FeedItemCompact(
                     item = item,
@@ -262,24 +264,34 @@ fun SwipeableFeedItemPreview(
                     onToggleBookmarked = onToggleBookmarked,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
-                    newIndicator = false,
                     bookmarkIndicator = bookmarkIndicator,
+                    imageWidth = when (compactLandscape) {
+                        true -> 196.dp
+                        false -> 64.dp
+                    },
+                    titleMaxLines = when (compactLandscape) {
+                        true -> 2
+                        false -> 3
+                    },
+                    snippetMaxLines = when (compactLandscape) {
+                        true -> 2
+                        false -> 4
+                    },
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
                 )
             }
+
             FeedItemStyle.SUPER_COMPACT -> {
                 FeedItemSuperCompact(
                     item = item,
-                    showThumbnail = showThumbnail,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
                     onToggleBookmarked = onToggleBookmarked,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
-                    newIndicator = false,
                     bookmarkIndicator = bookmarkIndicator,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
@@ -306,6 +318,7 @@ fun SwipeableFeedItemPreview(
                                     this
                                         .height(0.dp)
                                         .width(0.dp)
+
                                 SwipeAsRead.ONLY_FROM_END -> {
                                     anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
                                     this
@@ -313,6 +326,7 @@ fun SwipeableFeedItemPreview(
                                         .width(this@BoxWithConstraints.maxWidth / 4)
                                         .align(Alignment.CenterEnd)
                                 }
+
                                 SwipeAsRead.FROM_ANYWHERE -> {
                                     anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
                                     anchors[maxWidthPx] = FeedItemSwipeState.RIGHT

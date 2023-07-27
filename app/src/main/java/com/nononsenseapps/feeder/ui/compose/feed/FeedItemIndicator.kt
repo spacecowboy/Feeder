@@ -1,115 +1,172 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import androidx.compose.foundation.layout.Arrangement
+import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
+import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import okhttp3.HttpUrl
 
 @Composable
-fun FeedItemIndicatorRow(
-    unread: Boolean,
+fun FeedItemEitherIndicator(
     bookmarked: Boolean,
+    itemImage: String?,
+    feedImageUrl: HttpUrl?,
     modifier: Modifier = Modifier,
+    size: Dp = 8.dp,
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (unread) {
-            FeedItemIndicator {
-                Text(stringResource(id = R.string.new_indicator))
-            }
-        }
-        if (bookmarked) {
-            FeedItemIndicator {
-                Icon(
-                    Icons.Default.Star,
-                    contentDescription = stringResource(id = R.string.saved_article),
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun FeedItemIndicatorColumn(
-    unread: Boolean,
-    bookmarked: Boolean,
-    modifier: Modifier = Modifier,
-    spacing: Dp = 8.dp,
-    iconSize: Dp = 16.dp,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(spacing),
-        horizontalAlignment = Alignment.End,
-    ) {
-        if (unread) {
-            FeedItemIndicator {
-                Text(stringResource(id = R.string.new_indicator))
-            }
-        }
-        if (bookmarked) {
-            FeedItemIndicator {
-                Icon(
-                    Icons.Default.Star,
-                    contentDescription = stringResource(id = R.string.saved_article),
-                    modifier = Modifier.size(iconSize),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun FeedItemIndicator(
-    modifier: Modifier = Modifier,
-    content: @Composable (() -> Unit),
-) {
-    ProvideTextStyle(
-        value = MaterialTheme.typography.labelMedium,
-    ) {
-        Surface(
+    when {
+        bookmarked -> FeedItemSavedIndicator(size = size, modifier = modifier)
+//        unread -> FeedItemNewIndicator(size = size, modifier = modifier)
+        itemImage != null -> FeedItemImageIndicator(
+            imageUrl = itemImage,
+            size = size,
             modifier = modifier,
-            color = MaterialTheme.colorScheme.tertiaryContainer,
-            shape = MaterialTheme.shapes.medium,
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .defaultMinSize(
-                        minHeight = 24.dp,
-                    )
-                    .padding(
-                        start = 8.dp,
-                        end = 8.dp,
-                    ),
-            ) {
-                content()
-            }
+        )
+
+        feedImageUrl != null -> FeedItemFeedIconIndicator(
+            feedImageUrl = feedImageUrl,
+            size = size,
+            modifier = modifier,
+        )
+
+        else -> Box(modifier = modifier) {
+            Spacer(modifier = Modifier.size(size))
         }
+    }
+}
+
+@Composable
+fun FeedItemImageIndicator(
+    imageUrl: String,
+    size: Dp,
+    modifier: Modifier = Modifier,
+) {
+    val pixels = with(LocalDensity.current) {
+        size.roundToPx()
+    }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .listener(
+                    onError = { a, b ->
+                        Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                    },
+                )
+                .scale(Scale.FIT)
+                .size(pixels)
+                .precision(Precision.INEXACT)
+                .build(),
+            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+            contentDescription = stringResource(id = R.string.feed_icon),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .size(size),
+        )
+    }
+}
+
+@Composable
+fun FeedItemFeedIconIndicator(
+    feedImageUrl: HttpUrl,
+    size: Dp,
+    modifier: Modifier = Modifier,
+) {
+    val pixels = with(LocalDensity.current) {
+        size.roundToPx()
+    }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(feedImageUrl)
+                .listener(
+                    onError = { a, b ->
+                        Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                    },
+                )
+                .scale(Scale.FIT)
+                .size(pixels)
+                .precision(Precision.INEXACT)
+                .build(),
+            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+            contentDescription = stringResource(id = R.string.feed_icon),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(size),
+        )
+    }
+}
+
+@Composable
+fun FeedItemNewIndicator(
+    size: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        Icon(
+            Icons.Outlined.Circle,
+            contentDescription = stringResource(id = R.string.unread),
+            modifier = Modifier
+                .size(size),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+    }
+}
+
+@Composable
+fun FeedItemSavedIndicator(
+    size: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
+        Icon(
+            Icons.Default.Star,
+            contentDescription = stringResource(id = R.string.saved_article),
+            modifier = Modifier
+                .size(size),
+            tint = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
@@ -123,10 +180,10 @@ fun PreviewLightFeedItemIndicatorRow() {
                 modifier = Modifier
                     .padding(32.dp),
             ) {
-                FeedItemIndicatorRow(
-                    unread = true,
-                    bookmarked = true,
-                )
+                Row {
+                    FeedItemNewIndicator(size = 8.dp)
+                    FeedItemSavedIndicator(size = 8.dp)
+                }
             }
         }
     }
@@ -142,48 +199,10 @@ fun PreviewDarkFeedItemIndicatorRow() {
                 modifier = Modifier
                     .padding(32.dp),
             ) {
-                FeedItemIndicatorRow(
-                    unread = true,
-                    bookmarked = true,
-                )
-            }
-        }
-    }
-}
-
-@Preview("Light")
-@Composable
-fun PreviewLightFeedItemIndicatorColumn() {
-    FeederTheme(currentTheme = ThemeOptions.DAY) {
-        Surface {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(32.dp),
-            ) {
-                FeedItemIndicatorColumn(
-                    unread = true,
-                    bookmarked = true,
-                )
-            }
-        }
-    }
-}
-
-@Preview("Dark")
-@Composable
-fun PreviewDarkFeedItemIndicatorColumn() {
-    FeederTheme(currentTheme = ThemeOptions.NIGHT) {
-        Surface {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(32.dp),
-            ) {
-                FeedItemIndicatorColumn(
-                    unread = true,
-                    bookmarked = true,
-                )
+                Row {
+                    FeedItemNewIndicator(size = 8.dp)
+                    FeedItemSavedIndicator(size = 8.dp)
+                }
             }
         }
     }

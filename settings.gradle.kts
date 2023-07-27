@@ -144,6 +144,7 @@ dependencyResolutionManagement {
                 require("1.1.0")
             }
             library("compose-material", "androidx.compose.material", "material").withoutVersion()
+            library("compose-material3-windowsizeclass", "androidx.compose.material3", "material3-window-size-class").withoutVersion()
             library(
                 "compose-material-icons-extended",
                 "androidx.compose.material",

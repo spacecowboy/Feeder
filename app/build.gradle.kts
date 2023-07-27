@@ -261,6 +261,7 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.navigation.animation)
     implementation(libs.accompanist.adaptive)
+    implementation(libs.compose.material3.windowsizeclass)
 
     // Better times
     implementation(libs.threeten.abp)
