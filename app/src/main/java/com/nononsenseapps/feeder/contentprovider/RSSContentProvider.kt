@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
+import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -79,7 +80,7 @@ class RSSContentProvider : ContentProvider(), DIAware {
     }
 
     companion object {
-        private const val AUTHORITY = "com.nononsenseapps.feeder.rssprovider"
+        private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.rssprovider"
         private const val URI_FEED_LIST = 1
         private const val URI_ARTICLE_LIST = 2
         private const val URI_ARTICLE_IN_FEED_LIST = 3

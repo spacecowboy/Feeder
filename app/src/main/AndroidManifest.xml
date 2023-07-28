@@ -15,7 +15,7 @@
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
   <permission
-    android:name="com.nononsenseapps.feeder.permission.read"
+    android:name="${applicationId}.permission.read"
     android:description="@string/permission_read_desc"
     android:label="@string/permission_read_label" />
 
@@ -192,8 +192,8 @@
 
     <provider
       android:name=".contentprovider.RSSContentProvider"
-      android:authorities="com.nononsenseapps.feeder.rssprovider"
+      android:authorities="${applicationId}.rssprovider"
       android:exported="true"
-      android:readPermission="com.nononsenseapps.feeder.permission.read" />
+      android:readPermission="${applicationId}.permission.read" />
   </application>
 </manifest>

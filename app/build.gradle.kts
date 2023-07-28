@@ -99,6 +99,9 @@ android {
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
             }
+//            else {
+//                signingConfig = signingConfigs.getByName("shareddebug")
+//            }
         }
         val play by creating {
             applicationIdSuffix = ".play"
@@ -111,6 +114,9 @@ android {
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
             }
+//            else {
+//                signingConfig = signingConfigs.getByName("shareddebug")
+//            }
         }
     }
 
