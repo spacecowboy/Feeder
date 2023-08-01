@@ -125,6 +125,10 @@ class FeedArticleViewModel(
         }
     }
 
+    fun markAsReadOnSwipe(itemId: Long) = applicationCoroutineScope.launch {
+        repository.markAsReadAndNotified(itemId = itemId, readTimeBeforeMinReadTime = true)
+    }
+
     fun markBeforeAsRead(cursor: FeedItemCursor) = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
         repository.markBeforeAsRead(cursor, feedId, feedTag)

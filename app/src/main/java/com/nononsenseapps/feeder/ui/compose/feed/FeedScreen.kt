@@ -301,6 +301,16 @@ fun FeedScreen(
                     viewModel.markAsRead(itemId, feedOrTag)
                 }
             },
+            markAsReadOnSwipe = { itemId, unread ->
+                if (viewState.onlyUnread) {
+                    // Get rid of it
+                    viewModel.markAsReadOnSwipe(itemId)
+                } else if (unread) {
+                    viewModel.markAsUnread(itemId)
+                } else {
+                    viewModel.markAsRead(itemId, null)
+                }
+            },
             markBeforeAsRead = { cursor ->
                 viewModel.markBeforeAsRead(cursor)
             },
@@ -358,6 +368,7 @@ fun FeedScreen(
     onExport: () -> Unit,
     drawerState: DrawerState,
     markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsReadOnSwipe: (Long, Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
@@ -611,6 +622,7 @@ fun FeedScreen(
                 },
                 onAddFeed = onAddFeed,
                 markAsUnread = markAsUnread,
+                markAsReadOnSwipe = markAsReadOnSwipe,
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
                 onItemClick = onOpenFeedItem,
@@ -633,6 +645,7 @@ fun FeedScreen(
                 },
                 onAddFeed = onAddFeed,
                 markAsUnread = markAsUnread,
+                markAsReadOnSwipe = markAsReadOnSwipe,
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
                 onItemClick = onOpenFeedItem,
@@ -853,6 +866,7 @@ fun FeedListContent(
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsReadOnSwipe: (Long, Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
@@ -957,10 +971,9 @@ fun FeedListContent(
 
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
-                            markAsUnread(
+                            markAsReadOnSwipe(
                                 previewItem.id,
                                 !currentState,
-                                null,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,
@@ -1034,6 +1047,7 @@ fun FeedGridContent(
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsReadOnSwipe: (Long, Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
@@ -1133,10 +1147,9 @@ fun FeedGridContent(
 
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
-                            markAsUnread(
+                            markAsReadOnSwipe(
                                 previewItem.id,
                                 !currentState,
-                                null,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,

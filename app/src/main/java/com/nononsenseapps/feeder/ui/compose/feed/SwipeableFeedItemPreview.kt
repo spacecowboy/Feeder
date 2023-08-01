@@ -95,7 +95,7 @@ fun SwipeableFeedItemPreview(
     val color by animateColorAsState(
         when {
             swipeableState.targetValue == FeedItemSwipeState.NONE -> Color.Transparent
-            item.unread -> SwipingItemToReadColor
+            item.unread || onlyUnread -> SwipingItemToReadColor
             else -> SwipingItemToUnreadColor
         },
     )
