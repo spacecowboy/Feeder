@@ -126,8 +126,18 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsRead(itemIds)
     }
 
-    suspend fun markAsReadAndNotified(itemId: Long) {
-        dao.markAsReadAndNotified(itemId)
+    suspend fun markAsReadAndNotified(itemId: Long, readTime: Instant = Instant.now()) {
+        dao.markAsReadAndNotified(
+            id = itemId,
+            readTime = readTime.coerceAtLeast(Instant.EPOCH),
+        )
+    }
+
+    suspend fun markAsReadAndNotifiedAndOverwriteReadTime(itemId: Long, readTime: Instant) {
+        dao.markAsReadAndNotifiedAndOverwriteReadTime(
+            id = itemId,
+            readTime = readTime.coerceAtLeast(Instant.EPOCH),
+        )
     }
 
     suspend fun markAsUnread(itemId: Long) {

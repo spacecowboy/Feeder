@@ -297,8 +297,18 @@ class Repository(override val di: DI) : DIAware {
 
     val feedNotificationSettings: Flow<List<FeedForSettings>> = feedStore.feedForSettings
 
-    suspend fun markAsReadAndNotified(itemId: Long) {
-        feedItemStore.markAsReadAndNotified(itemId)
+    suspend fun markAsReadAndNotified(itemId: Long, readTimeBeforeMinReadTime: Boolean = false) {
+        minReadTime.value.let { minReadTimeValue ->
+            if (readTimeBeforeMinReadTime && minReadTimeValue.isAfter(Instant.EPOCH)) {
+                // If read time is not EPOCH, one second before so swipe can get rid of it
+                feedItemStore.markAsReadAndNotifiedAndOverwriteReadTime(
+                    itemId,
+                    minReadTimeValue.minusSeconds(1),
+                )
+            } else {
+                feedItemStore.markAsReadAndNotified(itemId)
+            }
+        }
         scheduleSendRead()
     }
 
