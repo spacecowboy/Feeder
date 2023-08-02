@@ -58,7 +58,7 @@ class SettingsStore(override val di: DI) : DIAware {
         when (_showOnlyUnread.value) {
             true -> Instant.now()
             false -> Instant.EPOCH
-        }
+        },
     )
     val minReadTime: StateFlow<Instant> = _minReadTime.asStateFlow()
     fun setMinReadTime(value: Instant) {
@@ -115,14 +115,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentTheme = MutableStateFlow(
-        try {
-            ThemeOptions.valueOf(
-                sp.getString(PREF_THEME, null)?.uppercase()
-                    ?: ThemeOptions.SYSTEM.name,
-            )
-        } catch (_: Exception) {
-            ThemeOptions.SYSTEM
-        },
+        themeOptionsFromString(
+            sp.getString(PREF_THEME, null)?.uppercase()
+                ?: ThemeOptions.SYSTEM.name,
+        ),
     )
     val currentTheme = _currentTheme.asStateFlow()
     fun setCurrentTheme(value: ThemeOptions) {
@@ -131,7 +127,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _darkThemePreference = MutableStateFlow(
-        DarkThemePreferences.valueOf(
+        darkThemePreferenceFromString(
             sp.getString(PREF_DARK_THEME, null)?.uppercase()
                 ?: DarkThemePreferences.BLACK.name,
         ),
@@ -143,7 +139,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentSorting = MutableStateFlow(
-        SortingOptions.valueOf(
+        sortingOptionsFromString(
             sp.getString(PREF_SORT, null)?.uppercase()
                 ?: SortingOptions.NEWEST_FIRST.name,
         ),
@@ -170,7 +166,7 @@ class SettingsStore(override val di: DI) : DIAware {
 
     private val _syncOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_WIFI, false))
     val syncOnlyOnWifi = _syncOnlyOnWifi.asStateFlow()
-    suspend fun setSyncOnlyOnWifi(value: Boolean) {
+    fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
         configurePeriodicSync(replace = true)
@@ -179,7 +175,7 @@ class SettingsStore(override val di: DI) : DIAware {
     private val _syncOnlyWhenCharging =
         MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
     val syncOnlyWhenCharging = _syncOnlyWhenCharging.asStateFlow()
-    suspend fun setSyncOnlyWhenCharging(value: Boolean) {
+    fun setSyncOnlyWhenCharging(value: Boolean) {
         _syncOnlyWhenCharging.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, value).apply()
         configurePeriodicSync(replace = true)
@@ -242,14 +238,12 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _itemOpener = MutableStateFlow(
-        when (sp.getStringNonNull(PREF_DEFAULT_OPEN_ITEM_WITH, PREF_VAL_OPEN_WITH_READER)) {
-            PREF_VAL_OPEN_WITH_BROWSER -> ItemOpener.DEFAULT_BROWSER
-            PREF_VAL_OPEN_WITH_WEBVIEW,
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB,
-            -> ItemOpener.CUSTOM_TAB
-
-            else -> ItemOpener.READER
-        },
+        itemOpenerFromString(
+            sp.getStringNonNull(
+                PREF_DEFAULT_OPEN_ITEM_WITH,
+                PREF_VAL_OPEN_WITH_READER,
+            ),
+        ),
     )
     val itemOpener = _itemOpener.asStateFlow()
     fun setItemOpener(value: ItemOpener) {
@@ -265,10 +259,9 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _linkOpener = MutableStateFlow(
-        when (sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_CUSTOM_TAB)) {
-            PREF_VAL_OPEN_WITH_BROWSER -> LinkOpener.DEFAULT_BROWSER
-            else -> LinkOpener.CUSTOM_TAB
-        },
+        linkOpenerFromString(
+            sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_CUSTOM_TAB),
+        ),
     )
     val linkOpener = _linkOpener.asStateFlow()
     fun setLinkOpener(value: LinkOpener) {
@@ -283,12 +276,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _feedItemStyle = MutableStateFlow(
-        when (sp.getStringNonNull(PREF_FEED_ITEM_STYLE, FeedItemStyle.CARD.name)) {
-            FeedItemStyle.CARD.name -> FeedItemStyle.CARD
-            FeedItemStyle.COMPACT.name -> FeedItemStyle.COMPACT
-            FeedItemStyle.SUPER_COMPACT.name -> FeedItemStyle.SUPER_COMPACT
-            else -> FeedItemStyle.CARD
-        },
+        feedItemStyleFromString(sp.getStringNonNull(PREF_FEED_ITEM_STYLE, FeedItemStyle.CARD.name)),
     )
     val feedItemStyle = _feedItemStyle.asStateFlow()
     fun setFeedItemStyle(value: FeedItemStyle) {
@@ -300,13 +288,9 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _swipeAsRead = MutableStateFlow(
-        try {
-            SwipeAsRead.valueOf(
-                sp.getStringNonNull(PREF_SWIPE_AS_READ, SwipeAsRead.ONLY_FROM_END.name),
-            )
-        } catch (_: Exception) {
-            SwipeAsRead.ONLY_FROM_END
-        },
+        swipeAsReadFromString(
+            sp.getStringNonNull(PREF_SWIPE_AS_READ, SwipeAsRead.ONLY_FROM_END.name),
+        ),
     )
     val swipeAsRead = _swipeAsRead.asStateFlow()
     fun setSwipeAsRead(value: SwipeAsRead) {
@@ -342,17 +326,12 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _syncFrequency by lazy {
-        val savedValue = sp.getStringNonNull(PREF_SYNC_FREQ, "60").toLong()
         MutableStateFlow(
-            SyncFrequency.values()
-                .firstOrNull {
-                    it.minutes == savedValue
-                }
-                ?: SyncFrequency.MANUAL,
+            syncFrequencyFromString(sp.getStringNonNull(PREF_SYNC_FREQ, "60")),
         )
     }
     val syncFrequency = _syncFrequency.asStateFlow()
-    suspend fun setSyncFrequency(value: SyncFrequency) {
+    fun setSyncFrequency(value: SyncFrequency) {
         _syncFrequency.value = value
         sp.edit().putString(PREF_SYNC_FREQ, "${value.minutes}").apply()
         configurePeriodicSync(replace = true)
@@ -402,15 +381,19 @@ class SettingsStore(override val di: DI) : DIAware {
         }
     }
 
+    fun getAllSettings(): Map<String, String> {
+        val all = sp.all ?: emptyMap()
+
+        val userPrefs = UserSettings.values().mapTo(mutableSetOf()) { it.key }
+
+        return all.filterKeys { it in userPrefs }
+            .mapValues { (_, value) -> value.toString() }
+    }
+
     companion object {
-        private const val LOG_TAG = "FEEDER_SETTINGSSTORE"
+//        private const val LOG_TAG = "FEEDER_SETTINGSSTORE"
     }
 }
-
-/**
- * Boolean indicating whether we performed the (one-time) welcome flow.
- */
-const val PREF_WELCOME_DONE = "pref_welcome_done"
 
 /**
  * Boolean indicating if only unread items should be shown
@@ -474,7 +457,6 @@ const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
  */
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
-const val PREF_PRELOAD_CUSTOM_TAB = "pref_preload_custom_tab"
 
 const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
@@ -490,11 +472,49 @@ const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
-enum class PrefValOpenWith {
-    OPEN_WITH_DEFAULT,
-    OPEN_WITH_READER,
-    OPEN_WITH_CUSTOM_TAB,
-    OPEN_WITH_BROWSER,
+enum class SettingType {
+    STRING,
+    FLOAT,
+    BOOLEAN,
+}
+
+/**
+ * Used for OPML Import/Export. Please add new (only) user configurable settings here
+ */
+enum class UserSettings(val key: String, val type: SettingType) {
+    SETTING_SHOW_ONLY_UNREAD(key = PREF_SHOW_ONLY_UNREAD, type = SettingType.BOOLEAN),
+    SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS, type = SettingType.BOOLEAN),
+    SETTING_THEME(key = PREF_THEME, type = SettingType.STRING),
+    SETTING_DARK_THEME(key = PREF_DARK_THEME, type = SettingType.STRING),
+    SETTING_DYNAMIC_THEME(key = PREF_DYNAMIC_THEME, type = SettingType.BOOLEAN),
+    SETTING_SORT(key = PREF_SORT, type = SettingType.STRING),
+    SETTING_SHOW_FAB(key = PREF_SHOW_FAB, type = SettingType.BOOLEAN),
+    SETTING_FEED_ITEM_STYLE(key = PREF_FEED_ITEM_STYLE, type = SettingType.STRING),
+    SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ, type = SettingType.STRING),
+    SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING, type = SettingType.BOOLEAN),
+    SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI, type = SettingType.BOOLEAN),
+    SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ, type = SettingType.STRING),
+    SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME, type = SettingType.BOOLEAN),
+    SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI, type = SettingType.BOOLEAN),
+    SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS, type = SettingType.BOOLEAN),
+    SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH, type = SettingType.STRING),
+    SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH, type = SettingType.STRING),
+    SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE, type = SettingType.FLOAT),
+    SETTING_IS_MARK_AS_READ_ON_SCROLL(
+        key = PREF_IS_MARK_AS_READ_ON_SCROLL,
+        type = SettingType.BOOLEAN,
+    ),
+    SETTING_READALOUD_USE_DETECT_LANGUAGE(
+        key = PREF_READALOUD_USE_DETECT_LANGUAGE,
+        type = SettingType.BOOLEAN,
+    ),
+    ;
+
+    companion object {
+        fun fromKey(key: String): UserSettings? {
+            return values().firstOrNull { it.key.equals(key, ignoreCase = true) }
+        }
+    }
 }
 
 enum class ThemeOptions(
@@ -575,3 +595,54 @@ fun String.dropEnds(
         (length - ending).coerceAtLeast(0),
     )
 }
+
+fun linkOpenerFromString(value: String): LinkOpener = when (value) {
+    PREF_VAL_OPEN_WITH_BROWSER -> LinkOpener.DEFAULT_BROWSER
+    else -> LinkOpener.CUSTOM_TAB
+}
+
+fun itemOpenerFromString(value: String) = when (value) {
+    PREF_VAL_OPEN_WITH_BROWSER -> ItemOpener.DEFAULT_BROWSER
+    PREF_VAL_OPEN_WITH_WEBVIEW,
+    PREF_VAL_OPEN_WITH_CUSTOM_TAB,
+    -> ItemOpener.CUSTOM_TAB
+
+    else -> ItemOpener.READER
+}
+
+fun sortingOptionsFromString(value: String): SortingOptions = try {
+    SortingOptions.valueOf(value.uppercase())
+} catch (_: Exception) {
+    SortingOptions.NEWEST_FIRST
+}
+
+fun themeOptionsFromString(value: String) = try {
+    ThemeOptions.valueOf(value.uppercase())
+} catch (_: Exception) {
+    ThemeOptions.SYSTEM
+}
+
+fun darkThemePreferenceFromString(value: String): DarkThemePreferences = try {
+    DarkThemePreferences.valueOf(value.uppercase())
+} catch (_: Exception) {
+    DarkThemePreferences.BLACK
+}
+
+fun swipeAsReadFromString(value: String): SwipeAsRead = try {
+    SwipeAsRead.valueOf(value.uppercase())
+} catch (_: Exception) {
+    SwipeAsRead.ONLY_FROM_END
+}
+
+fun feedItemStyleFromString(value: String) = try {
+    FeedItemStyle.valueOf(value.uppercase())
+} catch (_: Exception) {
+    FeedItemStyle.CARD
+}
+
+fun syncFrequencyFromString(value: String) =
+    SyncFrequency.values()
+        .firstOrNull {
+            it.minutes == value.toLongOrNull()
+        }
+        ?: SyncFrequency.MANUAL

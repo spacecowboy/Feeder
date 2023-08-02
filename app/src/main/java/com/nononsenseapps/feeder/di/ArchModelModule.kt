@@ -8,6 +8,8 @@ import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.SyncRemoteStore
 import com.nononsenseapps.feeder.base.bindWithActivityViewModelScope
 import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
+import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.model.opml.OPMLImporter
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -28,6 +30,7 @@ val archModelModule = DI.Module(name = "arch models") {
     bind<FeedStore>() with singleton { FeedStore(di) }
     bind<FeedItemStore>() with singleton { FeedItemStore(di) }
     bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
+    bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
 
     bindWithActivityViewModelScope<MainActivityViewModel>()
     bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
