@@ -9,7 +9,6 @@ import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_FEEDURL
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import java.net.URL
 import org.threeten.bp.Instant
 
@@ -35,7 +34,7 @@ data class RemoteReadMark @Ignore constructor(
     @ColumnInfo(name = COL_ID)
     var id: Long = ID_UNSET,
     @ColumnInfo(name = "sync_remote") var sync_remote: Long = ID_UNSET,
-    @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURL(""),
+    @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = URL("http://"),
     @ColumnInfo(name = COL_GUID) var guid: String = "",
     @ColumnInfo(
         name = "timestamp",

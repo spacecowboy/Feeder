@@ -73,6 +73,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
+import com.nononsenseapps.feeder.util.asUTF8Sequence
 import java.io.InputStream
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -1203,29 +1204,21 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
     builder: HtmlParser,
     stripLeading: Boolean,
 ) {
-    val string = wholeText
-
-    var reachedNonWhite = false
-    var lastWasWhite = false
-    var i = 0
-    while (i < string.length) {
-        val code = string.codePointAt(i)
-
-        // Unicode smileys are an example of where toChar() won't work. Needs to be String.
-        val char = String(intArrayOf(code), 0, 1)
-        i += Character.charCount(code)
-
-        lastWasWhite = if (isCollapsableWhiteSpace(char)) {
-            if (!(stripLeading && !reachedNonWhite || lastWasWhite)) {
-                builder.append(' ')
-            }
-            true
-        } else {
-            reachedNonWhite = true
-            builder.append(char)
-            false
+    wholeText.asUTF8Sequence()
+        .dropWhile {
+            stripLeading && isCollapsableWhiteSpace(it)
         }
-    }
+        .fold(false) { lastWasWhite, char ->
+            if (isCollapsableWhiteSpace(char)) {
+                if (!lastWasWhite) {
+                    builder.append(' ')
+                }
+                true
+            } else {
+                builder.append(char)
+                false
+            }
+        }
 }
 
 fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(

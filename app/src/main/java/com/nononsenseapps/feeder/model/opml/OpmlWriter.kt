@@ -10,23 +10,33 @@ import kotlinx.coroutines.withContext
 
 suspend fun writeFile(
     path: String,
+    settings: Map<String, String>,
+    blockedPatterns: List<String>,
     tags: Iterable<String>,
     feedsWithTag: suspend (String) -> Iterable<Feed>,
 ) {
     withContext(Dispatchers.IO) {
-        writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
+        writeOutputStream(
+            os = FileOutputStream(path),
+            settings = settings,
+            blockedPatterns = blockedPatterns,
+            tags = tags,
+            feedsWithTag = feedsWithTag,
+        )
     }
 }
 
 suspend fun writeOutputStream(
     os: OutputStream,
+    settings: Map<String, String>,
+    blockedPatterns: List<String>,
     tags: Iterable<String>,
     feedsWithTag: suspend (String) -> Iterable<Feed>,
-) {
+) = withContext(Dispatchers.IO) {
     try {
-        os.bufferedWriter().use {
-            it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            it.write(
+        os.bufferedWriter().use { bw ->
+            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            bw.write(
                 opml {
                     head {
                         title { +"Feeder" }
@@ -35,20 +45,27 @@ suspend fun writeOutputStream(
                         tags.forEach { tag ->
                             if (tag.isEmpty()) {
                                 feedsWithTag(tag).forEach { feed ->
-                                    outline(
-                                        title = escape(feed.displayTitle),
-                                        type = "rss",
-                                        xmlUrl = escape(feed.url.toString()),
-                                    ) {}
+                                    feed.toOutline()
                                 }
                             } else {
                                 outline(title = escape(tag)) {
                                     feedsWithTag(tag).forEach { feed ->
-                                        outline(
-                                            title = escape(feed.displayTitle),
-                                            type = "rss",
-                                            xmlUrl = escape(feed.url.toString()),
-                                        ) {}
+                                        feed.toOutline()
+                                    }
+                                }
+                            }
+                        }
+                        if (settings.isNotEmpty() || blockedPatterns.isNotEmpty()) {
+                            feederSettings {
+                                settings.forEach { (prefKey, prefValue) ->
+                                    feederSetting {
+                                        key = prefKey
+                                        value = escape(prefValue)
+                                    }
+                                }
+                                blockedPatterns.forEach { blockedPattern ->
+                                    feederBlocked {
+                                        pattern = escape(blockedPattern)
                                     }
                                 }
                             }
@@ -58,7 +75,7 @@ suspend fun writeOutputStream(
             )
         }
     } catch (e: IOException) {
-        Log.e("OmplWriter", "Failed to write stream", e)
+        Log.e(LOG_TAG, "Failed to write stream", e)
     }
 }
 
@@ -155,6 +172,7 @@ abstract class TagWithText(name: String) : Tag(name) {
 class Opml : TagWithText("opml") {
     init {
         attributes["version"] = "1.1"
+        attributes["xmlns:feeder"] = OPML_FEEDER_NAMESPACE
     }
 
     suspend fun head(init: suspend Head.() -> Unit) = initTag(Head(), init)
@@ -168,6 +186,12 @@ class Head : TagWithText("head") {
 class Title : TagWithText("title")
 
 abstract class BodyTag(name: String) : TagWithText(name) {
+    suspend fun feederSettings(
+        init: suspend FeederSettings.() -> Unit,
+    ) {
+        initTag(FeederSettings(), init)
+    }
+
     suspend fun outline(
         title: String,
         text: String = title,
@@ -185,29 +209,78 @@ abstract class BodyTag(name: String) : TagWithText(name) {
             o.xmlUrl = xmlUrl
         }
     }
+
+    suspend fun Feed.toOutline() = outline(
+        title = escape(displayTitle),
+        type = "rss",
+        xmlUrl = escape(url.toString()),
+    ) {
+        val feed = this@toOutline
+        notify = feed.notify
+        feed.imageUrl?.let { imageUrl = escape(it.toString()) }
+        fullTextByDefault = feed.fullTextByDefault
+        openArticlesWith = feed.openArticlesWith
+        alternateId = feed.alternateId
+    }
 }
 
 class Body : BodyTag("body")
 
+class FeederSettings : BodyTag("feeder:settings") {
+    suspend fun feederSetting(
+        init: suspend FeederSetting.() -> Unit,
+    ) {
+        initTag(FeederSetting(), init)
+    }
+
+    suspend fun feederBlocked(
+        init: suspend FeederBlocked.() -> Unit,
+    ) {
+        initTag(FeederBlocked(), init)
+    }
+}
+
+class FeederBlocked : BodyTag("feeder:blocked") {
+    var pattern: String by attributes
+}
+
+class FeederSetting : Tag("feeder:setting") {
+    var key: String by attributes
+    var value: String by attributes
+}
+
 class Outline : BodyTag("outline") {
-    var title: String
-        get() = attributes["title"]!!
+    var title: String by attributes
+    var text: String by attributes
+    var type: String by attributes
+    var xmlUrl: String by attributes
+
+    var notify: Boolean
+        get() = attributes["feeder:notify"]!!.toBoolean()
         set(value) {
-            attributes["title"] = value
+            attributes["feeder:notify"] = value.toString()
         }
-    var text: String
-        get() = attributes["text"]!!
+    var imageUrl: String
+        get() = attributes["feeder:imageUrl"]!!
         set(value) {
-            attributes["text"] = value
+            attributes["feeder:imageUrl"] = value
         }
-    var type: String
-        get() = attributes["type"]!!
+    var fullTextByDefault: Boolean
+        get() = attributes["feeder:fullTextByDefault"]!!.toBoolean()
         set(value) {
-            attributes["type"] = value
+            attributes["feeder:fullTextByDefault"] = value.toString()
         }
-    var xmlUrl: String
-        get() = attributes["xmlUrl"]!!
+    var openArticlesWith: String
+        get() = attributes["feeder:openArticlesWith"]!!
         set(value) {
-            attributes["xmlUrl"] = value
+            attributes["feeder:openArticlesWith"] = value
+        }
+    var alternateId: Boolean
+        get() = attributes["feeder:alternateId"]!!.toBoolean()
+        set(value) {
+            attributes["feeder:alternateId"] = value.toString()
         }
 }
+
+const val OPML_FEEDER_NAMESPACE = "https://nononsenseapps.com/feeder"
+private const val LOG_TAG = "FEEDER_OPMLWRITER"

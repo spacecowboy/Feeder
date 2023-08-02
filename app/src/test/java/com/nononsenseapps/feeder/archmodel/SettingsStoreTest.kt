@@ -378,4 +378,19 @@ class SettingsStoreTest : DIAware {
 
         confirmVerified(sp)
     }
+
+    @Test
+    fun getAllSettingsForOPMLExport() {
+        every { sp.all } returns mapOf(
+            PREF_SHOW_FAB to false,
+            "Not a pref" to true,
+            // Not OK if imported on a fresh device
+            PREF_LAST_FEED_TAG to "foo",
+            PREF_LAST_FEED_ID to 1L,
+            PREF_LAST_ARTICLE_ID to 2L,
+            PREF_IS_ARTICLE_OPEN to true,
+        )
+        val allSettings = store.getAllSettings()
+        assertEquals(1, allSettings.size)
+    }
 }

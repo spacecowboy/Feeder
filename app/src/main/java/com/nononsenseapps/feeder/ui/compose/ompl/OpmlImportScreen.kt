@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -42,7 +43,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserHandler
-import com.nononsenseapps.feeder.model.opml.OpmlParser
+import com.nononsenseapps.feeder.model.opml.OpmlPullParser
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithNonScrollableContent
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
@@ -55,6 +56,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
+import java.net.URL
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
@@ -79,13 +81,19 @@ fun OpmlImportScreen(
             viewState = ViewState(error = true, initial = false)
         } else {
             try {
-                val parser = OpmlParser(
+                val parser = OpmlPullParser(
                     object : OPMLParserHandler {
                         override suspend fun saveFeed(feed: Feed) {
                             viewState = viewState.copy(
                                 initial = false,
                                 feeds = viewState.feeds.plus(feed),
                             )
+                        }
+
+                        override suspend fun saveSetting(key: String, value: String) {
+                        }
+
+                        override suspend fun saveBlocklistPatterns(patterns: Iterable<String>) {
                         }
                     },
                 )
@@ -276,10 +284,19 @@ data class ViewState(
 @Composable
 private fun PreviewOpmlImportScreenSingle() {
     FeederTheme {
-        OpmlImportView(
-            viewState = ViewState(),
-            onDismiss = {},
-            onOk = {},
-        )
+        Surface {
+            OpmlImportView(
+                viewState = ViewState(
+                    feeds = listOf(
+                        Feed(
+                            title = "Foo Feed",
+                            url = URL("https://example.com/foo")
+                        )
+                    )
+                ),
+                onDismiss = {},
+                onOk = {},
+            )
+        }
     }
 }

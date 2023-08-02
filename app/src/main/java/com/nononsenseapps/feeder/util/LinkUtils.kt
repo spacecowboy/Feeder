@@ -8,18 +8,23 @@ import java.net.URL
 /**
  * Ensures a url is valid, having a scheme and everything. It turns 'google.com' into 'http://google.com' for example.
  */
-fun sloppyLinkToStrictURL(url: String): URL = try {
-    // If no exception, it's valid
-    URL(url)
-} catch (_: MalformedURLException) {
-    // Might be an unknown protocol in which case a URL is not valid to be created
-    sloppyLinktoURIOrNull(url)?.let { uri ->
-        if (uri.isAbsolute) {
-            uri.toURL()
-        } else {
-            null
-        }
-    } ?: URL("http://$url") // No scheme, assume http
+fun sloppyLinkToStrictURL(url: String): URL {
+    if (url.isBlank()) {
+        throw MalformedURLException("String is blank")
+    }
+    return try {
+        // If no exception, it's valid
+        URL(url)
+    } catch (_: MalformedURLException) {
+        // Might be an unknown protocol in which case a URL is not valid to be created
+        sloppyLinktoURIOrNull(url)?.let { uri ->
+            if (uri.isAbsolute) {
+                uri.toURL()
+            } else {
+                null
+            }
+        } ?: URL("http://$url") // No scheme, assume http
+    }
 }
 
 fun sloppyLinktoURIOrNull(text: String): URI? = try {
@@ -41,7 +46,7 @@ fun sloppyLinkToStrictURLOrNull(url: String): URL? = try {
 fun sloppyLinkToStrictURLNoThrows(url: String): URL = try {
     sloppyLinkToStrictURL(url)
 } catch (_: MalformedURLException) {
-    sloppyLinkToStrictURL("")
+    URL("http://")
 }
 
 /**

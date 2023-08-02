@@ -8,7 +8,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_URL
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import java.net.URL
 
 @Entity(
@@ -32,7 +31,7 @@ data class RemoteFeed @Ignore constructor(
     @ColumnInfo(name = COL_ID)
     var id: Long = ID_UNSET,
     @ColumnInfo(name = "sync_remote") var syncRemote: Long = ID_UNSET,
-    @ColumnInfo(name = COL_URL) var url: URL = sloppyLinkToStrictURL(""),
+    @ColumnInfo(name = COL_URL) var url: URL = URL("http://"),
 ) {
     constructor() : this(id = ID_UNSET)
 }
