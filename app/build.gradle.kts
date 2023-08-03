@@ -39,7 +39,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 compilerArgumentProviders(
-                    RoomSchemaArgProvider(File(projectDir, "schemas"))
+                    RoomSchemaArgProvider(File(projectDir, "schemas")),
                 )
                 argument("room.incremental", "true")
             }
@@ -53,12 +53,25 @@ android {
         }
     }
 
-    if (project.hasProperty("STORE_FILE")) {
-        signingConfigs {
+    signingConfigs {
+        create("shareddebug") {
+            storeFile = rootProject.file("shareddebug.keystore")
+            storePassword = "android"
+            keyAlias = "AndroidDebugKey"
+            keyPassword = "android"
+        }
+        if (project.hasProperty("STORE_FILE")) {
             create("release") {
+                @Suppress("LocalVariableName")
                 val STORE_FILE: String by project.properties
+
+                @Suppress("LocalVariableName")
                 val STORE_PASSWORD: String by project.properties
+
+                @Suppress("LocalVariableName")
                 val KEY_ALIAS: String by project.properties
+
+                @Suppress("LocalVariableName")
                 val KEY_PASSWORD: String by project.properties
                 storeFile = file(STORE_FILE)
                 storePassword = STORE_PASSWORD
@@ -76,17 +89,14 @@ android {
             isPseudoLocalesEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("shareddebug")
         }
         val debugMini by creating {
             initWith(debug)
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             matchingFallbacks.add("debug")
         }
         val release by getting {
@@ -94,7 +104,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
@@ -109,7 +119,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
@@ -159,7 +169,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes.addAll(
                 listOf(
@@ -174,8 +184,8 @@ android {
                     "META-INF/notice.txt",
                     "META-INF/ASL2.0",
                     "META-INF/AL2.0",
-                    "META-INF/LGPL2.1"
-                )
+                    "META-INF/LGPL2.1",
+                ),
             )
         }
     }
@@ -362,7 +372,7 @@ tasks {
                 file.name.startsWith("values")
             }?.map { file ->
                 file.resolve("strings.xml")
-            } ?: error("Could not resolve values folders!")
+            } ?: error("Could not resolve values folders!"),
         )
 
         val localesConfigFile = file(projectDir.resolve("src/main/res/xml/locales_config.xml"))
