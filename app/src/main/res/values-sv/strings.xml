@@ -207,5 +207,5 @@
     <string name="saved_article">Sparad artikel</string>
     <string name="failed_to_fetch_full_article_missing_body">Hittade ingenting att hämta</string>
     <string name="failed_to_fetch_full_article_missing_link">Flödet saknar länk till artikeln</string>
-    <string name="failed_to_fetch_full_article_not_html">Länk är inte ett HTML dokument</string>
+    <string name="failed_to_fetch_full_article_not_html">Länken är inte ett HTML-dokument</string>
 </resources>
