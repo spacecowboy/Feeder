@@ -1,0 +1,19 @@
+<p>Eleged van már a nem teljesen nyílt olvasókból, akik még személyes adatot is lopnak?<br/>
+Eleged van a nyakatekert szinkronizálási beállításokból amikhez több órányi szerver konfigurálás szükséges?<br/>
+Eleged van abból, hogy mindenhez fiókot kell létrehozni?<br/></p>
+
+<p>Próbáld ki a Feedert inkább!</p>
+
+<p>A Feeder egy teljesen ingyenes/ibre hírfolyam olvasó. Támogat minden népszerű formátumot, ezek között a JSONFeed-et is. Nem követ. Nem igényel beállításokat. Még csak egy fiókot sem kell létrehoznod! Csak add hozzá a feedjeidet, vagy importáld be őket a régi olvasódból OPML-ben, és irány szinkronizálni és olvasni.</p>
+
+<p><b>Tulajdonságok</b></p>
+
+<ul>
+<li>Elemzi a HTML-t és natív Szövegnézetben jeleníti azt meg</li>
+<li>Offline olvasás</li>
+<li>Szinkronizálás a háttérben</li>
+<li>Értesítések</li>
+<li>OPML Importálás/Exportálás</li>
+<li>Praktikus hozzáférés a szekrényhivatkozásokhoz</li>
+<li>Material dizájn</li>
+</ul>

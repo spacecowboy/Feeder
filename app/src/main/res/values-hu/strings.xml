@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tag">Címke</string>
-    <string name="url">Cím</string>
+    <string name="url">URL</string>
     <string name="add_feed_search_hint">Feed Cím</string>
     <string name="empty_feed_top">Nincs itt semmi olvasnivaló. Szeretnél inkább…</string>
     <string name="title">Cím</string>
@@ -46,8 +46,8 @@
     <string name="sync_option_every_6_hours">Minden 6 órában</string>
     <string name="sync_option_every_12_hours">Minden 12 órában</string>
     <string name="sync_option_every_day">MInden nap</string>
-    <string name="synchronization">Szinkronizálás</string>
-    <string name="syncing">Szinkronizálás</string>
+    <string name="synchronization">Szinkronizálás alatt</string>
+    <string name="syncing">Szinkronizálás alatt</string>
     <string name="only_on_wifi">Csak Wi-Fi-n keresztül</string>
     <string name="show_thumbnails">Előképek mutatása</string>
     <string name="may_result_data_charges">Adatforgalmi díjat vonhat maga után.</string>
@@ -107,7 +107,7 @@
     <string name="unread">Olvasatlan</string>
     <string name="already_read">Már elolvasott</string>
     <string name="showing_only_unread_articles">Csak olvasatlan cikkek mutatása</string>
-  <string name="showing_all_articles">Minden cikk mutatása</string>
+    <string name="showing_all_articles">Minden cikk mutatása</string>
     <string name="synchronize_feeds">Feedek szinkelése</string>
     <string name="zero_unread_articles">%1$s olvasatlan cikk</string>
     <string name="one_unread_article">%1$s olvasatlan cikk</string>
@@ -148,7 +148,7 @@
     <string name="swipe_to_mark_as_read">Húzd félre az olvasottnak jelöléshez</string>
     <string name="are_you_sure_leave_sync_chain">Biztos vagy benne, hogy el akarod hagyni a szink láncot\?</string>
     <string name="no_barcode_scanner_installed">Nem találtam vonalkód szkennelőt</string>
-  <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy feedeket és cikkeket olvasson</string>
+    <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy feedeket és cikkeket olvasson</string>
     <string name="permission_read_label">Feeder csak olvasási engedély</string>
     <string name="open_enclosed_media">Média melléklet megnyitása</string>
     <string name="open_enclosed_media_file">%1$s megnyitása</string>
@@ -168,8 +168,44 @@
     <string name="battery_optimization_disabled">Ki</string>
     <string name="battery_optimization">Akkumulátor optimalizáció</string>
     <string name="battery_optimization_enabled">Be</string>
-  <string name="feed_item_style_compact">Kompakt</string>
+    <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_super_compact">Szuper kompakt</string>
     <string name="invalid_url">Nem valós cím</string>
     <string name="remove_device">Eszköz eltávolítása</string>
+    <string name="sync_to_fetch">Szinkronizálás a cikk lekéréséhez</string>
+    <string name="new_indicator">Új</string>
+    <string name="explanation_permission_notifications">Az engedélyt meg kell adni, az értesítések engedélyezése előtt.</string>
+    <string name="block_list_description">Elrejti azokat a cikkeket, amelyek címe tartalmazza a fenti szűrők bármelyikét. Példa szűrők:</string>
+    <string name="no_feeds">Nincsenek hírcsatornák</string>
+    <string name="zero_feeds">%1$s feedek</string>
+    <string name="one_feed">%1$s feed</string>
+    <string name="two_feeds">%1$s feedek</string>
+    <string name="few_feeds">%1$s feedek</string>
+    <string name="many_feeds">%1$s feedek</string>
+    <string name="other_feeds">%1$s feedek</string>
+    <string name="import_x_feeds_with_y_tags">%1$s importálása %2$s-el\?</string>
+    <string name="zero_tags">%1$s címkék</string>
+    <string name="one_tags">%1$s címke</string>
+    <string name="two_tags">%1$s címkék</string>
+    <string name="few_tags">%1$s címkék</string>
+    <string name="many_tags">%1$s címkék</string>
+    <string name="other_tags">%1$s címkék</string>
+    <string name="failed_to_fetch_full_article_missing_link">A hírfolyamból hiányzik a cikk linkje</string>
+    <string name="failed_to_fetch_full_article_not_html">A link nem egy HTML dokumentum</string>
+    <string name="failed_to_fetch_full_article_missing_body">Nem találtunk semmit</string>
+    <string name="dynamic_theme_use">Dinamikus színek</string>
+    <string name="feed_icon">Feed ikon</string>
+    <string name="mark_as_read_on_scroll">Megjelölés olvasottként görgetésen</string>
+    <string name="skip_to_next">Ugrás a következőre</string>
+    <string name="set_language">Nyelv beállítása</string>
+    <string name="only_available_on_android_n">Csak Android %1$s és újabb rendszereken érhető el</string>
+    <string name="description_for_read_aloud">Cikk nyelvének automatikus felismerése</string>
+    <string name="unsave_article">Cikk mentésének leállítása</string>
+    <string name="article_image">Cikk képe</string>
+    <string name="text_to_speech">Szövegfelolvasás</string>
+    <string name="use_detect_language">Nyelv észlelése</string>
+    <string name="text_scale">Szövegméret</string>
+    <string name="saved_articles">Mentett cikkek</string>
+    <string name="saved_article">Cikk mentve</string>
+    <string name="save_article">Cikk mentése</string>
 </resources>
