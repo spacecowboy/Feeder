@@ -205,4 +205,7 @@
     <string name="zero_tags">%1$s grupami</string>
     <string name="two_tags">%1$s grupami</string>
     <string name="many_tags">%1$s grupami</string>
+    <string name="failed_to_fetch_full_article_missing_link">W kanale brakuje linku do artykułu</string>
+    <string name="failed_to_fetch_full_article_not_html">Link nie jest dokumentem HTML</string>
+    <string name="failed_to_fetch_full_article_missing_body">Nie znaleziono nic do pobrania</string>
 </resources>
