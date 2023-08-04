@@ -205,4 +205,7 @@
     <string name="other_tags">%1$s etichette</string>
     <string name="many_feeds">%1$s feed</string>
     <string name="many_tags">%1$s etichette</string>
+    <string name="failed_to_fetch_full_article_missing_body">Non è stato trovato nulla da recuperare</string>
+    <string name="failed_to_fetch_full_article_missing_link">Feed senza link ad articolo</string>
+    <string name="failed_to_fetch_full_article_not_html">Il link non è un documento HTML</string>
 </resources>
