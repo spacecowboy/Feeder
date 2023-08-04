@@ -191,4 +191,21 @@
     <string name="saved_article">Artigo gardado</string>
     <string name="save_article">Gardar artigo</string>
     <string name="unsave_article">Deixar de gardar artigo</string>
+    <string name="no_feeds">Sen canles</string>
+    <string name="one_feed">%1$s canle</string>
+    <string name="zero_feeds">%1$s canles</string>
+    <string name="two_feeds">%1$s canles</string>
+    <string name="few_feeds">%1$s canles</string>
+    <string name="many_feeds">%1$s canles</string>
+    <string name="other_feeds">%1$s canles</string>
+    <string name="import_x_feeds_with_y_tags">Importar %1$s con %2$s\?</string>
+    <string name="zero_tags">%1$s etiquetas</string>
+    <string name="one_tags">%1$s etiqueta</string>
+    <string name="two_tags">%1$s etiquetas</string>
+    <string name="few_tags">%1$s etiquetas</string>
+    <string name="many_tags">%1$s etiquetas</string>
+    <string name="other_tags">%1$s etiquetas</string>
+    <string name="failed_to_fetch_full_article_missing_body">Non se atopou nada</string>
+    <string name="failed_to_fetch_full_article_missing_link">A fonte carece da ligazón ao artigo</string>
+    <string name="failed_to_fetch_full_article_not_html">A ligazón non é un documento HTML</string>
 </resources>
