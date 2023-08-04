@@ -191,4 +191,20 @@
     <string name="saved_articles">Kaydedilen makaleler</string>
     <string name="saved_article">Kaydedilen makale</string>
     <string name="save_article">Makaleyi kaydet</string>
+    <string name="no_feeds">Yayın yok</string>
+    <string name="zero_feeds">%1$s yayınlar</string>
+    <string name="one_feed">%1$s yayın</string>
+    <string name="two_feeds">%1$s yayınlar</string>
+    <string name="few_feeds">%1$s yayınlar</string>
+    <string name="many_feeds">%1$s yayınlar</string>
+    <string name="other_feeds">%1$s yayınlar</string>
+    <string name="zero_tags">%1$s etiketler</string>
+    <string name="one_tags">%1$s etiket</string>
+    <string name="two_tags">%1$s etiketler</string>
+    <string name="few_tags">%1$s etiketler</string>
+    <string name="many_tags">%1$s etiketler</string>
+    <string name="other_tags">%1$s etiketler</string>
+    <string name="failed_to_fetch_full_article_missing_body">Getirilecek bir şey bulunamadı</string>
+    <string name="failed_to_fetch_full_article_not_html">Bağlantı bir HTML belgesi değil</string>
+    <string name="failed_to_fetch_full_article_missing_link">Yayın\'da makale bağlantısı eksik</string>
 </resources>
