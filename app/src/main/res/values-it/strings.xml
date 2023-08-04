@@ -148,7 +148,7 @@
     <string name="qr_code">Codice QR</string>
     <string name="feeder_device_sync_code">Codice di sincronizzazione del dispositivo di alimentazione</string>
     <string name="leave_sync_chain">Lascia la catena di sincronizzazione</string>
-    <string name="device_sync_description_1">La sincronizzazione dei dispositivi ti permette di sincronizzare le sottoscrizioni ai feed e di leggere gli articoli tra i tuoi vari dispositivi.</string>
+    <string name="device_sync_description_1">La sincronizzazione del dispositivo ti permette di sincronizzare le iscrizioni ai feed e gli articoli letti tra i tuoi dispositivi.</string>
     <string name="scan_or_enter_code">Scansiona o inserisci il codice di sincronizzazione</string>
     <string name="device_sync">Sincronizzazione del dispositivo</string>
     <string name="device_sync_financed_by_community">Questo servizio è pagato dalla comunità. Considera la possibilità di donare se lo trovi utile.</string>
@@ -183,7 +183,7 @@
     <string name="dynamic_theme_use">Colori dinamici</string>
     <string name="article_image">Immagine dell\'articolo</string>
     <string name="feed_icon">Icona del feed</string>
-    <string name="text_scale">Scala del testo</string>
+    <string name="text_scale">Dimensione del testo</string>
     <string name="block_list_description">Nasconde gli articoli con titoli contenenti uno qualsiasi di questi filtri. Filtri di esempio:</string>
     <string name="sync_to_fetch">Sincronizza per recuperare l\'articolo</string>
     <string name="saved_articles">Articoli salvati</string>
