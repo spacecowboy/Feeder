@@ -205,4 +205,7 @@
     <string name="many_tags">%1$s Schlagwörter</string>
     <string name="other_tags">%1$s Schlagwörter</string>
     <string name="import_x_feeds_with_y_tags">%1$s mit %2$s importieren\?</string>
+    <string name="failed_to_fetch_full_article_missing_body">Nichts zum Abrufen gefunden</string>
+    <string name="failed_to_fetch_full_article_missing_link">Feed fehlt der Link zum Artikel</string>
+    <string name="failed_to_fetch_full_article_not_html">Link ist kein HTML-Dokument</string>
 </resources>
