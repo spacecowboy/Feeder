@@ -205,4 +205,7 @@
     <string name="many_feeds">%1$s canales</string>
     <string name="two_tags">%1$s etiquetas</string>
     <string name="many_tags">%1$s etiquetas</string>
+    <string name="failed_to_fetch_full_article_missing_body">No se ha encontrado nada</string>
+    <string name="failed_to_fetch_full_article_missing_link">A la fuente le falta el enlace al artículo</string>
+    <string name="failed_to_fetch_full_article_not_html">El enlace no es un documento HTML</string>
 </resources>
