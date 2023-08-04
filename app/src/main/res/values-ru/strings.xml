@@ -191,4 +191,18 @@
     <string name="mark_as_read_on_scroll">Пометить как прочитанное при пролистывании</string>
     <string name="saved_article">Сохранённая статья</string>
     <string name="unsave_article">Остановить сохранение статьи</string>
+    <string name="no_feeds">Нет каналов</string>
+    <string name="zero_feeds">%1$s каналов</string>
+    <string name="one_feed">%1$s канал</string>
+    <string name="two_feeds">%1$s канала</string>
+    <string name="few_feeds">%1$s каналов</string>
+    <string name="many_feeds">%1$s каналов</string>
+    <string name="zero_tags">%1$s меток</string>
+    <string name="other_feeds">%1$s каналы</string>
+    <string name="one_tags">%1$s метка</string>
+    <string name="two_tags">%1$s метки</string>
+    <string name="few_tags">%1$s меток</string>
+    <string name="many_tags">%1$s меток</string>
+    <string name="other_tags">%1$s меток</string>
+    <string name="failed_to_fetch_full_article_missing_link">В ленте ссылка на статью отсутствует</string>
 </resources>
