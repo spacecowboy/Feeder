@@ -205,4 +205,7 @@
     <string name="no_feeds">没有订阅源</string>
     <string name="few_feeds">%1$s 个订阅源</string>
     <string name="import_x_feeds_with_y_tags">导入 %1$s 个含 %2$s 标签的订阅源？</string>
+    <string name="failed_to_fetch_full_article_missing_body">没找到可获取的东西</string>
+    <string name="failed_to_fetch_full_article_not_html">链接不是 HTML 文档</string>
+    <string name="failed_to_fetch_full_article_missing_link">Feed 缺少文章链接</string>
 </resources>
