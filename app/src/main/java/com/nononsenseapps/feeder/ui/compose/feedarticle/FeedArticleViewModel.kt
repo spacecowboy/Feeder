@@ -42,7 +42,9 @@ import com.nononsenseapps.feeder.ui.compose.feed.isNotSavedArticles
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.FilePathProvider
-import java.util.*
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -57,8 +59,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.kodein.di.DI
 import org.kodein.di.instance
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
 
 class FeedArticleViewModel(
     di: DI,
@@ -416,7 +416,8 @@ class FeedArticleViewModel(
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT,
                 TextToDisplay.FAILED_MISSING_BODY,
                 TextToDisplay.FAILED_MISSING_LINK,
-                TextToDisplay.FAILED_NOT_HTML -> null
+                TextToDisplay.FAILED_NOT_HTML,
+                -> null
             }
 
             if (fullText == null) {

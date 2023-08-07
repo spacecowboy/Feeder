@@ -9,8 +9,8 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
 import java.net.URL
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
+import java.time.Instant
+import java.time.ZonedDateTime
 
 const val previewColumns = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,

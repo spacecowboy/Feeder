@@ -20,6 +20,7 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.minusMinutes
 import java.net.URL
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.test.Ignore
 import kotlin.test.assertTrue
@@ -43,7 +44,6 @@ import org.kodein.di.android.subDI
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import org.threeten.bp.Instant
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
@@ -61,7 +61,7 @@ class RssLocalSyncKtTest : DIAware {
         bind<FilePathProvider>(overrides = true) with singleton {
             filePathProvider(
                 cacheDir = getApplicationContext<FeederApplication>().cacheDir,
-                filesDir = getApplicationContext<FeederApplication>().filesDir
+                filesDir = getApplicationContext<FeederApplication>().filesDir,
             )
         }
     }
@@ -95,14 +95,14 @@ class RssLocalSyncKtTest : DIAware {
                 url = url,
                 tag = "",
                 alternateId = useAlternateId,
-            )
+            ),
         )
 
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
                 return responses.getOrDefault(
                     request.requestUrl?.toUrl(),
-                    MockResponse().setResponseCode(404)
+                    MockResponse().setResponseCode(404),
                 )
             }
         }
@@ -121,13 +121,14 @@ class RssLocalSyncKtTest : DIAware {
     @Test
     fun syncCowboyJsonWorks() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").toUrl(),
-            cowboyJson
+            "cowboyjson",
+            server.url("/feed.json").toUrl(),
+            cowboyJson,
         )
 
         runBlocking {
             rssLocalSync.syncFeeds(
-                feedId = cowboyJsonId
+                feedId = cowboyJsonId,
             )
         }
 
@@ -135,20 +136,22 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Unexpected number of items in feed",
             10,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size,
         )
     }
 
     @Test
     fun syncCowboyAtomWorks() = runBlocking {
         val cowboyAtomId = insertFeed(
-            "cowboyatom", server.url("/atom.xml").toUrl(),
-            cowboyAtom, isJson = false
+            "cowboyatom",
+            server.url("/atom.xml").toUrl(),
+            cowboyAtom,
+            isJson = false,
         )
 
         runBlocking {
             rssLocalSync.syncFeeds(
-                feedId = cowboyAtomId
+                feedId = cowboyAtomId,
             )
         }
 
@@ -156,7 +159,7 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Unexpected number of items in feed",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
         )
     }
 
@@ -167,12 +170,12 @@ class RssLocalSyncKtTest : DIAware {
             server.url("/IDZ00059.warnings_vic.xml").toUrl(),
             rssWithDuplicateGuids,
             isJson = false,
-            useAlternateId = true
+            useAlternateId = true,
         )
 
         runBlocking {
             rssLocalSync.syncFeeds(
-                feedId = duplicateIdRss
+                feedId = duplicateIdRss,
             )
         }
 
@@ -180,19 +183,22 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Expected duplicate guids to be mitigated by alternate id",
             13,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(duplicateIdRss).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(duplicateIdRss).size,
         )
     }
 
     @Test
     fun syncAllWorks() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").toUrl(),
-            cowboyJson
+            "cowboyjson",
+            server.url("/feed.json").toUrl(),
+            cowboyJson,
         )
         val cowboyAtomId = insertFeed(
-            "cowboyatom", server.url("/atom.xml").toUrl(),
-            cowboyAtom, isJson = false
+            "cowboyatom",
+            server.url("/atom.xml").toUrl(),
+            cowboyAtom,
+            isJson = false,
         )
 
         runBlocking {
@@ -205,22 +211,23 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Unexpected number of items in feed",
             10,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size,
         )
 
         @Suppress("DEPRECATION")
         assertEquals(
             "Unexpected number of items in feed",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
         )
     }
 
     @Test
     fun responsesAreNotParsedUnlessFeedHashHasChanged() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").toUrl(),
-            cowboyJson
+            "cowboyjson",
+            server.url("/feed.json").toUrl(),
+            cowboyJson,
         )
 
         runBlocking {
@@ -239,15 +246,16 @@ class RssLocalSyncKtTest : DIAware {
         assertNotEquals(
             "Cached response should still have updated feed last sync",
             999L,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli()
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli(),
         )
     }
 
     @Test
     fun feedsSyncedWithin15MinAreIgnored() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").toUrl(),
-            cowboyJson
+            "cowboyjson",
+            server.url("/feed.json").toUrl(),
+            cowboyJson,
         )
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
@@ -261,27 +269,30 @@ class RssLocalSyncKtTest : DIAware {
             }
             rssLocalSync.syncFeeds(
                 feedId = cowboyJsonId,
-                forceNetwork = false, minFeedAgeMinutes = 15
+                forceNetwork = false,
+                minFeedAgeMinutes = 15,
             )
         }
 
         assertEquals(
             "Recently synced feed should not get a second network request",
-            1, server.requestCount
+            1,
+            server.requestCount,
         )
 
         assertEquals(
             "Last sync should not have changed",
             fourteenMinsAgo,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync,
         )
     }
 
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").toUrl(),
-            cowboyJson
+            "cowboyjson",
+            server.url("/feed.json").toUrl(),
+            cowboyJson,
         )
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
@@ -295,7 +306,8 @@ class RssLocalSyncKtTest : DIAware {
             }
             rssLocalSync.syncFeeds(
                 feedId = cowboyJsonId,
-                forceNetwork = true, minFeedAgeMinutes = 15
+                forceNetwork = true,
+                minFeedAgeMinutes = 15,
             )
         }
 
@@ -304,7 +316,7 @@ class RssLocalSyncKtTest : DIAware {
         assertNotEquals(
             "Last sync should have changed",
             fourteenMinsAgo,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync,
         )
     }
 
@@ -321,8 +333,8 @@ class RssLocalSyncKtTest : DIAware {
             Feed(
                 title = "failJson",
                 url = URL("$url"),
-                tag = ""
-            )
+                tag = "",
+            ),
         )
 
         runBlocking {
@@ -332,7 +344,7 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Last sync should not have been updated",
             Instant.EPOCH,
-            testDb.db.feedDao().loadFeed(failingJsonId)!!.lastSync
+            testDb.db.feedDao().loadFeed(failingJsonId)!!.lastSync,
         )
 
         // Assert the feed was retrieved
@@ -353,24 +365,25 @@ class RssLocalSyncKtTest : DIAware {
             Feed(
                 title = "NixOS",
                 url = URL("$url"),
-                tag = ""
-            )
+                tag = "",
+            ),
         )
 
         runBlocking {
             rssLocalSync.syncFeeds(
-                feedId = feedId
+                feedId = feedId,
             )
         }
 
         // Assert the feed was retrieved
         assertEquals("/news-rss.xml", server.takeRequest().path)
 
-        @Suppress("DEPRECATION") val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+        @Suppress("DEPRECATION")
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
         assertEquals(
             "Unique IDs should have been generated for items",
             99,
-            items.size
+            items.size,
         )
 
         // Should be unique to item so that it stays the same after updates
@@ -391,8 +404,8 @@ class RssLocalSyncKtTest : DIAware {
 
         val feedId = testDb.db.feedDao().insertFeed(
             Feed(
-                url = URL("$url")
-            )
+                url = URL("$url"),
+            ),
         )
 
         val beforeSyncTime = Instant.now()
@@ -404,21 +417,23 @@ class RssLocalSyncKtTest : DIAware {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest().path)
 
-        @Suppress("DEPRECATION") val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+        @Suppress("DEPRECATION")
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
 
         assertNotNull(
             "Item should have gotten a pubDate generated",
-            items[0].pubDate
+            items[0].pubDate,
         )
 
         assertNotEquals(
             "Items should have distinct pubDates",
-            items[0].pubDate, items[1].pubDate
+            items[0].pubDate,
+            items[1].pubDate,
         )
 
         assertTrue(
             "The pubDate should be after 'before sync time'",
-            items[0].pubDate!!.toInstant() > beforeSyncTime
+            items[0].pubDate!!.toInstant() > beforeSyncTime,
         )
 
         // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
@@ -435,21 +450,21 @@ class RssLocalSyncKtTest : DIAware {
             MockResponse().also {
                 it.setResponseCode(200)
                 it.setBody(fooRss(1))
-            }
+            },
         )
         server.enqueue(
             MockResponse().also {
                 it.setResponseCode(200)
                 it.setBody(fooRss(2))
-            }
+            },
         )
 
         val url = server.url("/rss")
 
         val feedId = testDb.db.feedDao().insertFeed(
             Feed(
-                url = URL("$url")
-            )
+                url = URL("$url"),
+            ),
         )
 
         // Sync first time
@@ -460,11 +475,12 @@ class RssLocalSyncKtTest : DIAware {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-        @Suppress("DEPRECATION") val firstItem =
+        @Suppress("DEPRECATION")
+        val firstItem =
             testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
                 assertNotNull(
                     "Item should have gotten a pubDate generated",
-                    items[0].pubDate
+                    items[0].pubDate,
                 )
 
                 items[0]
@@ -482,19 +498,22 @@ class RssLocalSyncKtTest : DIAware {
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals(
                 "Should be 2 items in feed",
-                2, items.size
+                2,
+                items.size,
             )
 
             val item = items.last()
 
             assertEquals(
                 "Making sure we are comparing the same item",
-                firstItem.id, item.id
+                firstItem.id,
+                item.id,
             )
 
             assertEquals(
                 "Pubdate should not have changed",
-                firstItem.pubDate, item.pubDate
+                firstItem.pubDate,
+                item.pubDate,
             )
         }
     }
@@ -506,15 +525,15 @@ class RssLocalSyncKtTest : DIAware {
             MockResponse().also {
                 it.setResponseCode(200)
                 it.setBody(fooRss(feedItemCount))
-            }
+            },
         )
 
         val url = server.url("/rss")
 
         val feedId = testDb.db.feedDao().insertFeed(
             Feed(
-                url = URL("$url")
-            )
+                url = URL("$url"),
+            ),
         )
 
         val maxFeedItemCount = 5
@@ -523,7 +542,7 @@ class RssLocalSyncKtTest : DIAware {
         runBlocking {
             rssLocalSync.syncFeeds(
                 feedId = feedId,
-                maxFeedItemCount = maxFeedItemCount
+                maxFeedItemCount = maxFeedItemCount,
             )
         }
 
@@ -534,7 +553,8 @@ class RssLocalSyncKtTest : DIAware {
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals(
                 "Feed should have no less items than in the raw feed even if that's more than cleanup count",
-                feedItemCount, items.size
+                feedItemCount,
+                items.size,
             )
         }
     }
@@ -553,7 +573,7 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Feed should have been parsed from slow response",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
         )
     }
 
@@ -571,7 +591,7 @@ class RssLocalSyncKtTest : DIAware {
         assertEquals(
             "Feed should not have been parsed from extremely slow response",
             0,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
         )
     }
 

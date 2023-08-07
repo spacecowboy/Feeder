@@ -16,9 +16,9 @@ import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
 import java.net.URL
+import java.time.Instant
+import java.time.ZonedDateTime
 import kotlinx.coroutines.flow.Flow
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
 
 @Dao
 interface FeedItemDao {

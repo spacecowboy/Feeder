@@ -3,7 +3,7 @@ package com.nononsenseapps.feeder.sync
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import java.net.URL
-import org.threeten.bp.Instant
+import java.time.Instant
 
 data class CreateRequest(
     val deviceName: String,

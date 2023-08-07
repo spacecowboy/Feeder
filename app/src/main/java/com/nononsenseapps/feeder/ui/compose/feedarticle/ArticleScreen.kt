@@ -72,9 +72,9 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
+import java.time.ZonedDateTime
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
-import org.threeten.bp.ZonedDateTime
 
 @Composable
 fun ArticleScreen(
@@ -105,7 +105,8 @@ fun ArticleScreen(
                 TextToDisplay.FAILED_MISSING_BODY,
                 TextToDisplay.FAILED_MISSING_LINK,
                 TextToDisplay.FAILED_NOT_HTML,
-                TextToDisplay.FULLTEXT -> viewModel.displayArticleText()
+                TextToDisplay.FULLTEXT,
+                -> viewModel.displayArticleText()
             }
         },
         onMarkAsUnread = {

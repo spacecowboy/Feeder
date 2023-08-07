@@ -21,7 +21,7 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.COL_WHEN_MODIFIED
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import java.net.URL
-import org.threeten.bp.Instant
+import java.time.Instant
 
 const val OPEN_ARTICLE_WITH_APPLICATION_DEFAULT = ""
 

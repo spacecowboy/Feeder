@@ -1,10 +1,10 @@
 package com.nononsenseapps.feeder.archmodel
 
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import org.threeten.bp.Instant
 
 class SessionStore {
     private val _resumeTime = MutableStateFlow(Instant.EPOCH)

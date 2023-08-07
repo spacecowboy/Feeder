@@ -265,6 +265,9 @@ fun SwipeableFeedItemPreview(
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
+                    modifier = Modifier
+                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                        .graphicsLayer(alpha = itemAlpha),
                     imageWidth = when (compactLandscape) {
                         true -> 196.dp
                         false -> 64.dp
@@ -277,9 +280,6 @@ fun SwipeableFeedItemPreview(
                         true -> 2
                         false -> 4
                     },
-                    modifier = Modifier
-                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                        .graphicsLayer(alpha = itemAlpha),
                 )
             }
 

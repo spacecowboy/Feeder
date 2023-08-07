@@ -3,8 +3,8 @@ package com.nononsenseapps.feeder.db.room
 import androidx.room.TypeConverter
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URL
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
+import java.time.Instant
+import java.time.ZonedDateTime
 
 class Converters {
 
@@ -14,7 +14,7 @@ class Converters {
         if (value != null) {
             try {
                 dt = ZonedDateTime.parse(value)
-            } catch (t: Throwable) {
+            } catch (_: Throwable) {
             }
         }
         return dt

@@ -16,10 +16,10 @@ import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import java.net.URL
+import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
-import org.threeten.bp.Instant
 
 class CreateFeedScreenViewModel(
     di: DI,

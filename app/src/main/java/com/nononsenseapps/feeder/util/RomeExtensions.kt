@@ -17,9 +17,9 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import java.net.URL
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.ZonedDateTime
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()

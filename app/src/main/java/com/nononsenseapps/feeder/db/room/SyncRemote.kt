@@ -15,9 +15,9 @@ import com.nononsenseapps.feeder.db.COL_SYNC_CHAIN_ID
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.SYNC_REMOTE_TABLE_NAME
 import java.net.URL
-import java.util.*
+import java.time.Instant
+import java.util.Locale
 import kotlin.random.Random
-import org.threeten.bp.Instant
 
 @Entity(
     tableName = SYNC_REMOTE_TABLE_NAME,
@@ -46,9 +46,6 @@ data class SyncRemote @Ignore constructor(
 private const val DEFAULT_SERVER_HOST = "feeder-sync.nononsenseapps.com"
 private const val DEFAULT_SERVER_PORT = 443
 const val DEFAULT_SERVER_ADDRESS = "https://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT"
-
-inline fun String?.ifBlankOrNull(defaultValue: () -> String?): String? =
-    if (this?.isBlank() != false) defaultValue() else this
 
 val DEPRECATED_SYNC_HOSTS = listOf(
     "feederapp.nononsenseapps.com",

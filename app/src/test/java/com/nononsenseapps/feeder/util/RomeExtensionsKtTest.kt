@@ -18,6 +18,9 @@ import com.rometools.rome.feed.synd.SyndLink
 import com.rometools.rome.feed.synd.SyndPerson
 import java.net.URI
 import java.net.URL
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Random
 import kotlin.test.assertEquals
@@ -25,9 +28,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.ZonedDateTime
 
 class RomeExtensionsKtTest {
     @Test
@@ -497,7 +497,7 @@ class RomeExtensionsKtTest {
                 mockSyndEnclosure(
                     url = "http://foo/bar.png",
                     type = "image/png",
-                )
+                ),
             ),
         ).asItem(baseUrl)
 
@@ -697,6 +697,7 @@ class RomeExtensionsKtTest {
         return mock
     }
 
+    @Suppress("SameParameterValue")
     private fun mockMediaContent(url: String? = null, medium: String? = null): MediaContent {
         val mock = mock(MediaContent::class.java)
         var mockRef: Reference? = null

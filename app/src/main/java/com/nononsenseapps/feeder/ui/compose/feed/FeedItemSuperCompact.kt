@@ -13,8 +13,8 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import java.net.URL
+import java.time.Instant
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import org.threeten.bp.Instant
 
 @Composable
 fun FeedItemSuperCompact(
@@ -40,7 +40,7 @@ fun FeedItemSuperCompact(
             feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
             size = 16.dp,
         )
-        FeedItemtext(
+        FeedItemText(
             item = item,
             onMarkAboveAsRead = onMarkAboveAsRead,
             onMarkBelowAsRead = onMarkBelowAsRead,

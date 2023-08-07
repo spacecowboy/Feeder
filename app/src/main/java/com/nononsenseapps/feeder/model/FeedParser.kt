@@ -14,7 +14,7 @@ import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext

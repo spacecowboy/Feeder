@@ -7,21 +7,16 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.text.BidiFormatter
 import com.nononsenseapps.feeder.ui.MainActivity
-import java.util.*
+import java.util.Locale
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
     suspend fun makeToast(@StringRes resId: Int)
-}
-
-fun Context.makeToast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
 
 val Context.notificationManager: NotificationManagerCompat

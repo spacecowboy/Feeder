@@ -15,12 +15,12 @@ import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.generateDeviceName
 import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import org.threeten.bp.Instant
 
 class SyncRestClient(override val di: DI) : DIAware {
     private val repository: Repository by instance()

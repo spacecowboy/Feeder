@@ -10,7 +10,7 @@ import com.nononsenseapps.feeder.db.COL_FEEDURL
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import java.net.URL
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Entity(
     tableName = "remote_read_mark",
@@ -41,5 +41,6 @@ data class RemoteReadMark @Ignore constructor(
         typeAffinity = ColumnInfo.INTEGER,
     ) var timestamp: Instant = Instant.EPOCH,
 ) {
+    @Suppress("unused")
     constructor() : this(id = ID_UNSET)
 }

@@ -13,7 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.R
-import java.util.*
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

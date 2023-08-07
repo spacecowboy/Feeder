@@ -11,6 +11,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
@@ -22,7 +23,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import org.threeten.bp.Instant
 
 class SyncRemoteStoreTest : DIAware {
     private val store: SyncRemoteStore by instance()

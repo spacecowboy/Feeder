@@ -58,8 +58,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
+import java.time.Instant
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import org.threeten.bp.Instant
 
 @Composable
 fun FeedItemCard(
@@ -159,7 +159,7 @@ fun FeedItemCardVertical(
                     feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
                     size = 16.dp,
                 )
-                FeedItemtext(
+                FeedItemText(
                     item = item,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
@@ -248,7 +248,7 @@ fun FeedItemCardHorizontal(
                     feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
                     size = 16.dp,
                 )
-                FeedItemtext(
+                FeedItemText(
                     item = item,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
@@ -263,7 +263,7 @@ fun FeedItemCardHorizontal(
 }
 
 @Composable
-fun RowScope.FeedItemtext(
+fun RowScope.FeedItemText(
     item: FeedListItem,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -271,8 +271,8 @@ fun RowScope.FeedItemtext(
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val titleStyle = FeedListItemTitleTextStyle()
     val snippetStyle = FeedListItemSnippetTextStyle()
     val joinedText = remember {
         buildAnnotatedString {
@@ -292,7 +292,7 @@ fun RowScope.FeedItemtext(
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
+        modifier = modifier
             .weight(1f),
     ) {
         WithBidiDeterminedLayoutDirection(paragraph = joinedText.text) {

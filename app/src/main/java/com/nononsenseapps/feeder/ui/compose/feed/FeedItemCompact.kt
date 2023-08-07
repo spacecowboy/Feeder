@@ -58,8 +58,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
+import java.time.Instant
+import java.time.ZonedDateTime
 
 @Composable
 fun FeedItemCompact(
@@ -72,10 +72,10 @@ fun FeedItemCompact(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
+    modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
     titleMaxLines: Int = 3,
     snippetMaxLines: Int = 4,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -309,13 +309,13 @@ private fun PreviewRead() {
                     rawPubDate = null,
                 ),
                 showThumbnail = true,
-                bookmarkIndicator = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                bookmarkIndicator = true,
                 imageWidth = 64.dp,
             )
         }
@@ -343,13 +343,13 @@ private fun PreviewUnread() {
                     rawPubDate = null,
                 ),
                 showThumbnail = true,
-                bookmarkIndicator = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                bookmarkIndicator = true,
                 imageWidth = 64.dp,
             )
         }
@@ -380,13 +380,13 @@ private fun PreviewWithImage() {
                         rawPubDate = null,
                     ),
                     showThumbnail = true,
-                    bookmarkIndicator = true,
                     onMarkAboveAsRead = {},
                     onMarkBelowAsRead = {},
                     onShareItem = {},
                     onToggleBookmarked = {},
                     dropDownMenuExpanded = false,
                     onDismissDropdown = {},
+                    bookmarkIndicator = true,
                     imageWidth = 64.dp,
                 )
             }

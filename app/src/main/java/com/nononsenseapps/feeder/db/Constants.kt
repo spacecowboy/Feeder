@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.db
 
-import org.threeten.bp.Instant
+import java.time.Instant
 
 const val FEEDS_TABLE_NAME = "feeds"
 const val FEED_ITEMS_TABLE_NAME = "feed_items"
