@@ -15,7 +15,6 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
-import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.BlocklistDao
@@ -174,7 +173,6 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this)
         @Suppress("DEPRECATION")
         staticFilesDir = filesDir
     }

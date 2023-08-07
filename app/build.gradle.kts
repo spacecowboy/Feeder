@@ -153,6 +153,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -237,6 +238,8 @@ configurations.all {
 
 dependencies {
     kapt(libs.room)
+    // For java time
+    coreLibraryDesugaring(libs.desugar)
 
     // BOMS
     implementation(platform(libs.okhttp.bom))
@@ -279,8 +282,6 @@ dependencies {
     implementation(libs.accompanist.adaptive)
     implementation(libs.compose.material3.windowsizeclass)
 
-    // Better times
-    implementation(libs.threeten.abp)
     // HTML parsing
     implementation(libs.jsoup)
     implementation(libs.tagsoup)
@@ -322,9 +323,6 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockk)
     testImplementation(libs.mockwebserver)
-
-    // Needed for unit testing timezone stuff
-    testImplementation(libs.threeten.bp)
 
     androidTestImplementation(platform(libs.compose.bom))
 

@@ -26,6 +26,7 @@ import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
 import java.net.URL
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import org.threeten.bp.Instant
 
 class RepositoryTest : DIAware {
     private val repository: Repository by instance()

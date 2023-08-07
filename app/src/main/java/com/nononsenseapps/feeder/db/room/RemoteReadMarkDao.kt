@@ -9,7 +9,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nononsenseapps.feeder.db.COL_ID
 import java.net.URL
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Dao
 interface RemoteReadMarkDao {

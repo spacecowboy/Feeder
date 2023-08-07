@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             version("coroutines", "1.7.2")
             version("rome", "1.7.1-f8")
             version("moshi", "1.12.0")
-            version("threeten", "1.2.2")
+            version("desugar", "2.0.3")
             version("jsoup", "1.7.3")
             version("tagsoup", "1.2.1")
             version("readability4j", "1.0.5")
@@ -190,11 +190,7 @@ dependencyResolutionManagement {
             ).versionRef("accompanist")
 
             // Better times
-            library(
-                "threeten.abp",
-                "com.jakewharton.threetenabp",
-                "threetenabp"
-            ).versionRef("threeten")
+            library("desugar", "com.android.tools", "desugar_jdk_libs").versionRef("desugar")
             // HTML parsing
             library("jsoup", "org.jsoup", "jsoup").versionRef("jsoup")
             library("tagsoup", "org.ccil.cowan.tagsoup", "tagsoup").versionRef("tagsoup")
@@ -287,7 +283,6 @@ dependencyResolutionManagement {
             library("mockito-core", "org.mockito", "mockito-core").versionRef("mockito")
             library("mockk", "io.mockk", "mockk").versionRef("mockk")
             library("mockwebserver", "com.squareup.okhttp3", "mockwebserver").versionRef("okhttp")
-            library("threeten.bp", "org.threeten", "threetenbp").versionRef("threeten")
 
             library("mockk-android", "io.mockk", "mockk-android").versionRef("mockk")
             library("androidx-test-core", "androidx.test", "core").versionRef("androidxTestcore")

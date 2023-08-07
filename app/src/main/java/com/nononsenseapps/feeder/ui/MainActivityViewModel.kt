@@ -7,10 +7,10 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
+import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
-import org.threeten.bp.Instant
 
 class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()

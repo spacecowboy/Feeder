@@ -9,8 +9,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
+import java.time.Instant
 import kotlinx.coroutines.flow.Flow
-import org.threeten.bp.Instant
 
 @Dao
 interface SyncRemoteDao {

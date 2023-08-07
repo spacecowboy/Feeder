@@ -14,12 +14,12 @@ import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.db.room.generateDeviceName
 import java.net.URL
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import org.threeten.bp.Instant
-import org.threeten.bp.temporal.ChronoUnit
 
 class SyncRemoteStore(override val di: DI) : DIAware {
     private val dao: SyncRemoteDao by instance()

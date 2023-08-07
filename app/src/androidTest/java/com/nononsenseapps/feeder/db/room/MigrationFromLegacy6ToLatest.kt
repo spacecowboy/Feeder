@@ -38,6 +38,9 @@ import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import java.net.URL
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -50,9 +53,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.ZonedDateTime
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest

@@ -28,8 +28,8 @@ import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
 import java.net.URL
-import org.threeten.bp.Instant
-import org.threeten.bp.ZonedDateTime
+import java.time.Instant
+import java.time.ZonedDateTime
 
 const val feedItemColumnsWithFeed = """
     $FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE,
@@ -74,7 +74,7 @@ data class FeedItemWithFeed @Ignore constructor(
                 var fname: String? = null
                 try {
                     fname = URI(enclosureLink).path.split("/").last()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
                 return if (fname.isNullOrEmpty()) {
                     null

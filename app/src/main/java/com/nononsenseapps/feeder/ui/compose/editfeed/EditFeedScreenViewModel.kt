@@ -15,10 +15,10 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import java.net.URL
+import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
-import org.threeten.bp.Instant
 
 class EditFeedScreenViewModel(
     di: DI,

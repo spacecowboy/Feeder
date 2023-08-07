@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
 import java.net.URL
+import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -23,7 +24,6 @@ import org.kodein.di.android.subDI
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import org.threeten.bp.Instant
 
 @RunWith(AndroidJUnit4::class)
 class FeedsToSyncTest : DIAware {
@@ -59,8 +59,9 @@ class FeedsToSyncTest : DIAware {
 
         // when
         val result = rssLocalSync.feedsToSync(
-            feedId = feed.id, tag = "",
-            staleTime = now.minusMinutes(2).toEpochMilli()
+            feedId = feed.id,
+            tag = "",
+            staleTime = now.minusMinutes(2).toEpochMilli(),
         )
 
         // then
@@ -71,7 +72,7 @@ class FeedsToSyncTest : DIAware {
     fun returnsAllStaleFeeds() = runBlocking {
         val items = listOf(
             withFeed(url = URL("http://one")),
-            withFeed(url = URL("http://two"))
+            withFeed(url = URL("http://two")),
         )
 
         val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
@@ -84,13 +85,13 @@ class FeedsToSyncTest : DIAware {
         val now = Instant.now()
         val items = listOf(
             withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1)),
-            withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
+            withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3)),
         )
 
         val result = rssLocalSync.feedsToSync(
             feedId = ID_UNSET,
             tag = "",
-            staleTime = now.minusMinutes(2).toEpochMilli()
+            staleTime = now.minusMinutes(2).toEpochMilli(),
         )
 
         assertEquals(listOf(items[1]), result)
@@ -100,7 +101,7 @@ class FeedsToSyncTest : DIAware {
     fun returnsTaggedStaleFeeds() = runBlocking {
         val items = listOf(
             withFeed(url = URL("http://one"), tag = "tag"),
-            withFeed(url = URL("http://two"), tag = "tag")
+            withFeed(url = URL("http://two"), tag = "tag"),
         )
 
         val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
@@ -113,13 +114,13 @@ class FeedsToSyncTest : DIAware {
         val now = Instant.now()
         val items = listOf(
             withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),
-            withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
+            withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag"),
         )
 
         val result = rssLocalSync.feedsToSync(
             feedId = ID_UNSET,
             tag = "tag",
-            staleTime = now.minusMinutes(2).toEpochMilli()
+            staleTime = now.minusMinutes(2).toEpochMilli(),
         )
 
         assertEquals(listOf(items[1]), result)
@@ -128,12 +129,12 @@ class FeedsToSyncTest : DIAware {
     private suspend fun withFeed(
         lastSync: Instant = Instant.ofEpochMilli(0),
         url: URL = URL("http://url"),
-        tag: String = ""
+        tag: String = "",
     ): Feed {
         val feed = Feed(
             lastSync = lastSync,
             url = url,
-            tag = tag
+            tag = tag,
         )
 
         val id = testDb.db.feedDao().insertFeed(feed)
