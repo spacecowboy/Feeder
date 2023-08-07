@@ -21,8 +21,7 @@ import com.nononsenseapps.feeder.model.OPMLParserHandler
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.createTempFile
+import kotlin.random.Random
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -66,8 +65,8 @@ class OPMLTest : DIAware {
     @Before
     fun setup() {
         // Get internal data dir
-        dir = createTempDirectory().toFile()
-        path = createTempFile().toFile()
+        dir = context.externalCacheDir!!.resolve("${Random.nextInt()}").also { it.mkdir() }
+        path = context.externalCacheDir!!.resolve("${Random.nextInt()}").also { it.createNewFile() }
         assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
