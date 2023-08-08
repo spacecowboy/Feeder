@@ -122,7 +122,7 @@
     <string name="open_link_in_web_view">Link openen in webweergave</string>
     <string name="dark_theme_preference_dark">Donker</string>
     <string name="theme_automatic">Auto</string>
-    <string name="theme_night">Donker</string>
+    <string name="theme_night">Nacht</string>
     <string name="theme_system">Systeem</string>
     <string name="mark_items_above_as_read">Artikelen hierboven als gelezen markeren</string>
     <string name="no_email_client">Kon geen e-mail client openen</string>
@@ -191,4 +191,21 @@
     <string name="saved_article">Opgeslagen artikel</string>
     <string name="unsave_article">Stop met opslaan artikel</string>
     <string name="mark_as_read_on_scroll">Als gelezen markeren bij scrollen</string>
+    <string name="no_feeds">Geen feeds</string>
+    <string name="zero_feeds">%1$s feeds</string>
+    <string name="one_feed">%1$s feed</string>
+    <string name="two_feeds">%1$s feeds</string>
+    <string name="few_feeds">%1$s feeds</string>
+    <string name="many_feeds">%1$s feeds</string>
+    <string name="other_feeds">%1$s feeds</string>
+    <string name="import_x_feeds_with_y_tags">Importeer %1$s met %2$s\?</string>
+    <string name="one_tags">%1$s tag</string>
+    <string name="two_tags">%1$s tags</string>
+    <string name="few_tags">%1$s tags</string>
+    <string name="zero_tags">%1$s labels</string>
+    <string name="many_tags">%1$s tags</string>
+    <string name="other_tags">%1$s tags</string>
+    <string name="failed_to_fetch_full_article_missing_body">Niets gevonden om op te halen</string>
+    <string name="failed_to_fetch_full_article_missing_link">Feed mist link naar artikel</string>
+    <string name="failed_to_fetch_full_article_not_html">De link is geen HTML-document</string>
 </resources>
