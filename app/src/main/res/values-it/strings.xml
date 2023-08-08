@@ -37,7 +37,7 @@
     <string name="new_based_on_this">Novità basate su questo</string>
     <string name="indicator_for_mark_as_read">Indicatore di lettura</string>
     <string name="share">Condividi</string>
-    <string name="no_such_feed">Non è stato possibile trovare tale feed. Riprova magari utilizzando HTTPS\?</string>
+    <string name="no_such_feed">Impossibile trovare il feed. Riprova utilizzando HTTPS\?</string>
     <string name="nothing_to_display">Nulla da visualizzare!</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="all_feeds">Tutti i feed</string>
