@@ -1,3 +1,101 @@
+# 2.5.0
+Agnieszka C (1):
+  * [0818b4a7] Updated Polish translation using Weblate
+
+Axus Wizix (1):
+  * [fee820a7] Updated Russian translation using Weblate
+
+Bahasnyldz (1):
+  * [e2828a30] Updated Turkish translation using Weblate
+
+Dan (1):
+  * [2f1271fe] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [4fa7e6d0] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [2778cf14] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [e7b81bb9] Updated Chinese (Simplified) translation using Weblate
+
+Francesco Saltori (1):
+  * [a03f8fdb] Updated Italian translation using Weblate
+
+J. Lavoie (2):
+  * [3f0a9cb4] Updated French translation using Weblate
+  * [a66281a7] Updated Italian translation using Weblate
+
+Jonas Kalderstam (19):
+  * [272b6765] Added handler for crashes: will open a pre-formatted email to
+         report the crash
+  * [ae95be09] Added automatic releases on GitHub with easily downloadable
+         APK-files
+  * [3e3b93f0] Fixed bug where you could get stuck in Couldn't Fetch Full
+         Article Text
+  * [b0734769] Fixed so fetch full text will only try to read HTML links.
+         PDFs and similar will result in an error text
+  * [a4b86988] Fixed possible crash if OMPL import failed
+  * [7f78acbe] Ensured non-html links are not downloaded in vain when
+         parsing full articles
+  * [b4a11ebd] Updated Swedish translation using Weblate
+  * [2a11651a] Upgraded dependency versions
+  * [6e629e1b] Changed so articles don't disappear immediately when they are
+         read
+  * [fbb37288] Changed so articles published today show time instead of date
+  * [9dd52cd2] Updated article styles: increased difference between
+         read/unread, improved usabilty in phone landscape orientation,
+         added feed icon to card
+  * [b0565a36] Re-enabled mark as read on scroll for grid; Card style is now
+         the only option for the grid layout
+  * [253d1539] Changed ContentProvider to build type specific values
+  * [50e924e9] Changed so swiping will hide article immediately if only
+         showing unread items
+  * [72782af9] Added Feeder specific settings to OPML
+  * [e456f243] Added a shared key for debug builds
+  * [8249d95c] Upgraded from threeten.bp to core library desugaring for
+         java.time
+  * [78f0cea0] Fixed tests to run on Android 23
+  * [32fe6403] Fixed Hungarian name in Fastlane metadata
+
+Kingproone (1):
+  * [d4856de4] Updated Hungarian translation using Weblate
+
+Luna Jernberg (1):
+  * [34f3afd3] Updated Swedish translation using Weblate
+
+Meiru (1):
+  * [7c0247f4] Updated Japanese translation using Weblate
+
+Retrial (1):
+  * [dbbe60f1] Updated Greek translation using Weblate
+
+Reza Almanda (1):
+  * [6de1e084] Updated Indonesian translation using Weblate
+
+VfBFan (1):
+  * [dfc70bd3] Updated German translation using Weblate
+
+Vitor Henrique (1):
+  * [22acf1f1] Updated Portuguese (Brazil) translation using Weblate
+
+WB (1):
+  * [c16773af] Updated Galician translation using Weblate
+
+atilluF (2):
+  * [f5594a93] Updated Italian translation using Weblate
+  * [f2666d2a] Updated Italian translation using Weblate
+
+bruh (1):
+  * [85503868] Updated Vietnamese translation using Weblate
+
+mm4c (1):
+  * [a2835463] Updated Dutch translation using Weblate
+
+ssantos (1):
+  * [f8e72164] Updated Portuguese (Portugal) translation using Weblate
+
 # 2.4.20
 J. Lavoie (1):
   * [7c9ea4d7] Updated Italian translation using Weblate
