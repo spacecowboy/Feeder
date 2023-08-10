@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -154,6 +155,7 @@ private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 fun FeedScreen(
     navController: NavController,
     viewModel: FeedArticleViewModel,
+    navDrawerListState: LazyListState,
 ) {
     val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
@@ -210,6 +212,12 @@ fun FeedScreen(
         },
     )
 
+    // See https://issuetracker.google.com/issues/177245496#comment24
+    // After recreation, items first return 0 items, then the cached items.
+    // This behavior/issue is resetting the LazyListState scroll position.
+    // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
+    val workaroundNavDrawerListState = rememberLazyListState()
+
     ScreenWithNavDrawer(
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
         expandedTags = ImmutableHolder(viewState.expandedTags),
@@ -222,6 +230,10 @@ fun FeedScreen(
         },
         focusRequester = focusNavDrawer,
         drawerState = drawerState,
+        navDrawerListState = when (viewState.drawerItemsWithUnreadCounts.size) {
+            0 -> workaroundNavDrawerListState
+            else -> navDrawerListState
+        },
     ) {
         FeedScreen(
             viewState = viewState,

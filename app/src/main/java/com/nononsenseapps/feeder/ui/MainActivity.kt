@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.core.util.Consumer
@@ -79,18 +80,19 @@ class MainActivity : DIAwareComponentActivity() {
     @Composable
     fun AppContent() {
         val navController = rememberAnimatedNavController()
+        val navDrawerListState = rememberLazyListState()
 
         AnimatedNavHost(navController, startDestination = FeedDestination.route) {
-            FeedDestination.register(this, navController)
-            ArticleDestination.register(this, navController)
+            FeedDestination.register(this, navController, navDrawerListState)
+            ArticleDestination.register(this, navController, navDrawerListState)
             // Feed editing
-            EditFeedDestination.register(this, navController)
-            SearchFeedDestination.register(this, navController)
-            AddFeedDestination.register(this, navController)
+            EditFeedDestination.register(this, navController, navDrawerListState)
+            SearchFeedDestination.register(this, navController, navDrawerListState)
+            AddFeedDestination.register(this, navController, navDrawerListState)
             // Settings
-            SettingsDestination.register(this, navController)
+            SettingsDestination.register(this, navController, navDrawerListState)
             // Sync settings
-            SyncScreenDestination.register(this, navController)
+            SyncScreenDestination.register(this, navController, navDrawerListState)
         }
 
         DisposableEffect(navController) {
