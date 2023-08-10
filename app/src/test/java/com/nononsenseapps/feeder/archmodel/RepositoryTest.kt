@@ -301,8 +301,9 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun deleteFeeds() {
+    fun deleteFeedsNotCurrentFeed() {
         coEvery { feedStore.deleteFeeds(any()) } just Runs
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(3L to "")
 
         runBlocking {
             repository.deleteFeeds(listOf(1, 2))
@@ -310,6 +311,30 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedStore.deleteFeeds(listOf(1, 2))
+        }
+        verify(exactly = 0) {
+            settingsStore.setCurrentFeedAndTag(any(), any())
+        }
+
+        verify {
+            androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
+        }
+    }
+
+    @Test
+    fun deleteFeedsCurrentFeed() {
+        coEvery { feedStore.deleteFeeds(any()) } just Runs
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(1L to "")
+
+        runBlocking {
+            repository.deleteFeeds(listOf(1, 2))
+        }
+
+        coVerify {
+            feedStore.deleteFeeds(listOf(1, 2))
+        }
+        verify {
+            settingsStore.setCurrentFeedAndTag(ID_ALL_FEEDS, any())
         }
 
         verify {
