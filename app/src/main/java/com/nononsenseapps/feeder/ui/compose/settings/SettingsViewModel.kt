@@ -123,6 +123,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setIsMarkAsReadOnScroll(value)
     }
 
+    fun setMaxLines(value: Int) {
+        repository.setMaxLines(value)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
         repository.feedNotificationSettings
@@ -170,6 +174,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.textScale,
                 immutableFeedsSettings,
                 repository.isMarkAsReadOnScroll,
+                repository.maxLines,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -195,6 +200,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     textScale = params[19] as Float,
                     feedsSettings = params[20] as List<UIFeedSettings>,
                     isMarkAsReadOnScroll = params[21] as Boolean,
+                    maxLines = params[22] as Int,
                 )
             }.collect {
                 _viewState.value = it
@@ -231,6 +237,7 @@ data class SettingsViewState(
     val textScale: Float = 1f,
     val feedsSettings: List<UIFeedSettings> = emptyList(),
     val isMarkAsReadOnScroll: Boolean = false,
+    val maxLines: Int = 2,
 )
 
 data class UIFeedSettings(

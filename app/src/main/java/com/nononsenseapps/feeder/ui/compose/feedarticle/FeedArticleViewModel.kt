@@ -271,6 +271,7 @@ class FeedArticleViewModel(
             ttsStateHolder.availableLanguages,
             repository.getUnreadBookmarksCount,
             repository.isMarkAsReadOnScroll,
+            repository.maxLines,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -321,6 +322,7 @@ class FeedArticleViewModel(
                 ttsLanguages = params[22] as List<Locale>,
                 unreadBookmarksCount = params[23] as Int,
                 markAsReadOnScroll = params[24] as Boolean,
+                maxLines = params[25] as Int,
             )
         }
             .stateIn(
@@ -459,6 +461,7 @@ interface FeedScreenViewState {
     val haveVisibleFeedItems: Boolean
     val swipeAsRead: SwipeAsRead
     val markAsReadOnScroll: Boolean
+    val maxLines: Int
 }
 
 interface ArticleScreenViewState {
@@ -532,5 +535,6 @@ data class FeedArticleScreenViewState(
     override val useDetectLanguage: Boolean = false,
     override val markAsReadOnScroll: Boolean = false,
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
+    override val maxLines: Int = 2,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

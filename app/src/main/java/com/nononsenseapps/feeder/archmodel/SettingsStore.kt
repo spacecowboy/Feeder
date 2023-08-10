@@ -114,6 +114,17 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, open).apply()
     }
 
+    private val _maxLines = MutableStateFlow(
+        sp.getInt(PREF_MAX_LINES, 2),
+    )
+    val maxLines: StateFlow<Int> = _maxLines.asStateFlow()
+    fun setMaxLines(value: Int) {
+        if (value > 0) {
+            _maxLines.update { value }
+            sp.edit().putInt(PREF_MAX_LINES, value).apply()
+        }
+    }
+
     private val _currentTheme = MutableStateFlow(
         themeOptionsFromString(
             sp.getString(PREF_THEME, null)?.uppercase()
@@ -467,47 +478,42 @@ const val PREF_TEXT_SCALE = "pref_body_text_scale"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
+const val PREF_MAX_LINES = "pref_max_lines"
+
 /**
  * Read Aloud Settings
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
-enum class SettingType {
-    STRING,
-    FLOAT,
-    BOOLEAN,
-}
-
 /**
  * Used for OPML Import/Export. Please add new (only) user configurable settings here
  */
-enum class UserSettings(val key: String, val type: SettingType) {
-    SETTING_SHOW_ONLY_UNREAD(key = PREF_SHOW_ONLY_UNREAD, type = SettingType.BOOLEAN),
-    SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS, type = SettingType.BOOLEAN),
-    SETTING_THEME(key = PREF_THEME, type = SettingType.STRING),
-    SETTING_DARK_THEME(key = PREF_DARK_THEME, type = SettingType.STRING),
-    SETTING_DYNAMIC_THEME(key = PREF_DYNAMIC_THEME, type = SettingType.BOOLEAN),
-    SETTING_SORT(key = PREF_SORT, type = SettingType.STRING),
-    SETTING_SHOW_FAB(key = PREF_SHOW_FAB, type = SettingType.BOOLEAN),
-    SETTING_FEED_ITEM_STYLE(key = PREF_FEED_ITEM_STYLE, type = SettingType.STRING),
-    SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ, type = SettingType.STRING),
-    SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING, type = SettingType.BOOLEAN),
-    SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI, type = SettingType.BOOLEAN),
-    SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ, type = SettingType.STRING),
-    SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME, type = SettingType.BOOLEAN),
-    SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI, type = SettingType.BOOLEAN),
-    SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS, type = SettingType.BOOLEAN),
-    SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH, type = SettingType.STRING),
-    SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH, type = SettingType.STRING),
-    SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE, type = SettingType.FLOAT),
+enum class UserSettings(val key: String) {
+    SETTING_SHOW_ONLY_UNREAD(key = PREF_SHOW_ONLY_UNREAD),
+    SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS),
+    SETTING_THEME(key = PREF_THEME),
+    SETTING_DARK_THEME(key = PREF_DARK_THEME),
+    SETTING_DYNAMIC_THEME(key = PREF_DYNAMIC_THEME),
+    SETTING_SORT(key = PREF_SORT),
+    SETTING_SHOW_FAB(key = PREF_SHOW_FAB),
+    SETTING_FEED_ITEM_STYLE(key = PREF_FEED_ITEM_STYLE),
+    SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ),
+    SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING),
+    SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI),
+    SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ),
+    SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME),
+    SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI),
+    SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS),
+    SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
+    SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
+    SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,
-        type = SettingType.BOOLEAN,
     ),
     SETTING_READALOUD_USE_DETECT_LANGUAGE(
         key = PREF_READALOUD_USE_DETECT_LANGUAGE,
-        type = SettingType.BOOLEAN,
     ),
+    SETTING_MAX_LINES(key = PREF_MAX_LINES),
     ;
 
     companion object {

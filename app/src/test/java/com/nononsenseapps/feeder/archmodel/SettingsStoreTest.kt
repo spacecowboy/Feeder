@@ -178,6 +178,17 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun maxLines() {
+        store.setMaxLines(5)
+
+        verify {
+            sp.edit().putInt(PREF_MAX_LINES, 5).apply()
+        }
+
+        assertEquals(5, store.maxLines.value)
+    }
+
+    @Test
     fun currentSorting() {
         store.setCurrentSorting(SortingOptions.OLDEST_FIRST)
 

@@ -119,6 +119,11 @@ class Repository(override val di: DI) : DIAware {
         settingsStore.setIsMarkAsReadOnScroll(value)
     }
 
+    val maxLines: StateFlow<Int> = settingsStore.maxLines
+    fun setMaxLines(value: Int) {
+        settingsStore.setMaxLines(value.coerceAtLeast(1))
+    }
+
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
     fun setCurrentArticle(articleId: Long) =
         settingsStore.setCurrentArticle(articleId)

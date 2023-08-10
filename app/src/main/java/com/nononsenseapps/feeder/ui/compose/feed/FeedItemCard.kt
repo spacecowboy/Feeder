@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
@@ -31,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -72,33 +70,7 @@ fun FeedItemCard(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    FeedItemCardVertical(
-        item = item,
-        showThumbnail = showThumbnail,
-        onMarkAboveAsRead = onMarkAboveAsRead,
-        onMarkBelowAsRead = onMarkBelowAsRead,
-        onShareItem = onShareItem,
-        onToggleBookmarked = onToggleBookmarked,
-        dropDownMenuExpanded = dropDownMenuExpanded,
-        onDismissDropdown = onDismissDropdown,
-        bookmarkIndicator = bookmarkIndicator,
-        modifier = modifier,
-    )
-}
-
-@Composable
-fun FeedItemCardVertical(
-    item: FeedListItem,
-    showThumbnail: Boolean,
-    onMarkAboveAsRead: () -> Unit,
-    onMarkBelowAsRead: () -> Unit,
-    onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
-    dropDownMenuExpanded: Boolean,
-    onDismissDropdown: () -> Unit,
-    bookmarkIndicator: Boolean,
+    maxLines: Int,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -167,95 +139,7 @@ fun FeedItemCardVertical(
                     onToggleBookmarked = onToggleBookmarked,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = onDismissDropdown,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun FeedItemCardHorizontal(
-    item: FeedListItem,
-    showThumbnail: Boolean,
-    onMarkAboveAsRead: () -> Unit,
-    onMarkBelowAsRead: () -> Unit,
-    onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
-    dropDownMenuExpanded: Boolean,
-    onDismissDropdown: () -> Unit,
-    bookmarkIndicator: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    val imageHeightDp = minOf(
-        LocalConfiguration.current.screenHeightDp * 50 / 100,
-        180,
-    ).dp
-    val pixels = with(LocalDensity.current) {
-        val height = imageHeightDp.roundToPx()
-        Size(height * 4 / 3, height)
-    }
-    ElevatedCard(
-        modifier = modifier,
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .requiredHeightIn(min = minimumTouchSize),
-        ) {
-            if (showThumbnail) {
-                item.imageUrl?.let { imageUrl ->
-                    Box(modifier = Modifier) {
-                        val alpha = if (item.unread) {
-                            1f
-                        } else {
-                            0.74f
-                        }
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(imageUrl)
-                                .listener(
-                                    onError = { a, b ->
-                                        Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
-                                    },
-                                )
-                                .scale(Scale.FILL)
-                                .size(pixels)
-                                .precision(Precision.INEXACT)
-                                .build(),
-                            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
-                            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                            contentDescription = stringResource(id = R.string.article_image),
-                            contentScale = ContentScale.Crop,
-                            alignment = Alignment.Center,
-                            modifier = Modifier
-                                .clip(MaterialTheme.shapes.medium)
-                                .height(imageHeightDp)
-                                .aspectRatio(4.0f / 3.0f)
-                                .alpha(alpha),
-                        )
-                    }
-                }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .padding(vertical = 8.dp, horizontal = 8.dp),
-            ) {
-                FeedItemEitherIndicator(
-                    bookmarked = item.bookmarked && bookmarkIndicator,
-                    itemImage = null,
-                    feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
-                    size = 16.dp,
-                )
-                FeedItemText(
-                    item = item,
-                    onMarkAboveAsRead = onMarkAboveAsRead,
-                    onMarkBelowAsRead = onMarkBelowAsRead,
-                    onShareItem = onShareItem,
-                    onToggleBookmarked = onToggleBookmarked,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = onDismissDropdown,
+                    maxLines = maxLines,
                 )
             }
         }
@@ -271,6 +155,7 @@ fun RowScope.FeedItemText(
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
+    maxLines: Int,
     modifier: Modifier = Modifier,
 ) {
     val snippetStyle = FeedListItemSnippetTextStyle()
@@ -301,7 +186,7 @@ fun RowScope.FeedItemText(
                 style = FeedListItemTitleTextStyle(),
                 fontWeight = titleFontWeight(item.unread),
                 overflow = TextOverflow.Clip,
-                maxLines = 2,
+                maxLines = maxLines,
                 modifier = Modifier
                     .fillMaxWidth(),
             )
@@ -420,6 +305,7 @@ private fun Preview() {
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
+            maxLines = 2,
             bookmarkIndicator = true,
         )
     }
@@ -454,6 +340,7 @@ private fun PreviewWithImageUnread() {
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                maxLines = 2,
                 bookmarkIndicator = true,
             )
         }
@@ -489,6 +376,7 @@ private fun PreviewWithImageRead() {
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                maxLines = 2,
                 bookmarkIndicator = true,
             )
         }

@@ -639,6 +639,7 @@ class OPMLTest : DIAware {
                     UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
                     UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
                     UserSettings.SETTING_SYNC_FREQ -> "720"
+                    UserSettings.SETTING_MAX_LINES -> "6"
                 }
             }
     }
@@ -697,6 +698,7 @@ private val sampleFile: List<String> = """
           <feeder:setting key="pref_body_text_scale" value="1.6"/>
           <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
           <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
+          <feeder:setting key="pref_max_lines" value="6"/>
           <feeder:blocked pattern="foo"/>
         </feeder:settings>
       </body>
