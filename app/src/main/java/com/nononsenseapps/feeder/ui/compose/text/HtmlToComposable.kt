@@ -510,7 +510,7 @@ private fun HtmlComposer.appendTextChildren(
 
                         // Wordpress likes nested figures to get images side by side
                         if (this is LazyListComposer) {
-                            val imgElement = element.firstDescendant(tagName = "img")
+                            val imgElement = element.firstBestDescendantImg(baseUrl = baseUrl)
 
                             if (imgElement != null) {
                                 val composer = EagerComposer { paragraphBuilder, textStyler ->
@@ -1062,6 +1062,19 @@ private fun Element.firstDescendant(tagName: String): Element? {
     return descendants(tagName).firstOrNull()
 }
 
+private fun Element.firstBestDescendantImg(baseUrl: String): Element? {
+    return descendants("img")
+        .firstOrNull { element ->
+            ImageCandidates(
+                baseUrl = baseUrl,
+                srcSet = element.attr("srcset") ?: "",
+                absSrc = element.attr("abs:src") ?: "",
+            ).hasImage
+        }
+        // Return first just to show error image instead then
+        ?: firstDescendant("img")
+}
+
 private fun Element.notAncestorOf(tagName: String): Boolean {
     var current: Element? = this
 
@@ -1156,7 +1169,7 @@ internal class ImageCandidates(
     fun getBestImageForMaxSize(maxWidth: Int, pixelDensity: Float): String {
         val setCandidate = srcSet.splitToSequence(", ")
             .map { it.trim() }
-            .map { it.split(SpaceRegex).take(2).map { x -> x.trim() } }
+            .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
             .fold(100f to "") { acc, candidate ->
                 val candidateSize = if (candidate.size == 1) {
                     // Assume it corresponds to 1x pixel density
@@ -1187,14 +1200,17 @@ internal class ImageCandidates(
             }
             .second
 
-        return StringUtil.resolve(
-            baseUrl,
-            setCandidate.takeIf { it.isNotBlank() } ?: absSrc,
-        )
+        return (setCandidate.takeIf { it.isNotBlank() } ?: absSrc.takeIf { it.isNotBlank() })?.let {
+            StringUtil.resolve(baseUrl, it)
+        } ?: ""
+    }
+
+    override fun toString(): String {
+        return "ImageCandidates(srcSet=$srcSet, src=$absSrc)"
     }
 }
 
-private val SpaceRegex = Regex("\\s+")
+private val spaceRegex = Regex("\\s+")
 
 /**
  * Can't use JSoup's text() method because that strips invisible characters
