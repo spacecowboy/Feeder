@@ -375,6 +375,9 @@ class Repository(override val di: DI) : DIAware {
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedStore.deleteFeeds(feedIds)
         androidSystemStore.removeDynamicShortcuts(feedIds)
+        if (currentFeedAndTag.value.first in feedIds) {
+            setCurrentFeedAndTag(ID_ALL_FEEDS, "")
+        }
     }
 
     suspend fun markAllAsReadInFeedOrTag(feedId: Long, tag: String) {
