@@ -387,6 +387,7 @@ class Repository(override val di: DI) : DIAware {
             else -> feedItemStore.markAllAsRead()
         }
         scheduleSendRead()
+        settingsStore.setMinReadTime(Instant.now())
     }
 
     suspend fun markBeforeAsRead(cursor: FeedItemCursor, feedId: Long, tag: String) {

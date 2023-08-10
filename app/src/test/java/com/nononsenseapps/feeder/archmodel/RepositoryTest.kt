@@ -234,6 +234,9 @@ class RepositoryTest : DIAware {
         coVerify {
             feedItemStore.markAllAsReadInFeed(5L)
         }
+        verify {
+            settingsStore.setMinReadTime(any())
+        }
     }
 
     @Test
@@ -245,6 +248,9 @@ class RepositoryTest : DIAware {
         coVerify {
             feedItemStore.markAllAsReadInTag("foo")
         }
+        verify {
+            settingsStore.setMinReadTime(any())
+        }
     }
 
     @Test
@@ -255,6 +261,9 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedItemStore.markAllAsRead()
+        }
+        verify {
+            settingsStore.setMinReadTime(any())
         }
     }
 
