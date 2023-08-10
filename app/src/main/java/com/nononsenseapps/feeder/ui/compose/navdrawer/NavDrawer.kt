@@ -23,7 +23,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.Star
@@ -85,6 +87,7 @@ fun ScreenWithNavDrawer(
     onDrawerItemSelected: (Long, String) -> Unit,
     drawerState: DrawerState,
     focusRequester: FocusRequester,
+    navDrawerListState: LazyListState,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -107,6 +110,7 @@ fun ScreenWithNavDrawer(
         drawerContent = {
             DismissibleDrawerSheet {
                 ListOfFeedsAndTags(
+                    state = navDrawerListState,
                     modifier = Modifier
                         .focusRequester(focusRequester),
                     feedsAndTags = feedsAndTags,
@@ -133,7 +137,7 @@ private fun ListOfFeedsAndTagsPreview() {
     FeederTheme {
         Surface {
             ListOfFeedsAndTags(
-                immutableListHolderOf(
+                feedsAndTags = immutableListHolderOf(
                     DrawerTop(unreadCount = 100, totalChildren = 4),
                     DrawerSavedArticles(unreadCount = 5),
                     DrawerTag(
@@ -181,14 +185,15 @@ private fun ListOfFeedsAndTagsPreview() {
                         tag = "",
                     ),
                 ),
-                ImmutableHolder(
+                expandedTags = ImmutableHolder(
                     setOf(
                         "News tag",
                         "Funny tag",
                     ),
                 ),
-                1,
-                {},
+                unreadBookmarksCount = 1,
+                onToggleTagExpansion = {},
+                state = rememberLazyListState(),
             ) {}
         }
     }
@@ -201,6 +206,7 @@ fun ListOfFeedsAndTags(
     expandedTags: ImmutableHolder<Set<String>>,
     unreadBookmarksCount: Int,
     onToggleTagExpansion: (String) -> Unit,
+    state: LazyListState,
     modifier: Modifier = Modifier,
     onItemClick: (FeedIdTag) -> Unit,
 ) {
@@ -213,6 +219,7 @@ fun ListOfFeedsAndTags(
         }
     }
     LazyColumn(
+        state = state,
         contentPadding = WindowInsets.systemBars.asPaddingValues(),
         modifier = modifier
             .fillMaxSize()
