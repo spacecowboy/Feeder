@@ -184,6 +184,8 @@ fun SettingsScreen(
             onToggleNotification = settingsViewModel::toggleNotifications,
             isMarkAsReadOnScroll = viewState.isMarkAsReadOnScroll,
             onMarkAsReadOnScroll = settingsViewModel::setIsMarkAsReadOnScroll,
+            maxLines = viewState.maxLines,
+            setMaxLines = settingsViewModel::setMaxLines,
             modifier = Modifier.padding(padding),
         )
     }
@@ -241,6 +243,8 @@ fun SettingsScreenPreview() {
                 onToggleNotification = { _, _ -> },
                 isMarkAsReadOnScroll = false,
                 onMarkAsReadOnScroll = {},
+                maxLines = 2,
+                setMaxLines = {},
                 modifier = Modifier,
             )
         }
@@ -294,6 +298,8 @@ fun SettingsList(
     onToggleNotification: (Long, Boolean) -> Unit,
     isMarkAsReadOnScroll: Boolean,
     onMarkAsReadOnScroll: (Boolean) -> Unit,
+    maxLines: Int,
+    setMaxLines: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -347,48 +353,6 @@ fun SettingsList(
                 DarkThemePreferences.DARK.asDarkThemeOption(),
             ),
             onSelection = onDarkThemePreferenceChanged,
-        )
-
-        MenuSetting(
-            currentValue = currentSortingValue,
-            values = immutableListHolderOf(
-                SortingOptions.NEWEST_FIRST.asSortOption(),
-                SortingOptions.OLDEST_FIRST.asSortOption(),
-            ),
-            title = stringResource(id = R.string.sort),
-            onSelection = onSortingChanged,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.show_fab),
-            checked = showFabValue,
-            onCheckedChanged = onShowFabChanged,
-        )
-
-        if (isCompactDevice()) {
-            MenuSetting(
-                title = stringResource(id = R.string.feed_item_style),
-                currentValue = feedItemStyleValue.asFeedItemStyleOption(),
-                values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
-                onSelection = {
-                    onFeedItemStyleChanged(it.feedItemStyle)
-                },
-            )
-        }
-
-        MenuSetting(
-            title = stringResource(id = R.string.swipe_to_mark_as_read),
-            currentValue = swipeAsReadValue.asSwipeAsReadOption(),
-            values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
-            onSelection = {
-                onSwipeAsReadOptionChanged(it.swipeAsRead)
-            },
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.mark_as_read_on_scroll),
-            checked = isMarkAsReadOnScroll,
-            onCheckedChanged = onMarkAsReadOnScroll,
         )
 
         ListDialogSetting(
@@ -513,15 +477,58 @@ fun SettingsList(
 
         GroupTitle { innerModifier ->
             Text(
-                stringResource(id = R.string.image_loading),
+                stringResource(id = R.string.article_list_settings),
                 modifier = innerModifier,
             )
         }
 
+        MenuSetting(
+            currentValue = currentSortingValue,
+            values = immutableListHolderOf(
+                SortingOptions.NEWEST_FIRST.asSortOption(),
+                SortingOptions.OLDEST_FIRST.asSortOption(),
+            ),
+            title = stringResource(id = R.string.sort),
+            onSelection = onSortingChanged,
+        )
+
         SwitchSetting(
-            title = stringResource(id = R.string.only_on_wifi),
-            checked = loadImageOnlyOnWifiValue,
-            onCheckedChanged = onLoadImageOnlyOnWifiChanged,
+            title = stringResource(id = R.string.show_fab),
+            checked = showFabValue,
+            onCheckedChanged = onShowFabChanged,
+        )
+
+        if (isCompactDevice()) {
+            MenuSetting(
+                title = stringResource(id = R.string.feed_item_style),
+                currentValue = feedItemStyleValue.asFeedItemStyleOption(),
+                values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
+                onSelection = {
+                    onFeedItemStyleChanged(it.feedItemStyle)
+                },
+            )
+        }
+
+        MenuSetting(
+            title = stringResource(id = R.string.max_lines),
+            currentValue = maxLines,
+            values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+            onSelection = setMaxLines,
+        )
+
+        MenuSetting(
+            title = stringResource(id = R.string.swipe_to_mark_as_read),
+            currentValue = swipeAsReadValue.asSwipeAsReadOption(),
+            values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
+            onSelection = {
+                onSwipeAsReadOptionChanged(it.swipeAsRead)
+            },
+        )
+
+        SwitchSetting(
+            title = stringResource(id = R.string.mark_as_read_on_scroll),
+            checked = isMarkAsReadOnScroll,
+            onCheckedChanged = onMarkAsReadOnScroll,
         )
 
         SwitchSetting(
@@ -562,6 +569,21 @@ fun SettingsList(
             onSelection = {
                 onLinkOpenerChanged(it.linkOpener)
             },
+        )
+
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { innerModifier ->
+            Text(
+                stringResource(id = R.string.image_loading),
+                modifier = innerModifier,
+            )
+        }
+
+        SwitchSetting(
+            title = stringResource(id = R.string.only_on_wifi),
+            checked = loadImageOnlyOnWifiValue,
+            onCheckedChanged = onLoadImageOnlyOnWifiChanged,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))

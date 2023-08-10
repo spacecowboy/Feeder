@@ -254,6 +254,17 @@ class RepositoryTest : DIAware {
     }
 
     @Test
+    fun maxLines() {
+        repository.setMaxLines(9)
+
+        verify { settingsStore.setMaxLines(9) }
+
+        repository.setMaxLines(-1)
+
+        verify { settingsStore.setMaxLines(1) }
+    }
+
+    @Test
     fun markAllAsReadInCurrentAll() {
         runBlocking {
             repository.markAllAsReadInFeedOrTag(ID_ALL_FEEDS, "")

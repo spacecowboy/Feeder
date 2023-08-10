@@ -93,6 +93,7 @@
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>
   <string name="reader_settings">Reader</string>
+  <string name="article_list_settings">Article list</string>
   <string name="open_link_in_web_view">Open link in web view</string>
   <string name="open_in_web_view">Open in Web view</string>
   <string name="max_feed_items">Max items per feed</string>
@@ -221,4 +222,5 @@
   <string name="failed_to_fetch_full_article_missing_body">Found nothing to fetch</string>
   <string name="failed_to_fetch_full_article_missing_link">Feed is missing link to article</string>
   <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
+  <string name="max_lines">Max lines</string>
 </resources>

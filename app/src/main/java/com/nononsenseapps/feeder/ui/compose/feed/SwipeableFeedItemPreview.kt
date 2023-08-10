@@ -78,6 +78,7 @@ fun SwipeableFeedItemPreview(
     feedItemStyle: FeedItemStyle,
     swipeAsRead: SwipeAsRead,
     bookmarkIndicator: Boolean,
+    maxLines: Int,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onToggleBookmarked: () -> Unit,
@@ -248,6 +249,7 @@ fun SwipeableFeedItemPreview(
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
+                    maxLines = maxLines,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -293,6 +295,7 @@ fun SwipeableFeedItemPreview(
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
+                    maxLines = maxLines,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -312,6 +315,7 @@ fun SwipeableFeedItemPreview(
                 Box(
                     modifier = Modifier
                         .run {
+                            @Suppress("KotlinConstantConditions")
                             when (swipeAsRead) {
                                 // This never actually gets called due to outer if
                                 SwipeAsRead.DISABLED ->
