@@ -267,20 +267,13 @@ fun SwipeableFeedItemPreview(
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
+                    maxLines = maxLines,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
                     imageWidth = when (compactLandscape) {
                         true -> 196.dp
                         false -> 64.dp
-                    },
-                    titleMaxLines = when (compactLandscape) {
-                        true -> 2
-                        false -> 3
-                    },
-                    snippetMaxLines = when (compactLandscape) {
-                        true -> 2
-                        false -> 4
                     },
                 )
             }
