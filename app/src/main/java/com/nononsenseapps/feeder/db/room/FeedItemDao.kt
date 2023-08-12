@@ -7,7 +7,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_TITLE
@@ -17,7 +19,6 @@ import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
 import java.net.URL
 import java.time.Instant
-import java.time.ZonedDateTime
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -131,6 +132,12 @@ interface FeedItemDao {
         """,
     )
     suspend fun getFeedItem(id: Long): FeedItemWithFeed?
+
+    @RawQuery(observedEntities = [FeedItem::class])
+    fun getPreviewsCount(query: SupportSQLiteQuery): Flow<Int>
+
+    @RawQuery(observedEntities = [FeedItem::class])
+    fun pagingPreviews(query: SupportSQLiteQuery): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -308,178 +315,6 @@ interface FeedItemDao {
 
     @Query(
         """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                WHERE (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time < :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadDesc(
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                WHERE (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time > :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadAsc(
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                WHERE feed_id = :feedId
-                and (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time < :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadDesc(
-        feedId: Long,
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                WHERE feed_id = :feedId
-                and (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time > :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadAsc(
-        feedId: Long,
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag
-                and (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time < :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadDesc(
-        tag: String,
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
-            UPDATE feed_items SET read_time = coalesce(read_time, :markReadTime), notified = 1
-            WHERE id IN (
-                SELECT feed_items.id
-                FROM feed_items
-                LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag
-                and (read_time is null or read_time >= :queryReadTime)
-                and bookmarked in (1, :onlyBookmarked)
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-                -- this version of sqlite doesn't seem to support tuple comparisons
-                and (
-                    primary_sort_time > :primarySortTime
-                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
-                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
-                )
-            )
-        """,
-    )
-    suspend fun markAsReadAsc(
-        tag: String,
-        queryReadTime: Instant,
-        onlyBookmarked: Boolean,
-        primarySortTime: Instant,
-        pubDate: ZonedDateTime?,
-        id: Long,
-        markReadTime: Instant = Instant.now(),
-    )
-
-    @Query(
-        """
             SELECT feeds.open_articles_with
             FROM feed_items
             LEFT JOIN feeds ON feed_items.feed_id = feeds.id
@@ -588,9 +423,9 @@ interface FeedItemDao {
 
     companion object {
         // These are backed by a database index
-        private const val feedItemsListOrderByDesc =
+        const val feedItemsListOrderByDesc =
             "primary_sort_time DESC, pub_date DESC, feed_items.id DESC"
-        private const val feedItemsListOrderByAsc =
+        const val feedItemsListOrderByAsc =
             "primary_sort_time ASC, pub_date ASC, feed_items.id ASC"
     }
 }

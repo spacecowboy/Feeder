@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
+import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
@@ -72,7 +74,7 @@ private const val LOG_TAG = "FEEDER_SWIPEITEM"
 @Composable
 fun SwipeableFeedItemPreview(
     onSwipe: suspend (Boolean) -> Unit,
-    onlyUnread: Boolean,
+    filter: FeedListFilter,
     item: FeedListItem,
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
@@ -94,14 +96,15 @@ fun SwipeableFeedItemPreview(
     }
 
     val color by animateColorAsState(
-        when {
+        targetValue = when {
             swipeableState.targetValue == FeedItemSwipeState.NONE -> Color.Transparent
-            item.unread || onlyUnread -> SwipingItemToReadColor
+            item.unread || filter.onlyUnread -> SwipingItemToReadColor
             else -> SwipingItemToUnreadColor
         },
+        label = "swipeBackground",
     )
 
-    LaunchedEffect(onlyUnread, item.unread) {
+    LaunchedEffect(filter, item.unread) {
         // critical state changes - reset ui state
         ignoreSwipes = true
         swipeableState.animateTo(FeedItemSwipeState.NONE)

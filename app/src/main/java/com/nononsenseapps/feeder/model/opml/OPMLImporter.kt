@@ -36,7 +36,7 @@ class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
 
     override suspend fun saveSetting(key: String, value: String) {
         when (UserSettings.fromKey(key)) {
-            UserSettings.SETTING_SHOW_ONLY_UNREAD -> settingsStore.setShowOnlyUnread(value.toBoolean())
+            null -> Log.w(LOG_TAG, "Unrecognized setting during import: $key")
             UserSettings.SETTING_ADDED_FEEDER_NEWS -> settingsStore.setAddedFeederNews(value.toBoolean())
             UserSettings.SETTING_THEME -> settingsStore.setCurrentTheme(
                 themeOptionsFromString(value),
@@ -73,7 +73,9 @@ class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
             UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> settingsStore.setIsMarkAsReadOnScroll(value.toBoolean())
             UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> settingsStore.setUseDetectLanguage(value.toBoolean())
             UserSettings.SETTING_MAX_LINES -> settingsStore.setMaxLines((value.toIntOrNull() ?: 1).coerceAtLeast(1))
-            null -> Log.w(LOG_TAG, "Unrecognized setting during import: $key")
+            UserSettings.SETTINGS_FILTER_SAVED -> settingsStore.setFeedListFilterSaved(value.toBoolean())
+            UserSettings.SETTINGS_FILTER_RECENTLY_READ -> settingsStore.setFeedListFilterRecentlyRead(value.toBoolean())
+            UserSettings.SETTINGS_FILTER_READ -> settingsStore.setFeedListFilterRead(value.toBoolean())
         }
     }
 

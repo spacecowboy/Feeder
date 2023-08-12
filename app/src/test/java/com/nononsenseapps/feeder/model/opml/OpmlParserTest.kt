@@ -43,7 +43,6 @@ class OpmlParserTest : DIAware {
                 key = userSetting.key,
                 value = when (userSetting) {
                     UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                    UserSettings.SETTING_SHOW_ONLY_UNREAD -> "false"
                     UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
                     UserSettings.SETTING_THEME -> "night"
                     UserSettings.SETTING_DARK_THEME -> "DaRk"
@@ -63,6 +62,9 @@ class OpmlParserTest : DIAware {
                     UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
                     UserSettings.SETTING_SYNC_FREQ -> "720"
                     UserSettings.SETTING_MAX_LINES -> "6"
+                    UserSettings.SETTINGS_FILTER_SAVED -> "true"
+                    UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
+                    UserSettings.SETTINGS_FILTER_READ -> "false"
                 },
             )
         }
@@ -73,7 +75,6 @@ class OpmlParserTest : DIAware {
         setAllSettings()
         verify {
             settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
-            settingsStore.setShowOnlyUnread(false)
             settingsStore.setAddedFeederNews(true)
             settingsStore.setCurrentTheme(ThemeOptions.NIGHT)
             settingsStore.setDarkThemePreference(DarkThemePreferences.DARK)
@@ -93,6 +94,9 @@ class OpmlParserTest : DIAware {
             settingsStore.setSyncOnlyOnWifi(false)
             settingsStore.setSyncFrequency(SyncFrequency.EVERY_12_HOURS)
             settingsStore.setMaxLines(6)
+            settingsStore.setFeedListFilterRecentlyRead(true)
+            settingsStore.setFeedListFilterRead(false)
+            settingsStore.setFeedListFilterSaved(true)
         }
 
         confirmVerified(settingsStore)
