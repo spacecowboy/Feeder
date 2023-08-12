@@ -42,7 +42,7 @@ fun FeedItemSuperCompact(
             bookmarked = item.bookmarked && bookmarkIndicator,
             itemImage = null,
             feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
-            size = 16.dp,
+            size = 24.dp,
         )
         FeedItemText(
             item = item,
