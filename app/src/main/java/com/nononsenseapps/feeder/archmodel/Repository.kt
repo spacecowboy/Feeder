@@ -27,6 +27,8 @@ import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
+import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.logDebug
@@ -38,7 +40,6 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -83,9 +84,6 @@ class Repository(override val di: DI) : DIAware {
         }
     }
 
-    val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
-    fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
-
     val minReadTime: StateFlow<Instant> = settingsStore.minReadTime
     fun setMinReadTime(value: Instant) = settingsStore.setMinReadTime(value)
 
@@ -105,7 +103,7 @@ class Repository(override val di: DI) : DIAware {
             }
         }
         if (settingsStore.setCurrentFeedAndTag(feedId, tag)) {
-            settingsStore.setMinReadTime(Instant.now())
+            setMinReadTime(Instant.now())
         }
     }
 
@@ -122,6 +120,26 @@ class Repository(override val di: DI) : DIAware {
     val maxLines: StateFlow<Int> = settingsStore.maxLines
     fun setMaxLines(value: Int) {
         settingsStore.setMaxLines(value.coerceAtLeast(1))
+    }
+
+    val feedListFilter: StateFlow<FeedListFilter> = settingsStore.feedListFilter
+
+    fun setFeedListFilterSaved(value: Boolean) {
+        settingsStore.setFeedListFilterSaved(value)
+    }
+    fun setFeedListFilterRecentlyRead(value: Boolean) {
+        settingsStore.setFeedListFilterRecentlyRead(value)
+        // Implies read too
+        if (!value) {
+            settingsStore.setFeedListFilterRead(false)
+        }
+    }
+    fun setFeedListFilterRead(value: Boolean) {
+        settingsStore.setFeedListFilterRead(value)
+        // Implies recently read too
+        if (value) {
+            settingsStore.setFeedListFilterRecentlyRead(true)
+        }
     }
 
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
@@ -159,10 +177,10 @@ class Repository(override val di: DI) : DIAware {
     fun setSyncOnResume(value: Boolean) = settingsStore.setSyncOnResume(value)
 
     val syncOnlyOnWifi: StateFlow<Boolean> = settingsStore.syncOnlyOnWifi
-    suspend fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
+    fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
 
     val syncOnlyWhenCharging: StateFlow<Boolean> = settingsStore.syncOnlyWhenCharging
-    suspend fun setSyncOnlyWhenCharging(value: Boolean) =
+    fun setSyncOnlyWhenCharging(value: Boolean) =
         settingsStore.setSyncOnlyWhenCharging(value)
 
     val loadImageOnlyOnWifi = settingsStore.loadImageOnlyOnWifi
@@ -192,7 +210,7 @@ class Repository(override val di: DI) : DIAware {
     fun setLinkOpener(value: LinkOpener) = settingsStore.setLinkOpener(value)
 
     val syncFrequency = settingsStore.syncFrequency
-    suspend fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)
+    fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)
 
     val resumeTime: StateFlow<Instant> = sessionStore.resumeTime
     fun setResumeTime(value: Instant) {
@@ -210,31 +228,12 @@ class Repository(override val di: DI) : DIAware {
                 }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
-        minReadTime,
-        currentSorting,
-    ) { minReadTime, currentSorting ->
-        FeedListArgs(
-            feedId = feedId,
-            tag = tag,
-            minReadTime = minReadTime,
-            newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
-        )
-    }.flatMapLatest {
-        feedItemStore.getPagedFeedItems(
-            feedId = it.feedId,
-            tag = it.tag,
-            minReadTime = it.minReadTime,
-            newestFirst = it.newestFirst,
-        )
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> = combine(
         currentFeedAndTag,
         minReadTime,
         currentSorting,
-    ) { feedAndTag, minReadTime, currentSorting ->
+        feedListFilter,
+    ) { feedAndTag, minReadTime, currentSorting, feedListFilter ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
@@ -244,13 +243,16 @@ class Repository(override val di: DI) : DIAware {
                 else -> minReadTime
             },
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
+            filter = feedListFilter,
         )
     }.flatMapLatest {
-        feedItemStore.getPagedFeedItems(
+        logDebug("JONAS", "DAMP $it")
+        feedItemStore.getPagedFeedItemsRaw(
             feedId = it.feedId,
             tag = it.tag,
             minReadTime = it.minReadTime,
             newestFirst = it.newestFirst,
+            filter = it.filter,
         )
     }
 
@@ -258,8 +260,8 @@ class Repository(override val di: DI) : DIAware {
     fun getCurrentFeedListVisibleItemCount(): Flow<Int> = combine(
         currentFeedAndTag,
         minReadTime,
-        currentSorting,
-    ) { feedAndTag, minReadTime, _ ->
+        feedListFilter,
+    ) { feedAndTag, minReadTime, feedListFilter ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
@@ -269,12 +271,15 @@ class Repository(override val di: DI) : DIAware {
                 else -> minReadTime
             },
             newestFirst = false,
+            filter = feedListFilter,
         )
     }.flatMapLatest {
-        feedItemStore.getFeedItemCount(
+        logDebug("JONAS", "Fump $it")
+        feedItemStore.getFeedItemCountRaw(
             feedId = it.feedId,
             tag = it.tag,
             minReadTime = it.minReadTime,
+            filter = it.filter,
         )
     }
 
@@ -338,9 +343,6 @@ class Repository(override val di: DI) : DIAware {
             else -> itemOpener.value // Global default
         }
 
-    suspend fun getDisplayTitleForFeed(feedId: Long): String? =
-        feedStore.getDisplayTitle(feedId)
-
     fun getScreenTitleForFeedOrTag(feedId: Long, tag: String) = flow {
         emit(
             ScreenTitle(
@@ -392,14 +394,15 @@ class Repository(override val di: DI) : DIAware {
             else -> feedItemStore.markAllAsRead()
         }
         scheduleSendRead()
-        settingsStore.setMinReadTime(Instant.now())
+        setMinReadTime(Instant.now())
     }
 
     suspend fun markBeforeAsRead(cursor: FeedItemCursor, feedId: Long, tag: String) {
-        feedItemStore.markAsRead(
+        feedItemStore.markAsReadRaw(
             feedId = feedId,
             tag = tag,
-            queryReadTime = minReadTime.value,
+            filter = feedListFilter.value,
+            minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
         )
@@ -407,10 +410,11 @@ class Repository(override val di: DI) : DIAware {
     }
 
     suspend fun markAfterAsRead(cursor: FeedItemCursor, feedId: Long, tag: String) {
-        feedItemStore.markAsRead(
+        feedItemStore.markAsReadRaw(
             feedId = feedId,
             tag = tag,
-            queryReadTime = minReadTime.value,
+            filter = feedListFilter.value,
+            minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
         )
@@ -423,14 +427,12 @@ class Repository(override val di: DI) : DIAware {
         feedStore.drawerItemsWithUnreadCounts
 
     val getUnreadBookmarksCount
-        get() = feedItemStore.getFeedItemCount(
+        get() = feedItemStore.getFeedItemCountRaw(
             feedId = ID_SAVED_ARTICLES,
             tag = "",
-            minReadTime = null,
+            minReadTime = Instant.EPOCH,
+            filter = emptyFeedListFilter,
         )
-
-    fun getVisibleFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
-        feedStore.getFeedTitles(feedId, tag).buffer(1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentlyVisibleFeedTitles(): Flow<List<FeedTitle>> =
@@ -442,7 +444,7 @@ class Repository(override val di: DI) : DIAware {
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
 
-    suspend fun ensurePeriodicSyncConfigured() =
+    fun ensurePeriodicSyncConfigured() =
         settingsStore.configurePeriodicSync(replace = false)
 
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
@@ -479,18 +481,6 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun updateSyncRemoteMessageTimestamp(timestamp: Instant) {
         syncRemoteStore.updateSyncRemoteMessageTimestamp(timestamp)
-    }
-
-    suspend fun deleteAllReadStatusSyncs() {
-        syncRemoteStore.deleteAllReadStatusSyncs()
-    }
-
-    fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?> {
-        return syncRemoteStore.getNextFeedItemWithoutSyncedReadMark()
-    }
-
-    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
-        return syncRemoteStore.getFlowOfFeedItemsWithoutSyncedReadMark()
     }
 
     suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> {
@@ -552,10 +542,6 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun getFeedsOrderedByUrl(): List<Feed> {
         return feedStore.getFeedsOrderedByUrl()
-    }
-
-    fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {
-        return feedStore.getFlowOfFeedsOrderedByUrl()
     }
 
     suspend fun getRemotelySeenFeeds(): List<URL> {
@@ -651,6 +637,7 @@ private data class FeedListArgs(
     val tag: String,
     val newestFirst: Boolean,
     val minReadTime: Instant,
+    val filter: FeedListFilter,
 )
 
 // Wrapper class because flow combine doesn't like nulls

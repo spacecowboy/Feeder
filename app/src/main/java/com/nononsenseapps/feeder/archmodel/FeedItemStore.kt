@@ -4,17 +4,22 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.nononsenseapps.feeder.db.FAR_FUTURE
+import androidx.sqlite.db.SimpleSQLiteQuery
+import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.feedItemsListOrderByAsc
+import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.feedItemsListOrderByDesc
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.model.previewColumns
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
@@ -22,46 +27,44 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
+    private val appDatabase: AppDatabase by instance()
 
-    fun getFeedItemCount(
+    fun getFeedItemCountRaw(
         feedId: Long,
         tag: String,
-        minReadTime: Instant?,
-    ): Flow<Int> =
-        when {
-            feedId > ID_UNSET -> dao.getFeedItemCount(
-                feedId = feedId,
-                minReadTime = minReadTime ?: FAR_FUTURE,
-                bookmarked = false,
-            )
+        minReadTime: Instant,
+        filter: FeedListFilter,
+    ): Flow<Int> {
+        val queryString = StringBuilder()
+        val args = mutableListOf<Any?>()
 
-            tag.isNotEmpty() -> dao.getFeedItemCount(
-                tag = tag,
-                minReadTime = minReadTime ?: FAR_FUTURE,
-                bookmarked = false,
-            )
+        queryString.apply {
+            append("SELECT count(*) FROM feed_items\n")
+            append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
+            append("WHERE\n")
 
-            feedId == ID_SAVED_ARTICLES -> dao.getFeedItemCount(
-                minReadTime = minReadTime ?: FAR_FUTURE,
-                bookmarked = true,
-            )
-
-            else -> dao.getFeedItemCount(minReadTime = minReadTime ?: FAR_FUTURE, bookmarked = false)
+            rawQueryFilter(filter, args, minReadTime, feedId, tag)
         }
 
-    fun getPagedFeedItems(
+        return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
+    }
+
+    fun getPagedFeedItemsRaw(
         feedId: Long,
         tag: String,
         minReadTime: Instant,
         newestFirst: Boolean,
+        filter: FeedListFilter,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config = PagingConfig(
@@ -69,54 +72,134 @@ class FeedItemStore(override val di: DI) : DIAware {
                 enablePlaceholders = false,
             ),
         ) {
-            val onlyBookmarks = feedId == ID_SAVED_ARTICLES
-            when {
-                newestFirst -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(
-                            feedId = feedId,
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
+            val queryString = StringBuilder()
+            val args = mutableListOf<Any?>()
 
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(
-                            tag = tag,
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
+            queryString.apply {
+                append("SELECT $previewColumns FROM feed_items\n")
+                append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
+                append("WHERE\n")
 
-                        else -> dao.pagingUnreadPreviewsDesc(
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
-                    }
-                }
+                rawQueryFilter(filter, args, minReadTime, feedId, tag)
 
-                else -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(
-                            feedId = feedId,
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
-
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(
-                            tag = tag,
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
-
-                        else -> dao.pagingUnreadPreviewsAsc(
-                            minReadTime = minReadTime,
-                            bookmarked = onlyBookmarks,
-                        )
-                    }
+                when (newestFirst) {
+                    true -> append("ORDER BY $feedItemsListOrderByDesc\n")
+                    else -> append("ORDER BY $feedItemsListOrderByAsc\n")
                 }
             }
-        }.flow.map { pagingData ->
-            pagingData
-                .map { it.toFeedListItem() }
+
+            dao.pagingPreviews(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
         }
+            .flow.map { pagingData ->
+                pagingData
+                    .map { it.toFeedListItem() }
+            }
+
+    private fun StringBuilder.rawQueryFilter(
+        filter: FeedListFilter,
+        args: MutableList<Any?>,
+        minReadTime: Instant,
+        feedId: Long,
+        tag: String,
+    ) {
+        val onlySavedArticles = feedId == ID_SAVED_ARTICLES
+
+        // Always blocklist
+        append("NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)\n")
+        // List filter
+        if (!onlySavedArticles) {
+            append("AND (\n")
+            if (filter.unread && !filter.recentlyRead && !filter.read) {
+                append("read_time is null\n")
+            } else {
+                append("(read_time is null or read_time >= ?)\n").also {
+                    args.add(
+                        when {
+                            filter.read -> Instant.EPOCH
+                            else -> minReadTime
+                        }.toEpochMilli(),
+                    )
+                }
+            }
+            if (filter.saved) {
+                append("OR (bookmarked = 1)\n")
+            }
+            append(")\n")
+        }
+
+        when {
+            onlySavedArticles -> append("AND bookmarked = 1\n")
+            feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
+            tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }
+        }
+    }
+
+    suspend fun markAsReadRaw(
+        feedId: Long,
+        tag: String,
+        filter: FeedListFilter,
+        minReadTime: Instant,
+        descending: Boolean,
+        cursor: FeedItemCursor,
+    ) {
+        val queryString = StringBuilder()
+        val args = mutableListOf<Any?>()
+
+        queryString.apply {
+            append("UPDATE feed_items SET read_time = coalesce(read_time, ?), notified = 1\n").also {
+                args.add(Instant.now().toEpochMilli())
+            }
+            append("WHERE id IN (\n")
+
+            append("SELECT feed_items.id FROM feed_items\n")
+            append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
+            append("WHERE\n")
+            rawQueryFilter(filter, args, minReadTime, feedId, tag)
+            // this version of sqlite doesn't seem to support tuple comparisons
+            append("and (\n")
+
+            append(
+                when (descending) {
+                    true -> "primary_sort_time < ?\n"
+                    else -> "primary_sort_time > ?\n"
+                },
+            ).also { args.add(cursor.primarySortTime.toEpochMilli()) }
+            append(
+                when (descending) {
+                    true -> "or primary_sort_time = ? and pub_date < ?\n"
+                    else -> "or primary_sort_time = ? and pub_date > ?\n"
+                },
+            ).also {
+                args.add(cursor.primarySortTime.toEpochMilli())
+                args.add(cursor.pubDate)
+            }
+
+            append(
+                when (descending) {
+                    true -> "or primary_sort_time = ? and pub_date = ? and feed_items.id < ?\n"
+                    else -> "or primary_sort_time = ? and pub_date = ? and feed_items.id > ?\n"
+                },
+            ).also {
+                args.add(cursor.primarySortTime.toEpochMilli())
+                args.add(cursor.pubDate)
+                args.add(cursor.id)
+            }
+
+            append(")\n")
+
+            // where id in (
+            append(")\n")
+        }
+
+        // Room does not support writable raw queries
+        withContext(Dispatchers.IO) {
+            appDatabase.openHelper.writableDatabase.execSQL(
+                queryString.toString(),
+                args.toTypedArray(),
+            )
+            appDatabase.invalidationTracker.refreshVersionsAsync()
+        }
+    }
 
     suspend fun markAsNotified(itemIds: List<Long>) {
         dao.markAsNotified(itemIds)
@@ -178,77 +261,6 @@ class FeedItemStore(override val di: DI) : DIAware {
 
     suspend fun markAllAsRead() {
         dao.markAllAsRead()
-    }
-
-    suspend fun markAsRead(
-        feedId: Long,
-        tag: String,
-        queryReadTime: Instant,
-        descending: Boolean,
-        cursor: FeedItemCursor,
-    ) {
-        val onlyBookmarks = feedId == ID_SAVED_ARTICLES
-        when {
-            descending -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadDesc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        feedId = feedId,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadDesc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        tag = tag,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-
-                    else -> dao.markAsReadDesc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-                }
-            }
-
-            else -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadAsc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        feedId = feedId,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadAsc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        tag = tag,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-
-                    else -> dao.markAsReadAsc(
-                        primarySortTime = cursor.primarySortTime,
-                        pubDate = cursor.pubDate,
-                        id = cursor.id,
-                        queryReadTime = queryReadTime,
-                        onlyBookmarked = onlyBookmarks,
-                    )
-                }
-            }
-        }
     }
 
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =

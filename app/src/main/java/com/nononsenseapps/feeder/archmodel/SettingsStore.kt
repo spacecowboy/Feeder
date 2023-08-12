@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.time.Instant
@@ -42,29 +43,13 @@ class SettingsStore(override val di: DI) : DIAware {
         _addedFeederNews.value = value
     }
 
-    private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true))
-    val showOnlyUnread: StateFlow<Boolean> = _showOnlyUnread.asStateFlow()
-    fun setShowOnlyUnread(value: Boolean) {
-        sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
-        _showOnlyUnread.value = value
-        _minReadTime.value = when (value) {
-            true -> Instant.now()
-            false -> Instant.EPOCH
-        }
-    }
-
     private val _minReadTime: MutableStateFlow<Instant> = MutableStateFlow(
         // by design - min read time is never written to disk
-        when (_showOnlyUnread.value) {
-            true -> Instant.now()
-            false -> Instant.EPOCH
-        },
+        Instant.now(),
     )
     val minReadTime: StateFlow<Instant> = _minReadTime.asStateFlow()
     fun setMinReadTime(value: Instant) {
-        if (showOnlyUnread.value) {
-            _minReadTime.value = value
-        }
+        _minReadTime.value = value
     }
 
     private val _currentFeedAndTag = MutableStateFlow(
@@ -123,6 +108,33 @@ class SettingsStore(override val di: DI) : DIAware {
             _maxLines.update { value }
             sp.edit().putInt(PREF_MAX_LINES, value).apply()
         }
+    }
+
+    private val _feedListFilter = MutableStateFlow(
+        PrefsFeedListFilter(
+            saved = sp.getBoolean(PREFS_FILTER_SAVED, false),
+            recentlyRead = sp.getBoolean(PREFS_FILTER_RECENTLY_READ, true),
+            read = sp.getBoolean(
+                PREFS_FILTER_READ,
+                // Migration
+                !sp.getBoolean("pref_show_only_unread", true),
+            ),
+        ),
+    )
+    val feedListFilter: StateFlow<FeedListFilter> = _feedListFilter.asStateFlow()
+    fun setFeedListFilterSaved(value: Boolean) {
+        _feedListFilter.update { it.copy(saved = value) }
+        sp.edit().putBoolean(PREFS_FILTER_SAVED, value).apply()
+    }
+
+    fun setFeedListFilterRecentlyRead(value: Boolean) {
+        _feedListFilter.update { it.copy(recentlyRead = value) }
+        sp.edit().putBoolean(PREFS_FILTER_RECENTLY_READ, value).apply()
+    }
+
+    fun setFeedListFilterRead(value: Boolean) {
+        _feedListFilter.update { it.copy(read = value) }
+        sp.edit().putBoolean(PREFS_FILTER_READ, value).apply()
     }
 
     private val _currentTheme = MutableStateFlow(
@@ -407,11 +419,6 @@ class SettingsStore(override val di: DI) : DIAware {
 }
 
 /**
- * Boolean indicating if only unread items should be shown
- */
-const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
-
-/**
  * Boolean indicating if Feeder News feed has been added or not
  */
 const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
@@ -480,6 +487,10 @@ const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
 const val PREF_MAX_LINES = "pref_max_lines"
 
+const val PREFS_FILTER_SAVED = "prefs_filter_saved"
+const val PREFS_FILTER_RECENTLY_READ = "prefs_filter_recently_read"
+const val PREFS_FILTER_READ = "prefs_filter_read"
+
 /**
  * Read Aloud Settings
  */
@@ -489,7 +500,6 @@ const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
  * Used for OPML Import/Export. Please add new (only) user configurable settings here
  */
 enum class UserSettings(val key: String) {
-    SETTING_SHOW_ONLY_UNREAD(key = PREF_SHOW_ONLY_UNREAD),
     SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS),
     SETTING_THEME(key = PREF_THEME),
     SETTING_DARK_THEME(key = PREF_DARK_THEME),
@@ -514,6 +524,9 @@ enum class UserSettings(val key: String) {
         key = PREF_READALOUD_USE_DETECT_LANGUAGE,
     ),
     SETTING_MAX_LINES(key = PREF_MAX_LINES),
+    SETTINGS_FILTER_SAVED(key = PREFS_FILTER_SAVED),
+    SETTINGS_FILTER_RECENTLY_READ(key = PREFS_FILTER_RECENTLY_READ),
+    SETTINGS_FILTER_READ(key = PREFS_FILTER_READ),
     ;
 
     companion object {
@@ -652,3 +665,11 @@ fun syncFrequencyFromString(value: String) =
             it.minutes == value.toLongOrNull()
         }
         ?: SyncFrequency.MANUAL
+
+data class PrefsFeedListFilter(
+    override val saved: Boolean,
+    override val recentlyRead: Boolean,
+    override val read: Boolean,
+) : FeedListFilter {
+    override val unread: Boolean = true
+}
