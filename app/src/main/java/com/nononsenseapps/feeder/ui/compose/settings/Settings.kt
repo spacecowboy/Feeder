@@ -85,6 +85,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
@@ -950,7 +951,7 @@ fun RadioButtonSetting(
             .width(dimens.maxContentWidth)
             .heightIn(min = minHeight)
             .clickable { onClick() }
-            .semantics(mergeDescendants = true) {
+            .safeSemantics(mergeDescendants = true) {
                 role = Role.RadioButton
                 stateDescription = stateLabel
             },
@@ -1007,7 +1008,7 @@ fun SwitchSetting(
                 enabled = enabled,
                 onClick = { onCheckedChanged(!checked) },
             )
-            .semantics(mergeDescendants = true) {
+            .safeSemantics(mergeDescendants = true) {
                 stateDescription = stateLabel
                 role = Role.Switch
             },
@@ -1062,7 +1063,7 @@ fun ScaleSetting(
             .width(dimens.maxContentWidth)
             .heightIn(min = 64.dp)
             .padding(start = 64.dp)
-            .semantics(mergeDescendants = true) {
+            .safeSemantics(mergeDescendants = true) {
                 stateDescription = "%.1fx".format(safeCurrentValue)
             },
     ) {
