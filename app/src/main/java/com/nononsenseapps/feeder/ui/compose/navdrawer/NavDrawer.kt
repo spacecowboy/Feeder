@@ -67,6 +67,7 @@ import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
@@ -370,24 +371,18 @@ private fun ExpandableTag(
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
             .height(48.dp)
-            .semantics(mergeDescendants = true) {
-                try {
-                    stateDescription = if (expanded) {
-                        expandedLabel
-                    } else {
-                        contractedLabel
-                    }
-                    customActions = listOf(
-                        CustomAccessibilityAction(toggleExpandLabel) {
-                            onToggleExpansion(title)
-                            true
-                        },
-                    )
-                } catch (e: Exception) {
-                    // Observed nullpointer exception when setting customActions
-                    // No clue why it could be null
-                    Log.e("FeederNavDrawer", "Exception in semantics", e)
+            .safeSemantics(mergeDescendants = true) {
+                stateDescription = if (expanded) {
+                    expandedLabel
+                } else {
+                    contractedLabel
                 }
+                customActions = listOf(
+                    CustomAccessibilityAction(toggleExpandLabel) {
+                        onToggleExpansion(title)
+                        true
+                    },
+                )
             },
     ) {
         ExpandArrow(

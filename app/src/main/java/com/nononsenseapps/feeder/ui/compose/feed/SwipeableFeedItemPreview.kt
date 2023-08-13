@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
@@ -42,7 +41,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -50,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
@@ -162,43 +161,37 @@ fun SwipeableFeedItemPreview(
                 },
                 onClick = onItemClick,
             )
-            .semantics {
-                try {
-                    stateDescription = readStatusLabel
-                    customActions = listOf(
-                        CustomAccessibilityAction(toggleReadStatusLabel) {
-                            coroutineScope.launch {
-                                onSwipe(item.unread)
-                            }
-                            true
+            .safeSemantics {
+                stateDescription = readStatusLabel
+                customActions = listOf(
+                    CustomAccessibilityAction(toggleReadStatusLabel) {
+                        coroutineScope.launch {
+                            onSwipe(item.unread)
+                        }
+                        true
+                    },
+                    CustomAccessibilityAction(
+                        when (item.bookmarked) {
+                            true -> unSaveArticleLabel
+                            false -> saveArticleLabel
                         },
-                        CustomAccessibilityAction(
-                            when (item.bookmarked) {
-                                true -> unSaveArticleLabel
-                                false -> saveArticleLabel
-                            },
-                        ) {
-                            onToggleBookmarked()
-                            true
-                        },
-                        CustomAccessibilityAction(markAboveAsReadLabel) {
-                            onMarkAboveAsRead()
-                            true
-                        },
-                        CustomAccessibilityAction(markBelowAsReadLabel) {
-                            onMarkBelowAsRead()
-                            true
-                        },
-                        CustomAccessibilityAction(shareLabel) {
-                            onShareItem()
-                            true
-                        },
-                    )
-                } catch (e: Exception) {
-                    // Observed nullpointer exception when setting customActions
-                    // No clue why it could be null
-                    Log.e("FeederSwipeableFIP", "Exception in semantics", e)
-                }
+                    ) {
+                        onToggleBookmarked()
+                        true
+                    },
+                    CustomAccessibilityAction(markAboveAsReadLabel) {
+                        onMarkAboveAsRead()
+                        true
+                    },
+                    CustomAccessibilityAction(markBelowAsReadLabel) {
+                        onMarkBelowAsRead()
+                        true
+                    },
+                    CustomAccessibilityAction(shareLabel) {
+                        onShareItem()
+                        true
+                    },
+                )
             },
     ) {
         val maxWidthPx = with(LocalDensity.current) {

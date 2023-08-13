@@ -87,6 +87,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -102,6 +105,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
@@ -317,13 +321,16 @@ fun FeedScreen(
                         // Get rid of it
                         viewModel.markAsReadOnSwipe(itemId)
                     }
+
                     viewState.filter.onlyUnreadAndSaved && !saved -> {
                         // Get rid of it
                         viewModel.markAsReadOnSwipe(itemId)
                     }
+
                     unread -> {
                         viewModel.markAsUnread(itemId)
                     }
+
                     else -> {
                         viewModel.markAsRead(itemId, null)
                     }
@@ -400,6 +407,7 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     FeedScreen(
         modifier = modifier,
@@ -459,6 +467,14 @@ fun FeedScreen(
                                 text = {
                                     Text(stringResource(id = R.string.unread_adjective))
                                 },
+                                modifier = Modifier
+                                    .safeSemantics {
+                                        stateDescription = when (viewState.filter.unread) {
+                                            true -> context.getString(androidx.compose.ui.R.string.selected)
+                                            else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                        }
+                                        role = Role.Checkbox
+                                    },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -476,6 +492,14 @@ fun FeedScreen(
                                 text = {
                                     Text(stringResource(id = R.string.saved_adjective))
                                 },
+                                modifier = Modifier
+                                    .safeSemantics {
+                                        stateDescription = when (viewState.filter.saved) {
+                                            true -> context.getString(androidx.compose.ui.R.string.selected)
+                                            else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                        }
+                                        role = Role.Checkbox
+                                    },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -493,6 +517,14 @@ fun FeedScreen(
                                 text = {
                                     Text(stringResource(id = R.string.recently_read_adjective))
                                 },
+                                modifier = Modifier
+                                    .safeSemantics {
+                                        stateDescription = when (viewState.filter.recentlyRead) {
+                                            true -> context.getString(androidx.compose.ui.R.string.selected)
+                                            else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                        }
+                                        role = Role.Checkbox
+                                    },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -510,6 +542,14 @@ fun FeedScreen(
                                 text = {
                                     Text(stringResource(id = R.string.read_adjective))
                                 },
+                                modifier = Modifier
+                                    .safeSemantics {
+                                        stateDescription = when (viewState.filter.read) {
+                                            true -> context.getString(androidx.compose.ui.R.string.selected)
+                                            else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                        }
+                                        role = Role.Checkbox
+                                    },
                             )
                         }
                     }
