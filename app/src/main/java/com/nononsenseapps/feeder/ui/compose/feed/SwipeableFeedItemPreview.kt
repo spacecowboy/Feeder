@@ -80,6 +80,7 @@ fun SwipeableFeedItemPreview(
     swipeAsRead: SwipeAsRead,
     bookmarkIndicator: Boolean,
     maxLines: Int,
+    showOnlyTitle: Boolean,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onToggleBookmarked: () -> Unit,
@@ -246,6 +247,7 @@ fun SwipeableFeedItemPreview(
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
+                    showOnlyTitle = showOnlyTitle,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -264,6 +266,7 @@ fun SwipeableFeedItemPreview(
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
+                    showOnlyTitle = showOnlyTitle,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -285,6 +288,7 @@ fun SwipeableFeedItemPreview(
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
+                    showOnlyTitle = showOnlyTitle,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),

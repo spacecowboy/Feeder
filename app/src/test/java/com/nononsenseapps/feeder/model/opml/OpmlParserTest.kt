@@ -65,6 +65,7 @@ class OpmlParserTest : DIAware {
                     UserSettings.SETTINGS_FILTER_SAVED -> "true"
                     UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
                     UserSettings.SETTINGS_FILTER_READ -> "false"
+                    UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                 },
             )
         }
@@ -97,6 +98,7 @@ class OpmlParserTest : DIAware {
             settingsStore.setFeedListFilterRecentlyRead(true)
             settingsStore.setFeedListFilterRead(false)
             settingsStore.setFeedListFilterSaved(true)
+            settingsStore.setShowOnlyTitles(true)
         }
 
         confirmVerified(settingsStore)

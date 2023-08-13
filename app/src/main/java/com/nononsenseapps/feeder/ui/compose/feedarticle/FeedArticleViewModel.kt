@@ -278,6 +278,7 @@ class FeedArticleViewModel(
             repository.maxLines,
             filterMenuVisible,
             repository.feedListFilter,
+            repository.showOnlyTitle,
         ) { params: Array<Any> ->
             val article = params[16] as Article
 
@@ -326,6 +327,7 @@ class FeedArticleViewModel(
                 maxLines = params[24] as Int,
                 showFilterMenu = params[25] as Boolean,
                 filter = params[26] as FeedListFilter,
+                showOnlyTitle = params[27] as Boolean,
             )
         }
             .stateIn(
@@ -476,6 +478,7 @@ interface FeedScreenViewState {
     val swipeAsRead: SwipeAsRead
     val markAsReadOnScroll: Boolean
     val maxLines: Int
+    val showOnlyTitle: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
 }
@@ -577,6 +580,7 @@ data class FeedArticleScreenViewState(
     override val markAsReadOnScroll: Boolean = false,
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
     override val maxLines: Int = 2,
+    override val showOnlyTitle: Boolean = false,
     override val showFilterMenu: Boolean = false,
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,

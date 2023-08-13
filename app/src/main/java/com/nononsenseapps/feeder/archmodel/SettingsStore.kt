@@ -110,6 +110,15 @@ class SettingsStore(override val di: DI) : DIAware {
         }
     }
 
+    private val _showOnlyTitle = MutableStateFlow(
+        sp.getBoolean(PREF_LIST_SHOW_ONLY_TITLES, false),
+    )
+    val showOnlyTitle: StateFlow<Boolean> = _showOnlyTitle.asStateFlow()
+    fun setShowOnlyTitles(value: Boolean) {
+        _showOnlyTitle.update { value }
+        sp.edit().putBoolean(PREF_LIST_SHOW_ONLY_TITLES, value).apply()
+    }
+
     private val _feedListFilter = MutableStateFlow(
         PrefsFeedListFilter(
             saved = sp.getBoolean(PREFS_FILTER_SAVED, false),
@@ -491,6 +500,8 @@ const val PREFS_FILTER_SAVED = "prefs_filter_saved"
 const val PREFS_FILTER_RECENTLY_READ = "prefs_filter_recently_read"
 const val PREFS_FILTER_READ = "prefs_filter_read"
 
+const val PREF_LIST_SHOW_ONLY_TITLES = "prefs_list_show_only_titles"
+
 /**
  * Read Aloud Settings
  */
@@ -527,6 +538,7 @@ enum class UserSettings(val key: String) {
     SETTINGS_FILTER_SAVED(key = PREFS_FILTER_SAVED),
     SETTINGS_FILTER_RECENTLY_READ(key = PREFS_FILTER_RECENTLY_READ),
     SETTINGS_FILTER_READ(key = PREFS_FILTER_READ),
+    SETTINGS_LIST_SHOW_ONLY_TITLES(key = PREF_LIST_SHOW_ONLY_TITLES),
     ;
 
     companion object {

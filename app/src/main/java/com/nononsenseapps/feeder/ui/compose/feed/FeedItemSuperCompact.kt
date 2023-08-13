@@ -29,6 +29,7 @@ fun FeedItemSuperCompact(
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
     maxLines: Int,
+    showOnlyTitle: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -53,6 +54,7 @@ fun FeedItemSuperCompact(
             dropDownMenuExpanded = dropDownMenuExpanded,
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
+            showOnlyTitle = showOnlyTitle,
         )
     }
 }
@@ -85,6 +87,7 @@ private fun PreviewRead() {
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
                 maxLines = 2,
+                showOnlyTitle = false,
             )
         }
     }
@@ -118,6 +121,7 @@ private fun PreviewUnread() {
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
                 maxLines = 2,
+                showOnlyTitle = false,
             )
         }
     }
@@ -151,6 +155,7 @@ private fun PreviewWithImage() {
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
                 maxLines = 2,
+                showOnlyTitle = false,
             )
         }
     }

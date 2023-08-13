@@ -1104,6 +1104,7 @@ fun FeedListContent(
                         swipeAsRead = viewState.swipeAsRead,
                         bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         maxLines = viewState.maxLines,
+                        showOnlyTitle = viewState.showOnlyTitle,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)
                             if (viewState.filter.onlyUnread) {
@@ -1282,6 +1283,7 @@ fun FeedGridContent(
                         swipeAsRead = viewState.swipeAsRead,
                         bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         maxLines = viewState.maxLines,
+                        showOnlyTitle = viewState.showOnlyTitle,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)
                             if (viewState.filter.onlyUnread) {

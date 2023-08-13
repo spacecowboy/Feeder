@@ -122,6 +122,11 @@ class Repository(override val di: DI) : DIAware {
         settingsStore.setMaxLines(value.coerceAtLeast(1))
     }
 
+    val showOnlyTitle: StateFlow<Boolean> = settingsStore.showOnlyTitle
+    fun setShowOnlyTitles(value: Boolean) {
+        settingsStore.setShowOnlyTitles(value)
+    }
+
     val feedListFilter: StateFlow<FeedListFilter> = settingsStore.feedListFilter
 
     fun setFeedListFilterSaved(value: Boolean) {
