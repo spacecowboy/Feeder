@@ -71,6 +71,7 @@ fun FeedItemCard(
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
     maxLines: Int,
+    showOnlyTitle: Boolean,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -140,6 +141,7 @@ fun FeedItemCard(
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = onDismissDropdown,
                     maxLines = maxLines,
+                    showOnlyTitle = showOnlyTitle,
                 )
             }
         }
@@ -156,6 +158,7 @@ fun RowScope.FeedItemText(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     maxLines: Int,
+    showOnlyTitle: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val snippetStyle = FeedListItemSnippetTextStyle()
@@ -163,14 +166,14 @@ fun RowScope.FeedItemText(
         buildAnnotatedString {
             if (item.title.isNotBlank()) {
                 append(item.title)
-                if (item.snippet.isNotBlank()) {
+                if (!showOnlyTitle && item.snippet.isNotBlank()) {
                     withStyle(snippetStyle.toSpanStyle()) {
                         append('\n')
                         append(item.snippet)
                     }
                 }
             } else {
-                // Heard of one feed which did not have titles
+                // Heard of one feed which did not have titles. If so always include snippet
                 append(item.snippet)
             }
         }
@@ -185,7 +188,7 @@ fun RowScope.FeedItemText(
                 text = joinedText,
                 style = FeedListItemTitleTextStyle(),
                 fontWeight = titleFontWeight(item.unread),
-                overflow = TextOverflow.Clip,
+                overflow = TextOverflow.Ellipsis,
                 maxLines = maxLines,
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -306,6 +309,7 @@ private fun Preview() {
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
             maxLines = 2,
+            showOnlyTitle = false,
             bookmarkIndicator = true,
         )
     }
@@ -341,6 +345,7 @@ private fun PreviewWithImageUnread() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 maxLines = 2,
+                showOnlyTitle = false,
                 bookmarkIndicator = true,
             )
         }
@@ -377,6 +382,7 @@ private fun PreviewWithImageRead() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 maxLines = 2,
+                showOnlyTitle = false,
                 bookmarkIndicator = true,
             )
         }

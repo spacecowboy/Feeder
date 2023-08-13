@@ -55,6 +55,7 @@ fun FeedItemCompact(
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
     maxLines: Int,
+    showOnlyTitle: Boolean,
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
@@ -73,6 +74,7 @@ fun FeedItemCompact(
             dropDownMenuExpanded = dropDownMenuExpanded,
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
+            showOnlyTitle = showOnlyTitle,
             modifier = Modifier
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 8.dp),
@@ -196,6 +198,7 @@ private fun PreviewRead() {
                 bookmarkIndicator = true,
                 maxLines = 5,
                 imageWidth = 64.dp,
+                showOnlyTitle = false,
             )
         }
     }
@@ -231,6 +234,7 @@ private fun PreviewUnread() {
                 bookmarkIndicator = true,
                 maxLines = 5,
                 imageWidth = 64.dp,
+                showOnlyTitle = false,
             )
         }
     }
@@ -269,6 +273,7 @@ private fun PreviewWithImage() {
                     bookmarkIndicator = true,
                     maxLines = 5,
                     imageWidth = 64.dp,
+                    showOnlyTitle = false,
                 )
             }
         }

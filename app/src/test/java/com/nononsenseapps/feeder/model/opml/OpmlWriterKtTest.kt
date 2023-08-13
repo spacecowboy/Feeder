@@ -129,6 +129,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="prefs_filter_saved" value="true"/>
               <feeder:setting key="prefs_filter_recently_read" value="true"/>
               <feeder:setting key="prefs_filter_read" value="false"/>
+              <feeder:setting key="prefs_list_show_only_titles" value="true"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -163,6 +164,7 @@ class OpmlWriterKtTest {
                     UserSettings.SETTINGS_FILTER_SAVED -> "true"
                     UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
                     UserSettings.SETTINGS_FILTER_READ -> "false"
+                    UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                 }
             }
     }

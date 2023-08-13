@@ -187,6 +187,8 @@ fun SettingsScreen(
             onMarkAsReadOnScroll = settingsViewModel::setIsMarkAsReadOnScroll,
             maxLines = viewState.maxLines,
             setMaxLines = settingsViewModel::setMaxLines,
+            showOnlyTitle = viewState.showOnlyTitle,
+            onShowOnlyTitle = settingsViewModel::setShowOnlyTitles,
             modifier = Modifier.padding(padding),
         )
     }
@@ -246,6 +248,8 @@ fun SettingsScreenPreview() {
                 onMarkAsReadOnScroll = {},
                 maxLines = 2,
                 setMaxLines = {},
+                showOnlyTitle = false,
+                onShowOnlyTitle = {},
                 modifier = Modifier,
             )
         }
@@ -301,6 +305,8 @@ fun SettingsList(
     onMarkAsReadOnScroll: (Boolean) -> Unit,
     maxLines: Int,
     setMaxLines: (Int) -> Unit,
+    showOnlyTitle: Boolean,
+    onShowOnlyTitle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -515,6 +521,12 @@ fun SettingsList(
             currentValue = maxLines,
             values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
             onSelection = setMaxLines,
+        )
+
+        SwitchSetting(
+            title = stringResource(id = R.string.show_only_title),
+            checked = showOnlyTitle,
+            onCheckedChanged = onShowOnlyTitle,
         )
 
         MenuSetting(
@@ -994,11 +1006,7 @@ fun SwitchSetting(
     enabled: Boolean = true,
     onCheckedChanged: (Boolean) -> Unit,
 ) {
-    val stateLabel = if (checked) {
-        stringResource(androidx.compose.ui.R.string.on)
-    } else {
-        stringResource(androidx.compose.ui.R.string.off)
-    }
+    val context = LocalContext.current
     val dimens = LocalDimens.current
     Row(
         modifier = modifier
@@ -1009,7 +1017,10 @@ fun SwitchSetting(
                 onClick = { onCheckedChanged(!checked) },
             )
             .safeSemantics(mergeDescendants = true) {
-                stateDescription = stateLabel
+                stateDescription = when (checked) {
+                    true -> context.getString(androidx.compose.ui.R.string.on)
+                    else -> context.getString(androidx.compose.ui.R.string.off)
+                }
                 role = Role.Switch
             },
         verticalAlignment = Alignment.CenterVertically,

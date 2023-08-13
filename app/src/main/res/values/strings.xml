@@ -227,4 +227,5 @@
   <string name="recently_read_adjective">Recently read</string>
   <string name="read_adjective">Read</string>
   <string name="saved_adjective">Saved</string>
+  <string name="show_only_title">Show only title</string>
 </resources>
