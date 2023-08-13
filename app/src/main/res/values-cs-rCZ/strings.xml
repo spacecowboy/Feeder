@@ -204,4 +204,8 @@
     <string name="few_feeds">%1$s kanálů</string>
     <string name="many_feeds">%1$s kanálů</string>
     <string name="other_feeds">%1$s kanálů</string>
+    <string name="import_x_feeds_with_y_tags">Importovat %1$s s %2$s\?</string>
+    <string name="failed_to_fetch_full_article_missing_link">V kanálu chybí odkaz na článek</string>
+    <string name="failed_to_fetch_full_article_not_html">Odkaz není HTML dokument</string>
+    <string name="failed_to_fetch_full_article_missing_body">Nenašlo se nic, co by se dalo stáhnout</string>
 </resources>
