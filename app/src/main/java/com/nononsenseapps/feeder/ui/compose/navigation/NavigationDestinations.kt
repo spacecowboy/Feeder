@@ -6,6 +6,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -84,6 +85,7 @@ sealed class NavigationDestination(
     fun register(
         navGraphBuilder: NavGraphBuilder,
         navController: NavController,
+        navDrawerListState: LazyListState,
     ) {
         navGraphBuilder.composable(
             route = route,
@@ -97,6 +99,7 @@ sealed class NavigationDestination(
             RegisterScreen(
                 navController = navController,
                 backStackEntry = backStackEntry,
+                navDrawerListState = navDrawerListState,
             )
         }
     }
@@ -105,6 +108,7 @@ sealed class NavigationDestination(
     protected abstract fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     )
 }
 
@@ -152,6 +156,7 @@ object SearchFeedDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         SearchFeedScreen(
             onNavigateUp = {
@@ -209,6 +214,7 @@ object AddFeedDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.diAwareViewModel()
 
@@ -244,6 +250,7 @@ object EditFeedDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.diAwareViewModel()
         EditFeedScreen(
@@ -273,6 +280,7 @@ object SettingsDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         SettingsScreen(
             onNavigateUp = {
@@ -338,6 +346,7 @@ object FeedDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         val feedId = remember {
             backStackEntry.arguments?.getLong("id")
@@ -360,6 +369,7 @@ object FeedDestination : NavigationDestination(
         FeedScreen(
             navController = navController,
             viewModel = backStackEntry.diAwareViewModel(),
+            navDrawerListState = navDrawerListState,
         )
     }
 }
@@ -388,6 +398,7 @@ object ArticleDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         val itemId = remember {
             backStackEntry.arguments?.getLong("itemId")
@@ -453,6 +464,7 @@ object SyncScreenDestination : NavigationDestination(
     override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
     ) {
         val syncRemoteViewModel = backStackEntry.diAwareViewModel<SyncScreenViewModel>()
 

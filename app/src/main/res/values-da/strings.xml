@@ -157,7 +157,7 @@
     <string name="few_unread_articles">%1$s ulæste artikler</string>
     <string name="open_menu">Åbn menu</string>
     <string name="feed_item_style_super_compact">Super kompakt</string>
-    <string name="unread">Ulæst</string>
+    <string name="unread_adjective">Ulæst</string>
     <string name="already_read">Allerede læst</string>
     <string name="two_unread_articles">%1$s ulæste artikler</string>
     <string name="feed_item_style_card">Kort</string>

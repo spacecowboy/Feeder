@@ -143,7 +143,7 @@
     <string name="go_back">عُد</string>
     <string name="open_menu">افتح القائمة</string>
     <string name="go_to_feed">اذهب إلى %1$s</string>
-    <string name="unread">غير المقروء</string>
+    <string name="unread_adjective">غير المقروء</string>
     <string name="already_read">المقروءة فعلاً</string>
     <string name="showing_only_unread_articles">يعرض المقالات غير المقروءة</string>
   <string name="showing_all_articles">يعرض جميع المقالات</string>

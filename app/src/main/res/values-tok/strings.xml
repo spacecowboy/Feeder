@@ -62,7 +62,7 @@
     <string name="failed_to_fetch_full_article">mi ken ala kama jo e ale lipu</string>
     <string name="fetching_full_article">mi kama jo e lipu, o awen…</string>
     <string name="failed_to_load_text_to_speech">mi ken ala toki kalama e lipu</string>
-    <string name="unread">lukin ala</string>
+    <string name="unread_adjective">lukin ala</string>
     <string name="already_read">lukin</string>
     <string name="go_back">o tawa monsi</string>
     <string name="go_to_feed">o tawa %1$s</string>

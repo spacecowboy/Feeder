@@ -23,7 +23,7 @@
     <string name="theme">ଥିମ୍</string>
     <string name="dark_theme_preference_black">କଳା</string>
     <string name="dark_theme_preference_dark">ଗାଢ଼</string>
-    <string name="unread">ପଢ଼ି ନାହାଁନ୍ତି</string>
+    <string name="unread_adjective">ପଢ଼ି ନାହାଁନ୍ତି</string>
     <string name="already_read">ପଢ଼ି ସାରିଛନ୍ତି</string>
     <string name="feed_item_style_card">ପତ୍ର</string>
     <string name="new_indicator">ନୂଆ</string>

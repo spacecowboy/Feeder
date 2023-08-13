@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -25,9 +26,10 @@ class SyncSetupTest : BaseComposeTest {
             FeederTheme {
                 withDI {
                     val navController = rememberNavController()
+                    val navDrawerListState = rememberLazyListState()
 
                     NavHost(navController, startDestination = SyncScreenDestination.route) {
-                        SyncScreenDestination.register(this, navController)
+                        SyncScreenDestination.register(this, navController, navDrawerListState)
                     }
                 }
             }

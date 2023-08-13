@@ -97,39 +97,42 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
-    fun showOnlyUnreadFalse() {
-        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns true
+    fun filterRead() {
+        every { sp.getBoolean(PREFS_FILTER_READ, any()) } returns true
 
-        assertTrue {
-            store.minReadTime.value > Instant.EPOCH
-        }
-
-        store.setShowOnlyUnread(false)
+        store.setFeedListFilterRead(false)
 
         verify {
-            sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, false).apply()
+            sp.edit().putBoolean(PREFS_FILTER_READ, false).apply()
         }
 
-        assertEquals(false, store.showOnlyUnread.value, "Expected get to match mock")
-        assertEquals(Instant.EPOCH, store.minReadTime.value)
+        assertEquals(false, store.feedListFilter.value.read)
     }
 
     @Test
-    fun showOnlyUnreadTrue() {
-        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns false
+    fun filterRecentlyRead() {
+        every { sp.getBoolean(PREFS_FILTER_RECENTLY_READ, any()) } returns true
 
-        assertEquals(Instant.EPOCH, store.minReadTime.value)
-
-        store.setShowOnlyUnread(true)
+        store.setFeedListFilterRecentlyRead(false)
 
         verify {
-            sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, true).apply()
+            sp.edit().putBoolean(PREFS_FILTER_RECENTLY_READ, false).apply()
         }
 
-        assertEquals(true, store.showOnlyUnread.value, "Expected get to match mock")
-        assertTrue {
-            Instant.EPOCH < store.minReadTime.value
+        assertEquals(false, store.feedListFilter.value.recentlyRead)
+    }
+
+    @Test
+    fun filterSaved() {
+        every { sp.getBoolean(PREFS_FILTER_SAVED, any()) } returns true
+
+        store.setFeedListFilterSaved(false)
+
+        verify {
+            sp.edit().putBoolean(PREFS_FILTER_SAVED, false).apply()
         }
+
+        assertEquals(false, store.feedListFilter.value.saved)
     }
 
     @Test
@@ -175,6 +178,17 @@ class SettingsStoreTest : DIAware {
         }
 
         assertEquals(DarkThemePreferences.DARK, store.darkThemePreference.value)
+    }
+
+    @Test
+    fun maxLines() {
+        store.setMaxLines(5)
+
+        verify {
+            sp.edit().putInt(PREF_MAX_LINES, 5).apply()
+        }
+
+        assertEquals(5, store.maxLines.value)
     }
 
     @Test
@@ -347,8 +361,6 @@ class SettingsStoreTest : DIAware {
 
     @Test
     fun minReadTimeOnlyUnread() {
-        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns true
-
         assertTrue {
             store.minReadTime.value > Instant.EPOCH
         }
@@ -359,22 +371,6 @@ class SettingsStoreTest : DIAware {
 
         store.setMinReadTime(value)
         assertEquals(value, store.minReadTime.value)
-
-        confirmVerified(sp)
-    }
-
-    @Test
-    fun minReadTimeNotOnlyUnread() {
-        every { sp.getBoolean(PREF_SHOW_ONLY_UNREAD, any()) } returns false
-
-        assertEquals(Instant.EPOCH, store.minReadTime.value)
-
-        val value = Instant.ofEpochSecond(1691013971)
-
-        clearMocks(sp)
-
-        store.setMinReadTime(value)
-        assertEquals(Instant.EPOCH, store.minReadTime.value)
 
         confirmVerified(sp)
     }

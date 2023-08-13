@@ -14,7 +14,7 @@
     <string name="showing_all_articles">نمایش همه مقالات</string>
     <string name="showing_only_unread_articles">نمایش تنها مقالات خوانده نشده</string>
     <string name="already_read">خوانده شده</string>
-    <string name="unread">خوانده نشده</string>
+    <string name="unread_adjective">خوانده نشده</string>
     <string name="go_to_feed">رفتن به %1$s</string>
     <string name="open_menu">باز کردن فهرست</string>
     <string name="go_back">بازگشت</string>

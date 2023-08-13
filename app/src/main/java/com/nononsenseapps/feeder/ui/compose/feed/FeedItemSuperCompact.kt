@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import java.net.URL
@@ -26,19 +28,21 @@ fun FeedItemSuperCompact(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
+    maxLines: Int,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
+            .requiredHeightIn(min = minimumTouchSize)
             .padding(vertical = 8.dp, horizontal = LocalDimens.current.margin),
     ) {
         FeedItemEitherIndicator(
             bookmarked = item.bookmarked && bookmarkIndicator,
             itemImage = null,
             feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
-            size = 16.dp,
+            size = 24.dp,
         )
         FeedItemText(
             item = item,
@@ -48,6 +52,7 @@ fun FeedItemSuperCompact(
             onToggleBookmarked = onToggleBookmarked,
             dropDownMenuExpanded = dropDownMenuExpanded,
             onDismissDropdown = onDismissDropdown,
+            maxLines = maxLines,
         )
     }
 }
@@ -79,6 +84,7 @@ private fun PreviewRead() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
+                maxLines = 2,
             )
         }
     }
@@ -111,6 +117,7 @@ private fun PreviewUnread() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
+                maxLines = 2,
             )
         }
     }
@@ -143,6 +150,7 @@ private fun PreviewWithImage() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
+                maxLines = 2,
             )
         }
     }

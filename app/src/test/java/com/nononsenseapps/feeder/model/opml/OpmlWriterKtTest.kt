@@ -106,7 +106,6 @@ class OpmlWriterKtTest {
               <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" title="customTitle" text="customTitle" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
             </outline>
             <feeder:settings>
-              <feeder:setting key="pref_show_only_unread" value="false"/>
               <feeder:setting key="pref_added_feeder_news" value="true"/>
               <feeder:setting key="pref_theme" value="night"/>
               <feeder:setting key="pref_dark_theme" value="DaRk"/>
@@ -126,6 +125,10 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_body_text_scale" value="1.6"/>
               <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
               <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
+              <feeder:setting key="pref_max_lines" value="6"/>
+              <feeder:setting key="prefs_filter_saved" value="true"/>
+              <feeder:setting key="prefs_filter_recently_read" value="true"/>
+              <feeder:setting key="prefs_filter_read" value="false"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -138,7 +141,6 @@ class OpmlWriterKtTest {
             UserSettings.values().associate { userSetting ->
                 userSetting.key to when (userSetting) {
                     UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                    UserSettings.SETTING_SHOW_ONLY_UNREAD -> "false"
                     UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
                     UserSettings.SETTING_THEME -> "night"
                     UserSettings.SETTING_DARK_THEME -> "DaRk"
@@ -157,6 +159,10 @@ class OpmlWriterKtTest {
                     UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
                     UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
                     UserSettings.SETTING_SYNC_FREQ -> "720"
+                    UserSettings.SETTING_MAX_LINES -> "6"
+                    UserSettings.SETTINGS_FILTER_SAVED -> "true"
+                    UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
+                    UserSettings.SETTINGS_FILTER_READ -> "false"
                 }
             }
     }

@@ -123,7 +123,7 @@
     <string name="failed_to_load_text_to_speech">音声読み上げソフトを読み込めませんでした</string>
     <string name="go_back">戻る</string>
     <string name="open_menu">メニューを開く</string>
-    <string name="unread">未読</string>
+    <string name="unread_adjective">未読</string>
     <string name="already_read">既読</string>
     <string name="feed_item_style_card">カード</string>
     <string name="feed_item_style_compact">コンパクト</string>

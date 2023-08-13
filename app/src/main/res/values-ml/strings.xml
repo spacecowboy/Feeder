@@ -145,7 +145,7 @@
     <string name="treat_like_password">ഇതൊരു പാസ്‌വേഡ് പോലെ പരിഗണിക്കുക. ലിങ്ക് ഉണ്ടെങ്കിൽ ആർക്കും നിങ്ങളുടെ സമന്വയിപ്പിച്ച ഡാറ്റ വായിക്കാനാകും.</string>
     <string name="permission_read_desc">ഫീഡുകളും ലേഖനങ്ങളും വായിക്കാൻ പ്രയോഗത്തെ അനുവദിക്കുന്നു</string>
     <string name="javascript">ജാവാസ്ക്രിപ്റ്റ്</string>
-    <string name="unread">വായിക്കാത്തത്</string>
+    <string name="unread_adjective">വായിക്കാത്തത്</string>
     <string name="dynamic_theme_use">ചലനാത്മകമായ നിറങ്ങൾ</string>
     <string name="no_email_client">ഇ-മെയിൽ കക്ഷിയെ തുറക്കാൻ കഴിഞ്ഞില്ല</string>
     <string name="text_to_speech">വാചകം സംഭാഷണത്തിലേക്ക് തിരിക്കുക</string>

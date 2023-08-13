@@ -117,7 +117,7 @@
     <string name="showing_all_articles">Afișarea tuturor articolelor</string>
     <string name="showing_only_unread_articles">Afișarea numai a articolelor necitite</string>
     <string name="already_read">Deja citit</string>
-    <string name="unread">Necitite</string>
+    <string name="unread_adjective">Necitite</string>
     <string name="go_to_feed">Mergeți la %1$s</string>
     <string name="open_menu">Deschideți meniul</string>
     <string name="go_back">Înapoi</string>

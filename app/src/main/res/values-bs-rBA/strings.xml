@@ -121,7 +121,7 @@
     <string name="showing_all_articles">Prikaz svih članaka</string>
     <string name="showing_only_unread_articles">Prikaz samo nepročitanih članaka</string>
     <string name="already_read">Već pročitano</string>
-    <string name="unread">Nepročitano</string>
+    <string name="unread_adjective">Nepročitano</string>
     <string name="go_to_feed">Idi na %1$s</string>
     <string name="open_menu">Otvori meni</string>
     <string name="go_back">Vrati se</string>

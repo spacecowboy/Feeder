@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.time.Instant
@@ -42,29 +43,13 @@ class SettingsStore(override val di: DI) : DIAware {
         _addedFeederNews.value = value
     }
 
-    private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true))
-    val showOnlyUnread: StateFlow<Boolean> = _showOnlyUnread.asStateFlow()
-    fun setShowOnlyUnread(value: Boolean) {
-        sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
-        _showOnlyUnread.value = value
-        _minReadTime.value = when (value) {
-            true -> Instant.now()
-            false -> Instant.EPOCH
-        }
-    }
-
     private val _minReadTime: MutableStateFlow<Instant> = MutableStateFlow(
         // by design - min read time is never written to disk
-        when (_showOnlyUnread.value) {
-            true -> Instant.now()
-            false -> Instant.EPOCH
-        },
+        Instant.now(),
     )
     val minReadTime: StateFlow<Instant> = _minReadTime.asStateFlow()
     fun setMinReadTime(value: Instant) {
-        if (showOnlyUnread.value) {
-            _minReadTime.value = value
-        }
+        _minReadTime.value = value
     }
 
     private val _currentFeedAndTag = MutableStateFlow(
@@ -112,6 +97,44 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setIsMarkAsReadOnScroll(open: Boolean) {
         _isMarkAsReadOnScroll.update { open }
         sp.edit().putBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, open).apply()
+    }
+
+    private val _maxLines = MutableStateFlow(
+        sp.getInt(PREF_MAX_LINES, 2),
+    )
+    val maxLines: StateFlow<Int> = _maxLines.asStateFlow()
+    fun setMaxLines(value: Int) {
+        if (value > 0) {
+            _maxLines.update { value }
+            sp.edit().putInt(PREF_MAX_LINES, value).apply()
+        }
+    }
+
+    private val _feedListFilter = MutableStateFlow(
+        PrefsFeedListFilter(
+            saved = sp.getBoolean(PREFS_FILTER_SAVED, false),
+            recentlyRead = sp.getBoolean(PREFS_FILTER_RECENTLY_READ, true),
+            read = sp.getBoolean(
+                PREFS_FILTER_READ,
+                // Migration
+                !sp.getBoolean("pref_show_only_unread", true),
+            ),
+        ),
+    )
+    val feedListFilter: StateFlow<FeedListFilter> = _feedListFilter.asStateFlow()
+    fun setFeedListFilterSaved(value: Boolean) {
+        _feedListFilter.update { it.copy(saved = value) }
+        sp.edit().putBoolean(PREFS_FILTER_SAVED, value).apply()
+    }
+
+    fun setFeedListFilterRecentlyRead(value: Boolean) {
+        _feedListFilter.update { it.copy(recentlyRead = value) }
+        sp.edit().putBoolean(PREFS_FILTER_RECENTLY_READ, value).apply()
+    }
+
+    fun setFeedListFilterRead(value: Boolean) {
+        _feedListFilter.update { it.copy(read = value) }
+        sp.edit().putBoolean(PREFS_FILTER_READ, value).apply()
     }
 
     private val _currentTheme = MutableStateFlow(
@@ -396,11 +419,6 @@ class SettingsStore(override val di: DI) : DIAware {
 }
 
 /**
- * Boolean indicating if only unread items should be shown
- */
-const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
-
-/**
  * Boolean indicating if Feeder News feed has been added or not
  */
 const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
@@ -467,47 +485,48 @@ const val PREF_TEXT_SCALE = "pref_body_text_scale"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
+const val PREF_MAX_LINES = "pref_max_lines"
+
+const val PREFS_FILTER_SAVED = "prefs_filter_saved"
+const val PREFS_FILTER_RECENTLY_READ = "prefs_filter_recently_read"
+const val PREFS_FILTER_READ = "prefs_filter_read"
+
 /**
  * Read Aloud Settings
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
-enum class SettingType {
-    STRING,
-    FLOAT,
-    BOOLEAN,
-}
-
 /**
  * Used for OPML Import/Export. Please add new (only) user configurable settings here
  */
-enum class UserSettings(val key: String, val type: SettingType) {
-    SETTING_SHOW_ONLY_UNREAD(key = PREF_SHOW_ONLY_UNREAD, type = SettingType.BOOLEAN),
-    SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS, type = SettingType.BOOLEAN),
-    SETTING_THEME(key = PREF_THEME, type = SettingType.STRING),
-    SETTING_DARK_THEME(key = PREF_DARK_THEME, type = SettingType.STRING),
-    SETTING_DYNAMIC_THEME(key = PREF_DYNAMIC_THEME, type = SettingType.BOOLEAN),
-    SETTING_SORT(key = PREF_SORT, type = SettingType.STRING),
-    SETTING_SHOW_FAB(key = PREF_SHOW_FAB, type = SettingType.BOOLEAN),
-    SETTING_FEED_ITEM_STYLE(key = PREF_FEED_ITEM_STYLE, type = SettingType.STRING),
-    SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ, type = SettingType.STRING),
-    SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING, type = SettingType.BOOLEAN),
-    SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI, type = SettingType.BOOLEAN),
-    SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ, type = SettingType.STRING),
-    SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME, type = SettingType.BOOLEAN),
-    SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI, type = SettingType.BOOLEAN),
-    SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS, type = SettingType.BOOLEAN),
-    SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH, type = SettingType.STRING),
-    SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH, type = SettingType.STRING),
-    SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE, type = SettingType.FLOAT),
+enum class UserSettings(val key: String) {
+    SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS),
+    SETTING_THEME(key = PREF_THEME),
+    SETTING_DARK_THEME(key = PREF_DARK_THEME),
+    SETTING_DYNAMIC_THEME(key = PREF_DYNAMIC_THEME),
+    SETTING_SORT(key = PREF_SORT),
+    SETTING_SHOW_FAB(key = PREF_SHOW_FAB),
+    SETTING_FEED_ITEM_STYLE(key = PREF_FEED_ITEM_STYLE),
+    SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ),
+    SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING),
+    SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI),
+    SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ),
+    SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME),
+    SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI),
+    SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS),
+    SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
+    SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
+    SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,
-        type = SettingType.BOOLEAN,
     ),
     SETTING_READALOUD_USE_DETECT_LANGUAGE(
         key = PREF_READALOUD_USE_DETECT_LANGUAGE,
-        type = SettingType.BOOLEAN,
     ),
+    SETTING_MAX_LINES(key = PREF_MAX_LINES),
+    SETTINGS_FILTER_SAVED(key = PREFS_FILTER_SAVED),
+    SETTINGS_FILTER_RECENTLY_READ(key = PREFS_FILTER_RECENTLY_READ),
+    SETTINGS_FILTER_READ(key = PREFS_FILTER_READ),
     ;
 
     companion object {
@@ -646,3 +665,11 @@ fun syncFrequencyFromString(value: String) =
             it.minutes == value.toLongOrNull()
         }
         ?: SyncFrequency.MANUAL
+
+data class PrefsFeedListFilter(
+    override val saved: Boolean,
+    override val recentlyRead: Boolean,
+    override val read: Boolean,
+) : FeedListFilter {
+    override val unread: Boolean = true
+}

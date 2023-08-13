@@ -117,7 +117,7 @@
     <string name="showing_all_articles">Отображать все статьи</string>
     <string name="showing_only_unread_articles">Отображать только непрочитанные статьи</string>
     <string name="already_read">Прочитанное</string>
-    <string name="unread">Непрочитанное</string>
+    <string name="unread_adjective">Непрочитанное</string>
     <string name="go_to_feed">Перейти к %1$s</string>
     <string name="open_menu">Открыть меню</string>
     <string name="go_back">Назад</string>

@@ -142,7 +142,7 @@
     <string name="expanded_tag">Abrir categoria</string>
     <string name="contracted_tag">Categoria fechada</string>
     <string name="failed_to_open_article">Não foi possível abrir o artigo</string>
-    <string name="unread">Não lidos</string>
+    <string name="unread_adjective">Não lidos</string>
     <string name="already_read">Já lidos</string>
     <string name="showing_all_articles">Mostrar todos os artigos</string>
     <string name="zero_unread_articles">%1$s artigos não lidos</string>

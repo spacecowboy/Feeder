@@ -126,7 +126,7 @@
     <string name="go_back">Itzuli</string>
     <string name="open_menu">Menua ireki</string>
     <string name="go_to_feed">%1$s-(e)ra joan</string>
-    <string name="unread">Irakurri gabeak</string>
+    <string name="unread_adjective">Irakurri gabeak</string>
     <string name="already_read">Jada irakurriak</string>
     <string name="showing_only_unread_articles">Irakurri gabeko artikuluak soilik erakusten</string>
     <string name="showing_all_articles">Artikulu guztiak erakusten</string>

@@ -113,7 +113,7 @@
     <string name="expanded_tag">Buka tag</string>
     <string name="contracted_tag">Tutup tag</string>
     <string name="go_to_feed">Kunjungi %1$s</string>
-    <string name="unread">Belum dibaca</string>
+    <string name="unread_adjective">Belum dibaca</string>
     <string name="already_read">Sudah dibaca</string>
     <string name="showing_only_unread_articles">Hanya menampilkan artikel belum dibaca</string>
     <string name="showing_all_articles">Menampilkan semua artikel</string>

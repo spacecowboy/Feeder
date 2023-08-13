@@ -111,7 +111,7 @@
     <string name="dark_theme_preference_black">Црна</string>
     <string name="dark_theme_preference_dark">Тамна</string>
     <string name="failed_to_load_text_to_speech">Није успело учитавање претварања текста у говор</string>
-    <string name="unread">Непрочитано</string>
+    <string name="unread_adjective">Непрочитано</string>
     <string name="already_read">Већ прочитано</string>
     <string name="showing_only_unread_articles">Приказују се само непрочитани чланци</string>
     <string name="showing_all_articles">Приказују се сви чланци</string>

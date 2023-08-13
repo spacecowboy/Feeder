@@ -147,7 +147,7 @@
     <string name="fetching_full_article">กำลังดึงข้อมูลบทความเต็ม…</string>
     <string name="go_back">ย้อนกลับไป</string>
     <string name="open_menu">เปิดเมนู</string>
-    <string name="unread">ไม่ได้อ่าน</string>
+    <string name="unread_adjective">ไม่ได้อ่าน</string>
     <string name="showing_only_unread_articles">แสดงเฉพาะบทความที่ยังไม่ได้อ่าน</string>
     <string name="showing_all_articles">แสดงบทความทั้งหมด</string>
     <string name="zero_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>

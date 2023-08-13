@@ -234,6 +234,9 @@ class RepositoryTest : DIAware {
         coVerify {
             feedItemStore.markAllAsReadInFeed(5L)
         }
+        verify {
+            settingsStore.setMinReadTime(any())
+        }
     }
 
     @Test
@@ -245,6 +248,20 @@ class RepositoryTest : DIAware {
         coVerify {
             feedItemStore.markAllAsReadInTag("foo")
         }
+        verify {
+            settingsStore.setMinReadTime(any())
+        }
+    }
+
+    @Test
+    fun maxLines() {
+        repository.setMaxLines(9)
+
+        verify { settingsStore.setMaxLines(9) }
+
+        repository.setMaxLines(-1)
+
+        verify { settingsStore.setMaxLines(1) }
     }
 
     @Test
@@ -255,6 +272,9 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedItemStore.markAllAsRead()
+        }
+        verify {
+            settingsStore.setMinReadTime(any())
         }
     }
 
@@ -301,8 +321,9 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun deleteFeeds() {
+    fun deleteFeedsNotCurrentFeed() {
         coEvery { feedStore.deleteFeeds(any()) } just Runs
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(3L to "")
 
         runBlocking {
             repository.deleteFeeds(listOf(1, 2))
@@ -310,6 +331,30 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedStore.deleteFeeds(listOf(1, 2))
+        }
+        verify(exactly = 0) {
+            settingsStore.setCurrentFeedAndTag(any(), any())
+        }
+
+        verify {
+            androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
+        }
+    }
+
+    @Test
+    fun deleteFeedsCurrentFeed() {
+        coEvery { feedStore.deleteFeeds(any()) } just Runs
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(1L to "")
+
+        runBlocking {
+            repository.deleteFeeds(listOf(1, 2))
+        }
+
+        coVerify {
+            feedStore.deleteFeeds(listOf(1, 2))
+        }
+        verify {
+            settingsStore.setCurrentFeedAndTag(ID_ALL_FEEDS, any())
         }
 
         verify {

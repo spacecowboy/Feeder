@@ -93,6 +93,7 @@
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>
   <string name="reader_settings">Reader</string>
+  <string name="article_list_settings">Article list</string>
   <string name="open_link_in_web_view">Open link in web view</string>
   <string name="open_in_web_view">Open in Web view</string>
   <string name="max_feed_items">Max items per feed</string>
@@ -139,7 +140,7 @@
   <string name="go_back">Go back</string>
   <string name="open_menu">Open menu</string>
   <string name="go_to_feed">Go to %1$s</string>
-  <string name="unread">Unread</string>
+  <string name="unread_adjective">Unread</string>
   <string name="already_read">Already read</string>
   <string name="showing_only_unread_articles">Showing only unread articles</string>
   <string name="showing_all_articles">Showing all articles</string>
@@ -204,7 +205,7 @@
   <string name="save_article">Save article</string>
   <string name="unsave_article">Stop saving article</string>
   <string name="mark_as_read_on_scroll">Mark as read on scroll</string>
-    <string name="no_feeds">No feeds</string>
+  <string name="no_feeds">No feeds</string>
   <string name="zero_feeds">%1$s feeds</string>
   <string name="one_feed">%1$s feed</string>
   <string name="two_feeds">%1$s feeds</string>
@@ -221,4 +222,9 @@
   <string name="failed_to_fetch_full_article_missing_body">Found nothing to fetch</string>
   <string name="failed_to_fetch_full_article_missing_link">Feed is missing link to article</string>
   <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
+  <string name="max_lines">Max lines</string>
+  <string name="filter_noun">Filter</string>
+  <string name="recently_read_adjective">Recently read</string>
+  <string name="read_adjective">Read</string>
+  <string name="saved_adjective">Saved</string>
 </resources>

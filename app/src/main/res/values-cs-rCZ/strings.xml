@@ -111,7 +111,7 @@
     <string name="contracted_tag">Složený štítek</string>
     <string name="go_back">Jít zpět</string>
     <string name="go_to_feed">Přejít na %1$s</string>
-    <string name="unread">Nepřečtené</string>
+    <string name="unread_adjective">Nepřečtené</string>
     <string name="synchronize_feeds">Synchronizovat kanály</string>
     <string name="open_menu">Otevřít nabídku</string>
     <string name="two_unread_articles">%1$s nepřečtené články</string>
