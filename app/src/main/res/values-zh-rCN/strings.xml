@@ -111,7 +111,7 @@
     <string name="showing_all_articles">显示所有文章</string>
     <string name="showing_only_unread_articles">仅显示未读文章</string>
     <string name="already_read">已读</string>
-    <string name="unread">未读</string>
+    <string name="unread_adjective">未读</string>
     <string name="go_to_feed">转到 %1$s</string>
     <string name="open_menu">打开菜单</string>
     <string name="go_back">返回</string>

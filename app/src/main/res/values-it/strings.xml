@@ -117,7 +117,7 @@
     <string name="showing_all_articles">Visualizzazione di tutti gli articoli</string>
     <string name="showing_only_unread_articles">Visualizzazione solo degli articoli non letti</string>
     <string name="already_read">Già letto</string>
-    <string name="unread">Non letto</string>
+    <string name="unread_adjective">Non letto</string>
     <string name="go_to_feed">Vai a %1$s</string>
     <string name="open_menu">Apri il menù</string>
     <string name="go_back">Indietro</string>

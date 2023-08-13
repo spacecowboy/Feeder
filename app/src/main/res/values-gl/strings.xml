@@ -95,7 +95,7 @@
     <string name="failed_to_fetch_full_article">Non foi posíbel procurar o artigo completo</string>
     <string name="failed_to_open_article">Non foi posíbel abrir o artigo</string>
     <string name="go_to_feed">Ir a %1$s</string>
-    <string name="unread">Non lidos</string>
+    <string name="unread_adjective">Non lidos</string>
     <string name="already_read">Lidos</string>
     <string name="showing_only_unread_articles">Ver só artigos non lidos</string>
     <string name="showing_all_articles">Ver todos os artigos</string>

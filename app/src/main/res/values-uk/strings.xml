@@ -52,7 +52,7 @@
     <string name="one_unread_article">%1$s непрочитана стаття</string>
     <string name="synchronize_feeds">Синхронізувати канали</string>
     <string name="already_read">Прочитане</string>
-    <string name="unread">Непрочитане</string>
+    <string name="unread_adjective">Непрочитане</string>
     <string name="go_to_feed">Перейти до %1$s</string>
     <string name="open_menu">Відкрити меню</string>
     <string name="go_back">Назад</string>

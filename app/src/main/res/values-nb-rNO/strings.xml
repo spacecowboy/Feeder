@@ -118,7 +118,7 @@
     <string name="feed_item_style">Artikkelstil</string>
     <string name="two_unread_articles">%1$s uleste artikler</string>
     <string name="go_to_feed">Gå til %1$s</string>
-    <string name="unread">Ulest</string>
+    <string name="unread_adjective">Ulest</string>
     <string name="already_read">Allerede lest</string>
     <string name="feed_item_style_card">Kort</string>
     <string name="feed_item_style_compact">Kompakt</string>

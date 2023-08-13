@@ -143,7 +143,7 @@ fun FeedItemNewIndicator(
     Box(modifier = modifier) {
         Icon(
             Icons.Outlined.Circle,
-            contentDescription = stringResource(id = R.string.unread),
+            contentDescription = stringResource(id = R.string.unread_adjective),
             modifier = Modifier
                 .size(size),
             tint = MaterialTheme.colorScheme.primary,

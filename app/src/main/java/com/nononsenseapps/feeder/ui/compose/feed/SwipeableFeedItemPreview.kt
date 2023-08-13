@@ -139,7 +139,7 @@ fun SwipeableFeedItemPreview(
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
     val shareLabel = stringResource(R.string.share)
 
-    val unreadLabel = stringResource(R.string.unread)
+    val unreadLabel = stringResource(R.string.unread_adjective)
     val alreadyReadLabel = stringResource(R.string.already_read)
     val readStatusLabel by remember(item.unread) {
         derivedStateOf {

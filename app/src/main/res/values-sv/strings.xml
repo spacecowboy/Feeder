@@ -114,7 +114,7 @@
     <string name="showing_all_articles">Visar alla artiklar</string>
     <string name="showing_only_unread_articles">Visar bara olästa artiklar</string>
     <string name="already_read">Redan läst</string>
-    <string name="unread">Oläst</string>
+    <string name="unread_adjective">Oläst</string>
     <string name="go_to_feed">Öppna %1$s</string>
     <string name="open_menu">Öppna meny</string>
     <string name="go_back">Gå tillbaka</string>
