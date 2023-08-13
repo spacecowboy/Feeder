@@ -167,7 +167,7 @@
     <string name="set_language">Defineix l\'idioma</string>
     <string name="dynamic_theme_use">Colors dinàmics</string>
     <string name="dark_theme_preference_black">Negre</string>
-    <string name="unread">Sense llegir</string>
+    <string name="unread_adjective">Sense llegir</string>
     <string name="already_read">Ja llegit</string>
   <string name="one_unread_article">%1$s article sense llegir</string>
     <string name="invalid_url">URL no vàlida</string>

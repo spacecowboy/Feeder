@@ -111,7 +111,7 @@
     <string name="showing_only_unread_articles">Vain lukemattomat artikkelit näytetään</string>
     <string name="showing_all_articles">Kaikki artikkelit näytetään</string>
     <string name="already_read">Jo luettu</string>
-    <string name="unread">Lukematon</string>
+    <string name="unread_adjective">Lukematon</string>
     <string name="other_unread_articles">%1$s lukematonta artikkelia</string>
     <string name="many_unread_articles">%1$s lukematonta artikkelia</string>
     <string name="few_unread_articles">%1$s lukematonta artikkelia</string>

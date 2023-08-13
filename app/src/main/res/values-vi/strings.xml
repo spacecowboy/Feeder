@@ -117,7 +117,7 @@
     <string name="showing_all_articles">Đang hiện tất cả bài viết</string>
     <string name="showing_only_unread_articles">Đang hiện chỉ những bài viết chưa đọc</string>
     <string name="already_read">Đã đọc</string>
-    <string name="unread">Chưa đọc</string>
+    <string name="unread_adjective">Chưa đọc</string>
     <string name="go_to_feed">Đi đến %1$s</string>
     <string name="open_menu">Mở menu</string>
     <string name="go_back">Quay lại</string>

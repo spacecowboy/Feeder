@@ -117,7 +117,7 @@
     <string name="go_back">பின் செல்</string>
     <string name="open_menu">மெனுவைத் திற</string>
     <string name="go_to_feed">%1$sக்குச் செல்</string>
-    <string name="unread">படிக்காதது</string>
+    <string name="unread_adjective">படிக்காதது</string>
     <string name="already_read">ஏற்கனவே படித்தது</string>
     <string name="showing_all_articles">அனைத்து கட்டுரைகளையும் காட்டுகிறது</string>
     <string name="zero_unread_articles">%1$s படிக்காத கட்டுரைகள்</string>

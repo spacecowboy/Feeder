@@ -90,7 +90,7 @@
     <string name="two_unread_articles">%1$s 篇未讀文章</string>
     <string name="few_unread_articles">%1$s 篇未讀文章</string>
     <string name="many_unread_articles">%1$s 篇未讀文章</string>
-    <string name="unread">未讀</string>
+    <string name="unread_adjective">未讀</string>
     <string name="already_read">已讀</string>
     <string name="failed_to_open_article">無法打開文章</string>
     <string name="synchronize_feeds">同步訂閱</string>

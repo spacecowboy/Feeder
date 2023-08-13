@@ -117,7 +117,7 @@
     <string name="showing_all_articles">Rodomi visi straipsniai</string>
     <string name="showing_only_unread_articles">Rodomi tik neskaityti straipsniai</string>
     <string name="already_read">Jau skaityta</string>
-    <string name="unread">Neskaityta</string>
+    <string name="unread_adjective">Neskaityta</string>
     <string name="go_to_feed">Eiti į %1$s</string>
     <string name="open_menu">Atidaryti meniu</string>
     <string name="go_back">Grįžti atgal</string>

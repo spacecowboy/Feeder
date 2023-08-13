@@ -104,7 +104,7 @@
     <string name="go_back">Vissza</string>
     <string name="open_menu">Menü megnyitása</string>
     <string name="go_to_feed">%1$s -ra lépés</string>
-    <string name="unread">Olvasatlan</string>
+    <string name="unread_adjective">Olvasatlan</string>
     <string name="already_read">Már elolvasott</string>
     <string name="showing_only_unread_articles">Csak olvasatlan cikkek mutatása</string>
     <string name="showing_all_articles">Minden cikk mutatása</string>

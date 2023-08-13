@@ -426,7 +426,7 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         toolbarActions = {
             if (viewState.currentFeedOrTag.isNotSavedArticles) {
-                PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter)) }) {
+                PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter_noun)) }) {
                     Box {
                         IconButton(
                             onClick = { onShowFilterMenu(true) },
@@ -434,7 +434,7 @@ fun FeedScreen(
                         ) {
                             Icon(
                                 Icons.Default.FilterList,
-                                contentDescription = stringResource(R.string.filter),
+                                contentDescription = stringResource(R.string.filter_noun),
                             )
                         }
                         DropdownMenu(
@@ -457,7 +457,7 @@ fun FeedScreen(
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.unread))
+                                    Text(stringResource(id = R.string.unread_adjective))
                                 },
                             )
                             DropdownMenuItem(
@@ -474,7 +474,7 @@ fun FeedScreen(
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.saved))
+                                    Text(stringResource(id = R.string.saved_adjective))
                                 },
                             )
                             DropdownMenuItem(
@@ -491,7 +491,7 @@ fun FeedScreen(
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.recently_read))
+                                    Text(stringResource(id = R.string.recently_read_adjective))
                                 },
                             )
                             DropdownMenuItem(
@@ -508,7 +508,7 @@ fun FeedScreen(
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.read))
+                                    Text(stringResource(id = R.string.read_adjective))
                                 },
                             )
                         }

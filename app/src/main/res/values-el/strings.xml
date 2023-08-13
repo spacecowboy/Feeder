@@ -49,7 +49,7 @@
     <string name="dark_theme_preference_dark">Σκούρο</string>
     <string name="open_feed">Άνοιγμα ροής</string>
     <string name="open_menu">Άνοιγμα μενού</string>
-    <string name="unread">Αδιάβαστα</string>
+    <string name="unread_adjective">Αδιάβαστα</string>
     <string name="feed_item_style_card">Κάρτα</string>
     <string name="show_thumbnails">Εμφάνιση μικρογραφιών</string>
     <string name="theme_system">Σύστημα</string>

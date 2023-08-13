@@ -130,7 +130,7 @@
     <string name="battery_optimization">Batterijoptimalisatie</string>
     <string name="open_menu">Menu openen</string>
     <string name="go_to_feed">Ga naar %1$s</string>
-    <string name="unread">Niet gelezen</string>
+    <string name="unread_adjective">Niet gelezen</string>
     <string name="synchronize_feeds">Feeds synchroniseren</string>
     <string name="zero_unread_articles">%1$s ongelezen artikelen</string>
     <string name="failed_to_export_OPML">OPML export mislukt</string>
