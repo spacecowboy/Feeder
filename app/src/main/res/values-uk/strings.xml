@@ -208,4 +208,10 @@
     <string name="failed_to_fetch_full_article_missing_body">Не знайшов нічого для отримання</string>
     <string name="failed_to_fetch_full_article_missing_link">У стрічці відсутнє посилання на статтю</string>
     <string name="failed_to_fetch_full_article_not_html">Посилання не є HTML-документом</string>
+    <string name="recently_read_adjective">Нещодавно прочитане</string>
+    <string name="read_adjective">Читати</string>
+    <string name="saved_adjective">Збережено</string>
+    <string name="article_list_settings">Список статей</string>
+    <string name="max_lines">Максимальна кількість рядків</string>
+    <string name="filter_noun">Фільтр</string>
 </resources>
