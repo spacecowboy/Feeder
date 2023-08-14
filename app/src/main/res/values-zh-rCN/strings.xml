@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">没找到可获取的东西</string>
     <string name="failed_to_fetch_full_article_not_html">链接不是 HTML 文档</string>
     <string name="failed_to_fetch_full_article_missing_link">Feed 缺少文章链接</string>
+    <string name="article_list_settings">文章列表</string>
+    <string name="recently_read_adjective">最近读过</string>
+    <string name="read_adjective">已读</string>
+    <string name="saved_adjective">已保存</string>
+    <string name="show_only_title">只显示标题</string>
+    <string name="filter_noun">过滤器</string>
+    <string name="max_lines">最大行数</string>
 </resources>
