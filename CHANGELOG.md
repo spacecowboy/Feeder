@@ -1,3 +1,47 @@
+# 2.6.0
+Agnieszka C (1):
+  * [3ae0d2ab] Updated Polish translation using Weblate
+
+Dan (1):
+  * [c736b141] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [651c9ad5] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [437f5af8] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [a0d92681] Updated Chinese (Simplified) translation using Weblate
+
+Francesco Saltori (1):
+  * [9422a197] Updated Italian translation using Weblate
+
+Jonas Kalderstam (13):
+  * [1bbaa426] Changed so navigation drawer now remembers scroll position
+  * [7454a239] Fixed deleting current feed will switch to All Feeds view
+  * [80f209e1] Changed so the Mark All as Read button (FAB) will also
+         immediately hide all items
+  * [61b79f4b] Added new option to configure max lines for items in list
+  * [4800309f] Changed Compact article style to match other styles and take
+         advantage of configurable max lines
+  * [4472d2c9] Improved image loading in reader
+  * [468d953a] Added new filter options
+  * [98c2a504] Increased icon size in SuperCompact style
+  * [9f177538] Renamed some string names to make it clear if they are
+         adjectives or nouns during translation
+  * [c426488c] Fixed talkback on new filter menu
+  * [3c6c63b6] Added new setting for limiting list items to only title or
+         not
+  * [22b5a4f8] Fixed crash with device sync (#84)
+  * [052c6e48] Updated Swedish translation using Weblate
+
+Matth78 (1):
+  * [1c4d1d71] Updated French translation using Weblate
+
+Weblate (bot) (1):
+  * [6fb87310] Updated Czech translation using Weblate (#80)
+
 # 2.5.0
 Agnieszka C (1):
   * [0818b4a7] Updated Polish translation using Weblate
