@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">Hittade ingenting att hämta</string>
     <string name="failed_to_fetch_full_article_missing_link">Flödet saknar länk till artikeln</string>
     <string name="failed_to_fetch_full_article_not_html">Länken är inte ett HTML-dokument</string>
+    <string name="article_list_settings">Artikellista</string>
+    <string name="max_lines">Max antal linjer</string>
+    <string name="filter_noun">Filter</string>
+    <string name="recently_read_adjective">Nyligen lästa</string>
+    <string name="read_adjective">Lästa</string>
+    <string name="saved_adjective">Sparade</string>
+    <string name="show_only_title">Visa endast titel</string>
 </resources>
