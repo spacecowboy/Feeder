@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_link">W kanale brakuje linku do artykułu</string>
     <string name="failed_to_fetch_full_article_not_html">Link nie jest dokumentem HTML</string>
     <string name="failed_to_fetch_full_article_missing_body">Nie znaleziono nic do pobrania</string>
+    <string name="filter_noun">Filtruj</string>
+    <string name="recently_read_adjective">Ostatnio przeczytane</string>
+    <string name="read_adjective">Przeczytane</string>
+    <string name="saved_adjective">Zapisane</string>
+    <string name="article_list_settings">Lista artykułów</string>
+    <string name="max_lines">Maks. liczba linii</string>
+    <string name="show_only_title">Pokazuj tylko tytuł</string>
 </resources>
