@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">Non è stato trovato nulla da recuperare</string>
     <string name="failed_to_fetch_full_article_missing_link">Feed senza collegamento ad articolo</string>
     <string name="failed_to_fetch_full_article_not_html">Il collegamento non è un documento HTML</string>
+    <string name="article_list_settings">Lista degli articoli</string>
+    <string name="max_lines">Numero massimo di righe</string>
+    <string name="read_adjective">Letti</string>
+    <string name="saved_adjective">Salvati</string>
+    <string name="filter_noun">Filtro</string>
+    <string name="recently_read_adjective">Letti di recente</string>
+    <string name="show_only_title">Mostra solo il titolo</string>
 </resources>
