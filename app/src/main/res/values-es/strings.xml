@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">No se ha encontrado nada</string>
     <string name="failed_to_fetch_full_article_missing_link">A la fuente le falta el enlace al artículo</string>
     <string name="failed_to_fetch_full_article_not_html">El enlace no es un documento HTML</string>
+    <string name="filter_noun">Filtro</string>
+    <string name="recently_read_adjective">Leído recientemente</string>
+    <string name="read_adjective">Leído</string>
+    <string name="article_list_settings">Lista de artículos</string>
+    <string name="max_lines">Máximo de líneas</string>
+    <string name="saved_adjective">Guardado</string>
+    <string name="show_only_title">Mostrar solo el título</string>
 </resources>
