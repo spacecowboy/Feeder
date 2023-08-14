@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">Fandt intet at hente</string>
     <string name="failed_to_fetch_full_article_missing_link">Feed mangler link til artikel</string>
     <string name="failed_to_fetch_full_article_not_html">Link er ikke et HTML-dokument</string>
+    <string name="max_lines">Maks linjer</string>
+    <string name="filter_noun">Filter</string>
+    <string name="recently_read_adjective">Senest læst</string>
+    <string name="read_adjective">Læst</string>
+    <string name="saved_adjective">Gemt</string>
+    <string name="article_list_settings">Artikelliste</string>
+    <string name="show_only_title">Vis kun titel</string>
 </resources>
