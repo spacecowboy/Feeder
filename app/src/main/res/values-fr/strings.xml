@@ -17,11 +17,11 @@
     <string name="edit_feed">Modifier le flux</string>
     <string name="delete_feed">Supprimer le flux</string>
     <string name="show_all_items">Voir tout</string>
-    <string name="show_unread_items">Voir les éléments non lus</string>
-    <string name="new_items_available">Nouveaux éléments disponibles</string>
+    <string name="show_unread_items">Voir les articles non lus</string>
+    <string name="new_items_available">Nouveaux articles disponibles</string>
     <string name="view">Voir</string>
     <string name="no_tag">Aucune étiquette</string>
-    <string name="notify_for_new_items">Notifier les nouveaux éléments</string>
+    <string name="notify_for_new_items">Notifier les nouveaux articles</string>
     <string name="toggle_read_status">Basculer l’état de la lecture</string>
     <string name="open_link_in_browser">Ouvrir le lien dans un navigateur</string>
     <string name="open_enclosed_media">Ouvrir le média inclus</string>
@@ -48,7 +48,7 @@
     <string name="only_when_charging">Seulement pendant le chargement de l’appareil</string>
     <string name="image_loading">Chargement d’images</string>
     <string name="no_activity_for_link">Installez d’abord quelque chose pour ouvrir ce lien</string>
-    <string name="check_for_updates">Recherche de nouveaux articles…</string>
+    <string name="check_for_updates">Recherche des nouveaux articles…</string>
     <string name="include_mobile_hotspots">Inclure les points d’accès mobiles</string>
     <string name="updated_feeds">Flux mis à jour</string>
     <string name="preload_custom_tab">Précharger l’onglet personnalisé</string>
@@ -57,8 +57,8 @@
     <string name="battery_optimization">Optimisation de la batterie</string>
     <string name="toggle_tag_expansion">Basculer l’expansion des étiquettes</string>
     <string name="discovered_feeds_list">Liste des flux découverts</string>
-    <string name="mark_items_below_as_read">Marquer les éléments ci-dessous comme lus</string>
-    <string name="mark_items_above_as_read">Marquer les éléments ci-dessus comme lus</string>
+    <string name="mark_items_below_as_read">Marquer lus les articles du dessous</string>
+    <string name="mark_items_above_as_read">Marquer lus les articles du dessus</string>
     <string name="open_feed">Ouvrir le flux</string>
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Toucher pour lire la vidéo</string>
@@ -73,17 +73,17 @@
     <string name="theme_automatic">Automatique</string>
     <string name="theme_system">Système</string>
     <string name="could_not_load_url">Impossible de charger l’URL</string>
-    <string name="max_feed_items">Nombre maximum d’éléments par flux</string>
+    <string name="max_feed_items">Articles maximum par flux</string>
     <string name="open_link_in_web_view">Ouvrir le lien dans WebView</string>
     <string name="open_in_web_view">Ouvrir dans WebView</string>
     <string name="reader_settings">Lecteur</string>
     <string name="open_links_with">Ouvrir les liens avec</string>
-    <string name="open_item_by_default_with">Ouvrir les éléments par défaut avec</string>
+    <string name="open_item_by_default_with">Ouvrir par défaut les articles avec</string>
     <string name="open_in_custom_tab">Onglet personnalisé</string>
     <string name="open_in_default_browser">Navigateur par défaut</string>
     <string name="open_in_webview">WebView</string>
     <string name="open_in_reader">Lecteur</string>
-    <string name="notification_channel_description">Les notifications ne sont affichées que pour les éléments non lus dans les flux configurés</string>
+    <string name="notification_channel_description">Notifications uniquement des articles non lus pour les flux configurés</string>
     <string name="notification_channel_name">Flux non lus</string>
     <string name="show_fab">Afficher le bouton d’action flottant</string>
     <string name="on_startup">Au démarrage de l’appli</string>
@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">Il n\'y a rien à récupérer</string>
     <string name="failed_to_fetch_full_article_missing_link">Le lien vers l\'article est manquant dans le flux</string>
     <string name="failed_to_fetch_full_article_not_html">Le lien n\'est pas un document HTML</string>
+    <string name="max_lines">Nombre maximum de lignes</string>
+    <string name="recently_read_adjective">Lu récemment</string>
+    <string name="filter_noun">Filtre</string>
+    <string name="read_adjective">Lu</string>
+    <string name="show_only_title">Afficher uniquement le titre</string>
+    <string name="article_list_settings">Liste des articles</string>
+    <string name="saved_adjective">Sauvegardé</string>
 </resources>
