@@ -21,6 +21,7 @@ import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import retrofit2.Response
 
 class SyncRestClient(override val di: DI) : DIAware {
     private val repository: Repository by instance()
@@ -69,24 +70,32 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    private suspend fun safeBlock(block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Unit)?) {
+    private suspend fun <A> safeBlock(
+        block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<A, ErrorResponse>)?,
+    ): Either<A, ErrorResponse> {
         if (block != null) {
             repository.getSyncRemote().let { syncRemote ->
                 if (syncRemote.hasSyncChain()) {
                     feederSync?.let { feederSync ->
                         secretKey?.let { secretKey ->
-                            block(syncRemote, feederSync, secretKey)
+                            return block(syncRemote, feederSync, secretKey)
                         }
                     }
                 }
             }
         }
+        return Either.right(
+            ErrorResponse(
+                code = 1001,
+                body = null,
+            ),
+        )
     }
 
-    suspend fun create(): String {
+    suspend fun create(): Either<String, ErrorResponse> {
         logDebug(LOG_TAG, "create")
         // To ensure always uses correct client, manually set remote here ALWAYS
-        var syncRemote = repository.getSyncRemote()
+        val syncRemote = repository.getSyncRemote()
 
         val secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
         this.secretKey = secretKey
@@ -97,32 +106,32 @@ class SyncRestClient(override val di: DI) : DIAware {
         )
         this.feederSync = feederSync
 
-        val response = feederSync.create(
+        return feederSync.create(
             CreateRequest(
                 deviceName = AesCbcWithIntegrity.encryptString(syncRemote.deviceName, secretKey),
             ),
-        )
-
-        syncRemote = syncRemote.copy(
-            syncChainId = response.syncCode,
-            deviceId = response.deviceId,
-            deviceName = generateDeviceName(),
-            latestMessageTimestamp = Instant.EPOCH,
-        )
-
-        repository.updateSyncRemote(
-            syncRemote,
-        )
-
-        return response.syncCode
+        ).toEither()
+            .onLeft { response ->
+                repository.updateSyncRemote(
+                    syncRemote.copy(
+                        syncChainId = response.syncCode,
+                        deviceId = response.deviceId,
+                        deviceName = generateDeviceName(),
+                        latestMessageTimestamp = Instant.EPOCH,
+                    ),
+                )
+            }
+            .mapLeft { response ->
+                response.syncCode
+            }
     }
 
-    suspend fun join(syncCode: String, remoteSecretKey: String): String {
+    suspend fun join(syncCode: String, remoteSecretKey: String): Either<String, ErrorResponse> {
         logDebug(LOG_TAG, "join")
         try {
             logDebug(LOG_TAG, "Really joining")
             // To ensure always uses correct client, manually set remote here ALWAYS
-            var syncRemote = repository.getSyncRemote()
+            val syncRemote = repository.getSyncRemote()
             syncRemote.secretKey = remoteSecretKey
             syncRemote.deviceName = generateDeviceName()
             repository.updateSyncRemote(syncRemote)
@@ -138,7 +147,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
             logDebug(LOG_TAG, "Updated objects")
 
-            val response = feederSync.join(
+            return feederSync.join(
                 syncChainId = syncCode,
                 request = JoinRequest(
                     deviceName = AesCbcWithIntegrity.encryptString(
@@ -146,23 +155,23 @@ class SyncRestClient(override val di: DI) : DIAware {
                         secretKey,
                     ),
                 ),
-            )
+            ).toEither()
+                .onLeft { response ->
+                    logDebug(LOG_TAG, "Join response: $response")
 
-            logDebug(LOG_TAG, "Join response: $response")
+                    repository.updateSyncRemote(
+                        syncRemote.copy(
+                            syncChainId = response.syncCode,
+                            deviceId = response.deviceId,
+                            latestMessageTimestamp = Instant.EPOCH,
+                        ),
+                    )
 
-            syncRemote = syncRemote.copy(
-                syncChainId = response.syncCode,
-                deviceId = response.deviceId,
-                latestMessageTimestamp = Instant.EPOCH,
-            )
-
-            repository.updateSyncRemote(
-                syncRemote,
-            )
-
-            logDebug(LOG_TAG, "Updated sync remote")
-
-            return response.syncCode
+                    logDebug(LOG_TAG, "Updated sync remote")
+                }
+                .mapLeft { response ->
+                    response.syncCode
+                }
         } catch (e: Exception) {
             if (e is retrofit2.HttpException) {
                 Log.e(
@@ -175,300 +184,367 @@ class SyncRestClient(override val di: DI) : DIAware {
             } else {
                 Log.e(LOG_TAG, "Error during leave", e)
             }
-            throw e
+            return Either.right(ErrorResponse(999, e.message))
         }
     }
 
-    suspend fun leave() {
+    suspend fun leave(): Either<Boolean, ErrorResponse> {
         logDebug(LOG_TAG, "leave")
-        try {
+        return try {
             safeBlock { syncRemote, feederSync, _ ->
                 logDebug(LOG_TAG, "Really leaving")
                 feederSync.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
                     deviceId = syncRemote.deviceId,
-                )
-                this.feederSync = null
-                this.secretKey = null
+                ).toEither()
+                    .onRight {
+                        Log.e(LOG_TAG, "Error during leave: ${it.code}, ${it.body}", it.throwable)
+                    }
+                    .mapLeft {
+                        true
+                    }.also {
+                        this.feederSync = null
+                        this.secretKey = null
+                    }
             }
         } catch (e: Exception) {
-            // Always proceed with database reset
-            if (e is retrofit2.HttpException) {
-                Log.e(
-                    LOG_TAG,
-                    "Error during leave: msg: code: ${e.code()}, error: ${
-                    e.response()?.errorBody()?.string()
-                    }",
-                    e,
-                )
-            } else {
-                Log.e(LOG_TAG, "Error during leave", e)
+            Log.e(LOG_TAG, "Error during leave", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
+            )
+        } finally {
+            repository.replaceWithDefaultSyncRemote()
+        }
+    }
+
+    suspend fun removeDevice(deviceId: Long): Either<DeviceListResponse, ErrorResponse> {
+        return try {
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "removeDevice")
+                feederSync.removeDevice(
+                    syncChainId = syncRemote.syncChainId,
+                    currentDeviceId = syncRemote.deviceId,
+                    deviceId = deviceId,
+                ).toEither()
+                    .onLeft { deviceListResponse ->
+                        logDebug(LOG_TAG, "Updating device list: $deviceListResponse")
+
+                        repository.replaceDevices(
+                            deviceListResponse.devices.map {
+                                SyncDevice(
+                                    deviceId = it.deviceId,
+                                    deviceName = AesCbcWithIntegrity.decryptString(
+                                        it.deviceName,
+                                        secretKey,
+                                    ),
+                                    syncRemote = syncRemote.id,
+                                )
+                            },
+                        )
+                    }
+                    .onRight {
+                        it.leaveChainIfKickedOutElseLog()
+                    }
             }
-        }
-        repository.replaceWithDefaultSyncRemote()
-    }
-
-    suspend fun removeDevice(deviceId: Long) {
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "removeDevice")
-            val deviceListResponse = feederSync.removeDevice(
-                syncChainId = syncRemote.syncChainId,
-                currentDeviceId = syncRemote.deviceId,
-                deviceId = deviceId,
-            )
-
-            logDebug(LOG_TAG, "Updating device list: $deviceListResponse")
-
-            repository.replaceDevices(
-                deviceListResponse.devices.map {
-                    SyncDevice(
-                        deviceId = it.deviceId,
-                        deviceName = AesCbcWithIntegrity.decryptString(
-                            it.deviceName,
-                            secretKey,
-                        ),
-                        syncRemote = syncRemote.id,
-                    )
-                },
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in removeDevice", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
             )
         }
     }
 
-    internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>) {
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "markAsRead: ${feedItems.size} items")
-            feederSync.sendEncryptedReadMarks(
-                currentDeviceId = syncRemote.deviceId,
-                syncChainId = syncRemote.syncChainId,
-                request = SendEncryptedReadMarkBulkRequest(
-                    items = feedItems.map { feedItem ->
-                        SendEncryptedReadMarkRequest(
-                            encrypted = AesCbcWithIntegrity.encryptString(
-                                secretKeys = secretKey,
-                                plaintext = readMarkAdapter.toJson(
-                                    ReadMarkContent(
-                                        feedUrl = feedItem.feedUrl,
-                                        articleGuid = feedItem.guid,
+    internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>): Either<SendReadMarkResponse, ErrorResponse> {
+        return try {
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "markAsRead: ${feedItems.size} items")
+                feederSync.sendEncryptedReadMarks(
+                    currentDeviceId = syncRemote.deviceId,
+                    syncChainId = syncRemote.syncChainId,
+                    request = SendEncryptedReadMarkBulkRequest(
+                        items = feedItems.map { feedItem ->
+                            SendEncryptedReadMarkRequest(
+                                encrypted = AesCbcWithIntegrity.encryptString(
+                                    secretKeys = secretKey,
+                                    plaintext = readMarkAdapter.toJson(
+                                        ReadMarkContent(
+                                            feedUrl = feedItem.feedUrl,
+                                            articleGuid = feedItem.guid,
+                                        ),
                                     ),
                                 ),
-                            ),
-                        )
-                    },
-                ),
-            )
-            for (feedItem in feedItems) {
-                repository.setSynced(feedItemId = feedItem.id)
+                            )
+                        },
+                    ),
+                ).toEither()
+                    .onLeft {
+                        for (feedItem in feedItems) {
+                            repository.setSynced(feedItemId = feedItem.id)
+                        }
+                    }
+                    .onRight {
+                        it.leaveChainIfKickedOutElseLog()
+                    }
+
+                // Should not set latest timestamp here because we cant be sure to retrieved them
             }
-            // Should not set latest timestamp here because we cant be sure to retrieved them
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in markAsRead", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
+            )
         }
     }
 
-    suspend fun markAsRead() {
-        safeBlock { _, _, _ ->
-            val readItems = repository.getFeedItemsWithoutSyncedReadMark()
+    suspend fun markAsRead(): Either<Boolean, ErrorResponse> {
+        return try {
+            safeBlock { _, _, _ ->
+                val readItems = repository.getFeedItemsWithoutSyncedReadMark()
 
-            if (readItems.isEmpty()) {
-                return@safeBlock
-            }
+                if (readItems.isNotEmpty()) {
+                    logDebug(LOG_TAG, "markAsReadBatch: ${readItems.size} items")
 
-            logDebug(LOG_TAG, "markAsReadBatch: ${readItems.size} items")
-
-            readItems.asSequence()
-                .chunked(100)
-                .forEach { feedItems ->
-                    markAsRead(feedItems)
+                    readItems.asSequence()
+                        .chunked(100)
+                        .forEach { feedItems ->
+                            markAsRead(feedItems)
+                        }
                 }
+                Either.left(true)
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in markAsRead", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
+            )
         }
     }
 
-    internal suspend fun getDevices() {
-        logDebug(LOG_TAG, "getDevices")
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "getDevices Inside block")
-            val response = feederSync.getDevices(
-                syncChainId = syncRemote.syncChainId,
-                currentDeviceId = syncRemote.deviceId,
-            )
+    internal suspend fun getDevices(): Either<DeviceListResponse, ErrorResponse> {
+        return try {
+            logDebug(LOG_TAG, "getDevices")
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "getDevices Inside block")
+                feederSync.getDevices(
+                    syncChainId = syncRemote.syncChainId,
+                    currentDeviceId = syncRemote.deviceId,
+                ).toEither()
+                    .onLeft { response ->
+                        logDebug(LOG_TAG, "getDevices: $response")
 
-            logDebug(LOG_TAG, "getDevices: $response")
-
-            repository.replaceDevices(
-                response.devices.map {
-                    logDebug(LOG_TAG, "device: $it")
-                    SyncDevice(
-                        deviceId = it.deviceId,
-                        deviceName = AesCbcWithIntegrity.decryptString(
-                            it.deviceName,
-                            secretKey,
-                        ),
-                        syncRemote = syncRemote.id,
-                    )
-                },
+                        repository.replaceDevices(
+                            response.devices.map {
+                                logDebug(LOG_TAG, "device: $it")
+                                SyncDevice(
+                                    deviceId = it.deviceId,
+                                    deviceName = AesCbcWithIntegrity.decryptString(
+                                        it.deviceName,
+                                        secretKey,
+                                    ),
+                                    syncRemote = syncRemote.id,
+                                )
+                            },
+                        )
+                    }
+                    .onRight {
+                        it.leaveChainIfKickedOutElseLog()
+                    }
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in getDevices", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
             )
         }
     }
 
     internal suspend fun getRead() {
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "getRead")
-            val response = feederSync.getEncryptedReadMarks(
-                currentDeviceId = syncRemote.deviceId,
-                syncChainId = syncRemote.syncChainId,
-                // Add one ms so we don't get inclusive of last message we got
-                sinceMillis = syncRemote.latestMessageTimestamp.plusMillis(1).toEpochMilli(),
-            )
-            logDebug(LOG_TAG, "getRead: ${response.readMarks.size} read marks")
-            for (readMark in response.readMarks) {
-                val readMarkContent = readMarkAdapter.fromJson(
-                    AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey),
-                )
+        try {
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "getRead")
+                feederSync.getEncryptedReadMarks(
+                    currentDeviceId = syncRemote.deviceId,
+                    syncChainId = syncRemote.syncChainId,
+                    // Add one ms so we don't get inclusive of last message we got
+                    sinceMillis = syncRemote.latestMessageTimestamp.plusMillis(1).toEpochMilli(),
+                ).toEither()
+                    .onLeft { response ->
+                        logDebug(LOG_TAG, "getRead: ${response.readMarks.size} read marks")
+                        for (readMark in response.readMarks) {
+                            val readMarkContent = readMarkAdapter.fromJson(
+                                AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey),
+                            )
 
-                if (readMarkContent == null) {
-                    Log.e(LOG_TAG, "Failed to decrypt readMark content")
-                    continue
-                }
+                            if (readMarkContent == null) {
+                                Log.e(LOG_TAG, "Failed to decrypt readMark content")
+                                continue
+                            }
 
-                repository.remoteMarkAsRead(
-                    feedUrl = readMarkContent.feedUrl,
-                    articleGuid = readMarkContent.articleGuid,
-                )
-                repository.updateSyncRemoteMessageTimestamp(readMark.timestamp)
+                            repository.remoteMarkAsRead(
+                                feedUrl = readMarkContent.feedUrl,
+                                articleGuid = readMarkContent.articleGuid,
+                            )
+                            repository.updateSyncRemoteMessageTimestamp(readMark.timestamp)
+                        }
+                    }
+                    .onRight {
+                        it.leaveChainIfKickedOutElseLog()
+                    }
             }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in getRead", e)
         }
     }
 
     internal suspend fun getFeeds() {
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "getFeeds")
-            val response = feederSync.getFeeds(
-                syncChainId = syncRemote.syncChainId,
-                currentDeviceId = syncRemote.deviceId,
-            )
+        try {
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "getFeeds")
+                feederSync.getFeeds(
+                    syncChainId = syncRemote.syncChainId,
+                    currentDeviceId = syncRemote.deviceId,
+                ).toEither()
+                    .onLeft { response ->
+                        logDebug(LOG_TAG, "GetFeeds response hash: ${response.hash}")
 
-            logDebug(LOG_TAG, "GetFeeds response hash: ${response.hash}")
+                        if (response.hash == syncRemote.lastFeedsRemoteHash) {
+                            // Nothing to do
+                            logDebug(LOG_TAG, "GetFeeds got nothing new, returning.")
+                            return@onLeft
+                        }
 
-            if (response.hash == syncRemote.lastFeedsRemoteHash) {
-                // Nothing to do
-                logDebug(LOG_TAG, "GetFeeds got nothing new, returning.")
-                return@safeBlock
+                        val encryptedFeeds = feedsAdapter.fromJson(
+                            AesCbcWithIntegrity.decryptString(
+                                response.encrypted,
+                                secretKeys = secretKey,
+                            ),
+                        )
+
+                        if (encryptedFeeds == null) {
+                            Log.e(LOG_TAG, "Failed to decrypt encrypted feeds")
+                            return@onLeft
+                        }
+
+                        feedDiffing(encryptedFeeds.feeds)
+
+                        syncRemote.lastFeedsRemoteHash = response.hash
+                        repository.updateSyncRemote(syncRemote)
+                    }
+                    .onRight {
+                        it.leaveChainIfKickedOutElseLog()
+                    }
             }
-
-            val encryptedFeeds = feedsAdapter.fromJson(
-                AesCbcWithIntegrity.decryptString(
-                    response.encrypted,
-                    secretKeys = secretKey,
-                ),
-            )
-
-            if (encryptedFeeds == null) {
-                Log.e(LOG_TAG, "Failed to decrypt encrypted feeds")
-                return@safeBlock
-            }
-
-            feedDiffing(encryptedFeeds.feeds)
-
-            syncRemote.lastFeedsRemoteHash = response.hash
-            repository.updateSyncRemote(syncRemote)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in getFeeds", e)
         }
     }
 
     private suspend fun feedDiffing(
         remoteFeeds: List<EncryptedFeed>,
     ) {
-        logDebug(LOG_TAG, "feedDiffing: ${remoteFeeds.size}")
-        val remotelySeenFeedUrls = repository.getRemotelySeenFeeds()
+        try {
+            logDebug(LOG_TAG, "feedDiffing: ${remoteFeeds.size}")
+            val remotelySeenFeedUrls = repository.getRemotelySeenFeeds()
 
-        val feedUrlsWhichWereDeletedOnRemote = remotelySeenFeedUrls
-            .filterNot { url -> remoteFeeds.asSequence().map { it.url }.contains(url) }
+            val feedUrlsWhichWereDeletedOnRemote = remotelySeenFeedUrls
+                .filterNot { url -> remoteFeeds.asSequence().map { it.url }.contains(url) }
 
-        logDebug(LOG_TAG, "RemotelyDeleted: ${feedUrlsWhichWereDeletedOnRemote.size}")
+            logDebug(LOG_TAG, "RemotelyDeleted: ${feedUrlsWhichWereDeletedOnRemote.size}")
 
-        for (url in feedUrlsWhichWereDeletedOnRemote) {
-            logDebug(LOG_TAG, "Deleting remotely deleted feed: $url")
-            repository.deleteFeed(url)
-        }
+            for (url in feedUrlsWhichWereDeletedOnRemote) {
+                logDebug(LOG_TAG, "Deleting remotely deleted feed: $url")
+                repository.deleteFeed(url)
+            }
 
-        for (remoteFeed in remoteFeeds) {
-            val seenRemotelyBefore = remoteFeed.url in remotelySeenFeedUrls
-            val dbFeed = repository.getFeed(remoteFeed.url)
+            for (remoteFeed in remoteFeeds) {
+                val seenRemotelyBefore = remoteFeed.url in remotelySeenFeedUrls
+                val dbFeed = repository.getFeed(remoteFeed.url)
 
-            when {
-                dbFeed == null && !seenRemotelyBefore -> {
-                    // Entirely new remote feed
-                    logDebug(LOG_TAG, "Saving new feed: ${remoteFeed.url}")
-                    repository.saveFeed(
-                        remoteFeed.updateFeedCopy(Feed()),
-                    )
-                }
-                dbFeed == null && seenRemotelyBefore -> {
-                    // Has been locally deleted, it will be deleted on next call of updateFeeds
-                    logDebug(LOG_TAG, "Received update for locally deleted feed: ${remoteFeed.url}")
-                }
-                dbFeed != null -> {
-                    // Update of feed
-                    // Compare modification date - only save if remote is newer
-                    if (remoteFeed.whenModified > dbFeed.whenModified) {
-                        logDebug(LOG_TAG, "Saving updated feed: ${remoteFeed.url}")
+                when {
+                    dbFeed == null && !seenRemotelyBefore -> {
+                        // Entirely new remote feed
+                        logDebug(LOG_TAG, "Saving new feed: ${remoteFeed.url}")
                         repository.saveFeed(
-                            remoteFeed.updateFeedCopy(dbFeed),
+                            remoteFeed.updateFeedCopy(Feed()),
                         )
-                    } else {
+                    }
+
+                    dbFeed == null && seenRemotelyBefore -> {
+                        // Has been locally deleted, it will be deleted on next call of updateFeeds
                         logDebug(
                             LOG_TAG,
-                            "Not saving feed because local date trumps it: ${remoteFeed.url}",
+                            "Received update for locally deleted feed: ${remoteFeed.url}",
                         )
+                    }
+
+                    dbFeed != null -> {
+                        // Update of feed
+                        // Compare modification date - only save if remote is newer
+                        if (remoteFeed.whenModified > dbFeed.whenModified) {
+                            logDebug(LOG_TAG, "Saving updated feed: ${remoteFeed.url}")
+                            repository.saveFeed(
+                                remoteFeed.updateFeedCopy(dbFeed),
+                            )
+                        } else {
+                            logDebug(
+                                LOG_TAG,
+                                "Not saving feed because local date trumps it: ${remoteFeed.url}",
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        repository.replaceRemoteFeedsWith(
-            remoteFeeds.map {
-                RemoteFeed(
-                    syncRemote = 1L,
-                    url = it.url,
-                )
-            },
-        )
+            repository.replaceRemoteFeedsWith(
+                remoteFeeds.map {
+                    RemoteFeed(
+                        syncRemote = 1L,
+                        url = it.url,
+                    )
+                },
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in feedDiffing", e)
+        }
     }
 
-    suspend fun sendUpdatedFeeds() {
-        safeBlock { syncRemote, feederSync, secretKey ->
-            logDebug(LOG_TAG, "sendUpdatedFeeds")
-            val lastRemoteHash = syncRemote.lastFeedsRemoteHash
+    suspend fun sendUpdatedFeeds(): Either<Boolean, ErrorResponse> {
+        return try {
+            safeBlock { syncRemote, feederSync, secretKey ->
+                logDebug(LOG_TAG, "sendUpdatedFeeds")
+                val lastRemoteHash = syncRemote.lastFeedsRemoteHash
 
-            // Only send if hash does not match
-            // Important to keep iteration order stable - across devices. So sort on URL, not ID or date
-            val feeds = repository.getFeedsOrderedByUrl()
-                .map { it.toEncryptedFeed() }
+                // Only send if hash does not match
+                // Important to keep iteration order stable - across devices. So sort on URL, not ID or date
+                val feeds = repository.getFeedsOrderedByUrl()
+                    .map { it.toEncryptedFeed() }
 
-            // Yes, List hashCodes are based on elements. Just remember to hash what you send
-            // - and not raw database objects
-            val currentContentHash = feeds.hashCode()
+                // Yes, List hashCodes are based on elements. Just remember to hash what you send
+                // - and not raw database objects
+                val currentContentHash = feeds.hashCode()
 
-            if (lastRemoteHash == currentContentHash) {
-                // Nothing to do
-                logDebug(LOG_TAG, "Feeds haven't changed - so not sending")
-                return@safeBlock
-            }
+                if (lastRemoteHash == currentContentHash) {
+                    // Nothing to do
+                    logDebug(LOG_TAG, "Feeds haven't changed - so not sending")
+                    return@safeBlock Either.left(false)
+                }
 
-            val encrypted = AesCbcWithIntegrity.encryptString(
-                feedsAdapter.toJson(
-                    EncryptedFeeds(
-                        feeds = feeds,
+                val encrypted = AesCbcWithIntegrity.encryptString(
+                    feedsAdapter.toJson(
+                        EncryptedFeeds(
+                            feeds = feeds,
+                        ),
                     ),
-                ),
-                secretKeys = secretKey,
-            )
+                    secretKeys = secretKey,
+                )
 
-            logDebug(
-                LOG_TAG,
-                "Sending updated feeds with locally computed hash: $currentContentHash",
-            )
-            // Might fail with 412 in case already updated remotely - need to call get
-            try {
-                val response = feederSync.updateFeeds(
+                logDebug(
+                    LOG_TAG,
+                    "Sending updated feeds with locally computed hash: $currentContentHash",
+                )
+                // Might fail with 412 in case already updated remotely - need to call get
+                feederSync.updateFeeds(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
                     etagValue = syncRemote.lastFeedsRemoteHash.asWeakETagValue(),
@@ -476,25 +552,41 @@ class SyncRestClient(override val di: DI) : DIAware {
                         contentHash = currentContentHash,
                         encrypted = encrypted,
                     ),
-                )
+                ).toEither()
+                    .onRight {
+                        if (it.code == 412) {
+                            // Need to call get first because updates have happened
+                            getFeeds()
+                            // Now try again
+                            sendUpdatedFeeds()
+                        } else {
+                            it.leaveChainIfKickedOutElseLog()
+                        }
+                    }
+                    .onLeft { response ->
+                        // Store hash for future
+                        syncRemote.lastFeedsRemoteHash = response.hash
+                        repository.updateSyncRemote(syncRemote)
 
-                // Store hash for future
-                syncRemote.lastFeedsRemoteHash = response.hash
-                repository.updateSyncRemote(syncRemote)
-
-                logDebug(LOG_TAG, "Received updated feeds hash: ${response.hash}")
-            } catch (e: HttpException) {
-                if (e.response.code == 412) {
-                    // Need to call get first because updates have happened
-                    getFeeds()
-                    // Now try again
-                    sendUpdatedFeeds()
-                } else {
-                    Log.e(LOG_TAG, "Error when sending feeds", e)
-                }
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "Error when sending feeds", e)
+                        logDebug(LOG_TAG, "Received updated feeds hash: ${response.hash}")
+                    }
+                    .mapLeft {
+                        true
+                    }
             }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error in sendUpdatedFeeds", e)
+            Either.right(
+                ErrorResponse(1000, e.message, e),
+            )
+        }
+    }
+
+    private suspend fun ErrorResponse.leaveChainIfKickedOutElseLog() {
+        Log.e(LOG_TAG, "leaveChainIfKickedOutElseLog: $code, $body", throwable)
+        if (code == 400 && body?.contains("Device not registered") == true) {
+            // Forbidden, this device has been removed from the chain from another device
+            leave()
         }
     }
 
@@ -505,3 +597,74 @@ class SyncRestClient(override val di: DI) : DIAware {
 
 fun Any.asWeakETagValue() =
     "W/\"$this\""
+
+fun <T> Response<T>.toEither(): Either<T, ErrorResponse> {
+    return body()?.let { Either.left(it) }
+        ?: Either.right(
+            ErrorResponse(
+                code = code(),
+                body = errorBody()?.string(),
+            ),
+        )
+}
+
+data class ErrorResponse(
+    val code: Int,
+    val body: String? = null,
+    val throwable: Throwable? = null,
+)
+
+class Either<A, B>(
+    private val left: A?,
+    private val right: B?,
+) {
+    init {
+        check(left != null || right != null) {
+            "Either Left or Right must be non-null"
+        }
+        check(left == null || right == null) {
+            "Only one of left or right can be non-null"
+        }
+    }
+
+    suspend fun onLeft(block: suspend (left: A) -> Unit): Either<A, B> {
+        left?.let {
+            block(it)
+        }
+        return this
+    }
+
+    suspend fun <T> mapLeft(block: suspend (left: A) -> T): Either<T, B> {
+        return left?.let {
+            left(block(it))
+        } ?: right(this.right!!)
+    }
+
+    suspend fun <C> flatMapLeft(block: suspend (left: A) -> Either<C, B>): Either<C, B> {
+        return if (left != null) {
+            block(left)
+        } else {
+            right(this.right!!)
+        }
+    }
+
+    suspend fun flatMapRight(block: suspend (right: B) -> Either<A, B>): Either<A, B> {
+        return if (right != null) {
+            block(right)
+        } else {
+            this
+        }
+    }
+
+    suspend fun onRight(block: suspend (right: B) -> Unit): Either<A, B> {
+        right?.let {
+            block(it)
+        }
+        return this
+    }
+
+    companion object {
+        fun <A, B> left(left: A) = Either<A, B>(left = left, right = null)
+        fun <A, B> right(right: B) = Either<A, B>(left = null, right = right)
+    }
+}

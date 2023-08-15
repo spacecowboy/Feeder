@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
 import java.net.URL
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +31,6 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     private val context: Application by instance()
     private val repository: Repository by instance()
 
-    //    private val syncClient: SyncRestClient by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     private val _syncCode: MutableStateFlow<String> = MutableStateFlow(
@@ -82,6 +82,9 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         applicationCoroutineScope.launch {
             logDebug(tag = LOG_TAG, "Update Devices")
             repository.updateDeviceList()
+                .onRight {
+                    Log.e(LOG_TAG, "updateDeviceList: ${it.code}: ${it.body}", it.throwable)
+                }
         }
     }
 
@@ -89,12 +92,16 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         logDebug(tag = LOG_TAG, "Joining sync chain")
         viewModelScope.launch {
             try {
-                val joinJob = applicationCoroutineScope.launch {
+                applicationCoroutineScope.async {
                     repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
-                }
-                joinJob.join()
-                requestFeedSync(di)
-                joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
+                }.await()
+                    .onLeft {
+                        requestFeedSync(di)
+                        joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
+                    }
+                    .onRight {
+                        Log.e(LOG_TAG, "joinSyncChain: ${it.code}, ${it.body}", it.throwable)
+                    }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error when joining sync chain", e)
             }
@@ -129,8 +136,13 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     fun startNewSyncChain() {
         applicationCoroutineScope.launch {
             try {
-                val (syncCode, secretKey) = repository.startNewSyncChain()
-                joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
+                repository.startNewSyncChain()
+                    .onLeft { (syncCode, secretKey) ->
+                        joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
+                    }
+                    .onRight {
+                        Log.e(LOG_TAG, "startNewChain: ${it.body}", it.throwable)
+                    }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error when starting new sync chain", e)
             }
@@ -174,6 +186,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                         SyncScreenToShow.SETUP,
                         SyncScreenToShow.JOIN,
                         -> SyncScreenToShow.DEVICELIST
+
                         SyncScreenToShow.DEVICELIST,
                         SyncScreenToShow.ADD_DEVICE,
                         -> screen
@@ -183,6 +196,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                         SyncScreenToShow.SETUP,
                         SyncScreenToShow.JOIN,
                         -> screen
+
                         SyncScreenToShow.DEVICELIST,
                         SyncScreenToShow.ADD_DEVICE,
                         -> SyncScreenToShow.SETUP
