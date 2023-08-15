@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.sync
 
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -12,60 +13,60 @@ interface FeederSync {
     @POST("create")
     suspend fun create(
         @Body request: CreateRequest,
-    ): JoinResponse
+    ): Response<JoinResponse>
 
     @POST("join")
     suspend fun join(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Body request: JoinRequest,
-    ): JoinResponse
+    ): Response<JoinResponse>
 
     @GET("devices")
     suspend fun getDevices(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-    ): DeviceListResponse
+    ): Response<DeviceListResponse>
 
     @DELETE("devices/{deviceId}")
     suspend fun removeDevice(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Path("deviceId") deviceId: Long,
-    ): DeviceListResponse
+    ): Response<DeviceListResponse>
 
     @GET("readmark")
     suspend fun getReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Query("since") sinceMillis: Long,
-    ): GetReadMarksResponse
+    ): Response<GetReadMarksResponse>
 
     @POST("readmark")
     suspend fun sendReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Body request: SendReadMarkBulkRequest,
-    ): SendReadMarkResponse
+    ): Response<SendReadMarkResponse>
 
     @GET("ereadmark")
     suspend fun getEncryptedReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Query("since") sinceMillis: Long,
-    ): GetEncryptedReadMarksResponse
+    ): Response<GetEncryptedReadMarksResponse>
 
     @POST("ereadmark")
     suspend fun sendEncryptedReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Body request: SendEncryptedReadMarkBulkRequest,
-    ): SendReadMarkResponse
+    ): Response<SendReadMarkResponse>
 
     @GET("feeds")
     suspend fun getFeeds(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-    ): GetFeedsResponse
+    ): Response<GetFeedsResponse>
 
     @POST("feeds")
     suspend fun updateFeeds(
@@ -73,5 +74,5 @@ interface FeederSync {
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
         @Header("If-Match") etagValue: String,
         @Body request: UpdateFeedsRequest,
-    ): UpdateFeedsResponse
+    ): Response<UpdateFeedsResponse>
 }

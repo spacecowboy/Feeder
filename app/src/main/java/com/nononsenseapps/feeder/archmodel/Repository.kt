@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import androidx.work.Constraints
@@ -25,6 +26,9 @@ import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
+import com.nononsenseapps.feeder.sync.DeviceListResponse
+import com.nononsenseapps.feeder.sync.Either
+import com.nononsenseapps.feeder.sync.ErrorResponse
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
@@ -132,6 +136,7 @@ class Repository(override val di: DI) : DIAware {
     fun setFeedListFilterSaved(value: Boolean) {
         settingsStore.setFeedListFilterSaved(value)
     }
+
     fun setFeedListFilterRecentlyRead(value: Boolean) {
         settingsStore.setFeedListFilterRecentlyRead(value)
         // Implies read too
@@ -139,6 +144,7 @@ class Repository(override val di: DI) : DIAware {
             settingsStore.setFeedListFilterRead(false)
         }
     }
+
     fun setFeedListFilterRead(value: Boolean) {
         settingsStore.setFeedListFilterRead(value)
         // Implies recently read too
@@ -561,28 +567,39 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
     }
 
-    suspend fun updateDeviceList() {
-        syncClient.getDevices()
+    suspend fun updateDeviceList(): Either<DeviceListResponse, ErrorResponse> {
+        return syncClient.getDevices()
     }
 
-    suspend fun joinSyncChain(syncCode: String, secretKey: String) {
-        syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
-        syncClient.getDevices()
+    suspend fun joinSyncChain(syncCode: String, secretKey: String): Either<String, ErrorResponse> {
+        return syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
+            .onLeft {
+                syncClient.getDevices()
+            }
     }
 
     suspend fun leaveSyncChain() {
         syncClient.leave()
+            .onRight {
+                Log.e(LOG_TAG, "leaveSyncChain: ${it.code}, ${it.body}", it.throwable)
+            }
     }
 
     suspend fun removeDevice(deviceId: Long) {
         syncClient.removeDevice(deviceId = deviceId)
+            .onRight {
+                Log.e(LOG_TAG, "removeDevice: ${it.code}, ${it.body}", it.throwable)
+            }
     }
 
-    suspend fun startNewSyncChain(): Pair<String, String> {
-        val syncCode = syncClient.create()
-        val syncRemote = getSyncRemote()
-        updateDeviceList()
-        return syncCode to syncRemote.secretKey
+    suspend fun startNewSyncChain(): Either<Pair<String, String>, ErrorResponse> {
+        return syncClient.create()
+            .onLeft {
+                updateDeviceList()
+            }
+            .mapLeft { syncCode ->
+                syncCode to getSyncRemote().secretKey
+            }
     }
 
     private fun scheduleSendRead() {
