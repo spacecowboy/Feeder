@@ -27,13 +27,13 @@ import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.DeviceListResponse
-import com.nononsenseapps.feeder.sync.Either
 import com.nononsenseapps.feeder.sync.ErrorResponse
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
+import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
@@ -567,37 +567,37 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
     }
 
-    suspend fun updateDeviceList(): Either<DeviceListResponse, ErrorResponse> {
+    suspend fun updateDeviceList(): Either<ErrorResponse, DeviceListResponse> {
         return syncClient.getDevices()
     }
 
-    suspend fun joinSyncChain(syncCode: String, secretKey: String): Either<String, ErrorResponse> {
+    suspend fun joinSyncChain(syncCode: String, secretKey: String): Either<ErrorResponse, String> {
         return syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
-            .onLeft {
+            .onRight {
                 syncClient.getDevices()
             }
     }
 
     suspend fun leaveSyncChain() {
         syncClient.leave()
-            .onRight {
+            .onLeft {
                 Log.e(LOG_TAG, "leaveSyncChain: ${it.code}, ${it.body}", it.throwable)
             }
     }
 
     suspend fun removeDevice(deviceId: Long) {
         syncClient.removeDevice(deviceId = deviceId)
-            .onRight {
+            .onLeft {
                 Log.e(LOG_TAG, "removeDevice: ${it.code}, ${it.body}", it.throwable)
             }
     }
 
-    suspend fun startNewSyncChain(): Either<Pair<String, String>, ErrorResponse> {
+    suspend fun startNewSyncChain(): Either<ErrorResponse, Pair<String, String>> {
         return syncClient.create()
-            .onLeft {
+            .onRight {
                 updateDeviceList()
             }
-            .mapLeft { syncCode ->
+            .map { syncCode ->
                 syncCode to getSyncRemote().secretKey
             }
     }

@@ -1,7 +1,8 @@
+@file:OptIn(ExperimentalContracts::class)
+
 package com.nononsenseapps.feeder.sync
 
 import android.util.Log
-import coil.network.HttpException
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.crypto.SecretKeys
@@ -13,9 +14,11 @@ import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.generateDeviceName
+import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
 import java.time.Instant
+import kotlin.contracts.ExperimentalContracts
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
@@ -71,8 +74,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     private suspend fun <A> safeBlock(
-        block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<A, ErrorResponse>)?,
-    ): Either<A, ErrorResponse> {
+        block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<ErrorResponse, A>)?,
+    ): Either<ErrorResponse, A> {
         if (block != null) {
             repository.getSyncRemote().let { syncRemote ->
                 if (syncRemote.hasSyncChain()) {
@@ -84,7 +87,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 }
             }
         }
-        return Either.right(
+        return Either.Left(
             ErrorResponse(
                 code = 1001,
                 body = null,
@@ -92,7 +95,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         )
     }
 
-    suspend fun create(): Either<String, ErrorResponse> {
+    suspend fun create(): Either<ErrorResponse, String> {
         logDebug(LOG_TAG, "create")
         // To ensure always uses correct client, manually set remote here ALWAYS
         val syncRemote = repository.getSyncRemote()
@@ -111,7 +114,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 deviceName = AesCbcWithIntegrity.encryptString(syncRemote.deviceName, secretKey),
             ),
         ).toEither()
-            .onLeft { response ->
+            .onRight { response ->
                 repository.updateSyncRemote(
                     syncRemote.copy(
                         syncChainId = response.syncCode,
@@ -121,12 +124,12 @@ class SyncRestClient(override val di: DI) : DIAware {
                     ),
                 )
             }
-            .mapLeft { response ->
+            .map { response ->
                 response.syncCode
             }
     }
 
-    suspend fun join(syncCode: String, remoteSecretKey: String): Either<String, ErrorResponse> {
+    suspend fun join(syncCode: String, remoteSecretKey: String): Either<ErrorResponse, String> {
         logDebug(LOG_TAG, "join")
         try {
             logDebug(LOG_TAG, "Really joining")
@@ -156,7 +159,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     ),
                 ),
             ).toEither()
-                .onLeft { response ->
+                .onRight { response ->
                     logDebug(LOG_TAG, "Join response: $response")
 
                     repository.updateSyncRemote(
@@ -169,7 +172,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
                     logDebug(LOG_TAG, "Updated sync remote")
                 }
-                .mapLeft { response ->
+                .map { response ->
                     response.syncCode
                 }
         } catch (e: Exception) {
@@ -184,11 +187,11 @@ class SyncRestClient(override val di: DI) : DIAware {
             } else {
                 Log.e(LOG_TAG, "Error during leave", e)
             }
-            return Either.right(ErrorResponse(999, e.message))
+            return Either.Left(ErrorResponse(999, e.message))
         }
     }
 
-    suspend fun leave(): Either<Boolean, ErrorResponse> {
+    suspend fun leave(): Either<ErrorResponse, Boolean> {
         logDebug(LOG_TAG, "leave")
         return try {
             safeBlock { syncRemote, feederSync, _ ->
@@ -198,10 +201,10 @@ class SyncRestClient(override val di: DI) : DIAware {
                     currentDeviceId = syncRemote.deviceId,
                     deviceId = syncRemote.deviceId,
                 ).toEither()
-                    .onRight {
+                    .onLeft {
                         Log.e(LOG_TAG, "Error during leave: ${it.code}, ${it.body}", it.throwable)
                     }
-                    .mapLeft {
+                    .map {
                         true
                     }.also {
                         this.feederSync = null
@@ -210,7 +213,7 @@ class SyncRestClient(override val di: DI) : DIAware {
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error during leave", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         } finally {
@@ -218,7 +221,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun removeDevice(deviceId: Long): Either<DeviceListResponse, ErrorResponse> {
+    suspend fun removeDevice(deviceId: Long): Either<ErrorResponse, DeviceListResponse> {
         return try {
             safeBlock { syncRemote, feederSync, secretKey ->
                 logDebug(LOG_TAG, "removeDevice")
@@ -227,7 +230,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     currentDeviceId = syncRemote.deviceId,
                     deviceId = deviceId,
                 ).toEither()
-                    .onLeft { deviceListResponse ->
+                    .onRight { deviceListResponse ->
                         logDebug(LOG_TAG, "Updating device list: $deviceListResponse")
 
                         repository.replaceDevices(
@@ -243,19 +246,19 @@ class SyncRestClient(override val di: DI) : DIAware {
                             },
                         )
                     }
-                    .onRight {
+                    .onLeft {
                         it.leaveChainIfKickedOutElseLog()
                     }
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in removeDevice", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         }
     }
 
-    internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>): Either<SendReadMarkResponse, ErrorResponse> {
+    internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>): Either<ErrorResponse, SendReadMarkResponse> {
         return try {
             safeBlock { syncRemote, feederSync, secretKey ->
                 logDebug(LOG_TAG, "markAsRead: ${feedItems.size} items")
@@ -278,12 +281,12 @@ class SyncRestClient(override val di: DI) : DIAware {
                         },
                     ),
                 ).toEither()
-                    .onLeft {
+                    .onRight {
                         for (feedItem in feedItems) {
                             repository.setSynced(feedItemId = feedItem.id)
                         }
                     }
-                    .onRight {
+                    .onLeft {
                         it.leaveChainIfKickedOutElseLog()
                     }
 
@@ -291,13 +294,13 @@ class SyncRestClient(override val di: DI) : DIAware {
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in markAsRead", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         }
     }
 
-    suspend fun markAsRead(): Either<Boolean, ErrorResponse> {
+    suspend fun markAsRead(): Either<ErrorResponse, Boolean> {
         return try {
             safeBlock { _, _, _ ->
                 val readItems = repository.getFeedItemsWithoutSyncedReadMark()
@@ -311,17 +314,17 @@ class SyncRestClient(override val di: DI) : DIAware {
                             markAsRead(feedItems)
                         }
                 }
-                Either.left(true)
+                Either.Right(true)
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in markAsRead", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         }
     }
 
-    internal suspend fun getDevices(): Either<DeviceListResponse, ErrorResponse> {
+    internal suspend fun getDevices(): Either<ErrorResponse, DeviceListResponse> {
         return try {
             logDebug(LOG_TAG, "getDevices")
             safeBlock { syncRemote, feederSync, secretKey ->
@@ -330,7 +333,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
                 ).toEither()
-                    .onLeft { response ->
+                    .onRight { response ->
                         logDebug(LOG_TAG, "getDevices: $response")
 
                         repository.replaceDevices(
@@ -347,13 +350,13 @@ class SyncRestClient(override val di: DI) : DIAware {
                             },
                         )
                     }
-                    .onRight {
+                    .onLeft {
                         it.leaveChainIfKickedOutElseLog()
                     }
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in getDevices", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         }
@@ -369,7 +372,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     // Add one ms so we don't get inclusive of last message we got
                     sinceMillis = syncRemote.latestMessageTimestamp.plusMillis(1).toEpochMilli(),
                 ).toEither()
-                    .onLeft { response ->
+                    .onRight { response ->
                         logDebug(LOG_TAG, "getRead: ${response.readMarks.size} read marks")
                         for (readMark in response.readMarks) {
                             val readMarkContent = readMarkAdapter.fromJson(
@@ -388,7 +391,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                             repository.updateSyncRemoteMessageTimestamp(readMark.timestamp)
                         }
                     }
-                    .onRight {
+                    .onLeft {
                         it.leaveChainIfKickedOutElseLog()
                     }
             }
@@ -405,13 +408,13 @@ class SyncRestClient(override val di: DI) : DIAware {
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
                 ).toEither()
-                    .onLeft { response ->
+                    .onRight { response ->
                         logDebug(LOG_TAG, "GetFeeds response hash: ${response.hash}")
 
                         if (response.hash == syncRemote.lastFeedsRemoteHash) {
                             // Nothing to do
                             logDebug(LOG_TAG, "GetFeeds got nothing new, returning.")
-                            return@onLeft
+                            return@onRight
                         }
 
                         val encryptedFeeds = feedsAdapter.fromJson(
@@ -423,7 +426,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
                         if (encryptedFeeds == null) {
                             Log.e(LOG_TAG, "Failed to decrypt encrypted feeds")
-                            return@onLeft
+                            return@onRight
                         }
 
                         feedDiffing(encryptedFeeds.feeds)
@@ -431,7 +434,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                         syncRemote.lastFeedsRemoteHash = response.hash
                         repository.updateSyncRemote(syncRemote)
                     }
-                    .onRight {
+                    .onLeft {
                         it.leaveChainIfKickedOutElseLog()
                     }
             }
@@ -509,7 +512,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun sendUpdatedFeeds(): Either<Boolean, ErrorResponse> {
+    suspend fun sendUpdatedFeeds(): Either<ErrorResponse, Boolean> {
         return try {
             safeBlock { syncRemote, feederSync, secretKey ->
                 logDebug(LOG_TAG, "sendUpdatedFeeds")
@@ -527,7 +530,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 if (lastRemoteHash == currentContentHash) {
                     // Nothing to do
                     logDebug(LOG_TAG, "Feeds haven't changed - so not sending")
-                    return@safeBlock Either.left(false)
+                    return@safeBlock Either.Right(false)
                 }
 
                 val encrypted = AesCbcWithIntegrity.encryptString(
@@ -553,7 +556,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                         encrypted = encrypted,
                     ),
                 ).toEither()
-                    .onRight {
+                    .onLeft {
                         if (it.code == 412) {
                             // Need to call get first because updates have happened
                             getFeeds()
@@ -563,20 +566,20 @@ class SyncRestClient(override val di: DI) : DIAware {
                             it.leaveChainIfKickedOutElseLog()
                         }
                     }
-                    .onLeft { response ->
+                    .onRight { response ->
                         // Store hash for future
                         syncRemote.lastFeedsRemoteHash = response.hash
                         repository.updateSyncRemote(syncRemote)
 
                         logDebug(LOG_TAG, "Received updated feeds hash: ${response.hash}")
                     }
-                    .mapLeft {
+                    .map {
                         true
                     }
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in sendUpdatedFeeds", e)
-            Either.right(
+            Either.Left(
                 ErrorResponse(1000, e.message, e),
             )
         }
@@ -598,9 +601,9 @@ class SyncRestClient(override val di: DI) : DIAware {
 fun Any.asWeakETagValue() =
     "W/\"$this\""
 
-fun <T> Response<T>.toEither(): Either<T, ErrorResponse> {
-    return body()?.let { Either.left(it) }
-        ?: Either.right(
+fun <T> Response<T>.toEither(): Either<ErrorResponse, T> {
+    return body()?.let { Either.Right(it) }
+        ?: Either.Left(
             ErrorResponse(
                 code = code(),
                 body = errorBody()?.string(),
@@ -613,58 +616,3 @@ data class ErrorResponse(
     val body: String? = null,
     val throwable: Throwable? = null,
 )
-
-class Either<A, B>(
-    private val left: A?,
-    private val right: B?,
-) {
-    init {
-        check(left != null || right != null) {
-            "Either Left or Right must be non-null"
-        }
-        check(left == null || right == null) {
-            "Only one of left or right can be non-null"
-        }
-    }
-
-    suspend fun onLeft(block: suspend (left: A) -> Unit): Either<A, B> {
-        left?.let {
-            block(it)
-        }
-        return this
-    }
-
-    suspend fun <T> mapLeft(block: suspend (left: A) -> T): Either<T, B> {
-        return left?.let {
-            left(block(it))
-        } ?: right(this.right!!)
-    }
-
-    suspend fun <C> flatMapLeft(block: suspend (left: A) -> Either<C, B>): Either<C, B> {
-        return if (left != null) {
-            block(left)
-        } else {
-            right(this.right!!)
-        }
-    }
-
-    suspend fun flatMapRight(block: suspend (right: B) -> Either<A, B>): Either<A, B> {
-        return if (right != null) {
-            block(right)
-        } else {
-            this
-        }
-    }
-
-    suspend fun onRight(block: suspend (right: B) -> Unit): Either<A, B> {
-        right?.let {
-            block(it)
-        }
-        return this
-    }
-
-    companion object {
-        fun <A, B> left(left: A) = Either<A, B>(left = left, right = null)
-        fun <A, B> right(right: B) = Either<A, B>(left = null, right = right)
-    }
-}

@@ -82,7 +82,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         applicationCoroutineScope.launch {
             logDebug(tag = LOG_TAG, "Update Devices")
             repository.updateDeviceList()
-                .onRight {
+                .onLeft {
                     Log.e(LOG_TAG, "updateDeviceList: ${it.code}: ${it.body}", it.throwable)
                 }
         }
@@ -95,11 +95,11 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                 applicationCoroutineScope.async {
                     repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
                 }.await()
-                    .onLeft {
+                    .onRight {
                         requestFeedSync(di)
                         joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
                     }
-                    .onRight {
+                    .onLeft {
                         Log.e(LOG_TAG, "joinSyncChain: ${it.code}, ${it.body}", it.throwable)
                     }
             } catch (e: Exception) {
@@ -137,10 +137,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         applicationCoroutineScope.launch {
             try {
                 repository.startNewSyncChain()
-                    .onLeft { (syncCode, secretKey) ->
+                    .onRight { (syncCode, secretKey) ->
                         joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
                     }
-                    .onRight {
+                    .onLeft {
                         Log.e(LOG_TAG, "startNewChain: ${it.body}", it.throwable)
                     }
             } catch (e: Exception) {
