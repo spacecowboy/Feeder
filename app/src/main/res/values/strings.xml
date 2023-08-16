@@ -228,4 +228,15 @@
   <string name="read_adjective">Read</string>
   <string name="saved_adjective">Saved</string>
   <string name="show_only_title">Show only title</string>
+  <string name="failed_to_download">Failed to download</string>
+  <string name="failed_to_parse_the_page">Failed to parse the page</string>
+  <string name="no_feeds_in_the_page">No feeds in the page</string>
+  <string name="content_is_not_html">Content is not HTML</string>
+  <string name="failed_to_parse_rss_feed">Failed to parse RSS feed</string>
+  <string name="http_error">HTTP error</string>
+  <string name="failed_to_parse_json_feed">Failed to parse JSON feed</string>
+  <string name="no_body_in_response">No body in response</string>
+  <string name="unsupported_content_type">Unsupported content type</string>
+  <string name="failed_to_parse_full_article">Failed to parse full article</string>
+  <string name="no_url">No URL</string>
 </resources>

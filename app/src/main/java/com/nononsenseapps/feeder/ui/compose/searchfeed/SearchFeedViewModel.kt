@@ -1,73 +1,80 @@
 package com.nononsenseapps.feeder.ui.compose.searchfeed
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
+import com.nononsenseapps.feeder.model.FeedParserError
+import com.nononsenseapps.feeder.model.NoAlternateFeeds
+import com.nononsenseapps.feeder.model.NotInitializedYet
 import com.nononsenseapps.feeder.model.SiteMetaData
+import com.nononsenseapps.feeder.util.Either
+import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()
 
-    private var siteMetaData: SiteMetaData? by mutableStateOf(null)
+    private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
+        Either.Left(
+            NotInitializedYet,
+        ),
+    )
 
-    fun searchForFeeds(url: URL): Flow<SearchResult> {
+    fun searchForFeeds(initialUrl: URL): Flow<Either<FeedParserError, SearchResult>> {
         return flow {
-            siteMetaData = feedParser.getSiteMetaData(url)
+            siteMetaData = feedParser.getSiteMetaData(initialUrl)
             // Flow collection makes this block concurrent with map below
             val initialSiteMetaData = siteMetaData
-            emit(url)
 
-            initialSiteMetaData?.alternateFeedLinks?.forEach {
-                emit(it.link)
-            }
+            initialSiteMetaData
+                .onRight { metaData ->
+                    metaData.alternateFeedLinks.forEach {
+                        emit(Either.Right(it.link))
+                    }
+                    if (metaData.alternateFeedLinks.isEmpty()) {
+                        emit(Either.Left(NoAlternateFeeds(initialUrl.toString())))
+                    }
+                }
+                .onLeft {
+                    emit(Either.Right(initialUrl))
+                }
         }
-            .mapNotNull {
-                try {
-                    feedParser.parseFeedUrl(it)?.let { feed ->
-                        if (siteMetaData == null) {
-                            feed.home_page_url?.let { pageLink ->
-                                sloppyLinkToStrictURLOrNull(pageLink)?.let { pageUrl ->
-                                    siteMetaData = feedParser.getSiteMetaData(pageUrl)
+            .map { urlResult ->
+                urlResult.flatMap { url ->
+                    feedParser.parseFeedUrl(url)
+                        .onRight { feed ->
+                            if (siteMetaData.isLeft()) {
+                                feed.home_page_url?.let { pageLink ->
+                                    sloppyLinkToStrictURLOrNull(pageLink)?.let { pageUrl ->
+                                        siteMetaData = feedParser.getSiteMetaData(pageUrl)
+                                    }
                                 }
                             }
                         }
-
-                        SearchResult(
-                            title = feed.title ?: "",
-                            url = feed.feed_url ?: it.toString(),
-                            description = feed.description ?: "",
-                            isError = false,
-                            feedImage = siteMetaData?.feedImage ?: "",
-                        )
-                    }
-                } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to parse", t)
-                    SearchResult(
-                        title = FAILED_TO_PARSE_PLACEHOLDER,
-                        url = it.toString(),
-                        description = t.message ?: "",
-                        isError = true,
-                        feedImage = siteMetaData?.feedImage ?: "",
-                    )
+                        .map { feed ->
+                            SearchResult(
+                                title = feed.title ?: "",
+                                url = feed.feed_url ?: url.toString(),
+                                description = feed.description ?: "",
+                                feedImage = siteMetaData.getOrNull()?.feedImage ?: "",
+                            )
+                        }
                 }
             }
             .flowOn(Dispatchers.Default)
     }
 
     companion object {
-        const val FAILED_TO_PARSE_PLACEHOLDER = "failed_to_parse"
         const val LOG_TAG = "FEEDER_SearchFeed"
     }
 }

@@ -25,6 +25,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 sealed class Either<out A, out B> {
+    @OptIn(ExperimentalContracts::class)
     fun isLeft(): Boolean {
         contract {
             returns(true) implies (this@Either is Left<A>)
@@ -33,6 +34,7 @@ sealed class Either<out A, out B> {
         return this@Either is Left<A>
     }
 
+    @OptIn(ExperimentalContracts::class)
     fun isRight(): Boolean {
         contract {
             returns(true) implies (this@Either is Right<B>)
@@ -307,6 +309,7 @@ sealed class Either<out A, out B> {
             return try {
                 Right(block())
             } catch (t: Throwable) {
+                logDebug("FEEDER_EITHER", "Catching caught exception", t)
                 Left(onCatch(t))
             }
         }

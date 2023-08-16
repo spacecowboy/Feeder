@@ -2,7 +2,9 @@ package com.nononsenseapps.feeder.model
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.asFeed
+import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
@@ -40,31 +42,35 @@ class FeedParser(override val di: DI) : DIAware {
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
      */
-    suspend fun getSiteMetaData(url: URL): SiteMetaData? {
-        return try {
-            val html = curl(url)
-            return getSiteMetaDataInHtml(url, html)
-        } catch (t: Throwable) {
-            Log.e(LOG_TAG, "Error when fetching site metadata", t)
-            null
-        }
+    suspend fun getSiteMetaData(url: URL): Either<FeedParserError, SiteMetaData> {
+        return curl(url)
+            .flatMap { html ->
+                getSiteMetaDataInHtml(url, html)
+            }
     }
 
     @VisibleForTesting
-    internal fun getSiteMetaDataInHtml(url: URL, html: String?): SiteMetaData? {
-        return try {
-            if (html?.contains("<head>", ignoreCase = true) != true) {
-                // Probably a a feed URL and not a page
-                return null
-            }
+    internal fun getSiteMetaDataInHtml(
+        url: URL,
+        html: String,
+    ): Either<FeedParserError, SiteMetaData> {
+        if (!html.contains("<head>", ignoreCase = true)) {
+            // Probably a a feed URL and not a page
+            return Either.Left(NotHTML(url = url.toString()))
+        }
+
+        return Either.catching(
+            onCatch = { t ->
+                MetaDataParseError(url = url.toString(), throwable = t).also {
+                    Log.w(LOG_TAG, "Error when fetching site metadata", t)
+                }
+            },
+        ) {
             SiteMetaData(
                 url = url,
                 alternateFeedLinks = getAlternateFeedLinksInHtml(html, baseUrl = url),
                 feedImage = getFeedIconInHtml(html, baseUrl = url),
             )
-        } catch (t: Throwable) {
-            Log.e(LOG_TAG, "Error when fetching site metadata", t)
-            null
         }
     }
 
@@ -187,111 +193,115 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-    /**
-     * @throws IOException if request fails due to network issue for example
-     */
-    private suspend fun curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) =
-        client.curlAndOnResponse(url, block)
-
-    @Throws(FeedParsingError::class)
-    suspend fun parseFeedUrl(url: URL): Feed? {
-        try {
-            var result: Feed? = null
-            curlAndOnResponse(url) {
-                result = parseFeedResponse(it)
-            }
-            // Preserve original URL to maintain authentication data and/or tokens in query params
-            return result?.copy(feed_url = url.toString())
-        } catch (e: Throwable) {
-            throw FeedParsingError(url, e)
+    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, Feed> {
+        return client.curlAndOnResponse(url) {
+            parseFeedResponse(it)
         }
+            .map {
+                // Preserve original URL to maintain authentication data and/or tokens in query params
+                it.copy(feed_url = url.toString())
+            }
     }
 
-    @Throws(FeedParsingError::class)
-    internal fun parseFeedResponse(response: Response): Feed? {
+    internal fun parseFeedResponse(response: Response): Either<FeedParserError, Feed> {
         return response.body?.use {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
                 response.request.url.toUrl(),
                 it,
             )
-        }
+        } ?: Either.Left(NoBody(url = response.request.url.toString()))
     }
 
     /**
      * Takes body as bytes to handle encoding correctly
      */
-    @Throws(FeedParsingError::class)
     fun parseFeedResponse(
         url: URL,
         responseBody: ResponseBody,
-    ): Feed {
-        try {
-            val feed = when (responseBody.contentType()?.subtype?.contains("json")) {
-                true -> jsonFeedParser.parseJson(responseBody)
-                else -> parseRssAtom(url, responseBody)
+    ): Either<FeedParserError, Feed> {
+        return when (responseBody.contentType()?.subtype?.contains("json")) {
+            true -> Either.catching(
+                onCatch = { t ->
+                    JsonFeedParseError(url = url.toString(), throwable = t)
+                },
+            ) {
+                jsonFeedParser.parseJson(responseBody)
             }
 
-            return if (feed.feed_url == null) {
-                // Nice to return non-null value here
-                feed.copy(feed_url = url.toString())
-            } else {
-                feed
-            }
-        } catch (e: Throwable) {
-            throw FeedParsingError(url, e)
+            else -> parseRssAtom(url, responseBody)
         }
+            .map { feed ->
+                if (feed.feed_url == null) {
+                    // Nice to return non-null value here
+                    feed.copy(feed_url = url.toString())
+                } else {
+                    feed
+                }
+            }
     }
 
     /**
      * Takes body as bytes to handle encoding correctly
      */
-    @Throws(FeedParsingError::class)
     internal fun parseFeedResponse(
         url: URL,
         body: String,
         contentType: MediaType?,
-    ): Feed {
-        try {
-            val feed = when (contentType?.subtype?.contains("json")) {
-                true -> jsonFeedParser.parseJson(body)
-                else -> parseRssAtom(url, body)
+    ): Either<FeedParserError, Feed> {
+        return when (contentType?.subtype?.contains("json")) {
+            true -> Either.catching(
+                onCatch = { t ->
+                    JsonFeedParseError(url = url.toString(), throwable = t)
+                },
+            ) {
+                jsonFeedParser.parseJson(body)
             }
 
-            return if (feed.feed_url == null) {
+            else -> parseRssAtom(url, body)
+        }.map { feed ->
+
+            if (feed.feed_url == null) {
                 // Nice to return non-null value here
                 feed.copy(feed_url = url.toString())
             } else {
                 feed
             }
-        } catch (e: Throwable) {
-            throw FeedParsingError(url, e)
         }
     }
 
-    @Throws(FeedParsingError::class)
-    internal fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
-        try {
-            val contentType = responseBody.contentType()
-            val validMimeType = when (contentType?.type) {
-                "application" -> {
-                    when {
-                        contentType.subtype.contains("xml") -> true
-                        else -> false
-                    }
+    internal fun parseRssAtom(
+        url: URL,
+        responseBody: ResponseBody,
+    ): Either<FeedParserError, Feed> {
+        val contentType = responseBody.contentType()
+        val validMimeType = when (contentType?.type) {
+            "application" -> {
+                when {
+                    contentType.subtype.contains("xml") -> true
+                    else -> false
                 }
-
-                "text" -> {
-                    // So many sites on the internet return mimetype text/html for rss feeds...
-                    // So try to parse it despite it being wrong
-                    true
-                }
-
-                else -> false
             }
-            if (!validMimeType) {
-                throw RuntimeException("Not parsing document with invalid RSS/Atom mimetype: ${contentType?.type}/${contentType?.subtype}")
+
+            "text" -> {
+                // So many sites on the internet return mimetype text/html for rss feeds...
+                // So try to parse it despite it being wrong
+                true
             }
+
+            else -> false
+        }
+        if (!validMimeType) {
+            return Either.Left(
+                UnsupportedContentType(url = url.toString(), mimeType = contentType.toString()),
+            )
+        }
+
+        return Either.catching(
+            onCatch = { t ->
+                RSSParseError(url = url.toString(), throwable = t)
+            },
+        ) {
             responseBody.byteStream().use { bs ->
                 val feed = XmlReader(bs, true, responseBody.contentType()?.charset()?.name()).use {
                     SyndFeedInput()
@@ -300,16 +310,18 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl)
+                feed.asFeed(baseUrl = url)
             }
-        } catch (t: Throwable) {
-            throw FeedParsingError(baseUrl, t)
         }
     }
 
     @Throws(FeedParsingError::class)
-    internal fun parseRssAtom(baseUrl: URL, body: String): Feed {
-        try {
+    internal fun parseRssAtom(baseUrl: URL, body: String): Either<FeedParserError, Feed> {
+        return Either.catching(
+            onCatch = { t ->
+                RSSParseError(url = baseUrl.toString(), throwable = t)
+            },
+        ) {
             body.byteInputStream().use { bs ->
                 val feed = XmlReader(bs, true).use {
                     SyndFeedInput()
@@ -318,10 +330,8 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl)
+                feed.asFeed(baseUrl = baseUrl)
             }
-        } catch (t: Throwable) {
-            throw FeedParsingError(baseUrl, t)
         }
     }
 
@@ -399,32 +409,151 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
     }
 }
 
-suspend fun OkHttpClient.curl(url: URL): String? {
-    var result: String? = null
-    curlAndOnResponse(url) {
+suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
+    return curlAndOnResponse(url) {
         val contentType = it.body?.contentType()
-        result = when (contentType?.type) {
+        when (contentType?.type) {
             "text" -> {
                 when (contentType.subtype) {
-                    "plain", "html" -> it.body?.string()
-                    else -> null
+                    "plain", "html" -> {
+                        it.body?.let { body -> Either.Right(body.string()) }
+                            ?: Either.Left(
+                                NoBody(
+                                    url = url.toString(),
+                                ),
+                            )
+                    }
+
+                    else -> Either.Left(
+                        UnsupportedContentType(
+                            url = url.toString(),
+                            mimeType = contentType.toString(),
+                        ),
+                    )
                 }
             }
 
-            else -> null
+            else -> Either.Left(
+                UnsupportedContentType(
+                    url = url.toString(),
+                    mimeType = contentType.toString(),
+                ),
+            )
         }
     }
-    return result
 }
 
-suspend fun <T> OkHttpClient.curlAndOnResponse(url: URL, block: (suspend (Response) -> T)): T {
-    val response = getResponse(url)
-
-    if (!response.isSuccessful) {
-        throw IOException("Unexpected code $response")
+suspend fun <T> OkHttpClient.curlAndOnResponse(
+    url: URL,
+    block: (suspend (Response) -> Either<FeedParserError, T>),
+): Either<FeedParserError, T> {
+    return Either.catching(
+        onCatch = { t ->
+            FetchError(url = url.toString(), throwable = t)
+        },
+    ) {
+        getResponse(url)
+    }.flatMap { response ->
+        if (response.isSuccessful) {
+            response.use {
+                block(it)
+            }
+        } else {
+            Either.Left(
+                HttpError(
+                    url = url.toString(),
+                    code = response.code,
+                    message = response.message,
+                ),
+            )
+        }
     }
+}
 
-    return response.use {
-        block(it)
-    }
+sealed class FeedParserError {
+    abstract val url: String
+    abstract val description: String
+    abstract val throwable: Throwable?
+}
+
+object NotInitializedYet : FeedParserError() {
+    override val url: String = ""
+    override val description: String = ""
+    override val throwable: Throwable? = null
+}
+
+data class FetchError(override val url: String, override val throwable: Throwable?) :
+    FeedParserError() {
+    override val description: String = throwable?.message ?: ""
+}
+
+data class NotHTML(override val url: String) : FeedParserError() {
+    override val description: String = ""
+    override val throwable: Throwable? = null
+}
+
+data class MetaDataParseError(
+    override val url: String,
+    override val throwable: Throwable?,
+) : FeedParserError() {
+    override val description: String = throwable?.message ?: ""
+}
+
+data class RSSParseError(
+    override val throwable: Throwable?,
+    override val url: String,
+) : FeedParserError() {
+    override val description: String = throwable?.message ?: ""
+}
+
+data class JsonFeedParseError(
+    override val throwable: Throwable?,
+    override val url: String,
+) : FeedParserError() {
+    override val description: String = throwable?.message ?: ""
+}
+
+data class NoAlternateFeeds(override val url: String) : FeedParserError() {
+    override val description: String = ""
+    override val throwable: Throwable? = null
+}
+
+data class HttpError(
+    override val url: String,
+    val code: Int,
+    val message: String,
+) : FeedParserError() {
+    override val description: String = "$code: $message"
+    override val throwable: Throwable? = null
+}
+
+data class UnsupportedContentType(
+    override val url: String,
+    val mimeType: String,
+) :
+    FeedParserError() {
+    override val description: String = mimeType
+    override val throwable: Throwable? = null
+}
+
+data class NoBody(
+    override val url: String,
+) :
+    FeedParserError() {
+    override val description: String = ""
+    override val throwable: Throwable? = null
+}
+
+data class NoUrl(
+    override val description: String = "",
+) : FeedParserError() {
+    override val url: String = ""
+    override val throwable: Throwable? = null
+}
+
+data class FullTextDecodingFailure(
+    override val url: String,
+    override val throwable: Throwable?,
+) : FeedParserError() {
+    override val description: String = throwable?.message ?: ""
 }

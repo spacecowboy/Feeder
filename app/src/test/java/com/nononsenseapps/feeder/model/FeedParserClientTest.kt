@@ -76,14 +76,14 @@ class FeedParserClientTest : DIAware {
 
         runBlocking {
             val feed = feedParser.parseFeedUrl(url)
-            assertEquals("No auth", feed?.title)
+            assertEquals("No auth", feed.getOrNull()?.title)
         }
         assertNull(
-            server.takeRequest().headers.get("Authorization"),
+            server.takeRequest().headers["Authorization"],
             message = "First request is done with no auth",
         )
         assertNotNull(
-            server.takeRequest().headers.get("Authorization"),
+            server.takeRequest().headers["Authorization"],
             message = "After a 401 a new request is made with auth",
         )
     }
@@ -165,6 +165,6 @@ class FeedParserClientTest : DIAware {
         val url = server.url("/foo").toUrl()
         // This should not crash
         val result = feedParser.parseFeedUrl(url)
-        assertEquals("http://www.questionablecontent.net/comics/4776.png", result?.items?.first()?.image)
+        assertEquals("http://www.questionablecontent.net/comics/4776.png", result.getOrNull()?.items?.first()?.image)
     }
 }
