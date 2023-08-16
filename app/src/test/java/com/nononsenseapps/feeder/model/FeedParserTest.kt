@@ -7,9 +7,7 @@ import java.io.BufferedReader
 import java.net.URL
 import kotlin.test.Ignore
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
@@ -48,7 +46,7 @@ class FeedParserTest : DIAware {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
             val feeds =
-                feedParser.getSiteMetaData(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))!!.alternateFeedLinks.first()
+                feedParser.getSiteMetaData(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A")).getOrNull()!!.alternateFeedLinks.first()
             assertEquals(
                 AlternateLink(
                     URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw"),
@@ -67,7 +65,7 @@ class FeedParserTest : DIAware {
                 it,
                 null,
             )
-            val item = feed.items!!.first()
+            val item = feed.getOrNull()?.items!!.first()
 
             assertEquals(Author(name = "0235"), item.author)
         }
@@ -83,7 +81,7 @@ class FeedParserTest : DIAware {
                 null,
             )
 
-            val item = feed.items!![0]
+            val item = feed.getOrNull()?.items!![0]
             assertEquals(
                 "37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
                 item.title,
@@ -109,7 +107,7 @@ class FeedParserTest : DIAware {
                 null,
             )
 
-            val item = feed.items!![0]
+            val item = feed.getOrNull()?.items!![0]
             assertEquals(
                 "http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
                 item.image,
@@ -127,7 +125,7 @@ class FeedParserTest : DIAware {
             )
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertEquals("Can You Observe a Typical Universe?", item.title)
         assertEquals("https://i2.ytimg.com/vi/q-6oU3jXAho/hqdefault.jpg", item.image)
@@ -142,7 +140,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(URL("https://framatube.org/feeds/videos.xml"), it, null)
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertEquals("1.4. Et les réseaux sociaux ?", item.title)
         assertEquals(
@@ -164,7 +162,7 @@ class FeedParserTest : DIAware {
             )
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertEquals("Камеди Клаб: «3 сентября»", item.title)
         assertEquals(
@@ -183,7 +181,7 @@ class FeedParserTest : DIAware {
             )
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertEquals(
             "https://cdn.myanimelist.net/s/common/uploaded_files/1664092688-dd34666e64d7ae624e6e2c70087c181f.jpeg",
@@ -201,7 +199,7 @@ class FeedParserTest : DIAware {
             )
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertEquals(
             "https://i.guim.co.uk/img/media/c4d7049b24ee34d1c4c630c751094cabc57c54f6/0_32_6000_3601/master/6000.jpg?width=460&quality=85&auto=format&fit=max&s=919d72fef6d4f3469aff69e94964126c",
@@ -219,7 +217,7 @@ class FeedParserTest : DIAware {
             )
         }
 
-        val item = feed.items!!.first()
+        val item = feed.getOrNull()?.items!!.first()
 
         assertTrue {
             "\uD83D\uDE0D\uD83E\uDD29" in item.content_html!!
@@ -236,7 +234,7 @@ class FeedParserTest : DIAware {
                     AlternateLink(link = URL("https://www.fz.se/feeds/nyheter"), type = "application/rss+xml"),
                     AlternateLink(link = URL("https://www.fz.se/feeds/forum"), type = "application/rss+xml"),
                 ),
-                metadata!!.alternateFeedLinks,
+                metadata.getOrNull()!!.alternateFeedLinks,
             )
         }
     }
@@ -247,7 +245,7 @@ class FeedParserTest : DIAware {
             feedParser.getSiteMetaDataInHtml(URL("https://www.fz.se"), it)
         }
 
-        assertEquals("https://www.fz.se/apple-touch-icon.png", metadata!!.feedImage)
+        assertEquals("https://www.fz.se/apple-touch-icon.png", metadata.getOrNull()!!.feedImage)
     }
 
     @Test
@@ -275,7 +273,7 @@ class FeedParserTest : DIAware {
             val metadata = feedParser.getSiteMetaDataInHtml(URL("https://nixos.org"), it)
             assertEquals(
                 listOf(AlternateLink(URL("https://nixos.org/news-rss.xml"), "application/rss+xml")),
-                metadata!!.alternateFeedLinks,
+                metadata.getOrNull()!!.alternateFeedLinks,
             )
         }
     }
@@ -290,7 +288,7 @@ class FeedParserTest : DIAware {
                     AlternateLink(URL("https://www.fz.se/feeds/nyheter"), "application/rss+xml"),
                     AlternateLink(URL("https://www.fz.se/feeds/forum"), "application/rss+xml"),
                 ),
-                metadata!!.alternateFeedLinks,
+                metadata.getOrNull()!!.alternateFeedLinks,
             )
         }
     }
@@ -300,7 +298,7 @@ class FeedParserTest : DIAware {
     fun encodingIsHandledInAtomRss() = runBlocking {
         val feed = golemDe.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
+        assertEquals(true, feed.getOrNull()?.items?.get(0)?.content_text?.contains("größte"))
     }
 
     // Bug in Rome which I am working around, this will crash if not worked around
@@ -309,11 +307,11 @@ class FeedParserTest : DIAware {
     fun emptySlashCommentsDontCrashParsingAndEncodingIsStillRespected() = runBlocking {
         val feed = emptySlashComment.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals(1, feed?.items?.size)
+        assertEquals(1, feed.getOrNull()?.items?.size)
         assertEquals(
             true,
-            feed?.items?.get(0)?.content_text?.contains("größte"),
-            feed?.items?.get(0)?.content_text!!,
+            feed.getOrNull()?.items?.get(0)?.content_text?.contains("größte"),
+            feed.getOrNull()?.items?.get(0)?.content_text!!,
         )
     }
 
@@ -324,7 +322,7 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
-            feed?.items?.first()?.url,
+            feed.getOrNull()?.items?.first()?.url,
         )
     }
 
@@ -336,9 +334,9 @@ class FeedParserTest : DIAware {
             atomRelative,
             null,
         )
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.getOrNull()!!.feed_url)
     }
 
     @Test
@@ -349,25 +347,25 @@ class FeedParserTest : DIAware {
             atomRelativeNoBase,
             null,
         )
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.getOrNull()!!.feed_url)
     }
 
     @Test
     @Throws(Exception::class)
     fun relativeFeedLinkInRssIsMadeAbsolute() = runBlocking {
         val feed = lineageosRss.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("https://lineageos.org/", feed.home_page_url)
-        assertEquals("https://lineageos.org/feed.xml", feed.feed_url)
+        assertEquals("https://lineageos.org/", feed.getOrNull()!!.home_page_url)
+        assertEquals("https://lineageos.org/feed.xml", feed.getOrNull()!!.feed_url)
 
-        assertEquals("https://lineageos.org/Changelog-16", feed.items?.get(0)?.id)
-        assertEquals("https://lineageos.org/Changelog-16/", feed.items?.get(0)?.url)
+        assertEquals("https://lineageos.org/Changelog-16", feed.getOrNull()?.items?.get(0)?.id)
+        assertEquals("https://lineageos.org/Changelog-16/", feed.getOrNull()?.items?.get(0)?.url)
         assertEquals(
             "https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png",
-            feed.items?.get(0)?.image,
+            feed.getOrNull()?.items?.get(0)?.image,
         )
     }
 
@@ -375,13 +373,13 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun noStyles() = runBlocking {
         val feed = researchRsc.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
+        assertEquals("http://research.swtch.com/feed.atom", feed.getOrNull()!!.feed_url)
 
-        assertEquals(17, feed.items!!.size)
+        assertEquals(17, feed.getOrNull()?.items!!.size)
 
-        val (_, _, _, title, _, _, summary, image) = feed.items!![9]
+        val (_, _, _, title, _, _, summary, image) = feed.getOrNull()?.items!![9]
 
         assertEquals("http://research.swtch.com/qr-bbc.png", image)
 
@@ -401,28 +399,28 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun feedAuthorIsUsedAsFallback() = runBlocking {
         val feed = researchRsc.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
+        assertEquals("http://research.swtch.com/feed.atom", feed.getOrNull()!!.feed_url)
 
-        assertEquals(17, feed.items!!.size)
+        assertEquals(17, feed.getOrNull()?.items!!.size)
 
-        val (_, _, _, _, _, _, _, _, _, _, _, author) = feed.items!![9]
+        val (_, _, _, _, _, _, _, _, _, _, _, author) = feed.getOrNull()?.items!![9]
 
-        assertEquals("Russ Cox", feed.author!!.name)
-        assertEquals(feed.author, author)
+        assertEquals("Russ Cox", feed.getOrNull()!!.author!!.name)
+        assertEquals(feed.getOrNull()!!.author, author)
     }
 
     @Test
     fun nixos() = runBlocking {
         val feed = nixosRss.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://nixos.org/news-rss.xml", feed.feed_url)
+        assertEquals("http://nixos.org/news-rss.xml", feed.getOrNull()!!.feed_url)
 
-        assertEquals(99, feed.items!!.size)
+        assertEquals(99, feed.getOrNull()?.items!!.size)
 
-        val (_, _, _, title, _, _, _, image) = feed.items!![0]
+        val (_, _, _, title, _, _, _, image) = feed.getOrNull()?.items!![0]
 
         assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image)
         assertEquals("NixOS 18.09 released", title)
@@ -432,13 +430,13 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun nixers() = runBlocking {
         val feed = nixersRss.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("https://newsletter.nixers.net/feed.xml", feed.feed_url)
+        assertEquals("https://newsletter.nixers.net/feed.xml", feed.getOrNull()!!.feed_url)
 
-        assertEquals(111, feed.items!!.size)
+        assertEquals(111, feed.getOrNull()?.items!!.size)
 
-        val item = feed.items!![0]
+        val item = feed.getOrNull()?.items!![0]
 
         // Timezone issues - so only verify date
         assertTrue(message = "Expected a pubdate to have been parsed") {
@@ -448,11 +446,12 @@ class FeedParserTest : DIAware {
 
     @Test
     fun doesNotFetchVideos(): Unit = runBlocking {
-        val exception = assertFails {
-            videoResponse.use { feedParser.parseFeedResponse(it) }
+        val result = videoResponse.use { feedParser.parseFeedResponse(it) }
+        assertTrue {
+            result.isLeft()
         }
         assertTrue {
-            exception.message?.contains("video/mp4") ?: false
+            result.leftOrNull()!!.description.contains("video/mp4")
         }
     }
 
@@ -460,13 +459,13 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun cyklist() = runBlocking {
         val feed = cyklistBloggen.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://www.cyklistbloggen.se/feed/", feed.feed_url)
+        assertEquals("http://www.cyklistbloggen.se/feed/", feed.getOrNull()!!.feed_url)
 
-        assertEquals(10, feed.items!!.size)
+        assertEquals(10, feed.getOrNull()?.items!!.size)
 
-        val (_, _, _, title, _, _, summary, image) = feed.items!![0]
+        val (_, _, _, title, _, _, summary, image) = feed.getOrNull()?.items!![0]
 
         assertEquals(
             "http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg",
@@ -489,13 +488,13 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun cowboy() = runBlocking {
         val feed = cowboyRss.use { feedParser.parseFeedResponse(it) }
-        assertNotNull(feed)
+        assertTrue { feed.isRight() }
 
-        assertEquals("http://cowboyprogrammer.org/index.xml", feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/index.xml", feed.getOrNull()!!.feed_url)
 
-        assertEquals(15, feed.items!!.size)
+        assertEquals(15, feed.getOrNull()?.items!!.size)
 
-        var entry = feed.items!![1]
+        var entry = feed.getOrNull()?.items!![1]
 
         assertEquals(
             "https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
@@ -503,14 +502,14 @@ class FeedParserTest : DIAware {
         )
 
         // Snippet should not contain images
-        entry = feed.items!![4]
+        entry = feed.getOrNull()?.items!![4]
         assertEquals("Fixing the up button in Python shell history", entry.title)
         assertEquals(
             "In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. Ipython is more descri",
             entry.summary,
         )
         // Snippet should not contain links
-        entry = feed.items!![1]
+        entry = feed.getOrNull()?.items!![1]
         assertEquals("Compress all the images!", entry.title)
         assertEquals(
             "Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS) One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be d",
@@ -522,7 +521,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun rss() = runBlocking {
         val feed = cornucopiaRss.use { feedParser.parseFeedResponse(it) }
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertEquals("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss", feed_url)
@@ -556,7 +555,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun atom() = runBlocking {
         val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed_url)
@@ -590,7 +589,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun atomCowboy() = runBlocking {
         val feed = cowboyAtom.use { feedParser.parseFeedResponse(it) }
-        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feed!!
+        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals(15, items!!.size)
         val (id, _, _, _, _, _, _, image, _, date_published) = items[1]
@@ -609,7 +608,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun morningPaper() = runBlocking {
         val feed = morningPaper.use { feedParser.parseFeedResponse(it) }
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals("https://blog.acolyer.org", home_page_url)
         assertEquals("https://blog.acolyer.org/feed/", feed_url)
@@ -632,7 +631,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun londoner() = runBlocking {
         val feed = londoner.use { feedParser.parseFeedResponse(it) }
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals("http://londonist.com/", home_page_url)
         assertEquals("http://londonist.com/feed", feed_url)
@@ -654,15 +653,15 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun noLinkShouldBeNull() = runBlocking {
-        val feed = anon.use { feedParser.parseFeedResponse(it) }!!
+        val feed = anon.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals("http://ANON.com/sub", feed.home_page_url)
-        assertEquals("http://anon.com/rss", feed.feed_url)
-        assertEquals("ANON", feed.title)
-        assertEquals("ANON", feed.description)
+        assertEquals("http://ANON.com/sub", feed.getOrNull()!!.home_page_url)
+        assertEquals("http://anon.com/rss", feed.getOrNull()!!.feed_url)
+        assertEquals("ANON", feed.getOrNull()!!.title)
+        assertEquals("ANON", feed.getOrNull()!!.description)
 
-        assertEquals(1, feed.items!!.size)
-        val item = feed.items!![0]
+        assertEquals(1, feed.getOrNull()?.items!!.size)
+        val item = feed.getOrNull()?.items!![0]
 
         assertNull(item.url)
 
@@ -679,7 +678,7 @@ class FeedParserTest : DIAware {
     fun golem2ShouldBeParsedDespiteEmptySlashComments() = runBlocking {
         val feed = golemDe2.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals("Golem.de", feed?.title)
+        assertEquals("Golem.de", feed.getOrNull()?.title)
     }
 
     @Test
@@ -689,7 +688,7 @@ class FeedParserTest : DIAware {
         runBlocking {
             val feed =
                 feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
-            assertEquals("Cowboy Programmer", feed?.title)
+            assertEquals("Cowboy Programmer", feed.getOrNull()?.title)
         }
     }
 
@@ -697,7 +696,7 @@ class FeedParserTest : DIAware {
     fun diskuse() = runBlocking {
         runBlocking {
             val feed = diskuse.use { feedParser.parseFeedResponse(it) }
-            val entry = feed!!.items!!.first()
+            val entry = feed.getOrNull()?.items!!.first()
 
             assertEquals(
                 "Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title",
@@ -711,7 +710,7 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun fz() = runBlocking {
         val feed = fz.use { feedParser.parseFeedResponse(it) }
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
 
         assertEquals("http://www.fz.se/nyheter/", home_page_url)
         assertNull(feed_url)
@@ -732,18 +731,18 @@ class FeedParserTest : DIAware {
 
     @Test
     fun geekpark() = runBlocking {
-        val feed = geekpark.use { feedParser.parseFeedResponse(it) }!!
+        val feed = geekpark.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals("极客公园（！）", feed.title)
+        assertEquals("极客公园（！）", feed.getOrNull()!!.title)
 
-        assertEquals(30, feed.items?.size)
+        assertEquals(30, feed.getOrNull()?.items?.size)
     }
 
     @Test
     fun contentTypeHtmlIsNotUnescapedTwice() = runBlocking {
-        val feed = contentTypeHtml.use { feedParser.parseFeedResponse(it) }!!
+        val feed = contentTypeHtml.use { feedParser.parseFeedResponse(it) }
 
-        val item = feed.items!!.single()
+        val item = feed.getOrNull()?.items!!.single()
 
         assertFalse(
             item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon <- ncvar_get(nc.obs, 'lon')"),
@@ -762,7 +761,7 @@ class FeedParserTest : DIAware {
             null,
         )
 
-        val item = feed.items!!.single()
+        val item = feed.getOrNull()?.items!!.single()
 
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
@@ -782,7 +781,7 @@ class FeedParserTest : DIAware {
             null,
         )
 
-        val text = feed.items!!.first()
+        val text = feed.getOrNull()?.items!!.first()
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
             text.image,
@@ -792,7 +791,7 @@ class FeedParserTest : DIAware {
             text.content_html,
         )
 
-        val html = feed.items!![1]
+        val html = feed.getOrNull()?.items!![1]
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
             html.image,
@@ -802,7 +801,7 @@ class FeedParserTest : DIAware {
             html.content_html,
         )
 
-        val xhtml = feed.items!![2]
+        val xhtml = feed.getOrNull()?.items!![2]
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
             xhtml.image,
@@ -820,7 +819,7 @@ class FeedParserTest : DIAware {
             null,
         )
 
-        assertEquals(8, feed.items!!.size)
+        assertEquals(8, feed.getOrNull()?.items!!.size)
     }
 
     private fun <T> readResource(asdf: String, block: suspend (String) -> T): T {

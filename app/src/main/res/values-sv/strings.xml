@@ -215,4 +215,15 @@
     <string name="read_adjective">Lästa</string>
     <string name="saved_adjective">Sparade</string>
     <string name="show_only_title">Visa endast titel</string>
+    <string name="failed_to_download">Kunde inte hämta</string>
+    <string name="failed_to_parse_the_page">Kunde inte läsa sidan</string>
+    <string name="no_feeds_in_the_page">Inga flöden i sidan</string>
+    <string name="content_is_not_html">Innehållet är inte HTML</string>
+    <string name="failed_to_parse_rss_feed">Kunde inte läsa RSS-flöde</string>
+    <string name="http_error">HTTP-fel</string>
+    <string name="failed_to_parse_json_feed">Kunde inte läsa JSON-flöde</string>
+    <string name="no_body_in_response">Inget att läsa i svar</string>
+    <string name="unsupported_content_type">Innehållstypen stöds inte</string>
+    <string name="failed_to_parse_full_article">Kund inte läsa hela artikeln</string>
+    <string name="no_url">Ingen URL</string>
 </resources>

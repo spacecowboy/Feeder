@@ -11,7 +11,10 @@ import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.model.FullTextParser.Companion.LOG_TAG
+import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
+import com.nononsenseapps.feeder.util.flatten
+import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
 import java.nio.charset.Charset
@@ -72,81 +75,75 @@ class FullTextParser(override val di: DI) : DIAware {
             .map { feedItem ->
                 parseFullArticleIfMissing(
                     feedItem = feedItem,
-                ) is FullTextParsingSuccess
+                ).isRight()
             }
             .fold(true) { acc, value ->
                 acc && value
             }
     }
 
-    suspend fun parseFullArticleIfMissing(feedItem: FeedItemForFetching): FullTextParsingResult {
+    suspend fun parseFullArticleIfMissing(feedItem: FeedItemForFetching): Either<FeedParserError, Unit> {
         val fullArticleFile =
             blobFullFile(itemId = feedItem.id, filesDir = filePathProvider.fullArticleDir)
 
         return try {
             if (fullArticleFile.isFile) {
-                FullTextParsingSuccess
+                Either.Right(Unit)
             } else {
                 parseFullArticle(feedItem = feedItem)
             }
+        } catch (t: Throwable) {
+            FullTextDecodingFailure(feedItem.link ?: "", t).left()
         } finally {
             repository.markAsFullTextDownloaded(feedItem.id)
+        }.onLeft {
+            Log.w(LOG_TAG, "Failed to parse missing full article: ${it.description}", it.throwable)
         }
     }
 
-    private suspend fun parseFullArticle(feedItem: FeedItemForFetching): FullTextParsingResult =
+    private suspend fun parseFullArticle(feedItem: FeedItemForFetching): Either<FeedParserError, Unit> =
         withContext(Dispatchers.Default) {
-            runCatching {
-                logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
-                val url = feedItem.link ?: throw MissingLink()
+            logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
+            val url = feedItem.link ?: return@withContext Either.Left(NoUrl())
 
-                val html: String = okHttpClient.curlAndOnResponse(URL(url)) { response ->
-                    val body = response.body ?: throw MissingBody()
-
-                    val contentType = body.contentType()
-                        ?: throw NotHtmlContent("null")
+            okHttpClient.curlAndOnResponse(URL(url)) { response ->
+                Either.catching(
+                    onCatch = { t ->
+                        FullTextDecodingFailure(url, t)
+                    },
+                ) {
+                    val body = response.body ?: return@catching NoBody(url = url).left()
 
                     val bytes = body.use {
                         it.bytes()
                     }
 
-                    logDebug(LOG_TAG, "contentType: $contentType")
+                    val contentType = body.contentType()
+                        ?: return@catching UnsupportedContentType(url = url, mimeType = "null").left()
 
                     if (contentType.type != "text" || contentType.subtype != "html") {
-                        throw NotHtmlContent("${contentType.type}/${contentType.subtype}")
+                        return@catching UnsupportedContentType(url = url, mimeType = contentType.toString()).left()
                     }
 
                     val charset = contentType.charset() ?: findMetaCharset(bytes)
 
                     logDebug(LOG_TAG, "Full article charset: $charset")
 
-                    String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
-                }
+                    val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
+                    logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
+                    val article = Readability4JExtended(url, html).parse()
+                    logDebug(LOG_TAG, "Writing article ${feedItem.link}")
+                    withContext(Dispatchers.IO) {
+                        filePathProvider.fullArticleDir.mkdirs()
+                        blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                            .bufferedWriter().use { writer ->
+                                writer.write(article.contentWithUtf8Encoding)
+                            }
+                    }
 
-                logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
-                val article = Readability4JExtended(url, html).parse()
-
-                logDebug(LOG_TAG, "Writing article ${feedItem.link}")
-                withContext(Dispatchers.IO) {
-                    filePathProvider.fullArticleDir.mkdirs()
-                    blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
-                        .bufferedWriter().use { writer ->
-                            writer.write(article.contentWithUtf8Encoding)
-                        }
+                    Either.Right(Unit)
                 }
-            }
-                .onFailure {
-                    Log.w(LOG_TAG, "Failed to get fulltext for ${feedItem.link}", it)
-                }
-                .fold(
-                    onSuccess = { FullTextParsingSuccess },
-                    onFailure = {
-                        when (it) {
-                            is FullTextParsingException -> FullTextParsingExplainableFailure(it)
-                            else -> FullTextParsingFailure(it)
-                        }
-                    },
-                )
+            }.flatten()
         }
 
     /**
@@ -310,20 +307,3 @@ enum class CharsetState {
     CHARSET_QUOTE,
     CHARSET,
 }
-
-sealed class FullTextParsingResult
-
-object FullTextParsingSuccess : FullTextParsingResult()
-
-class FullTextParsingFailure(val exception: Throwable) : FullTextParsingResult()
-
-class FullTextParsingExplainableFailure(val exception: FullTextParsingException) :
-    FullTextParsingResult()
-
-sealed class FullTextParsingException : Exception()
-
-class NotHtmlContent(actualContentType: String) : FullTextParsingException()
-
-class MissingBody : FullTextParsingException()
-
-class MissingLink : FullTextParsingException()

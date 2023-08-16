@@ -64,6 +64,19 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.FeedParserError
+import com.nononsenseapps.feeder.model.FetchError
+import com.nononsenseapps.feeder.model.FullTextDecodingFailure
+import com.nononsenseapps.feeder.model.HttpError
+import com.nononsenseapps.feeder.model.JsonFeedParseError
+import com.nononsenseapps.feeder.model.MetaDataParseError
+import com.nononsenseapps.feeder.model.NoAlternateFeeds
+import com.nononsenseapps.feeder.model.NoBody
+import com.nononsenseapps.feeder.model.NoUrl
+import com.nononsenseapps.feeder.model.NotHTML
+import com.nononsenseapps.feeder.model.NotInitializedYet
+import com.nononsenseapps.feeder.model.RSSParseError
+import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.Dimensions
@@ -157,7 +170,7 @@ fun SearchFeedView(
         mutableStateOf(listOf<SearchResult>())
     }
     var errors by rememberSaveable {
-        mutableStateOf(listOf<SearchResult>())
+        mutableStateOf(listOf<FeedParserError>())
     }
 
     SearchFeedView(
@@ -175,10 +188,10 @@ fun SearchFeedView(
                         currentlySearching = false
                     }
                     .collect {
-                        if (it.isError) {
-                            errors = errors + it
-                        } else {
-                            results = results + it
+                        it.onLeft { e ->
+                            errors = errors + e
+                        }.onRight { r ->
+                            results = results + r
                         }
                     }
             }
@@ -199,7 +212,7 @@ fun SearchFeedView(
     onUrlChanged: (String) -> Unit,
     onSearch: (URL) -> Unit,
     results: StableHolder<List<SearchResult>>,
-    errors: StableHolder<List<SearchResult>>,
+    errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     modifier: Modifier = Modifier,
     feedUrl: String = "",
@@ -372,19 +385,31 @@ fun ColumnScope.leftContent(
 @Composable
 fun ColumnScope.rightContent(
     results: StableHolder<List<SearchResult>>,
-    errors: StableHolder<List<SearchResult>>,
+    errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
 ) {
     if (results.item.isEmpty()) {
         for (error in errors.item) {
-            val title = stringResource(
-                R.string.failed_to_parse,
-                error.url,
-            )
+            val title = when (error) {
+                is FetchError -> stringResource(R.string.failed_to_download)
+                is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
+                is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
+                is NotHTML -> stringResource(R.string.content_is_not_html)
+                NotInitializedYet -> "Not initialized yet" // Should never happen
+                is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
+                is HttpError -> stringResource(R.string.http_error)
+                is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)
+                is NoBody -> stringResource(R.string.no_body_in_response)
+                is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
+                is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
+                is NoUrl -> stringResource(R.string.no_url)
+            }
+
             ErrorResultView(
                 title = title,
                 description = error.description,
+                url = error.url,
             )
         }
     }
@@ -462,6 +487,7 @@ fun SearchResultView(
 fun ErrorResultView(
     title: String,
     description: String,
+    url: String,
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
@@ -483,6 +509,10 @@ fun ErrorResultView(
                 title,
                 style = MaterialTheme.typography.titleSmall
                     .copy(color = MaterialTheme.colorScheme.error),
+            )
+            Text(
+                url,
+                style = MaterialTheme.typography.bodyMedium,
             )
             Text(
                 description,
@@ -511,14 +541,12 @@ fun SearchPreview() {
                         title = "Atom feed",
                         url = "https://cowboyprogrammer.org/atom",
                         description = "An atom feed",
-                        isError = false,
                         feedImage = "",
                     ),
                     SearchResult(
                         title = "RSS feed",
                         url = "https://cowboyprogrammer.org/rss",
                         description = "An RSS feed",
-                        isError = false,
                         feedImage = "",
                     ),
                 ),
@@ -547,12 +575,9 @@ fun ErrorPreview() {
                 onSearch = {},
                 results = stableListHolderOf(),
                 errors = stableListHolderOf(
-                    SearchResult(
-                        title = "Unknown Error",
-                        url = "https://cowboyprogrammer.org/bad",
-                        description = "Who knows what happened really",
-                        isError = true,
-                        feedImage = "",
+                    RSSParseError(
+                        url = "https://example.com/bad",
+                        throwable = NullPointerException("Missing header or something"),
                     ),
                 ),
                 currentlySearching = false,
@@ -588,14 +613,12 @@ fun SearchPreviewLarge() {
                         title = "Atom feed",
                         url = "https://cowboyprogrammer.org/atom",
                         description = "An atom feed",
-                        isError = false,
                         feedImage = "",
                     ),
                     SearchResult(
                         title = "RSS feed",
                         url = "https://cowboyprogrammer.org/rss",
                         description = "An RSS feed",
-                        isError = false,
                         feedImage = "",
                     ),
                 ),
@@ -633,7 +656,6 @@ data class SearchResult(
     val title: String,
     val url: String,
     val description: String,
-    val isError: Boolean,
     // Empty string instead of null because query params
     val feedImage: String,
 ) : Parcelable

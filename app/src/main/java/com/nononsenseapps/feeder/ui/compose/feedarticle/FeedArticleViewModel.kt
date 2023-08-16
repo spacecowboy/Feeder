@@ -26,15 +26,13 @@ import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FullTextParser
-import com.nononsenseapps.feeder.model.FullTextParsingExplainableFailure
-import com.nononsenseapps.feeder.model.FullTextParsingFailure
-import com.nononsenseapps.feeder.model.FullTextParsingSuccess
 import com.nononsenseapps.feeder.model.LocaleOverride
-import com.nononsenseapps.feeder.model.MissingBody
-import com.nononsenseapps.feeder.model.MissingLink
-import com.nononsenseapps.feeder.model.NotHtmlContent
+import com.nononsenseapps.feeder.model.NoBody
+import com.nononsenseapps.feeder.model.NoUrl
+import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
+import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
@@ -364,17 +362,17 @@ class FeedArticleViewModel(
 
         setTextToDisplayFor(
             itemId,
-            when (result) {
-                is FullTextParsingFailure -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
-                is FullTextParsingExplainableFailure -> {
-                    when (result.exception) {
-                        is MissingBody -> TextToDisplay.FAILED_MISSING_BODY
-                        is MissingLink -> TextToDisplay.FAILED_MISSING_LINK
-                        is NotHtmlContent -> TextToDisplay.FAILED_NOT_HTML
+            when {
+                result.isRight() -> TextToDisplay.FULLTEXT
+                else -> {
+                    when (result.leftOrNull()) {
+                        is NoBody -> TextToDisplay.FAILED_MISSING_BODY
+                        is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
+                        is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
+                        is NotHTML -> TextToDisplay.FAILED_NOT_HTML
+                        else -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
                     }
                 }
-
-                FullTextParsingSuccess -> TextToDisplay.FULLTEXT
             },
         )
     }

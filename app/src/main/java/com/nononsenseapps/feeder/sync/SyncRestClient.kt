@@ -191,7 +191,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun leave(): Either<ErrorResponse, Boolean> {
+    suspend fun leave(): Either<ErrorResponse, Unit> {
         logDebug(LOG_TAG, "leave")
         return try {
             safeBlock { syncRemote, feederSync, _ ->
@@ -205,7 +205,6 @@ class SyncRestClient(override val di: DI) : DIAware {
                         Log.e(LOG_TAG, "Error during leave: ${it.code}, ${it.body}", it.throwable)
                     }
                     .map {
-                        true
                     }.also {
                         this.feederSync = null
                         this.secretKey = null
@@ -300,7 +299,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun markAsRead(): Either<ErrorResponse, Boolean> {
+    suspend fun markAsRead(): Either<ErrorResponse, Unit> {
         return try {
             safeBlock { _, _, _ ->
                 val readItems = repository.getFeedItemsWithoutSyncedReadMark()
@@ -314,7 +313,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                             markAsRead(feedItems)
                         }
                 }
-                Either.Right(true)
+                Either.Right(Unit)
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error in markAsRead", e)
