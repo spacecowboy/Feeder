@@ -208,4 +208,9 @@
     <string name="failed_to_fetch_full_article_missing_link">Tautan ke artikel hilang</string>
     <string name="saved_articles">Artikel yang disimpan</string>
     <string name="saved_article">Artikel yang disimpan</string>
+    <string name="max_lines">Baris maks</string>
+    <string name="read_adjective">Baca</string>
+    <string name="saved_adjective">Disimpan</string>
+    <string name="show_only_title">Hanya tampilkan judul</string>
+    <string name="article_list_settings">Daftar artikel</string>
 </resources>
