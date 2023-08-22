@@ -208,4 +208,11 @@
     <string name="failed_to_fetch_full_article_missing_body">Niets gevonden om op te halen</string>
     <string name="failed_to_fetch_full_article_missing_link">Feed mist link naar artikel</string>
     <string name="failed_to_fetch_full_article_not_html">De link is geen HTML-document</string>
+    <string name="max_lines">Max. aantal lijnen</string>
+    <string name="filter_noun">Filter</string>
+    <string name="show_only_title">Enkel titel tonen</string>
+    <string name="article_list_settings">Lijst van artikels</string>
+    <string name="recently_read_adjective">Recent gelezen</string>
+    <string name="read_adjective">Gelezen</string>
+    <string name="saved_adjective">Bewaard</string>
 </resources>
