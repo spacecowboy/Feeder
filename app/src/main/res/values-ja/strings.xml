@@ -208,4 +208,22 @@
     <string name="failed_to_fetch_full_article_missing_body">取得するものは見つかりませんでした</string>
     <string name="failed_to_fetch_full_article_missing_link">フィードに記事へのリンクがありません</string>
     <string name="failed_to_fetch_full_article_not_html">リンクはHTMLドキュメントではありません</string>
+    <string name="article_list_settings">記事リスト</string>
+    <string name="filter_noun">フィルター</string>
+    <string name="recently_read_adjective">最近読んだ</string>
+    <string name="read_adjective">既読</string>
+    <string name="show_only_title">タイトルのみ表示</string>
+    <string name="http_error">HTTPエラー</string>
+    <string name="no_url">URLはありません</string>
+    <string name="saved_adjective">保存済み</string>
+    <string name="failed_to_download">ダウンロード出来ませんでした</string>
+    <string name="max_lines">最大行数</string>
+    <string name="failed_to_parse_the_page">ページの解析に失敗しました</string>
+    <string name="content_is_not_html">コンテンツはHTMLではありません</string>
+    <string name="failed_to_parse_rss_feed">RSSフィードの解析に失敗しました</string>
+    <string name="failed_to_parse_json_feed">JSONフィードの解析に失敗しました</string>
+    <string name="no_feeds_in_the_page">ページ内にフィードはありません</string>
+    <string name="no_body_in_response">回答はありません</string>
+    <string name="unsupported_content_type">未対応のコンテンツタイプ</string>
+    <string name="failed_to_parse_full_article">記事全体の解析に失敗しました</string>
 </resources>
