@@ -57,8 +57,8 @@
     <string name="battery_optimization">Optimisation de la batterie</string>
     <string name="toggle_tag_expansion">Basculer l’expansion des étiquettes</string>
     <string name="discovered_feeds_list">Liste des flux découverts</string>
-    <string name="mark_items_below_as_read">Marquer lus les articles du dessous</string>
-    <string name="mark_items_above_as_read">Marquer lus les articles du dessus</string>
+    <string name="mark_items_below_as_read">Marquer lus les articles en dessous</string>
+    <string name="mark_items_above_as_read">Marquer lus les articles au dessus</string>
     <string name="open_feed">Ouvrir le flux</string>
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Toucher pour lire la vidéo</string>
@@ -215,4 +215,15 @@
     <string name="show_only_title">Afficher uniquement le titre</string>
     <string name="article_list_settings">Liste des articles</string>
     <string name="saved_adjective">Sauvegardé</string>
+    <string name="no_feeds_in_the_page">Flux inexistant</string>
+    <string name="failed_to_download">Échec du téléchargement</string>
+    <string name="failed_to_parse_the_page">Échec de lecture de la page</string>
+    <string name="content_is_not_html">Le contenu n\'est pas du HTML</string>
+    <string name="http_error">Erreur HTTP</string>
+    <string name="no_body_in_response">Aucun corps dans le retour du flux</string>
+    <string name="failed_to_parse_rss_feed">Échec de lecture du flux RSS</string>
+    <string name="failed_to_parse_json_feed">Échec de lecture du flux JSON</string>
+    <string name="unsupported_content_type">Type de contenu non supporté</string>
+    <string name="failed_to_parse_full_article">Échec de lecture de l\'intégralité de l\'article</string>
+    <string name="no_url">URL manquante</string>
 </resources>
