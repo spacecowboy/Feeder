@@ -97,7 +97,7 @@
     <string name="battery_optimization_disabled">Wyłączona</string>
     <string name="battery_optimization_enabled">Włączona</string>
     <string name="preload_custom_tab">Ładuj wstępnie własną kartę</string>
-    <string name="failed_to_parse">Nie udało się przeanalizować %1$s</string>
+    <string name="failed_to_parse">Nie udało się przetworzyć %1$s</string>
     <string name="fetching_full_article">Pobieranie całego artykułu…</string>
     <string name="failed_to_fetch_full_article">Nie udało się pobrać całego artykułu</string>
     <string name="fetch_full_articles_by_default">Domyślnie pobieraj całe artykuły</string>
@@ -215,4 +215,15 @@
     <string name="article_list_settings">Lista artykułów</string>
     <string name="max_lines">Maks. liczba linii</string>
     <string name="show_only_title">Pokazuj tylko tytuł</string>
+    <string name="failed_to_download">Nie udało się pobrać</string>
+    <string name="failed_to_parse_the_page">Nie udało się przetworzyć strony</string>
+    <string name="no_feeds_in_the_page">Brak kanałów na stronie</string>
+    <string name="content_is_not_html">Treść nie jest HTML-em</string>
+    <string name="http_error">Błąd HTTP</string>
+    <string name="failed_to_parse_rss_feed">Nie udało się przetworzyć kanału RSS</string>
+    <string name="no_body_in_response">Brak danych w odpowiedzi</string>
+    <string name="unsupported_content_type">Nieobsługiwany typ treści</string>
+    <string name="failed_to_parse_json_feed">Nie udało się przetworzyć kanału JSON</string>
+    <string name="failed_to_parse_full_article">Nie udało się przetworzyć całego artykułu</string>
+    <string name="no_url">Brak adresu URL</string>
 </resources>
