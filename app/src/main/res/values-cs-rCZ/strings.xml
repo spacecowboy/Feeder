@@ -208,4 +208,21 @@
     <string name="failed_to_fetch_full_article_missing_link">V kanálu chybí odkaz na článek</string>
     <string name="failed_to_fetch_full_article_not_html">Odkaz není HTML dokument</string>
     <string name="failed_to_fetch_full_article_missing_body">Nenašlo se nic, co by se dalo stáhnout</string>
+    <string name="article_list_settings">Seznam článků</string>
+    <string name="max_lines">Max. počet řádků</string>
+    <string name="read_adjective">Přečtené</string>
+    <string name="saved_adjective">Uložené</string>
+    <string name="show_only_title">Zobrazit pouze titulek</string>
+    <string name="filter_noun">Filtr</string>
+    <string name="recently_read_adjective">Nedávno přečtené</string>
+    <string name="failed_to_download">Stažení se nezdařilo</string>
+    <string name="failed_to_parse_the_page">Nepodařilo se zpracovat stránku</string>
+    <string name="no_feeds_in_the_page">Na stránce nejsou žádné kanály</string>
+    <string name="content_is_not_html">Obsah není HTML</string>
+    <string name="failed_to_parse_rss_feed">Nepodařilo se zpracovat kanál RSS</string>
+    <string name="http_error">Chyba HTTP</string>
+    <string name="failed_to_parse_json_feed">Nepodařilo se zpracovat kanál JSON</string>
+    <string name="unsupported_content_type">Nepodporovaný typ obsahu</string>
+    <string name="failed_to_parse_full_article">Nepodařilo se zpracovat celý článek</string>
+    <string name="no_url">Žádná URL adresa</string>
 </resources>
