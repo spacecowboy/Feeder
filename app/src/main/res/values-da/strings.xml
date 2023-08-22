@@ -215,4 +215,15 @@
     <string name="saved_adjective">Gemt</string>
     <string name="article_list_settings">Artikelliste</string>
     <string name="show_only_title">Vis kun titel</string>
+    <string name="failed_to_download">Download mislykkedes</string>
+    <string name="no_feeds_in_the_page">Ingen feeds på siden</string>
+    <string name="failed_to_parse_the_page">Kunne ikke behandle siden</string>
+    <string name="content_is_not_html">Indhold er ikke HTML</string>
+    <string name="http_error">HTTP-fejl</string>
+    <string name="failed_to_parse_rss_feed">Kunne ikke behandle RSS-feed</string>
+    <string name="failed_to_parse_json_feed">Kunne ikke behandle JSON-feed</string>
+    <string name="no_body_in_response">Intet indhold i svar</string>
+    <string name="unsupported_content_type">Ikke-understøttet indholdstype</string>
+    <string name="failed_to_parse_full_article">Kunne ikke behandle hele artiklen</string>
+    <string name="no_url">Ingen URL</string>
 </resources>
