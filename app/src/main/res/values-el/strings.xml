@@ -208,4 +208,22 @@
     <string name="failed_to_fetch_full_article_missing_body">Δεν βρέθηκε τίποτα προς ανάκτηση</string>
     <string name="failed_to_fetch_full_article_missing_link">Από τη ροή λείπει ο σύνδεσμος προς το άρθρο</string>
     <string name="failed_to_fetch_full_article_not_html">Ο σύνδεσμος δεν είναι έγγραφο HTML</string>
+    <string name="article_list_settings">Λίστα άρθρων</string>
+    <string name="max_lines">Μέγιστες γραμμές</string>
+    <string name="filter_noun">Φίλτρο</string>
+    <string name="read_adjective">Διαβάστηκε</string>
+    <string name="show_only_title">Εμφάνιση μόνο του τίτλου</string>
+    <string name="failed_to_download">Αποτυχία λήψης</string>
+    <string name="failed_to_parse_the_page">Η ανάλυση της σελίδας απέτυχε</string>
+    <string name="no_feeds_in_the_page">Δεν υπάρχουν ροές στη σελίδα</string>
+    <string name="recently_read_adjective">Διαβάστηκε πρόσφατα</string>
+    <string name="saved_adjective">Αποθηκευμένα</string>
+    <string name="content_is_not_html">Το περιεχόμενο δεν είναι HTML</string>
+    <string name="failed_to_parse_rss_feed">Απέτυχε η ανάλυση της ροής RSS</string>
+    <string name="failed_to_parse_json_feed">Απέτυχε η ανάλυση της ροής JSON</string>
+    <string name="http_error">Σφάλμα HTTP</string>
+    <string name="no_body_in_response">Κανένα σώμα σε απάντηση</string>
+    <string name="unsupported_content_type">Μη υποστηριζόμενος τύπος περιεχομένου</string>
+    <string name="failed_to_parse_full_article">Απέτυχε η ανάλυση του πλήρους άρθρου</string>
+    <string name="no_url">Χωρίς URL</string>
 </resources>
