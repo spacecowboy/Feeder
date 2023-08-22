@@ -215,4 +215,15 @@
     <string name="show_only_title">只显示标题</string>
     <string name="filter_noun">过滤器</string>
     <string name="max_lines">最大行数</string>
+    <string name="failed_to_download">下载失败</string>
+    <string name="failed_to_parse_the_page">解析页面失败</string>
+    <string name="no_feeds_in_the_page">页面中无订阅源</string>
+    <string name="content_is_not_html">内容不是 HTML</string>
+    <string name="failed_to_parse_rss_feed">解析 RSS 源失败</string>
+    <string name="http_error">HTTP 失败</string>
+    <string name="failed_to_parse_json_feed">解析 JSON 源失败</string>
+    <string name="no_body_in_response">无响应正文</string>
+    <string name="unsupported_content_type">不受支持的内容类型</string>
+    <string name="failed_to_parse_full_article">未能解析完整文章</string>
+    <string name="no_url">无 URL</string>
 </resources>
