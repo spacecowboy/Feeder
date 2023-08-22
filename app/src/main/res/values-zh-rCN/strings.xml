@@ -94,8 +94,8 @@
     <string name="discovered_feeds_list">已发现订阅列表</string>
     <string name="toggle_tag_expansion">展开/闭合标签</string>
     <string name="battery_optimization">电池优化</string>
-    <string name="battery_optimization_disabled">电池优化已禁用</string>
-    <string name="battery_optimization_enabled">电池优化已启用</string>
+    <string name="battery_optimization_disabled">已禁用</string>
+    <string name="battery_optimization_enabled">已启用</string>
     <string name="preload_custom_tab">预加载自定义标签页</string>
     <string name="fetching_full_article">获取全文中…</string>
     <string name="failed_to_fetch_full_article">获取全文失败</string>
@@ -138,7 +138,7 @@
     <string name="sync_status">同步状态</string>
     <string name="invalid_url">无效 URL</string>
     <string name="failed_to_import_OPML">导入 OPML 失败</string>
-    <string name="failed_to_export_OPML">未能导出 OPML</string>
+    <string name="failed_to_export_OPML">导出 OPML 失败</string>
     <string name="failed_to_open_article">打不开文章</string>
     <string name="device_sync_financed_by_community">这项服务是由社区支付的。如果您觉得有用，请考虑捐赠。</string>
     <string name="treat_like_password">把它当作密码。任何有此链接的人都都可以读取你的同步数据。</string>
@@ -161,10 +161,10 @@
     <string name="secret_key">密钥</string>
     <string name="device_sync">设备同步</string>
     <string name="device_sync_description_1">设备同步允许你在不同设备之间同步订阅和已读文章。</string>
-    <string name="only_from_end">仅来自结尾</string>
+    <string name="only_from_end">仅从右侧</string>
     <string name="swipe_to_mark_as_read">滑动标记为已读</string>
     <string name="disabled">已禁用</string>
-    <string name="from_anywhere">来自任何地方</string>
+    <string name="from_anywhere">从任何方向</string>
     <string name="are_you_sure_leave_sync_chain">你确定你想离开同步链吗？</string>
     <string name="no_barcode_scanner_installed">找不到条形码扫描器</string>
     <string name="remove">删除</string>
@@ -190,7 +190,7 @@
     <string name="saved_article">已保存文章</string>
     <string name="save_article">保存文章</string>
     <string name="unsave_article">停止保存文章</string>
-    <string name="mark_as_read_on_scroll">滚动时标记为已读</string>
+    <string name="mark_as_read_on_scroll">随滚动标记为已读</string>
     <string name="zero_feeds">%1$s 个订阅源</string>
     <string name="one_feed">%1$s 个订阅源</string>
     <string name="two_feeds">%1$s 个订阅源</string>
