@@ -78,8 +78,8 @@
     <string name="could_not_load_url">Adresse konnte nicht geladen werden</string>
     <string name="theme_system">System</string>
     <string name="theme_automatic">Auto</string>
-    <string name="theme_day">Hell</string>
-    <string name="theme_night">Dunkel</string>
+    <string name="theme_day">Tag</string>
+    <string name="theme_night">Nacht</string>
     <string name="theme">Farbschema</string>
     <string name="sort_newest_first">Neueste zuerst</string>
     <string name="sort_oldest_first">Älteste zuerst</string>
@@ -112,7 +112,7 @@
     <string name="few_unread_articles">%1$s ungelesene Artikel</string>
     <string name="two_unread_articles">%1$s ungelesene Artikel</string>
     <string name="one_unread_article">%1$s ungelesener Artikel</string>
-    <string name="zero_unread_articles">%1$s ungelesener Artikel</string>
+    <string name="zero_unread_articles">%1$s ungelesene Artikel</string>
     <string name="synchronize_feeds">Feeds synchronisieren</string>
     <string name="showing_all_articles">Alle Artikel anzeigen</string>
     <string name="showing_only_unread_articles">Nur ungelesene Artikel anzeigen</string>
@@ -208,4 +208,22 @@
     <string name="failed_to_fetch_full_article_missing_body">Nichts zum Abrufen gefunden</string>
     <string name="failed_to_fetch_full_article_missing_link">Feed fehlt der Link zum Artikel</string>
     <string name="failed_to_fetch_full_article_not_html">Link ist kein HTML-Dokument</string>
+    <string name="article_list_settings">Artikelliste</string>
+    <string name="max_lines">Maximale Zeilen</string>
+    <string name="filter_noun">Filter</string>
+    <string name="show_only_title">Nur Namen anzeigen</string>
+    <string name="failed_to_download">Download fehlgeschlagen</string>
+    <string name="failed_to_parse_the_page">Seite konnte nicht analysiert werden</string>
+    <string name="content_is_not_html">Inhalt ist kein HTML</string>
+    <string name="http_error">HTTP-Fehler</string>
+    <string name="no_url">Keine Adresse</string>
+    <string name="unsupported_content_type">Nicht unterstützter Inhaltstyp</string>
+    <string name="no_body_in_response">Kein Inhalt in der Antwort</string>
+    <string name="read_adjective">Gelesen</string>
+    <string name="saved_adjective">Gespeichert</string>
+    <string name="recently_read_adjective">Zuletzt gelesen</string>
+    <string name="no_feeds_in_the_page">Keine Feeds auf der Seite</string>
+    <string name="failed_to_parse_full_article">Artikel konnte nicht vollständig analysiert werden</string>
+    <string name="failed_to_parse_json_feed">JSON-Feed konnte nicht analysiert werden</string>
+    <string name="failed_to_parse_rss_feed">RSS-Feed konnte nicht analysiert werden</string>
 </resources>
