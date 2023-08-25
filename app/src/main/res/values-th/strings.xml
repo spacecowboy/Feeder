@@ -203,4 +203,5 @@
     <string name="other_tags">%1$s แท็ก</string>
     <string name="zero_tags">%1$s แท็ก</string>
     <string name="many_tags">%1$s แท็ก</string>
+    <string name="article_list_settings">รายการบทความ</string>
 </resources>
