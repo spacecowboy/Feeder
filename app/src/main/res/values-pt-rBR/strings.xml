@@ -208,4 +208,18 @@
     <string name="failed_to_fetch_full_article_missing_body">Nada foi encontrado para baixar</string>
     <string name="failed_to_fetch_full_article_missing_link">O feed está sem o link para o artigo</string>
     <string name="failed_to_fetch_full_article_not_html">O link não é um documento HTML</string>
+    <string name="article_list_settings">Lista de artigos</string>
+    <string name="recently_read_adjective">Lido recentemente</string>
+    <string name="filter_noun">Filtro</string>
+    <string name="saved_adjective">Salvo</string>
+    <string name="show_only_title">Mostrar apenas título</string>
+    <string name="failed_to_download">Falha ao baixar</string>
+    <string name="failed_to_parse_the_page">Falha ao analisar a página</string>
+    <string name="http_error">Erro HTTP</string>
+    <string name="content_is_not_html">O conteúdo não é HTML</string>
+    <string name="failed_to_parse_rss_feed">Falha ao analisar o feed RSS</string>
+    <string name="failed_to_parse_json_feed">Falha ao analisar o feed JSON</string>
+    <string name="unsupported_content_type">Tipo de conteúdo não suportado</string>
+    <string name="failed_to_parse_full_article">Falha ao analisar o artigo completo</string>
+    <string name="no_url">Sem URL</string>
 </resources>
