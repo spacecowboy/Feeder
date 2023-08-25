@@ -214,4 +214,16 @@
     <string name="article_list_settings">Список статей</string>
     <string name="max_lines">Максимальна кількість рядків</string>
     <string name="filter_noun">Фільтр</string>
+    <string name="no_feeds_in_the_page">Немає каналів на сторінці</string>
+    <string name="content_is_not_html">Вміст не є HTML</string>
+    <string name="failed_to_parse_the_page">Не вдалося проаналізувати сторінку</string>
+    <string name="failed_to_parse_rss_feed">Не вдалося проаналізувати канал RSS</string>
+    <string name="http_error">Помилка HTTP</string>
+    <string name="failed_to_parse_json_feed">Не вдалося проаналізувати канал JSON</string>
+    <string name="no_body_in_response">Немає тіла у відповідь</string>
+    <string name="unsupported_content_type">Непідтримуваний тип вмісту</string>
+    <string name="failed_to_parse_full_article">Не вдалося проаналізувати повну статтю</string>
+    <string name="show_only_title">Показувати лише назву</string>
+    <string name="failed_to_download">Не вдалося звантажити</string>
+    <string name="no_url">Немає URL</string>
 </resources>
