@@ -328,6 +328,7 @@ fun SettingsList(
                 ThemeOptions.SYSTEM.asThemeOption(),
                 ThemeOptions.DAY.asThemeOption(),
                 ThemeOptions.NIGHT.asThemeOption(),
+                ThemeOptions.E_INK.asThemeOption(),
             ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged,
