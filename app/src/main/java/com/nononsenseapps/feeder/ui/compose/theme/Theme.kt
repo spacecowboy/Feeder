@@ -76,6 +76,36 @@ private val darkColors = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
 )
 
+private val eInkColors = lightColorScheme(
+    primary = md_theme_eink_primary,
+    onPrimary = md_theme_eink_onPrimary,
+    primaryContainer = md_theme_eink_primaryContainer,
+    onPrimaryContainer = md_theme_eink_onPrimaryContainer,
+    secondary = md_theme_eink_secondary,
+    onSecondary = md_theme_eink_onSecondary,
+    secondaryContainer = md_theme_eink_secondaryContainer,
+    onSecondaryContainer = md_theme_eink_onSecondaryContainer,
+    tertiary = md_theme_eink_tertiary,
+    onTertiary = md_theme_eink_onTertiary,
+    tertiaryContainer = md_theme_eink_tertiaryContainer,
+    onTertiaryContainer = md_theme_eink_onTertiaryContainer,
+    error = md_theme_eink_error,
+    errorContainer = md_theme_eink_errorContainer,
+    onError = md_theme_eink_onError,
+    onErrorContainer = md_theme_eink_onErrorContainer,
+    background = md_theme_eink_background,
+    onBackground = md_theme_eink_onBackground,
+    surface = md_theme_eink_surface,
+    onSurface = md_theme_eink_onSurface,
+    surfaceVariant = md_theme_eink_surfaceVariant,
+    onSurfaceVariant = md_theme_eink_onSurfaceVariant,
+    outline = md_theme_eink_outline,
+    inverseOnSurface = md_theme_eink_inverseOnSurface,
+    inverseSurface = md_theme_eink_inverseSurface,
+    inversePrimary = md_theme_eink_inversePrimary,
+    surfaceTint = md_theme_eink_surfaceTint,
+)
+
 /**
  * Only use this in the root of the activity
  */
@@ -117,7 +147,9 @@ fun FeederTheme(
 @Composable
 private fun ThemeOptions.isDarkSystemIcons(): Boolean {
     val isDarkTheme = when (this) {
-        ThemeOptions.DAY -> false
+        ThemeOptions.DAY,
+        ThemeOptions.E_INK,
+        -> false
         ThemeOptions.NIGHT -> true
         ThemeOptions.SYSTEM -> isSystemInDarkTheme()
     }
@@ -149,7 +181,9 @@ private fun ThemeOptions.getColorScheme(
     dynamicColors: Boolean,
 ): ColorScheme {
     val dark = when (this) {
-        ThemeOptions.DAY -> false
+        ThemeOptions.DAY,
+        ThemeOptions.E_INK,
+        -> false
         ThemeOptions.NIGHT -> true
         ThemeOptions.SYSTEM -> {
             isSystemInDarkTheme()
@@ -166,7 +200,11 @@ private fun ThemeOptions.getColorScheme(
         }
 
         dark -> darkColors
-        else -> lightColors
+        else -> if (this == ThemeOptions.E_INK) {
+            eInkColors
+        } else {
+            lightColors
+        }
     }
 
     return if (dark && darkThemePreference == DarkThemePreferences.BLACK) {

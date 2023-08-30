@@ -103,6 +103,7 @@
   <string name="theme_automatic">Auto</string>
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>
+  <string name="theme_e_ink">E Ink</string>
   <string name="theme">Theme</string>
   <string name="dynamic_theme_use">Dynamic colors</string>
   <string name="dark_theme_preference">Preferred dark theme</string>

@@ -553,6 +553,7 @@ enum class ThemeOptions(
 ) {
     DAY(R.string.theme_day),
     NIGHT(R.string.theme_night),
+    E_INK(R.string.theme_e_ink),
     SYSTEM(R.string.theme_system),
 }
 
