@@ -206,7 +206,7 @@
     <string name="many_feeds">%1$s feed</string>
     <string name="many_tags">%1$s etichette</string>
     <string name="failed_to_fetch_full_article_missing_body">Non è stato trovato nulla da recuperare</string>
-    <string name="failed_to_fetch_full_article_missing_link">Feed senza collegamento ad articolo</string>
+    <string name="failed_to_fetch_full_article_missing_link">Il feed non ha collegamenti all\'articolo</string>
     <string name="failed_to_fetch_full_article_not_html">Il collegamento non è un documento HTML</string>
     <string name="article_list_settings">Lista degli articoli</string>
     <string name="max_lines">Numero massimo di righe</string>
@@ -215,4 +215,15 @@
     <string name="filter_noun">Filtro</string>
     <string name="recently_read_adjective">Letti di recente</string>
     <string name="show_only_title">Mostra solo il titolo</string>
+    <string name="http_error">Errore HTTP</string>
+    <string name="failed_to_parse_json_feed">Errore nel parsing del feed JSON</string>
+    <string name="content_is_not_html">Il contenuto non è HTML</string>
+    <string name="no_feeds_in_the_page">Nessun feed nella pagina</string>
+    <string name="no_url">Nessun URL</string>
+    <string name="failed_to_download">Download fallito</string>
+    <string name="failed_to_parse_the_page">Errore nel parsing della pagina</string>
+    <string name="failed_to_parse_rss_feed">Errore nel parsing del feed RSS</string>
+    <string name="unsupported_content_type">Contenuto non supportato</string>
+    <string name="failed_to_parse_full_article">Errore nel parsing dell\'intero articolo</string>
+    <string name="no_body_in_response">Nessun contenuto</string>
 </resources>
