@@ -226,4 +226,5 @@
     <string name="unsupported_content_type">不受支持的内容类型</string>
     <string name="failed_to_parse_full_article">未能解析完整文章</string>
     <string name="no_url">无 URL</string>
+    <string name="theme_e_ink">电子墨水</string>
 </resources>
