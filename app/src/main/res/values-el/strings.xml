@@ -24,8 +24,8 @@
     <string name="sync_option_every_3_hours">Κάθε 3 ώρες</string>
     <string name="open_in_browser">Άνοιγμα σε περιηγητή ιστού</string>
     <string name="url">URL</string>
-    <string name="navigation_drawer_open">Άνοιγμα συρταριού πλοήγησης</string>
-    <string name="navigation_drawer_close">Κλείσιμο συρταριού πλοήγησης</string>
+    <string name="navigation_drawer_open">Άνοιγμα μενού πλοήγησης</string>
+    <string name="navigation_drawer_close">Κλείσιμο μενού πλοήγησης</string>
     <string name="open_enclosed_media_file">Άνοιγμα %1$s</string>
     <string name="share">Κοινή χρήση</string>
     <string name="sort">Ταξινόμηση κατά</string>
@@ -226,4 +226,5 @@
     <string name="unsupported_content_type">Μη υποστηριζόμενος τύπος περιεχομένου</string>
     <string name="failed_to_parse_full_article">Απέτυχε η ανάλυση του πλήρους άρθρου</string>
     <string name="no_url">Χωρίς URL</string>
+    <string name="theme_e_ink">Ηλεκτρονικός σύνδεσμος</string>
 </resources>
