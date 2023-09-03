@@ -207,4 +207,24 @@
     <string name="failed_to_fetch_full_article_missing_body">Getirilecek bir şey bulunamadı</string>
     <string name="failed_to_fetch_full_article_not_html">Bağlantı bir HTML belgesi değil</string>
     <string name="failed_to_fetch_full_article_missing_link">Yayın\'da makale bağlantısı eksik</string>
+    <string name="article_list_settings">Makale listesi</string>
+    <string name="import_x_feeds_with_y_tags">%1$s %2$s ile içe aktarılsın mı\?</string>
+    <string name="max_lines">En fazla satır sayısı</string>
+    <string name="filter_noun">Filtre</string>
+    <string name="recently_read_adjective">Son okunan</string>
+    <string name="read_adjective">Okunan</string>
+    <string name="saved_adjective">Kaydedilen</string>
+    <string name="show_only_title">Yalnızca başlığı göster</string>
+    <string name="failed_to_parse_the_page">Sayfa ayrıştırılamadı</string>
+    <string name="no_feeds_in_the_page">Sayfada yayın yok</string>
+    <string name="content_is_not_html">İçerik HTML değil</string>
+    <string name="failed_to_parse_rss_feed">RSS yayını ayrıştırılamadı</string>
+    <string name="http_error">HTTP hatası</string>
+    <string name="failed_to_parse_json_feed">JSON yayını ayrıştırılamadı</string>
+    <string name="no_body_in_response">Yanıtta gövde yok</string>
+    <string name="unsupported_content_type">Desteklenmeyen içerik türü</string>
+    <string name="failed_to_parse_full_article">Makalenin tamamı ayrıştırılamadı</string>
+    <string name="no_url">URL yok</string>
+    <string name="theme_e_ink">E Ink</string>
+    <string name="failed_to_download">İndirilemedi</string>
 </resources>
