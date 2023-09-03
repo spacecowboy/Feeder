@@ -208,4 +208,5 @@
     <string name="saved_article">Bài viết đã lưu</string>
     <string name="save_article">Lưu bài viết</string>
     <string name="unsave_article">Dừng lưu bài viết</string>
+    <string name="theme_e_ink">Giấy điện tử</string>
 </resources>

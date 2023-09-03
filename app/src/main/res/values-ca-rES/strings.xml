@@ -215,4 +215,5 @@
     <string name="saved_article">Article desat</string>
     <string name="save_article">Desa l\'article</string>
     <string name="unsave_article">Treu l\'article de desats</string>
+    <string name="theme_e_ink">Paper electrònic</string>
 </resources>

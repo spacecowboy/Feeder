@@ -226,4 +226,5 @@
     <string name="show_only_title">Показувати лише назву</string>
     <string name="failed_to_download">Не вдалося звантажити</string>
     <string name="no_url">Немає URL</string>
+    <string name="theme_e_ink">Електронний папір</string>
 </resources>

@@ -208,4 +208,5 @@
     <string name="failed_to_fetch_full_article_missing_body">Nada foi encontrado para descarregar</string>
     <string name="failed_to_fetch_full_article_not_html">A ligação não é um documento de HTML</string>
     <string name="failed_to_fetch_full_article_missing_link">O feed não tem ligação ao artigo</string>
+    <string name="theme_e_ink">Papel eletrónico</string>
 </resources>

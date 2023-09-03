@@ -215,4 +215,5 @@
     <string name="recently_read_adjective">Recent gelezen</string>
     <string name="read_adjective">Gelezen</string>
     <string name="saved_adjective">Bewaard</string>
+    <string name="theme_e_ink">Elektronisch papier</string>
 </resources>

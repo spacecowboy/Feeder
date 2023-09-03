@@ -226,4 +226,5 @@
     <string name="unsupported_content_type">Contenuto non supportato</string>
     <string name="failed_to_parse_full_article">Errore nel parsing dell\'intero articolo</string>
     <string name="no_body_in_response">Nessun contenuto</string>
+    <string name="theme_e_ink">Carta elettronica</string>
 </resources>

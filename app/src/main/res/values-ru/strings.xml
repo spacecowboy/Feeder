@@ -205,4 +205,5 @@
     <string name="many_tags">%1$s меток</string>
     <string name="other_tags">%1$s меток</string>
     <string name="failed_to_fetch_full_article_missing_link">В ленте ссылка на статью отсутствует</string>
+    <string name="theme_e_ink">Электронные чернила</string>
 </resources>

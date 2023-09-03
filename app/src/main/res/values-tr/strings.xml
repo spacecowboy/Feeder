@@ -225,6 +225,6 @@
     <string name="unsupported_content_type">Desteklenmeyen içerik türü</string>
     <string name="failed_to_parse_full_article">Makalenin tamamı ayrıştırılamadı</string>
     <string name="no_url">URL yok</string>
-    <string name="theme_e_ink">E Ink</string>
+    <string name="theme_e_ink">E-kâğıt</string>
     <string name="failed_to_download">İndirilemedi</string>
 </resources>

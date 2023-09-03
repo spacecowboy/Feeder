@@ -154,4 +154,5 @@
     <string name="set_language">ഭാഷ സജ്ജമാക്കുക</string>
     <string name="new_based_on_this">ഇതിന്റെ അടിസ്ഥാനത്തിൽ പുതിയത്</string>
     <string name="only_available_on_android_n">ആൻഡ്രോയിഡ് %1$s-ലും അതിനുമുകളിലുള്ളവയിലും മാത്രമേ ലഭ്യമാകൂ</string>
+    <string name="theme_e_ink">ഇലക്ട്രോണിക് പേപ്പർ</string>
 </resources>
