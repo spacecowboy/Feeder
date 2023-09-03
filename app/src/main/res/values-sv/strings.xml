@@ -226,5 +226,5 @@
     <string name="unsupported_content_type">Innehållstypen stöds inte</string>
     <string name="failed_to_parse_full_article">Kund inte läsa hela artikeln</string>
     <string name="no_url">Ingen URL</string>
-    <string name="theme_e_ink">Elektroniskt papper</string>
+    <string name="theme_e_ink">Läsplatta</string>
 </resources>
