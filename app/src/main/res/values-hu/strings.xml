@@ -209,4 +209,22 @@
     <string name="saved_article">Cikk mentve</string>
     <string name="save_article">Cikk mentése</string>
     <string name="theme_e_ink">E-papír</string>
+    <string name="article_list_settings">Cikk lista</string>
+    <string name="show_only_title">Csak a cím mutatása</string>
+    <string name="filter_noun">Szűrő</string>
+    <string name="recently_read_adjective">Nemrégiben olvasott</string>
+    <string name="read_adjective">Olvasás</string>
+    <string name="saved_adjective">Mentve</string>
+    <string name="failed_to_download">Sikertelen letöltés</string>
+    <string name="failed_to_parse_rss_feed">Nem sikerült elemezni az RSS hírfolyamot</string>
+    <string name="http_error">HTTP hiba</string>
+    <string name="failed_to_parse_json_feed">Nem sikerült elemezni a JSON hírfolyamot</string>
+    <string name="unsupported_content_type">Nem támogatott tartalom típus</string>
+    <string name="failed_to_parse_full_article">Nem sikerült a teljes cikket elemzni</string>
+    <string name="no_url">Nincs URL</string>
+    <string name="content_is_not_html">A tartalom nem HTML</string>
+    <string name="max_lines">Maximum sorok</string>
+    <string name="failed_to_parse_the_page">Az oldal sikertelen elemzése</string>
+    <string name="no_body_in_response">Nincs tartalma a válasznak</string>
+    <string name="no_feeds_in_the_page">Nincsenek hírcsatornák az oldalon</string>
 </resources>
