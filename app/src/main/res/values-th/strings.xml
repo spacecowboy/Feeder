@@ -204,4 +204,5 @@
     <string name="zero_tags">%1$s แท็ก</string>
     <string name="many_tags">%1$s แท็ก</string>
     <string name="article_list_settings">รายการบทความ</string>
+    <string name="theme_e_ink">กระดาษอิเล็กทรอนิกส์</string>
 </resources>

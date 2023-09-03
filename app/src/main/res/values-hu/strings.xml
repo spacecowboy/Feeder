@@ -208,4 +208,5 @@
     <string name="saved_articles">Mentett cikkek</string>
     <string name="saved_article">Cikk mentve</string>
     <string name="save_article">Cikk mentése</string>
+    <string name="theme_e_ink">E-papír</string>
 </resources>

@@ -222,4 +222,5 @@
     <string name="unsupported_content_type">Tipo de conteúdo não suportado</string>
     <string name="failed_to_parse_full_article">Falha ao analisar o artigo completo</string>
     <string name="no_url">Sem URL</string>
+    <string name="theme_e_ink">Papel eletrônico</string>
 </resources>

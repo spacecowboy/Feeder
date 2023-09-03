@@ -139,4 +139,5 @@
     <string name="many_unread_articles">%1$s படிக்காத கட்டுரைகள்</string>
     <string name="other_unread_articles">%1$s படிக்காத கட்டுரைகள்</string>
     <string name="feed_item_style_super_compact">சிறந்த கச்சிதமான</string>
+    <string name="theme_e_ink">மின் தாள்</string>
 </resources>

@@ -226,4 +226,5 @@
     <string name="unsupported_content_type">Type de contenu non supporté</string>
     <string name="failed_to_parse_full_article">Échec de lecture de l\'intégralité de l\'article</string>
     <string name="no_url">URL manquante</string>
+    <string name="theme_e_ink">Encre électronique</string>
 </resources>

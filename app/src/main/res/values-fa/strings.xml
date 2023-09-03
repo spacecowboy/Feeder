@@ -129,4 +129,5 @@
     <string name="action_settings">تنظیمات</string>
     <string name="navigation_drawer_close">بستن کشوی ناوبری</string>
     <string name="navigation_drawer_open">باز کردن کشوی ناوبری</string>
+    <string name="theme_e_ink">کاغذ الکترونیک</string>
 </resources>

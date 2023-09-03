@@ -215,4 +215,5 @@
     <string name="recently_read_adjective">قرأت مؤخرا</string>
     <string name="read_adjective">مقروء</string>
     <string name="saved_adjective">محفوظ</string>
+    <string name="theme_e_ink">ورق إلكتروني</string>
 </resources>
