@@ -208,4 +208,22 @@
     <string name="failed_to_fetch_full_article_missing_body">Non se atopou nada</string>
     <string name="failed_to_fetch_full_article_missing_link">A fonte carece da ligazón ao artigo</string>
     <string name="failed_to_fetch_full_article_not_html">A ligazón non é un documento HTML</string>
+    <string name="article_list_settings">Lista de artigos</string>
+    <string name="max_lines">Máximo de liñas</string>
+    <string name="filter_noun">Filtro</string>
+    <string name="recently_read_adjective">Lido recentemente</string>
+    <string name="read_adjective">Lido</string>
+    <string name="saved_adjective">Gardado</string>
+    <string name="show_only_title">Ver só o título</string>
+    <string name="failed_to_parse_full_article">Fallo ao analizar o artigo completo</string>
+    <string name="failed_to_download">Fallo ao descarregar</string>
+    <string name="failed_to_parse_the_page">Fallo ao analizar a páxina</string>
+    <string name="content_is_not_html">O contido non é HTML</string>
+    <string name="no_feeds_in_the_page">Non hai fontes na páxina</string>
+    <string name="unsupported_content_type">Tipo de contido non soportado</string>
+    <string name="no_url">Non hai URL</string>
+    <string name="failed_to_parse_rss_feed">Fallo ao analizar a fonte RSS</string>
+    <string name="http_error">Erro HTTP</string>
+    <string name="failed_to_parse_json_feed">Fallo ao analizar a fonte JSON</string>
+    <string name="no_body_in_response">Resposta sen corpo</string>
 </resources>
