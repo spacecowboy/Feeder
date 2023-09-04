@@ -85,19 +85,15 @@ class RssLocalSync(override val di: DI) : DIAware {
                         Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
                             .toEpochMilli()
                     }
-                    // Get read marks in background - this blocks sync until done
-                    val getReadMarksJob = launch(coroutineContext) {
-                        try {
-                            syncClient.getRead()
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "Error when syncing readmarks in sync. ${e.message}", e)
-                        }
-                    }
-                    // Fetch new feeds first
+                    // Fetch sync stuff first - this is fast
                     try {
                         syncClient.getFeeds()
+                        syncClient.getRead()
+                        syncClient.getDevices()
+                        syncClient.sendUpdatedFeeds()
+                        syncClient.markAsRead()
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error when fetching new feeds in sync. ${e.message}", e)
+                        Log.e(LOG_TAG, "error with syncClient: ${e.message}", e)
                     }
 
                     val feedsToFetch =
@@ -106,25 +102,13 @@ class RssLocalSync(override val di: DI) : DIAware {
                     logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
                     val coroutineContext =
-                        Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
+                        this.coroutineContext + CoroutineExceptionHandler { _, throwable ->
                             Log.e(LOG_TAG, "Error during sync", throwable)
                         }
-
-                    // Fetch latest read marks and send possible feed updates
-                    launch(coroutineContext) {
-                        try {
-                            syncClient.getDevices()
-                            syncClient.sendUpdatedFeeds()
-                            syncClient.markAsRead()
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "Error when syncing data in sync. ${e.message}", e)
-                        }
-                    }
 
                     val jobs = feedsToFetch.map {
                         needFullTextSync = needFullTextSync || it.fullTextByDefault
                         launch(coroutineContext) {
-                            getReadMarksJob.join()
                             try {
                                 // Want unique sync times so UI gets updated state
                                 repository.setCurrentlySyncingOn(

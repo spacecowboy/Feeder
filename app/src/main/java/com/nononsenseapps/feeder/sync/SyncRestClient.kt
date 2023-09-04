@@ -109,9 +109,11 @@ class SyncRestClient(override val di: DI) : DIAware {
         )
         this.feederSync = feederSync
 
+        val deviceName = generateDeviceName()
+
         return feederSync.create(
             CreateRequest(
-                deviceName = AesCbcWithIntegrity.encryptString(syncRemote.deviceName, secretKey),
+                deviceName = AesCbcWithIntegrity.encryptString(deviceName, secretKey),
             ),
         ).toEither()
             .onRight { response ->
@@ -119,7 +121,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     syncRemote.copy(
                         syncChainId = response.syncCode,
                         deviceId = response.deviceId,
-                        deviceName = generateDeviceName(),
+                        deviceName = deviceName,
                         latestMessageTimestamp = Instant.EPOCH,
                     ),
                 )
