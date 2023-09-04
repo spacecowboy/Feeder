@@ -601,13 +601,32 @@ fun Any.asWeakETagValue() =
     "W/\"$this\""
 
 fun <T> Response<T>.toEither(): Either<ErrorResponse, T> {
-    return body()?.let { Either.Right(it) }
-        ?: Either.Left(
+    return try {
+        if (isSuccessful) {
+            body()?.let { Either.Right(it) }
+                ?: Either.Left(
+                    ErrorResponse(
+                        code = 998,
+                        body = "No body but success",
+                    ),
+                )
+        } else {
+            Either.Left(
+                ErrorResponse(
+                    code = code(),
+                    body = errorBody()?.string(),
+                ),
+            )
+        }
+    } catch (e: Exception) {
+        Either.Left(
             ErrorResponse(
-                code = code(),
-                body = errorBody()?.string(),
+                code = 999,
+                body = e.message,
+                throwable = e,
             ),
         )
+    }
 }
 
 data class ErrorResponse(
