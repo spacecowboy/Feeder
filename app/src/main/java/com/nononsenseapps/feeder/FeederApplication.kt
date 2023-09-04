@@ -15,6 +15,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
+import com.danielrampelt.coil.ico.IcoDecoder
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.BlocklistDao
@@ -151,6 +152,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                     } else {
                         add(GifDecoder.Factory())
                     }
+                    add(IcoDecoder.Factory(this@FeederApplication))
                 }
                 .build()
         }
