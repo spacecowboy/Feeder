@@ -27,7 +27,17 @@ class SyncServiceSendReadWorker(val context: Context, workerParams: WorkerParame
         return try {
             Log.d(LOG_TAG, "Doing work")
             syncClient.markAsRead()
-            Result.success()
+                .onLeft {
+                    Log.e(
+                        LOG_TAG,
+                        "Error when sending readmarks ${it.code}, ${it.body}",
+                        it.throwable,
+                    )
+                }
+                .fold(
+                    ifLeft = { Result.failure() },
+                    ifRight = { Result.success() },
+                )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error when sending read marks", e)
             Result.failure()

@@ -588,7 +588,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
     private suspend fun ErrorResponse.leaveChainIfKickedOutElseLog() {
         Log.e(LOG_TAG, "leaveChainIfKickedOutElseLog: $code, $body", throwable)
-        if (code == 400 && body?.contains("Device not registered") == true) {
+        if (code == 400 && body?.contains("Device not registered", ignoreCase = true) == true) {
             // Forbidden, this device has been removed from the chain from another device
             leave()
         }
