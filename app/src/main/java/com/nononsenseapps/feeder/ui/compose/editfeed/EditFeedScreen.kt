@@ -254,7 +254,9 @@ fun EditFeedView(
 ) {
     val dimens = LocalDimens.current
 
-    val (leftFocusRequester, rightFocusRequester) = createRefs()
+    val (leftFocusRequester, rightFocusRequester) = remember {
+        createRefs()
+    }
 
     OkCancelWithContent(
         onOk = {
