@@ -19,7 +19,7 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
-class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
+open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
     private val feedDao: FeedDao by instance()
     private val settingsStore: SettingsStore by instance()
 

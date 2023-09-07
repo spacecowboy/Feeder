@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.model.opml
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -9,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import androidx.work.WorkManager
+import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.UserSettings
@@ -18,6 +21,8 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.util.Either
+import com.nononsenseapps.feeder.util.ToastMaker
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -35,6 +40,7 @@ import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
+import org.kodein.di.compose.instance
 import org.kodein.di.instance
 import org.kodein.di.singleton
 
@@ -52,8 +58,16 @@ class OPMLTest : DIAware {
         bind<FeedDao>() with singleton { db.feedDao() }
         bind<BlocklistDao>() with singleton { db.blocklistDao() }
         bind<SettingsStore>() with singleton { SettingsStore(di) }
+        bind<FeedStore>() with singleton { FeedStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@OPMLTest.context) }
+        bind<ToastMaker>() with instance(
+            object : ToastMaker {
+                override suspend fun makeToast(text: String) {}
+                override suspend fun makeToast(resId: Int) {}
+            },
+        )
+        bind<ContentResolver>() with singleton { this@OPMLTest.context.contentResolver }
     }
 
     private var dir: File? = null
@@ -61,6 +75,7 @@ class OPMLTest : DIAware {
 
     private val opmlParserHandler: OPMLParserHandler by instance()
     private val settingsStore: SettingsStore by instance()
+    private val feedStore: FeedStore by instance()
 
     @Before
     fun setup() {
@@ -300,14 +315,9 @@ class OPMLTest : DIAware {
         val path = File(dir, "lsadflibaslsdfa.opml")
         // Read file
         val parser = OpmlPullParser(opmlParserHandler)
-        var raised = false
-        try {
-            parser.parseFile(path.absolutePath)
-        } catch (e: IOException) {
-            raised = true
-        }
+        val result = parser.parseFile(path.absolutePath)
 
-        assertTrue("Should raise exception", raised)
+        assertTrue(result.isLeft())
     }
 
     @Throws(IOException::class)
@@ -365,7 +375,7 @@ class OPMLTest : DIAware {
 
         // when
         val parser = OpmlPullParser(opmlParserHandler)
-        parser.parseInputStream(opmlStream)
+        parser.parseInputStreamWithFallback(opmlStream)
 
         // then
         val feeds = db.feedDao().loadFeeds()
@@ -421,7 +431,7 @@ class OPMLTest : DIAware {
 
         // when
         val parser = OpmlPullParser(opmlParserHandler)
-        parser.parseInputStream(opmlStream)
+        parser.parseInputStreamWithFallback(opmlStream)
 
         // then
         val feeds = db.feedDao().loadFeeds()
@@ -510,7 +520,7 @@ class OPMLTest : DIAware {
 
         // when
         val parser = OpmlPullParser(opmlParserHandler)
-        parser.parseInputStream(opmlStream)
+        parser.parseInputStreamWithFallback(opmlStream)
 
         // then
         val feeds = db.feedDao().loadFeeds()
@@ -558,6 +568,68 @@ class OPMLTest : DIAware {
         }
     }
 
+    @MediumTest
+    @Test
+    fun testExportThenImport(): Unit = runBlocking {
+        val fileUri = context.cacheDir.resolve("exporttest.opml").toUri()
+        val feedIds = mutableSetOf<Long>()
+        feedStore.saveFeed(
+            Feed(
+                title = "Ampersands are & the worst",
+                url = URL("https://example.com/ampersands"),
+            ),
+        ).also { feedIds.add(it) }
+        feedStore.saveFeed(
+            Feed(
+                title = "So are > brackets",
+                url = URL("https://example.com/lt"),
+            ),
+        ).also { feedIds.add(it) }
+        feedStore.saveFeed(
+            Feed(
+                title = "So are < brackets",
+                url = URL("https://example.com/gt"),
+            ),
+        ).also { feedIds.add(it) }
+
+        assertEquals(3, feedIds.size)
+
+        val exportResult = exportOpml(di, fileUri)
+
+        exportResult.leftOrNull()?.let { e ->
+            throw e.throwable!!
+        }
+
+        val opmlFeedList = OpmlFeedList()
+        val parser = OpmlPullParser(opmlFeedList)
+        val result = parser.parseFile(fileUri.path!!)
+
+        result.leftOrNull()?.let { e ->
+            throw e.throwable!!
+        }
+
+        assertEquals(3, opmlFeedList.feeds.size)
+    }
+
+    @Test
+    @MediumTest
+    fun importPlenaryProgramming(): Unit = runBlocking {
+        // given
+        val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("Programming.opml")!!
+
+        // when
+        val opmlFeedList = OpmlFeedList()
+        val parser = OpmlPullParser(opmlFeedList)
+        val result = parser.parseInputStreamWithFallback(opmlStream)
+
+        result.leftOrNull()?.let {
+            throw it.throwable!!
+        }
+
+        // then
+        assertEquals("Expecting feeds", 50, opmlFeedList.feeds.size)
+    }
+
     @Test
     @MediumTest
     fun rssGuardOPMLImports2() = runBlocking {
@@ -566,7 +638,7 @@ class OPMLTest : DIAware {
 
         // when
         val parser = OpmlPullParser(opmlParserHandler)
-        parser.parseInputStream(opmlStream)
+        parser.parseInputStreamWithFallback(opmlStream)
 
         // then
         val feeds = db.feedDao().loadFeeds()
@@ -648,12 +720,13 @@ class OPMLTest : DIAware {
     }
 }
 
-@Throws(IOException::class)
-suspend fun OpmlPullParser.parseFile(path: String) {
-    val file = File(path)
-
-    file.inputStream().use {
-        parseInputStream(it)
+suspend fun OpmlPullParser.parseFile(path: String): Either<OpmlError, Unit> {
+    return try {
+        File(path).inputStream().use {
+            parseInputStreamWithFallback(it)
+        }
+    } catch (t: Throwable) {
+        Either.Left(OpmlUnknownError(t))
     }
 }
 
@@ -711,3 +784,20 @@ private val sampleFile: List<String> = """
     </opml>
 """.trimIndent()
     .split("\n")
+
+class OpmlFeedList : OPMLParserHandler {
+    val feeds = mutableMapOf<URL, Feed>()
+    val settings = mutableMapOf<String, String>()
+    val blockList = mutableListOf<String>()
+    override suspend fun saveFeed(feed: Feed) {
+        feeds[feed.url] = feed
+    }
+
+    override suspend fun saveSetting(key: String, value: String) {
+        settings.put(key, value)
+    }
+
+    override suspend fun saveBlocklistPatterns(patterns: Iterable<String>) {
+        blockList.addAll(patterns)
+    }
+}

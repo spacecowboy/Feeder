@@ -86,7 +86,7 @@ fun OpmlImportScreen(
                         override suspend fun saveFeed(feed: Feed) {
                             viewState = viewState.copy(
                                 initial = false,
-                                feeds = viewState.feeds.plus(feed),
+                                feeds = viewState.feeds + (feed.url to feed),
                             )
                         }
 
@@ -100,7 +100,7 @@ fun OpmlImportScreen(
                 val contentResolver: ContentResolver by di.instance()
                 contentResolver.openInputStream(uri).use {
                     it?.let { stream ->
-                        parser.parseInputStream(stream)
+                        parser.parseInputStreamWithFallback(stream)
                     }
                 }
             } catch (t: Throwable) {
@@ -230,6 +230,12 @@ fun OpmlImportView(
             }
         }
 
+        val feedValues by remember(viewState.feeds) {
+            derivedStateOf {
+                viewState.feeds.values.sortedBy { it.title }
+            }
+        }
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
@@ -238,9 +244,9 @@ fun OpmlImportView(
                 .weight(1f),
         ) {
             items(
-                count = viewState.feeds.size,
+                count = feedValues.size,
             ) {
-                val feed = viewState.feeds[it]
+                val feed = feedValues[it]
 
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -271,13 +277,13 @@ fun OpmlImportView(
 
 @Immutable
 data class ViewState(
-    val feeds: List<Feed> = emptyList(),
+    val feeds: Map<URL, Feed> = mutableMapOf(),
     val error: Boolean = false,
     val initial: Boolean = true,
 ) {
     val okEnabled: Boolean = feeds.isNotEmpty()
     val feedCount: Int = feeds.size
-    val tagCount: Int = feeds.asSequence().map { it.tag }.filterNot { it.isBlank() }.count()
+    val tagCount: Int = feeds.values.asSequence().map { it.tag }.filterNot { it.isBlank() }.count()
 }
 
 @ThemePreviews
@@ -287,12 +293,12 @@ private fun PreviewOpmlImportScreenSingle() {
         Surface {
             OpmlImportView(
                 viewState = ViewState(
-                    feeds = listOf(
-                        Feed(
+                    feeds = mapOf(
+                        URL("https://example.com/foo") to Feed(
                             title = "Foo Feed",
-                            url = URL("https://example.com/foo")
-                        )
-                    )
+                            url = URL("https://example.com/foo"),
+                        ),
+                    ),
                 ),
                 onDismiss = {},
                 onOk = {},
