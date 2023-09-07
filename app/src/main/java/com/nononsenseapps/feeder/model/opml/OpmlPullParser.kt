@@ -4,13 +4,17 @@ import android.util.Log
 import android.util.Xml
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.util.Either
+import com.nononsenseapps.feeder.util.flatMap
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.Arrays
 import kotlin.reflect.KProperty
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.toByteString
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 
@@ -51,27 +55,59 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     private val blockList: MutableSet<String> = mutableSetOf()
     private val parser: XmlPullParser = Xml.newPullParser()
 
-    @Throws(IOException::class)
-    suspend fun parseInputStream(inputStream: InputStream) = withContext(IO) {
-        inputStream.use { inputStream ->
-            try {
-                parser.setInput(inputStream, null)
-                parser.nextTag()
-                readOpml()
+    suspend fun parseInputStreamWithFallback(inputStream: InputStream): Either<OpmlError, Unit> {
+        return Either.catching(
+            onCatch = {
+                OpmlUnknownError(it)
+            },
+        ) {
+            inputStream.use {
+                it.readTheBytes()
+            }
+        }.flatMap { bytes ->
+            val parseResult = parseInputStream(bytes.inputStream())
 
-                for (feed in feeds) {
-                    opmlToDb.saveFeed(feed)
-                }
-                for ((key, value) in settings) {
-                    opmlToDb.saveSetting(key = key, value = value)
-                }
-
-                opmlToDb.saveBlocklistPatterns(blockList)
-            } catch (e: XmlPullParserException) {
-                Log.e(LOG_TAG, "OPML Import exploded", e)
+            if (parseResult.isRight()) {
+                parseResult
+            } else {
+                bytes.toByteString().utf8()
+                    .replace(
+                        "<outline.*?xmlUrl=\"([^\"]+)\".*?/>".toRegex(),
+                        "<outline xmlUrl=\"$1\" type=\"rss\" />",
+                    ).byteInputStream().let {
+                        parseInputStream(it)
+                    }
             }
         }
     }
+
+    private suspend fun parseInputStream(inputStream: InputStream): Either<OpmlError, Unit> =
+        Either.catching(
+            onCatch = { t ->
+                Log.e(LOG_TAG, "OPML Import exploded", t)
+                when (t) {
+                    is XmlPullParserException -> OpmlParsingError(t)
+                    else -> OpmlUnknownError(t)
+                }
+            },
+        ) {
+            withContext(IO) {
+                inputStream.use { inputStream ->
+                    parser.setInput(inputStream, null)
+                    parser.nextTag()
+                    readOpml()
+
+                    for (feed in feeds) {
+                        opmlToDb.saveFeed(feed)
+                    }
+                    for ((key, value) in settings) {
+                        opmlToDb.saveSetting(key = key, value = value)
+                    }
+
+                    opmlToDb.saveBlocklistPatterns(blockList)
+                }
+            }
+        }
 
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readOpml() {
@@ -117,9 +153,11 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                 parser.name == TAG_SETTING && parser.namespace == OPML_FEEDER_NAMESPACE -> {
                     readSetting()
                 }
+
                 parser.name == TAG_BLOCKED && parser.namespace == OPML_FEEDER_NAMESPACE -> {
                     readBlocked()
                 }
+
                 else -> {
                     skip()
                 }
@@ -151,7 +189,7 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
 
         pattern?.let { pattern ->
             blockList.add(
-                unescape(pattern)
+                unescape(pattern),
             )
         }
 
@@ -203,11 +241,13 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                 ?: "",
         )
         try {
+            val feedUrl = URL(parser.getAttributeValue(null, ATTR_XMLURL))
             val feed = Feed(
-                title = feedTitle,
+                // Ensure not both are empty string: title will get replaced on sync
+                title = feedTitle.ifBlank { feedUrl.toString() },
                 customTitle = feedTitle,
                 tag = tag,
-                url = URL(parser.getAttributeValue(null, ATTR_XMLURL)),
+                url = feedUrl,
             ).let { feed ->
                 // Copy so default values can be referenced
                 feed.copy(
@@ -286,3 +326,68 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
 }
 
 private const val LOG_TAG = "FEEDER_OPMLPULL"
+
+sealed class OpmlError {
+    abstract val throwable: Throwable?
+}
+
+data class OpmlUnknownError(override val throwable: Throwable?) : OpmlError()
+data class OpmlParsingError(override val throwable: Throwable) : OpmlError()
+
+fun InputStream.readTheBytes(): ByteArray {
+    val len = Int.MAX_VALUE
+    require(len >= 0) { "len < 0" }
+    var bufs: MutableList<ByteArray>? = null
+    var result: ByteArray? = null
+    var total = 0
+    var remaining = len
+    var n: Int
+    do {
+        val buf = ByteArray(Math.min(remaining, 8192))
+        var nread = 0
+
+        // read to EOF which may read more or less than buffer size
+        while (read(
+                buf,
+                nread,
+                Math.min(buf.size - nread, remaining),
+            ).also { n = it } > 0
+        ) {
+            nread += n
+            remaining -= n
+        }
+        if (nread > 0) {
+            if ((Int.MAX_VALUE - 8) - total < nread) {
+                throw OutOfMemoryError("Required array size too large")
+            }
+            total += nread
+            if (result == null) {
+                result = buf
+            } else {
+                if (bufs == null) {
+                    bufs = ArrayList()
+                    bufs.add(result)
+                }
+                bufs.add(buf)
+            }
+        }
+        // if the last call to read returned -1 or the number of bytes
+        // requested have been read then break
+    } while (n >= 0 && remaining > 0)
+    if (bufs == null) {
+        if (result == null) {
+            return ByteArray(0)
+        }
+        return if (result.size == total) result else Arrays.copyOf(result, total)
+    }
+    result = ByteArray(total)
+    var offset = 0
+    remaining = total
+    for (b in bufs) {
+        val count = Math.min(b.size, remaining)
+        System.arraycopy(b, 0, result, offset, count)
+        offset += count
+        remaining -= count
+    }
+    return result
+}
