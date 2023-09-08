@@ -206,4 +206,23 @@
     <string name="other_tags">%1$s меток</string>
     <string name="failed_to_fetch_full_article_missing_link">В ленте ссылка на статью отсутствует</string>
     <string name="theme_e_ink">Электронные чернила</string>
+    <string name="failed_to_parse_json_feed">Не удалось разобрать фид JSON</string>
+    <string name="failed_to_fetch_full_article_missing_body">Не найдено ничего, что можно было бы получить</string>
+    <string name="failed_to_parse_full_article">Не удалось разобрать всю статью</string>
+    <string name="article_list_settings">Список статей</string>
+    <string name="filter_noun">Фильтр</string>
+    <string name="recently_read_adjective">Недавно прочитанное</string>
+    <string name="failed_to_fetch_full_article_not_html">Ссылка не является HTML-документом</string>
+    <string name="no_feeds_in_the_page">На странице нет каналов</string>
+    <string name="http_error">Ошибка HTTP</string>
+    <string name="no_url">Нет URL-адреса</string>
+    <string name="max_lines">Макс. кол-во строк</string>
+    <string name="failed_to_parse_the_page">Не удалось разобрать страницу</string>
+    <string name="saved_adjective">Сохранено</string>
+    <string name="failed_to_parse_rss_feed">Не удалось разобрать RSS-канал</string>
+    <string name="unsupported_content_type">Неподдерживаемый тип контента</string>
+    <string name="failed_to_download">Не удалось скачать</string>
+    <string name="read_adjective">Чтение</string>
+    <string name="show_only_title">Показать только заголовок</string>
+    <string name="content_is_not_html">Содержимое не является HTML</string>
 </resources>
