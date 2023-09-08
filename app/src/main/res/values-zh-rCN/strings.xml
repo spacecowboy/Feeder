@@ -58,7 +58,7 @@
     <string name="only_when_charging">仅在充电时</string>
     <string name="image_loading">图片加载</string>
     <string name="no_activity_for_link">无法找到打开该链接的应用</string>
-    <string name="check_for_updates">查找新文章…</string>
+    <string name="check_for_updates">查找新文章频率</string>
     <string name="on_startup">启动时</string>
     <string name="show_fab">显示浮动操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
