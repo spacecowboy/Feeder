@@ -67,6 +67,9 @@ class FeedStore(override val di: DI) : DIAware {
     val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
         feedDao.loadFlowOfFeedsWithUnreadCounts()
             .mapLatest { feeds ->
+                // TODO would like to have a throttle here. Emit first immediately
+                // then at most every X ms (including latest item
+                // Must emit first immediately or the feed list will have a delay
                 mapFeedsToSortedDrawerItems(feeds)
             }
 

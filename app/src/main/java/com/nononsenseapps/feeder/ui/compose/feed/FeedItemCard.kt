@@ -162,7 +162,7 @@ fun RowScope.FeedItemText(
     modifier: Modifier = Modifier,
 ) {
     val snippetStyle = FeedListItemSnippetTextStyle()
-    val joinedText = remember {
+    val joinedText = remember(item, showOnlyTitle) {
         buildAnnotatedString {
             if (item.title.isNotBlank()) {
                 append(item.title)
