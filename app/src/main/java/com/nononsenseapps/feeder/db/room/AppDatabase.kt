@@ -50,7 +50,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 27,
+    version = 28,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -114,12 +114,23 @@ fun getAllMigrations(di: DI) = arrayOf(
     MigrationFrom24To25(di),
     MigrationFrom25To26(di),
     MigrationFrom26To27(di),
+    MigrationFrom27To28(di),
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+class MigrationFrom27To28(override val di: DI) : Migration(27, 28), DIAware {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                alter table feeds add column site_fetched integer not null default 0
+            """.trimIndent(),
+        )
+    }
+}
+
 class MigrationFrom26To27(override val di: DI) : Migration(26, 27), DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
