@@ -22,6 +22,8 @@ dependencyResolutionManagement {
             version("kotlin", kotlinVersion)
             version("androidPlugin", "8.0.2")
             version("composeCompiler", "1.4.8")
+            // Ksoup needs different version when Kotlin 1.9 is used
+            version("ksoup", "0.1.4")
 
             // BEGIN These should be upgraded in unison
             version("okhttp", "4.10.0")
@@ -37,7 +39,6 @@ dependencyResolutionManagement {
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
             version("jsoup", "1.7.3")
-            version("tagsoup", "1.2.1")
             version("readability4j", "1.0.5")
             version("retrofit", "2.9.0")
             version("qrgen", "2.6.0")
@@ -193,7 +194,8 @@ dependencyResolutionManagement {
             library("desugar", "com.android.tools", "desugar_jdk_libs").versionRef("desugar")
             // HTML parsing
             library("jsoup", "org.jsoup", "jsoup").versionRef("jsoup")
-            library("tagsoup", "org.ccil.cowan.tagsoup", "tagsoup").versionRef("tagsoup")
+            library("ksoup-html", "com.mohamedrejeb.ksoup", "ksoup-html").versionRef("ksoup")
+            library("ksoup-entities", "com.mohamedrejeb.ksoup", "ksoup-entites").versionRef("ksoup")
             // RSS
             library("rome", "com.rometools", "rome").versionRef("rome")
             library("rome-modules", "com.rometools", "rome-modules").versionRef("rome")

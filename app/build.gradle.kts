@@ -284,7 +284,8 @@ dependencies {
 
     // HTML parsing
     implementation(libs.jsoup)
-    implementation(libs.tagsoup)
+    implementation(libs.ksoup.html)
+    implementation(libs.ksoup.entities)
     // RSS
     implementation(libs.rome)
     implementation(libs.rome.modules)

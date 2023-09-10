@@ -172,22 +172,26 @@ fun SyndEntry.contentText(): String {
 
             possiblyHtml
         }
+
         else -> // Rss
             description?.value
     }
 
     val result = HtmlToPlainTextConverter().convert(possiblyHtml ?: "")
+        .getOrNull() ?: ""
 
     // Description consists of at least one image, avoid opening browser for this item
     return when {
         result.isBlank() && possiblyHtml?.contains("img") == true ->
             "<image>"
+
         else -> result
     }
 }
 
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
     return HtmlToPlainTextConverter().convert(content?.value ?: fallback ?: "")
+        .getOrNull() ?: ""
 }
 
 fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
@@ -355,6 +359,7 @@ fun SyndEntry.modifiedRFC3339ZonedDateTime(): ZonedDateTime? =
             Instant.ofEpochMilli(updatedDate.time),
             ZoneOffset.systemDefault(),
         )
+
         else -> null
     }
 

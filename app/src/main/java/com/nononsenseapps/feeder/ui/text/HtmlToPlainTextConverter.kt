@@ -1,73 +1,62 @@
 package com.nononsenseapps.feeder.ui.text
 
-import java.io.IOException
-import java.io.StringReader
+import android.util.Log
+import com.mohamedrejeb.ksoup.entities.KsoupEntities
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlOptions
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import com.nononsenseapps.feeder.util.Either
 import java.util.Stack
-import org.ccil.cowan.tagsoup.HTMLSchema
-import org.ccil.cowan.tagsoup.Parser
-import org.xml.sax.Attributes
-import org.xml.sax.ContentHandler
-import org.xml.sax.InputSource
-import org.xml.sax.Locator
-import org.xml.sax.SAXException
-import org.xml.sax.SAXNotRecognizedException
-import org.xml.sax.SAXNotSupportedException
 
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
  */
 @Suppress("UNUSED_PARAMETER")
-class HtmlToPlainTextConverter : ContentHandler {
-    private val parser: Parser = Parser()
+class HtmlToPlainTextConverter : KsoupHtmlHandler {
     private var builder: StringBuilder? = null
     private val listings = Stack<Listing>()
     private var ignoreCount = 0
     private val ignoredTags = listOf("style", "script")
     private var lastImageAlt: String? = null
+    private var inCdata: Boolean = false
 
     private val isOrderedList: Boolean
         get() = !listings.isEmpty() && listings.peek().ordered
 
-    init {
-        try {
-            parser.setProperty(Parser.schemaProperty, HTMLSchema())
-            parser.contentHandler = this
-        } catch (e: SAXNotRecognizedException) {
-            throw RuntimeException(e)
-        } catch (e: SAXNotSupportedException) {
-            throw RuntimeException(e)
-        }
-    }
-
     /**
      * Converts HTML into plain text
      */
-    fun convert(source: String): String {
+    fun convert(source: String): Either<HtmlError, String> {
         this.builder = StringBuilder()
+        this.listings.clear()
+        this.ignoreCount = 0
+        this.lastImageAlt = null
+        val parser = KsoupHtmlParser(
+            handler = this,
+            options = KsoupHtmlOptions(
+                recognizeCDATA = true,
+                decodeEntities = false,
+            ),
+        )
 
-        try {
-            parser.parse(InputSource(StringReader(source)))
-        } catch (e: IOException) {
-            // We are reading from a string. There should not be IO problems.
-            throw RuntimeException(e)
-        } catch (e: SAXException) {
-            // TagSoup doesn't throw parse exceptions.
-            throw RuntimeException(e)
+        return Either.catching(
+            onCatch = {
+                Log.e(LOG_TAG, "Failed to convert to plain text", it)
+                HtmlError(it)
+            },
+        ) {
+            parser.write(source)
         }
-
-        // Replace non-breaking space (160) with normal space
-        return builder!!.toString().replace(160.toChar(), ' ').trim { it <= ' ' }
+            .onEither {
+                parser.end()
+            }
+            .map {
+                // Replace non-breaking space (160) with normal space
+                builder!!.toString().replace(160.toChar(), ' ').trim { it <= ' ' }
+            }
     }
 
-    override fun setDocumentLocator(locator: Locator) {
-    }
-
-    @Throws(SAXException::class)
-    override fun startDocument() {
-    }
-
-    @Throws(SAXException::class)
-    override fun endDocument() {
+    override fun onEnd() {
         // See test mentioning XKCD
         if (builder?.isEmpty() == true) {
             lastImageAlt?.let {
@@ -76,25 +65,17 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    @Throws(SAXException::class)
-    override fun startPrefixMapping(prefix: String, uri: String) {
+    override fun onOpenTag(name: String, attributes: Map<String, String>, isImplied: Boolean) {
+        handleStartTag(name, attributes)
     }
 
-    @Throws(SAXException::class)
-    override fun endPrefixMapping(prefix: String) {
-    }
-
-    @Throws(SAXException::class)
-    override fun startElement(uri: String, localName: String, qName: String, attributes: Attributes) {
-        handleStartTag(localName, attributes)
-    }
-
-    private fun handleStartTag(tag: String, attributes: Attributes) {
+    private fun handleStartTag(tag: String, attributes: Map<String, String>) {
         when {
             tag.equals("br", ignoreCase = true) -> {
-                // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
+                // We don't need to handle this. Soup will ensure that there's a </br> for each <br>
                 // so we can safely emit the linebreaks when we handle the close tag.
             }
+
             tag.equals("p", ignoreCase = true) -> ensureSpace(builder)
             tag.equals("div", ignoreCase = true) -> ensureSpace(builder)
             tag.equals("strong", ignoreCase = true) -> strong(builder)
@@ -108,6 +89,7 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.length == 2 &&
                 Character.toLowerCase(tag[0]) == 'h' &&
                 tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+
             tag.equals("ul", ignoreCase = true) -> startUl(builder)
             tag.equals("ol", ignoreCase = true) -> startOl(builder)
             tag.equals("li", ignoreCase = true) -> startLi(builder)
@@ -116,11 +98,11 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    private fun startImg(text: StringBuilder?, attributes: Attributes) {
+    private fun startImg(text: StringBuilder?, attributes: Map<String, String>) {
         // Ensure whitespace
         ensureSpace(text)
 
-        lastImageAlt = attributes.getValue("", "alt").orEmpty().ifBlank { "IMG" }
+        lastImageAlt = attributes.getOrDefault("alt", "").ifBlank { "IMG" }
     }
 
     private fun startOl(text: StringBuilder?) {
@@ -172,13 +154,12 @@ class HtmlToPlainTextConverter : ContentHandler {
         listings.pop()
     }
 
-    private fun startA(builder: StringBuilder?, attributes: Attributes) {}
+    private fun startA(builder: StringBuilder?, attributes: Map<String, String>) {}
 
     private fun endA(builder: StringBuilder?) {}
 
-    @Throws(SAXException::class)
-    override fun endElement(uri: String, localName: String, qName: String) {
-        handleEndTag(localName)
+    override fun onCloseTag(name: String, isImplied: Boolean) {
+        handleEndTag(name)
     }
 
     private fun handleEndTag(tag: String) {
@@ -197,6 +178,7 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.length == 2 &&
                 Character.toLowerCase(tag[0]) == 'h' &&
                 tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+
             tag.equals("ul", ignoreCase = true) -> endUl(builder)
             tag.equals("ol", ignoreCase = true) -> endOl(builder)
             tag.equals("li", ignoreCase = true) -> endLi(builder)
@@ -220,8 +202,15 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    @Throws(SAXException::class)
-    override fun characters(ch: CharArray, start: Int, length: Int) {
+    override fun onCDataStart() {
+        inCdata = true
+    }
+
+    override fun onCDataEnd() {
+        inCdata = false
+    }
+
+    override fun onText(text: String) {
         if (ignoreCount > 0) {
             return
         }
@@ -234,10 +223,11 @@ class HtmlToPlainTextConverter : ContentHandler {
          *
          * TODO handle non-breaking space (character 160)
          */
-
-        for (i in 0 until length) {
-            val c = ch[i + start]
-
+        val textToRead = when (inCdata) {
+            true -> text
+            else -> KsoupEntities.decodeHtml(text)
+        }
+        for (c in textToRead) {
             if (c == ' ' || c == '\n') {
                 var len = sb.length
 
@@ -264,36 +254,6 @@ class HtmlToPlainTextConverter : ContentHandler {
         builder!!.append(sb)
     }
 
-    @Throws(SAXException::class)
-    override fun ignorableWhitespace(ch: CharArray, start: Int, length: Int) {
-    }
-
-    @Throws(SAXException::class)
-    override fun processingInstruction(target: String, data: String) {
-    }
-
-    @Throws(SAXException::class)
-    override fun skippedEntity(name: String) {
-    }
-
-    private class Bold
-
-    private class Italic
-
-    private class Underline
-
-    private class Big
-
-    private class Small
-
-    private class Monospace
-
-    private class Blockquote
-
-    private class Super
-
-    private class Sub
-
     class Listing(var ordered: Boolean) {
         var number: Int = 0
 
@@ -302,19 +262,9 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    private open class Bullet
-
-    private class CountBullet : Bullet()
-
-    private class Pre
-
-    private class Code
-
-    private class Font(var mColor: String, var mFace: String?)
-
-    private class Href(var mHref: String?)
-
-    private class Header(var mLevel: Int)
+    companion object {
+        private const val LOG_TAG = "FEEDER_HTMLTOPLAIN"
+    }
 }
 
 fun repeated(string: String, count: Int): String {
@@ -326,3 +276,5 @@ fun repeated(string: String, count: Int): String {
 
     return sb.toString()
 }
+
+data class HtmlError(val throwable: Throwable)

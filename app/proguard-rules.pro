@@ -31,8 +31,8 @@
 # Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.
 -dontwarn org.codehaus.mojo.animal_sniffer.*
 
-# For TagSoup
--keep class org.ccil.cowan.tagsoup.** { *; }
+# For Ksoup
+-keep class com.mohamedrejeb.ksoup.** { *; }
 
 # For Jsoup
 -keep class org.jsoup.**  { *; }

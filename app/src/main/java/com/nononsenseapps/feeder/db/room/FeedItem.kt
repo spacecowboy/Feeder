@@ -70,21 +70,36 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
     @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
     @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-    @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) override var pubDate: ZonedDateTime? = null,
+    @ColumnInfo(
+        name = COL_PUBDATE,
+        typeAffinity = ColumnInfo.TEXT,
+    ) override var pubDate: ZonedDateTime? = null,
     @ColumnInfo(name = COL_LINK) override var link: String? = null,
-    @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.", replaceWith = ReplaceWith("readTime"))
+    @Deprecated(
+        "This column has been 'removed' but sqlite doesn't support drop column.",
+        replaceWith = ReplaceWith("readTime"),
+    )
     @ColumnInfo(name = "unread")
     var oldUnread: Boolean = true,
     @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-    @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) override var primarySortTime: Instant = Instant.EPOCH,
+    @ColumnInfo(
+        name = COL_FIRSTSYNCEDTIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) var firstSyncedTime: Instant = Instant.EPOCH,
+    @ColumnInfo(
+        name = COL_PRIMARYSORTTIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) override var primarySortTime: Instant = Instant.EPOCH,
     @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.")
     @ColumnInfo(name = "pinned")
     var oldPinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
     @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
-    @ColumnInfo(name = COL_READ_TIME, typeAffinity = ColumnInfo.INTEGER) var readTime: Instant? = null,
+    @ColumnInfo(
+        name = COL_READ_TIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) var readTime: Instant? = null,
 ) : FeedItemForFetching, FeedItemCursor {
 
     constructor() : this(id = ID_UNSET)
@@ -101,8 +116,11 @@ data class FeedItem @Ignore constructor(
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
         val summary: String = (
-            entry.summary ?: entry.content_text
+            entry.summary
+                ?: entry.content_text
                 ?: converter.convert(text)
+                    .getOrNull()
+                ?: ""
             ).take(MAX_SNIPPET_LENGTH)
 
         // Make double sure no base64 images are used as thumbnails
@@ -115,6 +133,7 @@ data class FeedItem @Ignore constructor(
             feed.feed_url != null && safeImage != null -> {
                 relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
             }
+
             else -> safeImage
         }
 

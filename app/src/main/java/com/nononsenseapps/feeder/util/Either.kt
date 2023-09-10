@@ -236,6 +236,14 @@ sealed class Either<out A, out B> {
         return also { if (it.isLeft()) action(it.value) }
     }
 
+    inline fun onEither(action: () -> Unit): Either<A, B> {
+        contract {
+            callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+        }
+        action()
+        return this
+    }
+
     /**
      * Returns the unwrapped value [B] of [Either.Right] or `null` if it is [Either.Left].
      *
