@@ -52,15 +52,15 @@
     <string name="sync_option_every_12_hours">每 12 小时</string>
     <string name="sync_option_every_day">每天</string>
     <string name="synchronization">同步</string>
-    <string name="only_on_wifi">仅通过 WiFi</string>
+    <string name="only_on_wifi">仅在连接 WiFi 时</string>
     <string name="show_thumbnails">显示缩略图</string>
     <string name="may_result_data_charges">可能产生移动数据费用。</string>
     <string name="only_when_charging">仅在充电时</string>
     <string name="image_loading">图片加载</string>
     <string name="no_activity_for_link">无法找到打开该链接的应用</string>
     <string name="check_for_updates">查找新文章频率</string>
-    <string name="on_startup">启动时</string>
-    <string name="show_fab">显示浮动操作按钮</string>
+    <string name="on_startup">在程序启动时</string>
+    <string name="show_fab">显示悬浮操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
     <string name="updated_feeds">更新订阅</string>
     <string name="notification_channel_name">未读订阅</string>
@@ -129,7 +129,7 @@
     <string name="feed_item_style_compact">紧凑</string>
     <string name="feed_item_style_card">卡片</string>
     <string name="feed_item_style">文章样式</string>
-    <string name="dark_theme_preference_black">黑色</string>
+    <string name="dark_theme_preference_black">黑色（AMOLED）</string>
     <string name="dark_theme_preference_dark">深色</string>
     <string name="dark_theme_preference">夜间主题偏好</string>
     <string name="generate_extra_unique_ids">生成附加的唯一 ID</string>
