@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.COL_LASTSYNC
 import com.nononsenseapps.feeder.db.COL_NOTIFY
 import com.nononsenseapps.feeder.db.COL_OPEN_ARTICLES_WITH
 import com.nononsenseapps.feeder.db.COL_RESPONSEHASH
+import com.nononsenseapps.feeder.db.COL_SITE_FETCHED
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -50,6 +51,7 @@ data class Feed @Ignore constructor(
     @ColumnInfo(name = COL_CURRENTLY_SYNCING) var currentlySyncing: Boolean = false,
     // Only update this field when user modifies the feed
     @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
+    @ColumnInfo(name = COL_SITE_FETCHED) var siteFetched: Instant = Instant.EPOCH,
 ) {
     constructor() : this(id = ID_UNSET)
 

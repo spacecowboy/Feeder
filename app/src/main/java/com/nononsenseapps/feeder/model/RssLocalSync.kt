@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Item
 import java.io.IOException
+import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
@@ -259,6 +260,26 @@ class RssLocalSync(override val di: DI) : DIAware {
                         blobOutputStream(feedItem.id, filePathProvider.articleDir).bufferedWriter()
                             .use {
                                 it.write(text)
+                            }
+                    }
+                }
+                // Try to look for image if not done before
+                if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
+                    val siteUrl = try {
+                        URL(feed.home_page_url)
+                    } catch (e: Throwable) {
+                        logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
+                        null
+                    }
+                    if (siteUrl != null) {
+                        feedSql.siteFetched = Instant.now()
+                        feedParser.getSiteMetaData(siteUrl)
+                            .onRight { metadata ->
+                                try {
+                                    feedSql.imageUrl = URL(metadata.feedImage)
+                                } catch (e: Throwable) {
+                                    logDebug(LOG_TAG, "Bad feedImage url: ${feed.home_page_url}", e)
+                                }
                             }
                     }
                 }
