@@ -37,10 +37,12 @@ else
   NEXT_CODE="${next_code_in}"
 fi
 
+# Get rid of these to make the build reproducible
+ci/delete-unwanted-langs
+
 read -r -p "Update locales_config.xml? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  ci/delete-unwanted-langs
   ./gradlew --no-configuration-cache :app:generateLocalesConfig
   git add app/src/main/res/xml/locales_config.xml
 fi
