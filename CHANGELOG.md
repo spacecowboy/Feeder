@@ -1,3 +1,12 @@
+# 2.6.3
+Jonas Kalderstam (2):
+  * [77ec797b] Changed so sync will try to fetch the favicon of a site if no
+         feed image (one time only)
+  * [57d86668] Made builds reproducible
+
+YGXB_net (1):
+  * [278355d1] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.2
 Axus Wizix (1):
   * [ec5281aa] Updated Russian translation using Weblate
