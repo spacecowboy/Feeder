@@ -68,6 +68,7 @@ fun AddFeedView(
     screenType: ScreenType,
     categories: ImmutableHolder<List<CategoryToggle>>,
     feedSuggestions: ImmutableHolder<List<FeedSuggestion>>,
+    modifier: Modifier = Modifier,
 ) {
     val localDimens = LocalDimens.current
     Column(
