@@ -2,31 +2,48 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Terrain
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,28 +85,85 @@ fun AddFeedView(
     screenType: ScreenType,
     categories: ImmutableHolder<List<CategoryToggle>>,
     feedSuggestions: ImmutableHolder<List<FeedSuggestion>>,
+    showCategorySheet: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val localDimens = LocalDimens.current
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .then(modifier),
     ) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            categories.item.forEach { category ->
-                FilterChip(
-                    selected = category.selected,
-                    onClick = { /*TODO*/ },
-                    label = {
-                        Text(category.title)
-                    },
+        ScreenSpecificSearchBar(
+            screenType = screenType,
+            query = "",
+            onQueryChange = {},
+            onSearch = {},
+            active = true,
+            onActiveChange = {},
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
                 )
+            },
+            trailingIcon = {
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = null,
+                )
+            },
+            placeholder = { Text("Search feeds, categories") },
+        ) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                item {
+                    InputChip(
+                        selected = false,
+                        onClick = { /*TODO*/ },
+                        label = { Text("Categories") },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.ExpandMore,
+                                contentDescription = null,
+                            )
+                        },
+                    )
+                }
+                item {
+                    InputChip(
+                        selected = false,
+                        onClick = { /*TODO*/ },
+                        label = { Text("Languages") },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.ExpandMore,
+                                contentDescription = null,
+                            )
+                        },
+                    )
+                }
             }
         }
+//        FlowRow(
+//            horizontalArrangement = Arrangement.spacedBy(8.dp),
+//            verticalAlignment = Alignment.CenterVertically,
+//        ) {
+//            categories.item.forEach { category ->
+//                FilterChip(
+//                    selected = category.selected,
+//                    onClick = { /*TODO*/ },
+//                    label = {
+//                        Text(category.title)
+//                    },
+//                )
+//            }
+//        }
 //        LazyRow(
 //            horizontalArrangement = Arrangement.spacedBy(8.dp),
 //            verticalAlignment = Alignment.CenterVertically,
@@ -134,6 +208,61 @@ fun AddFeedView(
                 )
             }
         }
+        AnimatedVisibility(visible = showCategorySheet) {
+            CategorySheet(
+                categories = categories,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScreenSpecificSearchBar(
+    screenType: ScreenType,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    active: Boolean,
+    onActiveChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    when (screenType) {
+        ScreenType.DUAL -> DockedSearchBar(
+            query = query,
+            onQueryChange = onQueryChange,
+            onSearch = onSearch,
+            active = active,
+            onActiveChange = onActiveChange,
+            modifier = modifier,
+            enabled = enabled,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            interactionSource = interactionSource,
+            content = content,
+        )
+
+        ScreenType.SINGLE -> SearchBar(
+            query = query,
+            onQueryChange = onQueryChange,
+            onSearch = onSearch,
+            active = active,
+            onActiveChange = onActiveChange,
+            modifier = modifier,
+            enabled = enabled,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            interactionSource = interactionSource,
+            content = content,
+        )
     }
 }
 
@@ -213,8 +342,70 @@ fun FeedSuggestionCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategorySheet(
+    categories: ImmutableHolder<List<CategoryToggle>>,
+    modifier: Modifier = Modifier,
+) {
+    ModalBottomSheet(
+        dragHandle = null,
+        sheetState = SheetState(
+            skipPartiallyExpanded = true,
+            initialValue = SheetValue.Expanded,
+        ),
+        onDismissRequest = { /*TODO*/ },
+        modifier = modifier,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(16.dp),
+        ) {
+            Icon(
+                Icons.Default.Close,
+                null,
+            )
+            Text("Categories")
+        }
+        LazyColumn {
+            items(
+                categories.item,
+                key = { it.title },
+            ) {
+                CategoryFilterToggle(it)
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryFilterToggle(
+    categoryToggle: CategoryToggle,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .then(modifier),
+    ) {
+        Text(
+            categoryToggle.title,
+            modifier = Modifier.weight(1f),
+        )
+        Checkbox(
+            checked = categoryToggle.selected,
+            onCheckedChange = {},
+        )
+    }
+}
+
 @Immutable
 data class CategoryToggle(
+    // TODO have an english "title-id" and a localspecific title
     val title: String,
     val selected: Boolean,
 )
@@ -435,50 +626,6 @@ private fun previewCategories() = ImmutableHolder(
 )
 
 @Preview(
-    name = "Feed Suggestion",
-    showSystemUi = true,
-    device = Devices.NEXUS_5,
-    uiMode = UI_MODE_NIGHT_NO,
-)
-@Composable
-fun PreviewFeedSuggestionCard() {
-    FeederTheme {
-        Surface {
-            FeedSuggestionCard(
-                FeedSuggestion(
-                    title = "Coding Horror",
-                    subtitle = "programming and human factors",
-                    url = URL("https://feeds.feedburner.com/codinghorror"),
-                    image = URL("https://blog.codinghorror.com/favicon.png"),
-                    language = "english",
-                    category = "Programming",
-                    tags = emptySet(),
-                ),
-            )
-        }
-    }
-}
-
-@Preview(
-    name = "Add Screen Phone",
-    showSystemUi = true,
-    device = Devices.NEXUS_5,
-    uiMode = UI_MODE_NIGHT_NO,
-)
-@Composable
-fun PreviewAddScreenPhone() {
-    FeederTheme {
-        Surface {
-            AddFeedView(
-                screenType = ScreenType.SINGLE,
-                categories = previewCategories(),
-                feedSuggestions = previewItems(),
-            )
-        }
-    }
-}
-
-@Preview(
     name = "Add Screen Foldable",
     showSystemUi = true,
     device = Devices.FOLDABLE,
@@ -498,6 +645,67 @@ fun PreviewAddScreenLarge() {
                 screenType = ScreenType.DUAL,
                 categories = previewCategories(),
                 feedSuggestions = previewItems(),
+                showCategorySheet = false,
+            )
+        }
+    }
+}
+
+@Preview(
+    showSystemUi = true,
+    device = Devices.NEXUS_5,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun PreviewAddScreenPhone() {
+    FeederTheme {
+        Surface {
+            AddFeedView(
+                screenType = ScreenType.SINGLE,
+                categories = previewCategories(),
+                feedSuggestions = previewItems(),
+                showCategorySheet = false,
+            )
+        }
+    }
+}
+
+@Preview(
+    showSystemUi = true,
+    device = Devices.NEXUS_5,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun PreviewCategorySheet() {
+    FeederTheme {
+        Surface {
+            CategorySheet(
+                previewCategories(),
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Feed Suggestion",
+    showSystemUi = true,
+    device = Devices.NEXUS_5,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun PreviewFeedSuggestionCard() {
+    FeederTheme {
+        Surface {
+            FeedSuggestionCard(
+                FeedSuggestion(
+                    title = "Coding Horror",
+                    subtitle = "programming and human factors",
+                    url = URL("https://feeds.feedburner.com/codinghorror"),
+                    image = URL("https://blog.codinghorror.com/favicon.png"),
+                    language = "english",
+                    category = "Programming",
+                    tags = emptySet(),
+                ),
             )
         }
     }
