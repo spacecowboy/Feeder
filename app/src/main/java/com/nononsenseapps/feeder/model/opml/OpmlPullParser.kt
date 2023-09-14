@@ -200,12 +200,10 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     private fun readOutline(parser: XmlPullParser, parentOutlineTag: String) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
-        val type by this
         val xmlUrl by this
         when {
-            type == "rss" || xmlUrl != null -> readOutlineAsRss(parser, tag = parentOutlineTag)
-            type == null -> readOutlineAsTag()
-            else -> skip()
+            xmlUrl != null -> readOutlineAsRss(parser, tag = parentOutlineTag)
+            else -> readOutlineAsTag()
         }
     }
 
