@@ -214,4 +214,17 @@
     <string name="show_only_title">Hanya tampilkan judul</string>
     <string name="article_list_settings">Daftar artikel</string>
     <string name="theme_e_ink">Kertas elektronik</string>
+    <string name="failed_to_parse_json_feed">Gagal membuka umpan JSON</string>
+    <string name="failed_to_parse_full_article">Gagal membuka keseluruhan artikel</string>
+    <string name="filter_noun">Filter</string>
+    <string name="recently_read_adjective">Baru saja dibaca</string>
+    <string name="no_feeds_in_the_page">Tidak ada umpan dalam halaman</string>
+    <string name="no_body_in_response">Tidak ada isi dalam respons</string>
+    <string name="http_error">Galat HTTP</string>
+    <string name="no_url">Tidak ada URL</string>
+    <string name="failed_to_parse_the_page">Gagal membuka halaman</string>
+    <string name="failed_to_parse_rss_feed">Gagal membuka umpan RSS</string>
+    <string name="unsupported_content_type">Tipe konten tidak didukung</string>
+    <string name="failed_to_download">Gagal mengunduh</string>
+    <string name="content_is_not_html">Konten bukan HTML</string>
 </resources>
