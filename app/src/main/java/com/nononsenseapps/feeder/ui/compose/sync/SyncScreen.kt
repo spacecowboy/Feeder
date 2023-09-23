@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.sync
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -94,6 +95,8 @@ import java.net.URL
 import java.net.URLDecoder
 import net.glxn.qrgen.android.QRCode
 import net.glxn.qrgen.core.scheme.Url
+
+private const val LOG_TAG = "FEEDER_SYNCSCREEN"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -614,7 +617,12 @@ internal val String.secretKeyQueryParam
         .let {
             // Deeplinks are already decoded - but not if you scan a QR code
             if ("%3A" in it) {
-                URLDecoder.decode(it, "UTF-8")
+                try {
+                    URLDecoder.decode(it, "UTF-8")
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Failed to decode secret key", e)
+                    it
+                }
             } else {
                 it
             }
