@@ -53,7 +53,6 @@ dependencyResolutionManagement {
             // Compose related below
             version("compose", "2023.06.01")
             val activityCompose = "1.7.0"
-            version("activityCompose", activityCompose)
             version("paging", "3.1.1")
             version("pagingCompose", "1.0.0-alpha20")
             version("accompanist", "0.30.1")

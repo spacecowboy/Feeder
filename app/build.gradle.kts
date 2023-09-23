@@ -20,11 +20,12 @@ class RoomSchemaArgProvider(
 
 android {
     namespace = "com.nononsenseapps.feeder"
+    compileSdk = 33
+
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
         versionCode = 287
         versionName = "2.6.3"
-        compileSdk = 33
         minSdk = 23
         targetSdk = 33
 
