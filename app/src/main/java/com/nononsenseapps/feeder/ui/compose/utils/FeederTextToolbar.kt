@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
+import android.util.Log
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -20,8 +21,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 
+private const val LOG_TAG = "FEEDER_TEXTTOOL"
+
 @Composable
-fun withFeederTextToolbar(content: @Composable () -> Unit) {
+fun WithFeederTextToolbar(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalTextToolbar provides FeederTextToolbar(LocalView.current)) {
         content()
     }
@@ -49,7 +52,7 @@ class FeederTextToolbar(private val view: View) : TextToolbar {
         onCopyRequested: (() -> Unit)?,
         onPasteRequested: (() -> Unit)?,
         onCutRequested: (() -> Unit)?,
-        onSelectAllRequested: (() -> Unit)?
+        onSelectAllRequested: (() -> Unit)?,
     ) {
         textActionModeCallback.rect = rect
         textActionModeCallback.onCopyRequested = onCopyRequested
@@ -75,7 +78,7 @@ class FeederTextActionModeCallback(
     var onCopyRequested: (() -> Unit)? = null,
     var onPasteRequested: (() -> Unit)? = null,
     var onCutRequested: (() -> Unit)? = null,
-    var onSelectAllRequested: (() -> Unit)? = null
+    var onSelectAllRequested: (() -> Unit)? = null,
 ) : ActionMode.Callback {
     private val displayNameComparator by lazy {
         ResolveInfo.DisplayNameComparator(packageManager)
@@ -145,7 +148,13 @@ class FeederTextActionModeCallback(
                     }
                 }
 
-                prevClip?.let { clipboardManager.setPrimaryClip(it) }
+                try {
+                    prevClip?.let { clipboardManager.setPrimaryClip(it) }
+                } catch (e: Exception) {
+                    // This can crash if the content contains a fileUri for example
+                    // android.os.FileUriExposedException: file:/// exposed beyond app through ClipData.Item.getUri()
+                    Log.e(LOG_TAG, "Resetting clipboard failed", e)
+                }
             }
         }
         mode?.finish()
@@ -207,7 +216,7 @@ class FeederTextActionModeCallback(
     private fun addOrRemoveMenuItem(
         menu: Menu,
         item: MenuItemOption,
-        callback: (() -> Unit)?
+        callback: (() -> Unit)?,
     ) {
         when {
             callback != null && menu.findItem(item.id) == null -> addMenuItem(menu, item)
@@ -220,7 +229,8 @@ internal enum class MenuItemOption(val id: Int) {
     Copy(0),
     Paste(1),
     Cut(2),
-    SelectAll(3);
+    SelectAll(3),
+    ;
 
     val titleResource: Int
         get() = when (this) {
@@ -237,7 +247,7 @@ internal enum class MenuItemOption(val id: Int) {
 }
 
 internal class FloatingTextActionModeCallback(
-    private val callback: FeederTextActionModeCallback
+    private val callback: FeederTextActionModeCallback,
 ) : ActionMode.Callback2() {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return callback.onActionItemClicked(mode, item)
@@ -258,7 +268,7 @@ internal class FloatingTextActionModeCallback(
     override fun onGetContentRect(
         mode: ActionMode?,
         view: View?,
-        outRect: android.graphics.Rect?
+        outRect: android.graphics.Rect?,
     ) {
         val rect = callback.rect
         outRect?.set(
