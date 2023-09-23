@@ -137,6 +137,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
+import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.openLinkInBrowser
@@ -148,6 +149,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
+import org.kodein.di.compose.instance
 import org.kodein.di.instance
 
 private const val LOG_TAG = "FEEDER_FEEDSCREEN"
@@ -162,6 +164,7 @@ fun FeedScreen(
     viewModel: FeedArticleViewModel,
     navDrawerListState: LazyListState,
 ) {
+    val toastMaker: ToastMaker by instance()
     val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
 
@@ -293,20 +296,36 @@ fun FeedScreen(
                 context.startActivity(emailBugReportIntent())
             },
             onImport = {
-                opmlImporter.launch(
-                    arrayOf(
-                        // All valid for OPML files
-                        "text/xml",
-                        "text/x-opml",
-                        "application/xml",
-                        // This is the mimetype the file actually gets when exported
-                        "application/octet-stream",
-                        // But just in case a file isn't named right etc, accept all
-                        "*/*",
-                    ),
-                )
+                try {
+                    opmlImporter.launch(
+                        arrayOf(
+                            // All valid for OPML files
+                            "text/xml",
+                            "text/x-opml",
+                            "application/xml",
+                            // This is the mimetype the file actually gets when exported
+                            "application/octet-stream",
+                            // But just in case a file isn't named right etc, accept all
+                            "*/*",
+                        ),
+                    )
+                } catch (e: Exception) {
+                    // ActivityNotFoundException in particular
+                    coroutineScope.launch {
+                        toastMaker.makeToast(R.string.failed_to_import_OPML)
+                    }
+                }
             },
-            onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
+            onExport = {
+                try {
+                    opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml")
+                } catch (e: Exception) {
+                    // ActivityNotFoundException in particular
+                    coroutineScope.launch {
+                        toastMaker.makeToast(R.string.failed_to_export_OPML)
+                    }
+                }
+            },
             drawerState = drawerState,
             markAsUnread = { itemId, unread, feedOrTag ->
                 if (unread) {
