@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.nononsenseapps.feeder.util.Either
@@ -20,6 +21,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.MediaType
@@ -470,90 +472,99 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
     }
 }
 
-sealed class FeedParserError {
+@Parcelize
+sealed class FeedParserError : Parcelable {
     abstract val url: String
     abstract val description: String
     abstract val throwable: Throwable?
 }
 
-object NotInitializedYet : FeedParserError() {
-    override val url: String = ""
-    override val description: String = ""
-    override val throwable: Throwable? = null
-}
+/*
+ * Data object would be ideal for this
+ */
+@Parcelize
+data class NotInitializedYet(
+    override val url: String = "",
+    override val description: String = "",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
-data class FetchError(override val url: String, override val throwable: Throwable?) :
-    FeedParserError() {
-    override val description: String = throwable?.message ?: ""
-}
+@Parcelize
+data class FetchError(
+    override val url: String,
+    override val throwable: Throwable?,
+    override val description: String = throwable?.message ?: "",
+) : FeedParserError()
 
-data class NotHTML(override val url: String) : FeedParserError() {
-    override val description: String = ""
-    override val throwable: Throwable? = null
-}
+@Parcelize
+data class NotHTML(
+    override val url: String,
+    override val description: String = "",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class MetaDataParseError(
     override val url: String,
     override val throwable: Throwable?,
-) : FeedParserError() {
-    override val description: String = throwable?.message ?: ""
-}
+    override val description: String = throwable?.message ?: "",
+) : FeedParserError()
 
+@Parcelize
 data class RSSParseError(
     override val throwable: Throwable?,
     override val url: String,
-) : FeedParserError() {
-    override val description: String = throwable?.message ?: ""
-}
+    override val description: String = throwable?.message ?: "",
+) : FeedParserError()
 
+@Parcelize
 data class JsonFeedParseError(
     override val throwable: Throwable?,
     override val url: String,
-) : FeedParserError() {
-    override val description: String = throwable?.message ?: ""
-}
+    override val description: String = throwable?.message ?: "",
+) : FeedParserError()
 
-data class NoAlternateFeeds(override val url: String) : FeedParserError() {
-    override val description: String = ""
-    override val throwable: Throwable? = null
-}
+@Parcelize
+data class NoAlternateFeeds(
+    override val url: String,
+    override val description: String = "",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class HttpError(
     override val url: String,
     val code: Int,
     val message: String,
-) : FeedParserError() {
-    override val description: String = "$code: $message"
-    override val throwable: Throwable? = null
-}
+    override val description: String = "$code: $message",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class UnsupportedContentType(
     override val url: String,
     val mimeType: String,
-) :
-    FeedParserError() {
-    override val description: String = mimeType
-    override val throwable: Throwable? = null
-}
+    override val description: String = mimeType,
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class NoBody(
     override val url: String,
-) :
-    FeedParserError() {
-    override val description: String = ""
-    override val throwable: Throwable? = null
-}
+    override val description: String = "",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class NoUrl(
     override val description: String = "",
-) : FeedParserError() {
-    override val url: String = ""
-    override val throwable: Throwable? = null
-}
+    override val url: String = "",
+    override val throwable: Throwable? = null,
+) : FeedParserError()
 
+@Parcelize
 data class FullTextDecodingFailure(
     override val url: String,
     override val throwable: Throwable?,
-) : FeedParserError() {
-    override val description: String = throwable?.message ?: ""
-}
+    override val description: String = throwable?.message ?: "",
+) : FeedParserError()
