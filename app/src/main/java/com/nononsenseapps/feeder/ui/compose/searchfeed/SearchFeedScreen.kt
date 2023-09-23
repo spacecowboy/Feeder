@@ -396,7 +396,7 @@ fun ColumnScope.rightContent(
                 is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
                 is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
                 is NotHTML -> stringResource(R.string.content_is_not_html)
-                NotInitializedYet -> "Not initialized yet" // Should never happen
+                is NotInitializedYet -> "Not initialized yet" // Should never happen
                 is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
                 is HttpError -> stringResource(R.string.http_error)
                 is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)

@@ -26,7 +26,7 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
-            NotInitializedYet,
+            NotInitializedYet(),
         ),
     )
 
