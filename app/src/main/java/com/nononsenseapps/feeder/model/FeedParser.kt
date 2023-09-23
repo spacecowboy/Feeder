@@ -418,12 +418,22 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
             "text" -> {
                 when (contentType.subtype) {
                     "plain", "html" -> {
-                        it.body?.let { body -> Either.Right(body.string()) }
-                            ?: Either.Left(
-                                NoBody(
-                                    url = url.toString(),
-                                ),
-                            )
+                        it.body?.let { body ->
+                            Either.catching(
+                                onCatch = { throwable ->
+                                    FetchError(
+                                        throwable = throwable,
+                                        url = url.toString(),
+                                    )
+                                },
+                            ) {
+                                body.string()
+                            }
+                        } ?: Either.Left(
+                            NoBody(
+                                url = url.toString(),
+                            ),
+                        )
                     }
 
                     else -> Either.Left(
