@@ -410,7 +410,16 @@ fun ColumnScope.rightContent(
                 title = title,
                 description = error.description,
                 url = error.url,
-            )
+            ) {
+                onClick(
+                    SearchResult(
+                        title = error.url,
+                        url = error.url,
+                        description = "",
+                        feedImage = "",
+                    ),
+                )
+            }
         }
     }
     for (result in results.item) {
@@ -489,6 +498,7 @@ fun ErrorResultView(
     description: String,
     url: String,
     modifier: Modifier = Modifier,
+    onAddAnyway: () -> Unit,
 ) {
     val dimens = LocalDimens.current
 
@@ -518,6 +528,9 @@ fun ErrorResultView(
                 description,
                 style = MaterialTheme.typography.bodyMedium,
             )
+            OutlinedButton(onClick = onAddAnyway) {
+                Text(stringResource(id = R.string.add_anyway))
+            }
         }
     }
 }

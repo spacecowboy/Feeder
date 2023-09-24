@@ -16,7 +16,8 @@ fun cachingHttpClient(
     cacheSize: Long = 10L * 1024L * 1024L,
     trustAllCerts: Boolean = true,
     connectTimeoutSecs: Long = 30L,
-    readTimeoutSecs: Long = 30L
+    readTimeoutSecs: Long = 30L,
+    block: (OkHttpClient.Builder.() -> Unit)? = null,
 ): OkHttpClient {
     val builder: OkHttpClient.Builder = OkHttpClient.Builder()
 
@@ -33,6 +34,10 @@ fun cachingHttpClient(
         builder.trustAllCerts()
     }
 
+    block?.let {
+        builder.block()
+    }
+
     return builder.build()
 }
 
@@ -45,7 +50,7 @@ fun feedAdapter(): JsonAdapter<Feed> =
  */
 class JsonFeedParser(
     private val httpClient: OkHttpClient,
-    private val jsonFeedAdapter: JsonAdapter<Feed>
+    private val jsonFeedAdapter: JsonAdapter<Feed>,
 ) {
 
     constructor(
@@ -53,16 +58,16 @@ class JsonFeedParser(
         cacheSize: Long = 10L * 1024L * 1024L,
         trustAllCerts: Boolean = true,
         connectTimeoutSecs: Long = 5L,
-        readTimeoutSecs: Long = 5L
+        readTimeoutSecs: Long = 5L,
     ) : this(
         cachingHttpClient(
             cacheDirectory = cacheDirectory,
             cacheSize = cacheSize,
             trustAllCerts = trustAllCerts,
             connectTimeoutSecs = connectTimeoutSecs,
-            readTimeoutSecs = readTimeoutSecs
+            readTimeoutSecs = readTimeoutSecs,
         ),
-        feedAdapter()
+        feedAdapter(),
     )
 
     /**
@@ -77,7 +82,7 @@ class JsonFeedParser(
         } catch (error: Throwable) {
             throw IllegalArgumentException(
                 "Bad URL. Perhaps it is missing an http:// prefix?",
-                error
+                error,
             )
         }
 
@@ -95,11 +100,13 @@ class JsonFeedParser(
                         contentType.subtype.contains("json") -> {
                             parseJson(body)
                         }
+
                         else -> {
                             throw IOException("Incorrect subtype: ${contentType.type}/${contentType.subtype}")
                         }
                     }
                 }
+
                 else -> {
                     throw IOException("Incorrect type: ${contentType?.type}/${contentType?.subtype}")
                 }
@@ -133,13 +140,13 @@ data class Feed(
     val author: Author? = null,
     val expired: Boolean? = null,
     val hubs: List<Hub>? = null,
-    val items: List<Item>?
+    val items: List<Item>?,
 )
 
 data class Author(
     val name: String? = null,
     val url: String? = null,
-    val avatar: String? = null
+    val avatar: String? = null,
 )
 
 data class Item(
@@ -156,7 +163,7 @@ data class Item(
     val date_modified: String? = null,
     val author: Author? = null,
     val tags: List<String>? = null,
-    val attachments: List<Attachment>? = null
+    val attachments: List<Attachment>? = null,
 )
 
 data class Attachment(
@@ -164,10 +171,10 @@ data class Attachment(
     val mime_type: String? = null,
     val title: String? = null,
     val size_in_bytes: Long? = null,
-    val duration_in_seconds: Long? = null
+    val duration_in_seconds: Long? = null,
 )
 
 data class Hub(
     val type: String?,
-    val url: String?
+    val url: String?,
 )

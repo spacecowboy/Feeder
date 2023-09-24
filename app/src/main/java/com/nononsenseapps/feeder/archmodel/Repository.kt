@@ -257,7 +257,6 @@ class Repository(override val di: DI) : DIAware {
             filter = feedListFilter,
         )
     }.flatMapLatest {
-        logDebug("JONAS", "DAMP $it")
         feedItemStore.getPagedFeedItemsRaw(
             feedId = it.feedId,
             tag = it.tag,
@@ -285,7 +284,6 @@ class Repository(override val di: DI) : DIAware {
             filter = feedListFilter,
         )
     }.flatMapLatest {
-        logDebug("JONAS", "Fump $it")
         feedItemStore.getFeedItemCountRaw(
             feedId = it.feedId,
             tag = it.tag,
