@@ -272,7 +272,7 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    internal fun parseRssAtom(
+    private fun parseRssAtom(
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, Feed> {
@@ -344,22 +344,24 @@ class FeedParser(override val di: DI) : DIAware {
 
 class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 
-suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): Response {
+suspend fun OkHttpClient.getResponse(
+    url: URL,
+    forceNetwork: Boolean = false,
+): Response {
     val request = Request.Builder()
         .url(url)
-        .cacheControl(
-            CacheControl.Builder()
-                .run {
-                    if (forceNetwork) {
+        .run {
+            if (forceNetwork) {
+                cacheControl(
+                    CacheControl.Builder()
                         // Force cache-revalidation
-                        maxAge(0, TimeUnit.SECONDS)
-                    } else {
-                        // Will accept anything generated in the last X
-                        maxAge(10, TimeUnit.MINUTES)
-                    }
-                }
-                .build(),
-        )
+                        .maxAge(0, TimeUnit.SECONDS)
+                        .build(),
+                )
+            } else {
+                this
+            }
+        }
         .build()
 
     @Suppress("BlockingMethodInNonBlockingContext")
