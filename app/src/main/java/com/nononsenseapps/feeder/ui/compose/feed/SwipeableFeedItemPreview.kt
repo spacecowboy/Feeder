@@ -257,6 +257,31 @@ fun SwipeableFeedItemPreview(
                 )
             }
 
+            FeedItemStyle.COMPACT_CARD -> {
+                FeedItemCompactCard(
+                    state = FeedItemState(
+                        item = item,
+                        showThumbnail = showThumbnail && !compactLandscape,
+                        dropDownMenuExpanded = dropDownMenuExpanded,
+                        bookmarkIndicator = bookmarkIndicator,
+                        maxLines = maxLines,
+                        showReadingTime = showReadingTime
+                    ),
+                    onEvent = { event ->
+                        when (event) {
+                            FeedItemEvent.DismissDropdown -> { dropDownMenuExpanded = false }
+                            FeedItemEvent.MarkAboveAsRead -> onMarkAboveAsRead()
+                            FeedItemEvent.MarkBelowAsRead -> onMarkBelowAsRead()
+                            FeedItemEvent.ShareItem -> onShareItem()
+                            FeedItemEvent.ToggleBookmarked -> onToggleBookmarked()
+                        }
+                    },
+                    modifier = Modifier
+                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                        .graphicsLayer(alpha = itemAlpha),
+                )
+            }
+
             FeedItemStyle.COMPACT -> {
                 FeedItemCompact(
                     item = item,

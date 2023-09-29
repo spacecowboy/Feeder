@@ -1151,6 +1151,7 @@ fun FeedListContent(
         val arrangement =
             when (viewState.feedItemStyle) {
                 FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.margin)
+                FeedItemStyle.COMPACT_CARD -> Arrangement.spacedBy(LocalDimens.current.margin)
                 FeedItemStyle.COMPACT -> Arrangement.spacedBy(0.dp)
                 FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(0.dp)
             }
@@ -1177,6 +1178,7 @@ fun FeedListContent(
                         ).run {
                             when (viewState.feedItemStyle) {
                                 FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
+                                FeedItemStyle.COMPACT_CARD -> addMargin(horizontal = LocalDimens.current.margin)
                                 // No margin since dividers
                                 FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> this
                             }
@@ -1285,7 +1287,8 @@ fun FeedListContent(
                         onItemClick(previewItem.id)
                     }
 
-                    if (viewState.feedItemStyle != FeedItemStyle.CARD) {
+                    if (viewState.feedItemStyle != FeedItemStyle.CARD
+                        && viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD) {
                         if (itemIndex < pagedFeedItems.itemCount - 1) {
                             Divider(
                                 modifier =
@@ -1371,6 +1374,7 @@ fun FeedGridContent(
         val arrangement =
             when (feedItemStyle) {
                 FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
+                FeedItemStyle.COMPACT_CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
                 FeedItemStyle.COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
                 FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
             }

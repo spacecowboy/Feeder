@@ -157,6 +157,7 @@
 
   <string name="feed_item_style">Article style</string>
   <string name="feed_item_style_card">Card</string>
+  <string name="feed_item_style_compact_card">Compact Card</string>
   <string name="feed_item_style_compact">Compact</string>
   <string name="feed_item_style_super_compact">Super compact</string>
   <string name="generate_extra_unique_ids">Generate extra unique IDs</string>
