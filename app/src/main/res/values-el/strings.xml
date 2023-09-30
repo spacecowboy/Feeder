@@ -227,4 +227,5 @@
     <string name="failed_to_parse_full_article">Απέτυχε η ανάλυση του πλήρους άρθρου</string>
     <string name="no_url">Χωρίς URL</string>
     <string name="theme_e_ink">Ηλεκτρονικός σύνδεσμος</string>
+    <string name="add_anyway">Προσθήκη όπως και να χει</string>
 </resources>
