@@ -226,4 +226,6 @@
     <string name="unsupported_content_type">Тип садржаја који се не подржава</string>
     <string name="failed_to_parse_full_article">Комплетан чланак није могао да се парсира</string>
     <string name="no_url">Нема URL адресе</string>
+    <string name="add_anyway">Ипак додај</string>
+    <string name="theme_e_ink">E Ink</string>
 </resources>
