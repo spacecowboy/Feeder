@@ -227,4 +227,5 @@
     <string name="failed_to_parse_full_article">Fallo al analizar el artículo completo</string>
     <string name="no_url">No hay URL</string>
     <string name="theme_e_ink">Tinta electrónica</string>
+    <string name="add_anyway">Agregar de todos modos</string>
 </resources>
