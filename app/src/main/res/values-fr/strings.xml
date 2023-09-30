@@ -227,4 +227,5 @@
     <string name="failed_to_parse_full_article">Échec de lecture de l\'intégralité de l\'article</string>
     <string name="no_url">URL manquante</string>
     <string name="theme_e_ink">Encre électronique</string>
+    <string name="add_anyway">Ajouter quand même</string>
 </resources>

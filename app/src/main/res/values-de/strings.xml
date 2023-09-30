@@ -227,4 +227,5 @@
     <string name="failed_to_parse_json_feed">JSON-Feed konnte nicht analysiert werden</string>
     <string name="failed_to_parse_rss_feed">RSS-Feed konnte nicht analysiert werden</string>
     <string name="theme_e_ink">E-Papier</string>
+    <string name="add_anyway">Trotzdem hinzufügen</string>
 </resources>
