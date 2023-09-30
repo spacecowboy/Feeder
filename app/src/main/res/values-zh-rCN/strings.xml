@@ -227,4 +227,5 @@
     <string name="failed_to_parse_full_article">未能解析完整文章</string>
     <string name="no_url">无 URL</string>
     <string name="theme_e_ink">电子墨水</string>
+    <string name="add_anyway">仍要添加</string>
 </resources>
