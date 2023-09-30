@@ -227,4 +227,5 @@
     <string name="no_url">URL yok</string>
     <string name="theme_e_ink">E-kâğıt</string>
     <string name="failed_to_download">İndirilemedi</string>
+    <string name="add_anyway">Yine de ekle</string>
 </resources>
