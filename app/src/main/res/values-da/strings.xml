@@ -226,4 +226,6 @@
     <string name="unsupported_content_type">Ikke-understøttet indholdstype</string>
     <string name="failed_to_parse_full_article">Kunne ikke behandle hele artiklen</string>
     <string name="no_url">Ingen URL</string>
+    <string name="add_anyway">Tilføj alligevel</string>
+    <string name="theme_e_ink">E Ink</string>
 </resources>
