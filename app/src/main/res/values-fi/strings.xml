@@ -227,4 +227,5 @@
     <string name="failed_to_parse_full_article">Koko artikkelin jäsentäminen epäonnistui</string>
     <string name="no_url">Ei URL:ää</string>
     <string name="theme_e_ink">Sähkömuste</string>
+    <string name="add_anyway">Lisää kuitenkin</string>
 </resources>
