@@ -205,4 +205,22 @@
     <string name="many_tags">%1$s แท็ก</string>
     <string name="article_list_settings">รายการบทความ</string>
     <string name="theme_e_ink">กระดาษอิเล็กทรอนิกส์</string>
+    <string name="failed_to_parse_json_feed">เรียกข้อมูล JSON ฟีด ล้มเหลว</string>
+    <string name="failed_to_fetch_full_article_missing_body">ไม่มีอะไรให้ดึงข้อมูลได้</string>
+    <string name="failed_to_parse_full_article">เรียกข้อมูลบทความเต็มล้มเหลว</string>
+    <string name="failed_to_fetch_full_article_missing_link">ฟีดขาดลิงก์ไปยังบทความ</string>
+    <string name="filter_noun">ตัวกรอง</string>
+    <string name="recently_read_adjective">อ่านแล้วล่าสุด</string>
+    <string name="failed_to_fetch_full_article_not_html">ลิงก์ไม่ใช่เอกสาร HTML</string>
+    <string name="no_feeds_in_the_page">ไม่มีฟีดในหน้านี้</string>
+    <string name="http_error">ข้อผิดพลาด HTTP</string>
+    <string name="no_url">ไม่มี URL</string>
+    <string name="max_lines">บรรทัดสูงสุด</string>
+    <string name="saved_adjective">บันทึกแล้ว</string>
+    <string name="failed_to_parse_rss_feed">เรียกข้อมูล RSS ฟีดล้มเหลว</string>
+    <string name="unsupported_content_type">ไม่รองรับเนื้อหาชนิดนี้</string>
+    <string name="failed_to_download">ดาวน์โหลดล้มเหลว</string>
+    <string name="read_adjective">อ่านแล้ว</string>
+    <string name="show_only_title">แสดงเฉพาะชื่อ</string>
+    <string name="content_is_not_html">เนื้อหาไม่ใช่ HTML</string>
 </resources>
