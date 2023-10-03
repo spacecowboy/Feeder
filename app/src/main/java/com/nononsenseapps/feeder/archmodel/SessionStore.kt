@@ -31,4 +31,11 @@ class SessionStore {
             }
         }
     }
+
+    private val _searchText: MutableStateFlow<String?> = MutableStateFlow(null)
+    val searchText: StateFlow<String?> = _searchText.asStateFlow()
+
+    fun setSearchText(searchText: String?) {
+        _searchText.update { searchText }
+    }
 }

@@ -228,6 +228,12 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
+    val searchText = sessionStore.searchText
+
+    fun setSearchText(searchText: String?) {
+        sessionStore.setSearchText(searchText?.ifEmpty { null })
+    }
+
     /**
      * Returns EPOCH is no sync is currently happening
      */
@@ -244,7 +250,8 @@ class Repository(override val di: DI) : DIAware {
         minReadTime,
         currentSorting,
         feedListFilter,
-    ) { feedAndTag, minReadTime, currentSorting, feedListFilter ->
+        searchText,
+    ) { feedAndTag, minReadTime, currentSorting, feedListFilter, searchText ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
@@ -255,6 +262,7 @@ class Repository(override val di: DI) : DIAware {
             },
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
             filter = feedListFilter,
+            searchText = searchText,
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItemsRaw(
@@ -263,6 +271,7 @@ class Repository(override val di: DI) : DIAware {
             minReadTime = it.minReadTime,
             newestFirst = it.newestFirst,
             filter = it.filter,
+            searchText = it.searchText,
         )
     }
 
@@ -658,6 +667,7 @@ private data class FeedListArgs(
     val newestFirst: Boolean,
     val minReadTime: Instant,
     val filter: FeedListFilter,
+    val searchText: String? = null,
 )
 
 // Wrapper class because flow combine doesn't like nulls

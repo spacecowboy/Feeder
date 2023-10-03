@@ -171,6 +171,25 @@ class FeedArticleViewModel(
 
     val filterCallback: FeedListFilterCallback = this
 
+    private val searchFieldVisible: MutableStateFlow<Boolean> =
+        MutableStateFlow(state["showSearchField"] ?: false)
+
+    fun setSearchFieldVisible(visible: Boolean) {
+        state["showSearchField"] = visible
+        searchFieldVisible.update { visible }
+    }
+
+    fun hideSearchField() {
+        setSearchText("")
+        setSearchFieldVisible(false)
+    }
+
+    private val searchText: StateFlow<String?> = repository.searchText
+
+    fun setSearchText(searchTextVal: String) {
+        repository.setSearchText(searchTextVal)
+    }
+
     fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
 
     private val editDialogVisible = MutableStateFlow(false)
@@ -277,7 +296,9 @@ class FeedArticleViewModel(
             filterMenuVisible,
             repository.feedListFilter,
             repository.showOnlyTitle,
-        ) { params: Array<Any> ->
+            searchFieldVisible,
+            searchText,
+        ) { params: Array<Any?> ->
             val article = params[16] as Article
 
             val ttsState = params[17] as PlaybackStatus
@@ -326,6 +347,8 @@ class FeedArticleViewModel(
                 showFilterMenu = params[25] as Boolean,
                 filter = params[26] as FeedListFilter,
                 showOnlyTitle = params[27] as Boolean,
+                showSearchField = params[28] as Boolean,
+                searchText = params[29] as String?,
             )
         }
             .stateIn(
@@ -479,6 +502,8 @@ interface FeedScreenViewState {
     val showOnlyTitle: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
+    val showSearchField: Boolean
+    val searchText: String?
 }
 
 interface ArticleScreenViewState {
@@ -581,5 +606,7 @@ data class FeedArticleScreenViewState(
     override val showOnlyTitle: Boolean = false,
     override val showFilterMenu: Boolean = false,
     override val filter: FeedListFilter = emptyFeedListFilter,
+    override val showSearchField: Boolean = false,
+    override val searchText: String? = null,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

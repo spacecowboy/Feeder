@@ -65,6 +65,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         minReadTime: Instant,
         newestFirst: Boolean,
         filter: FeedListFilter,
+        searchText: String?,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config = PagingConfig(
@@ -80,7 +81,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
-                rawQueryFilter(filter, args, minReadTime, feedId, tag)
+                rawQueryFilter(filter, args, minReadTime, feedId, tag, searchText)
 
                 when (newestFirst) {
                     true -> append("ORDER BY $feedItemsListOrderByDesc\n")
@@ -101,6 +102,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         minReadTime: Instant,
         feedId: Long,
         tag: String,
+        searchText: String? = null,
     ) {
         val onlySavedArticles = feedId == ID_SAVED_ARTICLES
 
@@ -123,6 +125,9 @@ class FeedItemStore(override val di: DI) : DIAware {
             }
             if (filter.saved) {
                 append("OR (bookmarked = 1)\n")
+            }
+            if (searchText?.isNotEmpty() == true) {
+                append("AND plain_title LIKE '%' || ? || '%' \n").also { args.add(searchText.trim()) }
             }
             append(")\n")
         }

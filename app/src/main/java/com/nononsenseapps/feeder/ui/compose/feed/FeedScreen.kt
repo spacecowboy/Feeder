@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -129,6 +130,7 @@ import com.nononsenseapps.feeder.ui.compose.pullrefresh.pullRefresh
 import com.nononsenseapps.feeder.ui.compose.pullrefresh.rememberPullRefreshState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SearchTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -216,6 +218,15 @@ fun FeedScreen(
                 coroutineScope.launch {
                     drawerState.close()
                 }
+            }
+        },
+    )
+
+    BackHandler(
+        enabled = viewState.showSearchField,
+        onBack = {
+            coroutineScope.launch {
+                viewModel.hideSearchField()
             }
         },
     )
@@ -378,6 +389,9 @@ fun FeedScreen(
             onSetBookmarked = { itemId, value ->
                 viewModel.setBookmarked(itemId, value)
             },
+            onSearchChange = viewModel::setSearchText,
+            onShowSearchField = viewModel::setSearchFieldVisible,
+            hideSearchField = viewModel::hideSearchField,
             onShowFilterMenu = viewModel::setFilterMenuVisible,
             filterCallback = viewModel.filterCallback,
             feedListState = feedListState,
@@ -418,6 +432,9 @@ fun FeedScreen(
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
+    onShowSearchField: (Boolean) -> Unit,
+    onSearchChange: (String) -> Unit,
+    hideSearchField: () -> Unit,
     onShowFilterMenu: (Boolean) -> Unit,
     filterCallback: FeedListFilterCallback,
     feedListState: LazyListState,
@@ -441,6 +458,8 @@ fun FeedScreen(
                 }
             }
         },
+        onSearchChange = onSearchChange,
+        hideSearchField = hideSearchField,
         onMarkAllAsRead = onMarkAllAsRead,
         ttsOnPlay = ttsOnPlay,
         ttsOnPause = ttsOnPause,
@@ -453,6 +472,16 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         toolbarActions = {
             if (viewState.currentFeedOrTag.isNotSavedArticles) {
+                Box {
+                    IconButton(
+                        onClick = { onShowSearchField(true) }
+                    ) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search_noun),
+                        )
+                    }
+                }
                 PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter_noun)) }) {
                     Box {
                         IconButton(
@@ -816,6 +845,8 @@ fun FeedScreen(
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
+    onSearchChange: (String) -> Unit,
+    hideSearchField: () -> Unit,
     toolbarActions: @Composable (RowScope.() -> Unit),
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
@@ -899,26 +930,34 @@ fun FeedScreen(
 
     Scaffold(
         topBar = {
-            SensibleTopAppBar(
-                scrollBehavior = scrollBehavior,
-                title = when (viewState.feedScreenTitle.type) {
-                    FeedType.FEED -> viewState.feedScreenTitle.title
-                    FeedType.TAG -> viewState.feedScreenTitle.title
-                    FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
-                    FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
-                } ?: "",
-                navigationIcon = {
-                    IconButton(
-                        onClick = onOpenNavDrawer,
-                    ) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.navigation_drawer_open),
-                        )
-                    }
-                },
-                actions = toolbarActions,
-            )
+            if (viewState.showSearchField) {
+                SearchTopAppBar(
+                    searchText = viewState.searchText,
+                    onSearchChange,
+                    hideSearchField,
+                )
+            } else {
+                SensibleTopAppBar(
+                    scrollBehavior = scrollBehavior,
+                    title = when (viewState.feedScreenTitle.type) {
+                        FeedType.FEED -> viewState.feedScreenTitle.title
+                        FeedType.TAG -> viewState.feedScreenTitle.title
+                        FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
+                        FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
+                    } ?: "",
+                    navigationIcon = {
+                        IconButton(
+                            onClick = onOpenNavDrawer,
+                        ) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = stringResource(R.string.navigation_drawer_open),
+                            )
+                        }
+                    },
+                    actions = toolbarActions,
+                )
+            }
         },
         bottomBar = {
             HideableTTSPlayer(

@@ -225,6 +225,7 @@
   <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
   <string name="max_lines">Max lines</string>
   <string name="filter_noun">Filter</string>
+  <string name="search_noun">Search</string>
   <string name="recently_read_adjective">Recently read</string>
   <string name="read_adjective">Read</string>
   <string name="saved_adjective">Saved</string>
