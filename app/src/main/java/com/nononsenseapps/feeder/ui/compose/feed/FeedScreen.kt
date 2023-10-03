@@ -472,14 +472,17 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         toolbarActions = {
             if (viewState.currentFeedOrTag.isNotSavedArticles) {
-                Box {
-                    IconButton(
-                        onClick = { onShowSearchField(true) }
-                    ) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = stringResource(R.string.search_noun),
-                        )
+                PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.search_noun)) }) {
+                    Box {
+                        IconButton(
+                            onClick = { onShowSearchField(true) },
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search_noun),
+                            )
+                        }
                     }
                 }
                 PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter_noun)) }) {
