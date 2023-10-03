@@ -83,13 +83,13 @@ fun SearchTopAppBar(
                         visualTransformation = VisualTransformation.None,
                         interactionSource = interactionSource,
                         leadingIcon = {
-                            Icon(Icons.Default.Search, "")
+                            Icon(Icons.Default.Search, stringResource(id = R.string.search_noun))
                         },
                         trailingIcon = {
                             IconButton(
                                 onClick = hideSearchField
                             ) {
-                                Icon(Icons.Default.Clear, "")
+                                Icon(Icons.Default.Clear, stringResource(id = R.string.clear_search_noun))
                             }
                         },
                         contentPadding = PaddingValues(2.dp),

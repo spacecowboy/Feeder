@@ -226,6 +226,7 @@
   <string name="max_lines">Max lines</string>
   <string name="filter_noun">Filter</string>
   <string name="search_noun">Search</string>
+  <string name="clear_search_noun">Clear search</string>
   <string name="recently_read_adjective">Recently read</string>
   <string name="read_adjective">Read</string>
   <string name="saved_adjective">Saved</string>
