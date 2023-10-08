@@ -1,3 +1,7 @@
+# 2.6.6
+bowornsin (1):
+  * [cac00ff3] Updated Thai translation using Weblate
+
 # 2.6.5
 Agnieszka C (1):
   * [5fa3ac9e] Updated Polish translation using Weblate
