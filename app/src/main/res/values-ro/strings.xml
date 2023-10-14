@@ -71,7 +71,7 @@
     <string name="view_debug_log">Vizualizați jurnalul de depanare</string>
     <string name="import_feeds_from_opml">Importați fluxuri din OPML</string>
     <string name="export_feeds_to_opml">Exportați feed-uri în OPML</string>
-    <string name="sync">Sincronizare</string>
+    <string name="sync">Sincronizat</string>
     <string name="resume_reading">Citiți în continuare</string>
     <string name="pause_reading">Pauză de citire</string>
     <string name="read_article">Citiți cu voce tare</string>
@@ -92,8 +92,8 @@
     <string name="mark_as_unread">Marcați ca necitit</string>
     <string name="mark_as_read">Marcați ca fiind citit</string>
     <string name="search_feed_empty_hint">Introduceți o adresă de flux</string>
-    <string name="empty_feed_add"><annotation style="link">Add</annotation> mai multe fluxuri\?</string>
-    <string name="empty_feed_open"><annotation style="link">Open</annotation> alt flux\?</string>
+    <string name="empty_feed_add"><annotation style="link">Adăugați</annotation> mai multe fluxuri\?</string>
+    <string name="empty_feed_open"><annotation style="link">Deschideți</annotation> alt flux\?</string>
     <string name="empty_feed_top">Nimic de citit aici. Doriți să…</string>
     <string name="save">Salvați</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -169,8 +169,8 @@
     <string name="no_barcode_scanner_installed">Nu a putut găsi un cititor de coduri de bare</string>
     <string name="block_list">Lista de blocuri</string>
     <string name="add_item">Adăugați elementul</string>
-  <string name="remove">Eliminați</string>
-  <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
+    <string name="remove">Eliminați</string>
+    <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
     <string name="permission_read_label">Acces numai pentru citire la Feeder</string>
     <string name="use_detect_language">Detectarea limbii</string>
     <string name="text_to_speech">Text la vorbire</string>
@@ -178,7 +178,7 @@
     <string name="set_language">Setați limba</string>
     <string name="description_for_read_aloud">Detectează automat limba articolului</string>
     <string name="dynamic_theme_use">Culori dinamice</string>
-  <string name="new_indicator">Nou</string>
+    <string name="new_indicator">Nou</string>
     <string name="explanation_permission_notifications">Trebuie să se acorde permisiunea înainte de a activa notificările.</string>
     <string name="only_available_on_android_n">Disponibil numai pe Android %1$s și mai sus</string>
     <string name="article_image">Imaginea articolului</string>
@@ -186,4 +186,46 @@
     <string name="sync_to_fetch">Sincronizare pentru a prelua articolul</string>
     <string name="block_list_description">Ascunde articolele cu titluri care conțin oricare dintre aceste filtre. Exemple de filtre:</string>
     <string name="text_scale">Scala textului</string>
+    <string name="one_feed">%1$s flux de date</string>
+    <string name="article_list_settings">Listă de articole</string>
+    <string name="saved_article">Articol salvat</string>
+    <string name="saved_articles">Articole salvate</string>
+    <string name="many_feeds">%1$s de fluxuri de date</string>
+    <string name="save_article">Salvează articolul</string>
+    <string name="two_feeds">%1$s fluxuri de date</string>
+    <string name="zero_feeds">%1$s fluxuri de date</string>
+    <string name="no_feeds">Nu sunt fluxuri de date</string>
+    <string name="few_feeds">%1$s de fluxuri de date</string>
+    <string name="mark_as_read_on_scroll">Marchează ca citit în timpul derulării</string>
+    <string name="theme_e_ink">E-Ink</string>
+    <string name="failed_to_parse_json_feed">Nu s-a putut analiza fluxul JSON</string>
+    <string name="failed_to_fetch_full_article_missing_body">Nu am găsit nimic</string>
+    <string name="failed_to_parse_full_article">Nu s-a putut analiza întregul articol</string>
+    <string name="add_anyway">Adaugă oricum</string>
+    <string name="failed_to_fetch_full_article_missing_link">Aplicației îi lipsește link-ul către articol</string>
+    <string name="one_tags">%1$s etichetă</string>
+    <string name="filter_noun">Filtru</string>
+    <string name="recently_read_adjective">Citite recent</string>
+    <string name="failed_to_fetch_full_article_not_html">Link-ul nu este un document HTML</string>
+    <string name="no_feeds_in_the_page">Nu există fluxuri de știri pe aceasta pagină</string>
+    <string name="no_body_in_response">Nu există niciun conținut în răspuns</string>
+    <string name="http_error">Eroare HTTP</string>
+    <string name="no_url">Fără URL</string>
+    <string name="max_lines">Numărul maxim de linii</string>
+    <string name="failed_to_parse_the_page">Nu s-a putut analiza pagina</string>
+    <string name="saved_adjective">Salvate</string>
+    <string name="zero_tags">%1$s etichete</string>
+    <string name="failed_to_parse_rss_feed">Aa apărut în analiza fluxului RSS</string>
+    <string name="unsupported_content_type">Tipul conținutului nu este suportat de aplicație</string>
+    <string name="failed_to_download">A apărut o eroare în descărcare</string>
+    <string name="few_tags">%1$s de etichete</string>
+    <string name="read_adjective">Citite</string>
+    <string name="many_tags">%1$s de etichete</string>
+    <string name="show_only_title">Arată numai titlul</string>
+    <string name="import_x_feeds_with_y_tags">Importați %1$s cu %2$s\?</string>
+    <string name="unsave_article">Oprește salvarea articolului</string>
+    <string name="other_feeds">%1$s fluxuri</string>
+    <string name="two_tags">%1$s etichete</string>
+    <string name="content_is_not_html">Conținutul nu este HTML</string>
+    <string name="other_tags">%1$s etichete</string>
 </resources>
