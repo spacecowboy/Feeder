@@ -1,2 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="sync_option_every_15min">ప్రతి 15 నిమిషాలకు</string>
+    <string name="nothing_to_display">ప్రదర్శించడానికి ఏమీ లేదు!</string>
+    <string name="save">సేవ్ చేయండి</string>
+    <string name="failed_to_parse_full_article">పూర్తి కథనాన్ని అన్వయించడంలో విఫలమైంది</string>
+    <string name="title">శీర్షిక</string>
+    <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+    <string name="add_anyway">ఏమైనప్పటికీ జోడించండి</string>
+    <string name="sync_option_every_6_hours">ప్రతి 6 గంటలు</string>
+    <string name="open_link_in_browser">వెబ్ బ్రౌజర్‌లో లింక్‌ని తెరవండి</string>
+    <string name="open_enclosed_media">మూసివున్న మీడియాను తెరవండి</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="navigation_drawer_close">నావిగేషన్ డ్రాయర్ మూసుకొని ప్రారంభించండి</string>
+    <string name="edit_feed">ఫీడ్‌ని సవరించండి</string>
+    <string name="set_language">భాషను సెట్ చేయండి</string>
+    <string name="skip_to_next">తదుపరి దానికి దాటవేయి</string>
+    <string name="toggle_read_status">చదివే స్థితిని టోగుల్ చేయండి</string>
+    <string name="navigation_drawer_open">నావిగేషన్ డ్రాయర్‌ని తెరవండి</string>
+    <string name="empty_feed_top">ఇక్కడ చదవడానికి ఏమీ లేదు. మీరు చేయడానికి ఇష్టపడుతారా</string>
+    <string name="sync_option_manually">మానవీయంగా</string>
+    <string name="dont_notify_for_new_items">ప్రకటనలు ఆపు</string>
+    <string name="new_items_available">కొత్త వస్తువులు అందుబాటులో ఉన్నాయి</string>
+    <string name="read_article">గట్టిగ చదువుము</string>
+    <string name="new_based_on_this">దీని ఆధారంగా కొత్తది</string>
+    <string name="tag">ట్యాగ్</string>
+    <string name="url">యూఆర్ఎల్</string>
+    <string name="search_feed_empty_hint">ఫీడ్ చిరునామాను నమోదు చేయండి</string>
+    <string name="no_url">URL లేదు</string>
+    <string name="open_in_browser">వెబ్ బ్రౌజర్‌లో తెరవండి</string>
+    <string name="delete_feed">ఫీడ్‌ను తొలగించండి</string>
+    <string name="indicator_for_mark_as_read">చదివిన గుర్తుకు సూచిక</string>
+    <string name="sync_option_every_hour">ప్రతి గంట</string>
+    <string name="sync_option_every_day">ప్రతి రోజు</string>
+    <string name="view">చూడండి</string>
+    <string name="import_feeds_from_opml">OPML నుండి ఫీడ్‌లను దిగుమతి చేయండి</string>
+    <string name="sync">సమకాలీకరించు</string>
+    <string name="export_feeds_to_opml">OPMLకి ఫీడ్‌లను ఎగుమతి చేయండి</string>
+    <string name="unsupported_content_type">మద్దతు లేని కంటెంట్ రకం</string>
+    <string name="view_debug_log">డీబగ్ లాగ్‌ని వీక్షించండి</string>
+    <string name="open_enclosed_media_file">%1$sని తెరవండి</string>
+    <string name="pause_reading">చదవడం పాజ్ చేయండి</string>
+    <string name="sync_option_every_3_hours">ప్రతి 3 గంటలు</string>
+    <string name="show_all_items">ఫీడ్‌ను తొలగించండి</string>
+    <string name="mark_all_as_read">అన్నీ చదివినట్లు గుర్తించు</string>
+    <string name="title_activity_settings">సెట్టింగ్‌లు</string>
+    <string name="no_such_feed">అటువంటి ఫీడ్ కనుగొనబడలేదు. బహుశా HTTPSని ఉపయోగించి ప్రయత్నించాలా\?</string>
+    <string name="title_activity_edit_feed">ఫీడ్‌కు సభ్యత్వం పొందండి</string>
+    <string name="sync_option_every_30min">ప్రతి 30 నిమిషాలకు</string>
+    <string name="empty_feed_add">మరిన్ని ఫీడ్‌లను <annotation style="link">జోడించాలా</annotation>\?</string>
+    <string name="empty_feed_open">మరో ఫీడ్‌ని <annotation style="link">తెరువు</annotation> చేయాలా\?</string>
+    <string name="all_feeds">అన్ని ఫీడ్‌లు</string>
+    <string name="action_settings">సెట్టింగులు</string>
+    <string name="text_to_speech">వచనం నుండి ప్రసంగం</string>
+    <string name="sync_option_every_12_hours">ప్రతి 12 గంటలు</string>
+    <string name="resume_reading">చదవడం కొనసాగించండి</string>
+    <string name="notify_for_new_items">కొత్త అంశాల కోసం తెలియజేయండి</string>
+    <string name="share">షేర్ చేయండి</string>
+    <string name="stop_reading">చదవడం ఆపండి</string>
+    <string name="mark_as_read">చదివినట్లుగా గుర్తించు</string>
+    <string name="show_unread_items">చదవని అంశాలను చూపు</string>
+    <string name="no_tag">ట్యాగ్ లేదు</string>
+    <string name="mark_as_unread">చదవనట్టు గుర్తుపెట్టు</string>
+    <string name="add_feed_search_hint">ఫీడ్ యూఆర్ఎల్</string>
+    <string name="add_feed">ఫీడ్ జోడించండి</string>
+</resources>
