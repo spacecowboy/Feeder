@@ -223,4 +223,8 @@
     <string name="failed_to_parse_full_article">Falha ao analisar o artigo completo</string>
     <string name="no_url">Sem URL</string>
     <string name="theme_e_ink">Papel eletrônico</string>
+    <string name="add_anyway">Adicionar de qualquer maneira</string>
+    <string name="no_feeds_in_the_page">Sem feeds na página</string>
+    <string name="max_lines">Linhas máximas</string>
+    <string name="read_adjective">Ler</string>
 </resources>
