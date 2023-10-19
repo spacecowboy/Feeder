@@ -125,7 +125,7 @@ private fun createNotificationChannel(context: Context) {
     notificationManager.createNotificationChannel(channel)
 }
 
-private fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
+private suspend fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
     val text = item.feedDisplayTitle
@@ -162,7 +162,8 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
     val di by closestDI(context)
     val repository: Repository by di.instance()
-    if (repository.itemOpener.value == ItemOpener.DEFAULT_BROWSER && item.link != null) {
+
+    if (repository.getArticleOpener(item.id) == ItemOpener.DEFAULT_BROWSER && item.link != null) {
         builder.setContentIntent(
             PendingIntent.getActivity(
                 context,
@@ -190,7 +191,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         )
     }
 
-    if (repository.itemOpener.value != ItemOpener.DEFAULT_BROWSER) {
+    if (repository.getArticleOpener(item.id) != ItemOpener.DEFAULT_BROWSER) {
         item.link?.let { link ->
             builder.addAction(
                 R.drawable.notification_open_in_browser,
