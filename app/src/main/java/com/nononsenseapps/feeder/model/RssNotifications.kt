@@ -126,6 +126,9 @@ private fun createNotificationChannel(context: Context) {
 }
 
 private suspend fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
+    val di by closestDI(context)
+    val repository: Repository by di.instance()
+
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
     val text = item.feedDisplayTitle
@@ -159,9 +162,6 @@ private suspend fun singleNotification(context: Context, item: FeedItemWithFeed)
         .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
-
-    val di by closestDI(context)
-    val repository: Repository by di.instance()
 
     if (repository.getArticleOpener(item.id) == ItemOpener.DEFAULT_BROWSER && item.link != null) {
         builder.setContentIntent(
