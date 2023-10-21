@@ -1,8 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
-import android.content.Context
 import android.util.Log
-import androidx.annotation.ColorInt
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
@@ -39,15 +37,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Enclosure
-import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
-import com.nononsenseapps.feeder.util.openLinkInBrowser
-import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -204,23 +199,6 @@ fun ReaderView(
             }
 
             articleBody()
-        }
-    }
-}
-
-fun onLinkClick(
-    link: String,
-    linkOpener: LinkOpener,
-    context: Context,
-    @ColorInt toolbarColor: Int,
-) {
-    when (linkOpener) {
-        LinkOpener.CUSTOM_TAB -> {
-            openLinkInCustomTab(context, link, toolbarColor)
-        }
-
-        LinkOpener.DEFAULT_BROWSER -> {
-            openLinkInBrowser(context, link)
         }
     }
 }

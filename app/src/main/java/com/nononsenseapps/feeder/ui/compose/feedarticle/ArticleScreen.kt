@@ -68,9 +68,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScroll
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.FilePathProvider
-import com.nononsenseapps.feeder.util.openLinkInBrowser
-import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
 import java.time.ZonedDateTime
 import org.kodein.di.compose.LocalDI
@@ -85,7 +84,7 @@ fun ArticleScreen(
     BackHandler(onBack = onNavigateUp)
     val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     // Each article gets its own scroll state. Persists across device rotations, but is cleared
     // when switching articles.
@@ -124,12 +123,15 @@ fun ArticleScreen(
                     },
                     null,
                 )
-                context.startActivity(intent)
+                activityLauncher.startActivity(
+                    openAdjacentIfSuitable = false,
+                    intent = intent,
+                )
             }
         },
         onOpenInCustomTab = {
             viewState.articleLink?.let { link ->
-                openLinkInCustomTab(context, link, toolbarColor)
+                activityLauncher.openLinkInCustomTab(link, toolbarColor)
             }
         },
         onFeedTitleClick = {
@@ -377,6 +379,7 @@ fun ArticleContent(
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     if (viewState.articleId > ID_UNSET &&
         viewState.textToDisplay == TextToDisplay.FULLTEXT &&
@@ -392,7 +395,7 @@ fun ArticleContent(
         screenType = screenType,
         onEnclosureClick = {
             if (viewState.enclosure.present) {
-                openLinkInBrowser(context, viewState.enclosure.link)
+                activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)
             }
         },
         onFeedTitleClick = onFeedTitleClick,
@@ -432,10 +435,8 @@ fun ArticleContent(
                                     baseUrl = viewState.articleFeedUrl ?: "",
                                     keyHolder = viewState.keyHolder,
                                 ) { link ->
-                                    onLinkClick(
+                                    activityLauncher.openLink(
                                         link = link,
-                                        linkOpener = viewState.linkOpener,
-                                        context = context,
                                         toolbarColor = toolbarColor,
                                     )
                                 }
@@ -473,10 +474,8 @@ fun ArticleContent(
                                     baseUrl = viewState.articleFeedUrl ?: "",
                                     keyHolder = viewState.keyHolder,
                                 ) { link ->
-                                    onLinkClick(
+                                    activityLauncher.openLink(
                                         link = link,
-                                        linkOpener = viewState.linkOpener,
-                                        context = context,
                                         toolbarColor = toolbarColor,
                                     )
                                 }

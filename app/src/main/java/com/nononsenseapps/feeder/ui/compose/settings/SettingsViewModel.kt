@@ -131,6 +131,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowOnlyTitles(value)
     }
 
+    fun setIsOpenAdjacent(value: Boolean) {
+        repository.setOpenAdjacent(value)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
         repository.feedNotificationSettings
@@ -180,6 +184,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.isMarkAsReadOnScroll,
                 repository.maxLines,
                 repository.showOnlyTitle,
+                repository.isOpenAdjacent,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -207,6 +212,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     isMarkAsReadOnScroll = params[21] as Boolean,
                     maxLines = params[22] as Int,
                     showOnlyTitle = params[23] as Boolean,
+                    isOpenAdjacent = params[24] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -246,6 +252,7 @@ data class SettingsViewState(
     val isMarkAsReadOnScroll: Boolean = false,
     val maxLines: Int = 2,
     val showOnlyTitle: Boolean = false,
+    val isOpenAdjacent: Boolean = true,
 )
 
 data class UIFeedSettings(

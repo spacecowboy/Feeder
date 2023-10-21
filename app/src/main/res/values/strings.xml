@@ -241,4 +241,5 @@
   <string name="failed_to_parse_full_article">Failed to parse full article</string>
   <string name="no_url">No URL</string>
   <string name="add_anyway">Add anyway</string>
+  <string name="open_browser_in_split_screen">Open browser in split screen</string>
 </resources>

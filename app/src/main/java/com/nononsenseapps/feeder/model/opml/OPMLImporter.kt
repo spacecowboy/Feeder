@@ -77,6 +77,7 @@ open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
             UserSettings.SETTINGS_FILTER_RECENTLY_READ -> settingsStore.setFeedListFilterRecentlyRead(value.toBoolean())
             UserSettings.SETTINGS_FILTER_READ -> settingsStore.setFeedListFilterRead(value.toBoolean())
             UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> settingsStore.setShowOnlyTitles(value.toBoolean())
+            UserSettings.SETTING_OPEN_ADJACENT -> settingsStore.setOpenAdjacent(value.toBoolean())
         }
     }
 

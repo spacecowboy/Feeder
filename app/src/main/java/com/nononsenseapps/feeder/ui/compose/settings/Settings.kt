@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -98,6 +99,9 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
+import com.nononsenseapps.feeder.util.ActivityLauncher
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -189,6 +193,8 @@ fun SettingsScreen(
             setMaxLines = settingsViewModel::setMaxLines,
             showOnlyTitle = viewState.showOnlyTitle,
             onShowOnlyTitle = settingsViewModel::setShowOnlyTitles,
+            isOpenAdjacent = viewState.isOpenAdjacent,
+            onOpenAdjacent = settingsViewModel::setIsOpenAdjacent,
             modifier = Modifier.padding(padding),
         )
     }
@@ -250,6 +256,8 @@ fun SettingsScreenPreview() {
                 setMaxLines = {},
                 showOnlyTitle = false,
                 onShowOnlyTitle = {},
+                isOpenAdjacent = false,
+                onOpenAdjacent = {},
                 modifier = Modifier,
             )
         }
@@ -307,10 +315,12 @@ fun SettingsList(
     setMaxLines: (Int) -> Unit,
     showOnlyTitle: Boolean,
     onShowOnlyTitle: (Boolean) -> Unit,
+    isOpenAdjacent: Boolean,
+    onOpenAdjacent: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
     val dimens = LocalDimens.current
     val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     val isAndroidSAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -469,8 +479,9 @@ fun SettingsList(
             },
             title = stringResource(id = R.string.battery_optimization),
         ) {
-            context.startActivity(
-                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+            activityLauncher.startActivity(
+                openAdjacentIfSuitable = false,
+                intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
             )
         }
 
@@ -584,6 +595,16 @@ fun SettingsList(
                 onLinkOpenerChanged(it.linkOpener)
             },
         )
+
+        val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
+
+        if (notCompactScreen) {
+            SwitchSetting(
+                title = stringResource(id = R.string.open_browser_in_split_screen),
+                checked = isOpenAdjacent,
+                onCheckedChanged = onOpenAdjacent,
+            )
+        }
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 

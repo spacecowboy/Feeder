@@ -20,20 +20,25 @@ import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
+import com.nononsenseapps.feeder.util.ActivityLauncher
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 
 private const val LOG_TAG = "FEEDER_TEXTTOOL"
 
 @Composable
 fun WithFeederTextToolbar(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalTextToolbar provides FeederTextToolbar(LocalView.current)) {
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
+    CompositionLocalProvider(LocalTextToolbar provides FeederTextToolbar(LocalView.current, activityLauncher)) {
         content()
     }
 }
 
-class FeederTextToolbar(private val view: View) : TextToolbar {
+class FeederTextToolbar(private val view: View, activityLauncher: ActivityLauncher) : TextToolbar {
     private var actionMode: ActionMode? = null
     private val textActionModeCallback: FeederTextActionModeCallback = FeederTextActionModeCallback(
         context = view.context,
+        activityLauncher = activityLauncher,
         onActionModeDestroy = {
             actionMode = null
         },
@@ -75,6 +80,7 @@ class FeederTextActionModeCallback(
     val context: Context,
     val onActionModeDestroy: (() -> Unit)? = null,
     var rect: Rect = Rect.Zero,
+    val activityLauncher: ActivityLauncher,
     var onCopyRequested: (() -> Unit)? = null,
     var onPasteRequested: (() -> Unit)? = null,
     var onCutRequested: (() -> Unit)? = null,
@@ -138,8 +144,9 @@ class FeederTextActionModeCallback(
                 val clip = clipboardManager.primaryClip
                 if (clip != null && clip.itemCount > 0) {
                     textProcessors.getOrNull(itemId - 100)?.let { cn ->
-                        context.startActivity(
-                            Intent(Intent.ACTION_PROCESS_TEXT).apply {
+                        activityLauncher.startActivity(
+                            openAdjacentIfSuitable = true,
+                            intent = Intent(Intent.ACTION_PROCESS_TEXT).apply {
                                 type = "text/plain"
                                 component = cn
                                 putExtra(Intent.EXTRA_PROCESS_TEXT, clip.getItemAt(0).text)
