@@ -66,6 +66,7 @@ class OpmlParserTest : DIAware {
                     UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
                     UserSettings.SETTINGS_FILTER_READ -> "false"
                     UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
+                    UserSettings.SETTING_OPEN_ADJACENT -> "true"
                 },
             )
         }
@@ -99,6 +100,7 @@ class OpmlParserTest : DIAware {
             settingsStore.setFeedListFilterRead(false)
             settingsStore.setFeedListFilterSaved(true)
             settingsStore.setShowOnlyTitles(true)
+            settingsStore.setOpenAdjacent(true)
         }
 
         confirmVerified(settingsStore)

@@ -647,6 +647,11 @@ class Repository(override val di: DI) : DIAware {
     suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant? = null) =
         feedStore.setCurrentlySyncingOn(feedId = feedId, syncing = syncing, lastSync = lastSync)
 
+    val isOpenAdjacent: StateFlow<Boolean> = settingsStore.openAdjacent
+    fun setOpenAdjacent(value: Boolean) {
+        settingsStore.setOpenAdjacent(value)
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_REPO"
     }

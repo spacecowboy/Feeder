@@ -65,7 +65,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -88,6 +87,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
 import com.nononsenseapps.feeder.util.openKoFiIntent
@@ -95,6 +95,8 @@ import java.net.URL
 import java.net.URLDecoder
 import net.glxn.qrgen.android.QRCode
 import net.glxn.qrgen.core.scheme.Url
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 
 private const val LOG_TAG = "FEEDER_SYNCSCREEN"
 
@@ -544,6 +546,7 @@ fun SyncSetupContent(
     onStartNewSyncChain: () -> Unit,
 ) {
     val dimens = LocalDimens.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -569,14 +572,16 @@ fun SyncSetupContent(
         )
         // Google Play does not allow direct donation links
         if (!BuildConfig.BUILD_TYPE.contains("play", ignoreCase = true)) {
-            val context = LocalContext.current
             Text(
                 text = KOFI_URL,
                 style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        context.startActivity(openKoFiIntent())
+                        activityLauncher.startActivity(
+                            openAdjacentIfSuitable = true,
+                            intent = openKoFiIntent(),
+                        )
                     },
             )
         }
@@ -760,6 +765,7 @@ fun SyncDeviceListContent(
     }
 
     val dimens = LocalDimens.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -792,14 +798,16 @@ fun SyncDeviceListContent(
         )
         // Google Play does not allow direct donation links
         if (!BuildConfig.BUILD_TYPE.contains("play", ignoreCase = true)) {
-            val context = LocalContext.current
             Text(
                 text = KOFI_URL,
                 style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        context.startActivity(openKoFiIntent())
+                        activityLauncher.startActivity(
+                            openAdjacentIfSuitable = true,
+                            intent = openKoFiIntent(),
+                        )
                     },
             )
         }
@@ -941,7 +949,7 @@ fun SyncAddNewDeviceContent(
     syncUrl: ImmutableHolder<URL>,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     val qrCode by remember(syncUrl) {
         derivedStateOf {
@@ -1003,7 +1011,10 @@ fun SyncAddNewDeviceContent(
                         },
                         null,
                     )
-                    context.startActivity(intent)
+                    activityLauncher.startActivity(
+                        openAdjacentIfSuitable = false,
+                        intent = intent,
+                    )
                 },
         )
     }

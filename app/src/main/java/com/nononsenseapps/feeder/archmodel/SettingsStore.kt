@@ -307,6 +307,13 @@ class SettingsStore(override val di: DI) : DIAware {
         ).apply()
     }
 
+    private val _openAdjacent = MutableStateFlow(sp.getBoolean(PREF_OPEN_ADJACENT, true))
+    val openAdjacent = _openAdjacent.asStateFlow()
+    fun setOpenAdjacent(value: Boolean) {
+        _openAdjacent.value = value
+        sp.edit().putBoolean(PREF_OPEN_ADJACENT, value).apply()
+    }
+
     private val _feedItemStyle = MutableStateFlow(
         feedItemStyleFromString(sp.getStringNonNull(PREF_FEED_ITEM_STYLE, FeedItemStyle.CARD.name)),
     )
@@ -484,6 +491,7 @@ const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
  */
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
+const val PREF_OPEN_ADJACENT = "pref_open_adjacent"
 
 const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
@@ -527,6 +535,7 @@ enum class UserSettings(val key: String) {
     SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS),
     SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
     SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
+    SETTING_OPEN_ADJACENT(key = PREF_OPEN_ADJACENT),
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,

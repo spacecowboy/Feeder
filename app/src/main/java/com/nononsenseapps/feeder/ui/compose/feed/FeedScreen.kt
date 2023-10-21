@@ -137,11 +137,10 @@ import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
+import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.logDebug
-import com.nononsenseapps.feeder.util.openLinkInBrowser
-import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import java.time.Instant
 import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -190,7 +189,7 @@ fun FeedScreen(
         }
     }
 
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     // Each feed gets its own scroll state. Persists across device rotations, but is cleared when
     // switching feeds
@@ -293,7 +292,10 @@ fun FeedScreen(
                 SettingsDestination.navigate(navController)
             },
             onSendFeedback = {
-                context.startActivity(emailBugReportIntent())
+                activityLauncher.startActivity(
+                    openAdjacentIfSuitable = true,
+                    intent = emailBugReportIntent(),
+                )
             },
             onImport = {
                 try {
@@ -365,10 +367,10 @@ fun FeedScreen(
                 viewModel.openArticle(
                     itemId = itemId,
                     openInBrowser = { articleLink ->
-                        openLinkInBrowser(context, articleLink)
+                        activityLauncher.openLinkInBrowser(articleLink)
                     },
                     openInCustomTab = { articleLink ->
-                        openLinkInCustomTab(context, articleLink, toolbarColor)
+                        activityLauncher.openLinkInCustomTab(articleLink, toolbarColor)
                     },
                     navigateToArticle = {
                         ArticleDestination.navigate(navController, itemId)
@@ -1015,7 +1017,7 @@ fun FeedListContent(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     Box(modifier = modifier) {
         AnimatedVisibility(
@@ -1149,7 +1151,10 @@ fun FeedListContent(
                                 },
                                 null,
                             )
-                            context.startActivity(intent)
+                            activityLauncher.startActivity(
+                                openAdjacentIfSuitable = false,
+                                intent = intent,
+                            )
                         },
                     ) {
                         onItemClick(previewItem.id)
@@ -1199,7 +1204,7 @@ fun FeedGridContent(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
     val screenHeightPx = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
@@ -1328,7 +1333,10 @@ fun FeedGridContent(
                                 },
                                 null,
                             )
-                            context.startActivity(intent)
+                            activityLauncher.startActivity(
+                                openAdjacentIfSuitable = false,
+                                intent = intent,
+                            )
                         },
                     ) {
                         onItemClick(previewItem.id)

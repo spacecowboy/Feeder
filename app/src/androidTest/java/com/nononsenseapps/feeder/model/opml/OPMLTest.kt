@@ -715,6 +715,7 @@ class OPMLTest : DIAware {
                     UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
                     UserSettings.SETTINGS_FILTER_READ -> "false"
                     UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
+                    UserSettings.SETTING_OPEN_ADJACENT -> "true"
                 }
             }
     }
@@ -770,6 +771,7 @@ private val sampleFile: List<String> = """
           <feeder:setting key="pref_img_show_thumbnails" value="false"/>
           <feeder:setting key="pref_default_open_item_with" value="3"/>
           <feeder:setting key="pref_open_links_with" value="3"/>
+          <feeder:setting key="pref_open_adjacent" value="true"/>
           <feeder:setting key="pref_body_text_scale" value="1.6"/>
           <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
           <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
