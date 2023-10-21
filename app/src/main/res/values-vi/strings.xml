@@ -3,7 +3,7 @@
     <string name="failed_to_load_text_to_speech">Không thể tải văn bản thành giọng nói</string>
     <string name="fetching_full_article">Đang lấy bài viết đầy đủ…</string>
     <string name="failed_to_fetch_full_article">Không thể lấy bài viết đầy đủ</string>
-    <string name="fetch_full_articles_by_default">Mặc định luôn ;ấy bài viết đầy đủ</string>
+    <string name="fetch_full_articles_by_default">Nạp toàn bộ bài viết theo mặc định</string>
     <string name="fetch_full_article">Lấy bài viết đầy đủ</string>
     <string name="failed_to_parse">Không thể xử lý %1$s</string>
     <string name="preload_custom_tab">Tải trước tab tuỳ chỉnh</string>
@@ -11,10 +11,10 @@
     <string name="battery_optimization_disabled">Tắt</string>
     <string name="battery_optimization">Tối ưu hoá pin</string>
     <string name="toggle_tag_expansion">Bật/tắt mở rộng thẻ</string>
-    <string name="discovered_feeds_list">Danh sách các feed đã tìm ra</string>
+    <string name="discovered_feeds_list">Danh sách các nguồn cấp đã tìm ra</string>
     <string name="mark_items_below_as_read">Đánh dấu các mục ở dưới đã đọc</string>
     <string name="mark_items_above_as_read">Đánh dấu các mục ở trên đã đọc</string>
-    <string name="open_feed">Mở feed</string>
+    <string name="open_feed">Mở nguồn cấp</string>
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Chạm để phát video</string>
     <string name="no_email_client">Không thể mở ứng dụng email</string>
@@ -28,7 +28,7 @@
     <string name="theme_automatic">Tự động</string>
     <string name="theme_system">Hệ thống</string>
     <string name="could_not_load_url">Không thể tải URL</string>
-    <string name="max_feed_items">Số mục tối đa cho từng feed</string>
+    <string name="max_feed_items">Số mục tối đa trên mỗi nguồn cấp dữ liệu</string>
     <string name="open_in_web_view">Mở trong Web view</string>
     <string name="open_link_in_web_view">Mở liên kết trong web view</string>
     <string name="reader_settings">Trình đọc</string>
@@ -39,9 +39,9 @@
     <string name="open_in_default_browser">Trình duyệt mặc định</string>
     <string name="open_in_webview">Web view</string>
     <string name="open_in_reader">Trình đọc</string>
-    <string name="notification_channel_description">Thông báo chỉ được hiện cho các mục chưa đọc trong các feed được thiết lập</string>
-    <string name="notification_channel_name">Feed chưa đọc</string>
-    <string name="updated_feeds">Feed đã cập nhật</string>
+    <string name="notification_channel_description">Thông báo chỉ được hiện cho các mục chưa đọc trong các nguồn cấp được thiết lập</string>
+    <string name="notification_channel_name">Nguồn cấp chưa đọc</string>
+    <string name="updated_feeds">Nguồn cấp đã cập nhật</string>
     <string name="include_mobile_hotspots">Bao gồm các điểm phát sóng di động</string>
     <string name="show_fab">Hiện nút hành động nổi</string>
     <string name="on_startup">Khi khởi động ứng dụng</string>
@@ -61,16 +61,16 @@
     <string name="sync_option_every_30min">Mỗi 30 phút</string>
     <string name="sync_option_every_15min">Mỗi 15 phút</string>
     <string name="sync_option_manually">Thủ công</string>
-    <string name="all_feeds">Tất cả feed</string>
+    <string name="all_feeds">Tất cả nguồn cấp dữ liệu</string>
     <string name="title_activity_settings">Cài đặt</string>
     <string name="nothing_to_display">Không có gì để xem!</string>
-    <string name="no_such_feed">Không tìm thấy feed với đường dẫn đó. Thử sử dụng HTTPS\?</string>
+    <string name="no_such_feed">Không tìm thấy nguồn cấp nào như vậy. Hãy thử sử dụng https xem\?</string>
     <string name="share">Chia sẻ</string>
     <string name="indicator_for_mark_as_read">Dấu chỉ thị cho đánh dấu đã đọc</string>
     <string name="new_based_on_this">Mới và được dựa trên mục này</string>
     <string name="view_debug_log">Xem nhật ký gỡ lỗi</string>
-    <string name="import_feeds_from_opml">Nhập danh sách feed từ OPML</string>
-    <string name="export_feeds_to_opml">Xuất danh sách feed ra OPML</string>
+    <string name="import_feeds_from_opml">Nhập các nguồn cấp từ OPML</string>
+    <string name="export_feeds_to_opml">Xuất các nguồn cấp ra OPML</string>
     <string name="sync">Đồng bộ</string>
     <string name="resume_reading">Tiếp tục đọc</string>
     <string name="pause_reading">Tạm dừng đọc</string>
@@ -86,24 +86,24 @@
     <string name="new_items_available">Có mục mới</string>
     <string name="show_unread_items">Hiện các mục chưa đọc</string>
     <string name="show_all_items">Hiện tất cả các mục</string>
-    <string name="delete_feed">Xóa feed</string>
-    <string name="edit_feed">Chỉnh sửa feed</string>
+    <string name="delete_feed">Xóa nguồn cấp</string>
+    <string name="edit_feed">Chỉnh sửa nguồn cấp</string>
     <string name="mark_all_as_read">Đánh dấu tất cả đã đọc</string>
     <string name="mark_as_unread">Đánh dấu chưa đọc</string>
     <string name="mark_as_read">Đánh dấu đã đọc</string>
-    <string name="search_feed_empty_hint">Nhập địa chỉ của feed</string>
-    <string name="empty_feed_add"><annotation style="link">Thêm</annotation> feed khác\?</string>
-    <string name="empty_feed_open"><annotation style="link">Mở</annotation> một feed khác\?</string>
+    <string name="search_feed_empty_hint">Nhập địa chỉ một nguồn cấp</string>
+    <string name="empty_feed_add"><annotation style="link">Thêm</annotation> nguồn cấp khác\?</string>
+    <string name="empty_feed_open"><annotation style="link">Mở</annotation> một nguồn cấp khác\?</string>
     <string name="empty_feed_top">Không có gì để đọc ở đây. Bạn có muốn…</string>
     <string name="save">Lưu</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="title">Tiêu đề</string>
-    <string name="add_feed_search_hint">URL của feed</string>
+    <string name="add_feed_search_hint">URL nguồn cấp</string>
     <string name="tag">Thẻ</string>
     <string name="url">URL</string>
-    <string name="title_activity_edit_feed">Đăng ký feed</string>
-    <string name="add_feed">Thêm feed</string>
+    <string name="title_activity_edit_feed">Đăng ký nguồn cấp</string>
+    <string name="add_feed">Thêm nguồn cấp</string>
     <string name="action_settings">Cài đặt</string>
     <string name="navigation_drawer_close">Đóng ngăn điều hướng</string>
     <string name="navigation_drawer_open">Mở ngăn điều hướng</string>
@@ -113,7 +113,7 @@
     <string name="two_unread_articles">%1$s bài viết chưa đọc</string>
     <string name="one_unread_article">%1$s bài viết chưa đọc</string>
     <string name="zero_unread_articles">%1$s bài viết chưa đọc</string>
-    <string name="synchronize_feeds">Đồng bộ các feed</string>
+    <string name="synchronize_feeds">Đồng bộ các nguồn cấp</string>
     <string name="showing_all_articles">Đang hiện tất cả bài viết</string>
     <string name="showing_only_unread_articles">Đang hiện chỉ những bài viết chưa đọc</string>
     <string name="already_read">Đã đọc</string>
@@ -133,7 +133,7 @@
     <string name="dark_theme_preference_dark">Tối</string>
     <string name="dark_theme_preference">Chủ đề tối được ưu tiên</string>
     <string name="sync_status">Trạng thái đồng bộ</string>
-    <string name="only_enable_for_bad_id_feeds">Chỉ bật cho các feed có ID bị lỗi</string>
+    <string name="only_enable_for_bad_id_feeds">Chỉ bật cho các nguồn cấp có ID không hợp lệ</string>
     <string name="invalid_url">Không phải URL hợp lệ</string>
     <string name="generate_extra_unique_ids">Tạo thêm các ID độc nhất</string>
     <string name="syncing">Đang đồng bộ</string>
@@ -146,7 +146,7 @@
     <string name="device_sync">Đồng bộ thiết bị</string>
     <string name="device_sync_financed_by_community">Dịch vụ này được cộng đồng trả phí. Vui lòng cân nhắc ủng hộ nếu bạn thấy nó hữu ích.</string>
     <string name="secret_key">Mã bí mật</string>
-    <string name="device_sync_description_1">Đồng bộ thiết bị cho phép bạn đồng bộ việc đăng ký feed và bài viết đã đọc sang các thiết bị khác.</string>
+    <string name="device_sync_description_1">Đồng bộ thiết bị cho phép bạn đồng bộ việc đăng ký nguồn cấp và bài viết đã đọc sang các thiết bị khác.</string>
     <string name="disabled">Tắt</string>
     <string name="only_from_end">Chỉ từ cuối</string>
     <string name="from_anywhere">Từ bất cứ đâu</string>
@@ -170,7 +170,7 @@
     <string name="block_list">Danh sách chặn</string>
     <string name="add_item">Thêm mục</string>
     <string name="remove">Xoá</string>
-    <string name="permission_read_desc">Cho phép ứng dụng đọc feed và bài viết</string>
+    <string name="permission_read_desc">Cho phép ứng dụng đọc nguồn cấp và bài viết</string>
     <string name="permission_read_label">Quyền truy cập chỉ đọc</string>
     <string name="use_detect_language">Phát hiện ngôn ngữ</string>
     <string name="article_image">Hình ảnh bài viết</string>
@@ -209,4 +209,23 @@
     <string name="save_article">Lưu bài viết</string>
     <string name="unsave_article">Dừng lưu bài viết</string>
     <string name="theme_e_ink">Giấy điện tử</string>
+    <string name="failed_to_parse_json_feed">Không phân tích được nguồn cấp JSON</string>
+    <string name="failed_to_parse_full_article">Không thể phân tích toàn bộ bài viết</string>
+    <string name="add_anyway">Vẫn thêm</string>
+    <string name="article_list_settings">Danh sách bài viết</string>
+    <string name="filter_noun">Lọc</string>
+    <string name="recently_read_adjective">Đọc gần đây</string>
+    <string name="no_feeds_in_the_page">Không có nguồn cấp dữ liệu trong trang</string>
+    <string name="no_body_in_response">Không có ai phản hồi</string>
+    <string name="http_error">Lỗi HTTP</string>
+    <string name="no_url">Không có URL</string>
+    <string name="max_lines">Số dòng tối đa</string>
+    <string name="failed_to_parse_the_page">Không thể phân tích trang</string>
+    <string name="saved_adjective">Đã lưu</string>
+    <string name="failed_to_parse_rss_feed">Không thể phân tích nguồn cấp RSS</string>
+    <string name="unsupported_content_type">Loại nội dung không được hỗ trợ</string>
+    <string name="failed_to_download">Không thể tải xuống</string>
+    <string name="read_adjective">Đã đọc</string>
+    <string name="show_only_title">Chỉ hiện tiêu đề</string>
+    <string name="content_is_not_html">Nội dung không phải là HTML</string>
 </resources>
