@@ -23,6 +23,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.ItemOpener
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.FeedDao
@@ -123,7 +125,10 @@ private fun createNotificationChannel(context: Context) {
     notificationManager.createNotificationChannel(channel)
 }
 
-private fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
+private suspend fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
+    val di by closestDI(context)
+    val repository: Repository by di.instance()
+
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
     val text = item.feedDisplayTitle
@@ -151,13 +156,25 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
     builder.setContentText(text)
         .setContentTitle(title)
-        .setContentIntent(pendingIntent)
         .setGroup(articleNotificationGroup)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
         .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
+
+    if (repository.getArticleOpener(item.id) == ItemOpener.DEFAULT_BROWSER && item.link != null) {
+        builder.setContentIntent(
+            PendingIntent.getActivity(
+                context,
+                item.id.toInt(),
+                getOpenInDefaultActivityIntent(context, item.id, item.link),
+                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+            ),
+        )
+    } else {
+        builder.setContentIntent(pendingIntent)
+    }
 
     item.enclosureLink?.let { enclosureLink ->
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(enclosureLink))
@@ -174,17 +191,19 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         )
     }
 
-    item.link?.let { link ->
-        builder.addAction(
-            R.drawable.notification_open_in_browser,
-            context.getString(R.string.open_link_in_browser),
-            PendingIntent.getActivity(
-                context,
-                item.id.toInt(),
-                getOpenInDefaultActivityIntent(context, item.id, link),
-                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-            ),
-        )
+    if (repository.getArticleOpener(item.id) != ItemOpener.DEFAULT_BROWSER) {
+        item.link?.let { link ->
+            builder.addAction(
+                R.drawable.notification_open_in_browser,
+                context.getString(R.string.open_link_in_browser),
+                PendingIntent.getActivity(
+                    context,
+                    item.id.toInt(),
+                    getOpenInDefaultActivityIntent(context, item.id, link),
+                    PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+                ),
+            )
+        }
     }
 
     builder.addAction(
