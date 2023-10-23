@@ -350,18 +350,20 @@ suspend fun OkHttpClient.getResponse(
 ): Response {
     val request = Request.Builder()
         .url(url)
-        .run {
-            if (forceNetwork) {
-                cacheControl(
-                    CacheControl.Builder()
-                        // Force cache-revalidation
-                        .maxAge(0, TimeUnit.SECONDS)
-                        .build(),
+        .cacheControl(
+            CacheControl.Builder()
+                // The time between cache re-validations
+                .maxAge(
+                    if (forceNetwork) {
+                        0
+                    } else {
+                        // Matches fastest sync schedule
+                        15
+                    },
+                    TimeUnit.MINUTES,
                 )
-            } else {
-                this
-            }
-        }
+                .build(),
+        )
         .build()
 
     @Suppress("BlockingMethodInNonBlockingContext")
