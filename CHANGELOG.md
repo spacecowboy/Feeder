@@ -1,3 +1,26 @@
+# 2.6.7-1
+Harsha0431 (1):
+  * [b23fd0b6] Updated Telugu translation using Weblate
+
+Jonas Kalderstam (11):
+  * [6d136434] Added option to open links in an adjacent window on large
+         screens
+  * [78678111] Added max age of cached responses with at most 15 mins unless
+         manual sync
+
+Mozart Michael (1):
+  * [df81e402] Updated Romanian translation using Weblate
+
+derdilla (1):
+  * [69682160] Fixed notifications not following settings for item opening
+         (#108)
+
+ngocanhtve (1):
+  * [f9109ce4] Updated Vietnamese translation using Weblate
+
+trunars (1):
+  * [010a2f96] Translated using Weblate (Bulgarian)
+
 # 2.6.7
 Cleydison Nascimento (1):
   * [e736f383] Updated Portuguese (Brazil) translation using Weblate
