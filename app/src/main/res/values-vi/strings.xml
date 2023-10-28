@@ -228,4 +228,5 @@
     <string name="read_adjective">Đã đọc</string>
     <string name="show_only_title">Chỉ hiện tiêu đề</string>
     <string name="content_is_not_html">Nội dung không phải là HTML</string>
+    <string name="open_browser_in_split_screen">Mở trình duyệt ở chế độ chia đôi màn hình</string>
 </resources>
