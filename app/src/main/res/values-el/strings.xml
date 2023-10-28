@@ -228,4 +228,5 @@
     <string name="no_url">Χωρίς URL</string>
     <string name="theme_e_ink">Ηλεκτρονικός σύνδεσμος</string>
     <string name="add_anyway">Προσθήκη όπως και να χει</string>
+    <string name="open_browser_in_split_screen">Ανοίξτε το πρόγραμμα περιήγησης σε διαιρεμένη οθόνη</string>
 </resources>
