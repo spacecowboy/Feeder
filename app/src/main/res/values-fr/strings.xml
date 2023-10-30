@@ -28,7 +28,7 @@
     <string name="sync">Actualiser</string>
     <string name="export_feeds_to_opml">Exporter les flux vers un fichier OPML</string>
     <string name="import_feeds_from_opml">Importer des flux depuis un fichier OPML</string>
-    <string name="view_debug_log">Voir les journaux de débogage</string>
+    <string name="view_debug_log">Voir le journal de débogage</string>
     <string name="new_based_on_this">Nouveau flux basé sur ceci</string>
     <string name="indicator_for_mark_as_read">Indicateur pour marquer comme lu</string>
     <string name="share">Partager</string>
