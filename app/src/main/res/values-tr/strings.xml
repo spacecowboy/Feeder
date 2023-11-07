@@ -228,4 +228,5 @@
     <string name="theme_e_ink">E-kâğıt</string>
     <string name="failed_to_download">İndirilemedi</string>
     <string name="add_anyway">Yine de ekle</string>
+    <string name="open_browser_in_split_screen">Tarayıcıyı bölünmüş ekranda aç</string>
 </resources>
