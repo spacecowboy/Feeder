@@ -44,7 +44,7 @@
     <string name="sync_option_every_3_hours">Elke 3 uur</string>
     <string name="sync_option_every_6_hours">Elke 6 uur</string>
     <string name="sync_option_every_12_hours">Elke 12 uur</string>
-    <string name="syncing">Synchroniseren</string>
+    <string name="syncing">Synchronisatie</string>
     <string name="only_when_charging">Alleen tijdens opladen</string>
     <string name="image_loading">Afbeelding laden</string>
     <string name="check_for_updates">Nieuwe artikelen zoeken…</string>
@@ -114,7 +114,7 @@
     <string name="show_thumbnails">Miniaturen weergeven</string>
     <string name="import_feeds_from_opml">Feeds uit OPML importeren</string>
     <string name="no_such_feed">Geen feed gevonden. HTTPS proberen\?</string>
-    <string name="synchronization">Synchroniseren</string>
+    <string name="synchronization">Synchroniseert</string>
     <string name="only_on_wifi">Alleen via Wi-Fi</string>
     <string name="notification_channel_name">Ongelezen feeds</string>
     <string name="open_in_default_browser">Standaard browser</string>
@@ -216,4 +216,17 @@
     <string name="read_adjective">Gelezen</string>
     <string name="saved_adjective">Bewaard</string>
     <string name="theme_e_ink">Elektronisch papier</string>
+    <string name="failed_to_parse_json_feed">Mislukte analyse JSON feed</string>
+    <string name="failed_to_parse_full_article">Mislukte analyse van volledig artikel</string>
+    <string name="add_anyway">Toch toevoegen</string>
+    <string name="no_feeds_in_the_page">Geen feeds op de pagina</string>
+    <string name="no_body_in_response">Geen inhoud in het antwoord</string>
+    <string name="http_error">HTTP fout</string>
+    <string name="no_url">Geen URL</string>
+    <string name="failed_to_parse_the_page">Pagina is niet geanalyseerd</string>
+    <string name="failed_to_parse_rss_feed">Mislukte analyse RSS-feed</string>
+    <string name="unsupported_content_type">Geen ondersteund inhoud-type</string>
+    <string name="open_browser_in_split_screen">Browser in gedeeld venster openen</string>
+    <string name="failed_to_download">Download mislukt</string>
+    <string name="content_is_not_html">Inhoud is geen HTML</string>
 </resources>
