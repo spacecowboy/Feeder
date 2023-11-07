@@ -34,7 +34,7 @@
     <string name="open_enclosed_media">Öffne eingebettete Medien</string>
     <string name="sync">Synchronisieren</string>
     <string name="export_feeds_to_opml">Feeds als OPML exportieren</string>
-    <string name="import_feeds_from_opml">Feeds von OPML importieren</string>
+    <string name="import_feeds_from_opml">Feeds aus OPML importieren</string>
     <string name="view_debug_log">Betrachte den Debug Log</string>
     <string name="new_based_on_this">Neu darauf basierend</string>
     <string name="indicator_for_mark_as_read">Indikator für Lesemarkierung</string>
@@ -228,5 +228,5 @@
     <string name="failed_to_parse_rss_feed">RSS-Feed konnte nicht analysiert werden</string>
     <string name="theme_e_ink">E-Papier</string>
     <string name="add_anyway">Trotzdem hinzufügen</string>
-    <string name="open_browser_in_split_screen">Browser öffnen in getrennten Bildschirm</string>
+    <string name="open_browser_in_split_screen">Browser im geteilten Bildschirm öffnen</string>
 </resources>
