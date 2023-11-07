@@ -226,4 +226,7 @@
     <string name="failed_to_parse_full_article">Nepodařilo se zpracovat celý článek</string>
     <string name="no_url">Žádná URL adresa</string>
     <string name="theme_e_ink">E-papír</string>
+    <string name="add_anyway">Přesto přidat</string>
+    <string name="no_body_in_response">Žádné tělo v odpovědi</string>
+    <string name="open_browser_in_split_screen">Otevření prohlížeče na rozdělené obrazovce</string>
 </resources>
