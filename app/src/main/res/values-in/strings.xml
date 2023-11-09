@@ -227,4 +227,6 @@
     <string name="unsupported_content_type">Tipe konten tidak didukung</string>
     <string name="failed_to_download">Gagal mengunduh</string>
     <string name="content_is_not_html">Konten bukan HTML</string>
+    <string name="add_anyway">Tetap tambahkan</string>
+    <string name="open_browser_in_split_screen">Buka peramban dalam layar terbagi</string>
 </resources>
