@@ -1,3 +1,40 @@
+# 2.6.8
+Agnieszka C (1):
+  * [2ffda1a6] Updated Polish translation using Weblate
+
+Eric (1):
+  * [b70dd049] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [730ecf80] Updated Italian translation using Weblate
+
+Matth78 (1):
+  * [6ca6ba6b] Updated French translation using Weblate
+
+Oğuz Ersen (1):
+  * [ce281b46] Updated Turkish translation using Weblate
+
+Retrial (1):
+  * [091dbaa4] Updated Greek translation using Weblate
+
+VfBFan (1):
+  * [7ddadba4] Updated German translation using Weblate
+
+gallegonovato (1):
+  * [c48624de] Updated Spanish translation using Weblate
+
+ikanakova (1):
+  * [d71d728b] Updated Czech translation using Weblate
+
+mm4c (1):
+  * [4a08a92c] Updated Dutch translation using Weblate
+
+ngocanhtve (1):
+  * [5d76fbeb] Updated Vietnamese translation using Weblate
+
+zmni (1):
+  * [6bdfaad2] Updated Indonesian translation using Weblate
+
 # 2.6.7-1
 Harsha0431 (1):
   * [b23fd0b6] Updated Telugu translation using Weblate
