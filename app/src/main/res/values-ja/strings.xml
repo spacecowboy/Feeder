@@ -227,4 +227,6 @@
     <string name="unsupported_content_type">未対応のコンテンツタイプ</string>
     <string name="failed_to_parse_full_article">記事全体の解析に失敗しました</string>
     <string name="theme_e_ink">電子ペーパー</string>
+    <string name="add_anyway">とにかく追加</string>
+    <string name="open_browser_in_split_screen">分割画面でブラウザーを開く</string>
 </resources>
