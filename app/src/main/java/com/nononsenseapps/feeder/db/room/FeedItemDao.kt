@@ -250,6 +250,8 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND read_time is null
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+        ORDER BY $feedItemsListOrderByDesc
+        LIMIT 20
         """,
     )
     suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
