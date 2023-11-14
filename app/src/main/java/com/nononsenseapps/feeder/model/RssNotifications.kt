@@ -14,7 +14,9 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.TransactionTooLargeException
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.GROUP_ALERT_SUMMARY
@@ -45,8 +47,10 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
 const val summaryNotificationId = 2_147_483_646
-private const val channelId = "feederNotifications"
-private const val articleNotificationGroup = "com.nononsenseapps.feeder.ARTICLE"
+private const val CHANNEL_ID = "feederNotifications"
+private const val ARTICLE_NOTIFICATION_GROUP = "com.nononsenseapps.feeder.ARTICLE"
+
+private const val LOG_TAG = "FEEDER_NOTIFY"
 
 suspend fun notify(
     appContext: Context,
@@ -68,18 +72,24 @@ suspend fun notify(
 
     val nm: NotificationManagerCompat by di.instance()
 
+    // If too many it can cause a crash, so it's limited to 20
     val feedItems = getItemsToNotify(di)
 
-    if (feedItems.isNotEmpty()) {
-        if (!updateSummaryOnly) {
-            feedItems.map {
-                it.id.toInt() to singleNotification(appContext, it)
-            }.forEach { (id, notification) ->
-                nm.notify(id, notification)
+    try {
+        if (feedItems.isNotEmpty()) {
+            if (!updateSummaryOnly) {
+                feedItems.map {
+                    it.id.toInt() to singleNotification(appContext, it)
+                }.forEach { (id, notification) ->
+                    nm.notify(id, notification)
+                }
             }
+            // Shown on API Level < 24
+            nm.notify(summaryNotificationId, inboxNotification(appContext, feedItems))
         }
-        // Shown on API Level < 24
-        nm.notify(summaryNotificationId, inboxNotification(appContext, feedItems))
+    } catch (e: TransactionTooLargeException) {
+        // This can happen if there are too many notifications
+        Log.e(LOG_TAG, "Too many notifications", e)
     }
 }
 
@@ -119,7 +129,7 @@ private fun createNotificationChannel(context: Context) {
     val notificationManager: NotificationManager =
         context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-    val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_LOW)
+    val channel = NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW)
     channel.description = description
 
     notificationManager.createNotificationChannel(channel)
@@ -156,7 +166,7 @@ private suspend fun singleNotification(context: Context, item: FeedItemWithFeed)
 
     builder.setContentText(text)
         .setContentTitle(title)
-        .setGroup(articleNotificationGroup)
+        .setGroup(ARTICLE_NOTIFICATION_GROUP)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
         .setNumber(1)
@@ -313,7 +323,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     builder.setContentText(text)
         .setContentTitle(title)
         .setContentIntent(pendingIntent)
-        .setGroup(articleNotificationGroup)
+        .setGroup(ARTICLE_NOTIFICATION_GROUP)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setGroupSummary(true)
         .setDeleteIntent(getDeleteIntent(context, feedItems))
@@ -359,7 +369,7 @@ private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed)
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
-    return NotificationCompat.Builder(context, channelId)
+    return NotificationCompat.Builder(context, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_stat_f)
         .setLargeIcon(bm)
         .setAutoCancel(true)
