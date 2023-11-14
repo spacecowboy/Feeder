@@ -35,6 +35,20 @@ class AnnotatedParagraphStringBuilder {
             return false
         }
 
+    val endsWithNonBreakingSpace: Boolean
+        get() {
+            if (mLastTwoChars.isEmpty()) {
+                return false
+            }
+            mLastTwoChars.peekLatest()?.let { latest ->
+                if (latest.code == 160) {
+                    return true
+                }
+            }
+
+            return false
+        }
+
     fun pushVerbatimTtsAnnotation(verbatim: String) =
         builder.pushTtsAnnotation(VerbatimTtsAnnotation(verbatim))
 

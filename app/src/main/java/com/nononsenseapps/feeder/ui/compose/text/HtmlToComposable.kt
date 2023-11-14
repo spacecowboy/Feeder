@@ -578,7 +578,7 @@ private fun HtmlComposer.appendTextChildren(
                             .forEach { listItem ->
                                 withParagraph {
                                     // no break space
-                                    append("• ")
+                                    append("•\u00A0")
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         baseUrl = baseUrl,
@@ -595,7 +595,7 @@ private fun HtmlComposer.appendTextChildren(
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
                                     // no break space
-                                    append("${i + 1}. ")
+                                    append("${i + 1}.\u00A0")
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         baseUrl = baseUrl,
