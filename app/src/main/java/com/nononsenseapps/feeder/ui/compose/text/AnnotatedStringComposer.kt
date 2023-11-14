@@ -9,7 +9,8 @@ class AnnotatedStringComposer : HtmlParser() {
         strings
 
     override fun emitParagraph(): Boolean {
-        if (builder.isEmpty()) {
+        // List items emit dots and non-breaking space. Don't newline after that
+        if (builder.isEmpty() || builder.endsWithNonBreakingSpace) {
             // Nothing to emit, and nothing to reset
             return false
         }
