@@ -888,7 +888,7 @@ private fun EagerComposer.tableColFirst(
                         .filter {
                             it.tagName() in setOf("th", "td")
                         }.count()
-                }.max()
+                }.maxOrNull() ?: 0
         }
     }
 
@@ -952,58 +952,60 @@ private fun EagerComposer.tableColFirst(
         }
 
         key(rowCount, colCount, rowData, baseUrl, onLinkClick) {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(32.dp),
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .width(dimens.maxReaderWidth),
-            ) {
-                items(
-                    count = colCount,
-                ) { colIndex ->
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier,
-                    ) {
-                        for (rowIndex in 0 until rowCount) {
-                            val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
-                            var emptyCell = false
-                            Surface(
-                                tonalElevation = when (section) {
-                                    "thead" -> 3.dp
-                                    "tbody" -> 0.dp
-                                    "tfoot" -> 1.dp
-                                    else -> 0.dp
-                                },
-                            ) {
-                                rowElement.children()
-                                    .filter { it.tagName() in setOf("th", "td") }
-                                    .elementAtOrNullWithSpans(colIndex)
-                                    ?.let { colElement ->
-                                        withParagraph {
-                                            withStyle(
-                                                if (colElement.tagName() == "th") {
-                                                    SpanStyle(fontWeight = FontWeight.Bold)
-                                                } else {
-                                                    null
-                                                },
-                                            ) {
-                                                appendTextChildren(
-                                                    colElement.childNodes(),
-                                                    baseUrl = baseUrl,
-                                                    onLinkClick = onLinkClick,
-                                                    keyHolder = keyHolder,
-                                                )
+            if (rowCount > 0 && colCount > 0) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .width(dimens.maxReaderWidth),
+                ) {
+                    items(
+                        count = colCount,
+                    ) { colIndex ->
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier,
+                        ) {
+                            for (rowIndex in 0 until rowCount) {
+                                val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
+                                var emptyCell = false
+                                Surface(
+                                    tonalElevation = when (section) {
+                                        "thead" -> 3.dp
+                                        "tbody" -> 0.dp
+                                        "tfoot" -> 1.dp
+                                        else -> 0.dp
+                                    },
+                                ) {
+                                    rowElement.children()
+                                        .filter { it.tagName() in setOf("th", "td") }
+                                        .elementAtOrNullWithSpans(colIndex)
+                                        ?.let { colElement ->
+                                            withParagraph {
+                                                withStyle(
+                                                    if (colElement.tagName() == "th") {
+                                                        SpanStyle(fontWeight = FontWeight.Bold)
+                                                    } else {
+                                                        null
+                                                    },
+                                                ) {
+                                                    appendTextChildren(
+                                                        colElement.childNodes(),
+                                                        baseUrl = baseUrl,
+                                                        onLinkClick = onLinkClick,
+                                                        keyHolder = keyHolder,
+                                                    )
+                                                }
                                             }
                                         }
-                                    }
-                                emptyCell = !render()
-                            }
-                            if (emptyCell) {
-                                // An empty cell looks better if it has some height - but don't want
-                                // the surface because having one space wide surface is weird
-                                append(' ')
-                                render()
+                                    emptyCell = !render()
+                                }
+                                if (emptyCell) {
+                                    // An empty cell looks better if it has some height - but don't want
+                                    // the surface because having one space wide surface is weird
+                                    append(' ')
+                                    render()
+                                }
                             }
                         }
                     }

@@ -46,7 +46,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -254,9 +253,8 @@ fun EditFeedView(
 ) {
     val dimens = LocalDimens.current
 
-    val (leftFocusRequester, rightFocusRequester) = remember {
-        createRefs()
-    }
+    val leftFocusRequester = remember { FocusRequester() }
+    val rightFocusRequester = remember { FocusRequester() }
 
     OkCancelWithContent(
         onOk = {

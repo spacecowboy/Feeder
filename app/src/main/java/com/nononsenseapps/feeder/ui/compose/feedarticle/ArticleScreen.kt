@@ -188,9 +188,8 @@ fun ArticleScreen(
         bottomBarVisibleState.targetState = viewState.isBottomBarVisible
     }
 
-    val (focusArticle, focusTopBar) = remember {
-        FocusRequester.createRefs()
-    }
+    val focusArticle = remember { FocusRequester() }
+    val focusTopBar = remember { FocusRequester() }
 
     Scaffold(
         modifier = modifier
