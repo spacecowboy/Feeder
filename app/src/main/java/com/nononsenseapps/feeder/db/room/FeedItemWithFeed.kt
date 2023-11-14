@@ -6,6 +6,7 @@ import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.COL_ENCLOSURE_TYPE
 import com.nononsenseapps.feeder.db.COL_FEEDCUSTOMTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
@@ -33,7 +34,7 @@ import java.time.ZonedDateTime
 
 const val feedItemColumnsWithFeed = """
     $FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE,
-    $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK,
+    $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK, $COL_ENCLOSURE_TYPE,
     $COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_READ_TIME, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID,
     $FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE,
     $FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE,
@@ -51,6 +52,7 @@ data class FeedItemWithFeed @Ignore constructor(
     @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
     @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+    @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
     var author: String? = null,
     @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
     override var link: String? = null,

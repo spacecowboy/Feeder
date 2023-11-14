@@ -684,7 +684,11 @@ data class Enclosure(
     val present: Boolean = false,
     val link: String = "",
     val name: String = "",
+    val type: String = "",
 )
+
+val Enclosure.isImage: Boolean
+    get() = type.startsWith("image/")
 
 @Immutable
 data class Article(
@@ -699,6 +703,7 @@ data class Article(
             present = true,
             link = link,
             name = item.enclosureFilename ?: "",
+            type = item.enclosureType ?: "",
         )
     } ?: Enclosure(
         present = false,

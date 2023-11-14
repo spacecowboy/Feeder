@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.COL_ENCLOSURE_TYPE
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_DOWNLOADED
@@ -69,6 +70,7 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
     @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+    @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
     @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
     @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) override var pubDate: ZonedDateTime? = null,
     @ColumnInfo(name = COL_LINK) override var link: String? = null,
@@ -125,7 +127,10 @@ data class FeedItem @Ignore constructor(
         this.plainSnippet = summary
 
         this.imageUrl = absoluteImage
-        this.enclosureLink = entry.attachments?.firstOrNull()?.url
+        val firstEnclosure = entry.attachments?.firstOrNull()
+        this.enclosureLink = firstEnclosure?.url
+        this.enclosureType = firstEnclosure?.mime_type?.lowercase()
+
         this.author = entry.author?.name ?: feed.author?.name
         this.link = entry.url
 
