@@ -38,7 +38,9 @@ import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
+import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
+import java.io.FileNotFoundException
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.Locale
@@ -396,7 +398,14 @@ class FeedArticleViewModel(
     fun ttsPlay() {
         viewModelScope.launch(Dispatchers.IO) {
             val fullText = when (viewState.value.textToDisplay) {
-                TextToDisplay.DEFAULT -> {
+                TextToDisplay.DEFAULT -> Either.catching(
+                    onCatch = {
+                        when (it) {
+                            is FileNotFoundException -> TTSFileNotFound
+                            else -> TTSUnknownError
+                        }
+                    },
+                ) {
                     blobInputStream(viewState.value.articleId, filePathProvider.articleDir).use {
                         htmlToAnnotatedString(
                             inputStream = it,
@@ -405,7 +414,14 @@ class FeedArticleViewModel(
                     }
                 }
 
-                TextToDisplay.FULLTEXT -> {
+                TextToDisplay.FULLTEXT -> Either.catching(
+                    onCatch = {
+                        when (it) {
+                            is FileNotFoundException -> TTSFileNotFound
+                            else -> TTSUnknownError
+                        }
+                    },
+                ) {
                     blobFullInputStream(
                         viewState.value.articleId,
                         filePathProvider.fullArticleDir,
@@ -422,14 +438,13 @@ class FeedArticleViewModel(
                 TextToDisplay.FAILED_MISSING_BODY,
                 TextToDisplay.FAILED_MISSING_LINK,
                 TextToDisplay.FAILED_NOT_HTML,
-                -> null
+                -> Either.Left(TTSUnknownError)
             }
 
-            if (fullText == null) {
-                // TODO show error some message
-            } else {
+            // TODO show error some message
+            fullText.onRight {
                 ttsStateHolder.tts(
-                    textArray = fullText,
+                    textArray = it,
                     useDetectLanguage = viewState.value.useDetectLanguage,
                 )
             }
@@ -583,3 +598,9 @@ data class FeedArticleScreenViewState(
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
+
+sealed class TSSError
+
+object TTSFileNotFound : TSSError()
+
+object TTSUnknownError : TSSError()
