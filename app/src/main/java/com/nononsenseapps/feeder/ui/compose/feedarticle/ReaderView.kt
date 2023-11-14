@@ -8,9 +8,11 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -21,13 +23,21 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -35,11 +45,20 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
+import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Enclosure
+import com.nononsenseapps.feeder.archmodel.isImage
+import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
+import com.nononsenseapps.feeder.ui.compose.text.rememberMaxImageWidth
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
@@ -158,15 +177,47 @@ fun ReaderView(
 
             if (enclosure.present) {
                 item {
-                    val openLabel = if (enclosure.name.isBlank()) {
-                        stringResource(R.string.open_enclosed_media)
+                    if (enclosure.isImage) {
+                        BoxWithConstraints(
+                            modifier = Modifier
+                                .clip(RectangleShape)
+                                .fillMaxWidth(),
+                        ) {
+                            WithTooltipIfNotBlank(tooltip = enclosure.name) { innerModifier ->
+                                val imageWidth by rememberMaxImageWidth()
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(enclosure.link)
+                                        .scale(Scale.FIT)
+                                        .size(imageWidth)
+                                        .precision(Precision.INEXACT)
+                                        .build(),
+                                    contentDescription = enclosure.name,
+                                    placeholder = rememberTintedVectorPainter(
+                                        Icons.Outlined.Terrain,
+                                    ),
+                                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                    contentScale = if (dimens.hasImageAspectRatioInReader) {
+                                        ContentScale.Fit
+                                    } else {
+                                        ContentScale.FillWidth
+                                    },
+                                    modifier = innerModifier
+                                        .fillMaxWidth()
+                                        .run {
+                                            dimens.imageAspectRatioInReader?.let { ratio ->
+                                                aspectRatio(ratio)
+                                            } ?: this
+                                        },
+                                )
+                            }
+                        }
                     } else {
-                        stringResource(R.string.open_enclosed_media_file, enclosure.name)
-                    }
-                    Column(
-                        modifier = Modifier
-                            .width(dimens.maxReaderWidth),
-                    ) {
+                        val openLabel = if (enclosure.name.isBlank()) {
+                            stringResource(R.string.open_enclosed_media)
+                        } else {
+                            stringResource(R.string.open_enclosed_media_file, enclosure.name)
+                        }
                         ProvideScaledText(
                             style = MaterialTheme.typography.bodyLarge.merge(
                                 LinkTextStyle(),
@@ -175,6 +226,7 @@ fun ReaderView(
                             Text(
                                 text = openLabel,
                                 modifier = Modifier
+                                    .width(dimens.maxReaderWidth)
                                     .clickable {
                                         onEnclosureClick()
                                     }
@@ -189,7 +241,11 @@ fun ReaderView(
                                         } catch (e: Exception) {
                                             // Observed nullpointer exception when setting customActions
                                             // No clue why it could be null
-                                            Log.e("FeederReaderScreen", "Exception in semantics", e)
+                                            Log.e(
+                                                LOG_TAG,
+                                                "Exception in semantics",
+                                                e,
+                                            )
                                         }
                                     },
                             )
@@ -202,3 +258,5 @@ fun ReaderView(
         }
     }
 }
+
+private const val LOG_TAG = "FEEDER_READER"
