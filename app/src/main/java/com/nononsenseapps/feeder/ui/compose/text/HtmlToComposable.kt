@@ -877,18 +877,26 @@ private fun EagerComposer.tableColFirst(
 ) {
     val rowCount by remember {
         derivedStateOf {
-            element.descendants("tr").count()
+            try {
+                element.descendants("tr").count()
+            } catch (t: Throwable) {
+                0
+            }
         }
     }
     val colCount by remember {
         derivedStateOf {
-            element.descendants("tr")
-                .map { row ->
-                    row.descendants()
-                        .filter {
-                            it.tagName() in setOf("th", "td")
-                        }.count()
-                }.maxOrNull() ?: 0
+            try {
+                element.descendants("tr")
+                    .map { row ->
+                        row.descendants()
+                            .filter {
+                                it.tagName() in setOf("th", "td")
+                            }.count()
+                    }.maxOrNull() ?: 0
+            } catch (t: Throwable) {
+                0
+            }
         }
     }
 
