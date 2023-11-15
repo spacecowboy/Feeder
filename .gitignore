@@ -14,3 +14,4 @@ app/creds.b64
 keystore.b64
 devenv.local
 keystore
+stdout
