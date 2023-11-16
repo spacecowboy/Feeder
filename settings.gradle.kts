@@ -34,7 +34,7 @@ dependencyResolutionManagement {
 
             // Rest
             version("kodein", "7.5.0")
-            version("coroutines", "1.7.2")
+            version("coroutines", "1.7.3")
             version("rome", "1.7.1-f8")
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
@@ -43,20 +43,19 @@ dependencyResolutionManagement {
             version("readability4j", "1.0.5")
             version("retrofit", "2.9.0")
             version("qrgen", "2.6.0")
-            version("androidxCore", "1.7.0")
+            version("androidxCore", "1.10.1")
             version("androidxTestcore", "1.5.0")
             version("workmanager", "2.8.1")
-            version("appcompat", "1.3.0")
+            version("appcompat", "1.6.1")
             version("material", "1.6.1")
-            version("preference", "1.1.0")
+            version("preference", "1.2.1")
             version("testRunner", "1.4.0")
-            version("lifecycle", "2.6.1")
+            version("lifecycle", "2.6.2")
             version("room", "2.5.2")
             // Compose related below
             version("compose", "2023.06.01")
             val activityCompose = "1.7.0"
-            version("paging", "3.1.1")
-            version("pagingCompose", "1.0.0-alpha20")
+            version("paging", "3.2.1")
             version("accompanist", "0.30.1")
             version("coil", "2.4.0")
             version("androidWindow", "1.0.0")
@@ -170,7 +169,7 @@ dependencyResolutionManagement {
                 "paging-compose",
                 "androidx.paging",
                 "paging-compose",
-            ).versionRef("pagingCompose")
+            ).versionRef("paging")
             library("window", "androidx.window", "window").versionRef("androidWindow")
             library(
                 "android-material",
