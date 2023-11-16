@@ -1,21 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
-}
-
-class RoomSchemaArgProvider(
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val schemaDir: File
-) : CommandLineArgumentProvider {
-
-    override fun asArguments(): Iterable<String> {
-        // Note: If you're using KSP, you should change the line below to return
-        // listOf("room.schemaLocation=${schemaDir.path}")
-        return listOf("-Aroom.schemaLocation=${schemaDir.path}")
-    }
 }
 
 android {
@@ -35,16 +22,10 @@ android {
 
         // For espresso tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-        // Export Room schemas
-        javaCompileOptions {
-            annotationProcessorOptions {
-                compilerArgumentProviders(
-                    RoomSchemaArgProvider(File(projectDir, "schemas")),
-                )
-                argument("room.incremental", "true")
-            }
-        }
+    ksp {
+        arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
     }
 
     sourceSets {
@@ -150,7 +131,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "19"
     }
 
     compileOptions {
@@ -230,7 +211,7 @@ configurations.all {
 }
 
 dependencies {
-    kapt(libs.room)
+    ksp(libs.room)
     // For java time
     coreLibraryDesugaring(libs.desugar)
 
@@ -303,5 +284,17 @@ ${langs.joinToString("\n") { "                  <locale android:name=\"$it\"/>" 
                 writer.write(localesConfig)
             }
         }
+    }
+}
+
+class RoomSchemaArgProvider(
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val schemaDir: File
+) : CommandLineArgumentProvider {
+
+    override fun asArguments(): Iterable<String> {
+        // Note: If you're using KSP, change the line below to return
+        return listOf("room.schemaLocation=${schemaDir.path}")
     }
 }

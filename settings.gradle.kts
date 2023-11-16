@@ -18,10 +18,12 @@ dependencyResolutionManagement {
         create("libs") {
             // Compose compiler is highly coupled to Kotlin version
             // See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-            val kotlinVersion = "1.8.22"
+            val kotlinVersion = "1.9.20"
+            val kspVersion = "1.9.20-1.0.14"
             version("kotlin", kotlinVersion)
+            version("ksp", kspVersion)
             version("androidPlugin", "8.0.2")
-            version("composeCompiler", "1.4.8")
+            version("composeCompiler", "1.5.4")
 
             // BEGIN These should be upgraded in unison
             version("okhttp", "4.10.0")
@@ -71,7 +73,7 @@ dependencyResolutionManagement {
             plugin("android-application", "com.android.application").versionRef("androidPlugin")
             plugin("kotlin-android", "org.jetbrains.kotlin.android").versionRef("kotlin")
             plugin("kotlin-jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
-            plugin("kotlin-kapt", "org.jetbrains.kotlin.kapt").versionRef("kotlin")
+            plugin("kotlin-ksp", "com.google.devtools.ksp").versionRef("ksp")
             plugin("kotlin-parcelize", "org.jetbrains.kotlin.plugin.parcelize").versionRef("kotlin")
 
             // BOMS
