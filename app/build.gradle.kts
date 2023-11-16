@@ -223,17 +223,9 @@ android {
 //  }
 // }
 
-// TODO
 configurations.all {
     resolutionStrategy {
 //    failOnVersionConflict()
-//
-//    force "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-//    force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-//    force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-//    force "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-//    force "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-//    force "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     }
 }
 
@@ -244,103 +236,24 @@ dependencies {
 
     // BOMS
     implementation(platform(libs.okhttp.bom))
-    implementation(libs.coil.bom)
+    implementation(platform(libs.coil.bom))
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.room.ktx)
-    implementation(libs.room.paging)
-
-    implementation(libs.work.runtime.ktx)
-
-    implementation(libs.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.preference)
-
-    // ViewModel
-    implementation(libs.lifecycle.runtime.compose)
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.viewmodel.savedstate)
-    implementation(libs.paging.runtime.ktx)
-
-    // Compose
-    implementation(libs.activity.compose)
-    implementation(libs.ui)
-    implementation(libs.foundation)
-    implementation(libs.foundation.layout)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.runtime)
-    implementation(libs.ui.tooling)
-    implementation(libs.navigation.compose)
-    implementation(libs.paging.compose)
-    implementation(libs.window)
-    implementation(libs.android.material)
-    implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.accompanist.navigation.animation)
-    implementation(libs.accompanist.adaptive)
-    implementation(libs.compose.material3.windowsizeclass)
-
-    // HTML parsing
-    implementation(libs.jsoup)
-    implementation(libs.tagsoup)
-    // RSS
-    implementation(libs.rome)
-    implementation(libs.rome.modules)
-
-    // Includes conscrypt
+    // Dependencies
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.compose)
+    implementation(libs.bundles.jvm)
     implementation(libs.bundles.okhttp.android)
-    // Image loading
-    implementation(libs.coil.base)
-    implementation(libs.coil.gif)
-    implementation(libs.coil.svg)
-    implementation(libs.coil.compose)
+    implementation(libs.bundles.kotlin)
 
-    implementation(libs.bundles.kotlin.stdlib)
-    // Coroutines
-    implementation(libs.kotlin.coroutines.core)
-    // For doing coroutines on UI thread
-    implementation(libs.kotlin.coroutines.android)
-    // Dependency injection
-    implementation(libs.kodein.androidx)
-    // Custom tabs
-    implementation(libs.androidx.browser)
-    // Full text
-    implementation(libs.readability4j)
-    // For feeder-sync
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.moshi)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.moshi.adapters)
-    implementation(libs.qrgen)
-    // tests
-    testImplementation(libs.bundles.kotlin.stdlib)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.kotlin.coroutines.test)
-    testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockk)
-    testImplementation(libs.mockwebserver)
+    // Tests
+    testImplementation(libs.bundles.kotlin)
+    testImplementation(libs.bundles.test)
 
     androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.bundles.kotlin)
+    androidTestImplementation(libs.bundles.android.test)
 
-    androidTestImplementation(libs.bundles.kotlin.stdlib)
-    androidTestImplementation(libs.kotlin.test.junit)
-    androidTestImplementation(libs.kotlin.coroutines.test)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.mockwebserver)
-
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.androidx.test.core.ktx)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.junit.ktx)
-    androidTestImplementation(libs.room.testing)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
 }
 

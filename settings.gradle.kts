@@ -87,39 +87,43 @@ dependencyResolutionManagement {
             library(
                 "work-runtime-ktx",
                 "androidx.work",
-                "work-runtime-ktx"
+                "work-runtime-ktx",
             ).versionRef("workmanager")
 
             library("core-ktx", "androidx.core", "core-ktx").versionRef("androidxCore")
             library("androidx-appcompat", "androidx.appcompat", "appcompat").versionRef("appcompat")
 
-            library("androidx-preference", "androidx.preference", "preference").versionRef("preference")
+            library(
+                "androidx-preference",
+                "androidx.preference",
+                "preference",
+            ).versionRef("preference")
 
             // ViewModel
             library(
                 "lifecycle-runtime-compose",
                 "androidx.lifecycle",
-                "lifecycle-runtime-compose"
+                "lifecycle-runtime-compose",
             ).versionRef("lifecycle")
             library(
                 "lifecycle-runtime-ktx",
                 "androidx.lifecycle",
-                "lifecycle-runtime-ktx"
+                "lifecycle-runtime-ktx",
             ).versionRef("lifecycle")
             library(
                 "lifecycle-viewmodel-ktx",
                 "androidx.lifecycle",
-                "lifecycle-viewmodel-ktx"
+                "lifecycle-viewmodel-ktx",
             ).versionRef("lifecycle")
             library(
                 "lifecycle-viewmodel-savedstate",
                 "androidx.lifecycle",
-                "lifecycle-viewmodel-savedstate"
+                "lifecycle-viewmodel-savedstate",
             ).versionRef("lifecycle")
             library(
                 "paging-runtime-ktx",
                 "androidx.paging",
-                "paging-runtime-ktx"
+                "paging-runtime-ktx",
             ).versionRef("paging")
 
             // Compose
@@ -127,7 +131,7 @@ dependencyResolutionManagement {
             library(
                 "activity-compose",
                 "androidx.activity",
-                "activity-compose"
+                "activity-compose",
             ).version {
                 require(activityCompose)
             }
@@ -136,56 +140,60 @@ dependencyResolutionManagement {
             library(
                 "foundation-layout",
                 "androidx.compose.foundation",
-                "foundation-layout"
+                "foundation-layout",
             ).withoutVersion()
             library("compose-material3", "androidx.compose.material3", "material3").version {
                 // 1.1.0 introduced tooltips, not part of compose 05 bom at least
                 require("1.1.0")
             }
             library("compose-material", "androidx.compose.material", "material").withoutVersion()
-            library("compose-material3-windowsizeclass", "androidx.compose.material3", "material3-window-size-class").withoutVersion()
+            library(
+                "compose-material3-windowsizeclass",
+                "androidx.compose.material3",
+                "material3-window-size-class",
+            ).withoutVersion()
             library(
                 "compose-material-icons-extended",
                 "androidx.compose.material",
-                "material-icons-extended"
+                "material-icons-extended",
             ).withoutVersion()
             library("runtime", "androidx.compose.runtime", "runtime").withoutVersion()
             library("ui-tooling", "androidx.compose.ui", "ui-tooling").withoutVersion()
             library(
                 "navigation-compose",
                 "androidx.navigation",
-                "navigation-compose"
+                "navigation-compose",
             ).withoutVersion()
             library(
                 "paging-compose",
                 "androidx.paging",
-                "paging-compose"
+                "paging-compose",
             ).versionRef("pagingCompose")
             library("window", "androidx.window", "window").versionRef("androidWindow")
             library(
                 "android-material",
                 "com.google.android.material",
-                "material"
+                "material",
             ).versionRef("material")
             library(
                 "accompanist-permissions",
                 "com.google.accompanist",
-                "accompanist-permissions"
+                "accompanist-permissions",
             ).versionRef("accompanist")
             library(
                 "accompanist-systemuicontroller",
                 "com.google.accompanist",
-                "accompanist-systemuicontroller"
+                "accompanist-systemuicontroller",
             ).versionRef("accompanist")
             library(
                 "accompanist-navigation-animation",
                 "com.google.accompanist",
-                "accompanist-navigation-animation"
+                "accompanist-navigation-animation",
             ).versionRef("accompanist")
             library(
                 "accompanist-adaptive",
                 "com.google.accompanist",
-                "accompanist-adaptive"
+                "accompanist-adaptive",
             ).versionRef("accompanist")
 
             // Better times
@@ -206,11 +214,8 @@ dependencyResolutionManagement {
             library(
                 "conscrypt-android",
                 "org.conscrypt",
-                "conscrypt-android"
+                "conscrypt-android",
             ).versionRef("conscrypt")
-
-            bundle("okhttp", listOf("okhttp", "okio"))
-            bundle("okhttp-android", listOf("okhttp", "okio", "conscrypt-android"))
 
             // Image loading
             library("coil-base", "io.coil-kt", "coil-base").withoutVersion()
@@ -224,38 +229,37 @@ dependencyResolutionManagement {
             library(
                 "kotlin-stdlib-common",
                 "org.jetbrains.kotlin",
-                "kotlin-stdlib-common"
+                "kotlin-stdlib-common",
             ).version {
                 strictly(kotlinVersion)
             }
-            bundle("kotlin-stdlib", listOf("kotlin-stdlib", "kotlin-stdlib-common"))
             library(
                 "kotlin-test-junit",
                 "org.jetbrains.kotlin",
-                "kotlin-test-junit"
+                "kotlin-test-junit",
             ).versionRef("kotlin")
             // Coroutines
             library(
                 "kotlin-coroutines-test",
                 "org.jetbrains.kotlinx",
-                "kotlinx-coroutines-test"
+                "kotlinx-coroutines-test",
             ).versionRef("coroutines")
             library(
                 "kotlin-coroutines-core",
                 "org.jetbrains.kotlinx",
-                "kotlinx-coroutines-core"
+                "kotlinx-coroutines-core",
             ).versionRef("coroutines")
             // For doing coroutines on UI thread
             library(
                 "kotlin-coroutines-android",
                 "org.jetbrains.kotlinx",
-                "kotlinx-coroutines-android"
+                "kotlinx-coroutines-android",
             ).versionRef("coroutines")
             // Dependency injection
             library(
                 "kodein-androidx",
                 "org.kodein.di",
-                "kodein-di-framework-android-x"
+                "kodein-di-framework-android-x",
             ).versionRef("kodein")
             // Custom tabs
             library("androidx-browser", "androidx.browser", "browser").versionRef("androidxBrowser")
@@ -263,19 +267,28 @@ dependencyResolutionManagement {
             library(
                 "readability4j",
                 "net.dankito.readability4j",
-                "readability4j"
+                "readability4j",
             ).versionRef("readability4j")
             // For feeder-sync
             library("retrofit", "com.squareup.retrofit2", "retrofit").versionRef("retrofit")
             library(
                 "retrofit-converter-moshi",
                 "com.squareup.retrofit2",
-                "converter-moshi"
+                "converter-moshi",
             ).versionRef("retrofit")
             library("moshi", "com.squareup.moshi", "moshi").versionRef("moshi")
             library("moshi-kotlin", "com.squareup.moshi", "moshi-kotlin").versionRef("moshi")
             library("moshi-adapters", "com.squareup.moshi", "moshi-adapters").versionRef("moshi")
             library("qrgen", "com.github.kenglxn.qrgen", "android").versionRef("qrgen")
+
+            // Feel free to upgrade once we move to later sdk
+            // Only necessary to fix a bad transitive dependency by Google
+            library("emoji2-view-helper", "androidx.emoji2", "emoji2-views-helper").version {
+                strictly("1.3.+")
+            }
+            library("emoji2", "androidx.emoji2", "emoji2").version {
+                strictly("1.3.+")
+            }
 
             // testing
             library("junit", "junit", "junit").versionRef("junit")
@@ -285,17 +298,142 @@ dependencyResolutionManagement {
 
             library("mockk-android", "io.mockk", "mockk-android").versionRef("mockk")
             library("androidx-test-core", "androidx.test", "core").versionRef("androidxTestcore")
-            library("androidx-test-core-ktx", "androidx.test", "core-ktx").versionRef("androidxTestcore")
+            library(
+                "androidx-test-core-ktx",
+                "androidx.test",
+                "core-ktx",
+            ).versionRef("androidxTestcore")
             library("androidx-test-runner", "androidx.test", "runner").versionRef("testRunner")
             library("room-testing", "androidx.room", "room-testing").versionRef("room")
             library(
                 "espresso-core",
                 "androidx.test.espresso",
-                "espresso-core"
+                "espresso-core",
             ).versionRef("espresso")
-            library("compose-ui-test-junit4", "androidx.compose.ui", "ui-test-junit4").withoutVersion()
-            library("compose-ui-test-manifest", "androidx.compose.ui", "ui-test-manifest").withoutVersion()
-            library("androidx-test-junit-ktx", "androidx.test.ext", "junit-ktx").versionRef("androidx-test-junit-ktx")
+            library(
+                "compose-ui-test-junit4",
+                "androidx.compose.ui",
+                "ui-test-junit4",
+            ).withoutVersion()
+            library(
+                "compose-ui-test-manifest",
+                "androidx.compose.ui",
+                "ui-test-manifest",
+            ).withoutVersion()
+            library(
+                "androidx-test-junit-ktx",
+                "androidx.test.ext",
+                "junit-ktx",
+            ).versionRef("androidx-test-junit-ktx")
+
+            // bundles
+            bundle("okhttp", listOf("okhttp", "okio"))
+            bundle("okhttp-android", listOf("okhttp", "okio", "conscrypt-android"))
+            bundle(
+                "kotlin",
+                listOf(
+                    "kotlin-stdlib",
+                    "kotlin-stdlib-common",
+                    "kotlin-coroutines-core",
+                ),
+            )
+
+            bundle(
+                "jvm",
+                listOf(
+                    "jsoup",
+                    "tagsoup",
+                    "rome",
+                    "rome-modules",
+                    "readability4j",
+                    "retrofit",
+                    "retrofit-converter-moshi",
+                    "moshi",
+                    "moshi-kotlin",
+                    "moshi-adapters",
+                    "qrgen",
+                ),
+            )
+
+            bundle(
+                "android",
+                listOf(
+                    "lifecycle-runtime-ktx",
+                    "lifecycle-viewmodel-ktx",
+                    "lifecycle-viewmodel-savedstate",
+                    "paging-runtime-ktx",
+                    "room-ktx",
+                    "room-paging",
+                    "work-runtime-ktx",
+                    "core-ktx",
+                    "androidx-appcompat",
+                    "androidx-preference",
+                    "coil.base",
+                    "coil.gif",
+                    "coil.svg",
+                    "kotlin-coroutines-android",
+                    "kodein-androidx",
+                    "androidx-browser",
+                    "emoji2",
+                    "emoji2-view-helper",
+                ),
+            )
+
+            bundle(
+                "compose",
+                listOf(
+                    "activity-compose",
+                    "ui",
+                    "foundation",
+                    "foundation-layout",
+                    "compose-material3",
+                    "compose-material",
+                    "compose-material-icons-extended",
+                    "runtime",
+                    "ui-tooling",
+                    "navigation-compose",
+                    "paging-compose",
+                    "window",
+                    "android-material",
+                    "accompanist-permissions",
+                    "accompanist-systemuicontroller",
+                    "accompanist-navigation-animation",
+                    "accompanist-adaptive",
+                    "compose-material3-windowsizeclass",
+                    "lifecycle-runtime-compose",
+                    "coil-compose",
+                ),
+            )
+
+            bundle(
+                "test",
+                listOf(
+                    "kotlin-test-junit",
+                    "kotlin-coroutines-test",
+                    "junit",
+                    "mockito-core",
+                    "mockk",
+                    "mockwebserver",
+                ),
+            )
+
+            bundle(
+                "android-test",
+                listOf(
+                    "kotlin-test-junit",
+                    "kotlin-coroutines-test",
+                    "mockk-android",
+                    "junit",
+                    "mockwebserver",
+                    "androidx-test-core",
+                    "androidx-test-core-ktx",
+                    "androidx-test-runner",
+                    "androidx-test-junit-ktx",
+                    "room-testing",
+                    "espresso-core",
+                    "compose-ui-test-junit4",
+                ),
+            )
         }
     }
 }
