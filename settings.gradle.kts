@@ -22,7 +22,7 @@ dependencyResolutionManagement {
             val kspVersion = "1.9.20-1.0.14"
             version("kotlin", kotlinVersion)
             version("ksp", kspVersion)
-            version("androidPlugin", "8.0.2")
+            version("androidPlugin", "8.1.0")
             version("composeCompiler", "1.5.4")
 
             // BEGIN These should be upgraded in unison
