@@ -1,3 +1,24 @@
+# 2.6.9
+Jonas Kalderstam (11):
+  * [2bdade90] Fixed crash when table had no columns
+  * [03924c15] Fixed crash when trying to TTS play a missing file
+  * [cda338b7] Fixed another crash in table rendering
+  * [ccabb499] Fixed crash if trying to notify for too many items
+  * [f1a3a237] Changed so image enclosures are shown in the Reader
+  * [015f0766] Fixed so list items are not immediately given newlines if
+         followed by paragraph
+  * [020c31e7] Moved all dependencies into bundles
+  * [ce8461c1] Changed to ksp and upped kotlin and compose compile
+  * [042daa3a] Bumped android plugin version
+  * [0bcea035] Bumped bunch of versions
+  * [89775af8] Removed bad language
+
+Kazushi Hayama (1):
+  * [b5f4ca49] Updated Japanese translation using Weblate
+
+Vitor Henrique (1):
+  * [28063c3d] Translated using Weblate (Portuguese)
+
 # 2.6.8
 Agnieszka C (1):
   * [2ffda1a6] Updated Polish translation using Weblate
