@@ -11,6 +11,8 @@ paths=(
     "app/src/main/res/values-gl"
     "fastlane/metadata/android/eu"
     "app/src/main/res/values-eu"
+    "fastlane/metadata/android/pt"
+    "app/src/main/res/values-pt"
 )
 
 for p in "${paths[@]}"
