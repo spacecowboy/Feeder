@@ -55,7 +55,7 @@
     <string name="battery_optimization_enabled">Activé</string>
     <string name="battery_optimization_disabled">Désactivé</string>
     <string name="battery_optimization">Optimisation de la batterie</string>
-    <string name="toggle_tag_expansion">Basculer l’expansion des étiquettes</string>
+    <string name="toggle_tag_expansion">Ne pas regrouper les étiquettes</string>
     <string name="discovered_feeds_list">Liste des flux découverts</string>
     <string name="mark_items_below_as_read">Marquer lus les articles en dessous</string>
     <string name="mark_items_above_as_read">Marquer lus les articles au dessus</string>
@@ -121,8 +121,8 @@
     <string name="go_to_feed">Aller à %1$s</string>
     <string name="open_menu">Ouvrir le menu</string>
     <string name="go_back">Retour</string>
-    <string name="contracted_tag">Étiquette fermée</string>
-    <string name="expanded_tag">Étiquette ouverte</string>
+    <string name="contracted_tag">Étiquette regroupée</string>
+    <string name="expanded_tag">Étiquette dégroupée</string>
     <string name="stop_reading">Arrêter la lecture</string>
     <string name="open_enclosed_media_file">Ouvrir %1$s</string>
     <string name="feed_item_style_super_compact">Super compact</string>
