@@ -52,7 +52,7 @@
     <string name="sync_option_every_12_hours">Svakih 12 sati</string>
     <string name="sync_option_every_day">Svakog dana</string>
     <string name="synchronization">Sinhroniziranje</string>
-    <string name="only_on_wifi">Samo na WiFi mreži</string>
+    <string name="only_on_wifi">Samo na Wi-Fi mreži</string>
     <string name="show_thumbnails">Prikaži sličice</string>
     <string name="may_result_data_charges">Može povećati trošak mobilnih podataka.</string>
     <string name="only_when_charging">Samo tokom punjenja</string>
@@ -85,7 +85,7 @@
     <string name="sort_oldest_first">Prvo najstarije</string>
     <string name="sort">Poredaj po</string>
     <string name="send_bug_report">Pošalji izvještaj o greškama</string>
-    <string name="no_email_client">Nemoguće otvoriti email program</string>
+    <string name="no_email_client">Nemoguće otvoriti e-mail program</string>
     <string name="touch_to_play_video">Dodirnite za video reprodukciju</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Otvori izvor (feed)</string>
@@ -182,7 +182,7 @@
     <string name="dynamic_theme_use">Dinamičke boje</string>
     <string name="new_indicator">Novi</string>
     <string name="explanation_permission_notifications">Dozvole se moraju odobriti prije uključenja obavještenja.</string>
-    <string name="block_list_description">Sakriva članke s naslovima koji sadrže neke od ovih pojmova. Primjeri filtera:</string>
+    <string name="block_list_description">Sakriva članke s naslovima koji sadrže neke od ovih filtera. Primjeri filtera:</string>
     <string name="feed_icon">Ikonica izvora</string>
     <string name="text_scale">Skaliranje teksta</string>
     <string name="sync_to_fetch">Sinhronizuj za dohvatanje članka</string>
@@ -190,7 +190,7 @@
     <string name="failed_to_fetch_full_article_missing_body">Nema sadržaja za dohvatanje</string>
     <string name="failed_to_parse_full_article">Neuspješno raščlanjivanje cijelog članka</string>
     <string name="failed_to_fetch_full_article_missing_link">Izvoru nedostaje link na članak</string>
-    <string name="one_feed">%1$s feed</string>
+    <string name="one_feed">%1$s izvor</string>
     <string name="article_list_settings">Spisak članaka</string>
     <string name="saved_article">Sačuvani članak</string>
     <string name="one_tags">%1$s oznaka</string>
@@ -227,4 +227,6 @@
     <string name="two_tags">%1$s oznake</string>
     <string name="content_is_not_html">Sadržaj nije HTML</string>
     <string name="other_tags">%1$s oznaka</string>
+    <string name="add_anyway">Dodaj svakako</string>
+    <string name="open_browser_in_split_screen">Otvori preglednik na podijeljenom ekranu</string>
 </resources>
