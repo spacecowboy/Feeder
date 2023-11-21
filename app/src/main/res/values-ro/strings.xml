@@ -228,4 +228,5 @@
     <string name="two_tags">%1$s etichete</string>
     <string name="content_is_not_html">Conținutul nu este HTML</string>
     <string name="other_tags">%1$s etichete</string>
+    <string name="open_browser_in_split_screen">Deschideți browserul în ecran divizat</string>
 </resources>
