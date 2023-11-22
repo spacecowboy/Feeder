@@ -56,6 +56,7 @@ fun FeedItemCompact(
     bookmarkIndicator: Boolean,
     maxLines: Int,
     showOnlyTitle: Boolean,
+    showReadingTime: Boolean,
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
@@ -75,6 +76,7 @@ fun FeedItemCompact(
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
             showOnlyTitle = showOnlyTitle,
+            showReadingTime = showReadingTime,
             modifier = Modifier
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 8.dp),
@@ -149,6 +151,7 @@ data class FeedListItem(
     val feedImageUrl: URL?,
     val primarySortTime: Instant,
     val rawPubDate: ZonedDateTime?,
+    val wordCount: Int,
 ) {
     val cursor: FeedItemCursor
         get() = object : FeedItemCursor {
@@ -187,6 +190,7 @@ private fun PreviewRead() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -197,8 +201,9 @@ private fun PreviewRead() {
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
                 maxLines = 5,
-                imageWidth = 64.dp,
                 showOnlyTitle = false,
+                showReadingTime = true,
+                imageWidth = 64.dp,
             )
         }
     }
@@ -223,6 +228,7 @@ private fun PreviewUnread() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -233,8 +239,9 @@ private fun PreviewUnread() {
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
                 maxLines = 5,
-                imageWidth = 64.dp,
                 showOnlyTitle = false,
+                showReadingTime = true,
+                imageWidth = 64.dp,
             )
         }
     }
@@ -262,6 +269,7 @@ private fun PreviewWithImage() {
                         feedImageUrl = null,
                         primarySortTime = Instant.EPOCH,
                         rawPubDate = null,
+                        wordCount = 900,
                     ),
                     showThumbnail = true,
                     onMarkAboveAsRead = {},
@@ -272,8 +280,9 @@ private fun PreviewWithImage() {
                     onDismissDropdown = {},
                     bookmarkIndicator = true,
                     maxLines = 5,
-                    imageWidth = 64.dp,
                     showOnlyTitle = false,
+                    showReadingTime = true,
+                    imageWidth = 64.dp,
                 )
             }
         }

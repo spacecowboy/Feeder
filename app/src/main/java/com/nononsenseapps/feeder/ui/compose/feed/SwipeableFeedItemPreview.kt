@@ -81,6 +81,7 @@ fun SwipeableFeedItemPreview(
     bookmarkIndicator: Boolean,
     maxLines: Int,
     showOnlyTitle: Boolean,
+    showReadingTime: Boolean,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onToggleBookmarked: () -> Unit,
@@ -248,6 +249,7 @@ fun SwipeableFeedItemPreview(
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
+                    showReadingTime = showReadingTime,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -267,6 +269,7 @@ fun SwipeableFeedItemPreview(
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
+                    showReadingTime = showReadingTime,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -289,6 +292,7 @@ fun SwipeableFeedItemPreview(
                     bookmarkIndicator = bookmarkIndicator,
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
+                    showReadingTime = showReadingTime,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),

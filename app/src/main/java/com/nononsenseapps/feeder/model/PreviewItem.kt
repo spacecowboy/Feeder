@@ -3,8 +3,11 @@ package com.nononsenseapps.feeder.model
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
+import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.COL_READ_TIME
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
@@ -17,7 +20,8 @@ const val previewColumns = """
     author, pub_date, link, read_time, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
     feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
     feeds.open_articles_with AS feed_open_articles_with, bookmarked,
-    feeds.image_url as feed_image_url, primary_sort_time
+    feeds.image_url as feed_image_url, primary_sort_time, word_count, word_count_full,
+    feeds.fulltext_by_default as fulltext_by_default
 """
 
 data class PreviewItem @Ignore constructor(
@@ -40,6 +44,9 @@ data class PreviewItem @Ignore constructor(
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
     @ColumnInfo(name = "feed_image_url") var feedImageUrl: URL? = null,
     @ColumnInfo(name = COL_PRIMARYSORTTIME) var primarySortTime: Instant = Instant.EPOCH,
+    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
 ) {
     constructor() : this(id = ID_UNSET)
 
@@ -49,6 +56,12 @@ data class PreviewItem @Ignore constructor(
     val domain: String?
         get() {
             return (enclosureLink ?: link)?.host()
+        }
+
+    val bestWordCount: Int
+        get() = when (fullTextByDefault) {
+            true -> wordCountFull
+            false -> wordCount
         }
 }
 

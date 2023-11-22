@@ -47,6 +47,15 @@ interface FeedItemDao {
 
     @Query(
         """
+            update feed_items
+            set word_count_full = :wordCount
+            where id = :id
+        """,
+    )
+    suspend fun updateWordCountFull(id: Long, wordCount: Int)
+
+    @Query(
+        """
         SELECT id FROM feed_items
         WHERE feed_id IS :feedId AND bookmarked = 0
         ORDER BY primary_sort_time DESC, pub_date DESC

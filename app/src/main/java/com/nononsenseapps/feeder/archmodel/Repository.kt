@@ -652,6 +652,15 @@ class Repository(override val di: DI) : DIAware {
         settingsStore.setOpenAdjacent(value)
     }
 
+    val showReadingTime: StateFlow<Boolean> = settingsStore.showReadingTime
+    fun setShowReadingTime(value: Boolean) {
+        settingsStore.setShowReadingTime(value)
+    }
+
+    suspend fun updateWordCountFull(id: Long, wordCount: Int) {
+        feedItemStore.updateWordCountFull(id, wordCount)
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_REPO"
     }
@@ -713,6 +722,8 @@ data class Article(
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
     val bookmarked: Boolean = item?.bookmarked ?: false
+    val wordCount: Int = item?.wordCount ?: 0
+    val wordCountFull: Int = item?.wordCountFull ?: 0
 }
 
 enum class TextToDisplay {

@@ -242,4 +242,7 @@
   <string name="no_url">No URL</string>
   <string name="add_anyway">Add anyway</string>
   <string name="open_browser_in_split_screen">Open browser in split screen</string>
+  <string name="n_words_short">%1$d words</string>
+  <string name="n_reading_time">%1$d minutes %2$d seconds</string>
+  <string name="show_reading_time">Show estimated reading time</string>
 </resources>

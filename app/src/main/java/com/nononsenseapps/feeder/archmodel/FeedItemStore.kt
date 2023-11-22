@@ -290,6 +290,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.deleteFeedItems(ids)
     }
 
+    suspend fun updateWordCountFull(id: Long, wordCount: Int) {
+        dao.updateWordCountFull(id, wordCount)
+    }
+
     companion object {
         private const val PAGE_SIZE = 100
     }
@@ -315,6 +319,7 @@ private fun PreviewItem.toFeedListItem() =
         feedImageUrl = feedImageUrl,
         rawPubDate = pubDate,
         primarySortTime = primarySortTime,
+        wordCount = bestWordCount,
     )
 
 private fun LocalDateTime.formatDynamically(): String {

@@ -47,6 +47,8 @@ const val COL_GLOB_PATTERN = "glob_pattern"
 const val COL_FULLTEXT_DOWNLOADED = "fulltext_downloaded"
 const val COL_READ_TIME = "read_time"
 const val COL_SITE_FETCHED = "site_fetched"
+const val COL_WORD_COUNT = "word_count"
+const val COL_WORD_COUNT_FULL = "word_count_full"
 
 // year 5000
 val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

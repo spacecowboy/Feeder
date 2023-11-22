@@ -195,6 +195,8 @@ fun SettingsScreen(
             onShowOnlyTitle = settingsViewModel::setShowOnlyTitles,
             isOpenAdjacent = viewState.isOpenAdjacent,
             onOpenAdjacent = settingsViewModel::setIsOpenAdjacent,
+            showReadingTime = viewState.showReadingTime,
+            onShowReadingTimeChanged = settingsViewModel::setShowReadingTime,
             modifier = Modifier.padding(padding),
         )
     }
@@ -258,6 +260,8 @@ fun SettingsScreenPreview() {
                 onShowOnlyTitle = {},
                 isOpenAdjacent = false,
                 onOpenAdjacent = {},
+                showReadingTime = false,
+                onShowReadingTimeChanged = {},
                 modifier = Modifier,
             )
         }
@@ -317,6 +321,8 @@ fun SettingsList(
     onShowOnlyTitle: (Boolean) -> Unit,
     isOpenAdjacent: Boolean,
     onOpenAdjacent: (Boolean) -> Unit,
+    showReadingTime: Boolean,
+    onShowReadingTimeChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -560,6 +566,12 @@ fun SettingsList(
             title = stringResource(id = R.string.show_thumbnails),
             checked = showThumbnailsValue,
             onCheckedChanged = onShowThumbnailsChanged,
+        )
+
+        SwitchSetting(
+            title = stringResource(id = R.string.show_reading_time),
+            checked = showReadingTime,
+            onCheckedChanged = onShowReadingTimeChanged,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))

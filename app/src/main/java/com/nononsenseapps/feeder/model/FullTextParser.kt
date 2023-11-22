@@ -10,7 +10,9 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
+import com.nononsenseapps.feeder.db.room.estimateWordCount
 import com.nononsenseapps.feeder.model.FullTextParser.Companion.LOG_TAG
+import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatten
@@ -119,10 +121,16 @@ class FullTextParser(override val di: DI) : DIAware {
                     }
 
                     val contentType = body.contentType()
-                        ?: return@catching UnsupportedContentType(url = url, mimeType = "null").left()
+                        ?: return@catching UnsupportedContentType(
+                            url = url,
+                            mimeType = "null",
+                        ).left()
 
                     if (contentType.type != "text" || contentType.subtype != "html") {
-                        return@catching UnsupportedContentType(url = url, mimeType = contentType.toString()).left()
+                        return@catching UnsupportedContentType(
+                            url = url,
+                            mimeType = contentType.toString(),
+                        ).left()
                     }
 
                     val charset = contentType.charset() ?: findMetaCharset(bytes)
@@ -134,11 +142,20 @@ class FullTextParser(override val di: DI) : DIAware {
                     val article = Readability4JExtended(url, html).parse()
                     logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                     withContext(Dispatchers.IO) {
-                        filePathProvider.fullArticleDir.mkdirs()
-                        blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
-                            .bufferedWriter().use { writer ->
-                                writer.write(article.contentWithUtf8Encoding)
-                            }
+                        article.contentWithUtf8Encoding?.let { articleContent ->
+                            filePathProvider.fullArticleDir.mkdirs()
+                            blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                                .bufferedWriter().use { writer ->
+                                    writer.write(articleContent)
+                                }
+
+                            // Update word count on item
+                            val converter = HtmlToPlainTextConverter()
+                            val plainText = converter.convert(articleContent)
+                            val wordCount = estimateWordCount(plainText)
+
+                            repository.updateWordCountFull(feedItem.id, wordCount)
+                        }
                     }
 
                     Either.Right(Unit)
