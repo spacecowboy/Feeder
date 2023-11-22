@@ -45,6 +45,7 @@ import coil.size.Size
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.feedarticle.wordsToReadTimeSecs
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
@@ -72,6 +73,7 @@ fun FeedItemCard(
     bookmarkIndicator: Boolean,
     maxLines: Int,
     showOnlyTitle: Boolean,
+    showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -142,6 +144,7 @@ fun FeedItemCard(
                     onDismissDropdown = onDismissDropdown,
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
+                    showReadingTime = showReadingTime,
                 )
             }
         }
@@ -159,6 +162,7 @@ fun RowScope.FeedItemText(
     onDismissDropdown: () -> Unit,
     maxLines: Int,
     showOnlyTitle: Boolean,
+    showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val snippetStyle = FeedListItemSnippetTextStyle()
@@ -279,6 +283,45 @@ fun RowScope.FeedItemText(
                 )
             }
         }
+        if (showReadingTime) {
+            val readTimeSecs = remember(item.wordCount) {
+                wordsToReadTimeSecs(item.wordCount)
+            }
+            if (readTimeSecs > 0) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    val readTimeText = stringResource(
+                        id = R.string.n_reading_time,
+                        readTimeSecs / 60,
+                        readTimeSecs % 60,
+                    )
+                    val wordCountText = stringResource(id = R.string.n_words_short, item.wordCount)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
+                            Text(
+                                text = readTimeText,
+                                style = FeedListItemFeedTitleStyle(),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        WithBidiDeterminedLayoutDirection(paragraph = wordCountText) {
+                            Text(
+                                text = wordCountText,
+                                style = FeedListItemFeedTitleStyle(),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -300,6 +343,7 @@ private fun Preview() {
                 feedImageUrl = null,
                 primarySortTime = Instant.EPOCH,
                 rawPubDate = null,
+                wordCount = 900,
             ),
             showThumbnail = true,
             onMarkAboveAsRead = {},
@@ -308,9 +352,10 @@ private fun Preview() {
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
+            bookmarkIndicator = true,
             maxLines = 2,
             showOnlyTitle = false,
-            bookmarkIndicator = true,
+            showReadingTime = true,
         )
     }
 }
@@ -336,6 +381,7 @@ private fun PreviewWithImageUnread() {
                     feedImageUrl = URL("https://foo/bar.png"),
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -344,9 +390,10 @@ private fun PreviewWithImageUnread() {
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                bookmarkIndicator = true,
                 maxLines = 2,
                 showOnlyTitle = false,
-                bookmarkIndicator = true,
+                showReadingTime = true,
             )
         }
     }
@@ -373,6 +420,7 @@ private fun PreviewWithImageRead() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -381,9 +429,10 @@ private fun PreviewWithImageRead() {
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                bookmarkIndicator = true,
                 maxLines = 2,
                 showOnlyTitle = false,
-                bookmarkIndicator = true,
+                showReadingTime = true,
             )
         }
     }

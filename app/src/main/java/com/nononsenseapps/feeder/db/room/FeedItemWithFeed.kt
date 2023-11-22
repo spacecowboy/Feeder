@@ -23,6 +23,8 @@ import com.nononsenseapps.feeder.db.COL_READ_TIME
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.model.host
@@ -40,7 +42,9 @@ const val feedItemColumnsWithFeed = """
     $FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE,
     $FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL,
     $FEEDS_TABLE_NAME.$COL_FULLTEXT_BY_DEFAULT AS $COL_FULLTEXT_BY_DEFAULT,
-    $COL_BOOKMARKED
+    $COL_BOOKMARKED,
+    $COL_WORD_COUNT,
+    $COL_WORD_COUNT_FULL
 """
 
 data class FeedItemWithFeed @Ignore constructor(
@@ -64,6 +68,8 @@ data class FeedItemWithFeed @Ignore constructor(
     @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
     @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
 ) : FeedItemForFetching {
     constructor() : this(id = ID_UNSET)
 

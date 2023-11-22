@@ -392,6 +392,7 @@ fun ArticleContent(
 
     ReaderView(
         screenType = screenType,
+        wordCount = viewState.wordCount,
         onEnclosureClick = {
             if (viewState.enclosure.present) {
                 activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)

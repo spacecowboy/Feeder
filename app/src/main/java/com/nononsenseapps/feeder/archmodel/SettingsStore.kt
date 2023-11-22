@@ -314,6 +314,13 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_OPEN_ADJACENT, value).apply()
     }
 
+    private val _showReadingTime = MutableStateFlow(sp.getBoolean(PREF_LIST_SHOW_READING_TIME, false))
+    val showReadingTime = _showReadingTime.asStateFlow()
+    fun setShowReadingTime(value: Boolean) {
+        _showReadingTime.value = value
+        sp.edit().putBoolean(PREF_LIST_SHOW_READING_TIME, value).apply()
+    }
+
     private val _feedItemStyle = MutableStateFlow(
         feedItemStyleFromString(sp.getStringNonNull(PREF_FEED_ITEM_STYLE, FeedItemStyle.CARD.name)),
     )
@@ -509,6 +516,8 @@ const val PREFS_FILTER_RECENTLY_READ = "prefs_filter_recently_read"
 const val PREFS_FILTER_READ = "prefs_filter_read"
 
 const val PREF_LIST_SHOW_ONLY_TITLES = "prefs_list_show_only_titles"
+
+const val PREF_LIST_SHOW_READING_TIME = "pref_show_reading_time"
 
 /**
  * Read Aloud Settings

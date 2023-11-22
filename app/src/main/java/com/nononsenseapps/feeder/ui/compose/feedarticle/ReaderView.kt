@@ -11,10 +11,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -23,9 +22,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Terrain
+import androidx.compose.material.icons.outlined.Timelapse
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +46,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -56,6 +59,7 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
 import com.nononsenseapps.feeder.ui.compose.text.rememberMaxImageWidth
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
@@ -65,6 +69,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlin.math.roundToInt
 
 val dateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
@@ -74,6 +79,7 @@ val dateTimeFormat: DateTimeFormatter =
 @Composable
 fun ReaderView(
     screenType: ScreenType,
+    wordCount: Int,
     onEnclosureClick: () -> Unit,
     onFeedTitleClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,6 +91,10 @@ fun ReaderView(
     articleBody: LazyListScope.() -> Unit,
 ) {
     val dimens = LocalDimens.current
+
+    val readTimeSecs = remember(wordCount) {
+        wordsToReadTimeSecs(wordCount)
+    }
 
     SelectionContainer {
         LazyColumn(
@@ -106,6 +116,7 @@ fun ReaderView(
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .width(dimens.maxReaderWidth)
                         .semantics(mergeDescendants = true) {
@@ -135,7 +146,6 @@ fun ReaderView(
                                 .width(dimens.maxReaderWidth),
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                     ProvideScaledText(
                         style = MaterialTheme.typography.titleMedium.merge(
                             LinkTextStyle(),
@@ -156,7 +166,6 @@ fun ReaderView(
                         }
                     }
                     if (authorDate != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
                         ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 WithBidiDeterminedLayoutDirection(paragraph = authorDate) {
@@ -168,6 +177,41 @@ fun ReaderView(
                                             .indication(interactionSource, LocalIndication.current)
                                             .focusableInNonTouchMode(interactionSource = interactionSource),
                                     )
+                                }
+                            }
+                        }
+                    }
+                    if (readTimeSecs > 0) {
+                        ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.width(dimens.maxReaderWidth),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Timelapse,
+                                        contentDescription = null,
+                                    )
+                                    val readTimeText = stringResource(
+                                        id = R.string.n_reading_time,
+                                        readTimeSecs / 60,
+                                        readTimeSecs % 60,
+                                    )
+                                    WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
+                                        Text(
+                                            text = readTimeText,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .indication(
+                                                    interactionSource,
+                                                    LocalIndication.current,
+                                                )
+                                                .focusableInNonTouchMode(interactionSource = interactionSource),
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -257,6 +301,25 @@ fun ReaderView(
             articleBody()
         }
     }
+}
+
+@Preview
+@Composable
+fun ReaderPreview() {
+    FeederTheme {
+        Surface {
+            ReaderView(
+                screenType = ScreenType.SINGLE,
+                wordCount = 9831,
+                onEnclosureClick = {},
+                onFeedTitleClick = {},
+            ) {}
+        }
+    }
+}
+
+fun wordsToReadTimeSecs(words: Int): Int {
+    return (words * 60 / 220.0).roundToInt()
 }
 
 private const val LOG_TAG = "FEEDER_READER"

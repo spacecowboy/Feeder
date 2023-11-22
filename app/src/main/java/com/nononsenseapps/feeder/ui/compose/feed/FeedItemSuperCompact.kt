@@ -30,6 +30,7 @@ fun FeedItemSuperCompact(
     bookmarkIndicator: Boolean,
     maxLines: Int,
     showOnlyTitle: Boolean,
+    showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -55,6 +56,7 @@ fun FeedItemSuperCompact(
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
             showOnlyTitle = showOnlyTitle,
+            showReadingTime = showReadingTime,
         )
     }
 }
@@ -78,6 +80,7 @@ private fun PreviewRead() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
@@ -88,6 +91,7 @@ private fun PreviewRead() {
                 bookmarkIndicator = true,
                 maxLines = 2,
                 showOnlyTitle = false,
+                showReadingTime = true,
             )
         }
     }
@@ -112,6 +116,7 @@ private fun PreviewUnread() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
@@ -122,6 +127,7 @@ private fun PreviewUnread() {
                 bookmarkIndicator = true,
                 maxLines = 2,
                 showOnlyTitle = false,
+                showReadingTime = true,
             )
         }
     }
@@ -146,6 +152,7 @@ private fun PreviewWithImage() {
                     feedImageUrl = URL("https://example.com/image.png"),
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
+                    wordCount = 900,
                 ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
@@ -156,6 +163,7 @@ private fun PreviewWithImage() {
                 bookmarkIndicator = true,
                 maxLines = 2,
                 showOnlyTitle = false,
+                showReadingTime = true,
             )
         }
     }

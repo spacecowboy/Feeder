@@ -24,6 +24,8 @@ import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.COL_PUBDATE
 import com.nononsenseapps.feeder.db.COL_READ_TIME
 import com.nononsenseapps.feeder.db.COL_TITLE
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT
+import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
@@ -37,6 +39,8 @@ import java.time.ZonedDateTime
 
 const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
+
+private val patternWhitespace = "\\s+".toRegex()
 
 @Entity(
     tableName = FEED_ITEMS_TABLE_NAME,
@@ -72,21 +76,38 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
     @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
     @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-    @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) override var pubDate: ZonedDateTime? = null,
+    @ColumnInfo(
+        name = COL_PUBDATE,
+        typeAffinity = ColumnInfo.TEXT,
+    ) override var pubDate: ZonedDateTime? = null,
     @ColumnInfo(name = COL_LINK) override var link: String? = null,
-    @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.", replaceWith = ReplaceWith("readTime"))
+    @Deprecated(
+        "This column has been 'removed' but sqlite doesn't support drop column.",
+        replaceWith = ReplaceWith("readTime"),
+    )
     @ColumnInfo(name = "unread")
     var oldUnread: Boolean = true,
     @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-    @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) override var primarySortTime: Instant = Instant.EPOCH,
+    @ColumnInfo(
+        name = COL_FIRSTSYNCEDTIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) var firstSyncedTime: Instant = Instant.EPOCH,
+    @ColumnInfo(
+        name = COL_PRIMARYSORTTIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) override var primarySortTime: Instant = Instant.EPOCH,
     @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.")
     @ColumnInfo(name = "pinned")
     var oldPinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
     @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
-    @ColumnInfo(name = COL_READ_TIME, typeAffinity = ColumnInfo.INTEGER) var readTime: Instant? = null,
+    @ColumnInfo(
+        name = COL_READ_TIME,
+        typeAffinity = ColumnInfo.INTEGER,
+    ) var readTime: Instant? = null,
+    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
 ) : FeedItemForFetching, FeedItemCursor {
 
     constructor() : this(id = ID_UNSET)
@@ -101,10 +122,17 @@ data class FeedItem @Ignore constructor(
     ) {
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
-        val text = entry.content_html ?: entry.content_text ?: ""
+        val plainText = converter.convert(
+            entry.content_html
+                ?: entry.content_text
+                ?: "",
+        )
+        this.wordCount = estimateWordCount(plainText)
+
         val summary: String = (
-            entry.summary ?: entry.content_text
-                ?: converter.convert(text)
+            entry.summary
+                ?: entry.content_text
+                ?: plainText
             ).take(MAX_SNIPPET_LENGTH)
 
         // Make double sure no base64 images are used as thumbnails
@@ -117,6 +145,7 @@ data class FeedItem @Ignore constructor(
             feed.feed_url != null && safeImage != null -> {
                 relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
             }
+
             else -> safeImage
         }
 
@@ -177,4 +206,21 @@ interface FeedItemCursor {
     val primarySortTime: Instant
     val pubDate: ZonedDateTime?
     val id: Long
+}
+
+/**
+ * If language doesn't use spaces, then this function will try to return 0
+ */
+fun estimateWordCount(plainText: String): Int {
+    val charCount = plainText.length.toFloat()
+    val wordCount = plainText.splitToSequence(patternWhitespace).count()
+
+    // Calculate average length of chars between spaces
+    // A typical value for english is 5-7
+    // A typical value for japanese is 50-80
+    return if (charCount / wordCount < 15.0) {
+        wordCount
+    } else {
+        0
+    }
 }

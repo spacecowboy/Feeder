@@ -279,6 +279,7 @@ class FeedArticleViewModel(
             filterMenuVisible,
             repository.feedListFilter,
             repository.showOnlyTitle,
+            repository.showReadingTime,
         ) { params: Array<Any> ->
             val article = params[16] as Article
 
@@ -287,6 +288,8 @@ class FeedArticleViewModel(
             val haveVisibleFeedItems = (params[8] as Int) > 0
 
             val currentFeedOrTag = params[15] as FeedOrTag
+
+            val textToDisplay = getTextToDisplayFor(article.id)
 
             @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
@@ -313,7 +316,7 @@ class FeedArticleViewModel(
                 feedDisplayTitle = article.feedDisplayTitle,
                 currentFeedOrTag = currentFeedOrTag,
                 articleLink = article.link,
-                textToDisplay = getTextToDisplayFor(article.id),
+                textToDisplay = textToDisplay,
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
                 isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
                 articleId = article.id,
@@ -328,6 +331,20 @@ class FeedArticleViewModel(
                 showFilterMenu = params[25] as Boolean,
                 filter = params[26] as FeedListFilter,
                 showOnlyTitle = params[27] as Boolean,
+                showReadingTime = params[28] as Boolean,
+                wordCount = when (textToDisplay) {
+                    TextToDisplay.DEFAULT -> article.wordCount
+
+                    TextToDisplay.FULLTEXT,
+                    TextToDisplay.LOADING_FULLTEXT,
+                    -> article.wordCountFull
+
+                    TextToDisplay.FAILED_TO_LOAD_FULLTEXT,
+                    TextToDisplay.FAILED_MISSING_BODY,
+                    TextToDisplay.FAILED_MISSING_LINK,
+                    TextToDisplay.FAILED_NOT_HTML,
+                    -> 0
+                },
             )
         }
             .stateIn(
@@ -492,6 +509,7 @@ interface FeedScreenViewState {
     val markAsReadOnScroll: Boolean
     val maxLines: Int
     val showOnlyTitle: Boolean
+    val showReadingTime: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
 }
@@ -515,6 +533,7 @@ interface ArticleScreenViewState {
     val feedDisplayTitle: String
     val isBookmarked: Boolean
     val keyHolder: ArticleItemKeyHolder
+    val wordCount: Int
 }
 
 interface ArticleItemKeyHolder {
@@ -594,9 +613,11 @@ data class FeedArticleScreenViewState(
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
     override val maxLines: Int = 2,
     override val showOnlyTitle: Boolean = false,
+    override val showReadingTime: Boolean = false,
     override val showFilterMenu: Boolean = false,
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
+    override val wordCount: Int = 0,
 ) : FeedScreenViewState, ArticleScreenViewState
 
 sealed class TSSError
