@@ -20,7 +20,7 @@
     <string name="all_feeds">Ĉiuj fluoj</string>
     <string name="title_activity_settings">Agordoj</string>
     <string name="nothing_to_display">Neniu por montri!</string>
-    <string name="no_such_feed">Ne troviĝis ĉi tiu fluo. Provu uzi HTTPS.</string>
+    <string name="no_such_feed">Ne troviĝis ĉi tiu fluo. Ĉu provi uzi HTTPS eble?</string>
     <string name="share">Konigi</string>
     <string name="indicator_for_mark_as_read">Indikilo de legita statuso</string>
     <string name="new_based_on_this">Nova bazita sur ĉi tiu</string>
@@ -108,4 +108,12 @@
     <string name="read_article">Laŭtlegi</string>
     <string name="use_app_default">Uzi implicitaĵon de programo</string>
     <string name="theme_e_ink">E-papero</string>
+    <string name="use_detect_language">Detekti lingvon</string>
+    <string name="set_language">Agordi lingvon</string>
+    <string name="skip_to_next">Preterpasi al la sekva</string>
+    <string name="open_enclosed_media_file">Malfermi %1$s</string>
+    <string name="syncing">Sinkronigo</string>
+    <string name="text_to_speech">Teksto al parolado</string>
+    <string name="only_available_on_android_n">Havebla nur ĉe Android %1$s kaj pli</string>
+    <string name="stop_reading">Ĉesi legi</string>
 </resources>
