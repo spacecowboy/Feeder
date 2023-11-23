@@ -273,12 +273,13 @@ tasks {
 
         doLast {
             val langs = getListOfSupportedLocales()
-            val localesConfig = """
+            val localesConfig =
+                """
                 <?xml version="1.0" encoding="utf-8"?>
                 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-${langs.joinToString("\n") { "                  <locale android:name=\"$it\"/>" }}
+                ${langs.joinToString(" ") { "<locale android:name=\"$it\"/>" }}
                 </locale-config>
-            """.trimIndent()
+                """.trimIndent()
 
             localesConfigFile.bufferedWriter().use { writer ->
                 writer.write(localesConfig)
@@ -290,9 +291,8 @@ ${langs.joinToString("\n") { "                  <locale android:name=\"$it\"/>" 
 class RoomSchemaArgProvider(
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    val schemaDir: File
+    val schemaDir: File,
 ) : CommandLineArgumentProvider {
-
     override fun asArguments(): Iterable<String> {
         // Note: If you're using KSP, change the line below to return
         return listOf("room.schemaLocation=${schemaDir.path}")
