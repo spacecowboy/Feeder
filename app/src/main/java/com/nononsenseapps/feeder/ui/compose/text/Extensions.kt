@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import android.content.res.Resources
 import android.text.Annotation
-import android.text.SpannedString
+import android.text.Spanned
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
@@ -24,20 +24,22 @@ fun resources(): Resources {
 @Composable
 fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
-    val text = resources.getText(id) as SpannedString
+    val text = resources.getText(id)
 
     return buildAnnotatedString {
         this.append(text.toString())
 
-        for (annotation in text.getSpans<Annotation>()) {
-            when (annotation.key) {
-                "style" -> {
-                    getSpanStyle(annotation.value)?.let { spanStyle ->
-                        addStyle(
-                            spanStyle,
-                            text.getSpanStart(annotation),
-                            text.getSpanEnd(annotation),
-                        )
+        if (text is Spanned) {
+            for (annotation in text.getSpans<Annotation>()) {
+                when (annotation.key) {
+                    "style" -> {
+                        getSpanStyle(annotation.value)?.let { spanStyle ->
+                            addStyle(
+                                spanStyle,
+                                text.getSpanStart(annotation),
+                                text.getSpanEnd(annotation),
+                            )
+                        }
                     }
                 }
             }
