@@ -242,7 +242,17 @@
   <string name="no_url">No URL</string>
   <string name="add_anyway">Add anyway</string>
   <string name="open_browser_in_split_screen">Open browser in split screen</string>
-  <string name="n_words_short">%1$d words</string>
-  <string name="n_reading_time">%1$d minutes %2$d seconds</string>
   <string name="show_reading_time">Show estimated reading time</string>
+  <string name="zero_words">%1$s words</string>
+  <string name="one_word">%1$s word</string>
+  <string name="two_words">%1$s words</string>
+  <string name="few_words">%1$s words</string>
+  <string name="many_words">%1$s words</string>
+  <string name="other_words">%1$s words</string>
+  <string name="zero_minutes">%1$s minutes</string>
+  <string name="one_minute">%1$s minute</string>
+  <string name="two_minutes">%1$s minutes</string>
+  <string name="few_minutes">%1$s minutes</string>
+  <string name="many_minutes">%1$s minutes</string>
+  <string name="other_minutes">%1$s minutes</string>
 </resources>

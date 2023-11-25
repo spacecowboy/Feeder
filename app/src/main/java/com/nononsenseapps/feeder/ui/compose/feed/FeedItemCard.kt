@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -289,12 +290,14 @@ fun RowScope.FeedItemText(
             }
             if (readTimeSecs > 0) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    val readTimeText = stringResource(
-                        id = R.string.n_reading_time,
-                        readTimeSecs / 60,
-                        readTimeSecs % 60,
-                    )
-                    val wordCountText = stringResource(id = R.string.n_words_short, item.wordCount)
+                    val readTimeText =
+                        pluralStringResource(id = R.plurals.n_minutes, count = readTimeSecs / 60)
+                            .format(
+                                "${readTimeSecs / 60}:${readTimeSecs % 60}",
+                            )
+                    val wordCountText =
+                        pluralStringResource(id = R.plurals.n_words, count = item.wordCount)
+                            .format(item.wordCount)
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         modifier = Modifier
@@ -343,7 +346,7 @@ private fun Preview() {
                 feedImageUrl = null,
                 primarySortTime = Instant.EPOCH,
                 rawPubDate = null,
-                wordCount = 900,
+                wordCount = 588,
             ),
             showThumbnail = true,
             onMarkAboveAsRead = {},
@@ -381,7 +384,7 @@ private fun PreviewWithImageUnread() {
                     feedImageUrl = URL("https://foo/bar.png"),
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
-                    wordCount = 900,
+                    wordCount = 939,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -420,7 +423,7 @@ private fun PreviewWithImageRead() {
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
                     rawPubDate = null,
-                    wordCount = 900,
+                    wordCount = 950,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},

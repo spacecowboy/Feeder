@@ -229,7 +229,5 @@
     <string name="theme_e_ink">Läsplatta</string>
     <string name="add_anyway">Lägg till ändå</string>
     <string name="open_browser_in_split_screen">Öppna webbläsare i delad skärm</string>
-    <string name="n_words_short">%1$d ord</string>
-    <string name="n_reading_time">%1$d minuter %2$d sekunder</string>
     <string name="show_reading_time">Visa uppskattad lästid</string>
 </resources>

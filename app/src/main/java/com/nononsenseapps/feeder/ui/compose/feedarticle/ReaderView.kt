@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -193,11 +194,11 @@ fun ReaderView(
                                         imageVector = Icons.Outlined.Timelapse,
                                         contentDescription = null,
                                     )
-                                    val readTimeText = stringResource(
-                                        id = R.string.n_reading_time,
-                                        readTimeSecs / 60,
-                                        readTimeSecs % 60,
-                                    )
+                                    val readTimeText =
+                                        pluralStringResource(id = R.plurals.n_minutes, count = readTimeSecs / 60)
+                                            .format(
+                                                "${readTimeSecs / 60}:${readTimeSecs % 60}",
+                                            )
                                     WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
                                         val interactionSource =
                                             remember { MutableInteractionSource() }
