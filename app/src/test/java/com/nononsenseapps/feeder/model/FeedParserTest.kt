@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
-import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -69,7 +68,7 @@ class FeedParserTest : DIAware {
                     )
                 val item = feed.getOrNull()?.items!!.first()
 
-                assertEquals(Author(name = "0235"), item.author)
+                assertEquals(ParsedAuthor(name = "0235"), item.author)
             }
         }
 
@@ -116,7 +115,7 @@ class FeedParserTest : DIAware {
             val item = feed.getOrNull()?.items!![0]
             assertEquals(
                 "http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
-                item.image,
+                item.image?.url,
             )
         }
     }
@@ -136,7 +135,7 @@ class FeedParserTest : DIAware {
             val item = feed.getOrNull()?.items!!.first()
 
             assertEquals("Can You Observe a Typical Universe?", item.title)
-            assertEquals("https://i2.ytimg.com/vi/q-6oU3jXAho/hqdefault.jpg", item.image)
+            assertEquals("https://i2.ytimg.com/vi/q-6oU3jXAho/hqdefault.jpg", item.image?.url)
             assertTrue {
                 item.content_text!!.startsWith("Sign Up on Patreon to get access to the Space Time Discord!")
             }
@@ -155,7 +154,7 @@ class FeedParserTest : DIAware {
             assertEquals("1.4. Et les réseaux sociaux ?", item.title)
             assertEquals(
                 "https://framatube.org/static/thumbnails/ed5c048d-01f3-4ceb-97db-6e278de512b0.jpg",
-                item.image,
+                item.image?.url,
             )
             assertTrue {
                 item.content_text!!.startsWith("MOOC CHATONS#1 - Internet")
@@ -179,7 +178,7 @@ class FeedParserTest : DIAware {
             assertEquals("Камеди Клаб: «3 сентября»", item.title)
             assertEquals(
                 "https://pic.rutubelist.ru/video/93/24/93245691f0e18d063da5fa5cd60fa6de.jpg?size=l",
-                item.image,
+                item.image?.url,
             )
         }
 
@@ -199,7 +198,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "https://cdn.myanimelist.net/s/common/uploaded_files/1664092688-dd34666e64d7ae624e6e2c70087c181f.jpeg",
-                item.image,
+                item.image?.url,
             )
         }
 
@@ -219,7 +218,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "https://i.guim.co.uk/img/media/c4d7049b24ee34d1c4c630c751094cabc57c54f6/0_32_6000_3601/master/6000.jpg?width=460&quality=85&auto=format&fit=max&s=919d72fef6d4f3469aff69e94964126c",
-                item.image,
+                item.image?.url,
             )
         }
 
@@ -397,7 +396,7 @@ class FeedParserTest : DIAware {
             assertEquals("https://lineageos.org/Changelog-16/", feed.getOrNull()?.items?.get(0)?.url)
             assertEquals(
                 "https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png",
-                feed.getOrNull()?.items?.get(0)?.image,
+                feed.getOrNull()?.items?.get(0)?.image?.url,
             )
         }
 
@@ -412,19 +411,19 @@ class FeedParserTest : DIAware {
 
             assertEquals(17, feed.getOrNull()?.items!!.size)
 
-            val (_, _, _, title, _, _, summary, image) = feed.getOrNull()?.items!![9]
+            val item = feed.getOrNull()?.items!![9]
 
-            assertEquals("http://research.swtch.com/qr-bbc.png", image)
+            assertEquals("http://research.swtch.com/qr-bbc.png", item.image?.url)
 
             assertEquals(
                 "QArt Codes",
-                title,
+                item.title,
             )
 
             // Style tags should be ignored
             assertEquals(
                 "QR codes are 2-dimensional bar codes that encode arbitrary text strings. A common use of QR codes is to encode URLs so that people can scan a QR code (for example, on an advertising poster, building r",
-                summary,
+                item.summary,
             )
         }
 
@@ -439,10 +438,10 @@ class FeedParserTest : DIAware {
 
             assertEquals(17, feed.getOrNull()?.items!!.size)
 
-            val (_, _, _, _, _, _, _, _, _, _, _, author) = feed.getOrNull()?.items!![9]
+            val item = feed.getOrNull()?.items!![9]
 
             assertEquals("Russ Cox", feed.getOrNull()!!.author!!.name)
-            assertEquals(feed.getOrNull()!!.author, author)
+            assertEquals(feed.getOrNull()!!.author!!.name, item.author?.name)
         }
 
     @Test
@@ -457,7 +456,7 @@ class FeedParserTest : DIAware {
 
             val (_, _, _, title, _, _, _, image) = feed.getOrNull()?.items!![0]
 
-            assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image)
+            assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image?.url)
             assertEquals("NixOS 18.09 released", title)
         }
 
@@ -507,7 +506,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg",
-                image,
+                image?.url,
             )
 
             assertEquals(
@@ -537,7 +536,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
-                entry.image,
+                entry.image?.url,
             )
 
             // Snippet should not contain images
@@ -560,113 +559,109 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun rss() =
         runBlocking {
-            val feed = cornucopiaRss.use { feedParser.parseFeedResponse(it) }
-            val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = cornucopiaRss.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals("http://cornucopia.cornubot.se/", home_page_url)
-            assertEquals("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss", feed_url)
+            assertEquals("http://cornucopia.cornubot.se/", feed.home_page_url)
+            assertEquals("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss", feed.feed_url)
 
-            assertEquals(25, items!!.size)
-            val (_, _, _, title, content_html, _, summary, image, _, _, _, _, _, attachments) = items[0]
+            assertEquals(25, feed.items!!.size)
+            val item = feed.items!!.first()
 
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                title,
+                item.title,
             )
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                title,
+                item.title,
             )
 
             assertEquals(
                 "För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-                summary,
+                item.summary,
             )
-            assertTrue(content_html!!.startsWith("För tredje månaden på raken"))
+            assertTrue(item.content_html!!.startsWith("För tredje månaden på raken"))
             assertEquals(
                 "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-                image,
+                item.image?.url,
             )
 
-            assertEquals<List<Any>?>(emptyList(), attachments)
+            assertEquals<List<Any>?>(emptyList(), item.attachments)
         }
 
     @Test
     @Throws(Exception::class)
     fun atom() =
         runBlocking {
-            val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }
-            val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals("http://cornucopia.cornubot.se/", home_page_url)
-            assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed_url)
+            assertEquals("http://cornucopia.cornubot.se/", feed.home_page_url)
+            assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed.feed_url)
 
-            assertEquals(25, items!!.size)
-            val (_, _, _, title, content_html, _, summary, image, _, _, _, _, _, attachments) = items[0]
+            assertEquals(25, feed.items!!.size)
+            val item = feed.items!!.first()
 
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                title,
+                item.title,
             )
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                title,
+                item.title,
             )
 
             assertEquals(
                 "För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-                summary,
+                item.summary,
             )
-            assertTrue(content_html!!.startsWith("För tredje månaden på raken"))
+            assertTrue(item.content_html!!.startsWith("För tredje månaden på raken"))
             assertEquals(
                 "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-                image,
+                item.image?.url,
             )
 
-            assertEquals<List<Any>?>(emptyList(), attachments)
+            assertEquals<List<Any>?>(emptyList(), item.attachments)
         }
 
     @Test
     @Throws(Exception::class)
     fun atomCowboy() =
         runBlocking {
-            val feed = cowboyAtom.use { feedParser.parseFeedResponse(it) }
-            val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = cowboyAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals(15, items!!.size)
-            val (id, _, _, _, _, _, _, image, _, date_published) = items[1]
+            assertEquals(15, feed.items!!.size)
+            val item = feed.items!![1]
 
-            assertEquals("http://cowboyprogrammer.org/dummy-id-to-distinguis-from-alternate-link", id)
-            assertTrue(date_published!!.contains("2016"), "Should take the updated timestamp")
+            assertEquals("http://cowboyprogrammer.org/dummy-id-to-distinguis-from-alternate-link", item.id)
+            assertTrue(item.date_published!!.contains("2016"), "Should take the updated timestamp")
             assertEquals(
                 "http://localhost:1313/images/zopfli_all_the_things.jpg",
-                image,
+                item.image?.url,
             )
 
-            assertEquals("http://localhost:1313/css/images/logo.png", icon)
+            assertEquals("http://localhost:1313/css/images/logo.png", feed.icon)
         }
 
     @Test
     @Throws(Exception::class)
     fun morningPaper() =
         runBlocking {
-            val feed = morningPaper.use { feedParser.parseFeedResponse(it) }
-            val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = morningPaper.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals("https://blog.acolyer.org", home_page_url)
-            assertEquals("https://blog.acolyer.org/feed/", feed_url)
+            assertEquals("https://blog.acolyer.org", feed.home_page_url)
+            assertEquals("https://blog.acolyer.org/feed/", feed.feed_url)
 
-            assertEquals(10, items!!.size)
-            val (_, _, _, title, _, _, _, image) = items[0]
+            assertEquals(10, feed.items!!.size)
+            val item = feed.items!!.first()
 
             assertEquals(
                 "Thou shalt not depend on me: analysing the use of outdated JavaScript libraries on the web",
-                title,
+                item.title,
             )
 
             assertEquals(
                 "http://1.gravatar.com/avatar/a795b4f89a6d096f314fc0a2c80479c1?s=96&d=identicon&r=G",
-                image,
+                item.image?.url,
             )
         }
 
@@ -674,23 +669,22 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun londoner() =
         runBlocking {
-            val feed = londoner.use { feedParser.parseFeedResponse(it) }
-            val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = londoner.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals("http://londonist.com/", home_page_url)
-            assertEquals("http://londonist.com/feed", feed_url)
+            assertEquals("http://londonist.com/", feed.home_page_url)
+            assertEquals("http://londonist.com/feed", feed.feed_url)
 
-            assertEquals(40, items!!.size)
-            val (_, _, _, title, _, _, _, image) = items[0]
+            assertEquals(40, feed.items!!.size)
+            val item = feed.items!!.first()
 
             assertEquals(
                 "Make The Most Of London's Offerings With Chip",
-                title,
+                item.title,
             )
 
             assertEquals(
                 "http://assets.londonist.com/uploads/2017/06/chip_2.jpg",
-                image,
+                item.image?.url,
             )
         }
 
@@ -758,23 +752,22 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun fz() =
         runBlocking {
-            val feed = fz.use { feedParser.parseFeedResponse(it) }
-            val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed.getOrNull()!!
+            val feed = fz.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
-            assertEquals("http://www.fz.se/nyheter/", home_page_url)
-            assertNull(feed_url)
+            assertEquals("http://www.fz.se/nyheter/", feed.home_page_url)
+            assertNull(feed.feed_url)
 
-            assertEquals(20, items!!.size)
-            val (_, _, _, title, _, _, _, image) = items[0]
+            assertEquals(20, feed.items!!.size)
+            val item = feed.items!!.first()
 
             assertEquals(
                 "Nier: Automata bjuder på maffig lanseringstrailer",
-                title,
+                item.title,
             )
 
             assertEquals(
                 "http://d2ihp3fq52ho68.cloudfront.net/YTo2OntzOjI6ImlkIjtpOjEzOTI3OTM7czoxOiJ3IjtpOjUwMDtzOjE6ImgiO2k6OTk5OTtzOjE6ImMiO2k6MDtzOjE6InMiO2k6MDtzOjE6ImsiO3M6NDA6IjU5YjA2YjgyZjkyY2IxZjBiMDZjZmI5MmE3NTk5NjMzMjIyMmU4NGMiO30=",
-                image,
+                item.image?.url,
             )
         }
 
@@ -818,7 +811,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "http://cowboyprogrammer.org/hello.jpg&cached=true",
-                item.image,
+                item.image?.url,
             )
             assertEquals(
                 "<img src=\"hello.jpg&amp;cached=true\">",
@@ -839,7 +832,7 @@ class FeedParserTest : DIAware {
             val text = feed.getOrNull()?.items!!.first()
             assertEquals(
                 "http://cowboyprogrammer.org/hello.jpg&cached=true",
-                text.image,
+                text.image?.url,
             )
             assertEquals(
                 "<img src=\"hello.jpg&amp;cached=true\">",
@@ -849,7 +842,7 @@ class FeedParserTest : DIAware {
             val html = feed.getOrNull()?.items!![1]
             assertEquals(
                 "http://cowboyprogrammer.org/hello.jpg&cached=true",
-                html.image,
+                html.image?.url,
             )
             assertEquals(
                 "<img src=\"hello.jpg&amp;cached=true\">",
@@ -859,7 +852,7 @@ class FeedParserTest : DIAware {
             val xhtml = feed.getOrNull()?.items!![2]
             assertEquals(
                 "http://cowboyprogrammer.org/hello.jpg&cached=true",
-                xhtml.image,
+                xhtml.image?.url,
             )
             assertTrue("Actual:\n${xhtml.content_html}") {
                 "<img src=\"hello.jpg&amp;cached=true\" />" in xhtml.content_html!!

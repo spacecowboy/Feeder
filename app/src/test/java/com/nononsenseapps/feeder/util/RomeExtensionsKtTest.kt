@@ -1,9 +1,11 @@
 package com.nononsenseapps.feeder.util
 
-import com.nononsenseapps.jsonfeed.Attachment
-import com.nononsenseapps.jsonfeed.Author
-import com.nononsenseapps.jsonfeed.Feed
-import com.nononsenseapps.jsonfeed.Item
+import com.nononsenseapps.feeder.model.ImageFromHTML
+import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.model.ParsedArticle
+import com.nononsenseapps.feeder.model.ParsedAuthor
+import com.nononsenseapps.feeder.model.ParsedEnclosure
+import com.nononsenseapps.feeder.model.ParsedFeed
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.MediaContent
@@ -33,7 +35,7 @@ class RomeExtensionsKtTest {
     @Test
     fun author() {
         assertEquals(
-            Author(name = "Bobby Jane"),
+            ParsedAuthor(name = "Bobby Jane"),
             mockSyndPerson(name = "Bobby Jane").asAuthor(),
         )
     }
@@ -42,7 +44,7 @@ class RomeExtensionsKtTest {
     fun feedLinkButNoLinks() =
         runBlocking {
             assertEquals(
-                Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                ParsedFeed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
                 mockSyndFeed(link = "homepage").asFeed(baseUrl),
             )
         }
@@ -51,7 +53,7 @@ class RomeExtensionsKtTest {
     fun feedLinks() =
         runBlocking {
             assertEquals(
-                Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                ParsedFeed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
                 mockSyndFeed(
                     links =
                         listOf(
@@ -69,14 +71,14 @@ class RomeExtensionsKtTest {
     fun itemFallsBackToFeedAuthor() =
         runBlocking {
             assertEquals(
-                Feed(
-                    author = Author(name = "bob"),
+                ParsedFeed(
+                    author = ParsedAuthor(name = "bob"),
                     title = "",
                     items =
                         listOf(
-                            Item(
+                            ParsedArticle(
                                 id = "$baseUrl/id",
-                                author = Author(name = "bob"),
+                                author = ParsedAuthor(name = "bob"),
                                 content_text = "",
                                 url = null,
                                 summary = "",
@@ -102,14 +104,14 @@ class RomeExtensionsKtTest {
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = expectedSummary,
                 summary = expectedSummary,
                 url = null,
                 content_html = html,
-                image = "http://google.com/image.png",
+                image = ImageFromHTML(url = "http://google.com/image.png", width = null, height = null),
                 attachments = emptyList(),
             ),
             mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem(baseUrl),
@@ -126,7 +128,7 @@ class RomeExtensionsKtTest {
         val longText = "$expectedSummary and some additional text"
 
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = longText,
@@ -142,7 +144,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemShortTextShouldNotBeIndexOutOfBounds() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "abc",
                 summary = "abc",
@@ -158,7 +160,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemLinkButNoLinks() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "",
                 summary = "",
@@ -178,7 +180,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemLinks() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "",
                 summary = "",
@@ -202,7 +204,7 @@ class RomeExtensionsKtTest {
     @Test
     fun asAttachment() {
         assertEquals(
-            Attachment(url = "$baseUrl/uurl", mime_type = "text/html", size_in_bytes = 5),
+            ParsedEnclosure(url = "$baseUrl/uurl", mime_type = "text/html", size_in_bytes = 5),
             mockSyndEnclosure(url = "uurl", type = "text/html", length = 5).asAttachment(baseUrl),
         )
     }
@@ -210,7 +212,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithPlainAndOthers() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "PLAIN",
                 summary = "PLAIN",
@@ -235,7 +237,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithNullAndOthers() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "bah",
                 summary = "bah",
@@ -259,7 +261,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithOthers() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "html",
                 summary = "html",
@@ -282,7 +284,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentHtmlAtomWithOnlyUnknown() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "foo",
@@ -304,7 +306,7 @@ class RomeExtensionsKtTest {
     @Test
     fun titleHtmlAtom() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "600 – Email is your electronic memory",
                 content_text = "",
@@ -322,7 +324,7 @@ class RomeExtensionsKtTest {
     @Test
     fun titleXHtmlAtom() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "600 – Email is your electronic memory",
                 content_text = "",
@@ -340,7 +342,7 @@ class RomeExtensionsKtTest {
     @Test
     fun titlePlainAtomRss() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "600 – Email is your electronic memory",
                 content_text = "",
@@ -358,7 +360,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentHtmlRss() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 content_text = "html",
                 summary = "html",
@@ -377,14 +379,14 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithThumbnail() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                image = "$baseUrl/img",
+                image = MediaImage(url = "$baseUrl/img", width = 0, height = 0),
             ),
             mockSyndEntry(
                 uri = "id",
@@ -396,7 +398,7 @@ class RomeExtensionsKtTest {
     @Test
     fun asItemDiscardsInlineBase64ImagesAsThumbnails() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",
@@ -426,14 +428,14 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithContent() {
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                image = "$baseUrl/img",
+                image = MediaImage(url = "$baseUrl/img", width = 0, height = 0),
             ),
             mockSyndEntry(
                 uri = "id",
@@ -461,7 +463,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image,
+            item.image?.url,
         )
     }
 
@@ -484,7 +486,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image,
+            item.image?.url,
         )
     }
 
@@ -507,7 +509,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image,
+            item.image?.url,
         )
     }
 
@@ -527,7 +529,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             "http://foo/bar.png",
-            item.image,
+            item.image?.url,
         )
     }
 
@@ -537,7 +539,7 @@ class RomeExtensionsKtTest {
         val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",
@@ -559,7 +561,7 @@ class RomeExtensionsKtTest {
         val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",
@@ -584,7 +586,7 @@ class RomeExtensionsKtTest {
         val pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romePubDate.time), ZoneOffset.systemDefault())
         val modDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeModDate.time), ZoneOffset.systemDefault())
         assertEquals(
-            Item(
+            ParsedArticle(
                 id = "$baseUrl/id",
                 title = "",
                 content_text = "",

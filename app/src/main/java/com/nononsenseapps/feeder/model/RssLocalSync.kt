@@ -14,7 +14,6 @@ import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import com.nononsenseapps.jsonfeed.Item
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -391,5 +390,5 @@ class RssLocalSync(override val di: DI) : DIAware {
  * Remember that text or title literally can mean injection problems if the contain % or similar,
  * so do NOT use them literally
  */
-private val Item.alternateId: String
+private val ParsedArticle.alternateId: String
     get() = "$id|${content_text.hashCode()}|${title.hashCode()}"

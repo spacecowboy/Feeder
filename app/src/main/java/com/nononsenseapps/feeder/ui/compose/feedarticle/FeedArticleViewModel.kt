@@ -364,6 +364,8 @@ class FeedArticleViewModel(
                         TextToDisplay.FAILED_NOT_HTML,
                         -> 0
                     },
+                image = article.image,
+                imageFromBody = article.imageFromBody,
             )
         }
             .stateIn(
@@ -557,6 +559,8 @@ interface ArticleScreenViewState {
     val isBookmarked: Boolean
     val keyHolder: ArticleItemKeyHolder
     val wordCount: Int
+    val image: String?
+    val imageFromBody: Boolean
 }
 
 interface ArticleItemKeyHolder {
@@ -645,6 +649,8 @@ data class FeedArticleScreenViewState(
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
     override val wordCount: Int = 0,
+    override val image: String? = null,
+    override val imageFromBody: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
 
 sealed class TSSError

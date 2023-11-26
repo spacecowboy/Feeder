@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.db.COL_FULLTEXT_DOWNLOADED
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
+import com.nononsenseapps.feeder.db.COL_IMAGE_FROM_BODY
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
@@ -27,11 +28,10 @@ import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_WORD_COUNT
 import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
+import com.nononsenseapps.feeder.model.ParsedArticle
+import com.nononsenseapps.feeder.model.ParsedFeed
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
-import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
-import com.nononsenseapps.jsonfeed.Item
 import java.net.URI
 import java.time.Instant
 import java.time.ZoneOffset
@@ -75,6 +75,7 @@ data class FeedItem
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
+        @ColumnInfo(name = COL_IMAGE_FROM_BODY) var imageFromBody: Boolean = false,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
         @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
@@ -117,9 +118,9 @@ data class FeedItem
             get() = readTime == null
 
         fun updateFromParsedEntry(
-            entry: Item,
+            entry: ParsedArticle,
             entryGuid: String,
-            feed: com.nononsenseapps.jsonfeed.Feed,
+            feed: ParsedFeed,
         ) {
             val converter = HtmlToPlainTextConverter()
             // Be careful about nulls.
@@ -141,17 +142,8 @@ data class FeedItem
             // Make double sure no base64 images are used as thumbnails
             val safeImage =
                 when {
-                    entry.image?.startsWith("data") == true -> null
+                    entry.image?.url?.startsWith("data") == true -> null
                     else -> entry.image
-                }
-
-            val absoluteImage =
-                when {
-                    feed.feed_url != null && safeImage != null -> {
-                        relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
-                    }
-
-                    else -> safeImage
                 }
 
             this.guid = entryGuid
@@ -160,7 +152,8 @@ data class FeedItem
             this.title = this.plainTitle
             this.plainSnippet = summary
 
-            this.imageUrl = absoluteImage
+            this.imageUrl = safeImage?.url
+            this.imageFromBody = safeImage?.fromBody ?: false
             val firstEnclosure = entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()
