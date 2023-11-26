@@ -11,14 +11,14 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
-import java.net.URL
-import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.net.URL
+import java.time.Instant
 
 class FeedStore(override val di: DI) : DIAware {
     private val feedDao: FeedDao by instance()
@@ -49,11 +49,12 @@ class FeedStore(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun toggleNotifications(feedId: Long, value: Boolean) =
-        feedDao.setNotify(id = feedId, notify = value)
+    suspend fun toggleNotifications(
+        feedId: Long,
+        value: Boolean,
+    ) = feedDao.setNotify(id = feedId, notify = value)
 
-    suspend fun getDisplayTitle(feedId: Long): String? =
-        feedDao.getFeedTitle(feedId)?.displayTitle
+    suspend fun getDisplayTitle(feedId: Long): String? = feedDao.getFeedTitle(feedId)?.displayTitle
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedDao.deleteFeeds(feedIds)
@@ -73,39 +74,41 @@ class FeedStore(override val di: DI) : DIAware {
                 mapFeedsToSortedDrawerItems(feeds)
             }
 
-    private fun mapFeedsToSortedDrawerItems(
-        feeds: List<FeedUnreadCount>,
-    ): List<DrawerItemWithUnreadCount> {
+    private fun mapFeedsToSortedDrawerItems(feeds: List<FeedUnreadCount>): List<DrawerItemWithUnreadCount> {
         var topTag = DrawerTop(unreadCount = 0, totalChildren = 0)
         val tags: MutableMap<String, DrawerTag> = mutableMapOf()
         val data: MutableList<DrawerItemWithUnreadCount> = mutableListOf()
 
         for (feedDbo in feeds) {
-            val feed = DrawerFeed(
-                unreadCount = feedDbo.unreadCount,
-                tag = feedDbo.tag,
-                id = feedDbo.id,
-                displayTitle = feedDbo.displayTitle,
-                imageUrl = feedDbo.imageUrl,
-            )
+            val feed =
+                DrawerFeed(
+                    unreadCount = feedDbo.unreadCount,
+                    tag = feedDbo.tag,
+                    id = feedDbo.id,
+                    displayTitle = feedDbo.displayTitle,
+                    imageUrl = feedDbo.imageUrl,
+                )
 
             data.add(feed)
-            topTag = topTag.copy(
-                unreadCount = topTag.unreadCount + feed.unreadCount,
-                totalChildren = topTag.totalChildren + 1,
-            )
+            topTag =
+                topTag.copy(
+                    unreadCount = topTag.unreadCount + feed.unreadCount,
+                    totalChildren = topTag.totalChildren + 1,
+                )
 
             if (feed.tag.isNotEmpty()) {
-                val tag = tags[feed.tag] ?: DrawerTag(
-                    tag = feed.tag,
-                    unreadCount = 0,
-                    uiId = getTagUiId(feed.tag),
-                    totalChildren = 0,
-                )
-                tags[feed.tag] = tag.copy(
-                    unreadCount = tag.unreadCount + feed.unreadCount,
-                    totalChildren = tag.totalChildren + 1,
-                )
+                val tag =
+                    tags[feed.tag] ?: DrawerTag(
+                        tag = feed.tag,
+                        unreadCount = 0,
+                        uiId = getTagUiId(feed.tag),
+                        totalChildren = 0,
+                    )
+                tags[feed.tag] =
+                    tag.copy(
+                        unreadCount = tag.unreadCount + feed.unreadCount,
+                        totalChildren = tag.totalChildren + 1,
+                    )
             }
         }
 
@@ -115,17 +118,23 @@ class FeedStore(override val di: DI) : DIAware {
         return data.sorted()
     }
 
-    fun getFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
+    fun getFeedTitles(
+        feedId: Long,
+        tag: String,
+    ): Flow<List<FeedTitle>> =
         when {
             feedId > ID_UNSET -> feedDao.getFeedTitlesWithId(feedId)
             tag.isNotBlank() -> feedDao.getFeedTitlesWithTag(tag)
             else -> feedDao.getAllFeedTitles()
         }
 
-    fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?> =
-        feedDao.getCurrentlySyncingLatestTimestamp()
+    fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?> = feedDao.getCurrentlySyncingLatestTimestamp()
 
-    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant? = null) {
+    suspend fun setCurrentlySyncingOn(
+        feedId: Long,
+        syncing: Boolean,
+        lastSync: Instant? = null,
+    ) {
         if (lastSync != null) {
             feedDao.setCurrentlySyncingOn(feedId = feedId, syncing = syncing, lastSync = lastSync)
         } else {
@@ -164,21 +173,21 @@ class FeedStore(override val di: DI) : DIAware {
         feedDao.deleteFeedWithUrl(url)
     }
 
-    suspend fun loadFeedIfStale(feedId: Long, staleTime: Long) =
-        feedDao.loadFeedIfStale(feedId = feedId, staleTime = staleTime)
+    suspend fun loadFeedIfStale(
+        feedId: Long,
+        staleTime: Long,
+    ) = feedDao.loadFeedIfStale(feedId = feedId, staleTime = staleTime)
 
-    suspend fun loadFeed(feedId: Long): Feed? =
-        feedDao.loadFeed(feedId = feedId)
+    suspend fun loadFeed(feedId: Long): Feed? = feedDao.loadFeed(feedId = feedId)
 
-    suspend fun loadFeedsIfStale(tag: String, staleTime: Long) =
-        feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime)
+    suspend fun loadFeedsIfStale(
+        tag: String,
+        staleTime: Long,
+    ) = feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime)
 
-    suspend fun loadFeedsIfStale(staleTime: Long) =
-        feedDao.loadFeedsIfStale(staleTime = staleTime)
+    suspend fun loadFeedsIfStale(staleTime: Long) = feedDao.loadFeedsIfStale(staleTime = staleTime)
 
-    suspend fun loadFeeds(tag: String) =
-        feedDao.loadFeeds(tag = tag)
+    suspend fun loadFeeds(tag: String) = feedDao.loadFeeds(tag = tag)
 
-    suspend fun loadFeeds() =
-        feedDao.loadFeeds()
+    suspend fun loadFeeds() = feedDao.loadFeeds()
 }

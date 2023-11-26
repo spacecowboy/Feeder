@@ -6,7 +6,6 @@ import org.junit.Rule
 
 @Ignore
 class ReaderScreenScrollingTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
     // createAndroidComposeRule<MainActivity>()

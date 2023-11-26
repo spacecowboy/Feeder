@@ -47,54 +47,56 @@ const val feedItemColumnsWithFeed = """
     $COL_WORD_COUNT_FULL
 """
 
-data class FeedItemWithFeed @Ignore constructor(
-    override var id: Long = ID_UNSET,
-    var guid: String = "",
-    @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
-    var title: String = "",
-    @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
-    @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-    @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-    @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
-    @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
-    var author: String? = null,
-    @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
-    override var link: String? = null,
-    var tag: String = "",
-    @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
-    @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-    @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
-    @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",
-    @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
-    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
-    @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
-    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
-    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
-) : FeedItemForFetching {
-    constructor() : this(id = ID_UNSET)
+data class FeedItemWithFeed
+    @Ignore
+    constructor(
+        override var id: Long = ID_UNSET,
+        var guid: String = "",
+        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
+        var title: String = "",
+        @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
+        @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
+        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
+        @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+        @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
+        var author: String? = null,
+        @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
+        override var link: String? = null,
+        var tag: String = "",
+        @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
+        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+        @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
+        @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",
+        @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
+        @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
+        @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+        @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+        @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+    ) : FeedItemForFetching {
+        constructor() : this(id = ID_UNSET)
 
-    val feedDisplayTitle: String
-        get() = feedCustomTitle.ifBlank { feedTitle }
+        val feedDisplayTitle: String
+            get() = feedCustomTitle.ifBlank { feedTitle }
 
-    val enclosureFilename: String?
-        get() {
-            enclosureLink?.let { enclosureLink ->
-                var fname: String? = null
-                try {
-                    fname = URI(enclosureLink).path.split("/").last()
-                } catch (_: Exception) {
+        val enclosureFilename: String?
+            get() {
+                enclosureLink?.let { enclosureLink ->
+                    var fname: String? = null
+                    try {
+                        fname = URI(enclosureLink).path.split("/").last()
+                    } catch (_: Exception) {
+                    }
+                    return if (fname.isNullOrEmpty()) {
+                        null
+                    } else {
+                        fname
+                    }
                 }
-                return if (fname.isNullOrEmpty()) {
-                    null
-                } else {
-                    fname
-                }
+                return null
             }
-            return null
-        }
 
-    val domain: String?
-        get() {
-            return (enclosureLink ?: link)?.host()
-        }
-}
+        val domain: String?
+            get() {
+                return (enclosureLink ?: link)?.host()
+            }
+    }

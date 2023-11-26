@@ -39,8 +39,9 @@ fun ConfirmDialog(
                 text = stringResource(id = title),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .padding(vertical = 8.dp),
             )
         },
         text = {

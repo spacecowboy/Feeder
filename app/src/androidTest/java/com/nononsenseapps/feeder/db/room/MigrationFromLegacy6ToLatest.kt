@@ -37,10 +37,6 @@ import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
-import java.net.URL
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -53,31 +49,36 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
+import java.net.URL
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MigrationFromLegacy6ToLatest {
-
     private val feederApplication: FeederApplication = getApplicationContext()
     private val di: DI by closestDI(feederApplication)
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     private val testDbName = "TestingDatabase"
 
     private val legacyDb: LegacyDatabaseHandler
-        get() = LegacyDatabaseHandler(
-            context = feederApplication,
-            name = testDbName,
-            version = 6,
-        )
+        get() =
+            LegacyDatabaseHandler(
+                context = feederApplication,
+                name = testDbName,
+                version = 6,
+            )
 
     private val roomDb: AppDatabase
         get() =
@@ -97,30 +98,32 @@ class MigrationFromLegacy6ToLatest {
             createViewsAndTriggers(db)
 
             // Bare minimum non-null feeds
-            val idA = db.insert(
-                FEED_TABLE_NAME,
-                null,
-                contentValues {
-                    setString(COL_TITLE to "feedA")
-                    setString(COL_CUSTOM_TITLE to "feedACustom")
-                    setString(COL_URL to "https://feedA")
-                    setString(COL_TAG to "")
-                },
-            )
+            val idA =
+                db.insert(
+                    FEED_TABLE_NAME,
+                    null,
+                    contentValues {
+                        setString(COL_TITLE to "feedA")
+                        setString(COL_CUSTOM_TITLE to "feedACustom")
+                        setString(COL_URL to "https://feedA")
+                        setString(COL_TAG to "")
+                    },
+                )
 
             // All fields filled
-            val idB = db.insert(
-                FEED_TABLE_NAME,
-                null,
-                contentValues {
-                    setString(COL_TITLE to "feedB")
-                    setString(COL_CUSTOM_TITLE to "feedBCustom")
-                    setString(COL_URL to "https://feedB")
-                    setString(COL_TAG to "tag")
-                    setString(COL_IMAGEURL to "https://image")
-                    setInt(COL_NOTIFY to 1)
-                },
-            )
+            val idB =
+                db.insert(
+                    FEED_TABLE_NAME,
+                    null,
+                    contentValues {
+                        setString(COL_TITLE to "feedB")
+                        setString(COL_CUSTOM_TITLE to "feedBCustom")
+                        setString(COL_URL to "https://feedB")
+                        setString(COL_TAG to "tag")
+                        setString(COL_IMAGEURL to "https://image")
+                        setInt(COL_NOTIFY to 1)
+                    },
+                )
 
             IntRange(0, 1).forEach { index ->
                 db.insert(
@@ -171,122 +174,126 @@ class MigrationFromLegacy6ToLatest {
     }
 
     @Test
-    fun legacyMigrationTo7MinimalFeed() = runBlocking {
-        testHelper.runMigrationsAndValidate(
-            testDbName,
-            7,
-            true,
-            MIGRATION_6_7,
-        )
+    fun legacyMigrationTo7MinimalFeed() =
+        runBlocking {
+            testHelper.runMigrationsAndValidate(
+                testDbName,
+                7,
+                true,
+                MIGRATION_6_7,
+            )
 
-        roomDb.let { db ->
-            val feeds = db.feedDao().loadFeeds()
+            roomDb.let { db ->
+                val feeds = db.feedDao().loadFeeds()
 
-            assertEquals("Wrong number of feeds", 2, feeds.size)
+                assertEquals("Wrong number of feeds", 2, feeds.size)
 
-            val feedA = feeds[0]
+                val feedA = feeds[0]
 
-            assertEquals("feedA", feedA.title)
-            assertEquals("feedACustom", feedA.customTitle)
-            assertEquals(URL("https://feedA"), feedA.url)
-            assertEquals("", feedA.tag)
-            assertEquals(Instant.EPOCH, feedA.lastSync)
-            assertFalse(feedA.notify)
-            assertNull(feedA.imageUrl)
-        }
-    }
-
-    @Test
-    fun legacyMigrationTo7CompleteFeed() = runBlocking {
-        testHelper.runMigrationsAndValidate(
-            testDbName,
-            7,
-            true,
-            MIGRATION_6_7,
-        )
-
-        roomDb.let { db ->
-            val feeds = db.feedDao().loadFeeds()
-
-            assertEquals("Wrong number of feeds", 2, feeds.size)
-
-            val feedB = feeds[1]
-
-            assertEquals("feedB", feedB.title)
-            assertEquals("feedBCustom", feedB.customTitle)
-            assertEquals(URL("https://feedB"), feedB.url)
-            assertEquals("tag", feedB.tag)
-            assertEquals(Instant.EPOCH, feedB.lastSync)
-            assertTrue(feedB.notify)
-            assertEquals(URL("https://image"), feedB.imageUrl)
-        }
-    }
-
-    @Test
-    fun legacyMigrationTo7MinimalFeedItem() = runBlocking {
-        testHelper.runMigrationsAndValidate(
-            testDbName,
-            7,
-            true,
-            MIGRATION_6_7,
-        )
-
-        roomDb.let { db ->
-            val feed = db.feedDao().loadFeeds()[0]
-            assertEquals("feedA", feed.title)
-            @Suppress("DEPRECATION")
-            val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
-
-            assertEquals(2, items.size)
-
-            items.forEachIndexed { index, it ->
-                assertEquals(feed.id, it.feedId)
-                assertEquals("guid$index", it.guid)
-                assertEquals("plain$index", it.plainTitle)
-                assertEquals("plain$index", it.plainTitle)
-                assertEquals("snippet$index", it.plainSnippet)
-                assertTrue(it.unread)
-                assertNull(it.author)
-                assertNull(it.enclosureLink)
-                assertNull(it.imageUrl)
-                assertNull(it.pubDate)
-                assertNull(it.link)
-                assertFalse(it.notified)
+                assertEquals("feedA", feedA.title)
+                assertEquals("feedACustom", feedA.customTitle)
+                assertEquals(URL("https://feedA"), feedA.url)
+                assertEquals("", feedA.tag)
+                assertEquals(Instant.EPOCH, feedA.lastSync)
+                assertFalse(feedA.notify)
+                assertNull(feedA.imageUrl)
             }
         }
-    }
 
     @Test
-    fun legacyMigrationTo7CompleteFeedItem() = runBlocking {
-        testHelper.runMigrationsAndValidate(
-            testDbName,
-            7,
-            true,
-            MIGRATION_6_7,
-        )
+    fun legacyMigrationTo7CompleteFeed() =
+        runBlocking {
+            testHelper.runMigrationsAndValidate(
+                testDbName,
+                7,
+                true,
+                MIGRATION_6_7,
+            )
 
-        roomDb.let { db ->
-            val feed = db.feedDao().loadFeeds()[1]
-            assertEquals("feedB", feed.title)
-            @Suppress("DEPRECATION")
-            val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+            roomDb.let { db ->
+                val feeds = db.feedDao().loadFeeds()
 
-            assertEquals(2, items.size)
+                assertEquals("Wrong number of feeds", 2, feeds.size)
 
-            items.forEachIndexed { index, it ->
-                assertEquals(feed.id, it.feedId)
-                assertEquals("guid$index", it.guid)
-                assertEquals("plain$index", it.plainTitle)
-                assertEquals("plain$index", it.plainTitle)
-                assertEquals("snippet$index", it.plainSnippet)
-                assertFalse(it.unread)
-                assertEquals("author$index", it.author)
-                assertEquals("https://enclosure$index", it.enclosureLink)
-                assertEquals("https://image$index", it.imageUrl)
-                assertEquals(ZonedDateTime.of(2018, 2, 3, 4, 5, 0, 0, ZoneOffset.UTC), it.pubDate)
-                assertEquals("https://link$index", it.link)
-                assertTrue(it.notified)
+                val feedB = feeds[1]
+
+                assertEquals("feedB", feedB.title)
+                assertEquals("feedBCustom", feedB.customTitle)
+                assertEquals(URL("https://feedB"), feedB.url)
+                assertEquals("tag", feedB.tag)
+                assertEquals(Instant.EPOCH, feedB.lastSync)
+                assertTrue(feedB.notify)
+                assertEquals(URL("https://image"), feedB.imageUrl)
             }
         }
-    }
+
+    @Test
+    fun legacyMigrationTo7MinimalFeedItem() =
+        runBlocking {
+            testHelper.runMigrationsAndValidate(
+                testDbName,
+                7,
+                true,
+                MIGRATION_6_7,
+            )
+
+            roomDb.let { db ->
+                val feed = db.feedDao().loadFeeds()[0]
+                assertEquals("feedA", feed.title)
+                @Suppress("DEPRECATION")
+                val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+
+                assertEquals(2, items.size)
+
+                items.forEachIndexed { index, it ->
+                    assertEquals(feed.id, it.feedId)
+                    assertEquals("guid$index", it.guid)
+                    assertEquals("plain$index", it.plainTitle)
+                    assertEquals("plain$index", it.plainTitle)
+                    assertEquals("snippet$index", it.plainSnippet)
+                    assertTrue(it.unread)
+                    assertNull(it.author)
+                    assertNull(it.enclosureLink)
+                    assertNull(it.imageUrl)
+                    assertNull(it.pubDate)
+                    assertNull(it.link)
+                    assertFalse(it.notified)
+                }
+            }
+        }
+
+    @Test
+    fun legacyMigrationTo7CompleteFeedItem() =
+        runBlocking {
+            testHelper.runMigrationsAndValidate(
+                testDbName,
+                7,
+                true,
+                MIGRATION_6_7,
+            )
+
+            roomDb.let { db ->
+                val feed = db.feedDao().loadFeeds()[1]
+                assertEquals("feedB", feed.title)
+                @Suppress("DEPRECATION")
+                val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+
+                assertEquals(2, items.size)
+
+                items.forEachIndexed { index, it ->
+                    assertEquals(feed.id, it.feedId)
+                    assertEquals("guid$index", it.guid)
+                    assertEquals("plain$index", it.plainTitle)
+                    assertEquals("plain$index", it.plainTitle)
+                    assertEquals("snippet$index", it.plainSnippet)
+                    assertFalse(it.unread)
+                    assertEquals("author$index", it.author)
+                    assertEquals("https://enclosure$index", it.enclosureLink)
+                    assertEquals("https://image$index", it.imageUrl)
+                    assertEquals(ZonedDateTime.of(2018, 2, 3, 4, 5, 0, 0, ZoneOffset.UTC), it.pubDate)
+                    assertEquals("https://link$index", it.link)
+                    assertTrue(it.notified)
+                }
+            }
+        }
 }

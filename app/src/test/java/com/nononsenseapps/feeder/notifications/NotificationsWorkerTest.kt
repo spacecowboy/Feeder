@@ -43,7 +43,7 @@ class NotificationsWorkerTest : DIAware {
         runBlocking {
             notificationsWorker.unNotifyForMissingItems(
                 prev = listOf(1L, 2L, 3L, 4L),
-                current = listOf(1L, 3L)
+                current = listOf(1L, 3L),
             )
         }
 

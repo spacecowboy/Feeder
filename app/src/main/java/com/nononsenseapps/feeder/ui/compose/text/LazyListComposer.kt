@@ -9,7 +9,6 @@ class LazyListComposer(
     private val keyHolder: ArticleItemKeyHolder,
     private val paragraphEmitter: @Composable (AnnotatedParagraphStringBuilder, TextStyler?) -> Unit,
 ) : HtmlComposer() {
-
     override fun emitParagraph(): Boolean {
         // List items emit dots and non-breaking space. Don't newline after that
         if (builder.isEmpty() || builder.endsWithNonBreakingSpace) {
@@ -37,16 +36,17 @@ class LazyListComposer(
         emitParagraph()
 
         val url = link ?: findClosestLink()
-        val onClick: (() -> Unit) = when {
-            url?.isNotBlank() == true -> {
-                {
-                    onLinkClick(url)
+        val onClick: (() -> Unit) =
+            when {
+                url?.isNotBlank() == true -> {
+                    {
+                        onLinkClick(url)
+                    }
+                }
+                else -> {
+                    {}
                 }
             }
-            else -> {
-                {}
-            }
-        }
 
         item(keyHolder = keyHolder) {
             block(onClick)
@@ -57,7 +57,10 @@ class LazyListComposer(
      * Key is necessary or when you switch between default and full text - the initial items
      * will have the same index and will not recompose.
      */
-    fun item(keyHolder: ArticleItemKeyHolder, block: @Composable () -> Unit) {
+    fun item(
+        keyHolder: ArticleItemKeyHolder,
+        block: @Composable () -> Unit,
+    ) {
         lazyListScope.item(key = keyHolder.getAndIncrementKey()) {
             block()
         }
@@ -69,10 +72,11 @@ class LazyListComposer(
         for (span in spanStack) {
             when (span) {
                 is SpanWithStyle -> builder.pushStyle(span.spanStyle)
-                is SpanWithAnnotation -> builder.pushStringAnnotation(
-                    tag = span.tag,
-                    annotation = span.annotation,
-                )
+                is SpanWithAnnotation ->
+                    builder.pushStringAnnotation(
+                        tag = span.tag,
+                        annotation = span.annotation,
+                    )
                 is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
                 is SpanWithVerbatim -> builder.pushVerbatimTtsAnnotation(span.verbatim)
             }

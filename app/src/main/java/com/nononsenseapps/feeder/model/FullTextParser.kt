@@ -18,9 +18,6 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatten
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
-import java.net.URL
-import java.nio.charset.Charset
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -30,14 +27,16 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
+import java.net.URL
+import java.nio.charset.Charset
+import java.util.concurrent.TimeUnit
 
-fun scheduleFullTextParse(
-    di: DI,
-) {
+fun scheduleFullTextParse(di: DI) {
     Log.i(LOG_TAG, "Scheduling a full text parse work")
-    val workRequest = OneTimeWorkRequestBuilder<FullTextWorker>()
-        .addTag("feeder")
-        .keepResultsForAtLeast(1, TimeUnit.MINUTES)
+    val workRequest =
+        OneTimeWorkRequestBuilder<FullTextWorker>()
+            .addTag("feeder")
+            .keepResultsForAtLeast(1, TimeUnit.MINUTES)
 
     val workManager by di.instance<WorkManager>()
     workManager.enqueue(workRequest.build())
@@ -116,15 +115,17 @@ class FullTextParser(override val di: DI) : DIAware {
                 ) {
                     val body = response.body ?: return@catching NoBody(url = url).left()
 
-                    val bytes = body.use {
-                        it.bytes()
-                    }
+                    val bytes =
+                        body.use {
+                            it.bytes()
+                        }
 
-                    val contentType = body.contentType()
-                        ?: return@catching UnsupportedContentType(
-                            url = url,
-                            mimeType = "null",
-                        ).left()
+                    val contentType =
+                        body.contentType()
+                            ?: return@catching UnsupportedContentType(
+                                url = url,
+                                mimeType = "null",
+                            ).left()
 
                     if (contentType.type != "text" || contentType.subtype != "html") {
                         return@catching UnsupportedContentType(
@@ -197,38 +198,47 @@ class FullTextParser(override val di: DI) : DIAware {
         return null
     }
 
-    private fun nextCharsetState(byte: Byte, state: CharsetState): CharsetState =
+    private fun nextCharsetState(
+        byte: Byte,
+        state: CharsetState,
+    ): CharsetState =
         when (state) {
             CharsetState.END -> CharsetState.END
-            CharsetState.INIT -> when (byte.toInt().toChar()) {
-                '<' -> CharsetState.TAG_START
-                else -> CharsetState.INIT
-            }
+            CharsetState.INIT ->
+                when (byte.toInt().toChar()) {
+                    '<' -> CharsetState.TAG_START
+                    else -> CharsetState.INIT
+                }
 
-            CharsetState.TAG_START -> when (byte.toInt().toChar()) {
-                'm' -> CharsetState.META_M
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.TAG_START ->
+                when (byte.toInt().toChar()) {
+                    'm' -> CharsetState.META_M
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.TAG_END -> when (byte.toInt().toChar()) {
-                '>' -> CharsetState.INIT
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.TAG_END ->
+                when (byte.toInt().toChar()) {
+                    '>' -> CharsetState.INIT
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.META_M -> when (byte.toInt().toChar()) {
-                'e' -> CharsetState.META_E
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.META_M ->
+                when (byte.toInt().toChar()) {
+                    'e' -> CharsetState.META_E
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.META_E -> when (byte.toInt().toChar()) {
-                't' -> CharsetState.META_T
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.META_E ->
+                when (byte.toInt().toChar()) {
+                    't' -> CharsetState.META_T
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.META_T -> when (byte.toInt().toChar()) {
-                'a' -> CharsetState.META_A
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.META_T ->
+                when (byte.toInt().toChar()) {
+                    'a' -> CharsetState.META_A
+                    else -> CharsetState.TAG_END
+                }
 
             CharsetState.META_A -> {
                 val c = byte.toInt().toChar()
@@ -247,55 +257,65 @@ class FullTextParser(override val di: DI) : DIAware {
                 }
             }
 
-            CharsetState.CHARSET_C -> when (byte.toInt().toChar()) {
-                'h' -> CharsetState.CHARSET_H
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_C ->
+                when (byte.toInt().toChar()) {
+                    'h' -> CharsetState.CHARSET_H
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_H -> when (byte.toInt().toChar()) {
-                'a' -> CharsetState.CHARSET_A
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_H ->
+                when (byte.toInt().toChar()) {
+                    'a' -> CharsetState.CHARSET_A
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_A -> when (byte.toInt().toChar()) {
-                'r' -> CharsetState.CHARSET_R
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_A ->
+                when (byte.toInt().toChar()) {
+                    'r' -> CharsetState.CHARSET_R
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_R -> when (byte.toInt().toChar()) {
-                's' -> CharsetState.CHARSET_S
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_R ->
+                when (byte.toInt().toChar()) {
+                    's' -> CharsetState.CHARSET_S
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_S -> when (byte.toInt().toChar()) {
-                'e' -> CharsetState.CHARSET_E
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_S ->
+                when (byte.toInt().toChar()) {
+                    'e' -> CharsetState.CHARSET_E
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_E -> when (byte.toInt().toChar()) {
-                't' -> CharsetState.CHARSET_T
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_E ->
+                when (byte.toInt().toChar()) {
+                    't' -> CharsetState.CHARSET_T
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_T -> when (byte.toInt().toChar()) {
-                '=' -> CharsetState.CHARSET_EQUALS
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_T ->
+                when (byte.toInt().toChar()) {
+                    '=' -> CharsetState.CHARSET_EQUALS
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_EQUALS -> when (byte.toInt().toChar()) {
-                '"' -> CharsetState.CHARSET_QUOTE
-                else -> CharsetState.TAG_END
-            }
+            CharsetState.CHARSET_EQUALS ->
+                when (byte.toInt().toChar()) {
+                    '"' -> CharsetState.CHARSET_QUOTE
+                    else -> CharsetState.TAG_END
+                }
 
-            CharsetState.CHARSET_QUOTE -> when (byte.toInt().toChar()) {
-                '"' -> CharsetState.END
-                else -> CharsetState.CHARSET
-            }
+            CharsetState.CHARSET_QUOTE ->
+                when (byte.toInt().toChar()) {
+                    '"' -> CharsetState.END
+                    else -> CharsetState.CHARSET
+                }
 
-            CharsetState.CHARSET -> when (byte.toInt().toChar()) {
-                '"' -> CharsetState.END
-                else -> CharsetState.CHARSET
-            }
+            CharsetState.CHARSET ->
+                when (byte.toInt().toChar()) {
+                    '"' -> CharsetState.END
+                    else -> CharsetState.CHARSET
+                }
         }
 
     companion object {

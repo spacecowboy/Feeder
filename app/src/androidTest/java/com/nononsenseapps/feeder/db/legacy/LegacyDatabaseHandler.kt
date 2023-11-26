@@ -11,13 +11,16 @@ const val LEGACY_DATABASE_NAME = DATABASE_NAME
 class LegacyDatabaseHandler constructor(
     context: Context,
     name: String = LEGACY_DATABASE_NAME,
-    version: Int = LEGACY_DATABASE_VERSION
+    version: Int = LEGACY_DATABASE_VERSION,
 ) : SQLiteOpenHelper(context, name, null, version) {
-
     override fun onCreate(db: SQLiteDatabase) {
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    override fun onUpgrade(
+        db: SQLiteDatabase,
+        oldVersion: Int,
+        newVersion: Int,
+    ) {
     }
 
     override fun onOpen(db: SQLiteDatabase) {
@@ -46,6 +49,7 @@ const val FEED_ITEM_TABLE_NAME = "FeedItem"
 // Naming the id column with an underscore is good to be consistent
 // with other Android things. This is ALWAYS needed
 const val COL_ID = "_id"
+
 // These fields can be anything you want.
 const val COL_TITLE = "title"
 const val COL_CUSTOM_TITLE = "customtitle"
@@ -63,6 +67,7 @@ const val COL_AUTHOR = "author"
 const val COL_PUBDATE = "pubdate"
 const val COL_UNREAD = "unread"
 const val COL_NOTIFIED = "notified"
+
 // These fields corresponds to columns in Feed table
 const val COL_FEED = "feed"
 const val COL_FEEDTITLE = "feedtitle"

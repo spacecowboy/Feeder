@@ -40,5 +40,7 @@ private class FilePathProviderImpl(
     override val imageCacheDir: File = cacheDir.resolve("image_cache")
 }
 
-fun filePathProvider(cacheDir: File, filesDir: File): FilePathProvider =
-    FilePathProviderImpl(cacheDir = cacheDir, filesDir = filesDir)
+fun filePathProvider(
+    cacheDir: File,
+    filesDir: File,
+): FilePathProvider = FilePathProviderImpl(cacheDir = cacheDir, filesDir = filesDir)

@@ -2,14 +2,13 @@
 @file:DependsOn("org.jetbrains:markdown-jvm:0.4.1")
 @file:DependsOn("net.pwall.mustache:kotlin-mustache:0.10")
 
-import java.io.File
-import java.util.concurrent.TimeUnit
 import net.pwall.mustache.parser.Parser
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 val flavour = CommonMarkFlavourDescriptor()
 
@@ -74,13 +73,14 @@ fun recurseMarkdown(
 
     if (ignoreContent) {
         for (child in node.children) {
-            newVersion = recurseMarkdown(
-                node = child,
-                src = src,
-                version = newVersion,
-                sb = sb,
-                entries = entries,
-            )
+            newVersion =
+                recurseMarkdown(
+                    node = child,
+                    src = src,
+                    version = newVersion,
+                    sb = sb,
+                    entries = entries,
+                )
         }
     } else {
         val content = src.slice(node.startOffset until node.endOffset)
@@ -89,8 +89,12 @@ fun recurseMarkdown(
     return newVersion
 }
 
-fun generateHugoEntries(targetDir: File, entries: List<ChangelogEntry>) {
-    val hugoTemplateString = """
+fun generateHugoEntries(
+    targetDir: File,
+    entries: List<ChangelogEntry>,
+) {
+    val hugoTemplateString =
+        """
         ---
         title: "{{title}}"
         date: {{timestamp}}
@@ -98,7 +102,7 @@ fun generateHugoEntries(targetDir: File, entries: List<ChangelogEntry>) {
         thumbnail: "feature.png"
         ---
         {{&content}}
-    """.trimIndent()
+        """.trimIndent()
 
     println("${entries.size} entries")
 
@@ -120,11 +124,12 @@ fun generateHugoEntries(targetDir: File, entries: List<ChangelogEntry>) {
 
 fun String.runCommand(): String {
     val parts = this.split("\\s".toRegex())
-    val proc = ProcessBuilder(*parts.toTypedArray())
-        .directory(File("/home/jonas/workspace/feeder"))
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
+    val proc =
+        ProcessBuilder(*parts.toTypedArray())
+            .directory(File("/home/jonas/workspace/feeder"))
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .start()
 
     proc.waitFor(2, TimeUnit.SECONDS)
     return proc.inputStream.bufferedReader().readText().trim()
@@ -132,9 +137,10 @@ fun String.runCommand(): String {
 
 // $args
 
-val targetDir = args.firstOrNull()
-    ?.let { File(it) }
-    ?: error("Expects target directory as first argument")
+val targetDir =
+    args.firstOrNull()
+        ?.let { File(it) }
+        ?: error("Expects target directory as first argument")
 
 if (!targetDir.isDirectory) {
     error("$targetDir does not exist or is not a directory!")
@@ -147,7 +153,8 @@ val entries = parseChangelog()
 
 generateHugoEntries(
     targetDir = targetDir,
-    entries = entries.filter {
-        tag == null || it.version == tag
-    },
+    entries =
+        entries.filter {
+            tag == null || it.version == tag
+        },
 )

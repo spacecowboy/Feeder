@@ -17,12 +17,13 @@ class MigrationFrom12To13 {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate12to13() {
@@ -31,15 +32,15 @@ class MigrationFrom12To13 {
         db.use {
             db.execSQL(
                 """
-            INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash)
-            VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666)
+                INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash)
+                VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666)
                 """.trimIndent(),
             )
 
             db.execSQL(
                 """
-            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
-            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
+                INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
+                VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
                 """.trimIndent(),
             )
         }

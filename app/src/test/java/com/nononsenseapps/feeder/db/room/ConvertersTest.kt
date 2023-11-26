@@ -1,10 +1,10 @@
 package com.nononsenseapps.feeder.db.room
 
-import java.time.Instant
-import java.time.ZonedDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import java.time.Instant
+import java.time.ZonedDateTime
 
 class ConvertersTest {
     @Test

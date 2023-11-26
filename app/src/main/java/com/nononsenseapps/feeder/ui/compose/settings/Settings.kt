@@ -118,9 +118,10 @@ fun SettingsScreen(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -205,7 +206,7 @@ fun SettingsScreen(
 @Composable
 @Preview(showBackground = true, device = PIXEL_C)
 @Preview(showBackground = true, device = NEXUS_5)
-fun SettingsScreenPreview() {
+private fun SettingsScreenPreview() {
     FeederTheme(ThemeOptions.DAY) {
         Surface {
             SettingsList(
@@ -333,19 +334,21 @@ fun SettingsList(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .padding(horizontal = dimens.margin)
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
+        modifier =
+            modifier
+                .padding(horizontal = dimens.margin)
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
     ) {
         MenuSetting(
             currentValue = currentThemeValue,
-            values = immutableListHolderOf(
-                ThemeOptions.SYSTEM.asThemeOption(),
-                ThemeOptions.DAY.asThemeOption(),
-                ThemeOptions.NIGHT.asThemeOption(),
-                ThemeOptions.E_INK.asThemeOption(),
-            ),
+            values =
+                immutableListHolderOf(
+                    ThemeOptions.SYSTEM.asThemeOption(),
+                    ThemeOptions.DAY.asThemeOption(),
+                    ThemeOptions.NIGHT.asThemeOption(),
+                    ThemeOptions.E_INK.asThemeOption(),
+                ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged,
         )
@@ -353,18 +356,19 @@ fun SettingsList(
         SwitchSetting(
             title = stringResource(id = R.string.dynamic_theme_use),
             checked = useDynamicTheme,
-            description = when {
-                isAndroidSAndAbove -> {
-                    null
-                }
+            description =
+                when {
+                    isAndroidSAndAbove -> {
+                        null
+                    }
 
-                else -> {
-                    stringResource(
-                        id = R.string.only_available_on_android_n,
-                        "12",
-                    )
-                }
-            },
+                    else -> {
+                        stringResource(
+                            id = R.string.only_available_on_android_n,
+                            "12",
+                        )
+                    }
+                },
             enabled = isAndroidSAndAbove,
             onCheckedChanged = onUseDynamicTheme,
         )
@@ -372,10 +376,11 @@ fun SettingsList(
         MenuSetting(
             title = stringResource(id = R.string.dark_theme_preference),
             currentValue = currentDarkThemePreference,
-            values = immutableListHolderOf(
-                DarkThemePreferences.BLACK.asDarkThemeOption(),
-                DarkThemePreferences.DARK.asDarkThemeOption(),
-            ),
+            values =
+                immutableListHolderOf(
+                    DarkThemePreferences.BLACK.asDarkThemeOption(),
+                    DarkThemePreferences.DARK.asDarkThemeOption(),
+                ),
             onSelection = onDarkThemePreferenceChanged,
         )
 
@@ -436,11 +441,12 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
-            values = ImmutableHolder(
-                SyncFrequency.values().map {
-                    it.asSyncFreqOption()
-                },
-            ),
+            values =
+                ImmutableHolder(
+                    SyncFrequency.values().map {
+                        it.asSyncFreqOption()
+                    },
+                ),
             title = stringResource(id = R.string.check_for_updates),
             onSelection = {
                 onSyncFrequencyChanged(it.syncFrequency)
@@ -467,22 +473,24 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = maxItemsPerFeedValue,
-            values = immutableListHolderOf(
-                50,
-                100,
-                200,
-                500,
-                1000,
-            ),
+            values =
+                immutableListHolderOf(
+                    50,
+                    100,
+                    200,
+                    500,
+                    1000,
+                ),
             title = stringResource(id = R.string.max_feed_items),
             onSelection = onMaxItemsPerFeedChanged,
         )
 
         ExternalSetting(
-            currentValue = when (batteryOptimizationIgnoredValue) {
-                true -> stringResource(id = R.string.battery_optimization_disabled)
-                false -> stringResource(id = R.string.battery_optimization_enabled)
-            },
+            currentValue =
+                when (batteryOptimizationIgnoredValue) {
+                    true -> stringResource(id = R.string.battery_optimization_disabled)
+                    false -> stringResource(id = R.string.battery_optimization_enabled)
+                },
             title = stringResource(id = R.string.battery_optimization),
         ) {
             activityLauncher.startActivity(
@@ -509,10 +517,11 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentSortingValue,
-            values = immutableListHolderOf(
-                SortingOptions.NEWEST_FIRST.asSortOption(),
-                SortingOptions.OLDEST_FIRST.asSortOption(),
-            ),
+            values =
+                immutableListHolderOf(
+                    SortingOptions.NEWEST_FIRST.asSortOption(),
+                    SortingOptions.OLDEST_FIRST.asSortOption(),
+                ),
             title = stringResource(id = R.string.sort),
             onSelection = onSortingChanged,
         )
@@ -585,11 +594,12 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentItemOpenerValue.asItemOpenerOption(),
-            values = immutableListHolderOf(
-                ItemOpener.READER.asItemOpenerOption(),
-                ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
-                ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
-            ),
+            values =
+                immutableListHolderOf(
+                    ItemOpener.READER.asItemOpenerOption(),
+                    ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
+                    ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
+                ),
             title = stringResource(id = R.string.open_item_by_default_with),
             onSelection = {
                 onItemOpenerChanged(it.itemOpener)
@@ -598,10 +608,11 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
-            values = immutableListHolderOf(
-                LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
-                LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
-            ),
+            values =
+                immutableListHolderOf(
+                    LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
+                    LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
+                ),
             title = stringResource(id = R.string.open_links_with),
             onSelection = {
                 onLinkOpenerChanged(it.linkOpener)
@@ -645,13 +656,15 @@ fun SettingsList(
         SwitchSetting(
             title = stringResource(id = R.string.use_detect_language),
             checked = useDetectLanguage,
-            description = when {
-                isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
-                else -> stringResource(
-                    id = R.string.only_available_on_android_n,
-                    "10",
-                )
-            },
+            description =
+                when {
+                    isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
+                    else ->
+                        stringResource(
+                            id = R.string.only_available_on_android_n,
+                            "10",
+                        )
+                },
             enabled = isAndroidQAndAbove,
             onCheckedChanged = onUseDetectLanguageChanged,
         )
@@ -669,26 +682,30 @@ fun GroupTitle(
 ) {
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth),
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (startingSpace) {
             Box(
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(height),
+                modifier =
+                    Modifier
+                        .width(64.dp)
+                        .height(height),
             )
         }
         Box(
-            modifier = Modifier
-                .height(height),
+            modifier =
+                Modifier
+                    .height(height),
             contentAlignment = Alignment.CenterStart,
         ) {
             ProvideTextStyle(
-                value = MaterialTheme.typography.labelMedium.merge(
-                    TextStyle(color = MaterialTheme.colorScheme.primary),
-                ),
+                value =
+                    MaterialTheme.typography.labelMedium.merge(
+                        TextStyle(color = MaterialTheme.colorScheme.primary),
+                    ),
             ) {
                 title(Modifier.semantics { heading() })
             }
@@ -706,12 +723,13 @@ fun ExternalSetting(
 ) {
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .clickable { onClick() }
-            .semantics {
-                role = Role.Button
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .clickable { onClick() }
+                .semantics {
+                    role = Role.Button
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -746,12 +764,13 @@ fun <T> MenuSetting(
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .clickable { expanded = !expanded }
-            .semantics {
-                role = Role.Button
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .clickable { expanded = !expanded }
+                .semantics {
+                    role = Role.Button
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -775,9 +794,10 @@ fun <T> MenuSetting(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.onKeyEventLikeEscape {
-                expanded = false
-            },
+            modifier =
+                Modifier.onKeyEventLikeEscape {
+                    expanded = false
+                },
         ) {
             for (value in values.item) {
                 DropdownMenuItem(
@@ -786,16 +806,17 @@ fun <T> MenuSetting(
                         onSelection(value)
                     },
                     text = {
-                        val style = if (value == currentValue) {
-                            MaterialTheme.typography.bodyLarge.merge(
-                                TextStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                ),
-                            )
-                        } else {
-                            MaterialTheme.typography.bodyLarge
-                        }
+                        val style =
+                            if (value == currentValue) {
+                                MaterialTheme.typography.bodyLarge.merge(
+                                    TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                    ),
+                                )
+                            } else {
+                                MaterialTheme.typography.bodyLarge
+                            }
                         Text(
                             value.toString(),
                             style = style,
@@ -820,12 +841,13 @@ fun ListDialogSetting(
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .clickable { expanded = !expanded }
-            .semantics {
-                role = Role.Button
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .clickable { expanded = !expanded }
+                .semantics {
+                    role = Role.Button
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -874,12 +896,13 @@ fun NotificationsSetting(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val notificationsPermissionState = rememberApiPermissionState(
-        permission = "android.permission.POST_NOTIFICATIONS",
-        minimumApiLevel = 33,
-    ) { value ->
-        expanded = value
-    }
+    val notificationsPermissionState =
+        rememberApiPermissionState(
+            permission = "android.permission.POST_NOTIFICATIONS",
+            minimumApiLevel = 33,
+        ) { value ->
+            expanded = value
+        }
 
     val shouldShowExplanationForPermission by remember {
         derivedStateOf {
@@ -899,24 +922,25 @@ fun NotificationsSetting(
 
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .clickable {
-                when (notificationsPermissionState.status) {
-                    is PermissionStatus.Denied -> {
-                        if (notificationsPermissionState.status.shouldShowRationale) {
-                            permissionDismissed = false
-                        } else {
-                            notificationsPermissionState.launchPermissionRequest()
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .clickable {
+                    when (notificationsPermissionState.status) {
+                        is PermissionStatus.Denied -> {
+                            if (notificationsPermissionState.status.shouldShowRationale) {
+                                permissionDismissed = false
+                            } else {
+                                notificationsPermissionState.launchPermissionRequest()
+                            }
                         }
-                    }
 
-                    PermissionStatus.Granted -> expanded = true
+                        PermissionStatus.Granted -> expanded = true
+                    }
                 }
-            }
-            .semantics {
-                role = Role.Button
-            },
+                .semantics {
+                    role = Role.Button
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -934,16 +958,17 @@ fun NotificationsSetting(
             },
             subtitle = {
                 Text(
-                    text = when (permissionDenied) {
-                        true -> stringResource(id = R.string.explanation_permission_notifications)
-                        false -> {
-                            items.item.asSequence()
-                                .filter { it.notify }
-                                .map { it.title }
-                                .take(4)
-                                .joinToString(", ", limit = 3)
-                        }
-                    },
+                    text =
+                        when (permissionDenied) {
+                            true -> stringResource(id = R.string.explanation_permission_notifications)
+                            false -> {
+                                items.item.asSequence()
+                                    .filter { it.notify }
+                                    .map { it.title }
+                                    .take(4)
+                                    .joinToString(", ", limit = 3)
+                            }
+                        },
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -986,21 +1011,23 @@ fun RadioButtonSetting(
     minHeight: Dp = 64.dp,
     onClick: () -> Unit,
 ) {
-    val stateLabel = if (selected) {
-        stringResource(androidx.compose.ui.R.string.selected)
-    } else {
-        stringResource(androidx.compose.ui.R.string.not_selected)
-    }
+    val stateLabel =
+        if (selected) {
+            stringResource(androidx.compose.ui.R.string.selected)
+        } else {
+            stringResource(androidx.compose.ui.R.string.not_selected)
+        }
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .heightIn(min = minHeight)
-            .clickable { onClick() }
-            .safeSemantics(mergeDescendants = true) {
-                role = Role.RadioButton
-                stateDescription = stateLabel
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .heightIn(min = minHeight)
+                .clickable { onClick() }
+                .safeSemantics(mergeDescendants = true) {
+                    role = Role.RadioButton
+                    stateDescription = stateLabel
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -1043,20 +1070,22 @@ fun SwitchSetting(
     val context = LocalContext.current
     val dimens = LocalDimens.current
     Row(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .heightIn(min = 64.dp)
-            .clickable(
-                enabled = enabled,
-                onClick = { onCheckedChanged(!checked) },
-            )
-            .safeSemantics(mergeDescendants = true) {
-                stateDescription = when (checked) {
-                    true -> context.getString(androidx.compose.ui.R.string.on)
-                    else -> context.getString(androidx.compose.ui.R.string.off)
-                }
-                role = Role.Switch
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .heightIn(min = 64.dp)
+                .clickable(
+                    enabled = enabled,
+                    onClick = { onCheckedChanged(!checked) },
+                )
+                .safeSemantics(mergeDescendants = true) {
+                    stateDescription =
+                        when (checked) {
+                            true -> context.getString(androidx.compose.ui.R.string.on)
+                            else -> context.getString(androidx.compose.ui.R.string.off)
+                        }
+                    role = Role.Switch
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -1074,9 +1103,10 @@ fun SwitchSetting(
             title = {
                 Text(title)
             },
-            subtitle = description?.let {
-                { Text(it) }
-            },
+            subtitle =
+                description?.let {
+                    { Text(it) }
+                },
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1104,29 +1134,32 @@ fun ScaleSetting(
     // so no point in adding screen reader action?
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .heightIn(min = 64.dp)
-            .padding(start = 64.dp)
-            .safeSemantics(mergeDescendants = true) {
-                stateDescription = "%.1fx".format(safeCurrentValue)
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .heightIn(min = 64.dp)
+                .padding(start = 64.dp)
+                .safeSemantics(mergeDescendants = true) {
+                    stateDescription = "%.1fx".format(safeCurrentValue)
+                },
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
             tonalElevation = 3.dp,
         ) {
             Text(
                 "Lorem ipsum dolor sit amet.",
-                style = MaterialTheme.typography.bodyLarge
-                    .merge(
-                        TextStyle(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
+                style =
+                    MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
+                            ),
                         ),
-                    ),
                 modifier = Modifier.padding(4.dp),
             )
         }
@@ -1135,24 +1168,26 @@ fun ScaleSetting(
             startLabel = {
                 Text(
                     "A",
-                    style = MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
+                    style =
+                        MaterialTheme.typography.bodyLarge
+                            .merge(
+                                TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
+                                ),
                             ),
-                        ),
                     modifier = Modifier.alignByBaseline(),
                 )
             },
             endLabel = {
                 Text(
                     "A",
-                    style = MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
+                    style =
+                        MaterialTheme.typography.bodyLarge
+                            .merge(
+                                TextStyle(
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
+                                ),
                             ),
-                        ),
                     modifier = Modifier.alignByBaseline(),
                 )
             },

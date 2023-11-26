@@ -54,13 +54,15 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setSyncOnResume(value)
     }
 
-    fun setSyncOnlyOnWifi(value: Boolean) = applicationCoroutineScope.launch {
-        repository.setSyncOnlyOnWifi(value)
-    }
+    fun setSyncOnlyOnWifi(value: Boolean) =
+        applicationCoroutineScope.launch {
+            repository.setSyncOnlyOnWifi(value)
+        }
 
-    fun setSyncOnlyWhenCharging(value: Boolean) = applicationCoroutineScope.launch {
-        repository.setSyncOnlyWhenCharging(value)
-    }
+    fun setSyncOnlyWhenCharging(value: Boolean) =
+        applicationCoroutineScope.launch {
+            repository.setSyncOnlyWhenCharging(value)
+        }
 
     fun setLoadImageOnlyOnWifi(value: Boolean) {
         repository.setLoadImageOnlyOnWifi(value)
@@ -90,23 +92,29 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setLinkOpener(value)
     }
 
-    fun setSyncFrequency(value: SyncFrequency) = applicationCoroutineScope.launch {
-        repository.setSyncFrequency(value)
-    }
+    fun setSyncFrequency(value: SyncFrequency) =
+        applicationCoroutineScope.launch {
+            repository.setSyncFrequency(value)
+        }
 
     fun setFeedItemStyle(value: FeedItemStyle) {
         repository.setFeedItemStyle(value)
     }
 
-    fun addToBlockList(value: String) = applicationCoroutineScope.launch {
-        repository.addBlocklistPattern(value)
-    }
+    fun addToBlockList(value: String) =
+        applicationCoroutineScope.launch {
+            repository.addBlocklistPattern(value)
+        }
 
-    fun removeFromBlockList(value: String) = applicationCoroutineScope.launch {
-        repository.removeBlocklistPattern(value)
-    }
+    fun removeFromBlockList(value: String) =
+        applicationCoroutineScope.launch {
+            repository.removeBlocklistPattern(value)
+        }
 
-    fun toggleNotifications(feedId: Long, value: Boolean) = applicationCoroutineScope.launch {
+    fun toggleNotifications(
+        feedId: Long,
+        value: Boolean,
+    ) = applicationCoroutineScope.launch {
         repository.toggleNotifications(feedId, value)
     }
 
@@ -152,10 +160,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 }
             }
 
-    private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
-        val powerManager: PowerManager? = context.getSystemService()
-        powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
-    }.buffer(1)
+    private val batteryOptimizationIgnoredFlow: Flow<Boolean> =
+        repository.resumeTime.map {
+            val powerManager: PowerManager? = context.getSystemService()
+            powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
+        }.buffer(1)
 
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState>

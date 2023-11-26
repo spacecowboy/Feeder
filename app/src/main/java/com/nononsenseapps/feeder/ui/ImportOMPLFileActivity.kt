@@ -56,14 +56,15 @@ class ImportOMPLFileActivity : DIAwareComponentActivity() {
                             val deepLinkUri =
                                 "$DEEP_LINK_BASE_URI/feed?id=$ID_ALL_FEEDS"
 
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                deepLinkUri.toUri(),
-                                this@ImportOMPLFileActivity,
-                                MainActivity::class.java,
-                            ).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
+                            val intent =
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    deepLinkUri.toUri(),
+                                    this@ImportOMPLFileActivity,
+                                    MainActivity::class.java,
+                                ).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
 
                             startActivity(intent)
                             finish()

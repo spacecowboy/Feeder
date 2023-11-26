@@ -1,9 +1,9 @@
 package com.nononsenseapps.feeder.sync
 
-import java.net.URL
 import org.intellij.lang.annotations.Language
 import org.junit.Assert.*
 import org.junit.Test
+import java.net.URL
 
 class EncryptedFeedTest {
     private val moshi = getMoshi()
@@ -13,14 +13,15 @@ class EncryptedFeedTest {
         val adapter = moshi.adapter<EncryptedFeed>()
 
         @Language("JSON")
-        val json = """
+        val json =
+            """
             {
                "url": "https://foo.bar",
                "title": "foo",
                "alternateId": true,
                "notARealField": 1
             }
-        """.trimIndent()
+            """.trimIndent()
         val feed = adapter.fromJson(json)!!
 
         assertEquals(URL("https://foo.bar"), feed.url)

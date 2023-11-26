@@ -3,11 +3,11 @@ package com.nononsenseapps.feeder.model.opml
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.UserSettings
 import com.nononsenseapps.feeder.db.room.Feed
-import java.io.ByteArrayOutputStream
-import java.net.URL
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.net.URL
 
 class OpmlWriterKtTest {
     @Test
@@ -23,61 +23,66 @@ class OpmlWriterKtTest {
     }
 
     @Test
-    fun shouldEscapeStrings() = runBlocking {
-        val bos = ByteArrayOutputStream()
-        writeOutputStream(bos, emptyMap(), emptyList(), listOf("quoted \"tag\"")) { tag ->
-            val result = mutableListOf<Feed>()
-            val feed = Feed(
-                id = 1L,
-                title = "A \"feeditem\" with id '9' > 0 & < 10",
-                customTitle = "A custom \"title\" with id '9' > 0 & < 1e",
-                url = URL("http://example.com/rss.xml?format=feed&type=rss"),
-                tag = tag,
-                notify = true,
-                imageUrl = URL("https://example.com/feedImage"),
-                fullTextByDefault = true,
-                openArticlesWith = "reader",
-                alternateId = true,
-            )
+    fun shouldEscapeStrings() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("quoted \"tag\"")) { tag ->
+                val result = mutableListOf<Feed>()
+                val feed =
+                    Feed(
+                        id = 1L,
+                        title = "A \"feeditem\" with id '9' > 0 & < 10",
+                        customTitle = "A custom \"title\" with id '9' > 0 & < 1e",
+                        url = URL("http://example.com/rss.xml?format=feed&type=rss"),
+                        tag = tag,
+                        notify = true,
+                        imageUrl = URL("https://example.com/feedImage"),
+                        fullTextByDefault = true,
+                        openArticlesWith = "reader",
+                        alternateId = true,
+                    )
 
-            result.add(feed)
-            result
+                result.add(feed)
+                result
+            }
+            val output = String(bos.toByteArray())
+            assertEquals(expected, output.trimEnd())
         }
-        val output = String(bos.toByteArray())
-        assertEquals(expected, output.trimEnd())
-    }
 
     @Test
-    fun exportsSettings() = runBlocking {
-        val bos = ByteArrayOutputStream()
-        writeOutputStream(
-            os = bos,
-            settings = ALL_SETTINGS_WITH_VALUES,
-            blockedPatterns = listOf("foo", "break \"xml id '9' > 0 & < 10"),
-            tags = listOf("news"),
-        ) { tag ->
-            val result = mutableListOf<Feed>()
-            val feed = Feed(
-                id = 1L,
-                title = "title",
-                customTitle = "customTitle",
-                url = URL("http://example.com/rss.xml?format=feed&type=rss"),
-                tag = tag,
-                notify = true,
-                imageUrl = URL("https://example.com/feedImage"),
-                fullTextByDefault = true,
-                openArticlesWith = "reader",
-                alternateId = true,
-            )
+    fun exportsSettings() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(
+                os = bos,
+                settings = ALL_SETTINGS_WITH_VALUES,
+                blockedPatterns = listOf("foo", "break \"xml id '9' > 0 & < 10"),
+                tags = listOf("news"),
+            ) { tag ->
+                val result = mutableListOf<Feed>()
+                val feed =
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        customTitle = "customTitle",
+                        url = URL("http://example.com/rss.xml?format=feed&type=rss"),
+                        tag = tag,
+                        notify = true,
+                        imageUrl = URL("https://example.com/feedImage"),
+                        fullTextByDefault = true,
+                        openArticlesWith = "reader",
+                        alternateId = true,
+                    )
 
-            result.add(feed)
-            result
+                result.add(feed)
+                result
+            }
+            val output = String(bos.toByteArray())
+            assertEquals(expectedWithSettings, output.trimEnd())
         }
-        val output = String(bos.toByteArray())
-        assertEquals(expectedWithSettings, output.trimEnd())
-    }
 
-    private val expected = """
+    private val expected =
+        """
         <?xml version="1.0" encoding="UTF-8"?>
         <opml version="1.1" xmlns:feeder="https://nononsenseapps.com/feeder">
           <head>
@@ -91,9 +96,10 @@ class OpmlWriterKtTest {
             </outline>
           </body>
         </opml>
-    """.trimIndent()
+        """.trimIndent()
 
-    private val expectedWithSettings = """
+    private val expectedWithSettings =
+        """
         <?xml version="1.0" encoding="UTF-8"?>
         <opml version="1.1" xmlns:feeder="https://nononsenseapps.com/feeder">
           <head>
@@ -136,38 +142,39 @@ class OpmlWriterKtTest {
             </feeder:settings>
           </body>
         </opml>
-    """.trimIndent()
+        """.trimIndent()
 
     companion object {
         private val ALL_SETTINGS_WITH_VALUES: Map<String, String> =
             UserSettings.values().associate { userSetting ->
-                userSetting.key to when (userSetting) {
-                    UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                    UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
-                    UserSettings.SETTING_THEME -> "night"
-                    UserSettings.SETTING_DARK_THEME -> "DaRk"
-                    UserSettings.SETTING_DYNAMIC_THEME -> "false"
-                    UserSettings.SETTING_SORT -> "oldest_first"
-                    UserSettings.SETTING_SHOW_FAB -> "false"
-                    UserSettings.SETTING_FEED_ITEM_STYLE -> "super_compact"
-                    UserSettings.SETTING_SWIPE_AS_READ -> "DISABLED"
-                    UserSettings.SETTING_SYNC_ON_RESUME -> "true"
-                    UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
-                    UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
-                    UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
-                    UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                    UserSettings.SETTING_TEXT_SCALE -> "1.6"
-                    UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
-                    UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
-                    UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
-                    UserSettings.SETTING_SYNC_FREQ -> "720"
-                    UserSettings.SETTING_MAX_LINES -> "6"
-                    UserSettings.SETTINGS_FILTER_SAVED -> "true"
-                    UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
-                    UserSettings.SETTINGS_FILTER_READ -> "false"
-                    UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
-                    UserSettings.SETTING_OPEN_ADJACENT -> "true"
-                }
+                userSetting.key to
+                    when (userSetting) {
+                        UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
+                        UserSettings.SETTING_THEME -> "night"
+                        UserSettings.SETTING_DARK_THEME -> "DaRk"
+                        UserSettings.SETTING_DYNAMIC_THEME -> "false"
+                        UserSettings.SETTING_SORT -> "oldest_first"
+                        UserSettings.SETTING_SHOW_FAB -> "false"
+                        UserSettings.SETTING_FEED_ITEM_STYLE -> "super_compact"
+                        UserSettings.SETTING_SWIPE_AS_READ -> "DISABLED"
+                        UserSettings.SETTING_SYNC_ON_RESUME -> "true"
+                        UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
+                        UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
+                        UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
+                        UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_TEXT_SCALE -> "1.6"
+                        UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
+                        UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
+                        UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
+                        UserSettings.SETTING_SYNC_FREQ -> "720"
+                        UserSettings.SETTING_MAX_LINES -> "6"
+                        UserSettings.SETTINGS_FILTER_SAVED -> "true"
+                        UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
+                        UserSettings.SETTINGS_FILTER_READ -> "false"
+                        UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
+                        UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                    }
             }
     }
 }

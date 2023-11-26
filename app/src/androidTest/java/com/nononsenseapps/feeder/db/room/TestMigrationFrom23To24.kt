@@ -8,13 +8,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
-import kotlin.test.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -26,12 +26,13 @@ class TestMigrationFrom23To24 {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate() {
@@ -77,8 +78,9 @@ class TestMigrationFrom23To24 {
             }
         }
 
-        val blocks = sharedPrefs.getStringSet("pref_block_list_values", null)
-            ?: emptySet()
+        val blocks =
+            sharedPrefs.getStringSet("pref_block_list_values", null)
+                ?: emptySet()
 
         assertTrue {
             blocks.isEmpty()

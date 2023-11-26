@@ -31,15 +31,17 @@ import java.net.URL
         ),
     ],
 )
-data class ReadStatusSynced @Ignore constructor(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID)
-    var id: Long = ID_UNSET,
-    @ColumnInfo(name = "sync_remote") var sync_remote: Long = ID_UNSET,
-    @ColumnInfo(name = "feed_item") var feed_item: Long = ID_UNSET,
-) {
-    constructor() : this(id = ID_UNSET)
-}
+data class ReadStatusSynced
+    @Ignore
+    constructor(
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = COL_ID)
+        var id: Long = ID_UNSET,
+        @ColumnInfo(name = "sync_remote") var sync_remote: Long = ID_UNSET,
+        @ColumnInfo(name = "feed_item") var feed_item: Long = ID_UNSET,
+    ) {
+        constructor() : this(id = ID_UNSET)
+    }
 
 interface ReadStatusFeedItem {
     val id: Long

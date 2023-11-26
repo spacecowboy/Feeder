@@ -24,13 +24,15 @@ import com.nononsenseapps.feeder.db.SYNC_DEVICE_TABLE_NAME
         ),
     ],
 )
-data class SyncDevice @Ignore constructor(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID)
-    var id: Long = ID_UNSET,
-    @ColumnInfo(name = "sync_remote") var syncRemote: Long = ID_UNSET,
-    @ColumnInfo(name = "device_id") var deviceId: Long = ID_UNSET,
-    @ColumnInfo(name = "device_name") var deviceName: String = "",
-) {
-    constructor() : this(id = ID_UNSET)
-}
+data class SyncDevice
+    @Ignore
+    constructor(
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = COL_ID)
+        var id: Long = ID_UNSET,
+        @ColumnInfo(name = "sync_remote") var syncRemote: Long = ID_UNSET,
+        @ColumnInfo(name = "device_id") var deviceId: Long = ID_UNSET,
+        @ColumnInfo(name = "device_name") var deviceName: String = "",
+    ) {
+        constructor() : this(id = ID_UNSET)
+    }

@@ -90,11 +90,11 @@ import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import java.net.MalformedURLException
-import java.net.URL
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import java.net.MalformedURLException
+import java.net.URL
 
 private const val LOG_TAG = "FEEDER_SEARCH"
 
@@ -119,9 +119,10 @@ fun SearchFeedScreen(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -224,7 +225,8 @@ fun SearchFeedView(
 
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
-        if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() && isValidUrl(
+        if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() &&
+            isValidUrl(
                 feedUrl,
             )
         ) {
@@ -236,9 +238,10 @@ fun SearchFeedView(
 
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
@@ -247,9 +250,10 @@ fun SearchFeedView(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = true)
+                            .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     leftContent(
                         feedUrl = feedUrl,
@@ -264,9 +268,10 @@ fun SearchFeedView(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = true)
+                            .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     rightContent(
                         results = results,
@@ -280,9 +285,10 @@ fun SearchFeedView(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(horizontal = dimens.margin, vertical = 8.dp)
-                    .width(dimens.maxContentWidth),
+                modifier =
+                    Modifier
+                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                        .width(dimens.maxContentWidth),
             ) {
                 leftContent(
                     feedUrl = feedUrl,
@@ -332,35 +338,38 @@ fun ColumnScope.leftContent(
             Text(stringResource(id = R.string.add_feed_search_hint))
         },
         isError = isNotValidUrl,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrect = false,
-            keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Search,
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                if (isValidUrl) {
-                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                    keyboardController?.hide()
-                }
-            },
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrect = false,
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Search,
+            ),
+        keyboardActions =
+            KeyboardActions(
+                onSearch = {
+                    if (isValidUrl) {
+                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                        keyboardController?.hide()
+                    }
+                },
+            ),
         singleLine = true,
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .interceptKey(Key.Enter) {
-                if (isValidUrl(feedUrl)) {
-                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                    keyboardController?.hide()
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .interceptKey(Key.Enter) {
+                    if (isValidUrl(feedUrl)) {
+                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                        keyboardController?.hide()
+                    }
                 }
-            }
-            .interceptKey(Key.Escape) {
-                focusManager.clearFocus()
-            }
-            .safeSemantics {
-                testTag = "urlField"
-            },
+                .interceptKey(Key.Escape) {
+                    focusManager.clearFocus()
+                }
+                .safeSemantics {
+                    testTag = "urlField"
+                },
     )
 
     OutlinedButton(
@@ -391,20 +400,21 @@ fun ColumnScope.rightContent(
 ) {
     if (results.item.isEmpty()) {
         for (error in errors.item) {
-            val title = when (error) {
-                is FetchError -> stringResource(R.string.failed_to_download)
-                is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
-                is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
-                is NotHTML -> stringResource(R.string.content_is_not_html)
-                is NotInitializedYet -> "Not initialized yet" // Should never happen
-                is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
-                is HttpError -> stringResource(R.string.http_error)
-                is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)
-                is NoBody -> stringResource(R.string.no_body_in_response)
-                is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
-                is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
-                is NoUrl -> stringResource(R.string.no_url)
-            }
+            val title =
+                when (error) {
+                    is FetchError -> stringResource(R.string.failed_to_download)
+                    is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
+                    is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
+                    is NotHTML -> stringResource(R.string.content_is_not_html)
+                    is NotInitializedYet -> "Not initialized yet" // Should never happen
+                    is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
+                    is HttpError -> stringResource(R.string.http_error)
+                    is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)
+                    is NoBody -> stringResource(R.string.no_body_in_response)
+                    is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
+                    is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
+                    is NoUrl -> stringResource(R.string.no_url)
+                }
 
             ErrorResultView(
                 title = title,
@@ -437,16 +447,15 @@ fun ColumnScope.rightContent(
 }
 
 @Composable
-fun SearchingIndicator(
-    modifier: Modifier = Modifier,
-) {
+fun SearchingIndicator(modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .safeSemantics {
-                testTag = "searchingIndicator"
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .safeSemantics {
+                    testTag = "searchingIndicator"
+                },
     ) {
         CircularProgressIndicator()
     }
@@ -464,17 +473,19 @@ fun SearchResultView(
     val dimens = LocalDimens.current
     Card(
         onClick = onClick,
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .safeSemantics {
-                testTag = "searchResult"
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .safeSemantics {
+                    testTag = "searchResult"
+                },
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .width(dimens.maxContentWidth)
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .width(dimens.maxContentWidth)
+                    .padding(8.dp),
         ) {
             Text(
                 title,
@@ -503,22 +514,25 @@ fun ErrorResultView(
     val dimens = LocalDimens.current
 
     Card(
-        modifier = modifier
-            .width(dimens.maxContentWidth)
-            .safeSemantics {
-                testTag = "errorResult"
-            },
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .safeSemantics {
+                    testTag = "errorResult"
+                },
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .width(dimens.maxContentWidth)
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .width(dimens.maxContentWidth)
+                    .padding(8.dp),
         ) {
             Text(
                 title,
-                style = MaterialTheme.typography.titleSmall
-                    .copy(color = MaterialTheme.colorScheme.error),
+                style =
+                    MaterialTheme.typography.titleSmall
+                        .copy(color = MaterialTheme.colorScheme.error),
             )
             Text(
                 url,
@@ -542,27 +556,28 @@ fun ErrorResultView(
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Composable
-fun SearchPreview() {
+private fun SearchPreview() {
     FeederTheme {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
                 onUrlChanged = {},
                 onSearch = {},
-                results = stableListHolderOf(
-                    SearchResult(
-                        title = "Atom feed",
-                        url = "https://cowboyprogrammer.org/atom",
-                        description = "An atom feed",
-                        feedImage = "",
+                results =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Atom feed",
+                            url = "https://cowboyprogrammer.org/atom",
+                            description = "An atom feed",
+                            feedImage = "",
+                        ),
+                        SearchResult(
+                            title = "RSS feed",
+                            url = "https://cowboyprogrammer.org/rss",
+                            description = "An RSS feed",
+                            feedImage = "",
+                        ),
                     ),
-                    SearchResult(
-                        title = "RSS feed",
-                        url = "https://cowboyprogrammer.org/rss",
-                        description = "An RSS feed",
-                        feedImage = "",
-                    ),
-                ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
                 modifier = Modifier,
@@ -579,7 +594,7 @@ fun SearchPreview() {
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Composable
-fun ErrorPreview() {
+private fun ErrorPreview() {
     FeederTheme {
         Surface {
             SearchFeedView(
@@ -587,12 +602,13 @@ fun ErrorPreview() {
                 onUrlChanged = {},
                 onSearch = {},
                 results = stableListHolderOf(),
-                errors = stableListHolderOf(
-                    RSSParseError(
-                        url = "https://example.com/bad",
-                        throwable = NullPointerException("Missing header or something"),
+                errors =
+                    stableListHolderOf(
+                        RSSParseError(
+                            url = "https://example.com/bad",
+                            throwable = NullPointerException("Missing header or something"),
+                        ),
                     ),
-                ),
                 currentlySearching = false,
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
@@ -614,27 +630,28 @@ fun ErrorPreview() {
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Composable
-fun SearchPreviewLarge() {
+private fun SearchPreviewLarge() {
     FeederTheme {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.DUAL,
                 onUrlChanged = {},
                 onSearch = {},
-                results = stableListHolderOf(
-                    SearchResult(
-                        title = "Atom feed",
-                        url = "https://cowboyprogrammer.org/atom",
-                        description = "An atom feed",
-                        feedImage = "",
+                results =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Atom feed",
+                            url = "https://cowboyprogrammer.org/atom",
+                            description = "An atom feed",
+                            feedImage = "",
+                        ),
+                        SearchResult(
+                            title = "RSS feed",
+                            url = "https://cowboyprogrammer.org/rss",
+                            description = "An RSS feed",
+                            feedImage = "",
+                        ),
                     ),
-                    SearchResult(
-                        title = "RSS feed",
-                        url = "https://cowboyprogrammer.org/rss",
-                        description = "An RSS feed",
-                        feedImage = "",
-                    ),
-                ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
                 modifier = Modifier,

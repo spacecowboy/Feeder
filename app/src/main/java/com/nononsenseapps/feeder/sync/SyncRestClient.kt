@@ -16,15 +16,15 @@ import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.generateDeviceName
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.logDebug
-import java.net.URL
-import java.time.Instant
-import kotlin.contracts.ExperimentalContracts
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import retrofit2.Response
+import java.net.URL
+import java.time.Instant
+import kotlin.contracts.ExperimentalContracts
 
 class SyncRestClient(override val di: DI) : DIAware {
     private val repository: Repository by instance()
@@ -55,17 +55,19 @@ class SyncRestClient(override val di: DI) : DIAware {
                         LOG_TAG,
                         "Updating to latest sync host: $DEFAULT_SERVER_ADDRESS",
                     )
-                    syncRemote = syncRemote.copy(
-                        url = URL(DEFAULT_SERVER_ADDRESS),
-                    )
+                    syncRemote =
+                        syncRemote.copy(
+                            url = URL(DEFAULT_SERVER_ADDRESS),
+                        )
                     repository.updateSyncRemote(syncRemote)
                 }
                 if (syncRemote.hasSyncChain()) {
                     secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
-                    feederSync = getFeederSyncClient(
-                        syncRemote = syncRemote,
-                        okHttpClient = okHttpClient,
-                    )
+                    feederSync =
+                        getFeederSyncClient(
+                            syncRemote = syncRemote,
+                            okHttpClient = okHttpClient,
+                        )
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Failed to initialize", e)
@@ -103,10 +105,11 @@ class SyncRestClient(override val di: DI) : DIAware {
         val secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
         this.secretKey = secretKey
 
-        val feederSync = getFeederSyncClient(
-            syncRemote = syncRemote,
-            okHttpClient = okHttpClient,
-        )
+        val feederSync =
+            getFeederSyncClient(
+                syncRemote = syncRemote,
+                okHttpClient = okHttpClient,
+            )
         this.feederSync = feederSync
 
         val deviceName = generateDeviceName()
@@ -131,7 +134,10 @@ class SyncRestClient(override val di: DI) : DIAware {
             }
     }
 
-    suspend fun join(syncCode: String, remoteSecretKey: String): Either<ErrorResponse, String> {
+    suspend fun join(
+        syncCode: String,
+        remoteSecretKey: String,
+    ): Either<ErrorResponse, String> {
         logDebug(LOG_TAG, "join")
         try {
             logDebug(LOG_TAG, "Really joining")
@@ -144,22 +150,25 @@ class SyncRestClient(override val di: DI) : DIAware {
             val secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
             this.secretKey = secretKey
 
-            val feederSync = getFeederSyncClient(
-                syncRemote = syncRemote,
-                okHttpClient = okHttpClient,
-            )
+            val feederSync =
+                getFeederSyncClient(
+                    syncRemote = syncRemote,
+                    okHttpClient = okHttpClient,
+                )
             this.feederSync = feederSync
 
             logDebug(LOG_TAG, "Updated objects")
 
             return feederSync.join(
                 syncChainId = syncCode,
-                request = JoinRequest(
-                    deviceName = AesCbcWithIntegrity.encryptString(
-                        syncRemote.deviceName,
-                        secretKey,
+                request =
+                    JoinRequest(
+                        deviceName =
+                            AesCbcWithIntegrity.encryptString(
+                                syncRemote.deviceName,
+                                secretKey,
+                            ),
                     ),
-                ),
             ).toEither()
                 .onRight { response ->
                     logDebug(LOG_TAG, "Join response: $response")
@@ -182,7 +191,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Error during leave: msg: code: ${e.code()}, error: ${
-                    e.response()?.errorBody()?.string()
+                        e.response()?.errorBody()?.string()
                     }",
                     e,
                 )
@@ -238,10 +247,11 @@ class SyncRestClient(override val di: DI) : DIAware {
                             deviceListResponse.devices.map {
                                 SyncDevice(
                                     deviceId = it.deviceId,
-                                    deviceName = AesCbcWithIntegrity.decryptString(
-                                        it.deviceName,
-                                        secretKey,
-                                    ),
+                                    deviceName =
+                                        AesCbcWithIntegrity.decryptString(
+                                            it.deviceName,
+                                            secretKey,
+                                        ),
                                     syncRemote = syncRemote.id,
                                 )
                             },
@@ -266,21 +276,25 @@ class SyncRestClient(override val di: DI) : DIAware {
                 feederSync.sendEncryptedReadMarks(
                     currentDeviceId = syncRemote.deviceId,
                     syncChainId = syncRemote.syncChainId,
-                    request = SendEncryptedReadMarkBulkRequest(
-                        items = feedItems.map { feedItem ->
-                            SendEncryptedReadMarkRequest(
-                                encrypted = AesCbcWithIntegrity.encryptString(
-                                    secretKeys = secretKey,
-                                    plaintext = readMarkAdapter.toJson(
-                                        ReadMarkContent(
-                                            feedUrl = feedItem.feedUrl,
-                                            articleGuid = feedItem.guid,
-                                        ),
-                                    ),
-                                ),
-                            )
-                        },
-                    ),
+                    request =
+                        SendEncryptedReadMarkBulkRequest(
+                            items =
+                                feedItems.map { feedItem ->
+                                    SendEncryptedReadMarkRequest(
+                                        encrypted =
+                                            AesCbcWithIntegrity.encryptString(
+                                                secretKeys = secretKey,
+                                                plaintext =
+                                                    readMarkAdapter.toJson(
+                                                        ReadMarkContent(
+                                                            feedUrl = feedItem.feedUrl,
+                                                            articleGuid = feedItem.guid,
+                                                        ),
+                                                    ),
+                                            ),
+                                    )
+                                },
+                        ),
                 ).toEither()
                     .onRight {
                         for (feedItem in feedItems) {
@@ -342,10 +356,11 @@ class SyncRestClient(override val di: DI) : DIAware {
                                 logDebug(LOG_TAG, "device: $it")
                                 SyncDevice(
                                     deviceId = it.deviceId,
-                                    deviceName = AesCbcWithIntegrity.decryptString(
-                                        it.deviceName,
-                                        secretKey,
-                                    ),
+                                    deviceName =
+                                        AesCbcWithIntegrity.decryptString(
+                                            it.deviceName,
+                                            secretKey,
+                                        ),
                                     syncRemote = syncRemote.id,
                                 )
                             },
@@ -376,9 +391,10 @@ class SyncRestClient(override val di: DI) : DIAware {
                     .onRight { response ->
                         logDebug(LOG_TAG, "getRead: ${response.readMarks.size} read marks")
                         for (readMark in response.readMarks) {
-                            val readMarkContent = readMarkAdapter.fromJson(
-                                AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey),
-                            )
+                            val readMarkContent =
+                                readMarkAdapter.fromJson(
+                                    AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey),
+                                )
 
                             if (readMarkContent == null) {
                                 Log.e(LOG_TAG, "Failed to decrypt readMark content")
@@ -418,12 +434,13 @@ class SyncRestClient(override val di: DI) : DIAware {
                             return@onRight
                         }
 
-                        val encryptedFeeds = feedsAdapter.fromJson(
-                            AesCbcWithIntegrity.decryptString(
-                                response.encrypted,
-                                secretKeys = secretKey,
-                            ),
-                        )
+                        val encryptedFeeds =
+                            feedsAdapter.fromJson(
+                                AesCbcWithIntegrity.decryptString(
+                                    response.encrypted,
+                                    secretKeys = secretKey,
+                                ),
+                            )
 
                         if (encryptedFeeds == null) {
                             Log.e(LOG_TAG, "Failed to decrypt encrypted feeds")
@@ -444,15 +461,14 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    private suspend fun feedDiffing(
-        remoteFeeds: List<EncryptedFeed>,
-    ) {
+    private suspend fun feedDiffing(remoteFeeds: List<EncryptedFeed>) {
         try {
             logDebug(LOG_TAG, "feedDiffing: ${remoteFeeds.size}")
             val remotelySeenFeedUrls = repository.getRemotelySeenFeeds()
 
-            val feedUrlsWhichWereDeletedOnRemote = remotelySeenFeedUrls
-                .filterNot { url -> remoteFeeds.asSequence().map { it.url }.contains(url) }
+            val feedUrlsWhichWereDeletedOnRemote =
+                remotelySeenFeedUrls
+                    .filterNot { url -> remoteFeeds.asSequence().map { it.url }.contains(url) }
 
             logDebug(LOG_TAG, "RemotelyDeleted: ${feedUrlsWhichWereDeletedOnRemote.size}")
 
@@ -521,8 +537,9 @@ class SyncRestClient(override val di: DI) : DIAware {
 
                 // Only send if hash does not match
                 // Important to keep iteration order stable - across devices. So sort on URL, not ID or date
-                val feeds = repository.getFeedsOrderedByUrl()
-                    .map { it.toEncryptedFeed() }
+                val feeds =
+                    repository.getFeedsOrderedByUrl()
+                        .map { it.toEncryptedFeed() }
 
                 // Yes, List hashCodes are based on elements. Just remember to hash what you send
                 // - and not raw database objects
@@ -534,14 +551,15 @@ class SyncRestClient(override val di: DI) : DIAware {
                     return@safeBlock Either.Right(false)
                 }
 
-                val encrypted = AesCbcWithIntegrity.encryptString(
-                    feedsAdapter.toJson(
-                        EncryptedFeeds(
-                            feeds = feeds,
+                val encrypted =
+                    AesCbcWithIntegrity.encryptString(
+                        feedsAdapter.toJson(
+                            EncryptedFeeds(
+                                feeds = feeds,
+                            ),
                         ),
-                    ),
-                    secretKeys = secretKey,
-                )
+                        secretKeys = secretKey,
+                    )
 
                 logDebug(
                     LOG_TAG,
@@ -552,10 +570,11 @@ class SyncRestClient(override val di: DI) : DIAware {
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
                     etagValue = syncRemote.lastFeedsRemoteHash.asWeakETagValue(),
-                    request = UpdateFeedsRequest(
-                        contentHash = currentContentHash,
-                        encrypted = encrypted,
-                    ),
+                    request =
+                        UpdateFeedsRequest(
+                            contentHash = currentContentHash,
+                            encrypted = encrypted,
+                        ),
                 ).toEither()
                     .onLeft {
                         if (it.code == 412) {
@@ -599,8 +618,7 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 }
 
-fun Any.asWeakETagValue() =
-    "W/\"$this\""
+fun Any.asWeakETagValue() = "W/\"$this\""
 
 fun <T> Response<T>.toEither(): Either<ErrorResponse, T> {
     return try {

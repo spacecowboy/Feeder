@@ -43,20 +43,23 @@ fun SliderWithLabel(
 ) {
     Column {
         BoxWithConstraints(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier =
+                modifier
+                    .fillMaxWidth(),
         ) {
-            val offset = getSliderOffset(
-                value = value,
-                valueRange = valueRange,
-                boxWidth = maxWidth,
-                labelWidth = labelMinWidth + 8.dp, // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
-            )
+            val offset =
+                getSliderOffset(
+                    value = value,
+                    valueRange = valueRange,
+                    boxWidth = maxWidth,
+                    labelWidth = labelMinWidth + 8.dp, // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
+                )
 
             SliderLabel(
                 label = valueToLabel(value),
-                modifier = Modifier
-                    .padding(start = offset),
+                modifier =
+                    Modifier
+                        .padding(start = offset),
                 minWidth = labelMinWidth,
             )
         }
@@ -111,13 +114,14 @@ fun SliderLabel(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(10.dp),
-            )
-            .padding(4.dp)
-            .size(minWidth),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(10.dp),
+                )
+                .padding(4.dp)
+                .size(minWidth),
     ) {
         Text(
             label,
@@ -143,12 +147,15 @@ private fun getSliderOffset(
 }
 
 // Calculate the 0..1 fraction that `pos` value represents between `a` and `b`
-private fun calcFraction(a: Float, b: Float, pos: Float) =
-    (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
+private fun calcFraction(
+    a: Float,
+    b: Float,
+    pos: Float,
+) = (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
 
 @Preview
 @Composable
-fun PreviewSliderWithLabel() {
+private fun PreviewSliderWithLabel() {
     FeederTheme {
         Surface {
             var value by remember {
@@ -167,7 +174,7 @@ fun PreviewSliderWithLabel() {
 
 @Preview
 @Composable
-fun PreviewSliderWithEndLabels() {
+private fun PreviewSliderWithEndLabels() {
     FeederTheme {
         Surface {
             var value by remember {
@@ -178,26 +185,28 @@ fun PreviewSliderWithEndLabels() {
                 startLabel = {
                     Text(
                         "A",
-                        style = MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        style =
+                            MaterialTheme.typography.bodyLarge
+                                .merge(
+                                    TextStyle(
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    ),
                                 ),
-                            ),
                         modifier = Modifier.alignByBaseline(),
                     )
                 },
                 endLabel = {
                     Text(
                         "A",
-                        style = MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * 2,
+                        style =
+                            MaterialTheme.typography.bodyLarge
+                                .merge(
+                                    TextStyle(
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * 2,
+                                    ),
                                 ),
-                            ),
                         modifier = Modifier.alignByBaseline(),
                     )
                 },

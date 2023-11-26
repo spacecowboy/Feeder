@@ -13,7 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.R
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 /**
  * Any callers must call #shutdown when shutting down
@@ -56,7 +56,10 @@ class TTSStateHolder(
             override fun onStart(utteranceId: String) {
             }
 
-            override fun onError(utteranceId: String?, errorCode: Int) {
+            override fun onError(
+                utteranceId: String?,
+                errorCode: Int,
+            ) {
                 Log.e(LOG_TAG, "onError utteranceId $utteranceId, errorCode $errorCode")
 
                 if (utteranceId != null) {
@@ -142,7 +145,10 @@ class TTSStateHolder(
         }
     }
 
-    fun tts(textArray: List<AnnotatedString>, useDetectLanguage: Boolean) {
+    fun tts(
+        textArray: List<AnnotatedString>,
+        useDetectLanguage: Boolean,
+    ) {
         this.useDetectLanguage = useDetectLanguage
 //        val textArray = fullText.split(*PUNCTUATION)
         for (text in textArray) {
@@ -156,46 +162,48 @@ class TTSStateHolder(
 
     fun play() {
         startJob?.cancel()
-        startJob = coroutineScope.launch {
-            if (mutex.isLocked) {
-                // Oops, I was double clicked
-                return@launch
-            }
-            mutex.withLock {
-                if (textToSpeech == null) {
-                    initializedState = null
-                    textToSpeech = TextToSpeech(
-                        context,
-                        this@TTSStateHolder,
-                    )
-                }
-                while (initializedState == null) {
-                    delay(100)
-                }
-                if (initializedState != TextToSpeech.SUCCESS) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            R.string.failed_to_load_text_to_speech,
-                            Toast.LENGTH_SHORT,
-                        )
-                            .show()
-                    }
+        startJob =
+            coroutineScope.launch {
+                if (mutex.isLocked) {
+                    // Oops, I was double clicked
                     return@launch
                 }
-                _ttsState.value = PlaybackStatus.PLAYING
+                mutex.withLock {
+                    if (textToSpeech == null) {
+                        initializedState = null
+                        textToSpeech =
+                            TextToSpeech(
+                                context,
+                                this@TTSStateHolder,
+                            )
+                    }
+                    while (initializedState == null) {
+                        delay(100)
+                    }
+                    if (initializedState != TextToSpeech.SUCCESS) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                R.string.failed_to_load_text_to_speech,
+                                Toast.LENGTH_SHORT,
+                            )
+                                .show()
+                        }
+                        return@launch
+                    }
+                    _ttsState.value = PlaybackStatus.PLAYING
 
-                // Can only set this once engine has been initialized
-                textToSpeech?.setOnUtteranceProgressListener(speechListener)
-                try {
-                    updateAvailableLanguages()
-                    speakNext()
-                } catch (e: ConcurrentModificationException) {
-                    Log.e(LOG_TAG, "User probably double clicked play", e)
-                    // State will be weird. But mutex should prevent it happening
+                    // Can only set this once engine has been initialized
+                    textToSpeech?.setOnUtteranceProgressListener(speechListener)
+                    try {
+                        updateAvailableLanguages()
+                        speakNext()
+                    } catch (e: ConcurrentModificationException) {
+                        Log.e(LOG_TAG, "User probably double clicked play", e)
+                        // State will be weird. But mutex should prevent it happening
+                    }
                 }
             }
-        }
     }
 
     fun pause() {
@@ -246,31 +254,32 @@ class TTSStateHolder(
     fun updateAvailableLanguages() {
         allAvailableLanguages = textToSpeech?.availableLanguages ?: emptySet()
 
-        val sortedLanguages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            context.detectLocaleFromText(
-                textToSpeechQueue.joinToString("\n\n"),
-                minConfidence = 0f,
-            )
-                .sortedByDescending { it.confidence }
-                .map { it.locale }
-                .plus(
-                    context.getLocales()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
+        val sortedLanguages =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                context.detectLocaleFromText(
+                    textToSpeechQueue.joinToString("\n\n"),
+                    minConfidence = 0f,
                 )
-                .plus(
-                    allAvailableLanguages.asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                )
-        } else {
-            context.getLocales()
-                .sortedBy { it.displayName }
-                .plus(
-                    allAvailableLanguages.asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                )
-        }
-            .distinctBy { it.toLanguageTag() }
-            .toList()
+                    .sortedByDescending { it.confidence }
+                    .map { it.locale }
+                    .plus(
+                        context.getLocales()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    )
+                    .plus(
+                        allAvailableLanguages.asSequence()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    )
+            } else {
+                context.getLocales()
+                    .sortedBy { it.displayName }
+                    .plus(
+                        allAvailableLanguages.asSequence()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    )
+            }
+                .distinctBy { it.toLanguageTag() }
+                .toList()
 
         _availableLanguages.update {
             sortedLanguages
@@ -311,60 +320,61 @@ class TTSStateHolder(
 
     companion object {
         private const val LOG_TAG = "FeederTextToSpeech"
-        private val PUNCTUATION = arrayOf(
-            // New-lines
-            "\n",
-            // Very useful: https://unicodelookup.com/
-            // Full stop
-            ".",
-            "։",
-            "۔",
-            "܁",
-            "܂",
-            "。",
-            "︒",
-            "﹒",
-            "．",
-            "｡",
-            // Question mark
-            "?",
-            ";",
-            "՞",
-            "؟",
-            "⁇",
-            "⁈",
-            "⁉",
-            "︖",
-            "﹖",
-            "？",
-            // Exclamation mark
-            "!",
-            "՜",
-            "‼",
-            "︕",
-            "﹗",
-            "！",
-            // Colon and semi-colon
-            ":",
-            ";",
-            "؛",
-            "︓",
-            "︔",
-            "﹔",
-            "﹕",
-            "：",
-            "；",
-            // Ellipsis
-            "...",
-            "…",
-            "⋯",
-            "⋮",
-            "︙",
-            // Dash
-            "—",
-            "〜",
-            "〰",
-        )
+        private val PUNCTUATION =
+            arrayOf(
+                // New-lines
+                "\n",
+                // Very useful: https://unicodelookup.com/
+                // Full stop
+                ".",
+                "։",
+                "۔",
+                "܁",
+                "܂",
+                "。",
+                "︒",
+                "﹒",
+                "．",
+                "｡",
+                // Question mark
+                "?",
+                ";",
+                "՞",
+                "؟",
+                "⁇",
+                "⁈",
+                "⁉",
+                "︖",
+                "﹖",
+                "？",
+                // Exclamation mark
+                "!",
+                "՜",
+                "‼",
+                "︕",
+                "﹗",
+                "！",
+                // Colon and semi-colon
+                ":",
+                ";",
+                "؛",
+                "︓",
+                "︔",
+                "﹔",
+                "﹕",
+                "：",
+                "；",
+                // Ellipsis
+                "...",
+                "…",
+                "⋯",
+                "⋮",
+                "︙",
+                // Dash
+                "—",
+                "〜",
+                "〰",
+            )
     }
 }
 

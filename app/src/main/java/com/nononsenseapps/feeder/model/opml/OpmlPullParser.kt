@@ -6,17 +6,17 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.toByteString
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.Arrays
 import kotlin.reflect.KProperty
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.withContext
-import okio.ByteString.Companion.toByteString
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserException
 
 private const val TAG_SETTING = "setting"
 
@@ -197,7 +197,10 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readOutline(parser: XmlPullParser, parentOutlineTag: String) {
+    private fun readOutline(
+        parser: XmlPullParser,
+        parentOutlineTag: String,
+    ) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
         val xmlUrl by this
@@ -211,11 +214,12 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     private fun readOutlineAsTag() {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
-        val tag = unescape(
-            parser.getAttributeValue(null, ATTR_TITLE)
-                ?: parser.getAttributeValue(null, ATTR_TEXT)
-                ?: "",
-        )
+        val tag =
+            unescape(
+                parser.getAttributeValue(null, ATTR_TITLE)
+                    ?: parser.getAttributeValue(null, ATTR_TEXT)
+                    ?: "",
+            )
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
@@ -230,60 +234,70 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readOutlineAsRss(parser: XmlPullParser, tag: String) {
+    private fun readOutlineAsRss(
+        parser: XmlPullParser,
+        tag: String,
+    ) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
-        val feedTitle = unescape(
-            parser.getAttributeValue(null, ATTR_TITLE)
-                ?: parser.getAttributeValue(null, ATTR_TEXT)
-                ?: "",
-        )
+        val feedTitle =
+            unescape(
+                parser.getAttributeValue(null, ATTR_TITLE)
+                    ?: parser.getAttributeValue(null, ATTR_TEXT)
+                    ?: "",
+            )
         try {
             val feedUrl = URL(parser.getAttributeValue(null, ATTR_XMLURL))
-            val feed = Feed(
-                // Ensure not both are empty string: title will get replaced on sync
-                title = feedTitle.ifBlank { feedUrl.toString() },
-                customTitle = feedTitle,
-                tag = tag,
-                url = feedUrl,
-            ).let { feed ->
-                // Copy so default values can be referenced
-                feed.copy(
-                    notify = parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
-                        ?.toBoolean()
-                        ?: feed.notify,
-                    fullTextByDefault = (
-                        parser.getAttributeValue(
-                            OPML_FEEDER_NAMESPACE,
-                            ATTR_FULL_TEXT_BY_DEFAULT,
-                        )
-                            ?.toBoolean()
-                            // Support Flym's value for this
-                            ?: parser.getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+            val feed =
+                Feed(
+                    // Ensure not both are empty string: title will get replaced on sync
+                    title = feedTitle.ifBlank { feedUrl.toString() },
+                    customTitle = feedTitle,
+                    tag = tag,
+                    url = feedUrl,
+                ).let { feed ->
+                    // Copy so default values can be referenced
+                    feed.copy(
+                        notify =
+                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
                                 ?.toBoolean()
-                        ) ?: feed.fullTextByDefault,
-                    alternateId = parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)
-                        ?.toBoolean()
-                        ?: feed.alternateId,
-                    openArticlesWith = parser.getAttributeValue(
-                        OPML_FEEDER_NAMESPACE,
-                        ATTR_OPEN_ARTICLES_WITH,
-                    ) ?: feed.openArticlesWith,
-                    imageUrl = parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)
-                        ?.let { imageUrl ->
-                            try {
-                                URL(imageUrl)
-                            } catch (e: MalformedURLException) {
-                                Log.e(
-                                    LOG_TAG,
-                                    "Invalid imageUrl [$imageUrl] on feed [$feedTitle] in OPML",
-                                    e,
+                                ?: feed.notify,
+                        fullTextByDefault =
+                            (
+                                parser.getAttributeValue(
+                                    OPML_FEEDER_NAMESPACE,
+                                    ATTR_FULL_TEXT_BY_DEFAULT,
                                 )
-                                null
-                            }
-                        } ?: feed.imageUrl,
-                )
-            }
+                                    ?.toBoolean()
+                                    // Support Flym's value for this
+                                    ?: parser.getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+                                        ?.toBoolean()
+                            ) ?: feed.fullTextByDefault,
+                        alternateId =
+                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)
+                                ?.toBoolean()
+                                ?: feed.alternateId,
+                        openArticlesWith =
+                            parser.getAttributeValue(
+                                OPML_FEEDER_NAMESPACE,
+                                ATTR_OPEN_ARTICLES_WITH,
+                            ) ?: feed.openArticlesWith,
+                        imageUrl =
+                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)
+                                ?.let { imageUrl ->
+                                    try {
+                                        URL(imageUrl)
+                                    } catch (e: MalformedURLException) {
+                                        Log.e(
+                                            LOG_TAG,
+                                            "Invalid imageUrl [$imageUrl] on feed [$feedTitle] in OPML",
+                                            e,
+                                        )
+                                        null
+                                    }
+                                } ?: feed.imageUrl,
+                    )
+                }
 
             feeds.add(feed)
         } catch (e: MalformedURLException) {
@@ -330,6 +344,7 @@ sealed class OpmlError {
 }
 
 data class OpmlUnknownError(override val throwable: Throwable?) : OpmlError()
+
 data class OpmlParsingError(override val throwable: Throwable) : OpmlError()
 
 fun InputStream.readTheBytes(): ByteArray {

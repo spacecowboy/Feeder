@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.savedstate.SavedStateRegistryOwner
-import java.lang.reflect.InvocationTargetException
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
@@ -18,6 +17,7 @@ import org.kodein.di.compose.LocalDI
 import org.kodein.di.direct
 import org.kodein.di.factory
 import org.kodein.di.instance
+import java.lang.reflect.InvocationTargetException
 
 /**
  * A view model which is also kodein aware. Construct any deriving class by using the getViewModel()
@@ -49,19 +49,21 @@ class DIAwareViewModelFactory(
 }
 
 inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithActivityViewModelScope() {
-    bind<T>() with factory { activity: DIAwareComponentActivity ->
-        val factory = DIAwareViewModelFactory(activity.di)
+    bind<T>() with
+        factory { activity: DIAwareComponentActivity ->
+            val factory = DIAwareViewModelFactory(activity.di)
 
-        ViewModelProvider(activity, factory).get(T::class.java)
-    }
+            ViewModelProvider(activity, factory).get(T::class.java)
+        }
 }
 
 inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithComposableViewModelScope() {
-    bind<T>() with factory { activity: DIAwareComponentActivity ->
-        val factory = DIAwareSavedStateViewModelFactory(activity.di, activity)
+    bind<T>() with
+        factory { activity: DIAwareComponentActivity ->
+            val factory = DIAwareSavedStateViewModelFactory(activity.di, activity)
 
-        ViewModelProvider(activity, factory).get(T::class.java)
-    }
+            ViewModelProvider(activity, factory).get(T::class.java)
+        }
 }
 
 class DIAwareSavedStateViewModelFactory(
@@ -92,9 +94,7 @@ class DIAwareSavedStateViewModelFactory(
 }
 
 @Composable
-inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.diAwareViewModel(
-    key: String? = null,
-): T {
+inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.diAwareViewModel(key: String? = null): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
 
     return viewModel(
@@ -105,9 +105,7 @@ inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.diAwareViewMod
 }
 
 @Composable
-inline fun <reified T : DIAwareViewModel> NavBackStackEntry.diAwareViewModel(
-    key: String? = null,
-): T {
+inline fun <reified T : DIAwareViewModel> NavBackStackEntry.diAwareViewModel(key: String? = null): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this, arguments)
 
     return viewModel(

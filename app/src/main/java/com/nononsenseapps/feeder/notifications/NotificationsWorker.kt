@@ -28,33 +28,37 @@ class NotificationsWorker(override val di: DI) : DIAware {
 
     fun runForever() {
         job?.cancel("runForever")
-        job = applicationCoroutineScope.launch {
-            repository.getFeedItemsNeedingNotifying()
-                .runningReduce { prev, current ->
-                    try {
-                        unNotifyForMissingItems(prev, current)
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error in notifications worker", e)
+        job =
+            applicationCoroutineScope.launch {
+                repository.getFeedItemsNeedingNotifying()
+                    .runningReduce { prev, current ->
+                        try {
+                            unNotifyForMissingItems(prev, current)
+                        } catch (e: Exception) {
+                            Log.e(LOG_TAG, "Error in notifications worker", e)
+                        }
+                        // Always pass current on
+                        current
                     }
-                    // Always pass current on
-                    current
-                }
-                .collectLatest { items ->
-                    delay(100)
-                    // Individual notifications are triggered during sync, not here
-                    // but the summary notification still needs updating
-                    if (items.isNotEmpty()) {
-                        notify(context, updateSummaryOnly = true)
+                    .collectLatest { items ->
+                        delay(100)
+                        // Individual notifications are triggered during sync, not here
+                        // but the summary notification still needs updating
+                        if (items.isNotEmpty()) {
+                            notify(context, updateSummaryOnly = true)
+                        }
                     }
-                }
-        }
+            }
     }
 
     fun stopForever() {
         job?.cancel("stopForever")
     }
 
-    internal suspend fun unNotifyForMissingItems(prev: List<Long>, current: List<Long>) {
+    internal suspend fun unNotifyForMissingItems(
+        prev: List<Long>,
+        current: List<Long>,
+    ) {
         if (current.isEmpty()) {
             cancelNotification(summaryNotificationId.toLong())
         }

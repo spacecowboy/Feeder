@@ -90,8 +90,9 @@ fun DeleteFeedDialog(
                 text = stringResource(id = R.string.delete_feed),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .padding(vertical = 8.dp),
             )
         },
         text = {
@@ -102,23 +103,25 @@ fun DeleteFeedDialog(
                     feeds.item,
                     key = { feed -> feed.id },
                 ) { feed ->
-                    val stateLabel = if (isChecked(feed.id)) {
-                        stringResource(androidx.compose.ui.R.string.selected)
-                    } else {
-                        stringResource(androidx.compose.ui.R.string.not_selected)
-                    }
+                    val stateLabel =
+                        if (isChecked(feed.id)) {
+                            stringResource(androidx.compose.ui.R.string.selected)
+                        } else {
+                            stringResource(androidx.compose.ui.R.string.not_selected)
+                        }
                     Row(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .requiredHeightIn(min = minimumTouchSize)
-                            .clickable {
-                                onToggleFeed(feed.id, !isChecked(feed.id))
-                            }
-                            .safeSemantics(mergeDescendants = true) {
-                                stateDescription = stateLabel
-                            },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .requiredHeightIn(min = minimumTouchSize)
+                                .clickable {
+                                    onToggleFeed(feed.id, !isChecked(feed.id))
+                                }
+                                .safeSemantics(mergeDescendants = true) {
+                                    stateDescription = stateLabel
+                                },
                     ) {
                         Checkbox(
                             checked = isChecked(feed.id),
@@ -149,10 +152,11 @@ data class DeletableFeed(
 @Preview
 private fun Preview() =
     DeleteFeedDialog(
-        feeds = immutableListHolderOf(
-            DeletableFeed(1, "A Feed"),
-            DeletableFeed(2, "Another Feed"),
-        ),
+        feeds =
+            immutableListHolderOf(
+                DeletableFeed(1, "A Feed"),
+                DeletableFeed(2, "Another Feed"),
+            ),
         onDismiss = {},
         onDelete = {},
     )

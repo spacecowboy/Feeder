@@ -11,8 +11,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
-import java.time.Instant
-import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -23,6 +21,8 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.time.Instant
+import kotlin.test.assertEquals
 
 class SyncRemoteStoreTest : DIAware {
     private val store: SyncRemoteStore by instance()
@@ -52,9 +52,10 @@ class SyncRemoteStoreTest : DIAware {
     fun getNewSyncRemoteInsertsDefault() {
         coEvery { dao.getSyncRemote() } returns null
 
-        val result = runBlocking {
-            store.getSyncRemote()
-        }
+        val result =
+            runBlocking {
+                store.getSyncRemote()
+            }
 
         coVerify {
             dao.getSyncRemote()
@@ -71,9 +72,10 @@ class SyncRemoteStoreTest : DIAware {
         val expected = SyncRemote(id = 1L)
         coEvery { dao.getSyncRemote() } returns expected
 
-        val result = runBlocking {
-            store.getSyncRemote()
-        }
+        val result =
+            runBlocking {
+                store.getSyncRemote()
+            }
 
         coVerify {
             dao.getSyncRemote()
@@ -112,9 +114,10 @@ class SyncRemoteStoreTest : DIAware {
     fun getNextFeedItemWithoutSyncedReadMark() {
         coEvery { readStatusDao.getNextFeedItemWithoutSyncedReadMark() } returns emptyFlow()
 
-        val result = runBlocking {
-            store.getNextFeedItemWithoutSyncedReadMark().toList()
-        }
+        val result =
+            runBlocking {
+                store.getNextFeedItemWithoutSyncedReadMark().toList()
+            }
 
         assertEquals(emptyList(), result)
 

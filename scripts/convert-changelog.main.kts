@@ -2,14 +2,14 @@
 @file:DependsOn("org.jetbrains:markdown-jvm:0.4.1")
 @file:DependsOn("net.pwall.mustache:kotlin-mustache:0.10")
 
-import java.io.File
-import java.util.concurrent.TimeUnit
 import net.pwall.mustache.parser.Parser
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 val flavour = CommonMarkFlavourDescriptor()
 
@@ -85,7 +85,8 @@ fun recurseMarkdown(
 }
 
 fun generateAtomChangelog(entries: List<ChangelogEntry>) {
-    val atomTemplateString = """
+    val atomTemplateString =
+        """
         <?xml version='1.0' encoding='UTF-8'?>
         <feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
           <id>https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md</id>
@@ -122,23 +123,25 @@ fun generateAtomChangelog(entries: List<ChangelogEntry>) {
     val parser = Parser()
     val atomTemplate = parser.parse(atomTemplateString)
 
-    val y = atomTemplate.processToString(
-        mapOf(
-            "timestamp" to entries.first().timestamp,
-            "entry" to entries,
-        ),
-    )
+    val y =
+        atomTemplate.processToString(
+            mapOf(
+                "timestamp" to entries.first().timestamp,
+                "entry" to entries,
+            ),
+        )
 
     println(y)
 }
 
 fun String.runCommand(): String {
     val parts = this.split("\\s".toRegex())
-    val proc = ProcessBuilder(*parts.toTypedArray())
-        .directory(File("/home/jonas/workspace/feeder"))
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
+    val proc =
+        ProcessBuilder(*parts.toTypedArray())
+            .directory(File("/home/jonas/workspace/feeder"))
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .start()
 
     proc.waitFor(2, TimeUnit.SECONDS)
     return proc.inputStream.bufferedReader().readText().trim()

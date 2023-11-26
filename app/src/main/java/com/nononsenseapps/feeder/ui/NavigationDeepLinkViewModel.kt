@@ -10,7 +10,10 @@ import org.kodein.di.instance
 class NavigationDeepLinkViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
 
-    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
+    fun setCurrentFeedAndTag(
+        feedId: Long,
+        tag: String,
+    ) {
         repository.setCurrentFeedAndTag(feedId, tag)
         // Should open feed in portrait
         repository.setIsArticleOpen(false)

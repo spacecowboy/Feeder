@@ -9,12 +9,12 @@ import coil.decode.ImageSource
 import coil.fetch.SourceResult
 import coil.request.Options
 import com.danielrampelt.coil.ico.IcoDecoder
-import kotlin.test.assertNotNull
 import kotlinx.coroutines.runBlocking
 import okio.buffer
 import okio.source
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertNotNull
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -23,45 +23,51 @@ class IcoDecoderTest {
 
     @Test
     fun testPngFavicon() {
-        val decoder = factory.create(
-            pngIco,
-            Options(ApplicationProvider.getApplicationContext()),
-            ImageLoader(ApplicationProvider.getApplicationContext()),
-        )
+        val decoder =
+            factory.create(
+                pngIco,
+                Options(ApplicationProvider.getApplicationContext()),
+                ImageLoader(ApplicationProvider.getApplicationContext()),
+            )
 
         assertNotNull(decoder)
-        val result = runBlocking {
-            decoder.decode()
-        }
+        val result =
+            runBlocking {
+                decoder.decode()
+            }
         assertNotNull(result)
     }
 
     @Test
     fun testGitlabIco() {
-        val decoder = factory.create(
-            pngIco,
-            Options(ApplicationProvider.getApplicationContext()),
-            ImageLoader(ApplicationProvider.getApplicationContext()),
-        )
+        val decoder =
+            factory.create(
+                pngIco,
+                Options(ApplicationProvider.getApplicationContext()),
+                ImageLoader(ApplicationProvider.getApplicationContext()),
+            )
 
         assertNotNull(decoder)
-        val result = runBlocking {
-            decoder.decode()
-        }
+        val result =
+            runBlocking {
+                decoder.decode()
+            }
         assertNotNull(result)
     }
 
     companion object {
         private val gitlabIco: SourceResult
             get() {
-                val buf = Companion::class.java.getResourceAsStream("gitlab.ico")!!
-                    .source()
-                    .buffer()
+                val buf =
+                    Companion::class.java.getResourceAsStream("gitlab.ico")!!
+                        .source()
+                        .buffer()
 
-                val imageSource = ImageSource(
-                    source = buf,
-                    context = ApplicationProvider.getApplicationContext(),
-                )
+                val imageSource =
+                    ImageSource(
+                        source = buf,
+                        context = ApplicationProvider.getApplicationContext(),
+                    )
 
                 return SourceResult(
                     source = imageSource,
@@ -72,14 +78,16 @@ class IcoDecoderTest {
 
         private val pngIco: SourceResult
             get() {
-                val buf = Companion::class.java.getResourceAsStream("png.ico")!!
-                    .source()
-                    .buffer()
+                val buf =
+                    Companion::class.java.getResourceAsStream("png.ico")!!
+                        .source()
+                        .buffer()
 
-                val imageSource = ImageSource(
-                    source = buf,
-                    context = ApplicationProvider.getApplicationContext(),
-                )
+                val imageSource =
+                    ImageSource(
+                        source = buf,
+                        context = ApplicationProvider.getApplicationContext(),
+                    )
 
                 return SourceResult(
                     source = imageSource,

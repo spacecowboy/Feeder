@@ -8,15 +8,14 @@ import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class BugReportKTest {
-
     @Test
     fun bugIntentIsCorrect() {
         val intent = emailBugReportIntent()

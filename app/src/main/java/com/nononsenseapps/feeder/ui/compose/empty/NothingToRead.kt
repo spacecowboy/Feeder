@@ -37,10 +37,11 @@ fun NothingToRead(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .padding(horizontal = LocalDimens.current.margin)
-            .fillMaxHeight()
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .padding(horizontal = LocalDimens.current.margin)
+                .fillMaxHeight()
+                .fillMaxWidth(),
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -48,44 +49,49 @@ fun NothingToRead(
         ) {
             Text(
                 text = stringResource(id = R.string.empty_feed_top),
-                style = MaterialTheme.typography.headlineMedium.merge(
-                    TextStyle(fontWeight = FontWeight.Light),
-                ),
+                style =
+                    MaterialTheme.typography.headlineMedium.merge(
+                        TextStyle(fontWeight = FontWeight.Light),
+                    ),
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .heightIn(min = TextFieldDefaults.MinHeight)
-                    .fillMaxWidth()
-                    .clickable {
-                        onOpenOtherFeed()
-                    },
+                modifier =
+                    Modifier
+                        .heightIn(min = TextFieldDefaults.MinHeight)
+                        .fillMaxWidth()
+                        .clickable {
+                            onOpenOtherFeed()
+                        },
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_open),
-                    style = MaterialTheme.typography.headlineMedium.merge(
-                        TextStyle(fontWeight = FontWeight.Light),
-                    ),
+                    style =
+                        MaterialTheme.typography.headlineMedium.merge(
+                            TextStyle(fontWeight = FontWeight.Light),
+                        ),
                     textAlign = TextAlign.Center,
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .heightIn(min = TextFieldDefaults.MinHeight)
-                    .fillMaxWidth()
-                    .clickable {
-                        onAddFeed()
-                    },
+                modifier =
+                    Modifier
+                        .heightIn(min = TextFieldDefaults.MinHeight)
+                        .fillMaxWidth()
+                        .clickable {
+                            onAddFeed()
+                        },
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_add),
-                    style = MaterialTheme.typography.headlineMedium.merge(
-                        TextStyle(fontWeight = FontWeight.Light),
-                    ),
+                    style =
+                        MaterialTheme.typography.headlineMedium.merge(
+                            TextStyle(fontWeight = FontWeight.Light),
+                        ),
                     textAlign = TextAlign.Center,
                 )
             }
@@ -102,7 +108,7 @@ fun NothingToRead(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
-fun PreviewNothingToRead() {
+private fun PreviewNothingToRead() {
     FeederTheme {
         Surface {
             NothingToRead()

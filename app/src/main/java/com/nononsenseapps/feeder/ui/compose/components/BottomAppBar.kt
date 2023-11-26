@@ -80,7 +80,7 @@ fun PaddedBottomAppBar(
 
 @Preview
 @Composable
-fun PreviewPaddedBottomBar() {
+private fun PreviewPaddedBottomBar() {
     FeederTheme {
         PaddedBottomAppBar(
             actions = {
@@ -135,16 +135,18 @@ private fun BottomAppBar(
         modifier = modifier,
     ) {
         Box(
-            modifier = Modifier.windowInsetsPadding(
-                WindowInsets.navigationBars.only(WindowInsetsSides.Bottom),
-            ),
+            modifier =
+                Modifier.windowInsetsPadding(
+                    WindowInsets.navigationBars.only(WindowInsetsSides.Bottom),
+                ),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(bottomBarHeight)
-                    .padding(contentPadding)
-                    .focusGroup(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(bottomBarHeight)
+                        .padding(contentPadding)
+                        .focusGroup(),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 content = content,

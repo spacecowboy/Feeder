@@ -12,7 +12,6 @@ import org.kodein.di.compose.withDI
 
 @Ignore
 class EndToEndTest : BaseComposeTest {
-
     @get:Rule
     override val composeTestRule = createAndroidComposeRule<MainActivity>()
 

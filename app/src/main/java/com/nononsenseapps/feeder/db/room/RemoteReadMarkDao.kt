@@ -48,9 +48,11 @@ interface RemoteReadMarkDao {
     suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL): List<String>
 }
 
-data class RemoteReadMarkReadyToBeApplied @Ignore constructor(
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
-    @ColumnInfo(name = "feed_item_id") var feedItemId: Long = ID_UNSET,
-) {
-    constructor() : this(id = ID_UNSET)
-}
+data class RemoteReadMarkReadyToBeApplied
+    @Ignore
+    constructor(
+        @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+        @ColumnInfo(name = "feed_item_id") var feedItemId: Long = ID_UNSET,
+    ) {
+        constructor() : this(id = ID_UNSET)
+    }

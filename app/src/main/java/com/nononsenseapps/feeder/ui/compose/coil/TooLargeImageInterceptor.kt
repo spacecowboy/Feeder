@@ -20,7 +20,9 @@ class TooLargeImageInterceptor : Interceptor {
                     return ErrorResult(
                         chain.request.error,
                         chain.request,
-                        RuntimeException("Image was (probably) too large to render within memory constraints: ${result.drawable.intrinsicWidth} x ${result.drawable.intrinsicHeight} > 2500 x 2500"),
+                        RuntimeException(
+                            "Image was (probably) too large to render within memory constraints: ${result.drawable.intrinsicWidth} x ${result.drawable.intrinsicHeight} > 2500 x 2500",
+                        ),
                     )
                 } else {
                     result

@@ -38,9 +38,10 @@ fun OkCancelWithContent(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         content()
@@ -66,8 +67,9 @@ fun OkCancelWithNonScrollableContent(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
     ) {
         content()
         OkCancelButtons(
@@ -82,7 +84,7 @@ fun OkCancelWithNonScrollableContent(
 
 @Composable
 @Preview(showBackground = true)
-fun OkCancelButtons(
+private fun OkCancelButtons(
     modifier: Modifier = Modifier,
     onOk: () -> Unit = {},
     onCancel: () -> Unit = {},

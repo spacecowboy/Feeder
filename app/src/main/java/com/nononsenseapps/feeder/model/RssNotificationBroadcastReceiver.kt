@@ -19,24 +19,32 @@ const val ACTION_MARK_AS_READ: String = "mark_as_read"
 const val EXTRA_FEEDITEM_ID_ARRAY: String = "extra_feeditem_id_array"
 
 class RssNotificationBroadcastReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val ids = intent.getLongArrayExtra(EXTRA_FEEDITEM_ID_ARRAY)
         Log.d("RssNotificationReceiver", "onReceive: ${intent.action}; ${ids?.joinToString(", ")}")
         val di by closestDI(context)
         val dao: FeedItemDao by di.instance()
         when (intent.action) {
             ACTION_MARK_AS_NOTIFIED -> markAsNotified(context.applicationContext, dao, ids)
-            ACTION_MARK_AS_READ -> markAsReadAndNotified(
-                context.applicationContext,
-                dao,
-                intent.data?.lastPathSegment?.toLongOrNull() ?: ID_UNSET,
-            )
+            ACTION_MARK_AS_READ ->
+                markAsReadAndNotified(
+                    context.applicationContext,
+                    dao,
+                    intent.data?.lastPathSegment?.toLongOrNull() ?: ID_UNSET,
+                )
         }
     }
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-private fun markAsReadAndNotified(context: Context, feedItemDao: FeedItemDao, itemId: Long) {
+private fun markAsReadAndNotified(
+    context: Context,
+    feedItemDao: FeedItemDao,
+    itemId: Long,
+) {
     GlobalScope.launch(Dispatchers.Default) {
         feedItemDao.markAsReadAndNotified(itemId)
         cancelNotification(context, itemId)
@@ -44,7 +52,11 @@ private fun markAsReadAndNotified(context: Context, feedItemDao: FeedItemDao, it
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-private fun markAsNotified(context: Context, feedItemDao: FeedItemDao, itemIds: LongArray?) {
+private fun markAsNotified(
+    context: Context,
+    feedItemDao: FeedItemDao,
+    itemIds: LongArray?,
+) {
     if (itemIds != null) {
         GlobalScope.launch(Dispatchers.Default) {
             val idList = itemIds.toList()

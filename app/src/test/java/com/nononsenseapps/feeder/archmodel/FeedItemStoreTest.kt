@@ -8,10 +8,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import java.net.URL
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -23,6 +19,10 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.net.URL
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FeedItemStoreTest : DIAware {
     private val store: FeedItemStore by instance()
@@ -88,9 +88,10 @@ class FeedItemStoreTest : DIAware {
     fun getFeedItem() {
         coEvery { dao.loadFeedItemFlow(5L) } returns flowOf(FeedItemWithFeed(id = 5L))
 
-        val feedItem = runBlocking {
-            store.getFeedItem(5L).toList().first()
-        }
+        val feedItem =
+            runBlocking {
+                store.getFeedItem(5L).toList().first()
+            }
 
         assertEquals(5L, feedItem?.id)
     }
@@ -99,9 +100,10 @@ class FeedItemStoreTest : DIAware {
     fun getLink() {
         coEvery { dao.getLink(5L) } returns "foo"
 
-        val link = runBlocking {
-            store.getLink(5L)
-        }
+        val link =
+            runBlocking {
+                store.getLink(5L)
+            }
 
         assertEquals("foo", link)
     }
@@ -110,9 +112,10 @@ class FeedItemStoreTest : DIAware {
     fun getArticleOpener() {
         coEvery { dao.getOpenArticleWith(5L) } returns "foo"
 
-        val result = runBlocking {
-            store.getArticleOpener(5L)
-        }
+        val result =
+            runBlocking {
+                store.getArticleOpener(5L)
+            }
 
         assertEquals("foo", result)
     }
@@ -152,15 +155,17 @@ class FeedItemStoreTest : DIAware {
 
     @Test
     fun getFeedsItemsWithDefaultFullTextParse() {
-        val expected = listOf(
-            FeedItemIdWithLink(5L, "google.com"),
-            FeedItemIdWithLink(6L, "cowboy.com"),
-        )
+        val expected =
+            listOf(
+                FeedItemIdWithLink(5L, "google.com"),
+                FeedItemIdWithLink(6L, "cowboy.com"),
+            )
         every { dao.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(expected)
 
-        val items = runBlocking {
-            store.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
-        }
+        val items =
+            runBlocking {
+                store.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
+            }
 
         assertEquals(
             expected.size,
@@ -180,9 +185,10 @@ class FeedItemStoreTest : DIAware {
         val expected = listOf(1L, 2L)
         every { dao.getFeedItemsNeedingNotifying() } returns flowOf(expected)
 
-        val items = runBlocking {
-            store.getFeedItemsNeedingNotifying().first()
-        }
+        val items =
+            runBlocking {
+                store.getFeedItemsNeedingNotifying().first()
+            }
 
         assertEquals(
             expected.size,
@@ -203,9 +209,10 @@ class FeedItemStoreTest : DIAware {
         val guid = "foobar"
         coEvery { dao.getItemWith(url, guid) } returns 5L
 
-        val id = runBlocking {
-            store.getFeedItemId(url, guid)
-        }
+        val id =
+            runBlocking {
+                store.getFeedItemId(url, guid)
+            }
 
         assertEquals(5L, id)
     }
@@ -214,9 +221,10 @@ class FeedItemStoreTest : DIAware {
     fun loadFeedItem() {
         coEvery { dao.loadFeedItem(any(), any()) } returns null
 
-        val result = runBlocking {
-            store.loadFeedItem("foo", 5L)
-        }
+        val result =
+            runBlocking {
+                store.loadFeedItem("foo", 5L)
+            }
 
         assertNull(result)
 
@@ -227,9 +235,10 @@ class FeedItemStoreTest : DIAware {
     fun getItemsToBeCleanedFromFeed() {
         coEvery { dao.getItemsToBeCleanedFromFeed(any(), any()) } returns listOf(5L)
 
-        val result = runBlocking {
-            store.getItemsToBeCleanedFromFeed(6L, 50)
-        }
+        val result =
+            runBlocking {
+                store.getItemsToBeCleanedFromFeed(6L, 50)
+            }
 
         assertEquals(5L, result.first())
 

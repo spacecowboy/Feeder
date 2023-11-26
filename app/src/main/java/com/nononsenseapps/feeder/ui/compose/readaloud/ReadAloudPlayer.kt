@@ -162,9 +162,10 @@ fun TTSPlayer(
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.onKeyEventLikeEscape {
-                        showMenu = false
-                    },
+                    modifier =
+                        Modifier.onKeyEventLikeEscape {
+                            showMenu = false
+                        },
                 ) {
                     DropdownMenuItem(
                         onClick = {
@@ -206,7 +207,7 @@ fun TTSPlayer(
 
 @Preview
 @Composable
-fun PlayerPreview() {
+private fun PlayerPreview() {
     FeederTheme {
         TTSPlayer(
             currentlyPlaying = true,
@@ -221,7 +222,7 @@ fun PlayerPreview() {
 
 @Preview
 @Composable
-fun PlayerPreviewWithFab() {
+private fun PlayerPreviewWithFab() {
     FeederTheme {
         TTSPlayer(
             currentlyPlaying = true,

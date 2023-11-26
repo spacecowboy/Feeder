@@ -14,35 +14,36 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun Modifier.onKeyEventLikeEscape(
-    action: () -> Unit,
-) = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "onEscapeLikeKeyPress"
-        properties["action"] = action
-    },
-) {
-    onKeyEvent {
-        when (it.key) {
-            Key.Escape, Key.Back, Key.NavigateOut -> {
-                action()
-                true
-            }
+fun Modifier.onKeyEventLikeEscape(action: () -> Unit) =
+    composed(
+        inspectorInfo =
+            debugInspectorInfo {
+                name = "onEscapeLikeKeyPress"
+                properties["action"] = action
+            },
+    ) {
+        onKeyEvent {
+            when (it.key) {
+                Key.Escape, Key.Back, Key.NavigateOut -> {
+                    action()
+                    true
+                }
 
-            else -> false
+                else -> false
+            }
         }
     }
-}
 
 fun Modifier.focusableInNonTouchMode(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
 ) = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "focusableInNonTouchMode"
-        properties["enabled"] = enabled
-        properties["interactionSource"] = interactionSource
-    },
+    inspectorInfo =
+        debugInspectorInfo {
+            name = "focusableInNonTouchMode"
+            properties["enabled"] = enabled
+            properties["interactionSource"] = interactionSource
+        },
 ) {
     val inputModeManager = LocalInputModeManager.current
     Modifier

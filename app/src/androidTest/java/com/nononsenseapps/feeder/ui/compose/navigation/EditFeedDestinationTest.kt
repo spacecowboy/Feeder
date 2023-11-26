@@ -4,10 +4,10 @@ import androidx.navigation.NavController
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @Ignore
 class EditFeedDestinationTest {
@@ -23,7 +23,7 @@ class EditFeedDestinationTest {
     fun editFeedHasCorrectRoute() {
         assertEquals(
             "edit/feed/{feedId}",
-            EditFeedDestination.route
+            EditFeedDestination.route,
         )
     }
 
@@ -31,7 +31,7 @@ class EditFeedDestinationTest {
     fun editFeedNavigate() {
         EditFeedDestination.navigate(
             navController,
-            99L
+            99L,
         )
 
         verify {

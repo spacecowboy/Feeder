@@ -5,10 +5,10 @@ import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @Ignore
 class ArticleDestinationTest {
@@ -24,7 +24,7 @@ class ArticleDestinationTest {
     fun readerHasCorrectRoute() {
         assertEquals(
             "reader/{itemId}",
-            ArticleDestination.route
+            ArticleDestination.route,
         )
     }
 
@@ -32,9 +32,9 @@ class ArticleDestinationTest {
     fun readerHasCorrectDeeplinks() {
         assertEquals(
             listOf(
-                "$DEEP_LINK_BASE_URI/article/{itemId}"
+                "$DEEP_LINK_BASE_URI/article/{itemId}",
             ),
-            ArticleDestination.deepLinks.map { it.uriPattern }
+            ArticleDestination.deepLinks.map { it.uriPattern },
         )
     }
 
@@ -42,7 +42,7 @@ class ArticleDestinationTest {
     fun readerNavigate() {
         ArticleDestination.navigate(
             navController,
-            55L
+            55L,
         )
 
         verify {

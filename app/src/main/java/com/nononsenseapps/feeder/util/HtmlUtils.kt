@@ -3,11 +3,15 @@ package com.nononsenseapps.feeder.util
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser.unescapeEntities
 
-fun findFirstImageLinkInHtml(text: String?, baseUrl: String?): String? =
+fun findFirstImageLinkInHtml(
+    text: String?,
+    baseUrl: String?,
+): String? =
     if (text != null) {
-        val doc = unescapeEntities(text, true).byteInputStream().use {
-            Jsoup.parse(it, "UTF-8", baseUrl ?: "")
-        }
+        val doc =
+            unescapeEntities(text, true).byteInputStream().use {
+                Jsoup.parse(it, "UTF-8", baseUrl ?: "")
+            }
 
         doc.getElementsByTag("img").asSequence()
             .filterNot { it.attr("width") == "1" || it.attr("height") == "1" }

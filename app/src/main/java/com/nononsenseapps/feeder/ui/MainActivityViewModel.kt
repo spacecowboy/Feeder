@@ -7,10 +7,10 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
-import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.time.Instant
 
 class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
@@ -23,9 +23,10 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     val shouldSyncOnResume: Boolean =
         repository.syncOnResume.value
 
-    fun ensurePeriodicSyncConfigured() = viewModelScope.launch {
-        repository.ensurePeriodicSyncConfigured()
-    }
+    fun ensurePeriodicSyncConfigured() =
+        viewModelScope.launch {
+            repository.ensurePeriodicSyncConfigured()
+        }
 
     fun isOkToSyncAutomatically(): Boolean =
         currentlyConnected(context) &&

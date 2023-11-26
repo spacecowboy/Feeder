@@ -16,6 +16,10 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndLink
 import com.rometools.rome.feed.synd.SyndPerson
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.net.URI
 import java.net.URL
 import java.time.Instant
@@ -24,10 +28,6 @@ import java.time.ZonedDateTime
 import java.util.Date
 import java.util.Random
 import kotlin.test.assertEquals
-import kotlinx.coroutines.runBlocking
-import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 
 class RomeExtensionsKtTest {
     @Test
@@ -39,55 +39,61 @@ class RomeExtensionsKtTest {
     }
 
     @Test
-    fun feedLinkButNoLinks() = runBlocking {
-        assertEquals(
-            Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
-            mockSyndFeed(link = "homepage").asFeed(baseUrl),
-        )
-    }
+    fun feedLinkButNoLinks() =
+        runBlocking {
+            assertEquals(
+                Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                mockSyndFeed(link = "homepage").asFeed(baseUrl),
+            )
+        }
 
     @Test
-    fun feedLinks() = runBlocking {
-        assertEquals(
-            Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
-            mockSyndFeed(
-                links = listOf(
-                    mockSyndLink(
-                        href = "homepage",
-                        rel = "alternate",
-                        type = "text/html",
-                    ),
-                ),
-            ).asFeed(baseUrl),
-        )
-    }
+    fun feedLinks() =
+        runBlocking {
+            assertEquals(
+                Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                mockSyndFeed(
+                    links =
+                        listOf(
+                            mockSyndLink(
+                                href = "homepage",
+                                rel = "alternate",
+                                type = "text/html",
+                            ),
+                        ),
+                ).asFeed(baseUrl),
+            )
+        }
 
     @Test
-    fun itemFallsBackToFeedAuthor() = runBlocking {
-        assertEquals(
-            Feed(
-                author = Author(name = "bob"),
-                title = "",
-                items = listOf(
-                    Item(
-                        id = "$baseUrl/id",
-                        author = Author(name = "bob"),
-                        content_text = "",
-                        url = null,
-                        summary = "",
-                        title = "",
-                        attachments = emptyList(),
-                    ),
+    fun itemFallsBackToFeedAuthor() =
+        runBlocking {
+            assertEquals(
+                Feed(
+                    author = Author(name = "bob"),
+                    title = "",
+                    items =
+                        listOf(
+                            Item(
+                                id = "$baseUrl/id",
+                                author = Author(name = "bob"),
+                                content_text = "",
+                                url = null,
+                                summary = "",
+                                title = "",
+                                attachments = emptyList(),
+                            ),
+                        ),
                 ),
-            ),
-            mockSyndFeed(
-                author = mockSyndPerson(name = "bob"),
-                entries = listOf(
-                    mockSyndEntry(uri = "id"),
-                ),
-            ).asFeed(baseUrl),
-        )
-    }
+                mockSyndFeed(
+                    author = mockSyndPerson(name = "bob"),
+                    entries =
+                        listOf(
+                            mockSyndEntry(uri = "id"),
+                        ),
+                ).asFeed(baseUrl),
+            )
+        }
 
     // Essentially a test for XKCD
     @Test
@@ -184,10 +190,11 @@ class RomeExtensionsKtTest {
             mockSyndEntry(
                 uri = "id",
                 description = mockSyndContent(value = ""),
-                links = listOf(
-                    mockSyndLink(href = "abc", rel = "self"),
-                    mockSyndLink(href = "bcd"),
-                ),
+                links =
+                    listOf(
+                        mockSyndLink(href = "abc", rel = "self"),
+                        mockSyndLink(href = "bcd"),
+                    ),
             ).asItem(baseUrl),
         )
     }
@@ -214,12 +221,13 @@ class RomeExtensionsKtTest {
             ),
             mockSyndEntry(
                 uri = "id",
-                contents = listOf(
-                    mockSyndContent(value = "PLAIN", type = "text"),
-                    mockSyndContent(value = "<b>html</b>", type = "html"),
-                    mockSyndContent(value = null, type = "xhtml"),
-                    mockSyndContent(value = "bah", type = null),
-                ),
+                contents =
+                    listOf(
+                        mockSyndContent(value = "PLAIN", type = "text"),
+                        mockSyndContent(value = "<b>html</b>", type = "html"),
+                        mockSyndContent(value = null, type = "xhtml"),
+                        mockSyndContent(value = "bah", type = null),
+                    ),
             ).asItem(baseUrl),
         )
     }
@@ -238,11 +246,12 @@ class RomeExtensionsKtTest {
             ),
             mockSyndEntry(
                 uri = "id",
-                contents = listOf(
-                    mockSyndContent(value = "<b>html</b>", type = "html"),
-                    mockSyndContent(value = null, type = "xhtml"),
-                    mockSyndContent(value = "bah", type = null),
-                ),
+                contents =
+                    listOf(
+                        mockSyndContent(value = "<b>html</b>", type = "html"),
+                        mockSyndContent(value = null, type = "xhtml"),
+                        mockSyndContent(value = "bah", type = null),
+                    ),
             ).asItem(baseUrl),
         )
     }
@@ -261,10 +270,11 @@ class RomeExtensionsKtTest {
             ),
             mockSyndEntry(
                 uri = "id",
-                contents = listOf(
-                    mockSyndContent(value = "<b>html</b>", type = "html"),
-                    mockSyndContent(value = null, type = "xhtml"),
-                ),
+                contents =
+                    listOf(
+                        mockSyndContent(value = "<b>html</b>", type = "html"),
+                        mockSyndContent(value = null, type = "xhtml"),
+                    ),
             ).asItem(baseUrl),
         )
     }
@@ -283,9 +293,10 @@ class RomeExtensionsKtTest {
             ),
             mockSyndEntry(
                 uri = "id",
-                contents = listOf(
-                    mockSyndContent(value = "foo"),
-                ),
+                contents =
+                    listOf(
+                        mockSyndContent(value = "foo"),
+                    ),
             ).asItem(baseUrl),
         )
     }
@@ -396,16 +407,18 @@ class RomeExtensionsKtTest {
             ),
             mockSyndEntry(
                 uri = "id",
-                thumbnails = arrayOf(
-                    mockThumbnail(
-                        url = URI.create(
-                            "data:image/png;base64,iVBORw0KGgoAAA" +
-                                "ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
-                                "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU" +
-                                "5ErkJggg==",
+                thumbnails =
+                    arrayOf(
+                        mockThumbnail(
+                            url =
+                                URI.create(
+                                    "data:image/png;base64,iVBORw0KGgoAAA" +
+                                        "ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
+                                        "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU" +
+                                        "5ErkJggg==",
+                                ),
                         ),
                     ),
-                ),
             ).asItem(baseUrl),
         )
     }
@@ -431,17 +444,20 @@ class RomeExtensionsKtTest {
 
     @Test
     fun thumbnailFromHtmlDescriptionIsUnescaped() {
-        val description = mockSyndContent(
-            value = """
+        val description =
+            mockSyndContent(
+                value =
+                    """
                     <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
-            """.trimIndent(),
-            type = null,
-        )
+                    """.trimIndent(),
+                type = null,
+            )
 
-        val item = mockSyndEntry(
-            uri = "id",
-            description = description,
-        ).asItem(baseUrl)
+        val item =
+            mockSyndEntry(
+                uri = "id",
+                description = description,
+            ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
@@ -451,17 +467,20 @@ class RomeExtensionsKtTest {
 
     @Test
     fun thumbnailFromTypeTextIsFound() {
-        val description = mockSyndContent(
-            value = """
-            <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
-            """.trimIndent(),
-            type = "text",
-        )
+        val description =
+            mockSyndContent(
+                value =
+                    """
+                    <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+                    """.trimIndent(),
+                type = "text",
+            )
 
-        val item = mockSyndEntry(
-            uri = "id",
-            description = description,
-        ).asItem(baseUrl)
+        val item =
+            mockSyndEntry(
+                uri = "id",
+                description = description,
+            ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
@@ -471,17 +490,20 @@ class RomeExtensionsKtTest {
 
     @Test
     fun thumbnailFromTypeHtmlIsFound() {
-        val description = mockSyndContent(
-            value = """
-                <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
-            """.trimIndent(),
-            type = "html",
-        )
+        val description =
+            mockSyndContent(
+                value =
+                    """
+                    <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+                    """.trimIndent(),
+                type = "html",
+            )
 
-        val item = mockSyndEntry(
-            uri = "id",
-            description = description,
-        ).asItem(baseUrl)
+        val item =
+            mockSyndEntry(
+                uri = "id",
+                description = description,
+            ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
@@ -491,15 +513,17 @@ class RomeExtensionsKtTest {
 
     @Test
     fun thumbnailFromEnclosureIsFound() {
-        val item = mockSyndEntry(
-            uri = "id",
-            enclosures = listOf(
-                mockSyndEnclosure(
-                    url = "http://foo/bar.png",
-                    type = "image/png",
-                ),
-            ),
-        ).asItem(baseUrl)
+        val item =
+            mockSyndEntry(
+                uri = "id",
+                enclosures =
+                    listOf(
+                        mockSyndEnclosure(
+                            url = "http://foo/bar.png",
+                            type = "image/png",
+                        ),
+                    ),
+            ).asItem(baseUrl)
 
         assertEquals(
             "http://foo/bar.png",
@@ -612,7 +636,11 @@ class RomeExtensionsKtTest {
         return mock
     }
 
-    private fun mockSyndLink(href: String, rel: String? = null, type: String? = null): SyndLink {
+    private fun mockSyndLink(
+        href: String,
+        rel: String? = null,
+        type: String? = null,
+    ): SyndLink {
         val mock = mock(SyndLink::class.java)
 
         `when`(mock.href).thenReturn(href)
@@ -666,7 +694,10 @@ class RomeExtensionsKtTest {
         return mock
     }
 
-    private fun mockSyndContent(value: String? = null, type: String? = null): SyndContent {
+    private fun mockSyndContent(
+        value: String? = null,
+        type: String? = null,
+    ): SyndContent {
         val mock = mock(SyndContent::class.java)
 
         `when`(mock.value).thenReturn(value)
@@ -698,7 +729,10 @@ class RomeExtensionsKtTest {
     }
 
     @Suppress("SameParameterValue")
-    private fun mockMediaContent(url: String? = null, medium: String? = null): MediaContent {
+    private fun mockMediaContent(
+        url: String? = null,
+        medium: String? = null,
+    ): MediaContent {
         val mock = mock(MediaContent::class.java)
         var mockRef: Reference? = null
 

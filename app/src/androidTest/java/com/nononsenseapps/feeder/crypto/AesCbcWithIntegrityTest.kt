@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.crypto
 
-import kotlin.test.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class AesCbcWithIntegrityTest {
     @Test

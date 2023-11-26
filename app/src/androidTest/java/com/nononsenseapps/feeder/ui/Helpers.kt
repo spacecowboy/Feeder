@@ -10,7 +10,7 @@ suspend fun <T> whileNotEq(
     other: Any?,
     timeoutMillis: Long = 500,
     sleepMillis: Long = 50,
-    body: (suspend () -> T)
+    body: (suspend () -> T),
 ): T =
     withTimeout(timeoutMillis) {
         var item = body.invoke()
@@ -28,7 +28,7 @@ suspend fun <T> whileEq(
     other: Any?,
     timeoutMillis: Long = 500,
     sleepMillis: Long = 50,
-    body: (suspend () -> T)
+    body: (suspend () -> T),
 ): T =
     withTimeout(timeoutMillis) {
         var item = body.invoke()
@@ -46,13 +46,13 @@ suspend fun <T> untilNotEq(
     other: Any?,
     timeoutMillis: Long = 500,
     sleepMillis: Long = 50,
-    body: (suspend () -> T)
+    body: (suspend () -> T),
 ): T =
     whileEq(
         other = other,
         timeoutMillis = timeoutMillis,
         sleepMillis = sleepMillis,
-        body = body
+        body = body,
     )
 
 /**
@@ -62,11 +62,11 @@ suspend fun <T> untilEq(
     other: Any?,
     timeoutMillis: Long = 500,
     sleepMillis: Long = 50,
-    body: (suspend () -> T)
+    body: (suspend () -> T),
 ): T =
     whileNotEq(
         other = other,
         timeoutMillis = timeoutMillis,
         sleepMillis = sleepMillis,
-        body = body
+        body = body,
     )

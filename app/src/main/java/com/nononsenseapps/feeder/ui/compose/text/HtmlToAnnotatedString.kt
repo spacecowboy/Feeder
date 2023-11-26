@@ -3,11 +3,11 @@ package com.nononsenseapps.feeder.ui.compose.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.BaselineShift
-import java.io.InputStream
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
+import java.io.InputStream
 
 /**
  * Returns "plain text" with annotations for TTS
@@ -308,11 +308,12 @@ private fun AnnotatedStringComposer.appendTextChildren(
                             element.children()
                             element.children()
                                 .filter {
-                                    it.tagName() in setOf(
-                                        "thead",
-                                        "tbody",
-                                        "tfoot",
-                                    )
+                                    it.tagName() in
+                                        setOf(
+                                            "thead",
+                                            "tbody",
+                                            "tfoot",
+                                        )
                                 }
                                 .sortedBy {
                                     when (it.tagName()) {

@@ -11,9 +11,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
 import org.kodein.di.compose.withDI
 
 @Composable
-fun DIAwareComponentActivity.withAllProviders(
-    content: @Composable () -> Unit,
-) {
+fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
     withDI {
         val viewModel: CommonActivityViewModel = diAwareViewModel()
         val currentTheme by viewModel.currentTheme.collectAsStateWithLifecycle()

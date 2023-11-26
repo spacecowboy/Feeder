@@ -8,9 +8,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
-fun WindowInsets.addMargin(
-    all: Dp = 0.dp,
-) = addMargin(vertical = all, horizontal = all)
+fun WindowInsets.addMargin(all: Dp = 0.dp) = addMargin(vertical = all, horizontal = all)
 
 fun WindowInsets.addMargin(
     vertical: Dp = 0.dp,
@@ -31,14 +29,16 @@ fun WindowInsets.addMarginLayout(
 ): WindowInsets {
     val layoutDirection = LocalLayoutDirection.current
     return addMargin(
-        left = when (layoutDirection) {
-            LayoutDirection.Ltr -> start
-            LayoutDirection.Rtl -> end
-        },
-        right = when (layoutDirection) {
-            LayoutDirection.Ltr -> end
-            LayoutDirection.Rtl -> start
-        },
+        left =
+            when (layoutDirection) {
+                LayoutDirection.Ltr -> start
+                LayoutDirection.Rtl -> end
+            },
+        right =
+            when (layoutDirection) {
+                LayoutDirection.Ltr -> end
+                LayoutDirection.Rtl -> start
+            },
         top = top,
         bottom = bottom,
     )

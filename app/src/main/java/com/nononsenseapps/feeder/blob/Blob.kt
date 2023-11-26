@@ -7,24 +7,36 @@ import java.io.OutputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-fun blobFile(itemId: Long, filesDir: File): File =
-    File(filesDir, "$itemId.txt.gz")
+fun blobFile(
+    itemId: Long,
+    filesDir: File,
+): File = File(filesDir, "$itemId.txt.gz")
 
 @Throws(IOException::class)
-fun blobInputStream(itemId: Long, filesDir: File): InputStream =
-    GZIPInputStream(blobFile(itemId = itemId, filesDir = filesDir).inputStream())
+fun blobInputStream(
+    itemId: Long,
+    filesDir: File,
+): InputStream = GZIPInputStream(blobFile(itemId = itemId, filesDir = filesDir).inputStream())
 
 @Throws(IOException::class)
-fun blobOutputStream(itemId: Long, filesDir: File): OutputStream =
-    GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
+fun blobOutputStream(
+    itemId: Long,
+    filesDir: File,
+): OutputStream = GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
 
-fun blobFullFile(itemId: Long, filesDir: File): File =
-    File(filesDir, "$itemId.full.html.gz")
+fun blobFullFile(
+    itemId: Long,
+    filesDir: File,
+): File = File(filesDir, "$itemId.full.html.gz")
 
 @Throws(IOException::class)
-fun blobFullInputStream(itemId: Long, filesDir: File): InputStream =
-    GZIPInputStream(blobFullFile(itemId = itemId, filesDir = filesDir).inputStream())
+fun blobFullInputStream(
+    itemId: Long,
+    filesDir: File,
+): InputStream = GZIPInputStream(blobFullFile(itemId = itemId, filesDir = filesDir).inputStream())
 
 @Throws(IOException::class)
-fun blobFullOutputStream(itemId: Long, filesDir: File): OutputStream =
-    GZIPOutputStream(blobFullFile(itemId = itemId, filesDir = filesDir).outputStream())
+fun blobFullOutputStream(
+    itemId: Long,
+    filesDir: File,
+): OutputStream = GZIPOutputStream(blobFullFile(itemId = itemId, filesDir = filesDir).outputStream())

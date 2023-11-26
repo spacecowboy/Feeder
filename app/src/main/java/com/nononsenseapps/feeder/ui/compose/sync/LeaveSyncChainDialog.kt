@@ -18,7 +18,7 @@ fun LeaveSyncChainDialog(
 
 @Preview
 @Composable
-fun PreviewLeaveSyncChainDialog() {
+private fun PreviewLeaveSyncChainDialog() {
     LeaveSyncChainDialog(
         onDismiss = {},
         onOk = {},

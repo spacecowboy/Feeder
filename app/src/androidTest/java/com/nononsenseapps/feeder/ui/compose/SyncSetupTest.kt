@@ -16,7 +16,6 @@ import org.kodein.di.compose.withDI
 
 @Ignore
 class SyncSetupTest : BaseComposeTest {
-
     @get:Rule
     override val composeTestRule = createAndroidComposeRule<MainActivity>()
 

@@ -13,13 +13,12 @@ import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFeed(feed: Feed): Long
 
@@ -70,13 +69,19 @@ interface FeedDao {
        AND last_sync < :staleTime
     """,
     )
-    suspend fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
+    suspend fun loadFeedIfStale(
+        feedId: Long,
+        staleTime: Long,
+    ): Feed?
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag")
     suspend fun loadFeeds(tag: String): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime")
-    suspend fun loadFeedsIfStale(tag: String, staleTime: Long): List<Feed>
+    suspend fun loadFeedsIfStale(
+        tag: String,
+        staleTime: Long,
+    ): List<Feed>
 
     @Query("SELECT * FROM feeds")
     suspend fun loadFeeds(): List<Feed>
@@ -115,10 +120,16 @@ interface FeedDao {
     fun loadFlowOfFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
-    suspend fun setNotify(id: Long, notify: Boolean)
+    suspend fun setNotify(
+        id: Long,
+        notify: Boolean,
+    )
 
     @Query("UPDATE feeds SET notify = :notify WHERE tag IS :tag")
-    suspend fun setNotify(tag: String, notify: Boolean)
+    suspend fun setNotify(
+        tag: String,
+        notify: Boolean,
+    )
 
     @Query("UPDATE feeds SET notify = :notify")
     suspend fun setAllNotify(notify: Boolean)
@@ -161,7 +172,10 @@ interface FeedDao {
             WHERE id IS :feedId
         """,
     )
-    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean)
+    suspend fun setCurrentlySyncingOn(
+        feedId: Long,
+        syncing: Boolean,
+    )
 
     @Query(
         """
@@ -170,7 +184,11 @@ interface FeedDao {
             WHERE id IS :feedId
         """,
     )
-    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant)
+    suspend fun setCurrentlySyncingOn(
+        feedId: Long,
+        syncing: Boolean,
+        lastSync: Instant,
+    )
 
     @Query(
         """

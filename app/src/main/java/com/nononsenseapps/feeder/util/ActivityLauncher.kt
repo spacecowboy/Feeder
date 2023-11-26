@@ -37,7 +37,10 @@ class ActivityLauncher(
     /**
      * Returns true if activity was launched, false if no such activity
      */
-    fun startActivity(openAdjacentIfSuitable: Boolean, intent: Intent): Boolean {
+    fun startActivity(
+        openAdjacentIfSuitable: Boolean,
+        intent: Intent,
+    ): Boolean {
         return try {
             activity.startActivity(intent.openAdjacentIfSuitable(openAdjacentIfSuitable))
             true
@@ -67,12 +70,16 @@ class ActivityLauncher(
     /**
      * Returns true if activity was launched, false if no such activity
      */
-    fun openLinkInBrowser(link: String, openAdjacentIfSuitable: Boolean = true): Boolean {
+    fun openLinkInBrowser(
+        link: String,
+        openAdjacentIfSuitable: Boolean = true,
+    ): Boolean {
         return startActivity(
             openAdjacentIfSuitable = openAdjacentIfSuitable,
-            intent = Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
-                it.putExtra(Browser.EXTRA_CREATE_NEW_TAB, true)
-            },
+            intent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
+                    it.putExtra(Browser.EXTRA_CREATE_NEW_TAB, true)
+                },
         )
     }
 
@@ -86,12 +93,13 @@ class ActivityLauncher(
     ): Boolean {
         return try {
             val uri = Uri.parse(link)
-            val intent = CustomTabsIntent.Builder().apply {
-                setToolbarColor(toolbarColor)
-                addDefaultShareMenuItem()
-            }.build().intent.apply {
-                data = uri
-            }
+            val intent =
+                CustomTabsIntent.Builder().apply {
+                    setToolbarColor(toolbarColor)
+                    addDefaultShareMenuItem()
+                }.build().intent.apply {
+                    data = uri
+                }
             return startActivity(openAdjacentIfSuitable, intent)
         } catch (e: ActivityNotFoundException) {
             Log.e(LOG_TAG, "Failed to custom tab", e)

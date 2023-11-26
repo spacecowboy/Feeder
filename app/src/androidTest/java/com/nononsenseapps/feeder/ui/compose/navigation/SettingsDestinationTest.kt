@@ -4,10 +4,10 @@ import androidx.navigation.NavController
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @Ignore
 class SettingsDestinationTest {
@@ -23,14 +23,14 @@ class SettingsDestinationTest {
     fun settingsHasCorrectRoute() {
         assertEquals(
             "settings",
-            SettingsDestination.route
+            SettingsDestination.route,
         )
     }
 
     @Test
     fun settingsNavigateDefaults() {
         SettingsDestination.navigate(
-            navController
+            navController,
         )
 
         verify {

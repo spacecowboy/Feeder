@@ -6,10 +6,10 @@ import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @Ignore
 class FeedDestinationTest {
@@ -25,7 +25,7 @@ class FeedDestinationTest {
     fun feedHasCorrectRoute() {
         assertEquals(
             "feed?id={id}&tag={tag}",
-            FeedDestination.route
+            FeedDestination.route,
         )
     }
 
@@ -33,16 +33,16 @@ class FeedDestinationTest {
     fun feedHasCorrectDeeplinks() {
         assertEquals(
             listOf(
-                "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
+                "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}",
             ),
-            FeedDestination.deepLinks.map { it.uriPattern }
+            FeedDestination.deepLinks.map { it.uriPattern },
         )
     }
 
     @Test
     fun feedNavigateDefaults() {
         FeedDestination.navigate(
-            navController
+            navController,
         )
 
         verify {
@@ -54,7 +54,7 @@ class FeedDestinationTest {
     fun feedNavigateId() {
         FeedDestination.navigate(
             navController,
-            feedId = 6L
+            feedId = 6L,
         )
 
         verify {
@@ -66,7 +66,7 @@ class FeedDestinationTest {
     fun feedNavigateTag() {
         FeedDestination.navigate(
             navController,
-            tag = "foo bar+cop"
+            tag = "foo bar+cop",
         )
 
         verify {
@@ -79,7 +79,7 @@ class FeedDestinationTest {
         FeedDestination.navigate(
             navController,
             feedId = ID_ALL_FEEDS,
-            tag = "foo bar+cop"
+            tag = "foo bar+cop",
         )
 
         verify {

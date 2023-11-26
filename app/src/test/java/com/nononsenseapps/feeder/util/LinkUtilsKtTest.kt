@@ -1,11 +1,11 @@
 package com.nononsenseapps.feeder.util
 
+import org.junit.Test
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
-import org.junit.Test
 
 class LinkUtilsKtTest {
     @Test

@@ -7,10 +7,11 @@ object RssContentProviderContract {
     /**
      * Columns available via the content provider
      */
-    val feedsColumns = listOf(
-        "id",
-        "title",
-    )
+    val feedsColumns =
+        listOf(
+            "id",
+            "title",
+        )
 
     const val articlesMimeTypeList = "vnd.android.cursor.dir/vnd.rssprovider.items"
     const val articlesUriPathList = "articles"
@@ -20,9 +21,10 @@ object RssContentProviderContract {
     /**
      * Columns available via the content provider
      */
-    val articlesColumns = listOf(
-        "id",
-        "title",
-        "text",
-    )
+    val articlesColumns =
+        listOf(
+            "id",
+            "title",
+            "text",
+        )
 }
