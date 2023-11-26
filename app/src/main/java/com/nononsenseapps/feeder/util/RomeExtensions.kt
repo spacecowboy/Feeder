@@ -1,11 +1,14 @@
 package com.nononsenseapps.feeder.util
 
 import android.util.Log
+import com.nononsenseapps.feeder.model.EnclosureImage
+import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.model.ParsedArticle
+import com.nononsenseapps.feeder.model.ParsedAuthor
+import com.nononsenseapps.feeder.model.ParsedEnclosure
+import com.nononsenseapps.feeder.model.ParsedFeed
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
-import com.nononsenseapps.jsonfeed.Attachment
-import com.nononsenseapps.jsonfeed.Author
-import com.nononsenseapps.jsonfeed.Feed
-import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.MediaContent
@@ -21,8 +24,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-fun SyndFeed.asFeed(baseUrl: URL): Feed {
-    val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
+fun SyndFeed.asFeed(baseUrl: URL): ParsedFeed {
+    val feedAuthor: ParsedAuthor? = this.authors?.firstOrNull()?.asAuthor()
 
     val siteUrl =
         relativeLinkIntoAbsoluteOrNull(
@@ -47,7 +50,7 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
         }
 
     try {
-        return Feed(
+        return ParsedFeed(
             title = plainTitle(),
             home_page_url = siteUrl,
             feed_url =
@@ -67,8 +70,8 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
 
 fun SyndEntry.asItem(
     baseUrl: URL,
-    feedAuthor: Author? = null,
-): Item {
+    feedAuthor: ParsedAuthor? = null,
+): ParsedArticle {
     try {
         val contentText =
             contentText().orIfBlank {
@@ -78,17 +81,17 @@ fun SyndEntry.asItem(
         val image =
             thumbnail(baseUrl)?.let { img ->
                 when {
-                    img.startsWith("data:") -> null
+                    img.url.startsWith("data:") -> null
                     else -> img
                 }
             }
         val writer =
             when (author?.isNotBlank()) {
-                true -> Author(name = author)
+                true -> ParsedAuthor(name = author)
                 else -> feedAuthor
             }
 
-        return Item(
+        return ParsedArticle(
             id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
             url = linkToHtml(baseUrl),
             title = plainTitle(),
@@ -135,8 +138,8 @@ fun SyndEntry.linkToHtml(feedBaseUrl: URL): String? {
     return null
 }
 
-fun SyndEnclosure.asAttachment(baseUrl: URL): Attachment {
-    return Attachment(
+fun SyndEnclosure.asAttachment(baseUrl: URL): ParsedEnclosure {
+    return ParsedEnclosure(
         url =
             relativeLinkIntoAbsoluteOrNull(
                 baseUrl,
@@ -147,14 +150,14 @@ fun SyndEnclosure.asAttachment(baseUrl: URL): Attachment {
     )
 }
 
-fun SyndPerson.asAuthor(): Author {
+fun SyndPerson.asAuthor(): ParsedAuthor {
     val url: String? =
         when {
             this.uri != null -> this.uri
             this.email != null -> "mailto:${this.email}"
             else -> null
         }
-    return Author(
+    return ParsedAuthor(
         name = this.name,
         url = url,
     )
@@ -237,16 +240,16 @@ fun SyndEntry.mediaDescription(): String? {
 /**
  * Returns an absolute link, or null
  */
-fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
+fun SyndEntry.thumbnail(feedBaseUrl: URL): ThumbnailImage? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
     val thumbnailCandidates =
         sequence {
-            media?.findThumbnailCandidates()?.let {
+            media?.findThumbnailCandidates(feedBaseUrl)?.let {
                 yieldAll(it)
             }
             enclosures?.asSequence()
-                ?.mapNotNull { it.findThumbnailCandidate() }
+                ?.mapNotNull { it.findThumbnailCandidate(feedBaseUrl) }
                 ?.let {
                     yieldAll(it)
                 }
@@ -255,7 +258,7 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val thumbnail = thumbnailCandidates.maxByOrNull { it.width ?: -1 }
 
     return when {
-        thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail.url)
+        thumbnail != null -> thumbnail
         else -> {
             // Now we are resolving against original, not the feed
             val baseUrl: String = this.linkToHtml(feedBaseUrl) ?: feedBaseUrl.toString()
@@ -264,60 +267,54 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     }
 }
 
-data class ThumbnailCandidate(
-    val width: Int?,
-    val height: Int?,
-    val url: String,
-)
-
-private fun MediaEntryModule.findThumbnailCandidates(): Sequence<ThumbnailCandidate> {
+private fun MediaEntryModule.findThumbnailCandidates(feedBaseUrl: URL): Sequence<ThumbnailImage> {
     return sequence {
         mediaContents?.forEach { mediaContent ->
-            yieldAll(mediaContent.findThumbnailCandidates())
+            yieldAll(mediaContent.findThumbnailCandidates(feedBaseUrl))
         }
         metadata?.thumbnail?.let { thumbnails ->
             yieldAll(
-                thumbnails.mapNotNull { it.findThumbnailCandidate() },
+                thumbnails.mapNotNull { it.findThumbnailCandidate(feedBaseUrl) },
             )
         }
         mediaGroups?.forEach { mediaGroup ->
-            yieldAll(mediaGroup.findThumbnailCandidates())
+            yieldAll(mediaGroup.findThumbnailCandidates(feedBaseUrl))
         }
     }
 }
 
-private fun SyndEnclosure.findThumbnailCandidate(): ThumbnailCandidate? {
+private fun SyndEnclosure.findThumbnailCandidate(feedBaseUrl: URL): ThumbnailImage? {
     if (type?.startsWith("image/") == true) {
         url?.let { url ->
-            return ThumbnailCandidate(width = null, height = null, url = url)
+            return EnclosureImage(width = null, height = null, url = relativeLinkIntoAbsolute(feedBaseUrl, url))
         }
     }
     return null
 }
 
-private fun MediaGroup.findThumbnailCandidates(): Sequence<ThumbnailCandidate> =
+private fun MediaGroup.findThumbnailCandidates(feedBaseUrl: URL): Sequence<ThumbnailImage> =
     sequence {
         metadata.thumbnail?.forEach { thumbnail ->
-            thumbnail.findThumbnailCandidate()?.let { thumbnailCandidate ->
+            thumbnail.findThumbnailCandidate(feedBaseUrl)?.let { thumbnailCandidate ->
                 yield(thumbnailCandidate)
             }
         }
     }
 
-private fun Thumbnail.findThumbnailCandidate(): ThumbnailCandidate? {
+private fun Thumbnail.findThumbnailCandidate(feedBaseUrl: URL): ThumbnailImage? {
     return url?.let { url ->
-        ThumbnailCandidate(
+        MediaImage(
             width = width,
             height = height,
-            url = url.toString(),
+            url = relativeLinkIntoAbsolute(feedBaseUrl, url.toString()),
         )
     }
 }
 
-private fun MediaContent.findThumbnailCandidates(): Sequence<ThumbnailCandidate> =
+private fun MediaContent.findThumbnailCandidates(feedBaseUrl: URL): Sequence<ThumbnailImage> =
     sequence {
         metadata?.thumbnail?.forEach { thumbnail ->
-            thumbnail.findThumbnailCandidate()?.let { thumbnailCandidate ->
+            thumbnail.findThumbnailCandidate(feedBaseUrl)?.let { thumbnailCandidate ->
                 yield(thumbnailCandidate)
             }
         }
@@ -325,10 +322,10 @@ private fun MediaContent.findThumbnailCandidates(): Sequence<ThumbnailCandidate>
         if (isImage()) {
             reference?.let { ref ->
                 yield(
-                    ThumbnailCandidate(
+                    MediaImage(
                         width = width,
                         height = height,
-                        url = ref.toString(),
+                        url = relativeLinkIntoAbsolute(feedBaseUrl, ref.toString()),
                     ),
                 )
             }

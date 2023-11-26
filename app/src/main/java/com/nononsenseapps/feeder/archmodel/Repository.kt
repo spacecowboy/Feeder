@@ -796,6 +796,8 @@ data class Article(
     val bookmarked: Boolean = item?.bookmarked ?: false
     val wordCount: Int = item?.wordCount ?: 0
     val wordCountFull: Int = item?.wordCountFull ?: 0
+    val image: String? = item?.imageUrl
+    val imageFromBody: Boolean = item?.imageFromBody ?: false
 }
 
 enum class TextToDisplay {

@@ -83,12 +83,14 @@ fun ReaderView(
     wordCount: Int,
     onEnclosureClick: () -> Unit,
     onFeedTitleClick: () -> Unit,
+    enclosure: Enclosure,
+    articleTitle: String,
+    feedTitle: String,
+    authorDate: String?,
+    image: String?,
+    imageFromBody: Boolean,
     modifier: Modifier = Modifier,
     articleListState: LazyListState = rememberLazyListState(),
-    enclosure: Enclosure = Enclosure(),
-    articleTitle: String = "Article title on top",
-    feedTitle: String = "Feed Title is here",
-    authorDate: String? = "2018-01-02",
     articleBody: LazyListScope.() -> Unit,
 ) {
     val dimens = LocalDimens.current
@@ -142,17 +144,19 @@ fun ReaderView(
                                 }
                             },
                 ) {
-                    WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
-                        val interactionSource = remember { MutableInteractionSource() }
-                        Text(
-                            text = articleTitle,
-                            style = MaterialTheme.typography.headlineLarge,
-                            modifier =
-                                Modifier
-                                    .indication(interactionSource, LocalIndication.current)
-                                    .focusableInNonTouchMode(interactionSource = interactionSource)
-                                    .width(dimens.maxReaderWidth),
-                        )
+                    if (articleTitle.isNotBlank()) {
+                        WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
+                            val interactionSource = remember { MutableInteractionSource() }
+                            Text(
+                                text = articleTitle,
+                                style = MaterialTheme.typography.headlineLarge,
+                                modifier =
+                                    Modifier
+                                        .indication(interactionSource, LocalIndication.current)
+                                        .focusableInNonTouchMode(interactionSource = interactionSource)
+                                        .width(dimens.maxReaderWidth),
+                            )
+                        }
                     }
                     ProvideScaledText(
                         style =
@@ -206,7 +210,10 @@ fun ReaderView(
                                     )
                                     val seconds = "%02d".format(readTimeSecs % 60)
                                     val readTimeText =
-                                        pluralStringResource(id = R.plurals.n_minutes, count = readTimeSecs / 60)
+                                        pluralStringResource(
+                                            id = R.plurals.n_minutes,
+                                            count = readTimeSecs / 60,
+                                        )
                                             .format(
                                                 "${readTimeSecs / 60}:$seconds",
                                             )
@@ -234,47 +241,8 @@ fun ReaderView(
 
             if (enclosure.present) {
                 item {
-                    if (enclosure.isImage) {
-                        BoxWithConstraints(
-                            modifier =
-                                Modifier
-                                    .clip(RectangleShape)
-                                    .fillMaxWidth(),
-                        ) {
-                            WithTooltipIfNotBlank(tooltip = enclosure.name) { innerModifier ->
-                                val imageWidth by rememberMaxImageWidth()
-                                AsyncImage(
-                                    model =
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(enclosure.link)
-                                            .scale(Scale.FIT)
-                                            .size(imageWidth)
-                                            .precision(Precision.INEXACT)
-                                            .build(),
-                                    contentDescription = enclosure.name,
-                                    placeholder =
-                                        rememberTintedVectorPainter(
-                                            Icons.Outlined.Terrain,
-                                        ),
-                                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                    contentScale =
-                                        if (dimens.hasImageAspectRatioInReader) {
-                                            ContentScale.Fit
-                                        } else {
-                                            ContentScale.FillWidth
-                                        },
-                                    modifier =
-                                        innerModifier
-                                            .fillMaxWidth()
-                                            .run {
-                                                dimens.imageAspectRatioInReader?.let { ratio ->
-                                                    aspectRatio(ratio)
-                                                } ?: this
-                                            },
-                                )
-                            }
-                        }
-                    } else {
+                    // Image will be shown in block below
+                    if (!enclosure.isImage) {
                         val openLabel =
                             if (enclosure.name.isBlank()) {
                                 stringResource(R.string.open_enclosed_media)
@@ -320,6 +288,50 @@ fun ReaderView(
                 }
             }
 
+            if (!imageFromBody && image != null) {
+                item {
+                    BoxWithConstraints(
+                        modifier =
+                            Modifier
+                                .clip(RectangleShape)
+                                .fillMaxWidth(),
+                    ) {
+                        WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) { innerModifier ->
+                            val imageWidth by rememberMaxImageWidth()
+                            AsyncImage(
+                                model =
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .data(image)
+                                        .scale(Scale.FIT)
+                                        .size(imageWidth)
+                                        .precision(Precision.INEXACT)
+                                        .build(),
+                                contentDescription = enclosure.name,
+                                placeholder =
+                                    rememberTintedVectorPainter(
+                                        Icons.Outlined.Terrain,
+                                    ),
+                                error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                contentScale =
+                                    if (dimens.hasImageAspectRatioInReader) {
+                                        ContentScale.Fit
+                                    } else {
+                                        ContentScale.FillWidth
+                                    },
+                                modifier =
+                                    innerModifier
+                                        .fillMaxWidth()
+                                        .run {
+                                            dimens.imageAspectRatioInReader?.let { ratio ->
+                                                aspectRatio(ratio)
+                                            } ?: this
+                                        },
+                            )
+                        }
+                    }
+                }
+            }
+
             articleBody()
         }
     }
@@ -335,6 +347,12 @@ private fun ReaderPreview() {
                 wordCount = 9700,
                 onEnclosureClick = {},
                 onFeedTitleClick = {},
+                enclosure = Enclosure(),
+                articleTitle = "Article title on top",
+                feedTitle = "Feed Title is here",
+                authorDate = "2018-01-02",
+                image = "https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png",
+                imageFromBody = false,
             ) {}
         }
     }

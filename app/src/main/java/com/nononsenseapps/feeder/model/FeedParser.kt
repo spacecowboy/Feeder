@@ -9,7 +9,10 @@ import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
+import com.nononsenseapps.jsonfeed.Attachment
+import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.Feed
+import com.nononsenseapps.jsonfeed.Item
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
@@ -204,7 +207,7 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, Feed> {
+    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
         return client.curlAndOnResponse(url) {
             parseFeedResponse(it)
         }
@@ -214,7 +217,7 @@ class FeedParser(override val di: DI) : DIAware {
             }
     }
 
-    internal fun parseFeedResponse(response: Response): Either<FeedParserError, Feed> {
+    internal fun parseFeedResponse(response: Response): Either<FeedParserError, ParsedFeed> {
         return response.body?.use {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
@@ -230,7 +233,7 @@ class FeedParser(override val di: DI) : DIAware {
     fun parseFeedResponse(
         url: URL,
         responseBody: ResponseBody,
-    ): Either<FeedParserError, Feed> {
+    ): Either<FeedParserError, ParsedFeed> {
         return when (responseBody.contentType()?.subtype?.contains("json")) {
             true ->
                 Either.catching(
@@ -238,7 +241,7 @@ class FeedParser(override val di: DI) : DIAware {
                         JsonFeedParseError(url = url.toString(), throwable = t)
                     },
                 ) {
-                    jsonFeedParser.parseJson(responseBody)
+                    jsonFeedParser.parseJson(responseBody).asParsedFeed()
                 }
 
             else -> parseRssAtom(url, responseBody)
@@ -260,7 +263,7 @@ class FeedParser(override val di: DI) : DIAware {
         url: URL,
         body: String,
         contentType: MediaType?,
-    ): Either<FeedParserError, Feed> {
+    ): Either<FeedParserError, ParsedFeed> {
         return when (contentType?.subtype?.contains("json")) {
             true ->
                 Either.catching(
@@ -268,7 +271,7 @@ class FeedParser(override val di: DI) : DIAware {
                         JsonFeedParseError(url = url.toString(), throwable = t)
                     },
                 ) {
-                    jsonFeedParser.parseJson(body)
+                    jsonFeedParser.parseJson(body).asParsedFeed()
                 }
 
             else -> parseRssAtom(url, body)
@@ -286,7 +289,7 @@ class FeedParser(override val di: DI) : DIAware {
     private fun parseRssAtom(
         url: URL,
         responseBody: ResponseBody,
-    ): Either<FeedParserError, Feed> {
+    ): Either<FeedParserError, ParsedFeed> {
         val contentType = responseBody.contentType()
         val validMimeType =
             when (contentType?.type) {
@@ -334,7 +337,7 @@ class FeedParser(override val di: DI) : DIAware {
     internal fun parseRssAtom(
         baseUrl: URL,
         body: String,
-    ): Either<FeedParserError, Feed> {
+    ): Either<FeedParserError, ParsedFeed> {
         return Either.catching(
             onCatch = { t ->
                 RSSParseError(url = baseUrl.toString(), throwable = t)
@@ -358,6 +361,54 @@ class FeedParser(override val di: DI) : DIAware {
         private const val LOG_TAG = "FEEDER_FEEDPARSER"
     }
 }
+
+private fun Feed.asParsedFeed() =
+    ParsedFeed(
+        title = title,
+        home_page_url = home_page_url,
+        feed_url = feed_url,
+        description = description,
+        user_comment = user_comment,
+        next_url = next_url,
+        icon = icon,
+        favicon = favicon,
+        author = author?.asParsedAuthor(),
+        expired = expired,
+        items = items?.map { it.asParsedArticle() },
+    )
+
+private fun Item.asParsedArticle() =
+    ParsedArticle(
+        id = id,
+        url = url,
+        external_url = external_url,
+        title = title,
+        content_html = content_html,
+        content_text = content_text,
+        summary = summary,
+        image = image?.let { MediaImage(url = it, width = null, height = null) },
+        date_published = date_published,
+        date_modified = date_modified,
+        author = author?.asParsedAuthor(),
+        tags = tags,
+        attachments = attachments?.map { it.asParsedEnclosure() },
+    )
+
+private fun Attachment.asParsedEnclosure() =
+    ParsedEnclosure(
+        title = title,
+        url = url,
+        mime_type = mime_type,
+        size_in_bytes = size_in_bytes,
+        duration_in_seconds = duration_in_seconds,
+    )
+
+private fun Author?.asParsedAuthor() =
+    ParsedAuthor(
+        name = this?.name,
+        url = this?.url,
+        avatar = this?.avatar,
+    )
 
 class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 

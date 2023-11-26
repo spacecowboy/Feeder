@@ -1,12 +1,13 @@
 package com.nononsenseapps.feeder.util
 
+import com.nononsenseapps.feeder.model.ImageFromHTML
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser.unescapeEntities
 
 fun findFirstImageLinkInHtml(
     text: String?,
     baseUrl: String?,
-): String? =
+): ImageFromHTML? =
     if (text != null) {
         val doc =
             unescapeEntities(text, true).byteInputStream().use {
@@ -18,12 +19,16 @@ fun findFirstImageLinkInHtml(
             .map {
                 // abs: will resolve relative urls against the baseurl - and non-url value will get
                 // dropped, such as invalid values and data/base64 values
-                it.attr("abs:src")
+                ImageFromHTML(
+                    url = it.attr("abs:src"),
+                    width = it.attr("width").toIntOrNull(),
+                    height = it.attr("height").toIntOrNull(),
+                )
             }
             .firstOrNull {
-                it.isNotBlank() &&
-                    !it.contains("twitter_icon", ignoreCase = true) &&
-                    !it.contains("facebook_icon", ignoreCase = true)
+                it.url.isNotBlank() &&
+                    !it.url.contains("twitter_icon", ignoreCase = true) &&
+                    !it.url.contains("facebook_icon", ignoreCase = true)
             }
     } else {
         null

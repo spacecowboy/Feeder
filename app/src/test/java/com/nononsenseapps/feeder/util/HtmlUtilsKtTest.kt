@@ -26,7 +26,7 @@ ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4
         val text = "<summary type=\"html\">&lt;img src=\"https://imgs.xkcd.com/comics/interstellar_asteroid.png\" title=\"Every time we detect an asteroid from outside the Solar System, we should immediately launch a mission to fling one of our asteroids back in the direction it came from.\" alt=\"Every time we detect an asteroid from outside the Solar System, we should immediately launch a mission to fling one of our asteroids back in the direction it came from.\" /&gt;</summary>"
         assertEquals(
             "https://imgs.xkcd.com/comics/interstellar_asteroid.png",
-            findFirstImageLinkInHtml(text, null),
+            findFirstImageLinkInHtml(text, null)?.url,
         )
     }
 
@@ -35,7 +35,7 @@ ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4
         val text = "<summary type=\"html\">&lt;img title=\"Every time we detect an asteroid from outside the Solar System, we should immediately launch a mission to fling one of our asteroids back in the direction it came from.\" alt=\"Every time we detect an asteroid from outside the Solar System, we should immediately launch a mission to fling one of our asteroids back in the direction it came from.\" src=\"https://imgs.xkcd.com/comics/interstellar_asteroid.png\" /&gt;</summary>"
         assertEquals(
             "https://imgs.xkcd.com/comics/interstellar_asteroid.png",
-            findFirstImageLinkInHtml(text, null),
+            findFirstImageLinkInHtml(text, null)?.url,
         )
     }
 
