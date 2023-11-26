@@ -15,13 +15,6 @@ import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Item
-import java.io.IOException
-import java.net.URL
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.Executors
-import kotlin.math.max
-import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -35,6 +28,13 @@ import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.io.IOException
+import java.net.URL
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.Executors
+import kotlin.math.max
+import kotlin.system.measureTimeMillis
 
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
@@ -77,88 +77,92 @@ class RssLocalSync(override val di: DI) : DIAware {
         var needFullTextSync = false
         // Let all new items share download time
         val downloadTime = Instant.now()
-        val time = measureTimeMillis {
-            try {
-                supervisorScope {
-                    val staleTime: Long = if (forceNetwork) {
-                        Instant.now().toEpochMilli()
-                    } else {
-                        Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
-                            .toEpochMilli()
-                    }
-                    // Fetch sync stuff first - this is fast
-                    try {
-                        syncClient.getFeeds()
-                        syncClient.getRead()
-                        syncClient.getDevices()
-                        syncClient.sendUpdatedFeeds()
-                        syncClient.markAsRead()
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "error with syncClient: ${e.message}", e)
-                    }
-
-                    val feedsToFetch =
-                        feedsToSync(feedId, feedTag, staleTime = staleTime)
-
-                    logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
-
-                    val coroutineContext =
-                        this.coroutineContext + CoroutineExceptionHandler { _, throwable ->
-                            Log.e(LOG_TAG, "Error during sync", throwable)
-                        }
-
-                    val jobs = feedsToFetch.map {
-                        needFullTextSync = needFullTextSync || it.fullTextByDefault
-                        launch(coroutineContext) {
-                            try {
-                                // Want unique sync times so UI gets updated state
-                                repository.setCurrentlySyncingOn(
-                                    feedId = it.id,
-                                    syncing = true,
-                                    lastSync = Instant.now(),
-                                )
-                                syncFeed(
-                                    feedSql = it,
-                                    maxFeedItemCount = maxFeedItemCount,
-                                    forceNetwork = forceNetwork,
-                                    downloadTime = downloadTime,
-                                ).onLeft { feedParserError ->
-                                    Log.e(
-                                        LOG_TAG,
-                                        "Failed to sync ${it.displayTitle}: ${it.url} because:\n${feedParserError.description}",
-                                    )
-                                }
-                            } catch (e: Throwable) {
-                                Log.e(
-                                    LOG_TAG,
-                                    "Failed to sync ${it.displayTitle}: ${it.url}",
-                                    e,
-                                )
-                            } finally {
-                                repository.setCurrentlySyncingOn(feedId = it.id, syncing = false)
+        val time =
+            measureTimeMillis {
+                try {
+                    supervisorScope {
+                        val staleTime: Long =
+                            if (forceNetwork) {
+                                Instant.now().toEpochMilli()
+                            } else {
+                                Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
+                                    .toEpochMilli()
                             }
+                        // Fetch sync stuff first - this is fast
+                        try {
+                            syncClient.getFeeds()
+                            syncClient.getRead()
+                            syncClient.getDevices()
+                            syncClient.sendUpdatedFeeds()
+                            syncClient.markAsRead()
+                        } catch (e: Exception) {
+                            Log.e(LOG_TAG, "error with syncClient: ${e.message}", e)
                         }
-                    }
 
-                    jobs.joinAll()
-                    try {
-                        repository.applyRemoteReadMarks()
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error on final apply", e)
-                    }
+                        val feedsToFetch =
+                            feedsToSync(feedId, feedTag, staleTime = staleTime)
 
-                    result = true
-                }
-            } catch (e: Throwable) {
-                Log.e(LOG_TAG, "Outer error", e)
-            } finally {
-                if (needFullTextSync) {
-                    scheduleFullTextParse(
-                        di = di,
-                    )
+                        logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
+
+                        val coroutineContext =
+                            this.coroutineContext +
+                                CoroutineExceptionHandler { _, throwable ->
+                                    Log.e(LOG_TAG, "Error during sync", throwable)
+                                }
+
+                        val jobs =
+                            feedsToFetch.map {
+                                needFullTextSync = needFullTextSync || it.fullTextByDefault
+                                launch(coroutineContext) {
+                                    try {
+                                        // Want unique sync times so UI gets updated state
+                                        repository.setCurrentlySyncingOn(
+                                            feedId = it.id,
+                                            syncing = true,
+                                            lastSync = Instant.now(),
+                                        )
+                                        syncFeed(
+                                            feedSql = it,
+                                            maxFeedItemCount = maxFeedItemCount,
+                                            forceNetwork = forceNetwork,
+                                            downloadTime = downloadTime,
+                                        ).onLeft { feedParserError ->
+                                            Log.e(
+                                                LOG_TAG,
+                                                "Failed to sync ${it.displayTitle}: ${it.url} because:\n${feedParserError.description}",
+                                            )
+                                        }
+                                    } catch (e: Throwable) {
+                                        Log.e(
+                                            LOG_TAG,
+                                            "Failed to sync ${it.displayTitle}: ${it.url}",
+                                            e,
+                                        )
+                                    } finally {
+                                        repository.setCurrentlySyncingOn(feedId = it.id, syncing = false)
+                                    }
+                                }
+                            }
+
+                        jobs.joinAll()
+                        try {
+                            repository.applyRemoteReadMarks()
+                        } catch (e: Exception) {
+                            Log.e(LOG_TAG, "Error on final apply", e)
+                        }
+
+                        result = true
+                    }
+                } catch (e: Throwable) {
+                    Log.e(LOG_TAG, "Outer error", e)
+                } finally {
+                    if (needFullTextSync) {
+                        scheduleFullTextParse(
+                            di = di,
+                        )
+                    }
                 }
             }
-        }
         logDebug(LOG_TAG, "Completed in $time ms")
         return result
     }
@@ -222,10 +226,11 @@ class RssLocalSync(override val di: DI) : DIAware {
                 val feedItemSqls =
                     items
                         ?.map {
-                            val guid = when (isNotUniqueIds || feedSql.alternateId) {
-                                true -> it.alternateId
-                                else -> it.id ?: it.alternateId
-                            }
+                            val guid =
+                                when (isNotUniqueIds || feedSql.alternateId) {
+                                    true -> it.alternateId
+                                    else -> it.id ?: it.alternateId
+                                }
 
                             it to guid
                         }
@@ -265,12 +270,13 @@ class RssLocalSync(override val di: DI) : DIAware {
                 }
                 // Try to look for image if not done before
                 if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
-                    val siteUrl = try {
-                        URL(feed.home_page_url)
-                    } catch (e: Throwable) {
-                        logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
-                        null
-                    }
+                    val siteUrl =
+                        try {
+                            URL(feed.home_page_url)
+                        } catch (e: Throwable) {
+                            logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
+                            null
+                        }
                     if (siteUrl != null) {
                         feedSql.siteFetched = Instant.now()
                         feedParser.getSiteMetaData(siteUrl)
@@ -301,10 +307,11 @@ class RssLocalSync(override val di: DI) : DIAware {
                 repository.upsertFeed(feedSql)
 
                 // Finally, prune database of old items
-                val ids = repository.getItemsToBeCleanedFromFeed(
-                    feedId = feedSql.id,
-                    keepCount = max(maxFeedItemCount, items?.size ?: 0),
-                )
+                val ids =
+                    repository.getItemsToBeCleanedFromFeed(
+                        feedId = feedSql.id,
+                        keepCount = max(maxFeedItemCount, items?.size ?: 0),
+                    )
 
                 for (id in ids) {
                     blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
@@ -345,14 +352,15 @@ class RssLocalSync(override val di: DI) : DIAware {
     ): List<com.nononsenseapps.feeder.db.room.Feed> {
         return when {
             feedId > 0 -> {
-                val feed = if (staleTime > 0) {
-                    repository.loadFeedIfStale(
-                        feedId,
-                        staleTime = staleTime,
-                    )
-                } else {
-                    repository.loadFeed(feedId)
-                }
+                val feed =
+                    if (staleTime > 0) {
+                        repository.loadFeedIfStale(
+                            feedId,
+                            staleTime = staleTime,
+                        )
+                    } else {
+                        repository.loadFeed(feedId)
+                    }
                 if (feed != null) {
                     listOf(feed)
                 } else {
@@ -360,14 +368,15 @@ class RssLocalSync(override val di: DI) : DIAware {
                 }
             }
 
-            tag.isNotEmpty() -> if (staleTime > 0) {
-                repository.loadFeedsIfStale(
-                    tag = tag,
-                    staleTime = staleTime,
-                )
-            } else {
-                repository.loadFeeds(tag)
-            }
+            tag.isNotEmpty() ->
+                if (staleTime > 0) {
+                    repository.loadFeedsIfStale(
+                        tag = tag,
+                        staleTime = staleTime,
+                    )
+                } else {
+                    repository.loadFeeds(tag)
+                }
 
             else -> if (staleTime > 0) repository.loadFeedsIfStale(staleTime) else repository.loadFeeds()
         }

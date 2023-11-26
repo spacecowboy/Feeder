@@ -17,12 +17,13 @@ class MigrationFrom14To15 {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate14to15() {
@@ -31,15 +32,15 @@ class MigrationFrom14To15 {
         db.use {
             db.execSQL(
                 """
-            INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with)
-            VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '')
+                INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with)
+                VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '')
                 """.trimIndent(),
             )
 
             db.execSQL(
                 """
-            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
-            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
+                INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
+                VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
                 """.trimIndent(),
             )
         }

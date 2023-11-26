@@ -74,15 +74,15 @@ import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import com.nononsenseapps.feeder.util.asUTF8Sequence
-import java.io.InputStream
-import kotlin.math.abs
-import kotlin.math.roundToInt
-import kotlin.random.Random
 import org.jsoup.Jsoup
 import org.jsoup.helper.StringUtil
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
+import java.io.InputStream
+import kotlin.math.abs
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 private const val LOG_TAG = "FEEDER_HTMLTOCOM"
 
@@ -133,9 +133,10 @@ private fun ParagraphText(
                 ClickableText(
                     text = paragraph,
                     style = LocalTextStyle.current,
-                    modifier = modifier
-                        .indication(interactionSource, LocalIndication.current)
-                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                    modifier =
+                        modifier
+                            .indication(interactionSource, LocalIndication.current)
+                            .focusableInNonTouchMode(interactionSource = interactionSource),
                 ) { offset ->
                     paragraph.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
@@ -146,9 +147,10 @@ private fun ParagraphText(
             } else {
                 Text(
                     text = paragraph,
-                    modifier = modifier
-                        .indication(interactionSource, LocalIndication.current)
-                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                    modifier =
+                        modifier
+                            .indication(interactionSource, LocalIndication.current)
+                            .focusableInNonTouchMode(interactionSource = interactionSource),
                 )
             }
         }
@@ -161,16 +163,18 @@ private fun LazyListScope.formatBody(
     keyHolder: ArticleItemKeyHolder,
     onLinkClick: (String) -> Unit,
 ) {
-    val composer = LazyListComposer(this, keyHolder = keyHolder) { paragraphBuilder, textStyler ->
-        val dimens = LocalDimens.current
-        ParagraphText(
-            paragraphBuilder = paragraphBuilder,
-            textStyler = textStyler,
-            modifier = Modifier
-                .width(dimens.maxReaderWidth),
-            onLinkClick = onLinkClick,
-        )
-    }
+    val composer =
+        LazyListComposer(this, keyHolder = keyHolder) { paragraphBuilder, textStyler ->
+            val dimens = LocalDimens.current
+            ParagraphText(
+                paragraphBuilder = paragraphBuilder,
+                textStyler = textStyler,
+                modifier =
+                    Modifier
+                        .width(dimens.maxReaderWidth),
+                onLinkClick = onLinkClick,
+            )
+        }
 
     composer.appendTextChildren(
         element.childNodes(),
@@ -401,35 +405,38 @@ private fun HtmlComposer.appendTextChildren(
 
                             when (this) {
                                 is LazyListComposer -> {
-                                    val composer = EagerComposer { paragraphBuilder, textStyler ->
-                                        val dimens = LocalDimens.current
-                                        val scrollState = rememberScrollState()
-                                        val interactionSource =
-                                            remember { MutableInteractionSource() }
-                                        Surface(
-                                            color = CodeBlockBackground(),
-                                            shape = MaterialTheme.shapes.medium,
-                                            modifier = Modifier
-                                                .horizontalScroll(
-                                                    state = scrollState,
-                                                )
-                                                .width(dimens.maxReaderWidth)
-                                                .indication(
-                                                    interactionSource,
-                                                    LocalIndication.current,
-                                                )
-                                                .focusableInNonTouchMode(interactionSource = interactionSource),
-                                        ) {
-                                            Box(modifier = Modifier.padding(all = 4.dp)) {
-                                                Text(
-                                                    text = paragraphBuilder.rememberComposableAnnotatedString(),
-                                                    style = textStyler?.textStyle()
-                                                        ?: CodeBlockStyle(),
-                                                    softWrap = false,
-                                                )
+                                    val composer =
+                                        EagerComposer { paragraphBuilder, textStyler ->
+                                            val dimens = LocalDimens.current
+                                            val scrollState = rememberScrollState()
+                                            val interactionSource =
+                                                remember { MutableInteractionSource() }
+                                            Surface(
+                                                color = CodeBlockBackground(),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier =
+                                                    Modifier
+                                                        .horizontalScroll(
+                                                            state = scrollState,
+                                                        )
+                                                        .width(dimens.maxReaderWidth)
+                                                        .indication(
+                                                            interactionSource,
+                                                            LocalIndication.current,
+                                                        )
+                                                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                                            ) {
+                                                Box(modifier = Modifier.padding(all = 4.dp)) {
+                                                    Text(
+                                                        text = paragraphBuilder.rememberComposableAnnotatedString(),
+                                                        style =
+                                                            textStyler?.textStyle()
+                                                                ?: CodeBlockStyle(),
+                                                        softWrap = false,
+                                                    )
+                                                }
                                             }
                                         }
-                                    }
 
                                     with(composer) {
                                         item(keyHolder) {
@@ -513,24 +520,27 @@ private fun HtmlComposer.appendTextChildren(
                             val imgElement = element.firstBestDescendantImg(baseUrl = baseUrl)
 
                             if (imgElement != null) {
-                                val composer = EagerComposer { paragraphBuilder, textStyler ->
-                                    val dimens = LocalDimens.current
-                                    ParagraphText(
-                                        paragraphBuilder = paragraphBuilder,
-                                        textStyler = textStyler,
-                                        modifier = Modifier
-                                            .width(dimens.maxReaderWidth),
-                                        onLinkClick = onLinkClick,
-                                    )
-                                }
+                                val composer =
+                                    EagerComposer { paragraphBuilder, textStyler ->
+                                        val dimens = LocalDimens.current
+                                        ParagraphText(
+                                            paragraphBuilder = paragraphBuilder,
+                                            textStyler = textStyler,
+                                            modifier =
+                                                Modifier
+                                                    .width(dimens.maxReaderWidth),
+                                            onLinkClick = onLinkClick,
+                                        )
+                                    }
 
                                 item(keyHolder) {
                                     with(composer) {
                                         val dimens = LocalDimens.current
                                         Column(
                                             verticalArrangement = Arrangement.spacedBy(8.dp),
-                                            modifier = Modifier
-                                                .width(dimens.maxReaderWidth),
+                                            modifier =
+                                                Modifier
+                                                    .width(dimens.maxReaderWidth),
                                         ) {
                                             withTextStyle(NestedTextStyle.CAPTION) {
                                                 appendTextChildren(
@@ -560,8 +570,9 @@ private fun HtmlComposer.appendTextChildren(
                             val dimens = LocalDimens.current
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier
-                                    .width(dimens.maxReaderWidth),
+                                modifier =
+                                    Modifier
+                                        .width(dimens.maxReaderWidth),
                             ) {
                                 renderImage(
                                     baseUrl = baseUrl,
@@ -624,8 +635,9 @@ private fun HtmlComposer.appendTextChildren(
                             appendImage(onLinkClick = onLinkClick) {
                                 val dimens = LocalDimens.current
                                 Column(
-                                    modifier = Modifier
-                                        .width(dimens.maxReaderWidth),
+                                    modifier =
+                                        Modifier
+                                            .width(dimens.maxReaderWidth),
                                 ) {
                                     DisableSelection {
                                         BoxWithConstraints(
@@ -633,29 +645,32 @@ private fun HtmlComposer.appendTextChildren(
                                         ) {
                                             val imageWidth by rememberMaxImageWidth()
                                             AsyncImage(
-                                                model = ImageRequest.Builder(LocalContext.current)
-                                                    .placeholder(R.drawable.youtube_icon)
-                                                    .error(R.drawable.youtube_icon)
-                                                    .scale(Scale.FIT)
-                                                    .size(imageWidth)
-                                                    .precision(Precision.INEXACT)
-                                                    .build(),
+                                                model =
+                                                    ImageRequest.Builder(LocalContext.current)
+                                                        .placeholder(R.drawable.youtube_icon)
+                                                        .error(R.drawable.youtube_icon)
+                                                        .scale(Scale.FIT)
+                                                        .size(imageWidth)
+                                                        .precision(Precision.INEXACT)
+                                                        .build(),
                                                 contentDescription = stringResource(R.string.touch_to_play_video),
-                                                contentScale = if (dimens.hasImageAspectRatioInReader) {
-                                                    ContentScale.Fit
-                                                } else {
-                                                    ContentScale.FillWidth
-                                                },
-                                                modifier = Modifier
-                                                    .clickable {
-                                                        onLinkClick(video.link)
-                                                    }
-                                                    .fillMaxWidth()
-                                                    .run {
-                                                        dimens.imageAspectRatioInReader?.let { ratio ->
-                                                            aspectRatio(ratio)
-                                                        } ?: this
+                                                contentScale =
+                                                    if (dimens.hasImageAspectRatioInReader) {
+                                                        ContentScale.Fit
+                                                    } else {
+                                                        ContentScale.FillWidth
                                                     },
+                                                modifier =
+                                                    Modifier
+                                                        .clickable {
+                                                            onLinkClick(video.link)
+                                                        }
+                                                        .fillMaxWidth()
+                                                        .run {
+                                                            dimens.imageAspectRatioInReader?.let { ratio ->
+                                                                aspectRatio(ratio)
+                                                            } ?: this
+                                                        },
                                             )
                                         }
                                     }
@@ -671,13 +686,14 @@ private fun HtmlComposer.appendTextChildren(
                                             remember { MutableInteractionSource() }
                                         Text(
                                             text = stringResource(R.string.touch_to_play_video),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .indication(
-                                                    interactionSource,
-                                                    LocalIndication.current,
-                                                )
-                                                .focusableInNonTouchMode(interactionSource = interactionSource),
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .indication(
+                                                        interactionSource,
+                                                        LocalIndication.current,
+                                                    )
+                                                    .focusableInNonTouchMode(interactionSource = interactionSource),
                                         )
                                     }
                                 }
@@ -735,14 +751,15 @@ private fun ColumnScope.renderImage(
 
     DisableSelection {
         BoxWithConstraints(
-            modifier = Modifier
-                .clip(RectangleShape)
-                .clickable(
-                    enabled = onClick != null,
-                ) {
-                    onClick?.invoke()
-                }
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .clip(RectangleShape)
+                    .clickable(
+                        enabled = onClick != null,
+                    ) {
+                        onClick?.invoke()
+                    }
+                    .fillMaxWidth(),
         ) {
             val imageWidth by rememberMaxImageWidth()
             WithTooltipIfNotBlank(tooltip = alt) { modifier ->
@@ -750,18 +767,20 @@ private fun ColumnScope.renderImage(
                     Image(
                         rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
                         contentDescription = alt,
-                        contentScale = if (dimens.hasImageAspectRatioInReader) {
-                            ContentScale.Fit
-                        } else {
-                            ContentScale.FillWidth
-                        },
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .run {
-                                dimens.imageAspectRatioInReader?.let { ratio ->
-                                    aspectRatio(ratio)
-                                } ?: this
+                        contentScale =
+                            if (dimens.hasImageAspectRatioInReader) {
+                                ContentScale.Fit
+                            } else {
+                                ContentScale.FillWidth
                             },
+                        modifier =
+                            modifier
+                                .fillMaxWidth()
+                                .run {
+                                    dimens.imageAspectRatioInReader?.let { ratio ->
+                                        aspectRatio(ratio)
+                                    } ?: this
+                                },
                     )
                 } else {
                     val pixelDensity = LocalDensity.current.density
@@ -774,29 +793,33 @@ private fun ColumnScope.renderImage(
                         }
                     }
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(bestImage)
-                            .scale(Scale.FIT)
-                            .size(imageWidth)
-                            .precision(Precision.INEXACT)
-                            .build(),
+                        model =
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(bestImage)
+                                .scale(Scale.FIT)
+                                .size(imageWidth)
+                                .precision(Precision.INEXACT)
+                                .build(),
                         contentDescription = alt,
-                        placeholder = rememberTintedVectorPainter(
-                            Icons.Outlined.Terrain,
-                        ),
+                        placeholder =
+                            rememberTintedVectorPainter(
+                                Icons.Outlined.Terrain,
+                            ),
                         error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentScale = if (dimens.hasImageAspectRatioInReader) {
-                            ContentScale.Fit
-                        } else {
-                            ContentScale.FillWidth
-                        },
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .run {
-                                dimens.imageAspectRatioInReader?.let { ratio ->
-                                    aspectRatio(ratio)
-                                } ?: this
+                        contentScale =
+                            if (dimens.hasImageAspectRatioInReader) {
+                                ContentScale.Fit
+                            } else {
+                                ContentScale.FillWidth
                             },
+                        modifier =
+                            modifier
+                                .fillMaxWidth()
+                                .run {
+                                    dimens.imageAspectRatioInReader?.let { ratio ->
+                                        aspectRatio(ratio)
+                                    } ?: this
+                                },
                     )
                 }
             }
@@ -819,10 +842,11 @@ private fun ColumnScope.renderImage(
                 val interactionSource = remember { MutableInteractionSource() }
                 Text(
                     alt,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .indication(interactionSource, LocalIndication.current)
-                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .indication(interactionSource, LocalIndication.current)
+                            .focusableInNonTouchMode(interactionSource = interactionSource),
                 )
             }
         }
@@ -848,14 +872,15 @@ private fun LazyListComposer.appendTable(
         )
     } else {
         item(keyHolder) {
-            val composer = EagerComposer { paragraphBuilder, textStyler ->
-                ParagraphText(
-                    paragraphBuilder = paragraphBuilder,
-                    textStyler = textStyler,
-                    modifier = Modifier,
-                    onLinkClick = onLinkClick,
-                )
-            }
+            val composer =
+                EagerComposer { paragraphBuilder, textStyler ->
+                    ParagraphText(
+                        paragraphBuilder = paragraphBuilder,
+                        textStyler = textStyler,
+                        modifier = Modifier,
+                        onLinkClick = onLinkClick,
+                    )
+                }
             with(composer) {
                 tableColFirst(
                     baseUrl = baseUrl,
@@ -912,8 +937,9 @@ private fun EagerComposer.tableColFirst(
     val dimens = LocalDimens.current
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
-            .width(dimens.maxReaderWidth),
+        modifier =
+            Modifier
+                .width(dimens.maxReaderWidth),
     ) {
         key(element, baseUrl, onLinkClick) {
             element.children()
@@ -935,11 +961,12 @@ private fun EagerComposer.tableColFirst(
             derivedStateOf {
                 element.children()
                     .filter {
-                        it.tagName() in setOf(
-                            "thead",
-                            "tbody",
-                            "tfoot",
-                        )
+                        it.tagName() in
+                            setOf(
+                                "thead",
+                                "tbody",
+                                "tfoot",
+                            )
                     }
                     .sortedBy {
                         when (it.tagName()) {
@@ -963,9 +990,10 @@ private fun EagerComposer.tableColFirst(
             if (rowCount > 0 && colCount > 0) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(32.dp),
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .width(dimens.maxReaderWidth),
+                    modifier =
+                        Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .width(dimens.maxReaderWidth),
                 ) {
                     items(
                         count = colCount,
@@ -978,12 +1006,13 @@ private fun EagerComposer.tableColFirst(
                                 val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
                                 var emptyCell = false
                                 Surface(
-                                    tonalElevation = when (section) {
-                                        "thead" -> 3.dp
-                                        "tbody" -> 0.dp
-                                        "tfoot" -> 1.dp
-                                        else -> 0.dp
-                                    },
+                                    tonalElevation =
+                                        when (section) {
+                                            "thead" -> 3.dp
+                                            "tbody" -> 0.dp
+                                            "tfoot" -> 1.dp
+                                            else -> 0.dp
+                                        },
                                 ) {
                                     rowElement.children()
                                         .filter { it.tagName() in setOf("th", "td") }
@@ -1035,11 +1064,12 @@ fun Iterable<Element>.elementAtOrNullWithSpans(index: Int): Element? {
             return it
         }
         val spans = it.attr("colspan") ?: "1"
-        currentColumn += when (val spanCount = spans.toIntOrNull()) {
-            null, 1 -> (spanCount ?: 1)
-            0 -> return null // Firefox special - spans to end
-            else -> spanCount.coerceAtLeast(1)
-        }
+        currentColumn +=
+            when (val spanCount = spans.toIntOrNull()) {
+                null, 1 -> (spanCount ?: 1)
+                0 -> return null // Firefox special - spans to end
+                else -> spanCount.coerceAtLeast(1)
+            }
     }
     return null
 }
@@ -1091,19 +1121,20 @@ private fun Element.notAncestorOf(tagName: String): Boolean {
     while (current != null) {
         val parent = current.parent()
 
-        current = when {
-            parent == null || parent.tagName() == "#root" -> {
-                null
-            }
+        current =
+            when {
+                parent == null || parent.tagName() == "#root" -> {
+                    null
+                }
 
-            parent.tagName() == tagName -> {
-                return false
-            }
+                parent.tagName() == tagName -> {
+                    return false
+                }
 
-            else -> {
-                parent
+                else -> {
+                    parent
+                }
             }
-        }
     }
 
     return true
@@ -1112,54 +1143,62 @@ private fun Element.notAncestorOf(tagName: String): Boolean {
 private enum class NestedTextStyle : TextStyler {
     CAPTION {
         @Composable
-        override fun textStyle() = MaterialTheme.typography.labelMedium.merge(
-            TextStyle(color = MaterialTheme.colorScheme.onBackground),
-        )
+        override fun textStyle() =
+            MaterialTheme.typography.labelMedium.merge(
+                TextStyle(color = MaterialTheme.colorScheme.onBackground),
+            )
     },
 }
 
-private fun String.asFontFamily(): FontFamily? = when (this.lowercase()) {
-    "monospace" -> FontFamily.Monospace
-    "serif" -> FontFamily.Serif
-    "sans-serif" -> FontFamily.SansSerif
-    else -> null
-}
+private fun String.asFontFamily(): FontFamily? =
+    when (this.lowercase()) {
+        "monospace" -> FontFamily.Monospace
+        "serif" -> FontFamily.Serif
+        "sans-serif" -> FontFamily.SansSerif
+        else -> null
+    }
 
 @Preview
 @Composable
 private fun TestIt() {
-    val html = """
+    val html =
+        """
         <p>In Gimp you go to <em>Image</em> in the top menu bar and select <em>Mode</em> followed by <em>Indexed</em>. Now you see a popup where you can select the number of colors for a generated optimum palette.</p> <p>You&rsquo;ll have to experiment a little because it will depend on your image.</p> <p>I used this approach to shrink the size of the cover image in <a href="https://cowboyprogrammer.org/2016/08/zopfli_all_the_things/">the_zopfli post</a> from a 37KB (JPG) to just 15KB (PNG, all PNG sizes listed include Zopfli compression btw).</p> <h2 id="straight-jpg-to-png-conversion-124kb">Straight JPG to PNG conversion: 124KB</h2> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things.png" alt="PNG version RGB colors" /></p> <p>First off, I exported the JPG file as a PNG file. This PNG file had a whopping 124KB! Clearly there was some bloat being stored.</p> <h2 id="256-colors-40kb">256 colors: 40KB</h2> <p>Reducing from RGB to only 256 colors has no visible effect to my eyes.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_256.png" alt="256 colors" /></p> <h2 id="128-colors-34kb">128 colors: 34KB</h2> <p>Still no difference.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_128.png" alt="128 colors" /></p> <h2 id="64-colors-25kb">64 colors: 25KB</h2> <p>You can start to see some artifacting in the shadow behind the text.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_64.png" alt="64 colors" /></p> <h2 id="32-colors-15kb">32 colors: 15KB</h2> <p>In my opinion this is the sweet spot. The shadow artifacting is barely noticable but the size is significantly reduced.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_32.png" alt="32 colors" /></p> <h2 id="16-colors-11kb">16 colors: 11KB</h2> <p>Clear artifacting in the text shadow and the yellow (fire?) in the background has developed an outline.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_16.png" alt="16 colors" /></p> <h2 id="8-colors-7-3kb">8 colors: 7.3KB</h2> <p>The broom has shifted in color from a clear brown to almost grey. Text shadow is just a grey blob at this point. Even clearer outline developed on the yellow background.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_8.png" alt="8 colors" /></p> <h2 id="4-colors-4-3kb">4 colors: 4.3KB</h2> <p>Interestingly enough, I think 4 colors looks better than 8 colors. The outline in the background has disappeared because there&rsquo;s not enough color spectrum to render it. The broom is now black and filled areas tend to get a white separator to the outlines.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_4.png" alt="4 colors" /></p> <h2 id="2-colors-2-4kb">2 colors: 2.4KB</h2> <p>Well, at least the silhouette is well defined at this point I guess.</p> <p><img src="https://cowboyprogrammer.org/images/2017/10/zopfli_all_the_things_2.png" alt="2 colors" /></p> <hr/> <p>Other posts in the <b>Migrating from Ghost to Hugo</b> series:</p> <ul class="series"> <li>2016-10-21 &mdash; Reduce the size of images even further by reducing number of colors with Gimp </li> <li>2016-08-26 &mdash; <a href="https://cowboyprogrammer.org/2016/08/zopfli_all_the_things/">Compress all the images!</a> </li> <li>2016-07-25 &mdash; <a href="https://cowboyprogrammer.org/2016/07/migrating_from_ghost_to_hugo/">Migrating from Ghost to Hugo</a> </li> </ul>
-    """.trimIndent()
+        """.trimIndent()
 
     html.byteInputStream().use { stream ->
         LazyColumn {
             htmlFormattedText(
                 inputStream = stream,
                 baseUrl = "https://cowboyprogrammer.org",
-                keyHolder = object : ArticleItemKeyHolder {
-                    override fun getAndIncrementKey(): Long {
-                        return Random.nextLong()
-                    }
-                },
+                keyHolder =
+                    object : ArticleItemKeyHolder {
+                        override fun getAndIncrementKey(): Long {
+                            return Random.nextLong()
+                        }
+                    },
             ) {}
         }
     }
 }
 
 @Composable
-fun BoxWithConstraintsScope.rememberMaxImageWidth() = with(LocalDensity.current) {
-    remember {
-        derivedStateOf {
-            maxWidth.toPx().roundToInt().coerceAtMost(2000)
+fun BoxWithConstraintsScope.rememberMaxImageWidth() =
+    with(LocalDensity.current) {
+        remember {
+            derivedStateOf {
+                maxWidth.toPx().roundToInt().coerceAtMost(2000)
+            }
         }
     }
-}
 
 /**
  * Gets the url to the image in the <img> tag - could be from srcset or from src
  */
-internal fun getImageSource(baseUrl: String, element: Element) = ImageCandidates(
+internal fun getImageSource(
+    baseUrl: String,
+    element: Element,
+) = ImageCandidates(
     baseUrl = baseUrl,
     srcSet = element.attr("srcset") ?: "",
     absSrc = element.attr("abs:src") ?: "",
@@ -1176,39 +1215,45 @@ internal class ImageCandidates(
     /**
      * Might throw if hasImage returns false
      */
-    fun getBestImageForMaxSize(maxWidth: Int, pixelDensity: Float): String {
-        val setCandidate = srcSet.splitToSequence(", ")
-            .map { it.trim() }
-            .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
-            .fold(100f to "") { acc, candidate ->
-                val candidateSize = if (candidate.size == 1) {
-                    // Assume it corresponds to 1x pixel density
-                    1.0f / pixelDensity
-                } else {
-                    val descriptor = candidate.last()
-                    when {
-                        descriptor.endsWith("w", ignoreCase = true) -> {
-                            descriptor.substringBefore("w").toFloat() / maxWidth
-                                .toFloat()
+    fun getBestImageForMaxSize(
+        maxWidth: Int,
+        pixelDensity: Float,
+    ): String {
+        val setCandidate =
+            srcSet.splitToSequence(", ")
+                .map { it.trim() }
+                .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
+                .fold(100f to "") { acc, candidate ->
+                    val candidateSize =
+                        if (candidate.size == 1) {
+                            // Assume it corresponds to 1x pixel density
+                            1.0f / pixelDensity
+                        } else {
+                            val descriptor = candidate.last()
+                            when {
+                                descriptor.endsWith("w", ignoreCase = true) -> {
+                                    descriptor.substringBefore("w").toFloat() /
+                                        maxWidth
+                                            .toFloat()
+                                }
+
+                                descriptor.endsWith("x", ignoreCase = true) -> {
+                                    descriptor.substringBefore("x").toFloat() / pixelDensity
+                                }
+
+                                else -> {
+                                    return@fold acc
+                                }
+                            }
                         }
 
-                        descriptor.endsWith("x", ignoreCase = true) -> {
-                            descriptor.substringBefore("x").toFloat() / pixelDensity
-                        }
-
-                        else -> {
-                            return@fold acc
-                        }
+                    if (abs(candidateSize - 1.0f) < abs(acc.first - 1.0f)) {
+                        candidateSize to candidate.first()
+                    } else {
+                        acc
                     }
                 }
-
-                if (abs(candidateSize - 1.0f) < abs(acc.first - 1.0f)) {
-                    candidateSize to candidate.first()
-                } else {
-                    acc
-                }
-            }
-            .second
+                .second
 
         return (setCandidate.takeIf { it.isNotBlank() } ?: absSrc.takeIf { it.isNotBlank() })?.let {
             StringUtil.resolve(baseUrl, it)
@@ -1254,10 +1299,11 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
     for (child in childNodes()) {
         when (child) {
             is TextNode -> child.appendCorrectlyNormalizedWhiteSpace(builder, stripLeading)
-            is Element -> child.appendCorrectlyNormalizedWhiteSpaceRecursively(
-                builder,
-                stripLeading,
-            )
+            is Element ->
+                child.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                    builder,
+                    stripLeading,
+                )
         }
     }
 }
@@ -1273,8 +1319,7 @@ private const val formFeed = 12.toChar()
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
 private const val nonBreakableSpace = 160.toChar()
 
-private fun isCollapsableWhiteSpace(c: String) =
-    c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
+private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
 
 private fun isCollapsableWhiteSpace(c: Char) =
     c == space || c == tab || c == linefeed || c == carriageReturn || c == formFeed || c == nonBreakableSpace

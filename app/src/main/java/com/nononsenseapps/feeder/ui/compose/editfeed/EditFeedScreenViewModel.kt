@@ -14,11 +14,11 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
-import java.net.URL
-import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.net.URL
+import java.time.Instant
 
 class EditFeedScreenViewModel(
     di: DI,
@@ -26,8 +26,9 @@ class EditFeedScreenViewModel(
 ) : DIAwareViewModel(di), EditFeedScreenState {
     private val repository: Repository by instance()
 
-    val feedId: Long = state["feedId"]
-        ?: throw IllegalArgumentException("Missing feedId in savedState")
+    val feedId: Long =
+        state["feedId"]
+            ?: throw IllegalArgumentException("Missing feedId in savedState")
 
     // These two are updated as a result of url updating
     override var isNotValidUrl by mutableStateOf(false)
@@ -60,21 +61,23 @@ class EditFeedScreenViewModel(
         get() = articleOpener == PREF_VAL_OPEN_WITH_READER
 
     override val isOpenItemWithAppDefault: Boolean
-        get() = when (articleOpener) {
-            PREF_VAL_OPEN_WITH_READER,
-            PREF_VAL_OPEN_WITH_WEBVIEW,
-            PREF_VAL_OPEN_WITH_BROWSER,
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB,
-            -> false
+        get() =
+            when (articleOpener) {
+                PREF_VAL_OPEN_WITH_READER,
+                PREF_VAL_OPEN_WITH_WEBVIEW,
+                PREF_VAL_OPEN_WITH_BROWSER,
+                PREF_VAL_OPEN_WITH_CUSTOM_TAB,
+                -> false
 
-            else -> true
-        }
+                else -> true
+            }
 
     init {
         viewModelScope.launch {
             // Set initial state in case state is empty
-            val feed = repository.getFeed(feedId)
-                ?: throw IllegalArgumentException("No feed with id $feedId!")
+            val feed =
+                repository.getFeed(feedId)
+                    ?: throw IllegalArgumentException("No feed with id $feedId!")
 
             defaultTitle = feed.title
             feedImage = feed.imageUrl?.toString() ?: ""
@@ -108,37 +111,41 @@ class EditFeedScreenViewModel(
         }
     }
 
-    fun saveAndRequestSync(action: (Long) -> Unit) = viewModelScope.launch {
-        val feed = repository.getFeed(feedId)
-            ?: Feed() // Feed was deleted while being edited?
+    fun saveAndRequestSync(action: (Long) -> Unit) =
+        viewModelScope.launch {
+            val feed =
+                repository.getFeed(feedId)
+                    ?: Feed() // Feed was deleted while being edited?
 
-        val updatedFeed = feed.copy(
-            url = URL(feedUrl),
-            title = feedTitle,
-            customTitle = feedTitle,
-            tag = feedTag,
-            fullTextByDefault = fullTextByDefault,
-            notify = notify,
-            openArticlesWith = articleOpener,
-            alternateId = alternateId,
-        )
+            val updatedFeed =
+                feed.copy(
+                    url = URL(feedUrl),
+                    title = feedTitle,
+                    customTitle = feedTitle,
+                    tag = feedTag,
+                    fullTextByDefault = fullTextByDefault,
+                    notify = notify,
+                    openArticlesWith = articleOpener,
+                    alternateId = alternateId,
+                )
 
-        // No point in doing anything unless they actually differ
-        if (feed != updatedFeed) {
-            // In case clocks between different devices differ don't allow this date to go backwards
-            updatedFeed.whenModified = maxOf(Instant.now(), feed.whenModified.plusMillis(1))
-            val savedId = repository.saveFeed(
-                updatedFeed,
-            )
-            requestFeedSync(
-                di,
-                feedId = savedId,
-                forceNetwork = false,
-            )
+            // No point in doing anything unless they actually differ
+            if (feed != updatedFeed) {
+                // In case clocks between different devices differ don't allow this date to go backwards
+                updatedFeed.whenModified = maxOf(Instant.now(), feed.whenModified.plusMillis(1))
+                val savedId =
+                    repository.saveFeed(
+                        updatedFeed,
+                    )
+                requestFeedSync(
+                    di,
+                    feedId = savedId,
+                    forceNetwork = false,
+                )
+            }
+
+            action(feed.id)
         }
-
-        action(feed.id)
-    }
 }
 
 internal fun isValidUrl(value: String): Boolean {

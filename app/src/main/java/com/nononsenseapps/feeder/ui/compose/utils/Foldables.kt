@@ -22,13 +22,15 @@ val LocalFoldableHinge: ProvidableCompositionLocal<FoldableHinge?> =
 @Composable
 fun Activity.withFoldableHinge(content: @Composable () -> Unit) {
     val displayFeatures = calculateDisplayFeatures(this)
-    val fold = displayFeatures.find {
-        it is FoldingFeature
-    } as FoldingFeature?
+    val fold =
+        displayFeatures.find {
+            it is FoldingFeature
+        } as FoldingFeature?
 
-    val foldableHinge = fold?.let {
-        FoldableHinge(it.bounds.toComposeRect())
-    }
+    val foldableHinge =
+        fold?.let {
+            FoldableHinge(it.bounds.toComposeRect())
+        }
 
     CompositionLocalProvider(LocalFoldableHinge provides foldableHinge) {
         content()

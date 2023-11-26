@@ -44,9 +44,10 @@ fun SensibleTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         modifier = modifier,
-        colors = topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-        ),
+        colors =
+            topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            ),
     )
 }

@@ -93,29 +93,33 @@ suspend fun notify(
     }
 }
 
-suspend fun cancelNotification(context: Context, feedItemId: Long) =
-    cancelNotifications(context, listOf(feedItemId))
+suspend fun cancelNotification(
+    context: Context,
+    feedItemId: Long,
+) = cancelNotifications(context, listOf(feedItemId))
 
-suspend fun cancelNotifications(context: Context, feedItemIds: List<Long>) =
-    withContext(Dispatchers.Default) {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS,
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return@withContext
-        }
-
-        val nm = context.notificationManager
-
-        for (feedItemId in feedItemIds) {
-            nm.cancel(feedItemId.toInt())
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            notify(context)
-        }
+suspend fun cancelNotifications(
+    context: Context,
+    feedItemIds: List<Long>,
+) = withContext(Dispatchers.Default) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return@withContext
     }
+
+    val nm = context.notificationManager
+
+    for (feedItemId in feedItemIds) {
+        nm.cancel(feedItemId.toInt())
+    }
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        notify(context)
+    }
+}
 
 /**
  * This is an update operation if channel already exists so it's safe to call multiple times
@@ -135,7 +139,10 @@ private fun createNotificationChannel(context: Context) {
     notificationManager.createNotificationChannel(channel)
 }
 
-private suspend fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
+private suspend fun singleNotification(
+    context: Context,
+    item: FeedItemWithFeed,
+): Notification {
     val di by closestDI(context)
     val repository: Repository by di.instance()
 
@@ -146,21 +153,23 @@ private suspend fun singleNotification(context: Context, item: FeedItemWithFeed)
     style.bigText(text)
     style.setBigContentTitle(title)
 
-    val contentIntent = Intent(
-        Intent.ACTION_VIEW,
-        "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
-        context,
-        MainActivity::class.java,
-    ).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    val contentIntent =
+        Intent(
+            Intent.ACTION_VIEW,
+            "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
+            context,
+            MainActivity::class.java,
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
-    val pendingIntent = PendingIntent.getActivity(
-        context,
-        item.id.toInt(),
-        contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-    )
+    val pendingIntent =
+        PendingIntent.getActivity(
+            context,
+            item.id.toInt(),
+            contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+        )
 
     val builder = notificationBuilder(context)
 
@@ -263,7 +272,10 @@ internal fun getMarkAsReadIntent(
 /**
  * Use this on platforms older than 24 to bundle notifications together
  */
-private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed>): Notification {
+private fun inboxNotification(
+    context: Context,
+    feedItems: List<FeedItemWithFeed>,
+): Notification {
     val style = NotificationCompat.InboxStyle()
     val title = context.getString(R.string.updated_feeds)
     val text = feedItems.map { it.feedDisplayTitle }.toSet().joinToString(separator = ", ")
@@ -277,46 +289,50 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     // Otherwise we should go to All feeds
     val feedTags = feedItems.map { it.tag }.toSet()
 
-    val deepLinkTag = if (feedTags.size == 1) {
-        feedTags.first()
-    } else {
-        ""
-    }
+    val deepLinkTag =
+        if (feedTags.size == 1) {
+            feedTags.first()
+        } else {
+            ""
+        }
 
     val feedIds = feedItems.map { it.feedId }.toSet()
 
-    val deepLinkId = if (feedIds.size == 1) {
-        feedIds.first() ?: ID_UNSET
-    } else {
-        if (deepLinkTag.isNotEmpty()) {
-            ID_ALL_FEEDS // Tag will take precedence
+    val deepLinkId =
+        if (feedIds.size == 1) {
+            feedIds.first() ?: ID_UNSET
         } else {
-            ID_UNSET // Will default to last open when tag is empty too
+            if (deepLinkTag.isNotEmpty()) {
+                ID_ALL_FEEDS // Tag will take precedence
+            } else {
+                ID_UNSET // Will default to last open when tag is empty too
+            }
         }
-    }
 
     val deepLinkUri =
         "$DEEP_LINK_BASE_URI/feed?id=$deepLinkId&tag=${deepLinkTag.urlEncode()}"
 
-    val contentIntent = Intent(
-        Intent.ACTION_VIEW,
-        deepLinkUri.toUri(),
-        context,
-        OpenLinkInDefaultActivity::class.java, // Proxy activity to mark as read
-    ).apply {
-        putExtra(
-            EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED,
-            LongArray(feedItems.size) { i -> feedItems[i].id },
-        )
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    val contentIntent =
+        Intent(
+            Intent.ACTION_VIEW,
+            deepLinkUri.toUri(),
+            context,
+            OpenLinkInDefaultActivity::class.java, // Proxy activity to mark as read
+        ).apply {
+            putExtra(
+                EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED,
+                LongArray(feedItems.size) { i -> feedItems[i].id },
+            )
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
 
-    val pendingIntent = PendingIntent.getActivity(
-        context,
-        summaryNotificationId,
-        contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-    )
+    val pendingIntent =
+        PendingIntent.getActivity(
+            context,
+            summaryNotificationId,
+            contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+        )
 
     val builder = notificationBuilder(context)
 
@@ -333,7 +349,10 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     return style.build() ?: error("How null??")
 }
 
-private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>): PendingIntent {
+private fun getDeleteIntent(
+    context: Context,
+    feedItems: List<FeedItemWithFeed>,
+): PendingIntent {
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
 
@@ -348,7 +367,10 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>)
     )
 }
 
-internal fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): Intent {
+internal fun getDeleteIntent(
+    context: Context,
+    feedItem: FeedItemWithFeed,
+): Intent {
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
     intent.data = Uri.withAppendedPath(URI_FEEDITEMS, "${feedItem.id}")
@@ -358,7 +380,10 @@ internal fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): Inte
     return intent
 }
 
-private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed): PendingIntent =
+private fun getPendingDeleteIntent(
+    context: Context,
+    feedItem: FeedItemWithFeed,
+): PendingIntent =
     PendingIntent.getBroadcast(
         context,
         0,

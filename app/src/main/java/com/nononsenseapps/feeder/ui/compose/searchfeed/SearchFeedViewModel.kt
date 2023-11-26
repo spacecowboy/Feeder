@@ -12,7 +12,6 @@ import com.nononsenseapps.feeder.model.SiteMetaData
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
-import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.net.URL
 
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()

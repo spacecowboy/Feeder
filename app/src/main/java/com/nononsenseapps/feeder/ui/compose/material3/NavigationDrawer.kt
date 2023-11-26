@@ -85,9 +85,9 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ui.compose.material3.tokens.NavigationDrawerTokens
 import com.nononsenseapps.feeder.ui.compose.material3.tokens.NavigationDrawerTokens.getContainerWidth
 import com.nononsenseapps.feeder.ui.compose.material3.tokens.ScrimTokens
-import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [DrawerState].
@@ -118,12 +118,12 @@ class DrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true },
 ) {
-
-    internal val swipeableState = SwipeableState(
-        initialValue = initialValue,
-        animationSpec = AnimationSpec,
-        confirmStateChange = confirmStateChange,
-    )
+    internal val swipeableState =
+        SwipeableState(
+            initialValue = initialValue,
+            animationSpec = AnimationSpec,
+            confirmStateChange = confirmStateChange,
+        )
 
     /**
      * Whether the drawer is open.
@@ -182,7 +182,10 @@ class DrawerState(
      * @param anim The animation that will be used to animate to the new value.
      */
     @ExperimentalMaterial3Api
-    suspend fun animateTo(targetValue: DrawerValue, anim: AnimationSpec<Float>) {
+    suspend fun animateTo(
+        targetValue: DrawerValue,
+        anim: AnimationSpec<Float>,
+    ) {
         swipeableState.animateTo(targetValue, anim)
     }
 
@@ -327,7 +330,8 @@ fun ModalNavigationDrawer(
                                     .confirmStateChange(DrawerValue.Closed)
                             ) {
                                 scope.launch { drawerState.close() }
-                            }; true
+                            }
+                            true
                         }
                     }
                 },
@@ -399,7 +403,8 @@ fun DismissibleNavigationDrawer(
                                     .confirmStateChange(DrawerValue.Closed)
                             ) {
                                 scope.launch { drawerState.close() }
-                            }; true
+                            }
+                            true
                         }
                     }
                 },
@@ -409,7 +414,7 @@ fun DismissibleNavigationDrawer(
             Box {
                 content()
             }
-        },) { measurables, constraints ->
+        }) { measurables, constraints ->
             val sheetPlaceable = measurables[0].measure(constraints)
             val contentPlaceable = measurables[1].measure(constraints)
             layout(contentPlaceable.width, contentPlaceable.height) {
@@ -584,12 +589,13 @@ private fun DrawerSheet(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Surface(
-        modifier = modifier
-            .sizeIn(
-                minWidth = MinimumDrawerWidth,
-                maxWidth = DrawerDefaults.getMaximumDrawerWidth(),
-            )
-            .fillMaxHeight(),
+        modifier =
+            modifier
+                .sizeIn(
+                    minWidth = MinimumDrawerWidth,
+                    maxWidth = DrawerDefaults.getMaximumDrawerWidth(),
+                )
+                .fillMaxHeight(),
         shape = drawerShape,
         color = drawerContainerColor,
         contentColor = drawerContentColor,
@@ -642,16 +648,16 @@ object DrawerDefaults {
 
     /** Default and maximum width of a navigation drawer **/
     @Composable
-    fun getMaximumDrawerWidth() =
-        getContainerWidth()
+    fun getMaximumDrawerWidth() = getContainerWidth()
 
     /**
      * Default window insets for drawer sheets
      */
     val windowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.systemBarsForVisualComponents
-            .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
+        get() =
+            WindowInsets.systemBarsForVisualComponents
+                .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 
 /**
@@ -690,9 +696,10 @@ fun NavigationDrawerItem(
     Surface(
         selected = selected,
         onClick = onClick,
-        modifier = modifier
-            .height(NavigationDrawerTokens.ActiveIndicatorHeight)
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .height(NavigationDrawerTokens.ActiveIndicatorHeight)
+                .fillMaxWidth(),
         shape = shape,
         color = colors.containerColor(selected).value,
         interactionSource = interactionSource,
@@ -785,16 +792,17 @@ object NavigationDrawerItemDefaults {
         unselectedTextColor: Color = NavigationDrawerTokens.InactiveLabelTextColor.toColor(),
         selectedBadgeColor: Color = selectedTextColor,
         unselectedBadgeColor: Color = unselectedTextColor,
-    ): NavigationDrawerItemColors = DefaultDrawerItemsColor(
-        selectedIconColor,
-        unselectedIconColor,
-        selectedTextColor,
-        unselectedTextColor,
-        selectedContainerColor,
-        unselectedContainerColor,
-        selectedBadgeColor,
-        unselectedBadgeColor,
-    )
+    ): NavigationDrawerItemColors =
+        DefaultDrawerItemsColor(
+            selectedIconColor,
+            unselectedIconColor,
+            selectedTextColor,
+            unselectedTextColor,
+            selectedContainerColor,
+            unselectedContainerColor,
+            selectedBadgeColor,
+            unselectedBadgeColor,
+        )
 
     /**
      * Default external padding for a [NavigationDrawerItem] according to the Material
@@ -867,8 +875,11 @@ private class DefaultDrawerItemsColor(
     }
 }
 
-private fun calculateFraction(a: Float, b: Float, pos: Float) =
-    ((pos - a) / (b - a)).coerceIn(0f, 1f)
+private fun calculateFraction(
+    a: Float,
+    b: Float,
+    pos: Float,
+) = ((pos - a) / (b - a)).coerceIn(0f, 1f)
 
 @Composable
 private fun Scrim(
@@ -878,16 +889,20 @@ private fun Scrim(
     color: Color,
 ) {
     val closeDrawer = getString(Strings.CloseDrawer)
-    val dismissDrawer = if (open) {
-        Modifier
-            .pointerInput(onClose) { detectTapGestures { onClose() } }
-            .semantics(mergeDescendants = true) {
-                contentDescription = closeDrawer
-                onClick { onClose(); true }
-            }
-    } else {
-        Modifier
-    }
+    val dismissDrawer =
+        if (open) {
+            Modifier
+                .pointerInput(onClose) { detectTapGestures { onClose() } }
+                .semantics(mergeDescendants = true) {
+                    contentDescription = closeDrawer
+                    onClick {
+                        onClose()
+                        true
+                    }
+                }
+        } else {
+            Modifier
+        }
 
     Canvas(
         Modifier

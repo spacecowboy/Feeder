@@ -2,11 +2,11 @@ package com.nononsenseapps.feeder.model.opml
 
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.Feed
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 suspend fun writeFile(
     path: String,
@@ -116,11 +116,17 @@ suspend fun opml(init: suspend Opml.() -> Unit): Opml {
 }
 
 interface Element {
-    fun render(builder: StringBuilder, indent: String)
+    fun render(
+        builder: StringBuilder,
+        indent: String,
+    )
 }
 
 class TextElement(val text: String) : Element {
-    override fun render(builder: StringBuilder, indent: String) {
+    override fun render(
+        builder: StringBuilder,
+        indent: String,
+    ) {
         builder.append("$indent$text\n")
     }
 }
@@ -129,13 +135,19 @@ abstract class Tag(val name: String) : Element {
     val children = arrayListOf<Element>()
     val attributes = linkedMapOf<String, String>()
 
-    protected suspend fun <T : Element> initTag(tag: T, init: suspend T.() -> Unit): T {
+    protected suspend fun <T : Element> initTag(
+        tag: T,
+        init: suspend T.() -> Unit,
+    ): T {
         tag.init()
         children.add(tag)
         return tag
     }
 
-    override fun render(builder: StringBuilder, indent: String) {
+    override fun render(
+        builder: StringBuilder,
+        indent: String,
+    ) {
         builder.append("$indent<$name${renderAttributes()}")
         if (children.isEmpty()) {
             builder.append("/>\n")
@@ -176,6 +188,7 @@ class Opml : TagWithText("opml") {
     }
 
     suspend fun head(init: suspend Head.() -> Unit) = initTag(Head(), init)
+
     suspend fun body(init: suspend Body.() -> Unit) = initTag(Body(), init)
 }
 
@@ -186,9 +199,7 @@ class Head : TagWithText("head") {
 class Title : TagWithText("title")
 
 abstract class BodyTag(name: String) : TagWithText(name) {
-    suspend fun feederSettings(
-        init: suspend FeederSettings.() -> Unit,
-    ) {
+    suspend fun feederSettings(init: suspend FeederSettings.() -> Unit) {
         initTag(FeederSettings(), init)
     }
 
@@ -210,32 +221,29 @@ abstract class BodyTag(name: String) : TagWithText(name) {
         }
     }
 
-    suspend fun Feed.toOutline() = outline(
-        title = escape(displayTitle),
-        type = "rss",
-        xmlUrl = escape(url.toString()),
-    ) {
-        val feed = this@toOutline
-        notify = feed.notify
-        feed.imageUrl?.let { imageUrl = escape(it.toString()) }
-        fullTextByDefault = feed.fullTextByDefault
-        openArticlesWith = feed.openArticlesWith
-        alternateId = feed.alternateId
-    }
+    suspend fun Feed.toOutline() =
+        outline(
+            title = escape(displayTitle),
+            type = "rss",
+            xmlUrl = escape(url.toString()),
+        ) {
+            val feed = this@toOutline
+            notify = feed.notify
+            feed.imageUrl?.let { imageUrl = escape(it.toString()) }
+            fullTextByDefault = feed.fullTextByDefault
+            openArticlesWith = feed.openArticlesWith
+            alternateId = feed.alternateId
+        }
 }
 
 class Body : BodyTag("body")
 
 class FeederSettings : BodyTag("feeder:settings") {
-    suspend fun feederSetting(
-        init: suspend FeederSetting.() -> Unit,
-    ) {
+    suspend fun feederSetting(init: suspend FeederSetting.() -> Unit) {
         initTag(FeederSetting(), init)
     }
 
-    suspend fun feederBlocked(
-        init: suspend FeederBlocked.() -> Unit,
-    ) {
+    suspend fun feederBlocked(init: suspend FeederBlocked.() -> Unit) {
         initTag(FeederBlocked(), init)
     }
 }

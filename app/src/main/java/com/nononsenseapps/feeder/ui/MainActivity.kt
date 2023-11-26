@@ -49,16 +49,17 @@ class MainActivity : DIAwareComponentActivity() {
         maybeRequestSync()
     }
 
-    private fun maybeRequestSync() = lifecycleScope.launch {
-        if (mainActivityViewModel.shouldSyncOnResume) {
-            if (mainActivityViewModel.isOkToSyncAutomatically()) {
-                requestFeedSync(
-                    di = di,
-                    forceNetwork = false,
-                )
+    private fun maybeRequestSync() =
+        lifecycleScope.launch {
+            if (mainActivityViewModel.shouldSyncOnResume) {
+                if (mainActivityViewModel.isOkToSyncAutomatically()) {
+                    requestFeedSync(
+                        di = di,
+                        forceNetwork = false,
+                    )
+                }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,11 +97,12 @@ class MainActivity : DIAwareComponentActivity() {
         }
 
         DisposableEffect(navController) {
-            val listener = Consumer<Intent> { intent ->
-                if (!navController.handleDeepLink(intent)) {
-                    Log.e(LOG_TAG, "NavController rejected intent: $intent")
+            val listener =
+                Consumer<Intent> { intent ->
+                    if (!navController.handleDeepLink(intent)) {
+                        Log.e(LOG_TAG, "NavController rejected intent: $intent")
+                    }
                 }
-            }
             addOnNewIntentListener(listener)
             onDispose { removeOnNewIntentListener(listener) }
         }

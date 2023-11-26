@@ -145,24 +145,30 @@ object AesCbcWithIntegrity {
      * or a suitable RNG is not available
      */
     @Throws(GeneralSecurityException::class)
-    fun generateKeyFromPassword(password: String, salt: ByteArray): SecretKeys {
+    fun generateKeyFromPassword(
+        password: String,
+        salt: ByteArray,
+    ): SecretKeys {
         // Get enough random bytes for both the AES key and the HMAC key:
-        val keySpec: KeySpec = PBEKeySpec(
-            password.toCharArray(),
-            salt,
-            PBE_ITERATION_COUNT,
-            AES_KEY_LENGTH_BITS + HMAC_KEY_LENGTH_BITS,
-        )
-        val keyFactory = SecretKeyFactory
-            .getInstance(PBE_ALGORITHM)
+        val keySpec: KeySpec =
+            PBEKeySpec(
+                password.toCharArray(),
+                salt,
+                PBE_ITERATION_COUNT,
+                AES_KEY_LENGTH_BITS + HMAC_KEY_LENGTH_BITS,
+            )
+        val keyFactory =
+            SecretKeyFactory
+                .getInstance(PBE_ALGORITHM)
         val keyBytes = keyFactory.generateSecret(keySpec).encoded
 
         // Split the random bytes into two parts:
         val confidentialityKeyBytes = keyBytes.copyOfRange(0, AES_KEY_LENGTH_BITS / 8)
-        val integrityKeyBytes = keyBytes.copyOfRange(
-            AES_KEY_LENGTH_BITS / 8,
-            AES_KEY_LENGTH_BITS / 8 + HMAC_KEY_LENGTH_BITS / 8,
-        )
+        val integrityKeyBytes =
+            keyBytes.copyOfRange(
+                AES_KEY_LENGTH_BITS / 8,
+                AES_KEY_LENGTH_BITS / 8 + HMAC_KEY_LENGTH_BITS / 8,
+            )
 
         // Generate the AES key
         val confidentialityKey: SecretKey = SecretKeySpec(confidentialityKeyBytes, CIPHER)
@@ -180,7 +186,10 @@ object AesCbcWithIntegrity {
      * @throws GeneralSecurityException
      */
     @Throws(GeneralSecurityException::class)
-    fun generateKeyFromPassword(password: String, salt: String): SecretKeys {
+    fun generateKeyFromPassword(
+        password: String,
+        salt: String,
+    ): SecretKeys {
         return generateKeyFromPassword(password, Base64.decode(salt, BASE64_FLAGS))
     }
 
@@ -228,6 +237,7 @@ object AesCbcWithIntegrity {
  * Encryption
  * -----------------------------------------------------------------
  */
+
     /**
      * Generates a random IV and encrypts this plain text with the given key. Then attaches
      * a hashed MAC, which is contained in the CipherTextIvMac class.
@@ -245,11 +255,12 @@ object AesCbcWithIntegrity {
         plaintext: String,
         secretKeys: SecretKeys,
         encoding: Charset = Charsets.UTF_8,
-    ): String = encrypt(
-        plaintext = plaintext,
-        secretKeys = secretKeys,
-        encoding = encoding,
-    ).toString()
+    ): String =
+        encrypt(
+            plaintext = plaintext,
+            secretKeys = secretKeys,
+            encoding = encoding,
+        ).toString()
 
     /**
      * Generates a random IV and encrypts this plain text with the given key. Then attaches
@@ -282,7 +293,10 @@ object AesCbcWithIntegrity {
      * @throws GeneralSecurityException if AES is not implemented on this system
      */
     @Throws(GeneralSecurityException::class)
-    fun encrypt(plaintext: ByteArray, secretKeys: SecretKeys): CipherTextIvMac {
+    fun encrypt(
+        plaintext: ByteArray,
+        secretKeys: SecretKeys,
+    ): CipherTextIvMac {
         var iv = generateIv()
         val aesCipherForEncryption = Cipher.getInstance(CIPHER_TRANSFORMATION)
         aesCipherForEncryption.init(
@@ -307,6 +321,7 @@ object AesCbcWithIntegrity {
  * Decryption
  * -----------------------------------------------------------------
  */
+
     /**
      * AES CBC decrypt.
      *
@@ -354,7 +369,10 @@ object AesCbcWithIntegrity {
      * @throws GeneralSecurityException if MACs don't match or AES is not implemented
      */
     @Throws(GeneralSecurityException::class)
-    fun decrypt(civ: CipherTextIvMac, secretKeys: SecretKeys): ByteArray {
+    fun decrypt(
+        civ: CipherTextIvMac,
+        secretKeys: SecretKeys,
+    ): ByteArray {
         val ivCipherConcat = CipherTextIvMac.ivCipherConcat(civ.iv, civ.cipherText)
         val computedMac = generateMac(ivCipherConcat, secretKeys.integrityKey)
         return if (constantTimeEq(computedMac, civ.mac)) {
@@ -375,6 +393,7 @@ object AesCbcWithIntegrity {
  * Helper Code
  * -----------------------------------------------------------------
  */
+
     /**
      * Generate the mac based on HMAC_ALGORITHM
      * @param integrityKey The key used for hmac
@@ -384,7 +403,10 @@ object AesCbcWithIntegrity {
      * @throws InvalidKeyException
      */
     @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class)
-    fun generateMac(byteCipherText: ByteArray, integrityKey: SecretKey): ByteArray {
+    fun generateMac(
+        byteCipherText: ByteArray,
+        integrityKey: SecretKey,
+    ): ByteArray {
         // Now compute the mac for later integrity checking
         val sha256HMAC = Mac.getInstance(HMAC_ALGORITHM)
         sha256HMAC.init(integrityKey)
@@ -397,7 +419,10 @@ object AesCbcWithIntegrity {
      * @param b
      * @return true iff the arrays are exactly equal.
      */
-    private fun constantTimeEq(a: ByteArray, b: ByteArray): Boolean {
+    private fun constantTimeEq(
+        a: ByteArray,
+        b: ByteArray,
+    ): Boolean {
         if (a.size != b.size) {
             return false
         }
@@ -422,14 +447,16 @@ class SecretKeys(
      * @return base64(confidentialityKey):base64(integrityKey)
      */
     override fun toString(): String {
-        val a = Base64.encodeToString(
-            confidentialityKey.encoded,
-            AesCbcWithIntegrity.BASE64_FLAGS,
-        )
-        val b = Base64.encodeToString(
-            integrityKey.encoded,
-            AesCbcWithIntegrity.BASE64_FLAGS,
-        )
+        val a =
+            Base64.encodeToString(
+                confidentialityKey.encoded,
+                AesCbcWithIntegrity.BASE64_FLAGS,
+            )
+        val b =
+            Base64.encodeToString(
+                integrityKey.encoded,
+                AesCbcWithIntegrity.BASE64_FLAGS,
+            )
         return "$a:$b"
     }
 
@@ -528,7 +555,10 @@ class CipherTextIvMac {
          * @param cipherText the cipherText to append
          * @return iv:cipherText, a new byte array.
          */
-        fun ivCipherConcat(iv: ByteArray, cipherText: ByteArray): ByteArray {
+        fun ivCipherConcat(
+            iv: ByteArray,
+            cipherText: ByteArray,
+        ): ByteArray {
             val combined = ByteArray(iv.size + cipherText.size)
             System.arraycopy(iv, 0, combined, 0, iv.size)
             System.arraycopy(cipherText, 0, combined, iv.size, cipherText.size)

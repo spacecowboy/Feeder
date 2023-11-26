@@ -36,13 +36,14 @@ fun WithFeederTextToolbar(content: @Composable () -> Unit) {
 
 class FeederTextToolbar(private val view: View, activityLauncher: ActivityLauncher) : TextToolbar {
     private var actionMode: ActionMode? = null
-    private val textActionModeCallback: FeederTextActionModeCallback = FeederTextActionModeCallback(
-        context = view.context,
-        activityLauncher = activityLauncher,
-        onActionModeDestroy = {
-            actionMode = null
-        },
-    )
+    private val textActionModeCallback: FeederTextActionModeCallback =
+        FeederTextActionModeCallback(
+            context = view.context,
+            activityLauncher = activityLauncher,
+            onActionModeDestroy = {
+                actionMode = null
+            },
+        )
     override var status: TextToolbarStatus = TextToolbarStatus.Hidden
         private set
 
@@ -66,10 +67,11 @@ class FeederTextToolbar(private val view: View, activityLauncher: ActivityLaunch
         textActionModeCallback.onSelectAllRequested = onSelectAllRequested
         if (actionMode == null) {
             status = TextToolbarStatus.Shown
-            actionMode = view.startActionMode(
-                FloatingTextActionModeCallback(textActionModeCallback),
-                ActionMode.TYPE_FLOATING,
-            )
+            actionMode =
+                view.startActionMode(
+                    FloatingTextActionModeCallback(textActionModeCallback),
+                    ActionMode.TYPE_FLOATING,
+                )
         } else {
             actionMode?.invalidate()
         }
@@ -98,7 +100,10 @@ class FeederTextActionModeCallback(
 
     private val textProcessors = mutableListOf<ComponentName>()
 
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    override fun onCreateActionMode(
+        mode: ActionMode?,
+        menu: Menu?,
+    ): Boolean {
         requireNotNull(menu)
         requireNotNull(mode)
 
@@ -121,14 +126,20 @@ class FeederTextActionModeCallback(
         return true
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    override fun onPrepareActionMode(
+        mode: ActionMode?,
+        menu: Menu?,
+    ): Boolean {
         if (mode == null || menu == null) return false
         updateMenuItems(menu)
         // should return true so that new menu items are populated
         return true
     }
 
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+    override fun onActionItemClicked(
+        mode: ActionMode?,
+        item: MenuItem?,
+    ): Boolean {
         when (val itemId = item!!.itemId) {
             MenuItemOption.Copy.id -> onCopyRequested?.invoke()
             MenuItemOption.Paste.id -> onPasteRequested?.invoke()
@@ -146,11 +157,12 @@ class FeederTextActionModeCallback(
                     textProcessors.getOrNull(itemId - 100)?.let { cn ->
                         activityLauncher.startActivity(
                             openAdjacentIfSuitable = true,
-                            intent = Intent(Intent.ACTION_PROCESS_TEXT).apply {
-                                type = "text/plain"
-                                component = cn
-                                putExtra(Intent.EXTRA_PROCESS_TEXT, clip.getItemAt(0).text)
-                            },
+                            intent =
+                                Intent(Intent.ACTION_PROCESS_TEXT).apply {
+                                    type = "text/plain"
+                                    component = cn
+                                    putExtra(Intent.EXTRA_PROCESS_TEXT, clip.getItemAt(0).text)
+                                },
                         )
                     }
                 }
@@ -175,9 +187,10 @@ class FeederTextActionModeCallback(
     private fun addTextProcessors(menu: Menu) {
         textProcessors.clear()
 
-        val intent = Intent(Intent.ACTION_PROCESS_TEXT).apply {
-            type = "text/plain"
-        }
+        val intent =
+            Intent(Intent.ACTION_PROCESS_TEXT).apply {
+                type = "text/plain"
+            }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
@@ -215,7 +228,10 @@ class FeederTextActionModeCallback(
         }
     }
 
-    private fun addMenuItem(menu: Menu, item: MenuItemOption) {
+    private fun addMenuItem(
+        menu: Menu,
+        item: MenuItemOption,
+    ) {
         menu.add(0, item.id, item.order, item.titleResource)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
     }
@@ -240,12 +256,13 @@ internal enum class MenuItemOption(val id: Int) {
     ;
 
     val titleResource: Int
-        get() = when (this) {
-            Copy -> android.R.string.copy
-            Paste -> android.R.string.paste
-            Cut -> android.R.string.cut
-            SelectAll -> android.R.string.selectAll
-        }
+        get() =
+            when (this) {
+                Copy -> android.R.string.copy
+                Paste -> android.R.string.paste
+                Cut -> android.R.string.cut
+                SelectAll -> android.R.string.selectAll
+            }
 
     /**
      * This item will be shown before all items that have order greater than this value.
@@ -256,15 +273,24 @@ internal enum class MenuItemOption(val id: Int) {
 internal class FloatingTextActionModeCallback(
     private val callback: FeederTextActionModeCallback,
 ) : ActionMode.Callback2() {
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+    override fun onActionItemClicked(
+        mode: ActionMode?,
+        item: MenuItem?,
+    ): Boolean {
         return callback.onActionItemClicked(mode, item)
     }
 
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    override fun onCreateActionMode(
+        mode: ActionMode?,
+        menu: Menu?,
+    ): Boolean {
         return callback.onCreateActionMode(mode, menu)
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+    override fun onPrepareActionMode(
+        mode: ActionMode?,
+        menu: Menu?,
+    ): Boolean {
         return callback.onPrepareActionMode(mode, menu)
     }
 

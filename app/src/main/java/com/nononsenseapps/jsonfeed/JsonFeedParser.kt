@@ -3,13 +3,13 @@ package com.nononsenseapps.jsonfeed
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import java.io.File
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
+import java.io.File
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 fun cachingHttpClient(
     cacheDirectory: File? = null,
@@ -41,8 +41,7 @@ fun cachingHttpClient(
     return builder.build()
 }
 
-fun feedAdapter(): JsonAdapter<Feed> =
-    Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build().adapter(Feed::class.java)
+fun feedAdapter(): JsonAdapter<Feed> = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build().adapter(Feed::class.java)
 
 /**
  * A parser for JSONFeeds. CacheDirectory and CacheSize are only relevant if feeds are downloaded. They are not used
@@ -52,7 +51,6 @@ class JsonFeedParser(
     private val httpClient: OkHttpClient,
     private val jsonFeedAdapter: JsonAdapter<Feed>,
 ) {
-
     constructor(
         cacheDirectory: File? = null,
         cacheSize: Long = 10L * 1024L * 1024L,
@@ -76,9 +74,10 @@ class JsonFeedParser(
     fun parseUrl(url: String): Feed {
         val request: Request
         try {
-            request = Request.Builder()
-                .url(url)
-                .build()
+            request =
+                Request.Builder()
+                    .url(url)
+                    .build()
         } catch (error: Throwable) {
             throw IllegalArgumentException(
                 "Bad URL. Perhaps it is missing an http:// prefix?",
@@ -117,14 +116,14 @@ class JsonFeedParser(
     /**
      * Parse a JSONFeed
      */
-    fun parseJson(responseBody: ResponseBody): Feed =
-        parseJson(responseBody.string())
+    fun parseJson(responseBody: ResponseBody): Feed = parseJson(responseBody.string())
 
     /**
      * Parse a JSONFeed
      */
-    fun parseJson(json: String): Feed = jsonFeedAdapter.fromJson(json)
-        ?: throw IOException("Failed to parse JSONFeed")
+    fun parseJson(json: String): Feed =
+        jsonFeedAdapter.fromJson(json)
+            ?: throw IOException("Failed to parse JSONFeed")
 }
 
 data class Feed(

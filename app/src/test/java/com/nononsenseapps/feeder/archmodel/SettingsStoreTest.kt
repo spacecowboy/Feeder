@@ -14,9 +14,6 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import java.time.Instant
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -25,6 +22,9 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.time.Instant
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class SettingsStoreTest : DIAware {
     private val store: SettingsStore by instance()
@@ -377,15 +377,16 @@ class SettingsStoreTest : DIAware {
 
     @Test
     fun getAllSettingsForOPMLExport() {
-        every { sp.all } returns mapOf(
-            PREF_SHOW_FAB to false,
-            "Not a pref" to true,
-            // Not OK if imported on a fresh device
-            PREF_LAST_FEED_TAG to "foo",
-            PREF_LAST_FEED_ID to 1L,
-            PREF_LAST_ARTICLE_ID to 2L,
-            PREF_IS_ARTICLE_OPEN to true,
-        )
+        every { sp.all } returns
+            mapOf(
+                PREF_SHOW_FAB to false,
+                "Not a pref" to true,
+                // Not OK if imported on a fresh device
+                PREF_LAST_FEED_TAG to "foo",
+                PREF_LAST_FEED_ID to 1L,
+                PREF_LAST_ARTICLE_ID to 2L,
+                PREF_IS_ARTICLE_OPEN to true,
+            )
         val allSettings = store.getAllSettings()
         assertEquals(1, allSettings.size)
     }

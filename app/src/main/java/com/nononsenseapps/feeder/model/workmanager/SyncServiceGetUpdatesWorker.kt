@@ -14,11 +14,11 @@ import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceGetUpdatesWorker.Companion.UNIQUE_GETUPDATES_NAME
 import com.nononsenseapps.feeder.sync.SyncRestClient
-import java.util.concurrent.TimeUnit
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
+import java.util.concurrent.TimeUnit
 
 class SyncServiceGetUpdatesWorker(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), DIAware {
@@ -55,9 +55,10 @@ fun scheduleGetUpdates(di: DI) {
     Log.d(SyncServiceGetUpdatesWorker.LOG_TAG, "Scheduling work")
     val repository by di.instance<Repository>()
 
-    val constraints = Constraints.Builder()
-        // This prevents expedited if true
-        .setRequiresCharging(repository.syncOnlyWhenCharging.value)
+    val constraints =
+        Constraints.Builder()
+            // This prevents expedited if true
+            .setRequiresCharging(repository.syncOnlyWhenCharging.value)
 
     if (repository.syncOnlyOnWifi.value) {
         constraints.setRequiredNetworkType(NetworkType.UNMETERED)
@@ -65,10 +66,11 @@ fun scheduleGetUpdates(di: DI) {
         constraints.setRequiredNetworkType(NetworkType.CONNECTED)
     }
 
-    val workRequest = OneTimeWorkRequestBuilder<SyncServiceGetUpdatesWorker>()
-        .addTag("feeder")
-        .keepResultsForAtLeast(5, TimeUnit.MINUTES)
-        .setConstraints(constraints.build())
+    val workRequest =
+        OneTimeWorkRequestBuilder<SyncServiceGetUpdatesWorker>()
+            .addTag("feeder")
+            .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+            .setConstraints(constraints.build())
 
     val workManager by di.instance<WorkManager>()
     workManager.enqueueUniqueWork(

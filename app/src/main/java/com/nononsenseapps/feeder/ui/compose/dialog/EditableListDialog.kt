@@ -74,27 +74,30 @@ fun EditableListDialog(
                     label = {
                         Text(stringResource(id = R.string.add_item))
                     },
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrect = true,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            onAddItem(newValue)
-                            newValue = ""
-                        },
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .interceptKey(Key.Enter) {
-                            onAddItem(newValue)
-                            newValue = ""
-                        }
-                        .interceptKey(Key.Escape) {
-                            onDismiss()
-                        },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            capitalization = KeyboardCapitalization.None,
+                            autoCorrect = true,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onNext = {
+                                onAddItem(newValue)
+                                newValue = ""
+                            },
+                        ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .interceptKey(Key.Enter) {
+                                onAddItem(newValue)
+                                newValue = ""
+                            }
+                            .interceptKey(Key.Escape) {
+                                onDismiss()
+                            },
                 )
             }
         },
@@ -102,9 +105,10 @@ fun EditableListDialog(
         text = {
             LazyColumn(
                 state = lazyListState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
             ) {
                 items(
                     items.item,
@@ -113,9 +117,10 @@ fun EditableListDialog(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = minimumTouchSize),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = minimumTouchSize),
                     ) {
                         Text(
                             text = item,
@@ -141,7 +146,7 @@ fun EditableListDialog(
 
 @Preview
 @Composable
-fun PreviewDialog() {
+private fun PreviewDialog() {
     FeederTheme {
         EditableListDialog(
             title = {

@@ -5,7 +5,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 
 abstract class HtmlComposer : HtmlParser() {
-
     abstract fun appendImage(
         link: String? = null,
         onLinkClick: (String) -> Unit,
@@ -28,38 +27,30 @@ abstract class HtmlParser {
     val endsWithWhitespace: Boolean
         get() = builder.endsWithWhitespace
 
-    fun append(text: String) =
-        builder.append(text)
+    fun append(text: String) = builder.append(text)
 
-    fun append(char: Char) =
-        builder.append(char)
+    fun append(char: Char) = builder.append(char)
 
-    fun pop(index: Int) =
-        builder.pop(index)
+    fun pop(index: Int) = builder.pop(index)
 
-    fun pushStyle(style: SpanStyle): Int =
-        builder.pushStyle(style)
+    fun pushStyle(style: SpanStyle): Int = builder.pushStyle(style)
 
-    fun pushSpan(span: Span) =
-        spanStack.add(span)
+    fun pushSpan(span: Span) = spanStack.add(span)
 
-    fun pushStringAnnotation(tag: String, annotation: String): Int =
-        builder.pushStringAnnotation(tag = tag, annotation = annotation)
+    fun pushStringAnnotation(
+        tag: String,
+        annotation: String,
+    ): Int = builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
-    fun pushComposableStyle(style: @Composable () -> SpanStyle): Int =
-        builder.pushComposableStyle(style)
+    fun pushComposableStyle(style: @Composable () -> SpanStyle): Int = builder.pushComposableStyle(style)
 
-    fun popComposableStyle(index: Int) =
-        builder.popComposableStyle(index)
+    fun popComposableStyle(index: Int) = builder.popComposableStyle(index)
 
-    fun pushTextStyle(style: TextStyler) =
-        textStyleStack.add(style)
+    fun pushTextStyle(style: TextStyler) = textStyleStack.add(style)
 
-    fun popTextStyle() =
-        textStyleStack.removeLastOrNull()
+    fun popTextStyle() = textStyleStack.removeLastOrNull()
 
-    fun popSpan() =
-        spanStack.removeLast()
+    fun popSpan() = spanStack.removeLast()
 
     protected fun findClosestLink(): String? {
         for (span in spanStack.reversed()) {
@@ -85,9 +76,7 @@ inline fun <R : Any> HtmlComposer.withTextStyle(
     }
 }
 
-inline fun <R : Any> HtmlParser.withParagraph(
-    crossinline block: HtmlParser.() -> R,
-): R {
+inline fun <R : Any> HtmlParser.withParagraph(crossinline block: HtmlParser.() -> R): R {
     emitParagraph()
     return block(this).also {
         emitParagraph()

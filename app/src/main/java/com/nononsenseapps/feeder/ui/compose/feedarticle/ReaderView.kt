@@ -93,76 +93,85 @@ fun ReaderView(
 ) {
     val dimens = LocalDimens.current
 
-    val readTimeSecs = remember(wordCount) {
-        wordsToReadTimeSecs(wordCount)
-    }
+    val readTimeSecs =
+        remember(wordCount) {
+            wordsToReadTimeSecs(wordCount)
+        }
 
     SelectionContainer {
         LazyColumn(
             state = articleListState,
-            contentPadding = PaddingValues(
-                bottom = 92.dp,
-                start = when (screenType) {
-                    ScreenType.DUAL -> 0.dp // List items have enough padding
-                    ScreenType.SINGLE -> dimens.margin
-                },
-                end = dimens.margin,
-            ),
+            contentPadding =
+                PaddingValues(
+                    bottom = 92.dp,
+                    start =
+                        when (screenType) {
+                            ScreenType.DUAL -> 0.dp // List items have enough padding
+                            ScreenType.SINGLE -> dimens.margin
+                        },
+                    end = dimens.margin,
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = modifier
-                .fillMaxWidth()
-                .focusGroup(),
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .focusGroup(),
         ) {
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .width(dimens.maxReaderWidth)
-                        .semantics(mergeDescendants = true) {
-                            try {
-                                customActions = listOf(
-                                    // TODO enclosure?
-                                    CustomAccessibilityAction(goToFeedLabel) {
-                                        onFeedTitleClick()
-                                        true
-                                    },
-                                )
-                            } catch (e: Exception) {
-                                // Observed nullpointer exception when setting customActions
-                                // No clue why it could be null
-                                Log.e("FeederReaderScreen", "Exception in semantics", e)
-                            }
-                        },
+                    modifier =
+                        Modifier
+                            .width(dimens.maxReaderWidth)
+                            .semantics(mergeDescendants = true) {
+                                try {
+                                    customActions =
+                                        listOf(
+                                            // TODO enclosure?
+                                            CustomAccessibilityAction(goToFeedLabel) {
+                                                onFeedTitleClick()
+                                                true
+                                            },
+                                        )
+                                } catch (e: Exception) {
+                                    // Observed nullpointer exception when setting customActions
+                                    // No clue why it could be null
+                                    Log.e("FeederReaderScreen", "Exception in semantics", e)
+                                }
+                            },
                 ) {
                     WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
                         val interactionSource = remember { MutableInteractionSource() }
                         Text(
                             text = articleTitle,
                             style = MaterialTheme.typography.headlineLarge,
-                            modifier = Modifier
-                                .indication(interactionSource, LocalIndication.current)
-                                .focusableInNonTouchMode(interactionSource = interactionSource)
-                                .width(dimens.maxReaderWidth),
+                            modifier =
+                                Modifier
+                                    .indication(interactionSource, LocalIndication.current)
+                                    .focusableInNonTouchMode(interactionSource = interactionSource)
+                                    .width(dimens.maxReaderWidth),
                         )
                     }
                     ProvideScaledText(
-                        style = MaterialTheme.typography.titleMedium.merge(
-                            LinkTextStyle(),
-                        ),
+                        style =
+                            MaterialTheme.typography.titleMedium.merge(
+                                LinkTextStyle(),
+                            ),
                     ) {
                         WithBidiDeterminedLayoutDirection(paragraph = feedTitle) {
                             Text(
                                 text = feedTitle,
-                                modifier = Modifier
-                                    .width(dimens.maxReaderWidth)
-                                    .clearAndSetSemantics {
-                                        contentDescription = feedTitle
-                                    }
-                                    .clickable {
-                                        onFeedTitleClick()
-                                    },
+                                modifier =
+                                    Modifier
+                                        .width(dimens.maxReaderWidth)
+                                        .clearAndSetSemantics {
+                                            contentDescription = feedTitle
+                                        }
+                                        .clickable {
+                                            onFeedTitleClick()
+                                        },
                             )
                         }
                     }
@@ -173,10 +182,11 @@ fun ReaderView(
                                     val interactionSource = remember { MutableInteractionSource() }
                                     Text(
                                         text = authorDate,
-                                        modifier = Modifier
-                                            .width(dimens.maxReaderWidth)
-                                            .indication(interactionSource, LocalIndication.current)
-                                            .focusableInNonTouchMode(interactionSource = interactionSource),
+                                        modifier =
+                                            Modifier
+                                                .width(dimens.maxReaderWidth)
+                                                .indication(interactionSource, LocalIndication.current)
+                                                .focusableInNonTouchMode(interactionSource = interactionSource),
                                     )
                                 }
                             }
@@ -204,13 +214,14 @@ fun ReaderView(
                                             remember { MutableInteractionSource() }
                                         Text(
                                             text = readTimeText,
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .indication(
-                                                    interactionSource,
-                                                    LocalIndication.current,
-                                                )
-                                                .focusableInNonTouchMode(interactionSource = interactionSource),
+                                            modifier =
+                                                Modifier
+                                                    .weight(1f)
+                                                    .indication(
+                                                        interactionSource,
+                                                        LocalIndication.current,
+                                                    )
+                                                    .focusableInNonTouchMode(interactionSource = interactionSource),
                                         )
                                     }
                                 }
@@ -224,75 +235,84 @@ fun ReaderView(
                 item {
                     if (enclosure.isImage) {
                         BoxWithConstraints(
-                            modifier = Modifier
-                                .clip(RectangleShape)
-                                .fillMaxWidth(),
+                            modifier =
+                                Modifier
+                                    .clip(RectangleShape)
+                                    .fillMaxWidth(),
                         ) {
                             WithTooltipIfNotBlank(tooltip = enclosure.name) { innerModifier ->
                                 val imageWidth by rememberMaxImageWidth()
                                 AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(enclosure.link)
-                                        .scale(Scale.FIT)
-                                        .size(imageWidth)
-                                        .precision(Precision.INEXACT)
-                                        .build(),
+                                    model =
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(enclosure.link)
+                                            .scale(Scale.FIT)
+                                            .size(imageWidth)
+                                            .precision(Precision.INEXACT)
+                                            .build(),
                                     contentDescription = enclosure.name,
-                                    placeholder = rememberTintedVectorPainter(
-                                        Icons.Outlined.Terrain,
-                                    ),
+                                    placeholder =
+                                        rememberTintedVectorPainter(
+                                            Icons.Outlined.Terrain,
+                                        ),
                                     error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                    contentScale = if (dimens.hasImageAspectRatioInReader) {
-                                        ContentScale.Fit
-                                    } else {
-                                        ContentScale.FillWidth
-                                    },
-                                    modifier = innerModifier
-                                        .fillMaxWidth()
-                                        .run {
-                                            dimens.imageAspectRatioInReader?.let { ratio ->
-                                                aspectRatio(ratio)
-                                            } ?: this
+                                    contentScale =
+                                        if (dimens.hasImageAspectRatioInReader) {
+                                            ContentScale.Fit
+                                        } else {
+                                            ContentScale.FillWidth
                                         },
+                                    modifier =
+                                        innerModifier
+                                            .fillMaxWidth()
+                                            .run {
+                                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                                    aspectRatio(ratio)
+                                                } ?: this
+                                            },
                                 )
                             }
                         }
                     } else {
-                        val openLabel = if (enclosure.name.isBlank()) {
-                            stringResource(R.string.open_enclosed_media)
-                        } else {
-                            stringResource(R.string.open_enclosed_media_file, enclosure.name)
-                        }
+                        val openLabel =
+                            if (enclosure.name.isBlank()) {
+                                stringResource(R.string.open_enclosed_media)
+                            } else {
+                                stringResource(R.string.open_enclosed_media_file, enclosure.name)
+                            }
                         ProvideScaledText(
-                            style = MaterialTheme.typography.bodyLarge.merge(
-                                LinkTextStyle(),
-                            ),
+                            style =
+                                MaterialTheme.typography.bodyLarge.merge(
+                                    LinkTextStyle(),
+                                ),
                         ) {
                             Text(
                                 text = openLabel,
-                                modifier = Modifier
-                                    .width(dimens.maxReaderWidth)
-                                    .clickable {
-                                        onEnclosureClick()
-                                    }
-                                    .clearAndSetSemantics {
-                                        try {
-                                            customActions = listOf(
-                                                CustomAccessibilityAction(openLabel) {
-                                                    onEnclosureClick()
-                                                    true
-                                                },
-                                            )
-                                        } catch (e: Exception) {
-                                            // Observed nullpointer exception when setting customActions
-                                            // No clue why it could be null
-                                            Log.e(
-                                                LOG_TAG,
-                                                "Exception in semantics",
-                                                e,
-                                            )
+                                modifier =
+                                    Modifier
+                                        .width(dimens.maxReaderWidth)
+                                        .clickable {
+                                            onEnclosureClick()
                                         }
-                                    },
+                                        .clearAndSetSemantics {
+                                            try {
+                                                customActions =
+                                                    listOf(
+                                                        CustomAccessibilityAction(openLabel) {
+                                                            onEnclosureClick()
+                                                            true
+                                                        },
+                                                    )
+                                            } catch (e: Exception) {
+                                                // Observed nullpointer exception when setting customActions
+                                                // No clue why it could be null
+                                                Log.e(
+                                                    LOG_TAG,
+                                                    "Exception in semantics",
+                                                    e,
+                                                )
+                                            }
+                                        },
                             )
                         }
                     }
@@ -306,7 +326,7 @@ fun ReaderView(
 
 @Preview
 @Composable
-fun ReaderPreview() {
+private fun ReaderPreview() {
     FeederTheme {
         Surface {
             ReaderView(

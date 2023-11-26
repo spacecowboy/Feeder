@@ -9,12 +9,13 @@ import android.graphics.Typeface
 import android.text.TextPaint
 import kotlin.math.abs
 
-private val colors = arrayOf(
-    0xffe57373, 0xfff06292, 0xffba68c8, 0xff9575cd,
-    0xff7986cb, 0xff64b5f6, 0xff4fc3f7, 0xff4dd0e1, 0xff4db6ac, 0xff81c784,
-    0xffaed581, 0xffff8a65, 0xffd4e157, 0xffffd54f, 0xffffb74d, 0xffa1887f,
-    0xff90a4ae,
-)
+private val colors =
+    arrayOf(
+        0xffe57373, 0xfff06292, 0xffba68c8, 0xff9575cd,
+        0xff7986cb, 0xff64b5f6, 0xff4fc3f7, 0xff4dd0e1, 0xff4db6ac, 0xff81c784,
+        0xffaed581, 0xffff8a65, 0xffd4e157, 0xffffd54f, 0xffffb74d, 0xffa1887f,
+        0xff90a4ae,
+    )
 
 private const val NUM_OF_TILE_COLORS = 8
 
@@ -23,7 +24,11 @@ private const val NUM_OF_TILE_COLORS = 8
  * key: Anything which denotes the stable ID of the item.
  * radius: Pixel size of icon. Default should be suitable in most cases.
  */
-fun getLetterIcon(text: String, key: Any, radius: Int = 128): Bitmap {
+fun getLetterIcon(
+    text: String,
+    key: Any,
+    radius: Int = 128,
+): Bitmap {
     val paint = TextPaint()
     val bounds = Rect()
     val canvas = Canvas()
@@ -40,11 +45,12 @@ fun getLetterIcon(text: String, key: Any, radius: Int = 128): Bitmap {
     paint.textAlign = Paint.Align.CENTER
 
     val firstChar = CharArray(1)
-    firstChar[0] = if (text.isBlank()) {
-        'F'
-    } else {
-        text[0].uppercaseChar()
-    }
+    firstChar[0] =
+        if (text.isBlank()) {
+            'F'
+        } else {
+            text[0].uppercaseChar()
+        }
 
     val fontSize = radius * 0.8f
     paint.textSize = fontSize

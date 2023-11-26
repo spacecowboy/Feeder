@@ -16,7 +16,10 @@ class DelegatedMutableSavedState<T>(
     private var initialized: Boolean = false
     private var value: T by mutableStateOf(defaultValue)
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+    ): T {
         if (!initialized) {
             value = savedStateHandle[property.name] ?: value
             initialized = true
@@ -25,7 +28,11 @@ class DelegatedMutableSavedState<T>(
         return value
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    operator fun setValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+        value: T,
+    ) {
         savedStateHandle[property.name] = value
         this.value = value
         onChange?.invoke(value)

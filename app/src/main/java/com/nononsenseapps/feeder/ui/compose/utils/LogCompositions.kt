@@ -13,7 +13,10 @@ class Ref(var value: Int)
 // original call site.
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun LogCompositions(tag: String, msg: String) {
+inline fun LogCompositions(
+    tag: String,
+    msg: String,
+) {
     if (BuildConfig.DEBUG) {
         val ref = remember { Ref(0) }
         SideEffect { ref.value++ }

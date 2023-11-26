@@ -17,12 +17,13 @@ class MigrationFrom8To9 {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate8to9() {
@@ -31,8 +32,8 @@ class MigrationFrom8To9 {
         db.use {
             db.execSQL(
                 """
-            INSERT INTO feeds(title, url, custom_title, tag, notify, last_sync)
-            VALUES('feed', 'http://url', '', '', 0, 0)
+                INSERT INTO feeds(title, url, custom_title, tag, notify, last_sync)
+                VALUES('feed', 'http://url', '', '', 0, 0)
                 """.trimIndent(),
             )
         }

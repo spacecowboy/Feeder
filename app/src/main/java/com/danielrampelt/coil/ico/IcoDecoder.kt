@@ -38,9 +38,7 @@ class IcoDecoder(
         }
     }
 
-    private fun BitmapFactory.Options.decode(
-        bufferedSource: BufferedSource,
-    ): DecodeResult {
+    private fun BitmapFactory.Options.decode(bufferedSource: BufferedSource): DecodeResult {
         // Read the image's dimensions.
 //        inJustDecodeBounds = true
 //        val peek = bufferedSource.peek()
@@ -57,9 +55,10 @@ class IcoDecoder(
         inPremultiplied = options.premultipliedAlpha
 
         // Decode the bitmap.
-        val outBitmap: Bitmap? = bufferedSource.use {
-            BitmapFactory.decodeStream(it.inputStream(), null, this)
-        }
+        val outBitmap: Bitmap? =
+            bufferedSource.use {
+                BitmapFactory.decodeStream(it.inputStream(), null, this)
+            }
 
         if (outBitmap == null) {
             Log.w(

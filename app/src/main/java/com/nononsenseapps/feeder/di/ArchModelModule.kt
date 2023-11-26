@@ -23,23 +23,24 @@ import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
 
-val archModelModule = DI.Module(name = "arch models") {
-    bind<Repository>() with singleton { Repository(di) }
-    bind<SessionStore>() with singleton { SessionStore() }
-    bind<SettingsStore>() with singleton { SettingsStore(di) }
-    bind<FeedStore>() with singleton { FeedStore(di) }
-    bind<FeedItemStore>() with singleton { FeedItemStore(di) }
-    bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
-    bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+val archModelModule =
+    DI.Module(name = "arch models") {
+        bind<Repository>() with singleton { Repository(di) }
+        bind<SessionStore>() with singleton { SessionStore() }
+        bind<SettingsStore>() with singleton { SettingsStore(di) }
+        bind<FeedStore>() with singleton { FeedStore(di) }
+        bind<FeedItemStore>() with singleton { FeedItemStore(di) }
+        bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
+        bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
 
-    bindWithActivityViewModelScope<MainActivityViewModel>()
-    bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
-    bindWithActivityViewModelScope<CommonActivityViewModel>()
+        bindWithActivityViewModelScope<MainActivityViewModel>()
+        bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
+        bindWithActivityViewModelScope<CommonActivityViewModel>()
 
-    bindWithComposableViewModelScope<SettingsViewModel>()
-    bindWithComposableViewModelScope<EditFeedScreenViewModel>()
-    bindWithComposableViewModelScope<CreateFeedScreenViewModel>()
-    bindWithComposableViewModelScope<SearchFeedViewModel>()
-    bindWithComposableViewModelScope<FeedArticleViewModel>()
-    bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
-}
+        bindWithComposableViewModelScope<SettingsViewModel>()
+        bindWithComposableViewModelScope<EditFeedScreenViewModel>()
+        bindWithComposableViewModelScope<CreateFeedScreenViewModel>()
+        bindWithComposableViewModelScope<SearchFeedViewModel>()
+        bindWithComposableViewModelScope<FeedArticleViewModel>()
+        bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
+    }

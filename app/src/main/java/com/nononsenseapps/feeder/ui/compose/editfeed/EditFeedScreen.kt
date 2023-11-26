@@ -155,12 +155,13 @@ fun EditFeedScreen(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val notificationsPermissionState = rememberApiPermissionState(
-        permission = "android.permission.POST_NOTIFICATIONS",
-        minimumApiLevel = 33,
-    ) { value ->
-        viewState.notify = value
-    }
+    val notificationsPermissionState =
+        rememberApiPermissionState(
+            permission = "android.permission.POST_NOTIFICATIONS",
+            minimumApiLevel = 33,
+        ) { value ->
+            viewState.notify = value
+        }
 
     val shouldShowExplanationForPermission by remember {
         derivedStateOf {
@@ -172,39 +173,41 @@ fun EditFeedScreen(
         mutableStateOf(true)
     }
 
-    val screenState = remember {
-        object : EditFeedScreenState by viewState {
-            override var notify: Boolean
-                get() = viewState.notify
-                set(value) {
-                    if (!value) {
-                        viewState.notify = false
-                    } else {
-                        when (notificationsPermissionState.status) {
-                            is PermissionStatus.Denied -> {
-                                if (notificationsPermissionState.status.shouldShowRationale) {
-                                    // Dialog is shown inside EditFeedScreen with a button
-                                    permissionDismissed = false
-                                } else {
-                                    notificationsPermissionState.launchPermissionRequest()
+    val screenState =
+        remember {
+            object : EditFeedScreenState by viewState {
+                override var notify: Boolean
+                    get() = viewState.notify
+                    set(value) {
+                        if (!value) {
+                            viewState.notify = false
+                        } else {
+                            when (notificationsPermissionState.status) {
+                                is PermissionStatus.Denied -> {
+                                    if (notificationsPermissionState.status.shouldShowRationale) {
+                                        // Dialog is shown inside EditFeedScreen with a button
+                                        permissionDismissed = false
+                                    } else {
+                                        notificationsPermissionState.launchPermissionRequest()
+                                    }
                                 }
-                            }
 
-                            PermissionStatus.Granted -> viewState.notify = true
+                                PermissionStatus.Granted -> viewState.notify = true
+                            }
                         }
                     }
-                }
+            }
         }
-    }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -262,8 +265,9 @@ fun EditFeedView(
         },
         onCancel = onCancel,
         okEnabled = viewState.isOkToSave,
-        modifier = modifier
-            .padding(horizontal = LocalDimens.current.margin),
+        modifier =
+            modifier
+                .padding(horizontal = LocalDimens.current.margin),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
@@ -271,9 +275,10 @@ fun EditFeedView(
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = true)
+                            .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     LeftContent(
                         viewState = viewState,
@@ -283,9 +288,10 @@ fun EditFeedView(
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f, fill = true)
+                            .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     RightContent(
                         viewState = viewState,
@@ -350,24 +356,27 @@ fun ColumnScope.LeftContent(
             Text(stringResource(id = R.string.url))
         },
         isError = viewState.isNotValidUrl,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.None,
-            autoCorrect = false,
-            keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Next,
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                focusManager.moveFocus(focusDirection = FocusDirection.Down)
-            },
-        ),
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.None,
+                autoCorrect = false,
+                keyboardType = KeyboardType.Uri,
+                imeAction = ImeAction.Next,
+            ),
+        keyboardActions =
+            KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                },
+            ),
         singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .interceptKey(Key.Enter) {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
+                .interceptKey(Key.Enter) {
+                    focusManager.moveFocus(FocusDirection.Down)
+                },
     )
     AnimatedVisibility(visible = viewState.isNotValidUrl) {
         Text(
@@ -386,32 +395,36 @@ fun ColumnScope.LeftContent(
             Text(stringResource(id = R.string.title))
         },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            capitalization = KeyboardCapitalization.Words,
-            autoCorrect = true,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                focusManager.moveFocus(focusDirection = FocusDirection.Down)
-            },
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .interceptKey(Key.Enter) {
-                focusManager.moveFocus(FocusDirection.Down)
-            },
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+                autoCorrect = true,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+            ),
+        keyboardActions =
+            KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                },
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
+                .interceptKey(Key.Enter) {
+                    focusManager.moveFocus(FocusDirection.Down)
+                },
     )
 
     AutoCompleteResults(
-        modifier = Modifier
-            .focusGroup()
-            .onFocusChanged {
-                // Someone in hierarchy has focus - different from isFocused
-                showTagSuggestions = it.hasFocus
-            },
+        modifier =
+            Modifier
+                .focusGroup()
+                .onFocusChanged {
+                    // Someone in hierarchy has focus - different from isFocused
+                    showTagSuggestions = it.hasFocus
+                },
         displaySuggestions = showTagSuggestions,
         suggestions = filteredTags,
         onSuggestionClicked = { tag ->
@@ -422,10 +435,11 @@ fun ColumnScope.LeftContent(
         suggestionContent = {
             Box(
                 contentAlignment = Alignment.CenterStart,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .height(48.dp)
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(48.dp)
+                        .fillMaxWidth(),
             ) {
                 Text(
                     text = it,
@@ -441,25 +455,28 @@ fun ColumnScope.LeftContent(
                 Text(stringResource(id = R.string.tag))
             },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                autoCorrect = true,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    showTagSuggestions = false
-                    keyboardController?.hide()
-                    rightFocusRequester.requestFocus()
-                },
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .interceptKey(Key.Enter) {
-                    rightFocusRequester.requestFocus()
-                },
+            keyboardOptions =
+                KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    autoCorrect = true,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        showTagSuggestions = false
+                        keyboardController?.hide()
+                        rightFocusRequester.requestFocus()
+                    },
+                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp)
+                    .interceptKey(Key.Enter) {
+                        rightFocusRequester.requestFocus()
+                    },
         )
     }
 }
@@ -475,11 +492,12 @@ fun ColumnScope.RightContent(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
         icon = null,
-        modifier = Modifier
-            .focusRequester(rightFocusRequester)
-            .focusProperties {
-                previous = leftFocusRequester
-            },
+        modifier =
+            Modifier
+                .focusRequester(rightFocusRequester)
+                .focusProperties {
+                    previous = leftFocusRequester
+                },
     ) { viewState.fullTextByDefault = it }
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
@@ -583,7 +601,7 @@ private class ScreenState(
 
 @Preview("Edit Feed Phone")
 @Composable
-fun PreviewEditFeedScreenPhone() {
+private fun PreviewEditFeedScreenPhone() {
     FeederTheme {
         EditFeedScreen(
             screenType = ScreenType.SINGLE,
@@ -598,7 +616,7 @@ fun PreviewEditFeedScreenPhone() {
 @Preview("Edit Feed Foldable", device = Devices.FOLDABLE)
 @Preview("Edit Feed Tablet", device = Devices.PIXEL_C)
 @Composable
-fun PreviewEditFeedScreenLarge() {
+private fun PreviewEditFeedScreenLarge() {
     FeederTheme {
         EditFeedScreen(
             screenType = ScreenType.DUAL,

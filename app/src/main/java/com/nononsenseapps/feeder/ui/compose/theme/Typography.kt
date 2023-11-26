@@ -20,39 +20,45 @@ object FeederTypography {
 
     val typography: Typography =
         materialTypography.copy(
-            headlineLarge = materialTypography.headlineLarge.merge(
-                TextStyle(
-                    lineBreak = LineBreak.Paragraph,
+            headlineLarge =
+                materialTypography.headlineLarge.merge(
+                    TextStyle(
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
-            headlineMedium = materialTypography.headlineMedium.merge(
-                TextStyle(
-                    lineBreak = LineBreak.Paragraph,
+            headlineMedium =
+                materialTypography.headlineMedium.merge(
+                    TextStyle(
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
-            headlineSmall = materialTypography.headlineSmall.merge(
-                TextStyle(
-                    lineBreak = LineBreak.Paragraph,
+            headlineSmall =
+                materialTypography.headlineSmall.merge(
+                    TextStyle(
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
-            bodyLarge = materialTypography.bodyLarge.merge(
-                TextStyle(
-                    hyphens = Hyphens.Auto,
-                    lineBreak = LineBreak.Paragraph,
+            bodyLarge =
+                materialTypography.bodyLarge.merge(
+                    TextStyle(
+                        hyphens = Hyphens.Auto,
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
-            bodyMedium = materialTypography.bodyMedium.merge(
-                TextStyle(
-                    hyphens = Hyphens.Auto,
-                    lineBreak = LineBreak.Paragraph,
+            bodyMedium =
+                materialTypography.bodyMedium.merge(
+                    TextStyle(
+                        hyphens = Hyphens.Auto,
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
-            bodySmall = materialTypography.bodySmall.merge(
-                TextStyle(
-                    hyphens = Hyphens.Auto,
-                    lineBreak = LineBreak.Paragraph,
+            bodySmall =
+                materialTypography.bodySmall.merge(
+                    TextStyle(
+                        hyphens = Hyphens.Auto,
+                        lineBreak = LineBreak.Paragraph,
+                    ),
                 ),
-            ),
         )
 }
 
@@ -80,25 +86,22 @@ fun FeedListItemTitleTextStyle(): TextStyle =
 fun FeedListItemSnippetTextStyle(): TextStyle =
     MaterialTheme.typography.titleSmall.merge(
         TextStyle(
-            lineBreak = LineBreak.Paragraph, hyphens = Hyphens.Auto,
+            lineBreak = LineBreak.Paragraph,
+            hyphens = Hyphens.Auto,
         ),
     )
 
 @Composable
-fun FeedListItemStyle(): TextStyle =
-    MaterialTheme.typography.bodyLarge
+fun FeedListItemStyle(): TextStyle = MaterialTheme.typography.bodyLarge
 
 @Composable
-fun FeedListItemFeedTitleStyle(): TextStyle =
-    FeedListItemDateStyle()
+fun FeedListItemFeedTitleStyle(): TextStyle = FeedListItemDateStyle()
 
 @Composable
-fun FeedListItemDateStyle(): TextStyle =
-    MaterialTheme.typography.labelMedium
+fun FeedListItemDateStyle(): TextStyle = MaterialTheme.typography.labelMedium
 
 @Composable
-fun TTSPlayerStyle(): TextStyle =
-    MaterialTheme.typography.titleMedium
+fun TTSPlayerStyle(): TextStyle = MaterialTheme.typography.titleMedium
 
 @Composable
 fun CodeInlineStyle(): SpanStyle =
@@ -119,8 +122,7 @@ fun CodeBlockStyle(): TextStyle =
     )
 
 @Composable
-fun CodeBlockBackground(): Color =
-    MaterialTheme.colorScheme.surfaceVariant
+fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 
 @Composable
 fun BlockQuoteStyle(): SpanStyle =
@@ -135,17 +137,19 @@ data class TypographySettings(
     val fontScale: Float = 1.0f,
 )
 
-val LocalTypographySettings = staticCompositionLocalOf {
-    TypographySettings()
-}
+val LocalTypographySettings =
+    staticCompositionLocalOf {
+        TypographySettings()
+    }
 
 @Composable
 fun ProvideFontScale(
     fontScale: Float,
     content: @Composable () -> Unit,
 ) {
-    val typographySettings = TypographySettings(
-        fontScale = fontScale,
-    )
+    val typographySettings =
+        TypographySettings(
+            fontScale = fontScale,
+        )
     CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)
 }

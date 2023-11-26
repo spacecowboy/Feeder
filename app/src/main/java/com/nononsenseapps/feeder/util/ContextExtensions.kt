@@ -16,7 +16,10 @@ import java.util.Locale
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
-    suspend fun makeToast(@StringRes resId: Int)
+
+    suspend fun makeToast(
+        @StringRes resId: Int,
+    )
 }
 
 val Context.notificationManager: NotificationManagerCompat
@@ -27,40 +30,46 @@ val Context.notificationManager: NotificationManagerCompat
  * Ensures that a maximum number of shortcuts is available at any time with the last used being bumped out of the list
  * first.
  */
-fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {
+fun Context.addDynamicShortcutToFeed(
+    label: String,
+    id: Long,
+    icon: Icon? = null,
+) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
 
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
-                this,
-                MainActivity::class.java,
-            ).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val intent =
+                Intent(
+                    Intent.ACTION_VIEW,
+                    "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
+                    this,
+                    MainActivity::class.java,
+                ).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
 
             val current = shortcutManager.dynamicShortcuts.toMutableList()
 
             // Update shortcuts
-            val shortcut: ShortcutInfo = ShortcutInfo.Builder(this, "$id")
-                .setShortLabel(label)
-                .setLongLabel(label)
-                .setIcon(
-                    icon
-                        ?: Icon.createWithBitmap(
-                            getLetterIcon(
-                                label,
-                                id,
-                                radius = shortcutManager.iconMaxHeight,
+            val shortcut: ShortcutInfo =
+                ShortcutInfo.Builder(this, "$id")
+                    .setShortLabel(label)
+                    .setLongLabel(label)
+                    .setIcon(
+                        icon
+                            ?: Icon.createWithBitmap(
+                                getLetterIcon(
+                                    label,
+                                    id,
+                                    radius = shortcutManager.iconMaxHeight,
+                                ),
                             ),
-                        ),
-                )
-                .setIntent(intent)
-                .setDisabledMessage("Feed deleted")
-                .setRank(0)
-                .build()
+                    )
+                    .setIntent(intent)
+                    .setDisabledMessage("Feed deleted")
+                    .setRank(0)
+                    .build()
 
             if (current.map { it.id }.contains(shortcut.id)) {
                 // Just update existing one
@@ -98,8 +107,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
     }
 }
 
-fun Context.unicodeWrap(text: String): String =
-    BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+fun Context.unicodeWrap(text: String): String = BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
 
 fun Context.getLocale(): Locale =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

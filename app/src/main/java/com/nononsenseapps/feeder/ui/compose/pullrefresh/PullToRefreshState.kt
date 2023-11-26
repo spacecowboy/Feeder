@@ -15,10 +15,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.math.abs
-import kotlin.math.pow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.pow
 
 /**
  * Creates a [PullRefreshState] that is remembered across compositions.
@@ -56,9 +56,10 @@ fun rememberPullRefreshState(
 
     // refreshThreshold and refreshingOffset should not be changed after instantiation, so any
     // changes to these values are ignored.
-    val state = remember(scope) {
-        PullRefreshState(scope, onRefreshState, refreshingOffsetPx, thresholdPx)
-    }
+    val state =
+        remember(scope) {
+            PullRefreshState(scope, onRefreshState, refreshingOffsetPx, thresholdPx)
+        }
 
     SideEffect {
         state.setRefreshing(refreshing)
@@ -134,27 +135,29 @@ class PullRefreshState internal constructor(
         }
     }
 
-    private fun animateIndicatorTo(offset: Float) = animationScope.launch {
-        animate(initialValue = _position, targetValue = offset) { value, _ ->
-            _position = value
+    private fun animateIndicatorTo(offset: Float) =
+        animationScope.launch {
+            animate(initialValue = _position, targetValue = offset) { value, _ ->
+                _position = value
+            }
         }
-    }
 
-    private fun calculateIndicatorPosition(): Float = when {
-        // If drag hasn't gone past the threshold, the position is the adjustedDistancePulled.
-        adjustedDistancePulled <= threshold -> adjustedDistancePulled
-        else -> {
-            // How far beyond the threshold pull has gone, as a percentage of the threshold.
-            val overshootPercent = abs(progress) - 1.0f
-            // Limit the overshoot to 200%. Linear between 0 and 200.
-            val linearTension = overshootPercent.coerceIn(0f, 2f)
-            // Non-linear tension. Increases with linearTension, but at a decreasing rate.
-            val tensionPercent = linearTension - linearTension.pow(2) / 4
-            // The additional offset beyond the threshold.
-            val extraOffset = threshold * tensionPercent
-            threshold + extraOffset
+    private fun calculateIndicatorPosition(): Float =
+        when {
+            // If drag hasn't gone past the threshold, the position is the adjustedDistancePulled.
+            adjustedDistancePulled <= threshold -> adjustedDistancePulled
+            else -> {
+                // How far beyond the threshold pull has gone, as a percentage of the threshold.
+                val overshootPercent = abs(progress) - 1.0f
+                // Limit the overshoot to 200%. Linear between 0 and 200.
+                val linearTension = overshootPercent.coerceIn(0f, 2f)
+                // Non-linear tension. Increases with linearTension, but at a decreasing rate.
+                val tensionPercent = linearTension - linearTension.pow(2) / 4
+                // The additional offset beyond the threshold.
+                val extraOffset = threshold * tensionPercent
+                threshold + extraOffset
+            }
         }
-    }
 }
 
 /**

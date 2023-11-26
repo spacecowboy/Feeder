@@ -71,9 +71,9 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.unicodeWrap
-import java.time.ZonedDateTime
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.time.ZonedDateTime
 
 @Composable
 fun ArticleScreen(
@@ -88,9 +88,10 @@ fun ArticleScreen(
 
     // Each article gets its own scroll state. Persists across device rotations, but is cleared
     // when switching articles.
-    val articleListState = key(viewState.articleId) {
-        rememberLazyListState()
-    }
+    val articleListState =
+        key(viewState.articleId) {
+            rememberLazyListState()
+        }
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -113,16 +114,17 @@ fun ArticleScreen(
         },
         onShare = {
             if (viewState.articleId > ID_UNSET) {
-                val intent = Intent.createChooser(
-                    Intent(Intent.ACTION_SEND).apply {
-                        if (viewState.articleLink != null) {
-                            putExtra(Intent.EXTRA_TEXT, viewState.articleLink)
-                        }
-                        putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
-                        type = "text/plain"
-                    },
-                    null,
-                )
+                val intent =
+                    Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            if (viewState.articleLink != null) {
+                                putExtra(Intent.EXTRA_TEXT, viewState.articleLink)
+                            }
+                            putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
+                            type = "text/plain"
+                        },
+                        null,
+                    )
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = false,
                     intent = intent,
@@ -192,18 +194,20 @@ fun ArticleScreen(
     val focusTopBar = remember { FocusRequester() }
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
-                modifier = Modifier
-                    .focusGroup()
-                    .focusRequester(focusTopBar)
-                    .focusProperties {
-                        down = focusArticle
-                    },
+                modifier =
+                    Modifier
+                        .focusGroup()
+                        .focusRequester(focusTopBar)
+                        .focusProperties {
+                            down = focusArticle
+                        },
                 scrollBehavior = scrollBehavior,
                 title = viewState.feedDisplayTitle,
                 navigationIcon = {
@@ -243,8 +247,9 @@ fun ArticleScreen(
                         Box {
                             IconButton(
                                 onClick = { onShowToolbarMenu(true) },
-                                modifier = Modifier
-                                    .tooltipAnchor(),
+                                modifier =
+                                    Modifier
+                                        .tooltipAnchor(),
                             ) {
                                 Icon(
                                     Icons.Default.MoreVert,
@@ -254,10 +259,11 @@ fun ArticleScreen(
                             DropdownMenu(
                                 expanded = viewState.showToolbarMenu,
                                 onDismissRequest = { onShowToolbarMenu(false) },
-                                modifier = Modifier
-                                    .onKeyEventLikeEscape {
-                                        onShowToolbarMenu(false)
-                                    },
+                                modifier =
+                                    Modifier
+                                        .onKeyEventLikeEscape {
+                                            onShowToolbarMenu(false)
+                                        },
                             ) {
                                 DropdownMenuItem(
                                     onClick = {
@@ -353,13 +359,14 @@ fun ArticleScreen(
             articleListState = articleListState,
             onFeedTitleClick = onFeedTitleClick,
             displayFullText = displayFullText,
-            modifier = Modifier
-                .padding(padding)
-                .focusGroup()
-                .focusRequester(focusArticle)
-                .focusProperties {
-                    up = focusTopBar
-                },
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .focusGroup()
+                    .focusRequester(focusArticle)
+                    .focusProperties {
+                        up = focusTopBar
+                    },
         )
     }
 }
@@ -404,24 +411,25 @@ fun ArticleContent(
         enclosure = viewState.enclosure,
         articleTitle = viewState.articleTitle,
         feedTitle = viewState.feedDisplayTitle,
-        authorDate = when {
-            viewState.author == null && viewState.pubDate != null ->
-                stringResource(
-                    R.string.on_date,
-                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
-                )
+        authorDate =
+            when {
+                viewState.author == null && viewState.pubDate != null ->
+                    stringResource(
+                        R.string.on_date,
+                        (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
+                    )
 
-            viewState.author != null && viewState.pubDate != null ->
-                stringResource(
-                    R.string.by_author_on_date,
-                    // Must wrap author in unicode marks to ensure it formats
-                    // correctly in RTL
-                    context.unicodeWrap(viewState.author ?: ""),
-                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
-                )
+                viewState.author != null && viewState.pubDate != null ->
+                    stringResource(
+                        R.string.by_author_on_date,
+                        // Must wrap author in unicode marks to ensure it formats
+                        // correctly in RTL
+                        context.unicodeWrap(viewState.author ?: ""),
+                        (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
+                    )
 
-            else -> null
-        },
+                else -> null
+            },
     ) {
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {

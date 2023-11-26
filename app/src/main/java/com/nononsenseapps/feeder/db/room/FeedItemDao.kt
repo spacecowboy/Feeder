@@ -17,9 +17,9 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
+import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedItemDao {
@@ -52,7 +52,10 @@ interface FeedItemDao {
             where id = :id
         """,
     )
-    suspend fun updateWordCountFull(id: Long, wordCount: Int)
+    suspend fun updateWordCountFull(
+        id: Long,
+        wordCount: Int,
+    )
 
     @Query(
         """
@@ -62,10 +65,16 @@ interface FeedItemDao {
         LIMIT -1 OFFSET :keepCount
         """,
     )
-    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int): List<Long>
+    suspend fun getItemsToBeCleanedFromFeed(
+        feedId: Long,
+        keepCount: Int,
+    ): List<Long>
 
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
-    suspend fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
+    suspend fun loadFeedItem(
+        guid: String,
+        feedId: Long?,
+    ): FeedItem?
 
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
@@ -269,7 +278,10 @@ interface FeedItemDao {
     suspend fun markAllAsRead(readTime: Instant = Instant.now())
 
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE feed_id IS :feedId")
-    suspend fun markAllAsRead(feedId: Long?, readTime: Instant = Instant.now())
+    suspend fun markAllAsRead(
+        feedId: Long?,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query(
         """
@@ -282,25 +294,43 @@ interface FeedItemDao {
           WHERE tag IS :tag
         )""",
     )
-    suspend fun markAllAsRead(tag: String, readTime: Instant = Instant.now())
+    suspend fun markAllAsRead(
+        tag: String,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IS :id")
-    suspend fun markAsRead(id: Long, readTime: Instant = Instant.now())
+    suspend fun markAsRead(
+        id: Long,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query("UPDATE feed_items SET read_time = null WHERE id IS :id")
     suspend fun markAsUnread(id: Long)
 
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IN (:ids)")
-    suspend fun markAsRead(ids: List<Long>, readTime: Instant = Instant.now())
+    suspend fun markAsRead(
+        ids: List<Long>,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query("UPDATE feed_items SET bookmarked = :bookmarked WHERE id IS :id")
-    suspend fun setBookmarked(id: Long, bookmarked: Boolean)
+    suspend fun setBookmarked(
+        id: Long,
+        bookmarked: Boolean,
+    )
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
-    suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true)
+    suspend fun markAsNotified(
+        ids: List<Long>,
+        notified: Boolean = true,
+    )
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IS :id")
-    suspend fun markAsNotified(id: Long, notified: Boolean = true)
+    suspend fun markAsNotified(
+        id: Long,
+        notified: Boolean = true,
+    )
 
     @Query(
         """
@@ -313,16 +343,25 @@ interface FeedItemDao {
           WHERE tag IS :tag
         )""",
     )
-    suspend fun markTagAsNotified(tag: String, notified: Boolean = true)
+    suspend fun markTagAsNotified(
+        tag: String,
+        notified: Boolean = true,
+    )
 
     @Query("UPDATE feed_items SET notified = :notified")
     suspend fun markAllAsNotified(notified: Boolean = true)
 
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IS :id")
-    suspend fun markAsReadAndNotified(id: Long, readTime: Instant = Instant.now())
+    suspend fun markAsReadAndNotified(
+        id: Long,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query("UPDATE feed_items SET read_time = :readTime, notified = 1 WHERE id IS :id")
-    suspend fun markAsReadAndNotifiedAndOverwriteReadTime(id: Long, readTime: Instant = Instant.now())
+    suspend fun markAsReadAndNotifiedAndOverwriteReadTime(
+        id: Long,
+        readTime: Instant = Instant.now(),
+    )
 
     @Query(
         """
@@ -384,7 +423,10 @@ interface FeedItemDao {
               and NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(minReadTime: Instant, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(
+        minReadTime: Instant,
+        bookmarked: Boolean,
+    ): Flow<Int>
 
     @Query(
         """
@@ -397,7 +439,11 @@ interface FeedItemDao {
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(tag: String, minReadTime: Instant, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(
+        tag: String,
+        minReadTime: Instant,
+        bookmarked: Boolean,
+    ): Flow<Int>
 
     @Query(
         """
@@ -409,7 +455,11 @@ interface FeedItemDao {
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(feedId: Long, minReadTime: Instant, bookmarked: Boolean): Flow<Int>
+    fun getFeedItemCount(
+        feedId: Long,
+        minReadTime: Instant,
+        bookmarked: Boolean,
+    ): Flow<Int>
 
     @Query(
         """
@@ -430,7 +480,10 @@ interface FeedItemDao {
             where f.url IS :feedUrl AND fi.guid IS :articleGuid
         """,
     )
-    suspend fun getItemWith(feedUrl: URL, articleGuid: String): Long?
+    suspend fun getItemWith(
+        feedUrl: URL,
+        articleGuid: String,
+    ): Long?
 
     companion object {
         // These are backed by a database index
@@ -445,14 +498,16 @@ suspend fun FeedItemDao.upsertFeedItems(
     itemsWithText: List<Pair<FeedItem, String>>,
     block: suspend (FeedItem, String) -> Unit,
 ) {
-    val updatedItems = itemsWithText.filter { (item, _) ->
-        item.id > ID_UNSET
-    }
+    val updatedItems =
+        itemsWithText.filter { (item, _) ->
+            item.id > ID_UNSET
+        }
     updateFeedItems(updatedItems.map { (item, _) -> item })
 
-    val insertedItems = itemsWithText.filter { (item, _) ->
-        item.id <= ID_UNSET
-    }
+    val insertedItems =
+        itemsWithText.filter { (item, _) ->
+            item.id <= ID_UNSET
+        }
     val insertedIds = insertFeedItems(insertedItems.map { (item, _) -> item })
 
     updatedItems.forEach { (item, text) ->

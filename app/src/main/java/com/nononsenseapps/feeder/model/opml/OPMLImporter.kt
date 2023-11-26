@@ -34,41 +34,52 @@ open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
         }
     }
 
-    override suspend fun saveSetting(key: String, value: String) {
+    override suspend fun saveSetting(
+        key: String,
+        value: String,
+    ) {
         when (UserSettings.fromKey(key)) {
             null -> Log.w(LOG_TAG, "Unrecognized setting during import: $key")
             UserSettings.SETTING_ADDED_FEEDER_NEWS -> settingsStore.setAddedFeederNews(value.toBoolean())
-            UserSettings.SETTING_THEME -> settingsStore.setCurrentTheme(
-                themeOptionsFromString(value),
-            )
-            UserSettings.SETTING_DARK_THEME -> settingsStore.setDarkThemePreference(
-                darkThemePreferenceFromString(value),
-            )
+            UserSettings.SETTING_THEME ->
+                settingsStore.setCurrentTheme(
+                    themeOptionsFromString(value),
+                )
+            UserSettings.SETTING_DARK_THEME ->
+                settingsStore.setDarkThemePreference(
+                    darkThemePreferenceFromString(value),
+                )
             UserSettings.SETTING_DYNAMIC_THEME -> settingsStore.setUseDynamicTheme(value.toBoolean())
-            UserSettings.SETTING_SORT -> settingsStore.setCurrentSorting(
-                sortingOptionsFromString(value),
-            )
+            UserSettings.SETTING_SORT ->
+                settingsStore.setCurrentSorting(
+                    sortingOptionsFromString(value),
+                )
             UserSettings.SETTING_SHOW_FAB -> settingsStore.setShowFab(value.toBoolean())
-            UserSettings.SETTING_FEED_ITEM_STYLE -> settingsStore.setFeedItemStyle(
-                feedItemStyleFromString(value),
-            )
-            UserSettings.SETTING_SWIPE_AS_READ -> settingsStore.setSwipeAsRead(
-                swipeAsReadFromString(value),
-            )
+            UserSettings.SETTING_FEED_ITEM_STYLE ->
+                settingsStore.setFeedItemStyle(
+                    feedItemStyleFromString(value),
+                )
+            UserSettings.SETTING_SWIPE_AS_READ ->
+                settingsStore.setSwipeAsRead(
+                    swipeAsReadFromString(value),
+                )
             UserSettings.SETTING_SYNC_ONLY_CHARGING -> settingsStore.setSyncOnlyWhenCharging(value.toBoolean())
             UserSettings.SETTING_SYNC_ONLY_WIFI -> settingsStore.setSyncOnlyOnWifi(value.toBoolean())
-            UserSettings.SETTING_SYNC_FREQ -> settingsStore.setSyncFrequency(
-                syncFrequencyFromString(value),
-            )
+            UserSettings.SETTING_SYNC_FREQ ->
+                settingsStore.setSyncFrequency(
+                    syncFrequencyFromString(value),
+                )
             UserSettings.SETTING_SYNC_ON_RESUME -> settingsStore.setSyncOnResume(value.toBoolean())
             UserSettings.SETTING_IMG_ONLY_WIFI -> settingsStore.setLoadImageOnlyOnWifi(value.toBoolean())
             UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> settingsStore.setShowThumbnails(value.toBoolean())
-            UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> settingsStore.setItemOpener(
-                itemOpenerFromString(value),
-            )
-            UserSettings.SETTING_OPEN_LINKS_WITH -> settingsStore.setLinkOpener(
-                linkOpenerFromString(value),
-            )
+            UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH ->
+                settingsStore.setItemOpener(
+                    itemOpenerFromString(value),
+                )
+            UserSettings.SETTING_OPEN_LINKS_WITH ->
+                settingsStore.setLinkOpener(
+                    linkOpenerFromString(value),
+                )
             UserSettings.SETTING_TEXT_SCALE -> settingsStore.setTextScale(value.toFloatOrNull() ?: 1.0f)
             UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> settingsStore.setIsMarkAsReadOnScroll(value.toBoolean())
             UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> settingsStore.setUseDetectLanguage(value.toBoolean())

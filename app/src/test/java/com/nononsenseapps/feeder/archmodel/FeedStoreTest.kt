@@ -13,7 +13,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import java.time.Instant
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -26,6 +25,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.time.Instant
 
 class FeedStoreTest : DIAware {
     private val store: FeedStore by instance()
@@ -47,9 +47,10 @@ class FeedStoreTest : DIAware {
     fun getFeed() {
         coEvery { dao.loadFeed(5L) } returns Feed(id = 5L)
 
-        val feed = runBlocking {
-            store.getFeed(5L)
-        }
+        val feed =
+            runBlocking {
+                store.getFeed(5L)
+            }
 
         assertEquals(
             Feed(id = 5L),
@@ -84,9 +85,10 @@ class FeedStoreTest : DIAware {
     fun allTags() {
         every { dao.loadAllTags() } returns flowOf(listOf("one", "two"))
 
-        val tags = runBlocking {
-            store.allTags.toList().first()
-        }
+        val tags =
+            runBlocking {
+                store.allTags.toList().first()
+            }
 
         assertEquals(
             listOf("one", "two"),
@@ -98,9 +100,10 @@ class FeedStoreTest : DIAware {
     fun saveNewFeed() {
         coEvery { dao.insertFeed(any()) } returns 5L
 
-        val id = runBlocking {
-            store.saveFeed(Feed())
-        }
+        val id =
+            runBlocking {
+                store.saveFeed(Feed())
+            }
 
         assertEquals(
             5L,
@@ -110,9 +113,10 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun saveExistingFeed() {
-        val feedId = runBlocking {
-            store.saveFeed(Feed(id = 5L))
-        }
+        val feedId =
+            runBlocking {
+                store.saveFeed(Feed(id = 5L))
+            }
 
         assertEquals(5L, feedId)
 
@@ -123,19 +127,21 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun drawerItemsWithUnreadCounts() {
-        every { dao.loadFlowOfFeedsWithUnreadCounts() } returns flow {
-            emit(
-                listOf(
-                    FeedUnreadCount(id = 1, title = "zob", unreadCount = 3, currentlySyncing = true),
-                    FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4, currentlySyncing = false),
-                    FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5, currentlySyncing = true),
-                    FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7, currentlySyncing = false),
-                ),
-            )
-        }
-        val drawerItems = runBlocking {
-            store.drawerItemsWithUnreadCounts.toList().first()
-        }
+        every { dao.loadFlowOfFeedsWithUnreadCounts() } returns
+            flow {
+                emit(
+                    listOf(
+                        FeedUnreadCount(id = 1, title = "zob", unreadCount = 3, currentlySyncing = true),
+                        FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4, currentlySyncing = false),
+                        FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5, currentlySyncing = true),
+                        FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7, currentlySyncing = false),
+                    ),
+                )
+            }
+        val drawerItems =
+            runBlocking {
+                store.drawerItemsWithUnreadCounts.toList().first()
+            }
 
         assertEquals(
             listOf(
@@ -153,24 +159,27 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun getFeedTitles() {
-        every { dao.getFeedTitlesWithId(5L) } returns flowOf(
-            listOf(
-                FeedTitle(5L, "fejd"),
-            ),
-        )
-        every { dao.getFeedTitlesWithTag("foo") } returns flowOf(
-            listOf(
-                FeedTitle(5L, "fejd"),
-                FeedTitle(7L, "axv"),
-            ),
-        )
-        every { dao.getAllFeedTitles() } returns flowOf(
-            listOf(
-                FeedTitle(5L, "fejd"),
-                FeedTitle(7L, "axv"),
-                FeedTitle(8L, "zzz"),
-            ),
-        )
+        every { dao.getFeedTitlesWithId(5L) } returns
+            flowOf(
+                listOf(
+                    FeedTitle(5L, "fejd"),
+                ),
+            )
+        every { dao.getFeedTitlesWithTag("foo") } returns
+            flowOf(
+                listOf(
+                    FeedTitle(5L, "fejd"),
+                    FeedTitle(7L, "axv"),
+                ),
+            )
+        every { dao.getAllFeedTitles() } returns
+            flowOf(
+                listOf(
+                    FeedTitle(5L, "fejd"),
+                    FeedTitle(7L, "axv"),
+                    FeedTitle(8L, "zzz"),
+                ),
+            )
 
         assertEquals(
             listOf(FeedTitle(5L, "fejd")),
@@ -199,9 +208,10 @@ class FeedStoreTest : DIAware {
     fun getCurrentlySyncingLatestTimestamp() {
         every { dao.getCurrentlySyncingLatestTimestamp() } returns flowOf(null)
 
-        val result = runBlocking {
-            store.getCurrentlySyncingLatestTimestamp().toList()
-        }
+        val result =
+            runBlocking {
+                store.getCurrentlySyncingLatestTimestamp().toList()
+            }
 
         assertEquals(null, result.first())
 
@@ -226,9 +236,10 @@ class FeedStoreTest : DIAware {
     fun upsertFeed() {
         coEvery { dao.upsert(any()) } returns 6L
 
-        val result = runBlocking {
-            store.upsertFeed(Feed())
-        }
+        val result =
+            runBlocking {
+                store.upsertFeed(Feed())
+            }
 
         assertEquals(6L, result)
 

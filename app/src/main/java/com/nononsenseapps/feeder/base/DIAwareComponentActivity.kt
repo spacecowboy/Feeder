@@ -18,11 +18,12 @@ abstract class DIAwareComponentActivity : ComponentActivity(), DIAware {
         extend(parentDI)
         bind<MenuInflater>() with provider { menuInflater }
         bind<DIAwareComponentActivity>() with instance(this@DIAwareComponentActivity)
-        bind<ActivityLauncher>() with singleton {
-            ActivityLauncher(
-                this@DIAwareComponentActivity,
-                di.direct.instance(),
-            )
-        }
+        bind<ActivityLauncher>() with
+            singleton {
+                ActivityLauncher(
+                    this@DIAwareComponentActivity,
+                    di.direct.instance(),
+                )
+            }
     }
 }

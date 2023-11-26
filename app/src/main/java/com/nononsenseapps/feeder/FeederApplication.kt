@@ -39,9 +39,6 @@ import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.jsonfeed.cachingHttpClient
-import java.io.File
-import java.security.Security
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
@@ -55,6 +52,9 @@ import org.kodein.di.bind
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.io.File
+import java.security.Security
+import java.util.concurrent.TimeUnit
 
 class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
@@ -63,9 +63,10 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     override val di by DI.lazy {
         // import(androidXModule(this@FeederApplication))
 
-        bind<FilePathProvider>() with singleton {
-            filePathProvider(cacheDir = cacheDir, filesDir = filesDir)
-        }
+        bind<FilePathProvider>() with
+            singleton {
+                filePathProvider(cacheDir = cacheDir, filesDir = filesDir)
+            }
         bind<Application>() with singleton { this@FeederApplication }
         bind<AppDatabase>() with singleton { AppDatabase.getInstance(this@FeederApplication) }
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
@@ -83,96 +84,103 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
 
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
         bind<ContentResolver>() with singleton { contentResolver }
-        bind<ToastMaker>() with singleton {
-            object : ToastMaker {
-                override suspend fun makeToast(text: String) = withContext(Dispatchers.Main) {
-                    Toast.makeText(this@FeederApplication, text, Toast.LENGTH_SHORT).show()
-                }
+        bind<ToastMaker>() with
+            singleton {
+                object : ToastMaker {
+                    override suspend fun makeToast(text: String) =
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@FeederApplication, text, Toast.LENGTH_SHORT).show()
+                        }
 
-                override suspend fun makeToast(resId: Int) = withContext(Dispatchers.Main) {
-                    Toast.makeText(this@FeederApplication, resId, Toast.LENGTH_SHORT).show()
+                    override suspend fun makeToast(resId: Int) =
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(this@FeederApplication, resId, Toast.LENGTH_SHORT).show()
+                        }
                 }
             }
-        }
         bind<NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }
-        bind<SharedPreferences>() with singleton {
-            PreferenceManager.getDefaultSharedPreferences(
-                this@FeederApplication,
-            )
-        }
+        bind<SharedPreferences>() with
+            singleton {
+                PreferenceManager.getDefaultSharedPreferences(
+                    this@FeederApplication,
+                )
+            }
 
-        bind<OkHttpClient>() with singleton {
-            val filePathProvider = instance<FilePathProvider>()
-            cachingHttpClient(
-                cacheDirectory = (filePathProvider.httpCacheDir),
-            ) {
-                addNetworkInterceptor(UserAgentInterceptor)
-                if (BuildConfig.DEBUG) {
-                    addInterceptor { chain ->
-                        val request = chain.request()
-                        logDebug(
-                            "FEEDER",
-                            "Request ${request.url} headers [${request.headers}]",
-                        )
-
-                        chain.proceed(request).also {
+        bind<OkHttpClient>() with
+            singleton {
+                val filePathProvider = instance<FilePathProvider>()
+                cachingHttpClient(
+                    cacheDirectory = (filePathProvider.httpCacheDir),
+                ) {
+                    addNetworkInterceptor(UserAgentInterceptor)
+                    if (BuildConfig.DEBUG) {
+                        addInterceptor { chain ->
+                            val request = chain.request()
                             logDebug(
                                 "FEEDER",
-                                "Response ${it.request.url} code ${it.networkResponse?.code} cached ${it.cacheResponse != null}",
+                                "Request ${request.url} headers [${request.headers}]",
                             )
+
+                            chain.proceed(request).also {
+                                logDebug(
+                                    "FEEDER",
+                                    "Response ${it.request.url} code ${it.networkResponse?.code} cached ${it.cacheResponse != null}",
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-        bind<ImageLoader>() with singleton {
-            val filePathProvider = instance<FilePathProvider>()
-            val repository = instance<Repository>()
-            val okHttpClient = instance<OkHttpClient>()
-                .newBuilder()
-                // This is not used by Coil but no need to risk evicting the real cache
-                .cache(Cache(filePathProvider.cacheDir.resolve("dummy_img"), 1024L))
-                .addInterceptor { chain ->
-                    chain.proceed(
-                        when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
-                            true -> chain.request()
-                            false -> {
-                                // Forces only cached responses to be used - if no cache then 504 is thrown
-                                chain.request().newBuilder()
-                                    .cacheControl(
-                                        CacheControl.Builder()
-                                            .onlyIfCached()
-                                            .maxStale(Int.MAX_VALUE, TimeUnit.SECONDS)
-                                            .maxAge(Int.MAX_VALUE, TimeUnit.SECONDS)
-                                            .build(),
-                                    )
-                                    .build()
-                            }
-                        },
-                    )
-                }
-                .build()
+        bind<ImageLoader>() with
+            singleton {
+                val filePathProvider = instance<FilePathProvider>()
+                val repository = instance<Repository>()
+                val okHttpClient =
+                    instance<OkHttpClient>()
+                        .newBuilder()
+                        // This is not used by Coil but no need to risk evicting the real cache
+                        .cache(Cache(filePathProvider.cacheDir.resolve("dummy_img"), 1024L))
+                        .addInterceptor { chain ->
+                            chain.proceed(
+                                when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
+                                    true -> chain.request()
+                                    false -> {
+                                        // Forces only cached responses to be used - if no cache then 504 is thrown
+                                        chain.request().newBuilder()
+                                            .cacheControl(
+                                                CacheControl.Builder()
+                                                    .onlyIfCached()
+                                                    .maxStale(Int.MAX_VALUE, TimeUnit.SECONDS)
+                                                    .maxAge(Int.MAX_VALUE, TimeUnit.SECONDS)
+                                                    .build(),
+                                            )
+                                            .build()
+                                    }
+                                },
+                            )
+                        }
+                        .build()
 
-            ImageLoader.Builder(instance())
-                .okHttpClient(okHttpClient = okHttpClient)
-                .diskCache(
-                    DiskCache.Builder()
-                        .directory(filePathProvider.imageCacheDir)
-                        .maxSizeBytes(250L * 1024 * 1024)
-                        .build(),
-                )
-                .components {
-                    add(TooLargeImageInterceptor())
-                    add(SvgDecoder.Factory())
-                    if (SDK_INT >= 28) {
-                        add(ImageDecoderDecoder.Factory())
-                    } else {
-                        add(GifDecoder.Factory())
+                ImageLoader.Builder(instance())
+                    .okHttpClient(okHttpClient = okHttpClient)
+                    .diskCache(
+                        DiskCache.Builder()
+                            .directory(filePathProvider.imageCacheDir)
+                            .maxSizeBytes(250L * 1024 * 1024)
+                            .build(),
+                    )
+                    .components {
+                        add(TooLargeImageInterceptor())
+                        add(SvgDecoder.Factory())
+                        if (SDK_INT >= 28) {
+                            add(ImageDecoderDecoder.Factory())
+                        } else {
+                            add(GifDecoder.Factory())
+                        }
+                        add(IcoDecoder.Factory(this@FeederApplication))
                     }
-                    add(IcoDecoder.Factory(this@FeederApplication))
-                }
-                .build()
-        }
+                    .build()
+            }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
         bind<TTSStateHolder>() with instance(ttsStateHolder)

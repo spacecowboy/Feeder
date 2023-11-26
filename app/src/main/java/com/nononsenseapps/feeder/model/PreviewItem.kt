@@ -24,46 +24,49 @@ const val previewColumns = """
     feeds.fulltext_by_default as fulltext_by_default
 """
 
-data class PreviewItem @Ignore constructor(
-    var id: Long = ID_UNSET,
-    var guid: String = "",
-    @ColumnInfo(name = "plain_title") var plainTitle: String = "",
-    @ColumnInfo(name = "plain_snippet") var plainSnippet: String = "",
-    @ColumnInfo(name = "image_url") var imageUrl: String? = null,
-    @ColumnInfo(name = "enclosure_link") var enclosureLink: String? = null,
-    var author: String? = null,
-    @ColumnInfo(name = "pub_date") var pubDate: ZonedDateTime? = null,
-    var link: String? = null,
-    var tag: String = "",
-    @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
-    @ColumnInfo(name = "feed_id") var feedId: Long? = null,
-    @ColumnInfo(name = "feed_title") var feedTitle: String = "",
-    @ColumnInfo(name = "feed_customtitle") var feedCustomTitle: String = "",
-    @ColumnInfo(name = "feed_url") var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
-    @ColumnInfo(name = "feed_open_articles_with") var feedOpenArticlesWith: String = "",
-    @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
-    @ColumnInfo(name = "feed_image_url") var feedImageUrl: URL? = null,
-    @ColumnInfo(name = COL_PRIMARYSORTTIME) var primarySortTime: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
-    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
-    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
-) {
-    constructor() : this(id = ID_UNSET)
+data class PreviewItem
+    @Ignore
+    constructor(
+        var id: Long = ID_UNSET,
+        var guid: String = "",
+        @ColumnInfo(name = "plain_title") var plainTitle: String = "",
+        @ColumnInfo(name = "plain_snippet") var plainSnippet: String = "",
+        @ColumnInfo(name = "image_url") var imageUrl: String? = null,
+        @ColumnInfo(name = "enclosure_link") var enclosureLink: String? = null,
+        var author: String? = null,
+        @ColumnInfo(name = "pub_date") var pubDate: ZonedDateTime? = null,
+        var link: String? = null,
+        var tag: String = "",
+        @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
+        @ColumnInfo(name = "feed_id") var feedId: Long? = null,
+        @ColumnInfo(name = "feed_title") var feedTitle: String = "",
+        @ColumnInfo(name = "feed_customtitle") var feedCustomTitle: String = "",
+        @ColumnInfo(name = "feed_url") var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
+        @ColumnInfo(name = "feed_open_articles_with") var feedOpenArticlesWith: String = "",
+        @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+        @ColumnInfo(name = "feed_image_url") var feedImageUrl: URL? = null,
+        @ColumnInfo(name = COL_PRIMARYSORTTIME) var primarySortTime: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+        @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+        @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
+    ) {
+        constructor() : this(id = ID_UNSET)
 
-    val feedDisplayTitle: String
-        get() = feedCustomTitle.ifBlank { feedTitle }
+        val feedDisplayTitle: String
+            get() = feedCustomTitle.ifBlank { feedTitle }
 
-    val domain: String?
-        get() {
-            return (enclosureLink ?: link)?.host()
-        }
+        val domain: String?
+            get() {
+                return (enclosureLink ?: link)?.host()
+            }
 
-    val bestWordCount: Int
-        get() = when (fullTextByDefault) {
-            true -> wordCountFull
-            false -> wordCount
-        }
-}
+        val bestWordCount: Int
+            get() =
+                when (fullTextByDefault) {
+                    true -> wordCountFull
+                    false -> wordCount
+                }
+    }
 
 fun String?.host(): String? {
     val l: String? = this

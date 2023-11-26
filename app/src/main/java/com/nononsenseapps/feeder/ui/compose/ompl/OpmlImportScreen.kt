@@ -56,10 +56,10 @@ import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
-import java.net.URL
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.net.URL
 
 private const val LOG_TAG = "FEEDER_OPMLIMPORT"
 
@@ -81,22 +81,27 @@ fun OpmlImportScreen(
             viewState = ViewState(error = true, initial = false)
         } else {
             try {
-                val parser = OpmlPullParser(
-                    object : OPMLParserHandler {
-                        override suspend fun saveFeed(feed: Feed) {
-                            viewState = viewState.copy(
-                                initial = false,
-                                feeds = viewState.feeds + (feed.url to feed),
-                            )
-                        }
+                val parser =
+                    OpmlPullParser(
+                        object : OPMLParserHandler {
+                            override suspend fun saveFeed(feed: Feed) {
+                                viewState =
+                                    viewState.copy(
+                                        initial = false,
+                                        feeds = viewState.feeds + (feed.url to feed),
+                                    )
+                            }
 
-                        override suspend fun saveSetting(key: String, value: String) {
-                        }
+                            override suspend fun saveSetting(
+                                key: String,
+                                value: String,
+                            ) {
+                            }
 
-                        override suspend fun saveBlocklistPatterns(patterns: Iterable<String>) {
-                        }
-                    },
-                )
+                            override suspend fun saveBlocklistPatterns(patterns: Iterable<String>) {
+                            }
+                        },
+                    )
                 val contentResolver: ContentResolver by di.instance()
                 contentResolver.openInputStream(uri).use {
                     it?.let { stream ->
@@ -148,10 +153,11 @@ fun OpmlImportScreen(
 //        }
 //        ScreenType.SINGLE -> {
     Scaffold(
-        modifier = modifier
-            .fillMaxHeight(screenHeight)
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .fillMaxHeight(screenHeight)
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -199,28 +205,31 @@ fun OpmlImportView(
         onOk = onOk,
         onCancel = onDismiss,
         okEnabled = viewState.okEnabled,
-        modifier = modifier
-            .padding(horizontal = LocalDimens.current.margin)
-            .fillMaxHeight(),
+        modifier =
+            modifier
+                .padding(horizontal = LocalDimens.current.margin)
+                .fillMaxHeight(),
     ) {
         ProvideScaledText(
             style = MaterialTheme.typography.titleMedium,
         ) {
-            val text = when {
-                viewState.initial -> ""
-                viewState.error -> stringResource(id = R.string.failed_to_import_OPML)
-                viewState.feeds.isEmpty() -> stringResource(id = R.string.no_feeds)
-                else -> stringResource(
-                    id = R.string.import_x_feeds_with_y_tags,
-                    pluralStringResource(
-                        id = R.plurals.n_feeds,
-                        count = viewState.feedCount,
-                    ).format(viewState.feedCount),
-                    pluralStringResource(id = R.plurals.n_tags, count = viewState.tagCount).format(
-                        viewState.tagCount,
-                    ),
-                )
-            }
+            val text =
+                when {
+                    viewState.initial -> ""
+                    viewState.error -> stringResource(id = R.string.failed_to_import_OPML)
+                    viewState.feeds.isEmpty() -> stringResource(id = R.string.no_feeds)
+                    else ->
+                        stringResource(
+                            id = R.string.import_x_feeds_with_y_tags,
+                            pluralStringResource(
+                                id = R.plurals.n_feeds,
+                                count = viewState.feedCount,
+                            ).format(viewState.feedCount),
+                            pluralStringResource(id = R.plurals.n_tags, count = viewState.tagCount).format(
+                                viewState.tagCount,
+                            ),
+                        )
+                }
             WithBidiDeterminedLayoutDirection(paragraph = text) {
                 Text(
                     text = text,
@@ -238,10 +247,11 @@ fun OpmlImportView(
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .fillMaxWidth()
-                .weight(1f),
+            modifier =
+                Modifier
+                    .padding(vertical = 16.dp)
+                    .fillMaxWidth()
+                    .weight(1f),
         ) {
             items(
                 count = feedValues.size,
@@ -292,14 +302,17 @@ private fun PreviewOpmlImportScreenSingle() {
     FeederTheme {
         Surface {
             OpmlImportView(
-                viewState = ViewState(
-                    feeds = mapOf(
-                        URL("https://example.com/foo") to Feed(
-                            title = "Foo Feed",
-                            url = URL("https://example.com/foo"),
-                        ),
+                viewState =
+                    ViewState(
+                        feeds =
+                            mapOf(
+                                URL("https://example.com/foo") to
+                                    Feed(
+                                        title = "Foo Feed",
+                                        url = URL("https://example.com/foo"),
+                                    ),
+                            ),
                     ),
-                ),
                 onDismiss = {},
                 onOk = {},
             )

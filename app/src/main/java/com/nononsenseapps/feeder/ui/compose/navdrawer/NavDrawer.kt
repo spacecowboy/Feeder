@@ -75,8 +75,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
-import java.net.URL
 import kotlinx.coroutines.launch
+import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -101,19 +101,21 @@ fun ScreenWithNavDrawer(
     }
 
     DismissibleNavigationDrawer(
-        modifier = modifier
-            .onKeyEventLikeEscape {
-                coroutineScope.launch {
-                    drawerState.close()
-                }
-            },
+        modifier =
+            modifier
+                .onKeyEventLikeEscape {
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                },
         drawerState = drawerState,
         drawerContent = {
             DismissibleDrawerSheet {
                 ListOfFeedsAndTags(
                     state = navDrawerListState,
-                    modifier = Modifier
-                        .focusRequester(focusRequester),
+                    modifier =
+                        Modifier
+                            .focusRequester(focusRequester),
                     feedsAndTags = feedsAndTags,
                     expandedTags = expandedTags,
                     unreadBookmarksCount = unreadBookmarksCount,
@@ -138,60 +140,62 @@ private fun ListOfFeedsAndTagsPreview() {
     FeederTheme {
         Surface {
             ListOfFeedsAndTags(
-                feedsAndTags = immutableListHolderOf(
-                    DrawerTop(unreadCount = 100, totalChildren = 4),
-                    DrawerSavedArticles(unreadCount = 5),
-                    DrawerTag(
-                        tag = "News tag",
-                        unreadCount = 0,
-                        -1111,
-                        totalChildren = 2,
+                feedsAndTags =
+                    immutableListHolderOf(
+                        DrawerTop(unreadCount = 100, totalChildren = 4),
+                        DrawerSavedArticles(unreadCount = 5),
+                        DrawerTag(
+                            tag = "News tag",
+                            unreadCount = 0,
+                            -1111,
+                            totalChildren = 2,
+                        ),
+                        DrawerFeed(
+                            id = 1,
+                            displayTitle = "Times",
+                            tag = "News tag",
+                            unreadCount = 0,
+                        ),
+                        DrawerFeed(
+                            id = 2,
+                            displayTitle = "Post",
+                            imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
+                            tag = "News tag",
+                            unreadCount = 2,
+                        ),
+                        DrawerTag(
+                            tag = "Funny tag",
+                            unreadCount = 6,
+                            -2222,
+                            totalChildren = 1,
+                        ),
+                        DrawerFeed(
+                            id = 3,
+                            displayTitle = "Hidden",
+                            tag = "Funny tag",
+                            unreadCount = 6,
+                        ),
+                        DrawerFeed(
+                            id = 4,
+                            displayTitle = "Top Dog",
+                            unreadCount = 99,
+                            tag = "",
+                        ),
+                        DrawerFeed(
+                            id = 5,
+                            imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
+                            displayTitle = "Cowboy Programmer",
+                            unreadCount = 7,
+                            tag = "",
+                        ),
                     ),
-                    DrawerFeed(
-                        id = 1,
-                        displayTitle = "Times",
-                        tag = "News tag",
-                        unreadCount = 0,
+                expandedTags =
+                    ImmutableHolder(
+                        setOf(
+                            "News tag",
+                            "Funny tag",
+                        ),
                     ),
-                    DrawerFeed(
-                        id = 2,
-                        displayTitle = "Post",
-                        imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
-                        tag = "News tag",
-                        unreadCount = 2,
-                    ),
-                    DrawerTag(
-                        tag = "Funny tag",
-                        unreadCount = 6,
-                        -2222,
-                        totalChildren = 1,
-                    ),
-                    DrawerFeed(
-                        id = 3,
-                        displayTitle = "Hidden",
-                        tag = "Funny tag",
-                        unreadCount = 6,
-                    ),
-                    DrawerFeed(
-                        id = 4,
-                        displayTitle = "Top Dog",
-                        unreadCount = 99,
-                        tag = "",
-                    ),
-                    DrawerFeed(
-                        id = 5,
-                        imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
-                        displayTitle = "Cowboy Programmer",
-                        unreadCount = 7,
-                        tag = "",
-                    ),
-                ),
-                expandedTags = ImmutableHolder(
-                    setOf(
-                        "News tag",
-                        "Funny tag",
-                    ),
-                ),
                 unreadBookmarksCount = 1,
                 onToggleTagExpansion = {},
                 state = rememberLazyListState(),
@@ -222,22 +226,23 @@ fun ListOfFeedsAndTags(
     LazyColumn(
         state = state,
         contentPadding = WindowInsets.systemBars.asPaddingValues(),
-        modifier = modifier
-            .fillMaxSize()
-            .semantics {
-                testTag = "feedsAndTags"
-            },
+        modifier =
+            modifier
+                .fillMaxSize()
+                .semantics {
+                    testTag = "feedsAndTags"
+                },
     ) {
         item(
             key = ID_ALL_FEEDS,
             contentType = ID_ALL_FEEDS,
         ) {
-            val item = feedsAndTags.item.firstOrNull() ?: DrawerTop(
-                { stringResource(id = R.string.all_feeds) },
-
-                0,
-                0,
-            )
+            val item =
+                feedsAndTags.item.firstOrNull() ?: DrawerTop(
+                    { stringResource(id = R.string.all_feeds) },
+                    0,
+                    0,
+                )
             AllFeeds(
                 unreadCount = item.unreadCount,
                 title = stringResource(id = R.string.all_feeds),
@@ -367,23 +372,26 @@ private fun ExpandableTag(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
-            .fillMaxWidth()
-            .height(48.dp)
-            .safeSemantics(mergeDescendants = true) {
-                stateDescription = if (expanded) {
-                    expandedLabel
-                } else {
-                    contractedLabel
-                }
-                customActions = listOf(
-                    CustomAccessibilityAction(toggleExpandLabel) {
-                        onToggleExpansion(title)
-                        true
-                    },
-                )
-            },
+        modifier =
+            Modifier
+                .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
+                .fillMaxWidth()
+                .height(48.dp)
+                .safeSemantics(mergeDescendants = true) {
+                    stateDescription =
+                        if (expanded) {
+                            expandedLabel
+                        } else {
+                            contractedLabel
+                        }
+                    customActions =
+                        listOf(
+                            CustomAccessibilityAction(toggleExpandLabel) {
+                                onToggleExpansion(title)
+                                true
+                            },
+                        )
+                },
     ) {
         ExpandArrow(
             degrees = angle,
@@ -392,32 +400,36 @@ private fun ExpandableTag(
             },
         )
         Box(
-            modifier = Modifier
-                .clickable(onClick = onItemClick)
-                .fillMaxHeight()
-                .weight(1.0f, fill = true),
+            modifier =
+                Modifier
+                    .clickable(onClick = onItemClick)
+                    .fillMaxHeight()
+                    .weight(1.0f, fill = true),
         ) {
             Text(
                 text = title,
                 maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart),
             )
         }
         if (unreadCount > 0) {
-            val unreadLabel = LocalContext.current.resources.getQuantityString(
-                R.plurals.n_unread_articles,
-                unreadCount,
-                unreadCount,
-            )
+            val unreadLabel =
+                LocalContext.current.resources.getQuantityString(
+                    R.plurals.n_unread_articles,
+                    unreadCount,
+                    unreadCount,
+                )
             Text(
                 text = unreadCount.toString(),
                 maxLines = 1,
-                modifier = Modifier
-                    .semantics {
-                        contentDescription = unreadLabel
-                    },
+                modifier =
+                    Modifier
+                        .semantics {
+                            contentDescription = unreadLabel
+                        },
             )
         }
     }
@@ -505,42 +517,47 @@ private fun AllFeeds(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable(onClick = onItemClick)
-            .padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = 2.dp,
-                bottom = 2.dp,
-            )
-            .fillMaxWidth()
-            .height(48.dp),
+        modifier =
+            Modifier
+                .clickable(onClick = onItemClick)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 2.dp,
+                    bottom = 2.dp,
+                )
+                .fillMaxWidth()
+                .height(48.dp),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1.0f, fill = true),
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .weight(1.0f, fill = true),
         ) {
             Text(
                 text = title,
                 maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart),
             )
         }
         if (unreadCount > 0) {
-            val unreadLabel = LocalContext.current.resources.getQuantityString(
-                R.plurals.n_unread_articles,
-                unreadCount,
-                unreadCount,
-            )
+            val unreadLabel =
+                LocalContext.current.resources.getQuantityString(
+                    R.plurals.n_unread_articles,
+                    unreadCount,
+                    unreadCount,
+                )
             Text(
                 text = unreadCount.toString(),
                 maxLines = 1,
-                modifier = Modifier.semantics {
-                    contentDescription = unreadLabel
-                },
+                modifier =
+                    Modifier.semantics {
+                        contentDescription = unreadLabel
+                    },
             )
         }
     }
@@ -556,52 +573,58 @@ private fun Feed(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable(onClick = onItemClick)
-            .padding(
-                start = 0.dp,
-                end = 16.dp,
-                top = 2.dp,
-                bottom = 2.dp,
-            )
-            .fillMaxWidth()
-            .height(48.dp),
+        modifier =
+            Modifier
+                .clickable(onClick = onItemClick)
+                .padding(
+                    start = 0.dp,
+                    end = 16.dp,
+                    top = 2.dp,
+                    bottom = 2.dp,
+                )
+                .fillMaxWidth()
+                .height(48.dp),
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .minimumInteractiveComponentSize(),
-//                    .height(48.dp)
+            modifier =
+                Modifier
+                    .minimumInteractiveComponentSize(),
+            //                    .height(48.dp)
 //                    // Taking 4dp spacing into account
 //                    .width(44.dp),
         ) {
             image()
         }
         Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1.0f, fill = true),
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .weight(1.0f, fill = true),
         ) {
             Text(
                 text = title,
                 maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterStart),
             )
         }
         if (unreadCount > 0) {
-            val unreadLabel = LocalContext.current.resources.getQuantityString(
-                R.plurals.n_unread_articles,
-                unreadCount,
-                unreadCount,
-            )
+            val unreadLabel =
+                LocalContext.current.resources.getQuantityString(
+                    R.plurals.n_unread_articles,
+                    unreadCount,
+                    unreadCount,
+                )
             Text(
                 text = unreadCount.toString(),
                 maxLines = 1,
-                modifier = Modifier.semantics {
-                    contentDescription = unreadLabel
-                },
+                modifier =
+                    Modifier.semantics {
+                        contentDescription = unreadLabel
+                    },
             )
         }
     }
@@ -618,31 +641,34 @@ private fun Feed(
         title = title,
         unreadCount = unreadCount,
         onItemClick = onItemClick,
-        image = if (imageUrl != null) {
-            {
-                val pixels = with(LocalDensity.current) {
-                    24.dp.roundToPx()
+        image =
+            if (imageUrl != null) {
+                {
+                    val pixels =
+                        with(LocalDensity.current) {
+                            24.dp.roundToPx()
+                        }
+                    AsyncImage(
+                        model =
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(imageUrl.toString()).listener(
+                                    onError = { a, b ->
+                                        Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                                    },
+                                )
+                                .scale(Scale.FIT)
+                                .size(pixels)
+                                .precision(Precision.INEXACT)
+                                .build(),
+                        contentDescription = stringResource(id = R.string.feed_icon),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(24.dp),
+                    )
                 }
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageUrl.toString()).listener(
-                            onError = { a, b ->
-                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
-                            },
-                        )
-                        .scale(Scale.FIT)
-                        .size(pixels)
-                        .precision(Precision.INEXACT)
-                        .build(),
-                    contentDescription = stringResource(id = R.string.feed_icon),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        } else {
-            {
-                Box(modifier = Modifier.size(24.dp)) {}
-            }
-        },
+            } else {
+                {
+                    Box(modifier = Modifier.size(24.dp)) {}
+                }
+            },
     )
 }

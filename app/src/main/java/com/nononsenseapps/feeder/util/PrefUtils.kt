@@ -7,5 +7,7 @@ import android.content.SharedPreferences
  */
 const val PREF_MAX_ITEM_COUNT_PER_FEED = "pref_max_item_count_per_feed"
 
-fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
-    getString(key, defaultValue) ?: defaultValue
+fun SharedPreferences.getStringNonNull(
+    key: String,
+    defaultValue: String,
+): String = getString(key, defaultValue) ?: defaultValue

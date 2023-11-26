@@ -60,9 +60,10 @@ fun PullRefreshIndicator(
     }
 
     Surface(
-        modifier = modifier
-            .size(IndicatorSize)
-            .pullRefreshIndicatorTransform(state, scale),
+        modifier =
+            modifier
+                .size(IndicatorSize)
+                .pullRefreshIndicatorTransform(state, scale),
         shape = SpinnerShape,
         color = backgroundColor,
         tonalElevation = if (showElevation) Elevation else 0.dp,
@@ -104,12 +105,13 @@ private fun CircularArrowIndicator(
 
         rotate(degrees = values.rotation) {
             val arcRadius = ArcRadius.toPx() + StrokeWidth.toPx() / 2f
-            val arcBounds = Rect(
-                size.center.x - arcRadius,
-                size.center.y - arcRadius,
-                size.center.x + arcRadius,
-                size.center.y + arcRadius,
-            )
+            val arcBounds =
+                Rect(
+                    size.center.x - arcRadius,
+                    size.center.y - arcRadius,
+                    size.center.x + arcRadius,
+                    size.center.y + arcRadius,
+                )
             drawArc(
                 color = color,
                 alpha = values.alpha,
@@ -118,10 +120,11 @@ private fun CircularArrowIndicator(
                 useCenter = false,
                 topLeft = arcBounds.topLeft,
                 size = arcBounds.size,
-                style = Stroke(
-                    width = StrokeWidth.toPx(),
-                    cap = StrokeCap.Square,
-                ),
+                style =
+                    Stroke(
+                        width = StrokeWidth.toPx(),
+                        cap = StrokeCap.Square,
+                    ),
             )
             drawArrow(path, arcBounds, color, values)
         }
@@ -158,7 +161,12 @@ private fun ArrowValues(progress: Float): ArrowValues {
     return ArrowValues(alpha, rotation, startAngle, endAngle, scale)
 }
 
-private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values: ArrowValues) {
+private fun DrawScope.drawArrow(
+    arrow: Path,
+    bounds: Rect,
+    color: Color,
+    values: ArrowValues,
+) {
     arrow.reset()
     arrow.moveTo(0f, 0f) // Move to left corner
     arrow.lineTo(x = ArrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
@@ -198,11 +206,12 @@ fun Modifier.pullRefreshIndicatorTransform(
     state: PullRefreshState,
     scale: Boolean = false,
 ) = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "pullRefreshIndicatorTransform"
-        properties["state"] = state
-        properties["scale"] = scale
-    },
+    inspectorInfo =
+        debugInspectorInfo {
+            name = "pullRefreshIndicatorTransform"
+            properties["state"] = state
+            properties["scale"] = scale
+        },
 ) {
     var height by remember { mutableStateOf(0) }
 
@@ -212,9 +221,10 @@ fun Modifier.pullRefreshIndicatorTransform(
             translationY = state.position - height
 
             if (scale && !state.refreshing) {
-                val scaleFraction = LinearOutSlowInEasing
-                    .transform(state.position / state.threshold)
-                    .coerceIn(0f, 1f)
+                val scaleFraction =
+                    LinearOutSlowInEasing
+                        .transform(state.position / state.threshold)
+                        .coerceIn(0f, 1f)
                 scaleX = scaleFraction
                 scaleY = scaleFraction
             }

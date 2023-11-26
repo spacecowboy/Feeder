@@ -1,24 +1,25 @@
 package com.nononsenseapps.feeder.model
 
-import java.io.InputStream
 import org.intellij.lang.annotations.Language
+import java.io.InputStream
 
 class Feeds {
-
     companion object {
         val nixosRss: InputStream
             get() = Companion::class.java.getResourceAsStream("rss_nixos.xml")!!
 
         val cowboyJson: String
-            get() = String(
-                Companion::class.java.getResourceAsStream("cowboyprogrammer_feed.json")!!
-                    .use { it.readBytes() },
-            )
+            get() =
+                String(
+                    Companion::class.java.getResourceAsStream("cowboyprogrammer_feed.json")!!
+                        .use { it.readBytes() },
+                )
 
         val cowboyAtom: String
-            get() = String(
-                Companion::class.java.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() },
-            )
+            get() =
+                String(
+                    Companion::class.java.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() },
+                )
 
         /**
          * Reported in https://gitlab.com/spacecowboy/Feeder/-/issues/410

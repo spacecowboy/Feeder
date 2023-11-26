@@ -46,21 +46,24 @@ fun FeedItemEitherIndicator(
     when {
         bookmarked -> FeedItemSavedIndicator(size = size, modifier = modifier)
 //        unread -> FeedItemNewIndicator(size = size, modifier = modifier)
-        itemImage != null -> FeedItemImageIndicator(
-            imageUrl = itemImage,
-            size = size,
-            modifier = modifier,
-        )
+        itemImage != null ->
+            FeedItemImageIndicator(
+                imageUrl = itemImage,
+                size = size,
+                modifier = modifier,
+            )
 
-        feedImageUrl != null -> FeedItemFeedIconIndicator(
-            feedImageUrl = feedImageUrl,
-            size = size,
-            modifier = modifier,
-        )
+        feedImageUrl != null ->
+            FeedItemFeedIconIndicator(
+                feedImageUrl = feedImageUrl,
+                size = size,
+                modifier = modifier,
+            )
 
-        else -> Box(modifier = modifier) {
-            Spacer(modifier = Modifier.size(size))
-        }
+        else ->
+            Box(modifier = modifier) {
+                Spacer(modifier = Modifier.size(size))
+            }
     }
 }
 
@@ -70,32 +73,35 @@ fun FeedItemImageIndicator(
     size: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val pixels = with(LocalDensity.current) {
-        size.roundToPx()
-    }
+    val pixels =
+        with(LocalDensity.current) {
+            size.roundToPx()
+        }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .listener(
-                    onError = { a, b ->
-                        Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
-                    },
-                )
-                .scale(Scale.FIT)
-                .size(pixels)
-                .precision(Precision.INEXACT)
-                .build(),
+            model =
+                ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .listener(
+                        onError = { a, b ->
+                            Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                        },
+                    )
+                    .scale(Scale.FIT)
+                    .size(pixels)
+                    .precision(Precision.INEXACT)
+                    .build(),
             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
             contentDescription = stringResource(id = R.string.feed_icon),
             contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)
-                .size(size),
+            modifier =
+                Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .size(size),
         )
     }
 }
@@ -106,31 +112,34 @@ fun FeedItemFeedIconIndicator(
     size: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val pixels = with(LocalDensity.current) {
-        size.roundToPx()
-    }
+    val pixels =
+        with(LocalDensity.current) {
+            size.roundToPx()
+        }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(feedImageUrl)
-                .listener(
-                    onError = { a, b ->
-                        Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
-                    },
-                )
-                .scale(Scale.FIT)
-                .size(pixels)
-                .precision(Precision.INEXACT)
-                .build(),
+            model =
+                ImageRequest.Builder(LocalContext.current)
+                    .data(feedImageUrl)
+                    .listener(
+                        onError = { a, b ->
+                            Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                        },
+                    )
+                    .scale(Scale.FIT)
+                    .size(pixels)
+                    .precision(Precision.INEXACT)
+                    .build(),
             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
             contentDescription = stringResource(id = R.string.feed_icon),
             contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .size(size),
+            modifier =
+                Modifier
+                    .size(size),
         )
     }
 }
@@ -144,8 +153,9 @@ fun FeedItemNewIndicator(
         Icon(
             Icons.Outlined.Circle,
             contentDescription = stringResource(id = R.string.unread_adjective),
-            modifier = Modifier
-                .size(size),
+            modifier =
+                Modifier
+                    .size(size),
             tint = MaterialTheme.colorScheme.primary,
         )
     }
@@ -163,8 +173,9 @@ fun FeedItemSavedIndicator(
         Icon(
             Icons.Default.Star,
             contentDescription = stringResource(id = R.string.saved_article),
-            modifier = Modifier
-                .size(size),
+            modifier =
+                Modifier
+                    .size(size),
             tint = MaterialTheme.colorScheme.primary,
         )
     }
@@ -172,13 +183,14 @@ fun FeedItemSavedIndicator(
 
 @Preview("Light")
 @Composable
-fun PreviewLightFeedItemIndicatorRow() {
+private fun PreviewLightFeedItemIndicatorRow() {
     FeederTheme(currentTheme = ThemeOptions.DAY) {
         Surface {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(32.dp),
+                modifier =
+                    Modifier
+                        .padding(32.dp),
             ) {
                 Row {
                     FeedItemNewIndicator(size = 8.dp)
@@ -191,13 +203,14 @@ fun PreviewLightFeedItemIndicatorRow() {
 
 @Preview("Dark")
 @Composable
-fun PreviewDarkFeedItemIndicatorRow() {
+private fun PreviewDarkFeedItemIndicatorRow() {
     FeederTheme(currentTheme = ThemeOptions.NIGHT) {
         Surface {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(32.dp),
+                modifier =
+                    Modifier
+                        .padding(32.dp),
             ) {
                 Row {
                     FeedItemNewIndicator(size = 8.dp)

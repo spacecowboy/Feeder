@@ -8,13 +8,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
-import kotlin.test.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
+import kotlin.test.assertNull
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -25,12 +25,13 @@ class TestMigrationFrom28To29 : DIAware {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate() {
@@ -49,12 +50,13 @@ class TestMigrationFrom28To29 : DIAware {
                 """.trimIndent(),
             )
         }
-        val db = testHelper.runMigrationsAndValidate(
-            dbName,
-            TO_VERSION,
-            true,
-            MigrationFrom28To29(di),
-        )
+        val db =
+            testHelper.runMigrationsAndValidate(
+                dbName,
+                TO_VERSION,
+                true,
+                MigrationFrom28To29(di),
+            )
 
         db.query(
             """

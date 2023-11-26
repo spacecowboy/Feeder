@@ -1,8 +1,5 @@
 package com.nononsenseapps.feeder.ui.text
 
-import java.io.IOException
-import java.io.StringReader
-import java.util.Stack
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.Attributes
@@ -12,6 +9,9 @@ import org.xml.sax.Locator
 import org.xml.sax.SAXException
 import org.xml.sax.SAXNotRecognizedException
 import org.xml.sax.SAXNotSupportedException
+import java.io.IOException
+import java.io.StringReader
+import java.util.Stack
 
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
@@ -77,7 +77,10 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     @Throws(SAXException::class)
-    override fun startPrefixMapping(prefix: String, uri: String) {
+    override fun startPrefixMapping(
+        prefix: String,
+        uri: String,
+    ) {
     }
 
     @Throws(SAXException::class)
@@ -85,11 +88,19 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     @Throws(SAXException::class)
-    override fun startElement(uri: String, localName: String, qName: String, attributes: Attributes) {
+    override fun startElement(
+        uri: String,
+        localName: String,
+        qName: String,
+        attributes: Attributes,
+    ) {
         handleStartTag(localName, attributes)
     }
 
-    private fun handleStartTag(tag: String, attributes: Attributes) {
+    private fun handleStartTag(
+        tag: String,
+        attributes: Attributes,
+    ) {
         when {
             tag.equals("br", ignoreCase = true) -> {
                 // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
@@ -116,7 +127,10 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    private fun startImg(text: StringBuilder?, attributes: Attributes) {
+    private fun startImg(
+        text: StringBuilder?,
+        attributes: Attributes,
+    ) {
         // Ensure whitespace
         ensureSpace(text)
 
@@ -172,12 +186,19 @@ class HtmlToPlainTextConverter : ContentHandler {
         listings.pop()
     }
 
-    private fun startA(builder: StringBuilder?, attributes: Attributes) {}
+    private fun startA(
+        builder: StringBuilder?,
+        attributes: Attributes,
+    ) {}
 
     private fun endA(builder: StringBuilder?) {}
 
     @Throws(SAXException::class)
-    override fun endElement(uri: String, localName: String, qName: String) {
+    override fun endElement(
+        uri: String,
+        localName: String,
+        qName: String,
+    ) {
         handleEndTag(localName)
     }
 
@@ -221,7 +242,11 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     @Throws(SAXException::class)
-    override fun characters(ch: CharArray, start: Int, length: Int) {
+    override fun characters(
+        ch: CharArray,
+        start: Int,
+        length: Int,
+    ) {
         if (ignoreCount > 0) {
             return
         }
@@ -241,17 +266,18 @@ class HtmlToPlainTextConverter : ContentHandler {
             if (c == ' ' || c == '\n') {
                 var len = sb.length
 
-                val prev: Char = if (len == 0) {
-                    len = builder!!.length
-
+                val prev: Char =
                     if (len == 0) {
-                        '\n'
+                        len = builder!!.length
+
+                        if (len == 0) {
+                            '\n'
+                        } else {
+                            builder!![len - 1]
+                        }
                     } else {
-                        builder!![len - 1]
+                        sb[len - 1]
                     }
-                } else {
-                    sb[len - 1]
-                }
 
                 if (prev != ' ' && prev != '\n') {
                     sb.append(' ')
@@ -265,11 +291,18 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     @Throws(SAXException::class)
-    override fun ignorableWhitespace(ch: CharArray, start: Int, length: Int) {
+    override fun ignorableWhitespace(
+        ch: CharArray,
+        start: Int,
+        length: Int,
+    ) {
     }
 
     @Throws(SAXException::class)
-    override fun processingInstruction(target: String, data: String) {
+    override fun processingInstruction(
+        target: String,
+        data: String,
+    ) {
     }
 
     @Throws(SAXException::class)
@@ -317,7 +350,10 @@ class HtmlToPlainTextConverter : ContentHandler {
     private class Header(var mLevel: Int)
 }
 
-fun repeated(string: String, count: Int): String {
+fun repeated(
+    string: String,
+    count: Int,
+): String {
     val sb = StringBuilder()
 
     for (i in 0 until count) {

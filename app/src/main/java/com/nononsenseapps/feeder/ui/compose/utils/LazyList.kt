@@ -16,9 +16,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  */
 @Composable
 fun LazyListState.rememberIsItemVisible(key: Any): State<Boolean> {
-    val isVisible = remember {
-        mutableStateOf(layoutInfo.visibleItemsInfo.any { it.key == key })
-    }
+    val isVisible =
+        remember {
+            mutableStateOf(layoutInfo.visibleItemsInfo.any { it.key == key })
+        }
     LaunchedEffect(this, key) {
         snapshotFlow {
             layoutInfo.visibleItemsInfo.any { it.key == key }
@@ -39,9 +40,10 @@ fun LazyListState.rememberIsItemVisible(key: Any): State<Boolean> {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyStaggeredGridState.rememberIsItemVisible(key: Any): State<Boolean> {
-    val isVisible = remember {
-        mutableStateOf(layoutInfo.visibleItemsInfo.any { it.key == key })
-    }
+    val isVisible =
+        remember {
+            mutableStateOf(layoutInfo.visibleItemsInfo.any { it.key == key })
+        }
     LaunchedEffect(this, key) {
         snapshotFlow {
             layoutInfo.visibleItemsInfo.any { it.key == key }
@@ -58,14 +60,19 @@ fun LazyStaggeredGridState.rememberIsItemVisible(key: Any): State<Boolean> {
  * Becomes true the item is mostly visible on screen.
  */
 @Composable
-fun LazyListState.rememberIsItemMostlyVisible(key: Any, screenHeightPx: Int): State<Boolean> {
-    val result = remember {
-        mutableStateOf(false)
-    }
+fun LazyListState.rememberIsItemMostlyVisible(
+    key: Any,
+    screenHeightPx: Int,
+): State<Boolean> {
+    val result =
+        remember {
+            mutableStateOf(false)
+        }
     LaunchedEffect(this, key) {
         snapshotFlow {
-            val item = layoutInfo.visibleItemsInfo.firstOrNull { it.key == key }
-                ?: return@snapshotFlow false
+            val item =
+                layoutInfo.visibleItemsInfo.firstOrNull { it.key == key }
+                    ?: return@snapshotFlow false
 
             /*
              // constrained height
@@ -82,11 +89,13 @@ fun LazyListState.rememberIsItemMostlyVisible(key: Any, screenHeightPx: Int): St
             val vhp = (vh * 100) / h
              */
 
-            val visibleHeightPercentage = (
+            val visibleHeightPercentage =
                 (
-                    (item.offset + item.size).coerceAtMost(screenHeightPx) - item.offset.coerceAtLeast(
-                        0,
-                    )
+                    (
+                        (item.offset + item.size).coerceAtMost(screenHeightPx) -
+                            item.offset.coerceAtLeast(
+                                0,
+                            )
                     ) * 100
                 ) / item.size.coerceAtMost(screenHeightPx)
 
@@ -112,19 +121,23 @@ fun LazyStaggeredGridState.rememberIsItemMostlyVisible(
     key: Any,
     screenHeightPx: Int,
 ): State<Boolean> {
-    val result = remember {
-        mutableStateOf(false)
-    }
+    val result =
+        remember {
+            mutableStateOf(false)
+        }
     LaunchedEffect(this, key) {
         snapshotFlow {
-            val item = layoutInfo.visibleItemsInfo.firstOrNull { it.key == key }
-                ?: return@snapshotFlow false
+            val item =
+                layoutInfo.visibleItemsInfo.firstOrNull { it.key == key }
+                    ?: return@snapshotFlow false
 
-            val visibleHeightPercentage = (
+            val visibleHeightPercentage =
                 (
-                    (item.offset.y + item.size.height).coerceAtMost(screenHeightPx) - item.offset.y.coerceAtLeast(
-                        0,
-                    )
+                    (
+                        (item.offset.y + item.size.height).coerceAtMost(screenHeightPx) -
+                            item.offset.y.coerceAtLeast(
+                                0,
+                            )
                     ) * 100
                 ) / item.size.height.coerceAtMost(screenHeightPx)
 

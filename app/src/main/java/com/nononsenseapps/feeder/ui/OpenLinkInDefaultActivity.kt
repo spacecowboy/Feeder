@@ -34,19 +34,21 @@ class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
             val uri = intent.data
 
             if (uri?.host == DEEP_LINK_HOST && uri.lastPathSegment == "feed") {
-                val feedItemIds = intent.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
-                    ?: longArrayOf()
+                val feedItemIds =
+                    intent.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
+                        ?: longArrayOf()
 
                 viewModel.markAsNotifiedInBackground(feedItemIds.toList())
 
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = false,
-                    intent = Intent(
-                        Intent.ACTION_VIEW,
-                        uri,
-                        this,
-                        MainActivity::class.java,
-                    ),
+                    intent =
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            uri,
+                            this,
+                            MainActivity::class.java,
+                        ),
                 )
             } else {
                 handleNotificationActions(intent)

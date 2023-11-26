@@ -8,8 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.nononsenseapps.feeder.ui.compose.BaseComposeTest
 
-fun BaseComposeTest.feedScreen(block: FeedScreenRobot.() -> Unit) =
-    FeedScreenRobot(composeTestRule).apply { block() }
+fun BaseComposeTest.feedScreen(block: FeedScreenRobot.() -> Unit) = FeedScreenRobot(composeTestRule).apply { block() }
 
 class FeedScreenRobot(
     private val testRule: ComposeTestRule,

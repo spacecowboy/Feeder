@@ -20,13 +20,6 @@ import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
-import java.net.URL
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -34,6 +27,13 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.net.URL
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
@@ -67,10 +67,11 @@ class FeedItemStore(override val di: DI) : DIAware {
         filter: FeedListFilter,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
-            config = PagingConfig(
-                pageSize = PAGE_SIZE,
-                enablePlaceholders = false,
-            ),
+            config =
+                PagingConfig(
+                    pageSize = PAGE_SIZE,
+                    enablePlaceholders = false,
+                ),
         ) {
             val queryString = StringBuilder()
             val args = mutableListOf<Any?>()
@@ -209,14 +210,20 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsRead(itemIds)
     }
 
-    suspend fun markAsReadAndNotified(itemId: Long, readTime: Instant = Instant.now()) {
+    suspend fun markAsReadAndNotified(
+        itemId: Long,
+        readTime: Instant = Instant.now(),
+    ) {
         dao.markAsReadAndNotified(
             id = itemId,
             readTime = readTime.coerceAtLeast(Instant.EPOCH),
         )
     }
 
-    suspend fun markAsReadAndNotifiedAndOverwriteReadTime(itemId: Long, readTime: Instant) {
+    suspend fun markAsReadAndNotifiedAndOverwriteReadTime(
+        itemId: Long,
+        readTime: Instant,
+    ) {
         dao.markAsReadAndNotifiedAndOverwriteReadTime(
             id = itemId,
             readTime = readTime.coerceAtLeast(Instant.EPOCH),
@@ -227,7 +234,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsUnread(itemId)
     }
 
-    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) {
+    suspend fun setBookmarked(
+        itemId: Long,
+        bookmarked: Boolean,
+    ) {
         dao.setBookmarked(itemId, bookmarked)
     }
 
@@ -239,7 +249,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         return dao.loadFeedItemFlow(itemId)
     }
 
-    suspend fun getFeedItemId(feedUrl: URL, articleGuid: String): Long? {
+    suspend fun getFeedItemId(
+        feedUrl: URL,
+        articleGuid: String,
+    ): Long? {
         return dao.getItemWith(feedUrl = feedUrl, articleGuid = articleGuid)
     }
 
@@ -266,15 +279,16 @@ class FeedItemStore(override val di: DI) : DIAware {
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
         dao.getFeedsItemsWithDefaultFullTextNeedingDownload()
 
-    suspend fun markAsFullTextDownloaded(feedItemId: Long) =
-        dao.markAsFullTextDownloaded(feedItemId)
+    suspend fun markAsFullTextDownloaded(feedItemId: Long) = dao.markAsFullTextDownloaded(feedItemId)
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
         return dao.getFeedItemsNeedingNotifying()
     }
 
-    suspend fun loadFeedItem(guid: String, feedId: Long): FeedItem? =
-        dao.loadFeedItem(guid = guid, feedId = feedId)
+    suspend fun loadFeedItem(
+        guid: String,
+        feedId: Long,
+    ): FeedItem? = dao.loadFeedItem(guid = guid, feedId = feedId)
 
     suspend fun upsertFeedItems(
         itemsWithText: List<Pair<FeedItem, String>>,
@@ -283,14 +297,19 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.upsertFeedItems(itemsWithText = itemsWithText, block = block)
     }
 
-    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int) =
-        dao.getItemsToBeCleanedFromFeed(feedId = feedId, keepCount = keepCount)
+    suspend fun getItemsToBeCleanedFromFeed(
+        feedId: Long,
+        keepCount: Int,
+    ) = dao.getItemsToBeCleanedFromFeed(feedId = feedId, keepCount = keepCount)
 
     suspend fun deleteFeedItems(ids: List<Long>) {
         dao.deleteFeedItems(ids)
     }
 
-    suspend fun updateWordCountFull(id: Long, wordCount: Int) {
+    suspend fun updateWordCountFull(
+        id: Long,
+        wordCount: Int,
+    ) {
         dao.updateWordCountFull(id, wordCount)
     }
 

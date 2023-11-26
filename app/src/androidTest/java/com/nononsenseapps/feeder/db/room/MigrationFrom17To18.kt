@@ -16,12 +16,13 @@ class MigrationFrom17To18 {
 
     @Rule
     @JvmField
-    val testHelper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java,
-        emptyList(),
-        FrameworkSQLiteOpenHelperFactory(),
-    )
+    val testHelper: MigrationTestHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            AppDatabase::class.java,
+            emptyList(),
+            FrameworkSQLiteOpenHelperFactory(),
+        )
 
     @Test
     fun migrate15to16() {

@@ -62,9 +62,10 @@ fun FeedItemCompact(
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
-            .height(IntrinsicSize.Min)
-            .padding(start = LocalDimens.current.margin),
+        modifier =
+            modifier
+                .height(IntrinsicSize.Min)
+                .padding(start = LocalDimens.current.margin),
     ) {
         FeedItemText(
             item = item,
@@ -77,9 +78,10 @@ fun FeedItemCompact(
             maxLines = maxLines,
             showOnlyTitle = showOnlyTitle,
             showReadingTime = showReadingTime,
-            modifier = Modifier
-                .requiredHeightIn(min = minimumTouchSize)
-                .padding(vertical = 8.dp),
+            modifier =
+                Modifier
+                    .requiredHeightIn(min = minimumTouchSize)
+                    .padding(vertical = 8.dp),
         )
 
         if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.imageUrl != null || item.feedImageUrl != null)) {
@@ -93,39 +95,44 @@ fun FeedItemCompact(
                         itemImage = null,
                         feedImageUrl = null,
                         size = 24.dp,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(64.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .width(64.dp),
                     )
                 } else {
                     (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
-                        val scale = if (item.imageUrl != null) {
-                            ContentScale.Crop
-                        } else {
-                            ContentScale.Fit
-                        }
-                        val pixels = with(LocalDensity.current) {
-                            Size(64.dp.roundToPx(), 96.dp.roundToPx())
-                        }
+                        val scale =
+                            if (item.imageUrl != null) {
+                                ContentScale.Crop
+                            } else {
+                                ContentScale.Fit
+                            }
+                        val pixels =
+                            with(LocalDensity.current) {
+                                Size(64.dp.roundToPx(), 96.dp.roundToPx())
+                            }
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(imageUrl)
-                                .listener(
-                                    onError = { a, b ->
-                                        Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
-                                    },
-                                )
-                                .scale(Scale.FILL)
-                                .size(pixels)
-                                .precision(Precision.INEXACT)
-                                .build(),
+                            model =
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(imageUrl)
+                                    .listener(
+                                        onError = { a, b ->
+                                            Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
+                                        },
+                                    )
+                                    .scale(Scale.FILL)
+                                    .size(pixels)
+                                    .precision(Precision.INEXACT)
+                                    .build(),
                             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
                             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
                             contentDescription = stringResource(id = R.string.article_image),
                             contentScale = scale,
-                            modifier = Modifier
-                                .width(imageWidth)
-                                .fillMaxHeight(),
+                            modifier =
+                                Modifier
+                                    .width(imageWidth)
+                                    .fillMaxHeight(),
                         )
                     }
                 }
@@ -154,21 +161,23 @@ data class FeedListItem(
     val wordCount: Int,
 ) {
     val cursor: FeedItemCursor
-        get() = object : FeedItemCursor {
-            override val primarySortTime: Instant = this@FeedListItem.primarySortTime
-            override val pubDate: ZonedDateTime? = this@FeedListItem.rawPubDate
-            override val id: Long = this@FeedListItem.id
-        }
+        get() =
+            object : FeedItemCursor {
+                override val primarySortTime: Instant = this@FeedListItem.primarySortTime
+                override val pubDate: ZonedDateTime? = this@FeedListItem.rawPubDate
+                override val id: Long = this@FeedListItem.id
+            }
 
     /**
      * Used so lazylist/grid can re-use items.
      *
      * Type will depend on having images as that will influence visible items
      */
-    fun contentType(feedItemStyle: FeedItemStyle): String = when {
-        imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
-        else -> "$feedItemStyle/other"
-    }
+    fun contentType(feedItemStyle: FeedItemStyle): String =
+        when {
+            imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
+            else -> "$feedItemStyle/other"
+        }
 }
 
 @Composable
@@ -177,21 +186,22 @@ private fun PreviewRead() {
     FeederTheme {
         Surface {
             FeedItemCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = false,
-                    imageUrl = null,
-                    link = null,
-                    id = ID_UNSET,
-                    bookmarked = false,
-                    feedImageUrl = null,
-                    primarySortTime = Instant.EPOCH,
-                    rawPubDate = null,
-                    wordCount = 900,
-                ),
+                item =
+                    FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = false,
+                        imageUrl = null,
+                        link = null,
+                        id = ID_UNSET,
+                        bookmarked = false,
+                        feedImageUrl = null,
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
+                        wordCount = 900,
+                    ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
@@ -215,21 +225,22 @@ private fun PreviewUnread() {
     FeederTheme {
         Surface {
             FeedItemCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = true,
-                    imageUrl = null,
-                    link = null,
-                    id = ID_UNSET,
-                    bookmarked = true,
-                    feedImageUrl = null,
-                    primarySortTime = Instant.EPOCH,
-                    rawPubDate = null,
-                    wordCount = 900,
-                ),
+                item =
+                    FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = true,
+                        imageUrl = null,
+                        link = null,
+                        id = ID_UNSET,
+                        bookmarked = true,
+                        feedImageUrl = null,
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
+                        wordCount = 900,
+                    ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
@@ -256,21 +267,22 @@ private fun PreviewWithImage() {
                 modifier = Modifier.width(400.dp),
             ) {
                 FeedItemCompact(
-                    item = FeedListItem(
-                        title = "title",
-                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                        feedTitle = "Super Duper Feed One two three hup di too dasf",
-                        pubDate = "Jun 9, 2021",
-                        unread = true,
-                        imageUrl = "blabla",
-                        link = null,
-                        id = ID_UNSET,
-                        bookmarked = false,
-                        feedImageUrl = null,
-                        primarySortTime = Instant.EPOCH,
-                        rawPubDate = null,
-                        wordCount = 900,
-                    ),
+                    item =
+                        FeedListItem(
+                            title = "title",
+                            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                            feedTitle = "Super Duper Feed One two three hup di too dasf",
+                            pubDate = "Jun 9, 2021",
+                            unread = true,
+                            imageUrl = "blabla",
+                            link = null,
+                            id = ID_UNSET,
+                            bookmarked = false,
+                            feedImageUrl = null,
+                            primarySortTime = Instant.EPOCH,
+                            rawPubDate = null,
+                            wordCount = 900,
+                        ),
                     showThumbnail = true,
                     onMarkAboveAsRead = {},
                     onMarkBelowAsRead = {},

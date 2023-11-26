@@ -16,65 +16,70 @@ sealed class DrawerItemWithUnreadCount(
 ) : Comparable<DrawerItemWithUnreadCount>, FeedIdTag {
     abstract val uiId: Long
 
-    override fun compareTo(other: DrawerItemWithUnreadCount): Int = when (this) {
-        is DrawerFeed -> {
-            when (other) {
-                is DrawerFeed -> when {
-                    tag.equals(other.tag, ignoreCase = true) -> displayTitle.compareTo(
-                        other.displayTitle,
-                        ignoreCase = true,
-                    )
+    override fun compareTo(other: DrawerItemWithUnreadCount): Int =
+        when (this) {
+            is DrawerFeed -> {
+                when (other) {
+                    is DrawerFeed ->
+                        when {
+                            tag.equals(other.tag, ignoreCase = true) ->
+                                displayTitle.compareTo(
+                                    other.displayTitle,
+                                    ignoreCase = true,
+                                )
 
-                    tag.isEmpty() -> 1
-                    other.tag.isEmpty() -> -1
-                    else -> tag.compareTo(other.tag, ignoreCase = true)
+                            tag.isEmpty() -> 1
+                            other.tag.isEmpty() -> -1
+                            else -> tag.compareTo(other.tag, ignoreCase = true)
+                        }
+
+                    is DrawerTag ->
+                        when {
+                            tag.isEmpty() -> 1
+                            tag.equals(other.tag, ignoreCase = true) -> 1
+                            else -> tag.compareTo(other.tag, ignoreCase = true)
+                        }
+
+                    is DrawerTop,
+                    is DrawerSavedArticles,
+                    -> {
+                        1
+                    }
                 }
+            }
 
-                is DrawerTag -> when {
-                    tag.isEmpty() -> 1
-                    tag.equals(other.tag, ignoreCase = true) -> 1
-                    else -> tag.compareTo(other.tag, ignoreCase = true)
+            is DrawerTag -> {
+                when (other) {
+                    is DrawerFeed ->
+                        when {
+                            other.tag.isEmpty() -> -1
+                            tag.equals(other.tag, ignoreCase = true) -> -1
+                            else -> tag.compareTo(other.tag, ignoreCase = true)
+                        }
+
+                    is DrawerTag -> {
+                        tag.compareTo(other.tag, ignoreCase = true)
+                    }
+
+                    is DrawerTop,
+                    is DrawerSavedArticles,
+                    -> {
+                        1
+                    }
                 }
+            }
 
-                is DrawerTop,
-                is DrawerSavedArticles,
-                -> {
-                    1
+            is DrawerTop -> {
+                -1
+            }
+
+            is DrawerSavedArticles -> {
+                when (other) {
+                    is DrawerTop -> 1
+                    else -> -1
                 }
             }
         }
-
-        is DrawerTag -> {
-            when (other) {
-                is DrawerFeed -> when {
-                    other.tag.isEmpty() -> -1
-                    tag.equals(other.tag, ignoreCase = true) -> -1
-                    else -> tag.compareTo(other.tag, ignoreCase = true)
-                }
-
-                is DrawerTag -> {
-                    tag.compareTo(other.tag, ignoreCase = true)
-                }
-
-                is DrawerTop,
-                is DrawerSavedArticles,
-                -> {
-                    1
-                }
-            }
-        }
-
-        is DrawerTop -> {
-            -1
-        }
-
-        is DrawerSavedArticles -> {
-            when (other) {
-                is DrawerTop -> 1
-                else -> -1
-            }
-        }
-    }
 }
 
 @Immutable

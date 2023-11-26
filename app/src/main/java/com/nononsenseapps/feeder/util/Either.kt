@@ -119,7 +119,10 @@ sealed class Either<out A, out B> {
      * @param ifRight transform the [Either.Right] type [B] to [C].
      * @return the transformed value [C] by applying [ifLeft] or [ifRight] to [A] or [B] respectively.
      */
-    inline fun <C> fold(ifLeft: (left: A) -> C, ifRight: (right: B) -> C): C {
+    inline fun <C> fold(
+        ifLeft: (left: A) -> C,
+        ifRight: (right: B) -> C,
+    ): C {
         contract {
             callsInPlace(ifLeft, InvocationKind.AT_MOST_ONCE)
             callsInPlace(ifRight, InvocationKind.AT_MOST_ONCE)
@@ -145,8 +148,7 @@ sealed class Either<out A, out B> {
      * <!--- KNIT example-either-24.kt -->
      * <!-- TEST lines.isEmpty() -->
      */
-    fun swap(): Either<B, A> =
-        fold({ Right(it) }, { Left(it) })
+    fun swap(): Either<B, A> = fold({ Right(it) }, { Left(it) })
 
     /**
      * Map, or transform, the right value [B] of this [Either] to a new value [C].
@@ -283,10 +285,11 @@ sealed class Either<out A, out B> {
         return fold(::identity) { null }
     }
 
-    override fun toString(): String = fold(
-        { "Either.Left($it)" },
-        { "Either.Right($it)" },
-    )
+    override fun toString(): String =
+        fold(
+            { "Either.Left($it)" },
+            { "Either.Right($it)" },
+        )
 
     data class Left<out A>(
         val value: A,
@@ -301,7 +304,10 @@ sealed class Either<out A, out B> {
     }
 
     companion object {
-        inline fun <E, A> catching(onCatch: (t: Throwable) -> E, block: () -> A): Either<E, A> {
+        inline fun <E, A> catching(
+            onCatch: (t: Throwable) -> E,
+            block: () -> A,
+        ): Either<E, A> {
             contract {
                 callsInPlace(onCatch, InvocationKind.AT_MOST_ONCE)
                 callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -330,8 +336,7 @@ inline fun <A, B, C> Either<A, B>.flatMap(f: (right: B) -> Either<A, C>): Either
     }
 }
 
-fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> =
-    flatMap(::identity)
+fun <A, B> Either<A, Either<A, B>>.flatten(): Either<A, B> = flatMap(::identity)
 
 /**
  * Get the right value [B] of this [Either],
@@ -371,8 +376,7 @@ inline infix fun <A, B> Either<A, B>.getOrElse(default: (A) -> B): B {
  * <!--- KNIT example-either-41.kt -->
  * <!--- TEST lines.isEmpty() -->
  */
-inline fun <A> Either<A, A>.merge(): A =
-    fold(::identity, ::identity)
+inline fun <A> Either<A, A>.merge(): A = fold(::identity, ::identity)
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
@@ -395,15 +399,17 @@ fun <A, B> Either<A, B>.combine(
     combineRight: (B, B) -> B,
 ): Either<A, B> =
     when (val one = this) {
-        is Either.Left -> when (other) {
-            is Either.Left -> Either.Left(combineLeft(one.value, other.value))
-            is Either.Right -> one
-        }
+        is Either.Left ->
+            when (other) {
+                is Either.Left -> Either.Left(combineLeft(one.value, other.value))
+                is Either.Right -> one
+            }
 
-        is Either.Right -> when (other) {
-            is Either.Left -> other
-            is Either.Right -> Either.Right(combineRight(one.value, other.value))
-        }
+        is Either.Right ->
+            when (other) {
+                is Either.Left -> other
+                is Either.Right -> Either.Right(combineRight(one.value, other.value))
+            }
     }
 
 /**
@@ -423,10 +429,8 @@ fun <A, B> Either<A, B>.combine(
  * ```
  * <!--- KNIT example-either-44.kt -->
  */
-fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
-    this
+fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> = this
 
-fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
-    this
+fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> = this
 
 fun <A> identity(value: (A)): A = value

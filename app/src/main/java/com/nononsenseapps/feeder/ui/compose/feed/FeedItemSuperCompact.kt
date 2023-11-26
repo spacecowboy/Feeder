@@ -14,9 +14,9 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URL
 import java.time.Instant
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
 fun FeedItemSuperCompact(
@@ -36,9 +36,10 @@ fun FeedItemSuperCompact(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .requiredHeightIn(min = minimumTouchSize)
-            .padding(vertical = 8.dp, horizontal = LocalDimens.current.margin),
+        modifier =
+            modifier
+                .requiredHeightIn(min = minimumTouchSize)
+                .padding(vertical = 8.dp, horizontal = LocalDimens.current.margin),
     ) {
         FeedItemEitherIndicator(
             bookmarked = item.bookmarked && bookmarkIndicator,
@@ -67,21 +68,22 @@ private fun PreviewRead() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = false,
-                    imageUrl = null,
-                    link = null,
-                    id = ID_UNSET,
-                    bookmarked = true,
-                    feedImageUrl = null,
-                    primarySortTime = Instant.EPOCH,
-                    rawPubDate = null,
-                    wordCount = 900,
-                ),
+                item =
+                    FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = false,
+                        imageUrl = null,
+                        link = null,
+                        id = ID_UNSET,
+                        bookmarked = true,
+                        feedImageUrl = null,
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
+                        wordCount = 900,
+                    ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
@@ -103,21 +105,22 @@ private fun PreviewUnread() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = true,
-                    imageUrl = null,
-                    link = null,
-                    id = ID_UNSET,
-                    bookmarked = false,
-                    feedImageUrl = null,
-                    primarySortTime = Instant.EPOCH,
-                    rawPubDate = null,
-                    wordCount = 900,
-                ),
+                item =
+                    FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = true,
+                        imageUrl = null,
+                        link = null,
+                        id = ID_UNSET,
+                        bookmarked = false,
+                        feedImageUrl = null,
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
+                        wordCount = 900,
+                    ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
@@ -139,21 +142,22 @@ private fun PreviewWithImage() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = true,
-                    imageUrl = "blabla",
-                    link = null,
-                    id = ID_UNSET,
-                    bookmarked = false,
-                    feedImageUrl = URL("https://example.com/image.png"),
-                    primarySortTime = Instant.EPOCH,
-                    rawPubDate = null,
-                    wordCount = 900,
-                ),
+                item =
+                    FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = true,
+                        imageUrl = "blabla",
+                        link = null,
+                        id = ID_UNSET,
+                        bookmarked = false,
+                        feedImageUrl = URL("https://example.com/image.png"),
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
+                        wordCount = 900,
+                    ),
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},

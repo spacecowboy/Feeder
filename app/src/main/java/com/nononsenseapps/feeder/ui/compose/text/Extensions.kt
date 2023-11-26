@@ -22,7 +22,9 @@ fun resources(): Resources {
 }
 
 @Composable
-fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
+fun annotatedStringResource(
+    @StringRes id: Int,
+): AnnotatedString {
     val resources = resources()
     val text = resources.getText(id)
 

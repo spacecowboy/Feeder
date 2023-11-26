@@ -16,7 +16,6 @@ import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
-import java.net.URL
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.net.URL
 
 class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val context: Application by instance()
@@ -33,17 +33,20 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
 
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
-    private val _syncCode: MutableStateFlow<String> = MutableStateFlow(
-        state["syncCode"] ?: "",
-    )
+    private val _syncCode: MutableStateFlow<String> =
+        MutableStateFlow(
+            state["syncCode"] ?: "",
+        )
 
-    private val _secretKey: MutableStateFlow<String> = MutableStateFlow(
-        state["secretKey"] ?: "",
-    )
+    private val _secretKey: MutableStateFlow<String> =
+        MutableStateFlow(
+            state["secretKey"] ?: "",
+        )
 
-    private val _screenToShow: MutableStateFlow<SyncScreenToShow> = MutableStateFlow(
-        state["syncScreen"] ?: SyncScreenToShow.SETUP,
-    )
+    private val _screenToShow: MutableStateFlow<SyncScreenToShow> =
+        MutableStateFlow(
+            state["syncScreen"] ?: SyncScreenToShow.SETUP,
+        )
 
     init {
         if (_syncCode.value.isNotBlank() || _secretKey.value.isNotBlank()) {
@@ -56,11 +59,12 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     fun setSyncCode(value: String) {
         val possibleUrlCode = value.syncCodeQueryParam
 
-        val syncCode = if (possibleUrlCode.length == 64) {
-            possibleUrlCode
-        } else {
-            value
-        }
+        val syncCode =
+            if (possibleUrlCode.length == 64) {
+                possibleUrlCode
+            } else {
+                value
+            }
 
         state["syncCode"] = syncCode
         _syncCode.update { syncCode }
@@ -88,7 +92,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         }
     }
 
-    fun joinSyncChain(syncCode: String, secretKey: String) {
+    fun joinSyncChain(
+        syncCode: String,
+        secretKey: String,
+    ) {
         logDebug(tag = LOG_TAG, "Joining sync chain")
         viewModelScope.launch {
             try {
@@ -127,7 +134,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         }
     }
 
-    private fun joinedWithSyncCode(syncCode: String, secretKey: String) {
+    private fun joinedWithSyncCode(
+        syncCode: String,
+        secretKey: String,
+    ) {
         setSyncCode(syncCode)
         setSecretKey(secretKey)
         setScreen(SyncScreenToShow.ADD_DEVICE)
@@ -180,28 +190,29 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                 @Suppress("UNCHECKED_CAST")
                 val deviceList = params[3] as List<SyncDevice>
 
-                val actualScreen = if (syncRemote?.syncChainId?.length == 64) {
-                    when (screen) {
-                        // Setup and join only possible if nothing setup already
-                        SyncScreenToShow.SETUP,
-                        SyncScreenToShow.JOIN,
-                        -> SyncScreenToShow.DEVICELIST
+                val actualScreen =
+                    if (syncRemote?.syncChainId?.length == 64) {
+                        when (screen) {
+                            // Setup and join only possible if nothing setup already
+                            SyncScreenToShow.SETUP,
+                            SyncScreenToShow.JOIN,
+                            -> SyncScreenToShow.DEVICELIST
 
-                        SyncScreenToShow.DEVICELIST,
-                        SyncScreenToShow.ADD_DEVICE,
-                        -> screen
-                    }
-                } else {
-                    when (screen) {
-                        SyncScreenToShow.SETUP,
-                        SyncScreenToShow.JOIN,
-                        -> screen
+                            SyncScreenToShow.DEVICELIST,
+                            SyncScreenToShow.ADD_DEVICE,
+                            -> screen
+                        }
+                    } else {
+                        when (screen) {
+                            SyncScreenToShow.SETUP,
+                            SyncScreenToShow.JOIN,
+                            -> screen
 
-                        SyncScreenToShow.DEVICELIST,
-                        SyncScreenToShow.ADD_DEVICE,
-                        -> SyncScreenToShow.SETUP
+                            SyncScreenToShow.DEVICELIST,
+                            SyncScreenToShow.ADD_DEVICE,
+                            -> SyncScreenToShow.SETUP
+                        }
                     }
-                }
 
                 Log.v(
                     LOG_TAG,
@@ -239,16 +250,18 @@ data class SyncScreenViewState(
     val deviceList: List<SyncDevice> = emptyList(),
 ) {
     val leftScreenToShow: LeftScreenToShow
-        get() = when (singleScreenToShow) {
-            SyncScreenToShow.SETUP, SyncScreenToShow.JOIN -> LeftScreenToShow.SETUP
-            SyncScreenToShow.DEVICELIST, SyncScreenToShow.ADD_DEVICE -> LeftScreenToShow.DEVICELIST
-        }
+        get() =
+            when (singleScreenToShow) {
+                SyncScreenToShow.SETUP, SyncScreenToShow.JOIN -> LeftScreenToShow.SETUP
+                SyncScreenToShow.DEVICELIST, SyncScreenToShow.ADD_DEVICE -> LeftScreenToShow.DEVICELIST
+            }
 
     val rightScreenToShow: RightScreenToShow
-        get() = when (singleScreenToShow) {
-            SyncScreenToShow.SETUP, SyncScreenToShow.JOIN -> RightScreenToShow.JOIN
-            SyncScreenToShow.DEVICELIST, SyncScreenToShow.ADD_DEVICE -> RightScreenToShow.ADD_DEVICE
-        }
+        get() =
+            when (singleScreenToShow) {
+                SyncScreenToShow.SETUP, SyncScreenToShow.JOIN -> RightScreenToShow.JOIN
+                SyncScreenToShow.DEVICELIST, SyncScreenToShow.ADD_DEVICE -> RightScreenToShow.ADD_DEVICE
+            }
 }
 
 enum class SyncScreenToShow {

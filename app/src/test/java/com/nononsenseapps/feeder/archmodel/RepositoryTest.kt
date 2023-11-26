@@ -25,10 +25,6 @@ import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.verify
-import java.net.URL
-import java.time.Instant
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -41,6 +37,10 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.net.URL
+import java.time.Instant
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RepositoryTest : DIAware {
     private val repository: Repository by instance()
@@ -280,27 +280,30 @@ class RepositoryTest : DIAware {
 
     @Test
     fun getScreenTitleForCurrentFeedOrTagAll() {
-        val result = runBlocking {
-            repository.getScreenTitleForFeedOrTag(ID_ALL_FEEDS, "").toList().first()
-        }
+        val result =
+            runBlocking {
+                repository.getScreenTitleForFeedOrTag(ID_ALL_FEEDS, "").toList().first()
+            }
 
         assertEquals(ScreenTitle(title = null, type = FeedType.ALL_FEEDS), result)
     }
 
     @Test
     fun getScreenTitleForCurrentFeedOrTagSavedArticles() {
-        val result = runBlocking {
-            repository.getScreenTitleForFeedOrTag(ID_SAVED_ARTICLES, "").toList().first()
-        }
+        val result =
+            runBlocking {
+                repository.getScreenTitleForFeedOrTag(ID_SAVED_ARTICLES, "").toList().first()
+            }
 
         assertEquals(ScreenTitle(title = null, type = FeedType.SAVED_ARTICLES), result)
     }
 
     @Test
     fun getScreenTitleForCurrentFeedOrTagTag() {
-        val result = runBlocking {
-            repository.getScreenTitleForFeedOrTag(ID_UNSET, "fwr").toList().first()
-        }
+        val result =
+            runBlocking {
+                repository.getScreenTitleForFeedOrTag(ID_UNSET, "fwr").toList().first()
+            }
 
         assertEquals(ScreenTitle(title = "fwr", type = FeedType.TAG), result)
     }
@@ -309,9 +312,10 @@ class RepositoryTest : DIAware {
     fun getScreenTitleForCurrentFeedOrTagFeed() {
         coEvery { feedStore.getDisplayTitle(5L) } returns "floppa"
 
-        val result = runBlocking {
-            repository.getScreenTitleForFeedOrTag(5L, "fwr").toList().first()
-        }
+        val result =
+            runBlocking {
+                repository.getScreenTitleForFeedOrTag(5L, "fwr").toList().first()
+            }
 
         assertEquals(ScreenTitle(title = "floppa", type = FeedType.FEED), result)
 
@@ -377,13 +381,15 @@ class RepositoryTest : DIAware {
 
     @Test
     fun getFeedsItemsWithDefaultFullTextParse() {
-        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(
-            emptyList(),
-        )
+        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns
+            flowOf(
+                emptyList(),
+            )
 
-        val result = runBlocking {
-            repository.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
-        }
+        val result =
+            runBlocking {
+                repository.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
+            }
 
         assertTrue {
             result.isEmpty()
@@ -398,9 +404,10 @@ class RepositoryTest : DIAware {
     fun currentlySyncingLatestTimestamp() {
         every { feedStore.getCurrentlySyncingLatestTimestamp() } returns flowOf(null)
 
-        val result = runBlocking {
-            repository.currentlySyncingLatestTimestamp.toList()
-        }
+        val result =
+            runBlocking {
+                repository.currentlySyncingLatestTimestamp.toList()
+            }
 
         assertEquals(1, result.size)
         assertEquals(Instant.EPOCH, result.first())
@@ -412,10 +419,11 @@ class RepositoryTest : DIAware {
 
     @Test
     fun applyRemoteReadMarks() {
-        coEvery { syncRemoteStore.getRemoteReadMarksReadyToBeApplied() } returns listOf(
-            RemoteReadMarkReadyToBeApplied(1L, 2L),
-            RemoteReadMarkReadyToBeApplied(3L, 4L),
-        )
+        coEvery { syncRemoteStore.getRemoteReadMarksReadyToBeApplied() } returns
+            listOf(
+                RemoteReadMarkReadyToBeApplied(1L, 2L),
+                RemoteReadMarkReadyToBeApplied(3L, 4L),
+            )
 
         runBlocking {
             repository.applyRemoteReadMarks()

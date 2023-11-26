@@ -22,36 +22,45 @@ class RSSContentProvider : ContentProvider(), DIAware {
     private val feedDao: FeedDao by instance()
     private val feedItemDao: FeedItemDao by instance()
 
-    private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH).apply {
-        addURI(AUTHORITY, RssContentProviderContract.feedsUriPathList, URI_FEED_LIST)
-        addURI(
-            AUTHORITY,
-            RssContentProviderContract.articlesUriPathList,
-            URI_ARTICLE_LIST,
-        )
-        addURI(
-            AUTHORITY,
-            RssContentProviderContract.articlesUriPathItem,
-            URI_ARTICLE_IN_FEED_LIST,
-        )
-    }
+    private val uriMatcher =
+        UriMatcher(UriMatcher.NO_MATCH).apply {
+            addURI(AUTHORITY, RssContentProviderContract.feedsUriPathList, URI_FEED_LIST)
+            addURI(
+                AUTHORITY,
+                RssContentProviderContract.articlesUriPathList,
+                URI_ARTICLE_LIST,
+            )
+            addURI(
+                AUTHORITY,
+                RssContentProviderContract.articlesUriPathItem,
+                URI_ARTICLE_IN_FEED_LIST,
+            )
+        }
 
     override fun onCreate(): Boolean {
         return true
     }
 
-    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
+    override fun delete(
+        uri: Uri,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+    ): Int {
         throw UnsupportedOperationException("Not implemented")
     }
 
-    override fun getType(uri: Uri): String? = when (uriMatcher.match(uri)) {
-        URI_FEED_LIST -> RssContentProviderContract.feedsMimeTypeList
-        URI_ARTICLE_LIST -> RssContentProviderContract.articlesMimeTypeList
-        URI_ARTICLE_IN_FEED_LIST -> RssContentProviderContract.articlesMimeTypeItem
-        else -> null
-    }
+    override fun getType(uri: Uri): String? =
+        when (uriMatcher.match(uri)) {
+            URI_FEED_LIST -> RssContentProviderContract.feedsMimeTypeList
+            URI_ARTICLE_LIST -> RssContentProviderContract.articlesMimeTypeList
+            URI_ARTICLE_IN_FEED_LIST -> RssContentProviderContract.articlesMimeTypeItem
+            else -> null
+        }
 
-    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+    override fun insert(
+        uri: Uri,
+        values: ContentValues?,
+    ): Uri? {
         throw UnsupportedOperationException("Not implemented")
     }
 

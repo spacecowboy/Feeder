@@ -4,10 +4,10 @@ import androidx.navigation.NavController
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @Ignore
 class SearchFeedDestinationTest {
@@ -23,14 +23,14 @@ class SearchFeedDestinationTest {
     fun searchFeedHasCorrectRoute() {
         assertEquals(
             "search/feed?feedUrl={feedUrl}",
-            SearchFeedDestination.route
+            SearchFeedDestination.route,
         )
     }
 
     @Test
     fun searchFeedNavigateDefaults() {
         SearchFeedDestination.navigate(
-            navController
+            navController,
         )
 
         verify {
@@ -42,7 +42,7 @@ class SearchFeedDestinationTest {
     fun searchFeedNavigateFeed() {
         SearchFeedDestination.navigate(
             navController,
-            "https://cowboyprogrammer.org"
+            "https://cowboyprogrammer.org",
         )
 
         verify {

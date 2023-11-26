@@ -62,140 +62,145 @@ private val patternWhitespace = "\\s+".toRegex()
         ),
     ],
 )
-data class FeedItem @Ignore constructor(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID)
-    override var id: Long = ID_UNSET,
-    @ColumnInfo(name = COL_GUID) var guid: String = "",
-    @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
-    @ColumnInfo(name = COL_TITLE)
-    var title: String = "",
-    @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
-    @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-    @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-    @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
-    @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
-    @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-    @ColumnInfo(
-        name = COL_PUBDATE,
-        typeAffinity = ColumnInfo.TEXT,
-    ) override var pubDate: ZonedDateTime? = null,
-    @ColumnInfo(name = COL_LINK) override var link: String? = null,
-    @Deprecated(
-        "This column has been 'removed' but sqlite doesn't support drop column.",
-        replaceWith = ReplaceWith("readTime"),
-    )
-    @ColumnInfo(name = "unread")
-    var oldUnread: Boolean = true,
-    @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
-    @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-    @ColumnInfo(
-        name = COL_FIRSTSYNCEDTIME,
-        typeAffinity = ColumnInfo.INTEGER,
-    ) var firstSyncedTime: Instant = Instant.EPOCH,
-    @ColumnInfo(
-        name = COL_PRIMARYSORTTIME,
-        typeAffinity = ColumnInfo.INTEGER,
-    ) override var primarySortTime: Instant = Instant.EPOCH,
-    @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.")
-    @ColumnInfo(name = "pinned")
-    var oldPinned: Boolean = false,
-    @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
-    @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
-    @ColumnInfo(
-        name = COL_READ_TIME,
-        typeAffinity = ColumnInfo.INTEGER,
-    ) var readTime: Instant? = null,
-    @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
-    @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
-) : FeedItemForFetching, FeedItemCursor {
-
-    constructor() : this(id = ID_UNSET)
-
-    val unread: Boolean
-        get() = readTime == null
-
-    fun updateFromParsedEntry(
-        entry: Item,
-        entryGuid: String,
-        feed: com.nononsenseapps.jsonfeed.Feed,
-    ) {
-        val converter = HtmlToPlainTextConverter()
-        // Be careful about nulls.
-        val plainText = converter.convert(
-            entry.content_html
-                ?: entry.content_text
-                ?: "",
+data class FeedItem
+    @Ignore
+    constructor(
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = COL_ID)
+        override var id: Long = ID_UNSET,
+        @ColumnInfo(name = COL_GUID) var guid: String = "",
+        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
+        @ColumnInfo(name = COL_TITLE)
+        var title: String = "",
+        @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
+        @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
+        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
+        @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+        @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
+        @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
+        @ColumnInfo(
+            name = COL_PUBDATE,
+            typeAffinity = ColumnInfo.TEXT,
+        ) override var pubDate: ZonedDateTime? = null,
+        @ColumnInfo(name = COL_LINK) override var link: String? = null,
+        @Deprecated(
+            "This column has been 'removed' but sqlite doesn't support drop column.",
+            replaceWith = ReplaceWith("readTime"),
         )
-        this.wordCount = estimateWordCount(plainText)
+        @ColumnInfo(name = "unread")
+        var oldUnread: Boolean = true,
+        @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
+        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+        @ColumnInfo(
+            name = COL_FIRSTSYNCEDTIME,
+            typeAffinity = ColumnInfo.INTEGER,
+        ) var firstSyncedTime: Instant = Instant.EPOCH,
+        @ColumnInfo(
+            name = COL_PRIMARYSORTTIME,
+            typeAffinity = ColumnInfo.INTEGER,
+        ) override var primarySortTime: Instant = Instant.EPOCH,
+        @Deprecated("This column has been 'removed' but sqlite doesn't support drop column.")
+        @ColumnInfo(name = "pinned")
+        var oldPinned: Boolean = false,
+        @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+        @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
+        @ColumnInfo(
+            name = COL_READ_TIME,
+            typeAffinity = ColumnInfo.INTEGER,
+        ) var readTime: Instant? = null,
+        @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
+        @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+    ) : FeedItemForFetching, FeedItemCursor {
+        constructor() : this(id = ID_UNSET)
 
-        val summary: String = (
-            entry.summary
-                ?: entry.content_text
-                ?: plainText
-            ).take(MAX_SNIPPET_LENGTH)
+        val unread: Boolean
+            get() = readTime == null
 
-        // Make double sure no base64 images are used as thumbnails
-        val safeImage = when {
-            entry.image?.startsWith("data") == true -> null
-            else -> entry.image
-        }
+        fun updateFromParsedEntry(
+            entry: Item,
+            entryGuid: String,
+            feed: com.nononsenseapps.jsonfeed.Feed,
+        ) {
+            val converter = HtmlToPlainTextConverter()
+            // Be careful about nulls.
+            val plainText =
+                converter.convert(
+                    entry.content_html
+                        ?: entry.content_text
+                        ?: "",
+                )
+            this.wordCount = estimateWordCount(plainText)
 
-        val absoluteImage = when {
-            feed.feed_url != null && safeImage != null -> {
-                relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
-            }
+            val summary: String =
+                (
+                    entry.summary
+                        ?: entry.content_text
+                        ?: plainText
+                ).take(MAX_SNIPPET_LENGTH)
 
-            else -> safeImage
-        }
+            // Make double sure no base64 images are used as thumbnails
+            val safeImage =
+                when {
+                    entry.image?.startsWith("data") == true -> null
+                    else -> entry.image
+                }
 
-        this.guid = entryGuid
-        entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
-        @Suppress("DEPRECATION")
-        this.title = this.plainTitle
-        this.plainSnippet = summary
+            val absoluteImage =
+                when {
+                    feed.feed_url != null && safeImage != null -> {
+                        relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url), safeImage)
+                    }
 
-        this.imageUrl = absoluteImage
-        val firstEnclosure = entry.attachments?.firstOrNull()
-        this.enclosureLink = firstEnclosure?.url
-        this.enclosureType = firstEnclosure?.mime_type?.lowercase()
+                    else -> safeImage
+                }
 
-        this.author = entry.author?.name ?: feed.author?.name
-        this.link = entry.url
+            this.guid = entryGuid
+            entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
+            @Suppress("DEPRECATION")
+            this.title = this.plainTitle
+            this.plainSnippet = summary
 
-        this.pubDate =
-            try {
-                // Allow an actual pubdate to be updated
-                ZonedDateTime.parse(entry.date_published)
-            } catch (t: Throwable) {
-                // If a pubdate is missing, then don't update if one is already set
-                this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
-            }
-        primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
-    }
+            this.imageUrl = absoluteImage
+            val firstEnclosure = entry.attachments?.firstOrNull()
+            this.enclosureLink = firstEnclosure?.url
+            this.enclosureType = firstEnclosure?.mime_type?.lowercase()
 
-    val enclosureFilename: String?
-        get() {
-            enclosureLink?.let { enclosureLink ->
-                var fname: String? = null
+            this.author = entry.author?.name ?: feed.author?.name
+            this.link = entry.url
+
+            this.pubDate =
                 try {
-                    fname = URI(enclosureLink).path.split("/").last()
-                } catch (_: Exception) {
+                    // Allow an actual pubdate to be updated
+                    ZonedDateTime.parse(entry.date_published)
+                } catch (t: Throwable) {
+                    // If a pubdate is missing, then don't update if one is already set
+                    this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
                 }
-                return if (fname.isNullOrEmpty()) {
-                    null
-                } else {
-                    fname
-                }
-            }
-            return null
+            primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
         }
 
-    val domain: String?
-        get() {
-            return (enclosureLink ?: link)?.host()
-        }
-}
+        val enclosureFilename: String?
+            get() {
+                enclosureLink?.let { enclosureLink ->
+                    var fname: String? = null
+                    try {
+                        fname = URI(enclosureLink).path.split("/").last()
+                    } catch (_: Exception) {
+                    }
+                    return if (fname.isNullOrEmpty()) {
+                        null
+                    } else {
+                        fname
+                    }
+                }
+                return null
+            }
+
+        val domain: String?
+            get() {
+                return (enclosureLink ?: link)?.host()
+            }
+    }
 
 interface FeedItemForFetching {
     val id: Long

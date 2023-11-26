@@ -17,9 +17,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SetStatusBarColorToMatchScrollableTopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-) {
+fun SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior: TopAppBarScrollBehavior) {
     // This is what is changed by Black theme
     val surfaceColor = MaterialTheme.colorScheme.background
     val surfaceScrolledColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
@@ -28,11 +26,12 @@ fun SetStatusBarColorToMatchScrollableTopAppBar(
     val fraction = if (colorTransitionFraction > 0.01f) 1f else 0f
 
     val appBarContainerColor by animateColorAsState(
-        targetValue = lerp(
-            surfaceColor,
-            surfaceScrolledColor,
-            FastOutLinearInEasing.transform(fraction),
-        ),
+        targetValue =
+            lerp(
+                surfaceColor,
+                surfaceScrolledColor,
+                FastOutLinearInEasing.transform(fraction),
+            ),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
     )
 

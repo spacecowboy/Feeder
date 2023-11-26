@@ -33,10 +33,11 @@ class AnnotatedStringComposer : HtmlParser() {
         for (span in spanStack) {
             when (span) {
                 is SpanWithStyle -> builder.pushStyle(span.spanStyle)
-                is SpanWithAnnotation -> builder.pushStringAnnotation(
-                    tag = span.tag,
-                    annotation = span.annotation,
-                )
+                is SpanWithAnnotation ->
+                    builder.pushStringAnnotation(
+                        tag = span.tag,
+                        annotation = span.annotation,
+                    )
 
                 is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
                 is SpanWithVerbatim -> builder.pushVerbatimTtsAnnotation(span.verbatim)

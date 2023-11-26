@@ -91,12 +91,12 @@ import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
 import com.nononsenseapps.feeder.util.openKoFiIntent
-import java.net.URL
-import java.net.URLDecoder
 import net.glxn.qrgen.android.QRCode
 import net.glxn.qrgen.core.scheme.Url
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.net.URL
+import java.net.URLDecoder
 
 private const val LOG_TAG = "FEEDER_SYNCSCREEN"
 
@@ -118,9 +118,10 @@ private fun SyncScaffold(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier =
+            modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -150,9 +151,10 @@ private fun SyncScaffold(
                                 DropdownMenu(
                                     expanded = showToolbar,
                                     onDismissRequest = { showToolbar = false },
-                                    modifier = Modifier.onKeyEventLikeEscape {
-                                        showToolbar = false
-                                    },
+                                    modifier =
+                                        Modifier.onKeyEventLikeEscape {
+                                            showToolbar = false
+                                        },
                                 ) {
                                     DropdownMenuItem(
                                         onClick = {
@@ -188,10 +190,11 @@ fun SyncScreen(
     val viewState: SyncScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val windowSize = LocalWindowSize()
-    val syncScreenType = getSyncScreenType(
-        windowSize = windowSize,
-        viewState = viewState,
-    )
+    val syncScreenType =
+        getSyncScreenType(
+            windowSize = windowSize,
+            viewState = viewState,
+        )
 
     var previousScreen: SyncScreenType? by remember {
         mutableStateOf(null)
@@ -331,20 +334,22 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_SETUP,
-        enter = when (previousScreen) {
-            null -> fadeIn(initialAlpha = 1.0f)
-            else -> fadeIn()
-        },
-        /*
+        enter =
+            when (previousScreen) {
+                null -> fadeIn(initialAlpha = 1.0f)
+                else -> fadeIn()
+            },
+            /*
         This may seem weird - but it's a special case. This exit animation actually runs
         when the first screen is device list. So to prevent a flicker effect it's important to block
         sideways movement. The setup screen will be momentarily on screen because it takes
         a few millis to fetch the sync remote.
-         */
-        exit = when (previousScreen) {
-            null -> fadeOut(targetAlpha = 1.0f)
-            else -> fadeOut()
-        },
+             */
+        exit =
+            when (previousScreen) {
+                null -> fadeOut(targetAlpha = 1.0f)
+                else -> fadeOut()
+            },
     ) {
         SyncSetupScreen(
             onNavigateUp = onLeaveSyncSettings,
@@ -372,11 +377,12 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_DEVICELIST,
-        enter = when (previousScreen) {
-            SyncScreenType.SINGLE_ADD_DEVICE -> fadeIn()
-            null -> fadeIn(initialAlpha = 1.0f)
-            else -> fadeIn()
-        },
+        enter =
+            when (previousScreen) {
+                SyncScreenType.SINGLE_ADD_DEVICE -> fadeIn()
+                null -> fadeIn(initialAlpha = 1.0f)
+                else -> fadeIn()
+            },
         exit = fadeOut(),
     ) {
         SyncDeviceListScreen(
@@ -413,18 +419,19 @@ enum class SyncScreenType {
 fun getSyncScreenType(
     windowSize: WindowSizeClass,
     viewState: SyncScreenViewState,
-): SyncScreenType = when (getScreenType(windowSize)) {
-    ScreenType.SINGLE -> {
-        when (viewState.singleScreenToShow) {
-            SyncScreenToShow.SETUP -> SyncScreenType.SINGLE_SETUP
-            SyncScreenToShow.DEVICELIST -> SyncScreenType.SINGLE_DEVICELIST
-            SyncScreenToShow.ADD_DEVICE -> SyncScreenType.SINGLE_ADD_DEVICE
-            SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
+): SyncScreenType =
+    when (getScreenType(windowSize)) {
+        ScreenType.SINGLE -> {
+            when (viewState.singleScreenToShow) {
+                SyncScreenToShow.SETUP -> SyncScreenType.SINGLE_SETUP
+                SyncScreenToShow.DEVICELIST -> SyncScreenType.SINGLE_DEVICELIST
+                SyncScreenToShow.ADD_DEVICE -> SyncScreenType.SINGLE_ADD_DEVICE
+                SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
+            }
         }
-    }
 
-    ScreenType.DUAL -> SyncScreenType.DUAL
-}
+        ScreenType.DUAL -> SyncScreenType.DUAL
+    }
 
 @Composable
 fun DualSyncScreen(
@@ -462,15 +469,17 @@ fun DualSyncScreen(
         modifier = modifier,
     ) { innerModifier ->
         Row(
-            modifier = innerModifier
-                .verticalScroll(scrollState),
+            modifier =
+                innerModifier
+                    .verticalScroll(scrollState),
         ) {
             when (leftScreenToShow) {
                 LeftScreenToShow.SETUP -> {
                     SyncSetupContent(
                         onScanSyncCode = onScanSyncCode,
-                        modifier = Modifier
-                            .weight(1f, fill = true),
+                        modifier =
+                            Modifier
+                                .weight(1f, fill = true),
                         onStartNewSyncChain = onStartNewSyncChain,
                     )
                 }
@@ -482,8 +491,9 @@ fun DualSyncScreen(
                         onAddNewDevice = onAddNewDevice,
                         onDeleteDevice = onDeleteDevice,
                         showAddDeviceButton = false,
-                        modifier = Modifier
-                            .weight(1f, fill = true),
+                        modifier =
+                            Modifier
+                                .weight(1f, fill = true),
                     )
                 }
             }
@@ -492,8 +502,9 @@ fun DualSyncScreen(
                 RightScreenToShow.ADD_DEVICE -> {
                     SyncAddNewDeviceContent(
                         syncUrl = addDeviceUrl,
-                        modifier = Modifier
-                            .weight(1f, fill = true),
+                        modifier =
+                            Modifier
+                                .weight(1f, fill = true),
                     )
                 }
 
@@ -503,8 +514,9 @@ fun DualSyncScreen(
                         syncCode = syncCode,
                         onSetSyncCode = onSetSyncCode,
                         secretKey = secretKey,
-                        modifier = Modifier
-                            .weight(1f, fill = true),
+                        modifier =
+                            Modifier
+                                .weight(1f, fill = true),
                         onSetSecretKey = onSetSecretKey,
                     )
                 }
@@ -551,9 +563,10 @@ fun SyncSetupContent(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.device_sync_description_1),
@@ -575,14 +588,15 @@ fun SyncSetupContent(
             Text(
                 text = KOFI_URL,
                 style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        activityLauncher.startActivity(
-                            openAdjacentIfSuitable = true,
-                            intent = openKoFiIntent(),
-                        )
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            activityLauncher.startActivity(
+                                openAdjacentIfSuitable = true,
+                                intent = openKoFiIntent(),
+                            )
+                        },
             )
         }
         // Let this be hard-coded. It should not be localized.
@@ -617,21 +631,22 @@ internal val String.syncCodeQueryParam
     get() = substringAfter("sync_code=").take(64)
 
 internal val String.secretKeyQueryParam
-    get() = substringAfter("key=")
-        .substringBefore("&")
-        .let {
-            // Deeplinks are already decoded - but not if you scan a QR code
-            if ("%3A" in it) {
-                try {
-                    URLDecoder.decode(it, "UTF-8")
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Failed to decode secret key", e)
+    get() =
+        substringAfter("key=")
+            .substringBefore("&")
+            .let {
+                // Deeplinks are already decoded - but not if you scan a QR code
+                if ("%3A" in it) {
+                    try {
+                        URLDecoder.decode(it, "UTF-8")
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "Failed to decode secret key", e)
+                        it
+                    }
+                } else {
                     it
                 }
-            } else {
-                it
             }
-        }
 
 @Composable
 fun SyncJoinScreen(
@@ -679,9 +694,10 @@ fun SyncJoinContent(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         TextField(
             value = syncCode,
@@ -691,9 +707,10 @@ fun SyncJoinContent(
             onValueChange = onSetSyncCode,
             isError = syncCode.syncCodeQueryParam.length != 64,
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp),
         )
         TextField(
             value = secretKey,
@@ -702,9 +719,10 @@ fun SyncJoinContent(
             },
             onValueChange = onSetSecretKey,
             isError = !AesCbcWithIntegrity.isKeyDecodable(secretKey),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp),
         )
         Button(
             enabled = syncCode.syncCodeQueryParam.length == 64,
@@ -769,16 +787,18 @@ fun SyncDeviceListContent(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.devices_on_sync_chain),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(top = 8.dp, bottom = 8.dp)
+                    .fillMaxWidth(),
         )
         for (device in devices.item) {
             DeviceEntry(
@@ -792,23 +812,25 @@ fun SyncDeviceListContent(
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
         )
         // Google Play does not allow direct donation links
         if (!BuildConfig.BUILD_TYPE.contains("play", ignoreCase = true)) {
             Text(
                 text = KOFI_URL,
                 style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        activityLauncher.startActivity(
-                            openAdjacentIfSuitable = true,
-                            intent = openKoFiIntent(),
-                        )
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            activityLauncher.startActivity(
+                                openAdjacentIfSuitable = true,
+                                intent = openKoFiIntent(),
+                            )
+                        },
             )
         }
         if (showAddDeviceButton) {
@@ -847,15 +869,17 @@ fun DeviceEntry(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = minimumTouchSize),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = minimumTouchSize),
     ) {
-        val text = if (device.deviceId == currentDeviceId) {
-            stringResource(id = R.string.this_device, device.deviceName)
-        } else {
-            device.deviceName
-        }
+        val text =
+            if (device.deviceId == currentDeviceId) {
+                stringResource(id = R.string.this_device, device.deviceName)
+            } else {
+                device.deviceName
+            }
         Text(
             text = text,
             style = MaterialTheme.typography.titleMedium,
@@ -872,7 +896,7 @@ fun DeviceEntry(
 
 @Preview
 @Composable
-fun PreviewDeviceEntry() {
+private fun PreviewDeviceEntry() {
     FeederTheme {
         Surface {
             DeviceEntry(
@@ -907,8 +931,9 @@ fun DeleteDeviceDialog(
                 text = stringResource(R.string.remove_device),
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .padding(vertical = 8.dp),
             )
         },
         text = {
@@ -968,27 +993,31 @@ fun SyncAddNewDeviceContent(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.or_open_device_sync_link),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.treat_like_password),
             style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red),
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
         )
         Image(
             bitmap = qrCode,
@@ -1000,29 +1029,31 @@ fun SyncAddNewDeviceContent(
         Text(
             text = "$syncUrl",
             style = LinkTextStyle(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    val intent = Intent.createChooser(
-                        Intent(Intent.ACTION_SEND).apply {
-                            putExtra(Intent.EXTRA_TEXT, "$syncUrl")
-                            putExtra(Intent.EXTRA_TITLE, intentTitle)
-                            type = "text/plain"
-                        },
-                        null,
-                    )
-                    activityLauncher.startActivity(
-                        openAdjacentIfSuitable = false,
-                        intent = intent,
-                    )
-                },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val intent =
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    putExtra(Intent.EXTRA_TEXT, "$syncUrl")
+                                    putExtra(Intent.EXTRA_TITLE, intentTitle)
+                                    type = "text/plain"
+                                },
+                                null,
+                            )
+                        activityLauncher.startActivity(
+                            openAdjacentIfSuitable = false,
+                            intent = intent,
+                        )
+                    },
         )
     }
 }
 
 @Preview("Device List Tablet", device = Devices.PIXEL_C)
 @Composable
-fun PreviewDualSyncScreenDeviceList() {
+private fun PreviewDualSyncScreenDeviceList() {
     FeederTheme {
         DualSyncScreen(
             onNavigateUp = { },
@@ -1034,13 +1065,14 @@ fun PreviewDualSyncScreenDeviceList() {
             onDeleteDevice = {},
             onLeaveSyncChain = {},
             currentDeviceId = 5L,
-            devices = ImmutableHolder(
-                listOf(
-                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices =
+                ImmutableHolder(
+                    listOf(
+                        SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                        SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                        SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                    ),
                 ),
-            ),
             addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo")),
             onJoinSyncChain = { _, _ -> },
             syncCode = "",
@@ -1054,7 +1086,7 @@ fun PreviewDualSyncScreenDeviceList() {
 @Preview("Setup Tablet", device = Devices.PIXEL_C)
 @Preview("Setup Foldable", device = Devices.FOLDABLE, widthDp = 720, heightDp = 360)
 @Composable
-fun PreviewDualSyncScreenSetup() {
+private fun PreviewDualSyncScreenSetup() {
     FeederTheme {
         DualSyncScreen(
             onNavigateUp = { },
@@ -1066,13 +1098,14 @@ fun PreviewDualSyncScreenSetup() {
             onDeleteDevice = {},
             onLeaveSyncChain = {},
             currentDeviceId = 5L,
-            devices = ImmutableHolder(
-                listOf(
-                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices =
+                ImmutableHolder(
+                    listOf(
+                        SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                        SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                        SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                    ),
                 ),
-            ),
             addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo&key=123ABF")),
             onJoinSyncChain = { _, _ -> },
             syncCode = "",
@@ -1086,7 +1119,7 @@ fun PreviewDualSyncScreenSetup() {
 @Preview("Scan or Enter Phone")
 @Preview("Scan or Enter Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
-fun PreviewJoin() {
+private fun PreviewJoin() {
     FeederTheme {
         SyncJoinScreen(
             onNavigateUp = {},
@@ -1103,7 +1136,7 @@ fun PreviewJoin() {
 @Preview("Empty Phone")
 @Preview("Empty Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
-fun PreviewEmpty() {
+private fun PreviewEmpty() {
     FeederTheme {
         SyncSetupScreen(
             onNavigateUp = {},
@@ -1117,18 +1150,19 @@ fun PreviewEmpty() {
 @Preview("Device List Phone")
 @Preview("Device List Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
-fun PreviewDeviceList() {
+private fun PreviewDeviceList() {
     FeederTheme {
         SyncDeviceListScreen(
             onNavigateUp = {},
             currentDeviceId = 5L,
-            devices = ImmutableHolder(
-                listOf(
-                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices =
+                ImmutableHolder(
+                    listOf(
+                        SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                        SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                        SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                    ),
                 ),
-            ),
             onAddNewDevice = {},
             onDeleteDevice = {},
             onLeaveSyncChain = {},
@@ -1139,7 +1173,7 @@ fun PreviewDeviceList() {
 @Preview("Add New Device Phone")
 @Preview("Add New Device Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
-fun PreviewAddNewDeviceContent() {
+private fun PreviewAddNewDeviceContent() {
     FeederTheme {
         SyncAddNewDeviceScreen(
             onNavigateUp = {},

@@ -42,21 +42,23 @@ fun AutoCompleteResults(
 
         AnimatedVisibility(visible = displaySuggestions) {
             LazyColumn(
-                modifier = Modifier
-                    .heightIn(max = maxHeight)
-                    .fillMaxWidth(0.9f)
-                    .border(
-                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
-                        shape = RoundedCornerShape(8.dp),
-                    ),
+                modifier =
+                    Modifier
+                        .heightIn(max = maxHeight)
+                        .fillMaxWidth(0.9f)
+                        .border(
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
+                            shape = RoundedCornerShape(8.dp),
+                        ),
             ) {
                 items(
                     suggestions.item,
                     key = { item -> item },
                 ) { item ->
                     Box(
-                        modifier = Modifier
-                            .clickable { onSuggestionClicked(item) },
+                        modifier =
+                            Modifier
+                                .clickable { onSuggestionClicked(item) },
                     ) {
                         suggestionContent(item)
                     }
@@ -68,7 +70,7 @@ fun AutoCompleteResults(
 
 @Preview
 @Composable
-fun PreviewAutoCompleteOutlinedText() {
+private fun PreviewAutoCompleteOutlinedText() {
     AutoCompleteResults(
         displaySuggestions = true,
         suggestions = immutableListHolderOf("One", "Two", "Three"),

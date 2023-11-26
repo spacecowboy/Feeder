@@ -13,13 +13,13 @@ import com.nononsenseapps.feeder.db.room.SyncDeviceDao
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.db.room.generateDeviceName
-import java.net.URL
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.net.URL
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class SyncRemoteStore(override val di: DI) : DIAware {
     private val dao: SyncRemoteDao by instance()
@@ -83,7 +83,10 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         readStatusDao.deleteReadStatusSyncForItem(feedItemId)
     }
 
-    suspend fun addRemoteReadMark(feedUrl: URL, articleGuid: String) {
+    suspend fun addRemoteReadMark(
+        feedUrl: URL,
+        articleGuid: String,
+    ) {
         // Ignores duplicates
         remoteReadMarkDao.insert(
             RemoteReadMark(
@@ -100,22 +103,21 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         remoteReadMarkDao.deleteStaleRemoteReadMarks(now.minus(7, ChronoUnit.DAYS))
     }
 
-    suspend fun getRemoteReadMarksReadyToBeApplied() =
-        remoteReadMarkDao.getRemoteReadMarksReadyToBeApplied()
+    suspend fun getRemoteReadMarksReadyToBeApplied() = remoteReadMarkDao.getRemoteReadMarksReadyToBeApplied()
 
-    suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL) =
-        remoteReadMarkDao.getGuidsWhichAreSyncedAsReadInFeed(feedUrl = feedUrl)
+    suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL) = remoteReadMarkDao.getGuidsWhichAreSyncedAsReadInFeed(feedUrl = feedUrl)
 
     suspend fun replaceWithDefaultSyncRemote() {
         dao.replaceWithDefaultSyncRemote()
     }
 
     private suspend fun createDefaultSyncRemote(): SyncRemote {
-        val remote = SyncRemote(
-            id = 1L,
-            deviceName = generateDeviceName(),
-            secretKey = AesCbcWithIntegrity.generateKey().toString(),
-        )
+        val remote =
+            SyncRemote(
+                id = 1L,
+                deviceName = generateDeviceName(),
+                secretKey = AesCbcWithIntegrity.generateKey().toString(),
+            )
         dao.insert(remote)
         return remote
     }

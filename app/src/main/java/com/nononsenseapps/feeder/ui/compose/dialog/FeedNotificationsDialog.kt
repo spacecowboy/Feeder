@@ -68,9 +68,10 @@ fun FeedNotificationsDialog(
         text = {
             LazyColumn(
                 state = lazyListState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
             ) {
                 items(
                     items.item,
@@ -79,33 +80,36 @@ fun FeedNotificationsDialog(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = minimumTouchSize),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = minimumTouchSize),
                     ) {
-                        val stateLabel = if (item.notify) {
-                            stringResource(androidx.compose.ui.R.string.on)
-                        } else {
-                            stringResource(androidx.compose.ui.R.string.off)
-                        }
+                        val stateLabel =
+                            if (item.notify) {
+                                stringResource(androidx.compose.ui.R.string.on)
+                            } else {
+                                stringResource(androidx.compose.ui.R.string.off)
+                            }
                         val dimens = LocalDimens.current
                         Row(
-                            modifier = modifier
-                                .width(dimens.maxContentWidth)
-                                .heightIn(min = 64.dp)
-                                .clickable(
-                                    enabled = true,
-                                    onClick = {
-                                        onToggleItem(
-                                            item.feedId,
-                                            !item.notify,
-                                        )
+                            modifier =
+                                modifier
+                                    .width(dimens.maxContentWidth)
+                                    .heightIn(min = 64.dp)
+                                    .clickable(
+                                        enabled = true,
+                                        onClick = {
+                                            onToggleItem(
+                                                item.feedId,
+                                                !item.notify,
+                                            )
+                                        },
+                                    )
+                                    .safeSemantics(mergeDescendants = true) {
+                                        stateDescription = stateLabel
+                                        role = Role.Switch
                                     },
-                                )
-                                .safeSemantics(mergeDescendants = true) {
-                                    stateDescription = stateLabel
-                                    role = Role.Switch
-                                },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
@@ -139,7 +143,7 @@ fun FeedNotificationsDialog(
 
 @Preview
 @Composable
-fun PreviewNotificationsDialog() {
+private fun PreviewNotificationsDialog() {
     FeederTheme {
         FeedNotificationsDialog(
             title = {

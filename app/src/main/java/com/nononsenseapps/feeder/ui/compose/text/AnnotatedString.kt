@@ -49,21 +49,18 @@ class AnnotatedParagraphStringBuilder {
             return false
         }
 
-    fun pushVerbatimTtsAnnotation(verbatim: String) =
-        builder.pushTtsAnnotation(VerbatimTtsAnnotation(verbatim))
+    fun pushVerbatimTtsAnnotation(verbatim: String) = builder.pushTtsAnnotation(VerbatimTtsAnnotation(verbatim))
 
-    fun pushStyle(style: SpanStyle): Int =
-        builder.pushStyle(style = style)
+    fun pushStyle(style: SpanStyle): Int = builder.pushStyle(style = style)
 
-    fun pop(index: Int) =
-        builder.pop(index)
+    fun pop(index: Int) = builder.pop(index)
 
-    fun pushStringAnnotation(tag: String, annotation: String): Int =
-        builder.pushStringAnnotation(tag = tag, annotation = annotation)
+    fun pushStringAnnotation(
+        tag: String,
+        annotation: String,
+    ): Int = builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
-    fun pushComposableStyle(
-        style: @Composable () -> SpanStyle,
-    ): Int {
+    fun pushComposableStyle(style: @Composable () -> SpanStyle): Int {
         composableStyles.add(
             ComposableStyleWithStartEnd(
                 style = style,
@@ -73,9 +70,7 @@ class AnnotatedParagraphStringBuilder {
         return composableStyles.lastIndex
     }
 
-    fun popComposableStyle(
-        index: Int,
-    ) {
+    fun popComposableStyle(index: Int) {
         poppedComposableStyles.add(
             composableStyles.removeAt(index).copy(end = builder.length),
         )
@@ -123,6 +118,7 @@ class AnnotatedParagraphStringBuilder {
 }
 
 fun AnnotatedParagraphStringBuilder.isEmpty() = lastTwoChars.isEmpty()
+
 fun AnnotatedParagraphStringBuilder.isNotEmpty() = lastTwoChars.isNotEmpty()
 
 private fun CharSequence.secondToLast(): Char {

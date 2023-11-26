@@ -15,11 +15,11 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
-import java.net.URL
-import java.time.Instant
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.net.URL
+import java.time.Instant
 
 class CreateFeedScreenViewModel(
     di: DI,
@@ -55,15 +55,16 @@ class CreateFeedScreenViewModel(
         get() = articleOpener == PREF_VAL_OPEN_WITH_READER
 
     override val isOpenItemWithAppDefault: Boolean
-        get() = when (articleOpener) {
-            PREF_VAL_OPEN_WITH_READER,
-            PREF_VAL_OPEN_WITH_WEBVIEW,
-            PREF_VAL_OPEN_WITH_BROWSER,
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB,
-            -> false
+        get() =
+            when (articleOpener) {
+                PREF_VAL_OPEN_WITH_READER,
+                PREF_VAL_OPEN_WITH_WEBVIEW,
+                PREF_VAL_OPEN_WITH_BROWSER,
+                PREF_VAL_OPEN_WITH_CUSTOM_TAB,
+                -> false
 
-            else -> true
-        }
+                else -> true
+            }
 
     init {
         viewModelScope.launch {
@@ -74,24 +75,26 @@ class CreateFeedScreenViewModel(
         }
     }
 
-    fun saveAndRequestSync(action: (Long) -> Unit) = viewModelScope.launch {
-        val feedId = repository.saveFeed(
-            Feed(
-                url = URL(feedUrl),
-                title = feedTitle,
-                customTitle = feedTitle,
-                tag = feedTag,
-                fullTextByDefault = fullTextByDefault,
-                notify = notify,
-                openArticlesWith = articleOpener,
-                alternateId = alternateId,
-                whenModified = Instant.now(),
-                imageUrl = sloppyLinkToStrictURLOrNull(feedImage),
-            ),
-        )
+    fun saveAndRequestSync(action: (Long) -> Unit) =
+        viewModelScope.launch {
+            val feedId =
+                repository.saveFeed(
+                    Feed(
+                        url = URL(feedUrl),
+                        title = feedTitle,
+                        customTitle = feedTitle,
+                        tag = feedTag,
+                        fullTextByDefault = fullTextByDefault,
+                        notify = notify,
+                        openArticlesWith = articleOpener,
+                        alternateId = alternateId,
+                        whenModified = Instant.now(),
+                        imageUrl = sloppyLinkToStrictURLOrNull(feedImage),
+                    ),
+                )
 
-        requestFeedSync(di, feedId = feedId)
+            requestFeedSync(di, feedId = feedId)
 
-        action(feedId)
-    }
+            action(feedId)
+        }
 }

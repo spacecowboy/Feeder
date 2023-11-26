@@ -33,28 +33,30 @@ const val OPEN_ARTICLE_WITH_APPLICATION_DEFAULT = ""
         Index(value = [COL_ID, COL_URL, COL_TITLE], unique = true),
     ],
 )
-data class Feed @Ignore constructor(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID)
-    var id: Long = ID_UNSET,
-    @ColumnInfo(name = COL_TITLE) var title: String = "",
-    @ColumnInfo(name = COL_CUSTOM_TITLE) var customTitle: String = "",
-    @ColumnInfo(name = COL_URL) var url: URL = URL("http://"),
-    @ColumnInfo(name = COL_TAG) var tag: String = "",
-    @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
-    @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
-    @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0,
-    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
-    @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
-    @ColumnInfo(name = COL_ALTERNATE_ID) var alternateId: Boolean = false,
-    @ColumnInfo(name = COL_CURRENTLY_SYNCING) var currentlySyncing: Boolean = false,
-    // Only update this field when user modifies the feed
-    @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_SITE_FETCHED) var siteFetched: Instant = Instant.EPOCH,
-) {
-    constructor() : this(id = ID_UNSET)
+data class Feed
+    @Ignore
+    constructor(
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = COL_ID)
+        var id: Long = ID_UNSET,
+        @ColumnInfo(name = COL_TITLE) var title: String = "",
+        @ColumnInfo(name = COL_CUSTOM_TITLE) var customTitle: String = "",
+        @ColumnInfo(name = COL_URL) var url: URL = URL("http://"),
+        @ColumnInfo(name = COL_TAG) var tag: String = "",
+        @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
+        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
+        @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0,
+        @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
+        @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
+        @ColumnInfo(name = COL_ALTERNATE_ID) var alternateId: Boolean = false,
+        @ColumnInfo(name = COL_CURRENTLY_SYNCING) var currentlySyncing: Boolean = false,
+        // Only update this field when user modifies the feed
+        @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_SITE_FETCHED) var siteFetched: Instant = Instant.EPOCH,
+    ) {
+        constructor() : this(id = ID_UNSET)
 
-    val displayTitle: String
-        get() = (customTitle.ifBlank { title })
-}
+        val displayTitle: String
+            get() = (customTitle.ifBlank { title })
+    }

@@ -62,23 +62,27 @@ sealed class NavigationDestination(
     val route: String
 
     init {
-        val completePath = (
-            listOf(path) + navArguments.asSequence()
-                .filterIsInstance<PathParamArgument>()
-                .map { "{${it.name}}" }
-                .toList()
+        val completePath =
+            (
+                listOf(path) +
+                    navArguments.asSequence()
+                        .filterIsInstance<PathParamArgument>()
+                        .map { "{${it.name}}" }
+                        .toList()
             ).joinToString(separator = "/")
 
-        val queryParams = navArguments.asSequence()
-            .filterIsInstance<QueryParamArgument>()
-            .map { "${it.name}={${it.name}}" }
-            .joinToString(prefix = "?", separator = "&")
+        val queryParams =
+            navArguments.asSequence()
+                .filterIsInstance<QueryParamArgument>()
+                .map { "${it.name}={${it.name}}" }
+                .joinToString(prefix = "?", separator = "&")
 
-        route = if (queryParams == "?") {
-            completePath
-        } else {
-            completePath + queryParams
-        }
+        route =
+            if (queryParams == "?") {
+                completePath
+            } else {
+                completePath + queryParams
+            }
     }
 
     @OptIn(ExperimentalAnimationApi::class)
@@ -132,20 +136,24 @@ class PathParamArgument(
 @OptIn(ExperimentalAnimationApi::class)
 object SearchFeedDestination : NavigationDestination(
     path = "search/feed",
-    navArguments = listOf(
-        QueryParamArgument("feedUrl") {
-            type = NavType.StringType
-            defaultValue = null
-            nullable = true
-        },
-    ),
+    navArguments =
+        listOf(
+            QueryParamArgument("feedUrl") {
+                type = NavType.StringType
+                defaultValue = null
+                nullable = true
+            },
+        ),
     deepLinks = emptyList(),
 ) {
-
-    fun navigate(navController: NavController, feedUrl: String? = null) {
-        val params = queryParams {
-            +("feedUrl" to feedUrl)
-        }
+    fun navigate(
+        navController: NavController,
+        feedUrl: String? = null,
+    ) {
+        val params =
+            queryParams {
+                +("feedUrl" to feedUrl)
+            }
 
         navController.navigate(path + params) {
             launchSingleTop = true
@@ -178,32 +186,33 @@ object SearchFeedDestination : NavigationDestination(
 @OptIn(ExperimentalAnimationApi::class)
 object AddFeedDestination : NavigationDestination(
     path = "add/feed",
-    navArguments = listOf(
-        PathParamArgument("feedUrl") {
-            type = NavType.StringType
-        },
-        QueryParamArgument("feedTitle") {
-            type = NavType.StringType
-            defaultValue = ""
-        },
-        QueryParamArgument("feedImage") {
-            type = NavType.StringType
-            defaultValue = ""
-        },
-    ),
+    navArguments =
+        listOf(
+            PathParamArgument("feedUrl") {
+                type = NavType.StringType
+            },
+            QueryParamArgument("feedTitle") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+            QueryParamArgument("feedImage") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+        ),
     deepLinks = emptyList(),
 ) {
-
     fun navigate(
         navController: NavController,
         feedUrl: String,
         feedTitle: String = "",
         feedImage: String = "",
     ) {
-        val params = queryParams {
-            +("feedTitle" to feedTitle)
-            +("feedImage" to feedImage)
-        }
+        val params =
+            queryParams {
+                +("feedTitle" to feedTitle)
+                +("feedImage" to feedImage)
+            }
 
         navController.navigate("$path/${feedUrl.urlEncode()}$params") {
             launchSingleTop = true
@@ -232,15 +241,18 @@ object AddFeedDestination : NavigationDestination(
 @OptIn(ExperimentalAnimationApi::class)
 object EditFeedDestination : NavigationDestination(
     path = "edit/feed",
-    navArguments = listOf(
-        PathParamArgument("feedId") {
-            type = NavType.LongType
-        },
-    ),
+    navArguments =
+        listOf(
+            PathParamArgument("feedId") {
+                type = NavType.LongType
+            },
+        ),
     deepLinks = emptyList(),
 ) {
-
-    fun navigate(navController: NavController, feedId: Long) {
+    fun navigate(
+        navController: NavController,
+        feedId: Long,
+    ) {
         navController.navigate("$path/$feedId") {
             launchSingleTop = true
         }
@@ -303,29 +315,36 @@ object SettingsDestination : NavigationDestination(
 @OptIn(ExperimentalAnimationApi::class)
 object FeedDestination : NavigationDestination(
     path = "feed",
-    navArguments = listOf(
-        QueryParamArgument("id") {
-            type = NavType.LongType
-            defaultValue = ID_UNSET
-        },
-        QueryParamArgument("tag") {
-            type = NavType.StringType
-            defaultValue = ""
-        },
-    ),
-    deepLinks = listOf(
-        navDeepLink {
-            uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
-        },
-    ),
+    navArguments =
+        listOf(
+            QueryParamArgument("id") {
+                type = NavType.LongType
+                defaultValue = ID_UNSET
+            },
+            QueryParamArgument("tag") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+        ),
+    deepLinks =
+        listOf(
+            navDeepLink {
+                uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
+            },
+        ),
 ) {
-    fun navigate(navController: NavController, feedId: Long = ID_UNSET, tag: String = "") {
-        val params = queryParams {
-            if (feedId != ID_UNSET) {
-                +("id" to "$feedId")
+    fun navigate(
+        navController: NavController,
+        feedId: Long = ID_UNSET,
+        tag: String = "",
+    ) {
+        val params =
+            queryParams {
+                if (feedId != ID_UNSET) {
+                    +("id" to "$feedId")
+                }
+                +("tag" to tag)
             }
-            +("tag" to tag)
-        }
 
         logDebug(LOG_TAG, "Navigate to $path$params. Current: ${navController.currentDestination?.route}")
 
@@ -348,14 +367,16 @@ object FeedDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry,
         navDrawerListState: LazyListState,
     ) {
-        val feedId = remember {
-            backStackEntry.arguments?.getLong("id")
-                ?: ID_UNSET
-        }
-        val tag = remember {
-            backStackEntry.arguments?.getString("tag")
-                ?: ""
-        }
+        val feedId =
+            remember {
+                backStackEntry.arguments?.getLong("id")
+                    ?: ID_UNSET
+            }
+        val tag =
+            remember {
+                backStackEntry.arguments?.getString("tag")
+                    ?: ""
+            }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.diAwareViewModel()
@@ -377,18 +398,23 @@ object FeedDestination : NavigationDestination(
 @OptIn(ExperimentalAnimationApi::class)
 object ArticleDestination : NavigationDestination(
     path = "reader",
-    navArguments = listOf(
-        PathParamArgument("itemId") {
-            type = NavType.LongType
-        },
-    ),
-    deepLinks = listOf(
-        navDeepLink {
-            uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
-        },
-    ),
+    navArguments =
+        listOf(
+            PathParamArgument("itemId") {
+                type = NavType.LongType
+            },
+        ),
+    deepLinks =
+        listOf(
+            navDeepLink {
+                uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
+            },
+        ),
 ) {
-    fun navigate(navController: NavController, itemId: Long) {
+    fun navigate(
+        navController: NavController,
+        itemId: Long,
+    ) {
         navController.navigate("$path/$itemId") {
             launchSingleTop = true
         }
@@ -400,10 +426,11 @@ object ArticleDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry,
         navDrawerListState: LazyListState,
     ) {
-        val itemId = remember {
-            backStackEntry.arguments?.getLong("itemId")
-                ?: error("Missing mandatory argument: itemId")
-        }
+        val itemId =
+            remember {
+                backStackEntry.arguments?.getLong("itemId")
+                    ?: error("Missing mandatory argument: itemId")
+            }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.diAwareViewModel()
@@ -429,31 +456,38 @@ object ArticleDestination : NavigationDestination(
 @OptIn(ExperimentalAnimationApi::class)
 object SyncScreenDestination : NavigationDestination(
     path = "sync",
-    navArguments = listOf(
-        QueryParamArgument("syncCode") {
-            type = NavType.StringType
-            defaultValue = ""
-        },
-        QueryParamArgument("secretKey") {
-            type = NavType.StringType
-            defaultValue = ""
-        },
-    ),
-    deepLinks = listOf(
-        navDeepLink {
-            uriPattern = "$DEEP_LINK_BASE_URI/sync/join?sync_code={syncCode}&key={secretKey}"
-        },
-    ),
+    navArguments =
+        listOf(
+            QueryParamArgument("syncCode") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+            QueryParamArgument("secretKey") {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+        ),
+    deepLinks =
+        listOf(
+            navDeepLink {
+                uriPattern = "$DEEP_LINK_BASE_URI/sync/join?sync_code={syncCode}&key={secretKey}"
+            },
+        ),
 ) {
-    fun navigate(navController: NavController, syncCode: String, secretKey: String) {
-        val params = queryParams {
-            if (syncCode.isNotBlank()) {
-                +("syncCode" to syncCode)
+    fun navigate(
+        navController: NavController,
+        syncCode: String,
+        secretKey: String,
+    ) {
+        val params =
+            queryParams {
+                if (syncCode.isNotBlank()) {
+                    +("syncCode" to syncCode)
+                }
+                if (secretKey.isNotBlank()) {
+                    +("secretKey" to secretKey)
+                }
             }
-            if (secretKey.isNotBlank()) {
-                +("secretKey" to secretKey)
-            }
-        }
 
         navController.navigate("$path$params") {
             launchSingleTop = true
@@ -490,7 +524,10 @@ class QueryParamsBuilder {
         appendIfNotEmpty(first, second)
     }
 
-    private fun appendIfNotEmpty(name: String, value: String?) {
+    private fun appendIfNotEmpty(
+        name: String,
+        value: String?,
+    ) {
         if (value?.isNotEmpty() != true) {
             return
         }
