@@ -45,7 +45,7 @@ jobs:
     - name: gradle build
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: build app:bundlePlay :app:lint check
+        arguments: build app:bundlePlay :app:lint check pixel2api30DebugAndroidTest -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
 
     - name: validate deploy
       shell: bash
