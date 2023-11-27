@@ -38,6 +38,10 @@ jobs:
         KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
         KEYALIAS: ${{ secrets.KEYALIAS }}
 
+    # Accepts licenses also for emulator
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: bump version if not release
       shell: bash
       run: ci/run-if-not-release fastlane bump_version_code
