@@ -230,6 +230,4 @@
     <string name="add_anyway">Ajouter quand même</string>
     <string name="open_browser_in_split_screen">Ouvrir le navigateur dans un écran partagé</string>
     <string name="show_reading_time">Afficher le temps de lecture estimé</string>
-    <string name="n_words_short">%1$d mots</string>
-    <string name="n_reading_time">%1$d minutes %2$d secondes</string>
 </resources>
