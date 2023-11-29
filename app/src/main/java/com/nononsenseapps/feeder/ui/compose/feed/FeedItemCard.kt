@@ -303,10 +303,11 @@ fun RowScope.FeedItemText(
                 }
             if (readTimeSecs > 0) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    val seconds = "%02d".format(readTimeSecs % 60)
                     val readTimeText =
                         pluralStringResource(id = R.plurals.n_minutes, count = readTimeSecs / 60)
                             .format(
-                                "${readTimeSecs / 60}:${readTimeSecs % 60}",
+                                "${readTimeSecs / 60}:$seconds",
                             )
                     val wordCountText =
                         pluralStringResource(id = R.plurals.n_words, count = item.wordCount)
@@ -344,6 +345,7 @@ fun RowScope.FeedItemText(
 
 @Composable
 @ThemePreviews
+@Suppress("ktlint:standard:max-line-length")
 private fun Preview() {
     FeederTheme {
         FeedItemCard(
@@ -380,6 +382,7 @@ private fun Preview() {
 
 @Composable
 @ThemePreviews
+@Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageUnread() {
     FeederTheme {
         Box(
@@ -420,6 +423,7 @@ private fun PreviewWithImageUnread() {
 
 @Composable
 @ThemePreviews
+@Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageRead() {
     FeederTheme {
         Box(
@@ -440,7 +444,7 @@ private fun PreviewWithImageRead() {
                         feedImageUrl = null,
                         primarySortTime = Instant.EPOCH,
                         rawPubDate = null,
-                        wordCount = 950,
+                        wordCount = 910,
                     ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},

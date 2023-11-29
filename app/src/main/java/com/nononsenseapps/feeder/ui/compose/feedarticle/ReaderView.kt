@@ -204,10 +204,11 @@ fun ReaderView(
                                         imageVector = Icons.Outlined.Timelapse,
                                         contentDescription = null,
                                     )
+                                    val seconds = "%02d".format(readTimeSecs % 60)
                                     val readTimeText =
                                         pluralStringResource(id = R.plurals.n_minutes, count = readTimeSecs / 60)
                                             .format(
-                                                "${readTimeSecs / 60}:${readTimeSecs % 60}",
+                                                "${readTimeSecs / 60}:$seconds",
                                             )
                                     WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
                                         val interactionSource =
@@ -331,7 +332,7 @@ private fun ReaderPreview() {
         Surface {
             ReaderView(
                 screenType = ScreenType.SINGLE,
-                wordCount = 9831,
+                wordCount = 9700,
                 onEnclosureClick = {},
                 onFeedTitleClick = {},
             ) {}
