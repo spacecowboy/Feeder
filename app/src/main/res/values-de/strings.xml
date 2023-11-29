@@ -229,4 +229,17 @@
     <string name="theme_e_ink">E-Papier</string>
     <string name="add_anyway">Trotzdem hinzufügen</string>
     <string name="open_browser_in_split_screen">Browser im geteilten Bildschirm öffnen</string>
+    <string name="show_reading_time">Geschätzte Lesezeit anzeigen</string>
+    <string name="many_words">%1$s Wörter</string>
+    <string name="other_minutes">%1$s Minuten</string>
+    <string name="few_minutes">%1$s Minuten</string>
+    <string name="two_words">%1$s Wörter</string>
+    <string name="many_minutes">%1$s Minuten</string>
+    <string name="zero_minutes">%1$s Minuten</string>
+    <string name="few_words">%1$s Wörter</string>
+    <string name="zero_words">%1$s Wörter</string>
+    <string name="one_minute">%1$s Minute</string>
+    <string name="two_minutes">%1$s Minuten</string>
+    <string name="other_words">%1$s Wörter</string>
+    <string name="one_word">%1$s Wort</string>
 </resources>
