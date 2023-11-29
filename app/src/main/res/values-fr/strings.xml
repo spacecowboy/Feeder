@@ -21,7 +21,7 @@
     <string name="new_items_available">Nouveaux articles disponibles</string>
     <string name="view">Voir</string>
     <string name="no_tag">Aucune étiquette</string>
-    <string name="notify_for_new_items">Notifier les nouveaux articles</string>
+    <string name="notify_for_new_items">Notification des nouveaux articles</string>
     <string name="toggle_read_status">Basculer l’état de la lecture</string>
     <string name="open_link_in_browser">Ouvrir le lien dans un navigateur</string>
     <string name="open_enclosed_media">Ouvrir le média inclus</string>
@@ -229,4 +229,7 @@
     <string name="theme_e_ink">Encre électronique</string>
     <string name="add_anyway">Ajouter quand même</string>
     <string name="open_browser_in_split_screen">Ouvrir le navigateur dans un écran partagé</string>
+    <string name="show_reading_time">Afficher le temps de lecture estimé</string>
+    <string name="n_words_short">%1$d mots</string>
+    <string name="n_reading_time">%1$d minutes %2$d secondes</string>
 </resources>
