@@ -229,4 +229,17 @@
     <string name="theme_e_ink">Tinta electrónica</string>
     <string name="add_anyway">Agregar de todos modos</string>
     <string name="open_browser_in_split_screen">Abrir el navegador a pantalla dividida</string>
+    <string name="show_reading_time">Mostrar el tiempo estimado de lectura</string>
+    <string name="many_words">%1$s palabras</string>
+    <string name="other_minutes">%1$s minutos</string>
+    <string name="few_minutes">%1$s minutos</string>
+    <string name="two_words">%1$s palabras</string>
+    <string name="many_minutes">%1$s minutos</string>
+    <string name="zero_minutes">%1$s minutos</string>
+    <string name="few_words">%1$s palabras</string>
+    <string name="zero_words">%1$s palabras</string>
+    <string name="one_minute">%1$s minuto</string>
+    <string name="two_minutes">%1$s minutos</string>
+    <string name="other_words">%1$s palabras</string>
+    <string name="one_word">%1$s palabra</string>
 </resources>
