@@ -229,4 +229,7 @@
     <string name="theme_e_ink">E Ink</string>
     <string name="add_anyway">Dodaj mimo to</string>
     <string name="open_browser_in_split_screen">Otwieraj przeglądarkę na podzielonym ekranie</string>
+    <string name="show_reading_time">Pokazuj szacowany czas czytania</string>
+    <string name="n_words_short">%1$d słów</string>
+    <string name="n_reading_time">%1$d min %2$d sek.</string>
 </resources>
