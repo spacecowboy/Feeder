@@ -1,5 +1,7 @@
 task:
   name: Emulator tests
+  env:
+    CIRRUS_CLONE_SUBMODULES: "true"
   container:
     image: ghcr.io/cirruslabs/android-sdk:33
     cpu: 4
