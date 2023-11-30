@@ -432,6 +432,7 @@ fun ArticleContent(
             },
         image = viewState.image,
         imageFromBody = viewState.imageFromBody,
+        isFeedText = viewState.textToDisplay == TextToDisplay.DEFAULT,
     ) {
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {

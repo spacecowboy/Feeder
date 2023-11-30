@@ -89,6 +89,7 @@ fun ReaderView(
     authorDate: String?,
     image: String?,
     imageFromBody: Boolean,
+    isFeedText: Boolean,
     modifier: Modifier = Modifier,
     articleListState: LazyListState = rememberLazyListState(),
     articleBody: LazyListScope.() -> Unit,
@@ -288,7 +289,8 @@ fun ReaderView(
                 }
             }
 
-            if (!imageFromBody && image != null) {
+            // Don't show image for full text articles since it's typically inside the full article
+            if (isFeedText && !imageFromBody && image != null) {
                 item {
                     BoxWithConstraints(
                         modifier =
@@ -353,6 +355,7 @@ private fun ReaderPreview() {
                 authorDate = "2018-01-02",
                 image = "https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png",
                 imageFromBody = false,
+                isFeedText = true,
             ) {}
         }
     }
