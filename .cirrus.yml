@@ -1,9 +1,9 @@
-container:
-  image: ghcr.io/cirruslabs/android-sdk:33
-  cpu: 4
-  memory: 12G
-  kvm: "true"
-
-emulator_tests:
-  script:
-    - ./gradlew pixel2api30DebugAndroidTest
+task:
+  name: Emulator tests
+  container:
+    image: ghcr.io/cirruslabs/android-sdk:33
+    cpu: 4
+    memory: 12G
+    kvm: "true"
+  check_script:
+      - ./gradlew pixel2api30DebugAndroidTest
