@@ -7,5 +7,13 @@ task:
     cpu: 4
     memory: 12G
     kvm: "true"
+  gradle_cache:
+    folder: ~/.gradle/caches
   check_script:
-      - ./gradlew pixel2api30DebugAndroidTest
+    - ./gradlew pixel2api30DebugAndroidTest
+  cleanup_before_cache_script:
+    - rm -rf ~/.gradle/caches/$GRADLE_VERSION/
+    - rm -rf ~/.gradle/caches/transforms-1
+    - rm -rf ~/.gradle/caches/journal-1
+    - rm -rf ~/.gradle/caches/jars-3/*/buildSrc.jar
+    - find ~/.gradle/caches/ -name "*.lock" -type f -delete
