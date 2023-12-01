@@ -186,6 +186,11 @@ private fun LazyListScope.formatBody(
     composer.emitParagraph()
 }
 
+fun isHiddenByCSS(element: Element): Boolean {
+    val style = element.attr("style") ?: ""
+    return style.contains("display:") && style.contains("none")
+}
+
 private fun HtmlComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
@@ -209,6 +214,13 @@ private fun HtmlComposer.appendTextChildren(
 
             is Element -> {
                 val element = node
+
+                if (isHiddenByCSS(element)) {
+                    // Element is not supposed to be shown because javascript and/or tracking
+                    node = node.nextSibling()
+                    continue
+                }
+
                 when (element.tagName()) {
                     "p" -> {
                         // Readability4j inserts p-tags in divs for algorithmic purposes.
