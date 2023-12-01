@@ -140,10 +140,10 @@ class FullTextParser(override val di: DI) : DIAware {
 
                     val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                     logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
-                    val article = Readability4JExtended(url, html).parse()
+                    val article = parseFullArticle(url, html)
                     logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                     withContext(Dispatchers.IO) {
-                        article.contentWithUtf8Encoding?.let { articleContent ->
+                        article?.let { articleContent ->
                             filePathProvider.fullArticleDir.mkdirs()
                             blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
                                 .bufferedWriter().use { writer ->
@@ -163,6 +163,13 @@ class FullTextParser(override val di: DI) : DIAware {
                 }
             }.flatten()
         }
+
+    fun parseFullArticle(
+        uri: String,
+        html: String,
+    ): String? {
+        return Readability4JExtended(uri, html).parse().contentWithUtf8Encoding
+    }
 
     /**
      * For sites which don't use UTF-8 like http://www.muhasebetr.com/rss/

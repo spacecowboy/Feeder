@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
+import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.COL_READ_TIME
 import com.nononsenseapps.feeder.db.COL_WORD_COUNT
@@ -15,7 +16,7 @@ import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
 
-const val previewColumns = """
+const val PREVIEW_COLUMNS = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,
     author, pub_date, link, read_time, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
     feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
@@ -31,7 +32,7 @@ data class PreviewItem
         var guid: String = "",
         @ColumnInfo(name = "plain_title") var plainTitle: String = "",
         @ColumnInfo(name = "plain_snippet") var plainSnippet: String = "",
-        @ColumnInfo(name = "image_url") var imageUrl: String? = null,
+        @ColumnInfo(name = COL_IMAGEURL) var image: ThumbnailImage? = null,
         @ColumnInfo(name = "enclosure_link") var enclosureLink: String? = null,
         var author: String? = null,
         @ColumnInfo(name = "pub_date") var pubDate: ZonedDateTime? = null,

@@ -49,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
@@ -98,6 +97,7 @@ import java.net.URL
 
 private const val LOG_TAG = "FEEDER_SEARCH"
 
+@Suppress("ktlint:compose:vm-forwarding-check")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFeedScreen(
@@ -257,7 +257,9 @@ fun SearchFeedView(
                 ) {
                     leftContent(
                         feedUrl = feedUrl,
-                        focusManager = focusManager,
+                        clearFocus = {
+                            focusManager.clearFocus()
+                        },
                         dimens = dimens,
                         keyboardController = keyboardController,
                         onUrlChanged = onUrlChanged,
@@ -294,7 +296,9 @@ fun SearchFeedView(
                     feedUrl = feedUrl,
                     onUrlChanged = onUrlChanged,
                     onSearch = onSearch,
-                    focusManager = focusManager,
+                    clearFocus = {
+                        focusManager.clearFocus()
+                    },
                     dimens = dimens,
                     keyboardController = keyboardController,
                 )
@@ -310,13 +314,13 @@ fun SearchFeedView(
 }
 
 @Suppress("UnusedReceiverParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.leftContent(
     feedUrl: String,
     onUrlChanged: (String) -> Unit,
     onSearch: (URL) -> Unit,
-    focusManager: FocusManager,
+    clearFocus: () -> Unit,
     dimens: Dimensions,
     keyboardController: SoftwareKeyboardController?,
     modifier: Modifier = Modifier,
@@ -364,9 +368,7 @@ fun ColumnScope.leftContent(
                         keyboardController?.hide()
                     }
                 }
-                .interceptKey(Key.Escape) {
-                    focusManager.clearFocus()
-                }
+                .interceptKey(Key.Escape, clearFocus)
                 .safeSemantics {
                     testTag = "urlField"
                 },
@@ -378,7 +380,7 @@ fun ColumnScope.leftContent(
             if (isValidUrl) {
                 try {
                     onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                    focusManager.clearFocus()
+                    clearFocus()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Can't search", e)
                 }

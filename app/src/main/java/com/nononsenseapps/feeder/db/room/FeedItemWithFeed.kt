@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
-import com.nononsenseapps.feeder.db.COL_IMAGE_FROM_BODY
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
@@ -28,6 +27,7 @@ import com.nononsenseapps.feeder.db.COL_WORD_COUNT
 import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
@@ -35,7 +35,7 @@ import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
 
-const val feedItemColumnsWithFeed = """
+const val FEED_ITEM_COLUMNS_WITH_FEED = """
     $FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE,
     $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK, $COL_ENCLOSURE_TYPE,
     $COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_READ_TIME, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID,
@@ -45,8 +45,7 @@ const val feedItemColumnsWithFeed = """
     $FEEDS_TABLE_NAME.$COL_FULLTEXT_BY_DEFAULT AS $COL_FULLTEXT_BY_DEFAULT,
     $COL_BOOKMARKED,
     $COL_WORD_COUNT,
-    $COL_WORD_COUNT_FULL,
-    $COL_IMAGE_FROM_BODY
+    $COL_WORD_COUNT_FULL
 """
 
 data class FeedItemWithFeed
@@ -58,8 +57,7 @@ data class FeedItemWithFeed
         var title: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-        @ColumnInfo(name = COL_IMAGE_FROM_BODY) var imageFromBody: Boolean = false,
+        @ColumnInfo(name = COL_IMAGEURL) var thumbnailImage: ThumbnailImage? = null,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
         var author: String? = null,

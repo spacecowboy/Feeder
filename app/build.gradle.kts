@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -184,25 +185,21 @@ android {
     }
 }
 
-// https://chris.banes.dev/composable-metrics/
-// gw installDebugMini -Pmyapp.enableComposeCompilerReports=true
-// build/compose_metrics/[...]-composables.txt
-// tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-//  kotlinOptions {
-//    if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
-//      freeCompilerArgs += [
-//              "-P",
-//              "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
-//                      project.buildDir.absolutePath + "/compose_metrics"
-//      ]
-//      freeCompilerArgs += [
-//              "-P",
-//              "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
-//                      project.buildDir.absolutePath + "/compose_metrics"
-//      ]
-//    }
-//  }
-// }
+// gw installDebug -Pmyapp.enableComposeCompilerReports=true --rerun-tasks
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java) {
+    kotlinOptions {
+        if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+            freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}"
+            )
+            freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}"
+            )
+        }
+    }
+}
 
 configurations.all {
     resolutionStrategy {

@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.db.COL_WORD_COUNT_FULL
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.model.ParsedArticle
 import com.nononsenseapps.feeder.model.ParsedFeed
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import java.net.URI
@@ -74,8 +75,13 @@ data class FeedItem
         var title: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-        @ColumnInfo(name = COL_IMAGE_FROM_BODY) var imageFromBody: Boolean = false,
+        @ColumnInfo(name = COL_IMAGEURL) var thumbnailImage: ThumbnailImage? = null,
+        @ColumnInfo(name = COL_IMAGE_FROM_BODY)
+        @Deprecated(
+            "This column has been 'removed' but sqlite doesn't support drop column.",
+            replaceWith = ReplaceWith("thumbnailImage?.fromBody ?: false"),
+        )
+        var imageFromBody: Boolean = false,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_ENCLOSURE_TYPE) var enclosureType: String? = null,
         @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
@@ -152,8 +158,7 @@ data class FeedItem
             this.title = this.plainTitle
             this.plainSnippet = summary
 
-            this.imageUrl = safeImage?.url
-            this.imageFromBody = safeImage?.fromBody ?: false
+            this.thumbnailImage = safeImage
             val firstEnclosure = entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()

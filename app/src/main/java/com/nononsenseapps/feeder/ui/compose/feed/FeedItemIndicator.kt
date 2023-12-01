@@ -39,7 +39,7 @@ import okhttp3.HttpUrl
 fun FeedItemEitherIndicator(
     bookmarked: Boolean,
     itemImage: String?,
-    feedImageUrl: HttpUrl?,
+    feedImageUrl: String?,
     modifier: Modifier = Modifier,
     size: Dp = 8.dp,
 ) {
@@ -108,7 +108,7 @@ fun FeedItemImageIndicator(
 
 @Composable
 fun FeedItemFeedIconIndicator(
-    feedImageUrl: HttpUrl,
+    feedImageUrl: String,
     size: Dp,
     modifier: Modifier = Modifier,
 ) {

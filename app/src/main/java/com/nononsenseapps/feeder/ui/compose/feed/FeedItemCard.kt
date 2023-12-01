@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -24,12 +25,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
@@ -45,6 +47,8 @@ import coil.size.Scale
 import coil.size.Size
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.wordsToReadTimeSecs
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
@@ -57,7 +61,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URL
 import java.time.Instant
 
@@ -87,44 +90,57 @@ fun FeedItemCard(
                     .requiredHeightIn(min = minimumTouchSize),
         ) {
             if (showThumbnail) {
-                item.imageUrl?.let { imageUrl ->
-                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                        val pixels =
-                            with(LocalDensity.current) {
-                                val width = maxWidth.roundToPx()
-                                Size(width, (width * 9) / 16)
+                item.image?.let { image ->
+                    // Don't render known super small images. Null is OK
+                    val width = image.width
+                    val height = image.height
+                    val badHeight = (height ?: 1000) < 360
+                    val badWidth = (width ?: 1000) < 640
+                    if (!badWidth && !badHeight) {
+                        val pixelDensity = LocalDensity.current.density
+                        val contentScale =
+                            remember(pixelDensity) {
+                                RestrainedCropScaling(pixelDensity)
                             }
-                        val alpha =
-                            if (item.unread) {
-                                1f
-                            } else {
-                                0.74f
-                            }
-                        AsyncImage(
-                            model =
-                                ImageRequest.Builder(LocalContext.current)
-                                    .data(imageUrl)
-                                    .listener(
-                                        onError = { a, b ->
-                                            Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
-                                        },
-                                    )
-                                    .scale(Scale.FILL)
-                                    .size(pixels)
-                                    .precision(Precision.INEXACT)
-                                    .build(),
-                            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
-                            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                            contentDescription = stringResource(id = R.string.article_image),
-                            contentScale = ContentScale.Crop,
-                            alignment = Alignment.Center,
-                            modifier =
-                                Modifier
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .fillMaxWidth()
-                                    .aspectRatio(16.0f / 9.0f)
-                                    .alpha(alpha),
-                        )
+                        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                            val pixels =
+                                with(LocalDensity.current) {
+                                    val pxWidth = maxWidth.roundToPx()
+                                    Size(pxWidth, (pxWidth * 9) / 16)
+                                }
+                            val alpha =
+                                if (item.unread) {
+                                    1f
+                                } else {
+                                    0.74f
+                                }
+                            AsyncImage(
+                                model =
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .data(image.url)
+                                        .listener(
+                                            onError = { a, b ->
+                                                Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
+                                            },
+                                        )
+                                        .scale(Scale.FIT)
+                                        .size(pixels)
+                                        .precision(Precision.INEXACT)
+                                        .build(),
+                                placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+                                error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                contentDescription = stringResource(id = R.string.article_image),
+                                contentScale = contentScale,
+                                alignment = Alignment.Center,
+                                modifier =
+                                    Modifier
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .fillMaxWidth()
+                                        .aspectRatio(16.0f / 9.0f)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .alpha(alpha),
+                            )
+                        }
                     }
                 }
             }
@@ -138,7 +154,7 @@ fun FeedItemCard(
                 FeedItemEitherIndicator(
                     bookmarked = item.bookmarked && bookmarkIndicator,
                     itemImage = null,
-                    feedImageUrl = item.feedImageUrl?.toHttpUrlOrNull(),
+                    feedImageUrl = item.feedImageUrl?.toString(),
                     size = 16.dp,
                 )
                 FeedItemText(
@@ -356,7 +372,7 @@ private fun Preview() {
                     feedTitle = "Super Duper Feed One two three hup di too dasf dsaf asd fsa dfasdf",
                     pubDate = "Jun 9, 2021",
                     unread = true,
-                    imageUrl = null,
+                    image = null,
                     link = null,
                     id = ID_UNSET,
                     bookmarked = true,
@@ -396,7 +412,7 @@ private fun PreviewWithImageUnread() {
                         feedTitle = "Super Feed",
                         pubDate = "Jun 9, 2021",
                         unread = true,
-                        imageUrl = "blabla",
+                        image = MediaImage("blabal"),
                         link = null,
                         id = ID_UNSET,
                         bookmarked = false,
@@ -437,7 +453,7 @@ private fun PreviewWithImageRead() {
                         feedTitle = "Super Duper Feed",
                         pubDate = "Jun 9, 2021",
                         unread = false,
-                        imageUrl = "blabla",
+                        image = MediaImage("blabal"),
                         link = null,
                         id = ID_UNSET,
                         bookmarked = true,

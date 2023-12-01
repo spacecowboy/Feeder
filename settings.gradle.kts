@@ -20,8 +20,10 @@ dependencyResolutionManagement {
             // See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
             val kotlinVersion = "1.9.20"
             val kspVersion = "1.9.20-1.0.14"
+            val kotlinxSerialization = "1.6.1"
             version("kotlin", kotlinVersion)
             version("ksp", kspVersion)
+            version("kotlinxSerialization", kotlinxSerialization)
             version("androidPlugin", "8.1.0")
             version("composeCompiler", "1.5.4")
 
@@ -74,6 +76,7 @@ dependencyResolutionManagement {
             plugin("kotlin-jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
             plugin("kotlin-ksp", "com.google.devtools.ksp").versionRef("ksp")
             plugin("kotlin-parcelize", "org.jetbrains.kotlin.plugin.parcelize").versionRef("kotlin")
+            plugin("kotlin-serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
 
             // BOMS
             library("okhttp-bom", "com.squareup.okhttp3", "okhttp-bom").versionRef("okhttp")
@@ -234,6 +237,7 @@ dependencyResolutionManagement {
             ).version {
                 strictly(kotlinVersion)
             }
+            library("kotlin-serialization-json", "org.jetbrains.kotlinx", "kotlinx-serialization-json").versionRef("kotlinxSerialization")
             library(
                 "kotlin-test-junit",
                 "org.jetbrains.kotlin",
@@ -336,6 +340,7 @@ dependencyResolutionManagement {
                     "kotlin-stdlib",
                     "kotlin-stdlib-common",
                     "kotlin-coroutines-core",
+                    "kotlin-serialization-json",
                 ),
             )
 

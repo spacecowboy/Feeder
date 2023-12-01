@@ -9,15 +9,15 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemDao
-import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.feedItemsListOrderByAsc
-import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.feedItemsListOrderByDesc
+import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.FEED_ITEM_LIST_SORT_ORDER_ASC
+import com.nononsenseapps.feeder.db.room.FeedItemDao.Companion.FEED_ITEM_LIST_SORT_ORDER_DESC
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
+import com.nononsenseapps.feeder.model.PREVIEW_COLUMNS
 import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.model.previewColumns
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import kotlinx.coroutines.Dispatchers
@@ -77,15 +77,15 @@ class FeedItemStore(override val di: DI) : DIAware {
             val args = mutableListOf<Any?>()
 
             queryString.apply {
-                append("SELECT $previewColumns FROM feed_items\n")
+                append("SELECT $PREVIEW_COLUMNS FROM feed_items\n")
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
                 rawQueryFilter(filter, args, minReadTime, feedId, tag)
 
                 when (newestFirst) {
-                    true -> append("ORDER BY $feedItemsListOrderByDesc\n")
-                    else -> append("ORDER BY $feedItemsListOrderByAsc\n")
+                    true -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC\n")
+                    else -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC\n")
                 }
             }
 
@@ -276,8 +276,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAllAsRead()
     }
 
-    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
-        dao.getFeedsItemsWithDefaultFullTextNeedingDownload()
+    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> = dao.getFeedsItemsWithDefaultFullTextNeedingDownload()
 
     suspend fun markAsFullTextDownloaded(feedItemId: Long) = dao.markAsFullTextDownloaded(feedItemId)
 
@@ -332,7 +331,7 @@ private fun PreviewItem.toFeedListItem() =
         feedTitle = feedDisplayTitle,
         unread = readTime == null,
         pubDate = pubDate?.toLocalDateTime()?.formatDynamically() ?: "",
-        imageUrl = imageUrl,
+        image = image,
         link = link,
         bookmarked = bookmarked,
         feedImageUrl = feedImageUrl,

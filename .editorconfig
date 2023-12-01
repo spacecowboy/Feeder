@@ -14,6 +14,7 @@ ij_visual_guides = none
 ij_wrap_on_typing = false
 
 [*.{kt,kts}]
+max_line_length = 200
 ktlint_code_style = ktlint_official
 ktlint_function_naming_ignore_when_annotated_with=Composable
 twitter_compose_allowed_composition_locals = LocalTypographySettings,LocalDimens,LocalWindowSize,LocalFoldableHinge

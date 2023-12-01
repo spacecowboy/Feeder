@@ -56,6 +56,8 @@ import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.isImage
+import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
@@ -87,8 +89,7 @@ fun ReaderView(
     articleTitle: String,
     feedTitle: String,
     authorDate: String?,
-    image: String?,
-    imageFromBody: Boolean,
+    image: ThumbnailImage?,
     isFeedText: Boolean,
     modifier: Modifier = Modifier,
     articleListState: LazyListState = rememberLazyListState(),
@@ -290,45 +291,59 @@ fun ReaderView(
             }
 
             // Don't show image for full text articles since it's typically inside the full article
-            if (isFeedText && !imageFromBody && image != null) {
-                item {
-                    BoxWithConstraints(
-                        modifier =
-                            Modifier
-                                .clip(RectangleShape)
-                                .fillMaxWidth(),
-                    ) {
-                        WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) { innerModifier ->
-                            val imageWidth by rememberMaxImageWidth()
-                            AsyncImage(
-                                model =
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(image)
-                                        .scale(Scale.FIT)
-                                        .size(imageWidth)
-                                        .precision(Precision.INEXACT)
-                                        .build(),
-                                contentDescription = enclosure.name,
-                                placeholder =
-                                    rememberTintedVectorPainter(
-                                        Icons.Outlined.Terrain,
-                                    ),
-                                error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                contentScale =
-                                    if (dimens.hasImageAspectRatioInReader) {
-                                        ContentScale.Fit
-                                    } else {
-                                        ContentScale.FillWidth
-                                    },
-                                modifier =
-                                    innerModifier
-                                        .fillMaxWidth()
-                                        .run {
-                                            dimens.imageAspectRatioInReader?.let { ratio ->
-                                                aspectRatio(ratio)
-                                            } ?: this
+            if (isFeedText && image?.fromBody == false) {
+                val imageWidth: Int =
+                    if (image.width?.let { it < 640 } == true) {
+                        // Zero or too small, do not show
+                        -1
+                    } else if (image.width != null) {
+                        image.width ?: Int.MAX_VALUE
+                    } else {
+                        // Enclosures do not have a known width. This will be constrained below.
+                        Int.MAX_VALUE
+                    }
+
+                if (imageWidth > 0) {
+                    item {
+                        BoxWithConstraints(
+                            contentAlignment = Alignment.Center,
+                            modifier =
+                                Modifier
+                                    .clip(RectangleShape)
+                                    .fillMaxWidth(),
+                        ) {
+                            WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) { innerModifier ->
+                                val maxImageWidth by rememberMaxImageWidth()
+                                AsyncImage(
+                                    model =
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(image.url)
+                                            .scale(Scale.FIT)
+                                            .size(imageWidth.coerceAtMost(maxImageWidth))
+                                            .precision(Precision.INEXACT)
+                                            .build(),
+                                    contentDescription = enclosure.name,
+                                    placeholder =
+                                        rememberTintedVectorPainter(
+                                            Icons.Outlined.Terrain,
+                                        ),
+                                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                    contentScale =
+                                        if (dimens.hasImageAspectRatioInReader) {
+                                            ContentScale.Fit
+                                        } else {
+                                            ContentScale.FillWidth
                                         },
-                            )
+                                    modifier =
+                                        innerModifier
+                                            .fillMaxWidth()
+                                            .run {
+                                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                                    aspectRatio(ratio)
+                                                } ?: this
+                                            },
+                                )
+                            }
                         }
                     }
                 }
@@ -353,8 +368,7 @@ private fun ReaderPreview() {
                 articleTitle = "Article title on top",
                 feedTitle = "Feed Title is here",
                 authorDate = "2018-01-02",
-                image = "https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png",
-                imageFromBody = false,
+                image = MediaImage("https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png"),
                 isFeedText = true,
             ) {}
         }

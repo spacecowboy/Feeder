@@ -257,14 +257,19 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): ThumbnailImage? {
 
     val thumbnail = thumbnailCandidates.maxByOrNull { it.width ?: -1 }
 
-    return when {
-        thumbnail != null -> thumbnail
-        else -> {
-            // Now we are resolving against original, not the feed
-            val baseUrl: String = this.linkToHtml(feedBaseUrl) ?: feedBaseUrl.toString()
-            findFirstImageLinkInHtml(this.contentHtml(), baseUrl)
-        }
+    if (thumbnail is EnclosureImage && (thumbnail.length == 0L || thumbnail.length > 50_000L)) {
+        // Enclosures don't have width/height, so guessing from length
+        return thumbnail
+    } else if (thumbnail != null && (thumbnail.width ?: 0) >= 640) {
+        return thumbnail
     }
+
+    // Either image is too small for liking, or no image found. Try to find one in the content first
+
+    // Now we are resolving against original, not the feed
+    val baseUrl: String = this.linkToHtml(feedBaseUrl) ?: feedBaseUrl.toString()
+
+    return findFirstImageInHtml(this.contentHtml(), baseUrl) ?: thumbnail
 }
 
 private fun MediaEntryModule.findThumbnailCandidates(feedBaseUrl: URL): Sequence<ThumbnailImage> {
@@ -286,7 +291,10 @@ private fun MediaEntryModule.findThumbnailCandidates(feedBaseUrl: URL): Sequence
 private fun SyndEnclosure.findThumbnailCandidate(feedBaseUrl: URL): ThumbnailImage? {
     if (type?.startsWith("image/") == true) {
         url?.let { url ->
-            return EnclosureImage(width = null, height = null, url = relativeLinkIntoAbsolute(feedBaseUrl, url))
+            return EnclosureImage(
+                url = relativeLinkIntoAbsolute(feedBaseUrl, url),
+                length = this.length,
+            )
         }
     }
     return null

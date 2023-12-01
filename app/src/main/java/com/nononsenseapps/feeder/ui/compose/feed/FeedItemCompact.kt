@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -35,6 +34,10 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -42,6 +45,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
+import kotlin.math.roundToInt
 
 @Composable
 fun FeedItemCompact(
@@ -84,7 +88,7 @@ fun FeedItemCompact(
                     .padding(vertical = 8.dp),
         )
 
-        if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.imageUrl != null || item.feedImageUrl != null)) {
+        if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.image != null || item.feedImageUrl != null)) {
             Box(
                 modifier = Modifier.fillMaxHeight(),
                 contentAlignment = Alignment.TopEnd,
@@ -101,16 +105,18 @@ fun FeedItemCompact(
                                 .width(64.dp),
                     )
                 } else {
-                    (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
+                    (item.image?.url ?: item.feedImageUrl?.toString())?.let { imageUrl ->
+                        val pixelDensity = LocalDensity.current.density
                         val scale =
-                            if (item.imageUrl != null) {
-                                ContentScale.Crop
+                            if (item.image != null) {
+                                RestrainedCropScaling(pixelDensity)
                             } else {
-                                ContentScale.Fit
+                                RestrainedFitScaling(pixelDensity)
                             }
                         val pixels =
                             with(LocalDensity.current) {
-                                Size(64.dp.roundToPx(), 96.dp.roundToPx())
+                                val px = imageWidth.toPx()
+                                Size(px.roundToInt(), (px * 1.5).roundToInt())
                             }
                         AsyncImage(
                             model =
@@ -152,7 +158,7 @@ data class FeedListItem(
     val feedTitle: String,
     val unread: Boolean,
     val pubDate: String,
-    val imageUrl: String?,
+    val image: ThumbnailImage?,
     val link: String?,
     val bookmarked: Boolean,
     val feedImageUrl: URL?,
@@ -175,7 +181,7 @@ data class FeedListItem(
      */
     fun contentType(feedItemStyle: FeedItemStyle): String =
         when {
-            imageUrl?.isNotBlank() == true -> "$feedItemStyle/image"
+            image != null -> "$feedItemStyle/image"
             else -> "$feedItemStyle/other"
         }
 }
@@ -187,13 +193,14 @@ private fun PreviewRead() {
         Surface {
             FeedItemCompact(
                 item =
+                    @Suppress("ktlint:standard:max-line-length")
                     FeedListItem(
                         title = "title",
                         snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                         feedTitle = "Super Duper Feed One two three hup di too dasf",
                         pubDate = "Jun 9, 2021",
                         unread = false,
-                        imageUrl = null,
+                        image = null,
                         link = null,
                         id = ID_UNSET,
                         bookmarked = false,
@@ -226,13 +233,14 @@ private fun PreviewUnread() {
         Surface {
             FeedItemCompact(
                 item =
+                    @Suppress("ktlint:standard:max-line-length")
                     FeedListItem(
                         title = "title",
                         snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                         feedTitle = "Super Duper Feed One two three hup di too dasf",
                         pubDate = "Jun 9, 2021",
                         unread = true,
-                        imageUrl = null,
+                        image = null,
                         link = null,
                         id = ID_UNSET,
                         bookmarked = true,
@@ -268,13 +276,14 @@ private fun PreviewWithImage() {
             ) {
                 FeedItemCompact(
                     item =
+                        @Suppress("ktlint:standard:max-line-length")
                         FeedListItem(
                             title = "title",
                             snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                             feedTitle = "Super Duper Feed One two three hup di too dasf",
                             pubDate = "Jun 9, 2021",
                             unread = true,
-                            imageUrl = "blabla",
+                            image = MediaImage("blabla"),
                             link = null,
                             id = ID_UNSET,
                             bookmarked = false,

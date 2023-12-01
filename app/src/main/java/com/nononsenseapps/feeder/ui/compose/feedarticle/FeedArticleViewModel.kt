@@ -32,6 +32,7 @@ import com.nononsenseapps.feeder.model.NoUrl
 import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
@@ -80,7 +81,8 @@ class FeedArticleViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                1, // So we display an empty screen before data is loaded (less flicker)
+                // So we display an empty screen before data is loaded (less flicker)
+                1,
             )
 
     private val screenTitleForCurrentFeedOrTag: StateFlow<ScreenTitle> =
@@ -288,7 +290,8 @@ class FeedArticleViewModel(
             repository.currentArticle,
             ttsStateHolder.ttsState,
             repository.swipeAsRead,
-            textToDisplayTrigger, // Never actually read, only used as trigger
+            // Never actually read, only used as trigger
+            textToDisplayTrigger,
             repository.useDetectLanguage,
             ttsStateHolder.availableLanguages,
             repository.getUnreadBookmarksCount,
@@ -365,7 +368,6 @@ class FeedArticleViewModel(
                         -> 0
                     },
                 image = article.image,
-                imageFromBody = article.imageFromBody,
             )
         }
             .stateIn(
@@ -511,6 +513,7 @@ class FeedArticleViewModel(
     }
 }
 
+@Immutable
 interface FeedScreenViewState {
     val currentFeedOrTag: FeedOrTag
     val showFab: Boolean
@@ -539,6 +542,7 @@ interface FeedScreenViewState {
     val showFilterMenu: Boolean
 }
 
+@Immutable
 interface ArticleScreenViewState {
     val useDetectLanguage: Boolean
     val isBottomBarVisible: Boolean
@@ -559,14 +563,14 @@ interface ArticleScreenViewState {
     val isBookmarked: Boolean
     val keyHolder: ArticleItemKeyHolder
     val wordCount: Int
-    val image: String?
-    val imageFromBody: Boolean
+    val image: ThumbnailImage?
 }
 
 interface ArticleItemKeyHolder {
-    fun getAndIncrementKey(): Long
+    fun getAndIncrementKey(): Any
 }
 
+@Immutable
 interface FeedListFilter {
     val unread: Boolean
     val saved: Boolean
@@ -582,6 +586,7 @@ val emptyFeedListFilter =
         override val read: Boolean = false
     }
 
+@Immutable
 interface FeedListFilterCallback {
     fun setSaved(value: Boolean)
 
@@ -601,6 +606,22 @@ object RotatingArticleItemKeyHolder : ArticleItemKeyHolder {
 
     override fun getAndIncrementKey(): Long {
         return key++
+    }
+}
+
+class FullArticleItemKeyHolder : ArticleItemKeyHolder {
+    private var key: Long = 0L
+
+    override fun getAndIncrementKey(): Any {
+        return "Full ${key++}"
+    }
+}
+
+class DefaultArticleItemKeyHolder : ArticleItemKeyHolder {
+    private var key: Long = 0L
+
+    override fun getAndIncrementKey(): Any {
+        return "Default ${key++}"
     }
 }
 
@@ -649,8 +670,7 @@ data class FeedArticleScreenViewState(
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
     override val wordCount: Int = 0,
-    override val image: String? = null,
-    override val imageFromBody: Boolean = false,
+    override val image: ThumbnailImage? = null,
 ) : FeedScreenViewState, ArticleScreenViewState
 
 sealed class TSSError

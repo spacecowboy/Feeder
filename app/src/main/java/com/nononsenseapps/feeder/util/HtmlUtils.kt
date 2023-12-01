@@ -4,7 +4,7 @@ import com.nononsenseapps.feeder.model.ImageFromHTML
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser.unescapeEntities
 
-fun findFirstImageLinkInHtml(
+fun findFirstImageInHtml(
     text: String?,
     baseUrl: String?,
 ): ImageFromHTML? =
