@@ -1,17 +1,29 @@
 package com.nononsenseapps.feeder.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 /**
  * URL should be absolute at all times
  */
-sealed class ThumbnailImage(
-    val url: String,
-    val width: Int?,
-    val height: Int?,
-    val fromBody: Boolean,
-)
+@Serializable
+sealed class ThumbnailImage {
+    abstract val url: String
+    abstract val width: Int?
+    abstract val height: Int?
+    abstract val fromBody: Boolean
+}
 
-class ImageFromHTML(url: String, width: Int?, height: Int?) :
-    ThumbnailImage(url, width, height, fromBody = true) {
+@Serializable
+@SerialName("ImageFromHTML")
+class ImageFromHTML(
+    override val url: String,
+    override val width: Int? = null,
+    override val height: Int? = null,
+) : ThumbnailImage() {
+    override val fromBody: Boolean
+        get() = true
+
     override fun equals(other: Any?): Boolean {
         return if (other is ImageFromHTML) {
             return url == other.url && width == other.width && height == other.height
@@ -35,8 +47,23 @@ class ImageFromHTML(url: String, width: Int?, height: Int?) :
     }
 }
 
-class EnclosureImage(url: String, width: Int?, height: Int?) :
-    ThumbnailImage(url, width, height, fromBody = false) {
+@Serializable
+@SerialName("EnclosureImage")
+class EnclosureImage(
+    override val url: String,
+    /**
+     * Number of bytes of images, zero if not known
+     */
+    val length: Long,
+) : ThumbnailImage() {
+    override val width: Int?
+        get() = null
+    override val height: Int?
+        get() = null
+
+    override val fromBody: Boolean
+        get() = false
+
     override fun equals(other: Any?): Boolean {
         return if (other is EnclosureImage) {
             return url == other.url && width == other.width && height == other.height
@@ -60,8 +87,16 @@ class EnclosureImage(url: String, width: Int?, height: Int?) :
     }
 }
 
-class MediaImage(url: String, width: Int?, height: Int?) :
-    ThumbnailImage(url, width, height, fromBody = false) {
+@Serializable
+@SerialName("MediaImage")
+class MediaImage(
+    override val url: String,
+    override val width: Int? = null,
+    override val height: Int? = null,
+) : ThumbnailImage() {
+    override val fromBody: Boolean
+        get() = false
+
     override fun equals(other: Any?): Boolean {
         return if (other is MediaImage) {
             return url == other.url && width == other.width && height == other.height

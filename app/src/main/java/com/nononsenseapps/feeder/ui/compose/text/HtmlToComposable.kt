@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
@@ -35,10 +35,13 @@ import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -59,7 +62,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
+import coil.size.Size
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFillWidthScaling
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleItemKeyHolder
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
@@ -768,6 +774,11 @@ private fun ColumnScope.renderImage(
         }
     }
 
+    if (imageCandidates.notHasImage) {
+        // No image, no need to render
+        return
+    }
+
     // Some sites are silly and insert formatting in alt text
     val alt by remember {
         derivedStateOf {
@@ -777,6 +788,7 @@ private fun ColumnScope.renderImage(
 
     DisableSelection {
         BoxWithConstraints(
+            contentAlignment = Alignment.Center,
             modifier =
                 Modifier
                     .clip(RectangleShape)
@@ -787,67 +799,81 @@ private fun ColumnScope.renderImage(
                     }
                     .fillMaxWidth(),
         ) {
-            val imageWidth by rememberMaxImageWidth()
-            WithTooltipIfNotBlank(tooltip = alt) { modifier ->
-                if (imageCandidates.notHasImage) {
-                    Image(
-                        rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentDescription = alt,
-                        contentScale =
-                            if (dimens.hasImageAspectRatioInReader) {
-                                ContentScale.Fit
-                            } else {
-                                ContentScale.FillWidth
-                            },
-                        modifier =
-                            modifier
-                                .fillMaxWidth()
-                                .run {
-                                    dimens.imageAspectRatioInReader?.let { ratio ->
-                                        aspectRatio(ratio)
-                                    } ?: this
-                                },
-                    )
-                } else {
-                    val pixelDensity = LocalDensity.current.density
-                    val bestImage by remember {
-                        derivedStateOf {
-                            imageCandidates.getBestImageForMaxSize(
-                                pixelDensity = pixelDensity,
-                                maxWidth = imageWidth,
-                            )
-                        }
-                    }
-                    AsyncImage(
-                        model =
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(bestImage)
-                                .scale(Scale.FIT)
-                                .size(imageWidth)
-                                .precision(Precision.INEXACT)
-                                .build(),
-                        contentDescription = alt,
-                        placeholder =
-                            rememberTintedVectorPainter(
-                                Icons.Outlined.Terrain,
-                            ),
-                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentScale =
-                            if (dimens.hasImageAspectRatioInReader) {
-                                ContentScale.Fit
-                            } else {
-                                ContentScale.FillWidth
-                            },
-                        modifier =
-                            modifier
-                                .fillMaxWidth()
-                                .run {
-                                    dimens.imageAspectRatioInReader?.let { ratio ->
-                                        aspectRatio(ratio)
-                                    } ?: this
-                                },
+            val maxImageWidth by rememberMaxImageWidth()
+            val pixelDensity = LocalDensity.current.density
+            val bestImage by remember {
+                derivedStateOf {
+                    imageCandidates.getBestImageForMaxSize(
+                        pixelDensity = pixelDensity,
+                        maxWidth = maxImageWidth,
                     )
                 }
+            }
+            if (bestImage is NoImageCandidate) {
+                // No image, no need to render
+                return@BoxWithConstraints
+            }
+            val imageWidth: Int =
+                remember(bestImage) {
+                    when (bestImage) {
+                        is ImageCandidateFromSetWithPixelDensity -> maxImageWidth
+                        is ImageCandidateFromSetWithWidth -> (bestImage as ImageCandidateFromSetWithWidth).width
+                        is ImageCandidateUnknownSize -> maxImageWidth
+                        is ImageCandidateWithSize -> (bestImage as ImageCandidateWithSize).width
+                        // Will never happen
+                        NoImageCandidate -> maxImageWidth
+                    }
+                }
+            val imageHeight: Int? =
+                remember(bestImage) {
+                    when (bestImage) {
+                        is ImageCandidateWithSize -> (bestImage as ImageCandidateWithSize).height
+                        else -> null
+                    }
+                }
+
+            WithTooltipIfNotBlank(tooltip = alt) { modifier ->
+                val contentScale =
+                    remember(pixelDensity, dimens.hasImageAspectRatioInReader) {
+                        if (dimens.hasImageAspectRatioInReader) {
+                            RestrainedFitScaling(pixelDensity)
+                        } else {
+                            RestrainedFillWidthScaling(pixelDensity)
+                        }
+                    }
+
+                AsyncImage(
+                    model =
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(bestImage.url)
+                            .scale(Scale.FIT)
+                            // DO NOT use the actualSize parameter here
+                            .size(Size(imageWidth, imageHeight ?: imageWidth))
+                            // If image is larger than requested size, scale down
+                            // But if image is smaller, don't scale up
+                            // Note that this is the pixels, not how it is scaled inside the ImageView
+                            .precision(Precision.INEXACT)
+                            .build(),
+                    contentDescription = alt,
+                    placeholder =
+                        rememberTintedVectorPainter(
+                            Icons.Outlined.Terrain,
+                        ),
+                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                    contentScale = contentScale,
+                    modifier =
+                        modifier
+                            .widthIn(max = maxWidth)
+                            .fillMaxWidth()
+                            .run {
+                                // TODO take the real height into account
+                                // OR aspect ratio is no longer needed now that real size
+                                // is respected?
+                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                    aspectRatio(ratio)
+                                } ?: this
+                            },
+                )
             }
         }
     }
@@ -1135,6 +1161,8 @@ private fun Element.firstBestDescendantImg(baseUrl: String): Element? {
                 baseUrl = baseUrl,
                 srcSet = element.attr("srcset") ?: "",
                 absSrc = element.attr("abs:src") ?: "",
+                width = element.attr("width")?.toIntOrNull(),
+                height = element.attr("height")?.toIntOrNull(),
             ).hasImage
         }
         // Return first just to show error image instead then
@@ -1232,68 +1260,137 @@ internal fun getImageSource(
     baseUrl = baseUrl,
     srcSet = element.attr("srcset") ?: "",
     absSrc = element.attr("abs:src") ?: "",
+    width = element.attr("width")?.toIntOrNull(),
+    height = element.attr("height")?.toIntOrNull(),
 )
 
 internal class ImageCandidates(
     val baseUrl: String,
     val srcSet: String,
     val absSrc: String,
+    val width: Int?,
+    val height: Int?,
 ) {
     val hasImage: Boolean = srcSet.isNotBlank() || absSrc.isNotBlank()
     val notHasImage: Boolean = !hasImage
 
-    /**
-     * Might throw if hasImage returns false
-     */
     fun getBestImageForMaxSize(
         maxWidth: Int,
         pixelDensity: Float,
-    ): String {
-        val setCandidate =
-            srcSet.splitToSequence(", ")
-                .map { it.trim() }
-                .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
-                .fold(100f to "") { acc, candidate ->
-                    val candidateSize =
-                        if (candidate.size == 1) {
-                            // Assume it corresponds to 1x pixel density
-                            1.0f / pixelDensity
-                        } else {
-                            val descriptor = candidate.last()
-                            when {
-                                descriptor.endsWith("w", ignoreCase = true) -> {
-                                    descriptor.substringBefore("w").toFloat() /
-                                        maxWidth
-                                            .toFloat()
-                                }
+    ): ImageCandidate {
+        try {
+            val setCandidate =
+                srcSet.splitToSequence(", ")
+                    .map { it.trim() }
+                    .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
+                    .fold(Float.MAX_VALUE to NoImageCandidate) { acc: Pair<Float, ImageCandidate>, candidate ->
+                        if (candidate.first().isBlank()) {
+                            return@fold acc
+                        }
+                        val (candidateSize, imageCandidate) =
+                            if (candidate.size == 1) {
+                                // Assume it corresponds to 1x pixel density
+                                (1.0f / pixelDensity) to
+                                    ImageCandidateFromSetWithPixelDensity(
+                                        url = candidate.first(),
+                                        pixelDensity = 1.0f,
+                                    )
+                            } else {
+                                val descriptor = candidate.last()
+                                when {
+                                    descriptor.endsWith("w", ignoreCase = true) -> {
+                                        val width = descriptor.substringBefore("w").toFloat()
+                                        val ratio = width / maxWidth.toFloat()
 
-                                descriptor.endsWith("x", ignoreCase = true) -> {
-                                    descriptor.substringBefore("x").toFloat() / pixelDensity
-                                }
+                                        ratio to
+                                            ImageCandidateFromSetWithWidth(
+                                                url = candidate.first(),
+                                                width = width.toInt(),
+                                            )
+                                    }
 
-                                else -> {
-                                    return@fold acc
+                                    descriptor.endsWith("x", ignoreCase = true) -> {
+                                        val density = descriptor.substringBefore("x").toFloat()
+                                        val ratio = density / pixelDensity
+
+                                        ratio to
+                                            ImageCandidateFromSetWithPixelDensity(
+                                                url = candidate.first(),
+                                                pixelDensity = density,
+                                            )
+                                    }
+
+                                    else -> {
+                                        return@fold acc
+                                    }
                                 }
                             }
+
+                        // Find the image with the size closest to the desired size
+                        if (abs(candidateSize - 1.0f) < abs(acc.first - 1.0f)) {
+                            candidateSize to imageCandidate
+                        } else {
+                            acc
                         }
-
-                    if (abs(candidateSize - 1.0f) < abs(acc.first - 1.0f)) {
-                        candidateSize to candidate.first()
-                    } else {
-                        acc
                     }
-                }
-                .second
+                    .second
 
-        return (setCandidate.takeIf { it.isNotBlank() } ?: absSrc.takeIf { it.isNotBlank() })?.let {
-            StringUtil.resolve(baseUrl, it)
-        } ?: ""
+            return if (setCandidate is NoImageCandidate) {
+                absSrc.takeIf { it.isNotBlank() }?.let {
+                    val url = StringUtil.resolve(baseUrl, it)
+                    if (width != null && height != null) {
+                        ImageCandidateWithSize(
+                            url = url,
+                            width = width,
+                            height = height,
+                        )
+                    } else {
+                        ImageCandidateUnknownSize(
+                            url = url,
+                        )
+                    }
+                } ?: NoImageCandidate
+            } else {
+                setCandidate
+            }
+        } catch (_: Throwable) {
+            return NoImageCandidate
+        }
     }
 
     override fun toString(): String {
         return "ImageCandidates(srcSet=$srcSet, src=$absSrc)"
     }
 }
+
+sealed class ImageCandidate {
+    abstract val url: String
+}
+
+data object NoImageCandidate : ImageCandidate() {
+    override val url: String
+        get() = ""
+}
+
+data class ImageCandidateUnknownSize(
+    override val url: String,
+) : ImageCandidate()
+
+data class ImageCandidateWithSize(
+    override val url: String,
+    val width: Int,
+    val height: Int,
+) : ImageCandidate()
+
+data class ImageCandidateFromSetWithWidth(
+    override val url: String,
+    val width: Int,
+) : ImageCandidate()
+
+data class ImageCandidateFromSetWithPixelDensity(
+    override val url: String,
+    val pixelDensity: Float,
+) : ImageCandidate()
 
 private val spaceRegex = Regex("\\s+")
 
@@ -1351,8 +1448,7 @@ private const val NON_BREAKING_SPACE = 160.toChar()
 
 private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
 
-private fun isCollapsableWhiteSpace(c: Char) =
-    c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
+private fun isCollapsableWhiteSpace(c: Char) = c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
 
 /**
  * Super basic function to strip html formatting from alt-texts.
@@ -1396,3 +1492,9 @@ fun WithTooltipIfNotBlank(
         content(modifier)
     }
 }
+
+@Immutable
+data class ImageSize(
+    val width: Int,
+    val height: Int,
+)

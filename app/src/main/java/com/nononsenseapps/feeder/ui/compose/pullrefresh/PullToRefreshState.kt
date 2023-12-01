@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animate
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -81,6 +82,7 @@ fun rememberPullRefreshState(
  *
  * Should be created using [rememberPullRefreshState].
  */
+@Stable
 class PullRefreshState internal constructor(
     private val animationScope: CoroutineScope,
     private val onRefreshState: State<() -> Unit>,

@@ -299,7 +299,7 @@ fun ListOfFeedsAndTags(
                             TopLevelFeed(
                                 unreadCount = item.unreadCount,
                                 title = item.title(),
-                                imageUrl = item.imageUrl,
+                                imageUrl = item.imageUrl?.toString(),
                                 onItemClick = {
                                     onItemClick(item)
                                 },
@@ -310,7 +310,7 @@ fun ListOfFeedsAndTags(
                             ChildFeed(
                                 unreadCount = item.unreadCount,
                                 title = item.title(),
-                                imageUrl = item.imageUrl,
+                                imageUrl = item.imageUrl?.toString(),
                                 visible = item.tag in expandedTags.item,
                                 onItemClick = {
                                     onItemClick(item)
@@ -322,28 +322,10 @@ fun ListOfFeedsAndTags(
 
                 is DrawerTop -> {
                     // Handled at top
-                    /*
-                    AllFeeds(
-                    unreadCount = item.unreadCount,
-                    title = item.title(),
-                    onItemClick = {
-                        onItemClick(item)
-                    },
-                )
-                     */
                 }
 
                 is DrawerSavedArticles -> {
                     // Handled at top
-                    /*
-                    SavedArticles(
-                    unreadCount = item.unreadCount,
-                    title = item.title(),
-                    onItemClick = {
-                        onItemClick(item)
-                    },
-                )
-                     */
                 }
             }
         }
@@ -476,7 +458,7 @@ private fun TopLevelFeed(
     title: String = "Foo",
     unreadCount: Int = 99,
     onItemClick: () -> Unit = {},
-    imageUrl: URL? = null,
+    imageUrl: String? = null,
 ) = Feed(
     title = title,
     imageUrl = imageUrl,
@@ -488,7 +470,7 @@ private fun TopLevelFeed(
 @Composable
 private fun ChildFeed(
     title: String = "Foo",
-    imageUrl: URL? = null,
+    imageUrl: String? = null,
     unreadCount: Int = 99,
     visible: Boolean = true,
     onItemClick: () -> Unit = {},
@@ -633,7 +615,7 @@ private fun Feed(
 @Composable
 private fun Feed(
     title: String,
-    imageUrl: URL?,
+    imageUrl: String?,
     unreadCount: Int,
     onItemClick: () -> Unit,
 ) {

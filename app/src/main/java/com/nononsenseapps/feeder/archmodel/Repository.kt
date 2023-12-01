@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.DeviceListResponse
@@ -510,8 +511,7 @@ class Repository(override val di: DI) : DIAware {
 
     fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
 
-    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
-        feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload()
+    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> = feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload()
 
     suspend fun markAsFullTextDownloaded(feedItemId: Long) = feedItemStore.markAsFullTextDownloaded(feedItemId)
 
@@ -796,8 +796,7 @@ data class Article(
     val bookmarked: Boolean = item?.bookmarked ?: false
     val wordCount: Int = item?.wordCount ?: 0
     val wordCountFull: Int = item?.wordCountFull ?: 0
-    val image: String? = item?.imageUrl
-    val imageFromBody: Boolean = item?.imageFromBody ?: false
+    val image: ThumbnailImage? = item?.thumbnailImage
 }
 
 enum class TextToDisplay {

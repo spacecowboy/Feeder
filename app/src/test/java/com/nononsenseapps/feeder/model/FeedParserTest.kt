@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length", "ktlint:standard:property-naming")
+
 package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
@@ -535,7 +537,7 @@ class FeedParserTest : DIAware {
             var entry = feed.getOrNull()?.items!![1]
 
             assertEquals(
-                "https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
+                "https://cowboyprogrammer.org/images/zopfli_boxplot.png",
                 entry.image?.url,
             )
 
@@ -582,7 +584,7 @@ class FeedParserTest : DIAware {
             )
             assertTrue(item.content_html!!.startsWith("För tredje månaden på raken"))
             assertEquals(
-                "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
+                "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s640/konj.png",
                 item.image?.url,
             )
 
@@ -616,7 +618,7 @@ class FeedParserTest : DIAware {
             )
             assertTrue(item.content_html!!.startsWith("För tredje månaden på raken"))
             assertEquals(
-                "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
+                "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s640/konj.png",
                 item.image?.url,
             )
 
@@ -635,7 +637,7 @@ class FeedParserTest : DIAware {
             assertEquals("http://cowboyprogrammer.org/dummy-id-to-distinguis-from-alternate-link", item.id)
             assertTrue(item.date_published!!.contains("2016"), "Should take the updated timestamp")
             assertEquals(
-                "http://localhost:1313/images/zopfli_all_the_things.jpg",
+                "http://localhost:1313/images/zopfli_boxplot.png",
                 item.image?.url,
             )
 
@@ -660,7 +662,7 @@ class FeedParserTest : DIAware {
             )
 
             assertEquals(
-                "http://1.gravatar.com/avatar/a795b4f89a6d096f314fc0a2c80479c1?s=96&d=identicon&r=G",
+                "https://adriancolyer.files.wordpress.com/2017/02/js-libs-fig-1.jpeg?w=640",
                 item.image?.url,
             )
         }

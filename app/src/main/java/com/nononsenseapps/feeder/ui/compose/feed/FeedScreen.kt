@@ -1138,7 +1138,6 @@ fun FeedListContent(
                             visible = visible,
                             mostlyVisible = mostlyVisible,
                             currentFeedOrTag = viewState.currentFeedOrTag,
-                            coroutineScope = coroutineScope,
                             markAsRead = markAsUnread,
                         )
                     }
@@ -1330,7 +1329,6 @@ fun FeedGridContent(
                             visible = visible,
                             mostlyVisible = mostlyVisible,
                             currentFeedOrTag = viewState.currentFeedOrTag,
-                            coroutineScope = coroutineScope,
                             markAsRead = markAsUnread,
                         )
                     }
@@ -1441,9 +1439,10 @@ fun MarkItemAsReadOnScroll(
     visible: Boolean,
     mostlyVisible: Boolean,
     currentFeedOrTag: FeedOrTag,
-    coroutineScope: CoroutineScope,
     markAsRead: (Long, Boolean, FeedOrTag?) -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     var debounced by remember {
         mutableStateOf(false)
     }

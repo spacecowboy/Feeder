@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -158,7 +157,6 @@ fun ArticleScreen(
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class,
     ExperimentalFoundationApi::class,
 )
 @Composable
@@ -353,21 +351,27 @@ fun ArticleScreen(
             )
         },
     ) { padding ->
-        ArticleContent(
-            viewState = viewState,
-            screenType = ScreenType.SINGLE,
-            articleListState = articleListState,
-            onFeedTitleClick = onFeedTitleClick,
-            displayFullText = displayFullText,
+        // Box handles the dynamic padding so ArticleContent don't have to recompose on scroll
+        Box(
             modifier =
+            Modifier
+                .padding(padding),
+        ) {
+            ArticleContent(
+                viewState = viewState,
+                screenType = ScreenType.SINGLE,
+                articleListState = articleListState,
+                onFeedTitleClick = onFeedTitleClick,
+                displayFullText = displayFullText,
+                modifier =
                 Modifier
-                    .padding(padding)
                     .focusGroup()
                     .focusRequester(focusArticle)
                     .focusProperties {
                         up = focusTopBar
                     },
-        )
+            )
+        }
     }
 }
 
@@ -406,8 +410,6 @@ fun ArticleContent(
             }
         },
         onFeedTitleClick = onFeedTitleClick,
-        modifier = modifier,
-        articleListState = articleListState,
         enclosure = viewState.enclosure,
         articleTitle = viewState.articleTitle,
         feedTitle = viewState.feedDisplayTitle,
@@ -431,8 +433,9 @@ fun ArticleContent(
                 else -> null
             },
         image = viewState.image,
-        imageFromBody = viewState.imageFromBody,
         isFeedText = viewState.textToDisplay == TextToDisplay.DEFAULT,
+        modifier = modifier,
+        articleListState = articleListState,
     ) {
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
@@ -444,7 +447,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = viewState.keyHolder,
+                                    keyHolder = DefaultArticleItemKeyHolder(),
                                 ) { link ->
                                     activityLauncher.openLink(
                                         link = link,
@@ -483,7 +486,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = viewState.keyHolder,
+                                    keyHolder = FullArticleItemKeyHolder(),
                                 ) { link ->
                                     activityLauncher.openLink(
                                         link = link,

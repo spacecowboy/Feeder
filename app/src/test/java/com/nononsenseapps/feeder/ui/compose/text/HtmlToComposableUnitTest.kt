@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.text
 import io.mockk.every
 import io.mockk.mockk
 import org.jsoup.nodes.Element
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -10,6 +11,12 @@ import kotlin.test.assertTrue
 
 class HtmlToComposableUnitTest {
     private val element = mockk<Element>()
+
+    @Before
+    fun setup() {
+        every { element.attr("width") } returns null
+        every { element.attr("height") } returns null
+    }
 
     @Test
     fun findImageSrcWithNoSrc() {
@@ -29,7 +36,8 @@ class HtmlToComposableUnitTest {
         val result = getImageSource("http://foo", element)
 
         assertTrue(result.hasImage)
-        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(1, 1.0f))
+        val best = result.getBestImageForMaxSize(1, 1.0f)
+        assertEquals("http://foo/image.jpg", best.url)
     }
 
     @Test
@@ -40,7 +48,8 @@ class HtmlToComposableUnitTest {
         val result = getImageSource("http://foo", element)
 
         assertTrue(result.hasImage)
-        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(1, 1.0f))
+        val best = result.getBestImageForMaxSize(1, 1.0f)
+        assertEquals("http://foo/image.jpg", best.url)
     }
 
     @Test
@@ -53,7 +62,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1
-        assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 1.0f)
+        assertEquals("http://foo/header.png", best.url)
     }
 
     @Test
@@ -66,7 +76,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 640
-        assertEquals("http://foo/header640.png", result.getBestImageForMaxSize(maxSize, 1.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 1.0f)
+        assertEquals("http://foo/header640.png", best.url)
     }
 
     @Test
@@ -79,7 +90,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 900
-        assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 8.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 8.0f)
+        assertEquals("http://foo/header960.png", best.url)
     }
 
     @Test
@@ -92,7 +104,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 650
-        assertEquals("http://foo/header640.png", result.getBestImageForMaxSize(maxSize, 7.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 7.0f)
+        assertEquals("http://foo/header640.png", best.url)
     }
 
     @Test
@@ -105,7 +118,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 950
-        assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 7.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 7.0f)
+        assertEquals("http://foo/header960.png", best.url)
     }
 
     @Test
@@ -118,7 +132,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1500
-        assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 8.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 8.0f)
+        assertEquals("http://foo/header960.png", best.url)
     }
 
     @Test
@@ -131,7 +146,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1
-        assertEquals("http://foo/header3.0x.png", result.getBestImageForMaxSize(maxSize, 3.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 3.0f)
+        assertEquals("http://foo/header3.0x.png", best.url)
     }
 
     @Test
@@ -144,7 +160,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1
-        assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 1.0f)
+        assertEquals("http://foo/header.png", best.url)
     }
 
     @Test
@@ -157,7 +174,8 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1
-        assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
+        val best = result.getBestImageForMaxSize(maxSize, 1.0f)
+        assertEquals("http://foo/header.png", best.url)
     }
 
     @Test
@@ -176,12 +194,13 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1024
+        val best = result.getBestImageForMaxSize(
+            maxSize,
+            8.0f,
+        )
         assertEquals(
             "https://www.politico.eu/cdn-cgi/image/width=1024,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg",
-            result.getBestImageForMaxSize(
-                maxSize,
-                8.0f,
-            ),
+            best.url,
         )
     }
 
@@ -205,12 +224,13 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1024
+        val best = result.getBestImageForMaxSize(
+            maxSize,
+            8.0f,
+        )
         assertEquals(
             "https://duet-cdn.vox-cdn.com/thumbor/184x0:2614x1535/1080x720/filters:focal(1847x240:1848x241):format(webp)/cdn.vox-cdn.com/uploads/chorus_asset/file/24842461/Screenshot_2023_08_10_at_12.22.58_PM.png",
-            result.getBestImageForMaxSize(
-                maxSize,
-                8.0f,
-            ),
+            best.url,
         )
     }
 
@@ -226,12 +246,13 @@ class HtmlToComposableUnitTest {
         assertFalse(result.hasImage)
 
         val maxSize = 1024
+        val best = result.getBestImageForMaxSize(
+            maxSize,
+            8.0f,
+        )
         assertEquals(
             "",
-            result.getBestImageForMaxSize(
-                maxSize,
-                8.0f,
-            ),
+            best.url,
         )
     }
 }

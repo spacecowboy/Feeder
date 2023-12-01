@@ -70,6 +70,7 @@ fun PullRefreshIndicator(
     ) {
         Crossfade(
             targetState = refreshing,
+            label = "PullToRefresh",
             animationSpec = tween(durationMillis = CrossfadeDurationMs),
         ) { refreshing ->
             Box(

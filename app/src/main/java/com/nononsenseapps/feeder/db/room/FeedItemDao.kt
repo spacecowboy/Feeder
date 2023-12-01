@@ -15,8 +15,8 @@ import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
+import com.nononsenseapps.feeder.model.PREVIEW_COLUMNS
 import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.model.previewColumns
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
@@ -81,7 +81,7 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $feedItemColumnsWithFeed
+        SELECT $FEED_ITEM_COLUMNS_WITH_FEED
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
@@ -133,7 +133,7 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $feedItemColumnsWithFeed
+        SELECT $FEED_ITEM_COLUMNS_WITH_FEED
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
@@ -143,7 +143,7 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $feedItemColumnsWithFeed
+        SELECT $FEED_ITEM_COLUMNS_WITH_FEED
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
@@ -159,14 +159,14 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
     fun pagingUnreadPreviewsDesc(
@@ -177,14 +177,14 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
     fun pagingUnreadPreviewsDesc(
@@ -195,13 +195,13 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
     fun pagingUnreadPreviewsDesc(
@@ -211,14 +211,14 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
     fun pagingUnreadPreviewsAsc(
@@ -229,14 +229,14 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag 
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
     fun pagingUnreadPreviewsAsc(
@@ -247,13 +247,13 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
+        SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
     fun pagingUnreadPreviewsAsc(
@@ -263,12 +263,12 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $feedItemColumnsWithFeed
+        SELECT $FEED_ITEM_COLUMNS_WITH_FEED
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND read_time is null
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         LIMIT 20
         """,
     )
@@ -487,9 +487,9 @@ interface FeedItemDao {
 
     companion object {
         // These are backed by a database index
-        const val feedItemsListOrderByDesc =
+        const val FEED_ITEM_LIST_SORT_ORDER_DESC =
             "primary_sort_time DESC, pub_date DESC, feed_items.id DESC"
-        const val feedItemsListOrderByAsc =
+        const val FEED_ITEM_LIST_SORT_ORDER_ASC =
             "primary_sort_time ASC, pub_date ASC, feed_items.id ASC"
     }
 }

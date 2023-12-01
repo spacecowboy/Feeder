@@ -72,7 +72,7 @@ private const val LOG_TAG = "FEEDER_SWIPEITEM"
 )
 @Composable
 fun SwipeableFeedItemPreview(
-    onSwipe: suspend (Boolean) -> Unit,
+    onSwipe: (Boolean) -> Unit,
     filter: FeedListFilter,
     item: FeedListItem,
     showThumbnail: Boolean,
