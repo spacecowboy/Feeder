@@ -1,3 +1,53 @@
+# 2.6.10
+Agnieszka C (1):
+  * [1bedec87] Updated Polish translation using Weblate
+
+Belmar Begić (1):
+  * [0c4e4ca9] Updated Bosnian translation using Weblate
+
+Eric (1):
+  * [8f3b03f5] Updated Chinese (Simplified) translation using Weblate
+
+Jonas Kalderstam (12):
+  * [e89df3ba] Fixed crash when a resource string was not styled as expected
+  * [510a38ac] Added reading time/word count for languages which use spaces
+  * [d1d7b1a5] Added kurdish language file
+  * [8433be8d] Changed word/minutes to plural strings
+  * [63e5e584] Updated to ktlint 1.0.1
+  * [de62e7d8] Formatted according to latest ktlint
+  * [12bd7ccf] Added leading zero to seconds formatting
+  * [46dc5926] Fixed elements hidden by CSS being displayed
+  * [4efc9d70] Added display of article image inside reader
+  * [42533b32] Fixed image captions appearing twice in full text articles
+  * [833c51fa] Fixed ktlint triggering on compose function names
+  * [639eb889] Fixed some cover images appearing twice in reader if full
+         text
+
+Kazushi Hayama (1):
+  * [694ad69c] Updated Japanese translation using Weblate
+
+Matth78 (2):
+  * [55d2a796] Updated French translation using Weblate
+  * [d06e83e1] Updated French translation using Weblate
+
+Miraficus (1):
+  * [1760fe94] Updated Czech translation using Weblate
+
+RT Redréovič (1):
+  * [3bb9665c] Updated Esperanto translation using Weblate
+
+Simona Iacob (1):
+  * [bf39f0af] Updated Romanian translation using Weblate
+
+VfBFan (1):
+  * [b4c15b92] Updated German translation using Weblate
+
+berhat gergin (1):
+  * [78ddcc5c] Updated Kurdish translation using Weblate
+
+gallegonovato (1):
+  * [c7a535c6] Updated Spanish translation using Weblate
+
 # 2.6.9
 Jonas Kalderstam (11):
   * [2bdade90] Fixed crash when table had no columns
