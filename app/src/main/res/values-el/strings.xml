@@ -229,4 +229,17 @@
     <string name="theme_e_ink">Ηλεκτρονικός σύνδεσμος</string>
     <string name="add_anyway">Προσθήκη όπως και να χει</string>
     <string name="open_browser_in_split_screen">Ανοίξτε το πρόγραμμα περιήγησης σε διαιρεμένη οθόνη</string>
+    <string name="show_reading_time">Εμφάνιση εκτιμώμενου χρόνου ανάγνωσης</string>
+    <string name="many_words">%1$s λέξεις</string>
+    <string name="other_minutes">%1$s λεπτά</string>
+    <string name="few_minutes">%1$s λεπτά</string>
+    <string name="two_words">%1$s λέξεις</string>
+    <string name="many_minutes">%1$s λεπτά</string>
+    <string name="zero_minutes">%1$s λεπτά</string>
+    <string name="few_words">%1$s λέξεις</string>
+    <string name="zero_words">%1$s λέξεις</string>
+    <string name="one_minute">%1$s λεπτό</string>
+    <string name="two_minutes">%1$s λεπτά</string>
+    <string name="other_words">%1$s λέξεις</string>
+    <string name="one_word">%1$s λέξη</string>
 </resources>
