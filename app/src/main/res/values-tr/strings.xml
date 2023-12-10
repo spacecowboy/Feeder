@@ -229,4 +229,17 @@
     <string name="failed_to_download">İndirilemedi</string>
     <string name="add_anyway">Yine de ekle</string>
     <string name="open_browser_in_split_screen">Tarayıcıyı bölünmüş ekranda aç</string>
+    <string name="show_reading_time">Tahmini okuma süresini göster</string>
+    <string name="many_words">%1$s kelime</string>
+    <string name="other_minutes">%1$s dakika</string>
+    <string name="few_minutes">%1$s dakika</string>
+    <string name="two_words">%1$s kelime</string>
+    <string name="many_minutes">%1$s dakika</string>
+    <string name="zero_minutes">%1$s dakika</string>
+    <string name="few_words">%1$s kelime</string>
+    <string name="zero_words">%1$s kelime</string>
+    <string name="one_minute">%1$s dakika</string>
+    <string name="two_minutes">%1$s dakika</string>
+    <string name="other_words">%1$s kelime</string>
+    <string name="one_word">%1$s kelime</string>
 </resources>
