@@ -114,6 +114,6 @@
     <string name="open_enclosed_media_file">Malfermi %1$s</string>
     <string name="syncing">Sinkronigo</string>
     <string name="text_to_speech">Teksto al parolado</string>
-    <string name="only_available_on_android_n">Havebla nur ĉe Android %1$s kaj pli</string>
+    <string name="only_available_on_android_n">Disponebla nur ĉe Android %1$s kaj pli</string>
     <string name="stop_reading">Ĉesi legi</string>
 </resources>
