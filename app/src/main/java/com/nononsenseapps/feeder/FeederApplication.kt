@@ -29,6 +29,7 @@ import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.model.ForceCacheOnSomeFailuresInterceptor
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
@@ -42,7 +43,6 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
-import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
@@ -113,6 +113,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                     cacheDirectory = (filePathProvider.httpCacheDir),
                 ) {
                     addNetworkInterceptor(UserAgentInterceptor)
+                    addNetworkInterceptor(ForceCacheOnSomeFailuresInterceptor)
                     if (BuildConfig.DEBUG) {
                         addInterceptor { chain ->
                             val request = chain.request()
@@ -138,8 +139,6 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                 val okHttpClient =
                     instance<OkHttpClient>()
                         .newBuilder()
-                        // This is not used by Coil but no need to risk evicting the real cache
-                        .cache(Cache(filePathProvider.cacheDir.resolve("dummy_img"), 1024L))
                         .addInterceptor { chain ->
                             chain.proceed(
                                 when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
