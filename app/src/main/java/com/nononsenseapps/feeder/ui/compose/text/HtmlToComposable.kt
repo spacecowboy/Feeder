@@ -864,15 +864,13 @@ private fun ColumnScope.renderImage(
                     modifier =
                         modifier
                             .widthIn(max = maxWidth)
-                            .fillMaxWidth()
-                            .run {
-                                // TODO take the real height into account
-                                // OR aspect ratio is no longer needed now that real size
-                                // is respected?
-                                dimens.imageAspectRatioInReader?.let { ratio ->
-                                    aspectRatio(ratio)
-                                } ?: this
-                            },
+                            .fillMaxWidth(),
+//                            .run {
+//                                // This looks awful for small images
+//                                dimens.imageAspectRatioInReader?.let { ratio ->
+//                                    aspectRatio(ratio)
+//                                } ?: this
+//                            },
                 )
             }
         }
