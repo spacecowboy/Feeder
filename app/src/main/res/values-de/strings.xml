@@ -235,9 +235,9 @@
     <string name="few_minutes">%1$s Minuten</string>
     <string name="two_words">%1$s Wörter</string>
     <string name="many_minutes">%1$s Minuten</string>
-    <string name="zero_minutes">%1$s Minuten</string>
+    <string name="zero_minutes">%1$s Minute</string>
     <string name="few_words">%1$s Wörter</string>
-    <string name="zero_words">%1$s Wörter</string>
+    <string name="zero_words">%1$s Wort</string>
     <string name="one_minute">%1$s Minute</string>
     <string name="two_minutes">%1$s Minuten</string>
     <string name="other_words">%1$s Wörter</string>
