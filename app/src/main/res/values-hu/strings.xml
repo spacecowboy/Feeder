@@ -227,4 +227,19 @@
     <string name="failed_to_parse_the_page">Az oldal sikertelen elemzése</string>
     <string name="no_body_in_response">Nincs tartalma a válasznak</string>
     <string name="no_feeds_in_the_page">Nincsenek hírcsatornák az oldalon</string>
+    <string name="show_reading_time">Várható olvasási idő mutatása</string>
+    <string name="many_words">%1$s szó</string>
+    <string name="other_minutes">%1$s perc</string>
+    <string name="add_anyway">Mindenképp hozzáadás</string>
+    <string name="few_minutes">%1$s perc</string>
+    <string name="two_words">%1$s szó</string>
+    <string name="many_minutes">%1$s perc</string>
+    <string name="zero_minutes">%1$s perc</string>
+    <string name="few_words">%1$s szó</string>
+    <string name="zero_words">%1$s szó</string>
+    <string name="one_minute">%1$s perc</string>
+    <string name="open_browser_in_split_screen">Böngésző megnyitása felosztott képernyőn</string>
+    <string name="two_minutes">%1$s perc</string>
+    <string name="other_words">%1$s szó</string>
+    <string name="one_word">%1$s szó</string>
 </resources>
