@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:max-line-length")
+
 package com.nononsenseapps.feeder.ui.compose.text
 
 import io.mockk.every
@@ -16,6 +18,7 @@ class HtmlToComposableUnitTest {
     fun setup() {
         every { element.attr("width") } returns null
         every { element.attr("height") } returns null
+        every { element.attr("data-img-url") } returns null
     }
 
     @Test
@@ -194,10 +197,11 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1024
-        val best = result.getBestImageForMaxSize(
-            maxSize,
-            8.0f,
-        )
+        val best =
+            result.getBestImageForMaxSize(
+                maxSize,
+                8.0f,
+            )
         assertEquals(
             "https://www.politico.eu/cdn-cgi/image/width=1024,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg",
             best.url,
@@ -224,12 +228,43 @@ class HtmlToComposableUnitTest {
         assertTrue(result.hasImage)
 
         val maxSize = 1024
-        val best = result.getBestImageForMaxSize(
-            maxSize,
-            8.0f,
-        )
+        val best =
+            result.getBestImageForMaxSize(
+                maxSize,
+                8.0f,
+            )
         assertEquals(
             "https://duet-cdn.vox-cdn.com/thumbor/184x0:2614x1535/1080x720/filters:focal(1847x240:1848x241):format(webp)/cdn.vox-cdn.com/uploads/chorus_asset/file/24842461/Screenshot_2023_08_10_at_12.22.58_PM.png",
+            best.url,
+        )
+    }
+
+    @Test
+    fun findImageForXDAWithDataImgUrl() {
+        every {
+            element.attr("data-img-url")
+        } returns "https://static1.xdaimages.com/wordpress/wp-content/uploads/2023/12/onedrive-app-for-microsoft-teams.png"
+        every {
+            element.attr("srcset")
+        } returns null
+        every {
+            element.attr("abs:src")
+        } returns null
+        every { element.attr("width") } returns null
+        every { element.attr("height") } returns null
+
+        val result = getImageSource("https://www.xda-developers.com", element)
+
+        assertTrue(result.hasImage)
+
+        val maxSize = 1024
+        val best =
+            result.getBestImageForMaxSize(
+                maxSize,
+                8.0f,
+            )
+        assertEquals(
+            "https://static1.xdaimages.com/wordpress/wp-content/uploads/2023/12/onedrive-app-for-microsoft-teams.png",
             best.url,
         )
     }
@@ -246,10 +281,11 @@ class HtmlToComposableUnitTest {
         assertFalse(result.hasImage)
 
         val maxSize = 1024
-        val best = result.getBestImageForMaxSize(
-            maxSize,
-            8.0f,
-        )
+        val best =
+            result.getBestImageForMaxSize(
+                maxSize,
+                8.0f,
+            )
         assertEquals(
             "",
             best.url,
