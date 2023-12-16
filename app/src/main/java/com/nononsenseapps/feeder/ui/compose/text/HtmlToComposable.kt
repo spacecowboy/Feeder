@@ -1159,6 +1159,7 @@ private fun Element.firstBestDescendantImg(baseUrl: String): Element? {
                 baseUrl = baseUrl,
                 srcSet = element.attr("srcset") ?: "",
                 absSrc = element.attr("abs:src") ?: "",
+                dataImgUrl = element.attr("data-img-src") ?: "",
                 width = element.attr("width")?.toIntOrNull(),
                 height = element.attr("height")?.toIntOrNull(),
             ).hasImage
@@ -1258,6 +1259,7 @@ internal fun getImageSource(
     baseUrl = baseUrl,
     srcSet = element.attr("srcset") ?: "",
     absSrc = element.attr("abs:src") ?: "",
+    dataImgUrl = element.attr("data-img-url") ?: "",
     width = element.attr("width")?.toIntOrNull(),
     height = element.attr("height")?.toIntOrNull(),
 )
@@ -1266,10 +1268,11 @@ internal class ImageCandidates(
     val baseUrl: String,
     val srcSet: String,
     val absSrc: String,
+    val dataImgUrl: String,
     val width: Int?,
     val height: Int?,
 ) {
-    val hasImage: Boolean = srcSet.isNotBlank() || absSrc.isNotBlank()
+    val hasImage: Boolean = srcSet.isNotBlank() || absSrc.isNotBlank() || dataImgUrl.isNotBlank()
     val notHasImage: Boolean = !hasImage
 
     fun getBestImageForMaxSize(
@@ -1290,7 +1293,7 @@ internal class ImageCandidates(
                                 // Assume it corresponds to 1x pixel density
                                 (1.0f / pixelDensity) to
                                     ImageCandidateFromSetWithPixelDensity(
-                                        url = candidate.first(),
+                                        url = StringUtil.resolve(baseUrl, candidate.first()),
                                         pixelDensity = 1.0f,
                                     )
                             } else {
@@ -1302,7 +1305,7 @@ internal class ImageCandidates(
 
                                         ratio to
                                             ImageCandidateFromSetWithWidth(
-                                                url = candidate.first(),
+                                                url = StringUtil.resolve(baseUrl, candidate.first()),
                                                 width = width.toInt(),
                                             )
                                     }
@@ -1313,7 +1316,7 @@ internal class ImageCandidates(
 
                                         ratio to
                                             ImageCandidateFromSetWithPixelDensity(
-                                                url = candidate.first(),
+                                                url = StringUtil.resolve(baseUrl, candidate.first()),
                                                 pixelDensity = density,
                                             )
                                     }
@@ -1333,8 +1336,12 @@ internal class ImageCandidates(
                     }
                     .second
 
-            return if (setCandidate is NoImageCandidate) {
-                absSrc.takeIf { it.isNotBlank() }?.let {
+            if (setCandidate !is NoImageCandidate) {
+                return setCandidate
+            }
+
+            val dataImgUrlCandidate =
+                dataImgUrl.takeIf { it.isNotBlank() }?.let {
                     val url = StringUtil.resolve(baseUrl, it)
                     if (width != null && height != null) {
                         ImageCandidateWithSize(
@@ -1348,9 +1355,25 @@ internal class ImageCandidates(
                         )
                     }
                 } ?: NoImageCandidate
-            } else {
-                setCandidate
+
+            if (dataImgUrlCandidate !is NoImageCandidate) {
+                return dataImgUrlCandidate
             }
+
+            return absSrc.takeIf { it.isNotBlank() }?.let {
+                val url = StringUtil.resolve(baseUrl, it)
+                if (width != null && height != null) {
+                    ImageCandidateWithSize(
+                        url = url,
+                        width = width,
+                        height = height,
+                    )
+                } else {
+                    ImageCandidateUnknownSize(
+                        url = url,
+                    )
+                }
+            } ?: NoImageCandidate
         } catch (_: Throwable) {
             return NoImageCandidate
         }
