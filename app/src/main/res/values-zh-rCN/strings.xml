@@ -230,4 +230,16 @@
     <string name="add_anyway">仍要添加</string>
     <string name="open_browser_in_split_screen">在分屏中打开浏览器</string>
     <string name="show_reading_time">显示预估的阅读时间</string>
+    <string name="many_words">%1$s 个单词</string>
+    <string name="other_minutes">%1$s 分钟</string>
+    <string name="few_minutes">%1$s 分钟</string>
+    <string name="two_words">%1$s 个单词</string>
+    <string name="many_minutes">%1$s 分钟</string>
+    <string name="zero_minutes">%1$s 分钟</string>
+    <string name="few_words">%1$s 个单词</string>
+    <string name="zero_words">%1$s 个单词</string>
+    <string name="one_minute">%1$s 分钟</string>
+    <string name="two_minutes">%1$s 分钟</string>
+    <string name="other_words">%1$s 个单词</string>
+    <string name="one_word">%1$s 个单词</string>
 </resources>
