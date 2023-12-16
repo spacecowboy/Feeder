@@ -230,4 +230,16 @@
     <string name="add_anyway">Ajouter quand même</string>
     <string name="open_browser_in_split_screen">Ouvrir le navigateur dans un écran partagé</string>
     <string name="show_reading_time">Afficher le temps de lecture estimé</string>
+    <string name="many_words">%1$s mots</string>
+    <string name="other_minutes">%1$s minutes</string>
+    <string name="few_minutes">%1$s minutes</string>
+    <string name="two_words">%1$s mots</string>
+    <string name="many_minutes">%1$s minutes</string>
+    <string name="zero_minutes">%1$s minute</string>
+    <string name="few_words">%1$s mots</string>
+    <string name="zero_words">%1$s mot</string>
+    <string name="one_minute">%1$s minute</string>
+    <string name="two_minutes">%1$s minutes</string>
+    <string name="other_words">%1$s mots</string>
+    <string name="one_word">%1$s mot</string>
 </resources>
