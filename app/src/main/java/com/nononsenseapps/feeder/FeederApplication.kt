@@ -161,6 +161,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                         .build()
 
                 ImageLoader.Builder(instance())
+                    .dispatcher(Dispatchers.Default)
                     .okHttpClient(okHttpClient = okHttpClient)
                     .diskCache(
                         DiskCache.Builder()

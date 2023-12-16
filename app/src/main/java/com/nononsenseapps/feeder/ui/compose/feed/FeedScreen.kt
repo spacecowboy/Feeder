@@ -95,6 +95,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -140,8 +142,6 @@ import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.emailBugReportIntent
-import com.nononsenseapps.feeder.util.logDebug
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -788,7 +788,7 @@ fun FeedScreen(
                     gridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
                     modifier = innerModifier,
-                ).also { logDebug(LOG_TAG, "Showing GRID") }
+                )
 
             FeedScreenType.FeedList ->
                 FeedListContent(
@@ -812,7 +812,7 @@ fun FeedScreen(
                     listState = feedListState,
                     pagedFeedItems = pagedFeedItems,
                     modifier = innerModifier,
-                ).also { logDebug(LOG_TAG, "Showing LIST") }
+                )
         }
     }
 }
@@ -1109,21 +1109,18 @@ fun FeedListContent(
                 This is a trick to make the list stay at item 0 when updates come in IF it is
                 scrolled to the top.
                  */
-                item {
+                item(
+                    key = "SpacerScrollTrick",
+                    contentType = "SpacerScrollTrick",
+                ) {
                     Spacer(modifier = Modifier.fillMaxWidth())
                 }
                 items(
-                    pagedFeedItems.itemCount,
-                    key = { itemIndex ->
-                        pagedFeedItems.itemSnapshotList.items[itemIndex].id
-                    },
-                    contentType = { itemIndex ->
-                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(viewState.feedItemStyle)
-                    },
+                    count = pagedFeedItems.itemCount,
+                    key = pagedFeedItems.itemKey { it.id },
+                    contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
-                    val previewItem =
-                        pagedFeedItems[itemIndex]
-                            ?: return@items
+                    val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
 
                     if (viewState.markAsReadOnScroll && previewItem.unread) {
                         val visible: Boolean by listState.rememberIsItemVisible(
@@ -1209,7 +1206,10 @@ fun FeedListContent(
                 This item is provide padding for the FAB
                  */
                 if (viewState.showFab && !viewState.isBottomBarVisible) {
-                    item {
+                    item(
+                        key = "SpacerForFab",
+                        contentType = "SpacerForFab",
+                    ) {
                         Spacer(
                             modifier =
                                 Modifier
@@ -1303,20 +1303,15 @@ fun FeedGridContent(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 items(
-                    pagedFeedItems.itemCount,
-                    key = { itemIndex ->
-                        pagedFeedItems.itemSnapshotList.items[itemIndex].id
-                    },
-                    contentType = { itemIndex ->
-                        pagedFeedItems.itemSnapshotList.items[itemIndex].contentType(feedItemStyle)
-                    },
+                    count = pagedFeedItems.itemCount,
+                    key = pagedFeedItems.itemKey { it.id },
+                    contentType = pagedFeedItems.itemContentType { it.contentType(feedItemStyle) },
                 ) { itemIndex ->
-                    val previewItem =
-                        pagedFeedItems[itemIndex]
-                            ?: return@items
+                    val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
 
                     // Very important that items don't change size or disappear when scrolling
-                    if (viewState.markAsReadOnScroll && previewItem.unread) {
+                    // Placeholder will have no id
+                    if (previewItem.id > ID_UNSET && viewState.markAsReadOnScroll && previewItem.unread) {
                         val visible: Boolean by gridState.rememberIsItemVisible(
                             key = previewItem.id,
                         )
@@ -1478,3 +1473,20 @@ fun MarkItemAsReadOnScroll(
         }
     }
 }
+
+private val PLACEHOLDER_ITEM =
+    FeedListItem(
+        id = ID_UNSET,
+        title = "",
+        snippet = "",
+        feedTitle = "",
+        unread = true,
+        pubDate = "",
+        image = null,
+        link = null,
+        bookmarked = false,
+        feedImageUrl = null,
+        primarySortTime = Instant.EPOCH,
+        rawPubDate = null,
+        wordCount = 0,
+    )
