@@ -69,8 +69,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         Pager(
             config =
                 PagingConfig(
-                    pageSize = PAGE_SIZE,
-                    enablePlaceholders = false,
+                    pageSize = 10,
+                    initialLoadSize = 100,
+                    prefetchDistance = 100,
+                    jumpThreshold = 100,
                 ),
         ) {
             val queryString = StringBuilder()
@@ -310,10 +312,6 @@ class FeedItemStore(override val di: DI) : DIAware {
         wordCount: Int,
     ) {
         dao.updateWordCountFull(id, wordCount)
-    }
-
-    companion object {
-        private const val PAGE_SIZE = 100
     }
 }
 
