@@ -207,7 +207,7 @@
     <string name="failed_to_fetch_full_article_missing_body">Haettavaa ei löytynyt</string>
     <string name="failed_to_fetch_full_article_not_html">Linkki ei ole HTML-dokumentti</string>
     <string name="max_lines">Rivien maksimimäärä</string>
-    <string name="filter_noun">Suodata</string>
+    <string name="filter_noun">Suodatin</string>
     <string name="recently_read_adjective">Luettu äskettäin</string>
     <string name="saved_adjective">Tallennetut</string>
     <string name="read_adjective">Luetut</string>
@@ -228,4 +228,18 @@
     <string name="no_url">Ei URL:ää</string>
     <string name="theme_e_ink">Sähkömuste</string>
     <string name="add_anyway">Lisää kuitenkin</string>
+    <string name="show_reading_time">Näytä arvioitu lukemisaika</string>
+    <string name="many_words">%1$s sanaa</string>
+    <string name="other_minutes">%1$s minuuttia</string>
+    <string name="few_minutes">%1$s minuuttia</string>
+    <string name="two_words">%1$s sanaa</string>
+    <string name="many_minutes">%1$s minuuttia</string>
+    <string name="zero_minutes">%1$s minuuttia</string>
+    <string name="few_words">%1$s sanaa</string>
+    <string name="zero_words">%1$s sanaa</string>
+    <string name="one_minute">%1$s minuutti</string>
+    <string name="open_browser_in_split_screen">Avaa selain jaettuun näyttöön</string>
+    <string name="two_minutes">%1$s minuuttia</string>
+    <string name="other_words">%1$s sanaa</string>
+    <string name="one_word">%1$s sana</string>
 </resources>
