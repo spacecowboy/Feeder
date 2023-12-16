@@ -229,4 +229,17 @@
     <string name="show_only_title">Chỉ hiện tiêu đề</string>
     <string name="content_is_not_html">Nội dung không phải là HTML</string>
     <string name="open_browser_in_split_screen">Mở trình duyệt ở chế độ chia đôi màn hình</string>
+    <string name="show_reading_time">Hiện thời gian đọc ước tính</string>
+    <string name="many_words">%1$s từ</string>
+    <string name="other_minutes">%1$s phút</string>
+    <string name="few_minutes">%1$s phút</string>
+    <string name="two_words">%1$s từ</string>
+    <string name="many_minutes">%1$s phút</string>
+    <string name="zero_minutes">%1$s phút</string>
+    <string name="few_words">%1$s từ</string>
+    <string name="zero_words">%1$s từ</string>
+    <string name="one_minute">%1$s phút</string>
+    <string name="two_minutes">%1$s phút</string>
+    <string name="other_words">%1$s từ</string>
+    <string name="one_word">%1$s từ</string>
 </resources>
