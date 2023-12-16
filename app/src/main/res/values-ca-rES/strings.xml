@@ -216,4 +216,13 @@
     <string name="save_article">Desa l\'article</string>
     <string name="unsave_article">Treu l\'article de desats</string>
     <string name="theme_e_ink">Paper electrònic</string>
+    <string name="failed_to_parse_json_feed">Error analitzant la font JSON</string>
+    <string name="no_feeds_in_the_page">No hi ha fonts en aquesta pàgina</string>
+    <string name="no_body_in_response">No hi ha cos a la resposta</string>
+    <string name="http_error">Error HTTP</string>
+    <string name="failed_to_parse_the_page">Error analitzant la pàgina</string>
+    <string name="failed_to_parse_rss_feed">Error analitzant la font RSS</string>
+    <string name="unsupported_content_type">Tipus de contingut no suportat</string>
+    <string name="failed_to_download">Error al descarregar</string>
+    <string name="content_is_not_html">El contingut no és HTML</string>
 </resources>
