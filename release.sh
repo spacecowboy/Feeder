@@ -85,6 +85,9 @@ then
   sed -i "s|\(\s*versionName = \).*|\\1\"${NEXT_VERSION}\"|" app/build.gradle.kts
 fi
 
+echo "Verifying build"
+./gradlew check pixel2api30DebugAndroidTest
+
 read -r -p "Commit changes? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
