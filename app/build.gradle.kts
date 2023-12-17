@@ -76,12 +76,6 @@ android {
             )
             signingConfig = signingConfigs.getByName("shareddebug")
         }
-        val debugMini by creating {
-            initWith(debug)
-            isMinifyEnabled = true
-            isShrinkResources = true
-            matchingFallbacks.add("debug")
-        }
         val release by getting {
             isMinifyEnabled = true
             isShrinkResources = true
