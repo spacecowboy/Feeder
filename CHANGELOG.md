@@ -1,3 +1,50 @@
+# 2.6.12
+Jonas Kalderstam (9):
+  * [0044d6b1] Fixed small images being rendered too large and flickering on
+         scroll
+  * [3ec908d8] Added caching on failed (4xx) network requests
+  * [aa2dfc69] Changed so tablets don't force images to be 16:9 anymore
+  * [e7484738] Added debugMini icon and app name
+  * [2fa239a4] Improved scroll performance
+  * [432d9ab0] Added support for data-img-url in images
+  * [e936b2bc] Removed debugMini configuration
+  * [4de81e11] Added emulator tests to release script
+  * [923df8ac] Removed Toki Pona Play store translation: it is not supported
+
+Agnieszka C (1):
+  * [a804a9eb] Updated Polish translation using Weblate
+
+Eric (1):
+  * [8df6f688] Updated Chinese (Simplified) translation using Weblate
+
+H Tamás (1):
+  * [707db914] Updated Hungarian translation using Weblate
+
+J. Lavoie (1):
+  * [b453bb59] Updated Italian translation using Weblate
+
+Matth78 (2):
+  * [a3b75696] Updated French translation using Weblate
+  * [86d56964] Updated French translation using Weblate
+
+Mæve Rey (1):
+  * [4a650925] Translated using Weblate (Toki Pona)
+
+Sergi Font (1):
+  * [ef850fa1] Updated Catalan translation using Weblate
+
+minh (1):
+  * [e87046b4] Updated Vietnamese translation using Weblate
+
+mm4c (1):
+  * [0ec498fc] Updated Dutch translation using Weblate
+
+zmni (1):
+  * [bcd36c36] Updated Indonesian translation using Weblate
+
+Сергій (1):
+  * [f7c2c9f7] Updated Ukrainian translation using Weblate
+
 # 2.6.11
 Aitor Salaberria (1):
   * [a8431296] Translated using Weblate (Basque)
