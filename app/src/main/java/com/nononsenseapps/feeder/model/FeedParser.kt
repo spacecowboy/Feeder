@@ -122,20 +122,24 @@ class FeedParser(override val di: DI) : DIAware {
 
         val feeds =
             doc.getElementsByAttributeValue("rel", "alternate")
-                ?.filter { it.hasAttr("href") && it.hasAttr("type") }
-                ?.filter {
-                    val t = it.attr("type").lowercase(Locale.getDefault())
-                    when {
-                        t.contains("application/atom") -> true
-                        t.contains("application/rss") -> true
-                        // Youtube for example has alternate links with application/json+oembed type.
-                        t == "application/json" -> true
-                        else -> false
+                .filter { node ->
+                    if (!node.hasAttr("href") || !node.hasAttr("type")) {
+                        return@filter false
                     }
-                }
-                ?.filter {
-                    val l = it.attr("href").lowercase(Locale.getDefault())
-                    try {
+
+                    val t = node.attr("type").lowercase(Locale.getDefault())
+
+                    // Youtube for example has alternate links with application/json+oembed type.
+                    if (!t.contains("application/atom") &&
+                        !t.contains("application/rss") &&
+                        t != "application/json"
+                    ) {
+                        return@filter false
+                    }
+
+                    val l = node.attr("href").lowercase(Locale.getDefault())
+
+                    return@filter try {
                         if (baseUrl != null) {
                             relativeLinkIntoAbsoluteOrThrow(base = baseUrl, link = l)
                         } else {
@@ -146,7 +150,7 @@ class FeedParser(override val di: DI) : DIAware {
                         false
                     }
                 }
-                ?.mapNotNull { e ->
+                .mapNotNull { e ->
                     when {
                         baseUrl != null -> {
                             try {
@@ -171,7 +175,7 @@ class FeedParser(override val di: DI) : DIAware {
                                 )
                             }
                     }
-                } ?: emptyList()
+                }
 
         return when {
             feeds.isNotEmpty() -> feeds
@@ -186,8 +190,8 @@ class FeedParser(override val di: DI) : DIAware {
 
     private fun findFeedLinksForYoutube(doc: Document): List<AlternateLink> {
         val channelId: String? =
-            doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
-                ?.firstOrNull()
+            doc.body().getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
+                .firstOrNull()
                 ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
 
         return when (channelId) {

@@ -78,11 +78,11 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
+import com.nononsenseapps.feeder.ui.compose.utils.resolve
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import com.nononsenseapps.feeder.util.asUTF8Sequence
 import org.jsoup.Jsoup
-import org.jsoup.helper.StringUtil
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -101,8 +101,8 @@ fun LazyListScope.htmlFormattedText(
 ) {
     try {
         Jsoup.parse(inputStream, null, baseUrl)
-            ?.body()
-            ?.let { body ->
+            .body()
+            .let { body ->
                 formatBody(
                     element = body,
                     baseUrl = baseUrl,
@@ -397,7 +397,7 @@ private fun HtmlComposer.appendTextChildren(
                     }
 
                     "font" -> {
-                        val fontFamily: FontFamily? = element.attr("face")?.asFontFamily()
+                        val fontFamily: FontFamily? = element.attr("face").asFontFamily()
                         withStyle(SpanStyle(fontFamily = fontFamily)) {
                             appendTextChildren(
                                 element.childNodes(),
@@ -617,7 +617,7 @@ private fun HtmlComposer.appendTextChildren(
 
                     "ul" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { e -> e.tagName() == "li" }
                             .forEach { listItem ->
                                 withParagraph {
                                     // no break space
@@ -634,7 +634,7 @@ private fun HtmlComposer.appendTextChildren(
 
                     "ol" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { e -> e.tagName() == "li" }
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
                                     // no break space
@@ -993,7 +993,7 @@ private fun EagerComposer.tableColFirst(
     ) {
         key(element, baseUrl, onLinkClick) {
             element.children()
-                .filter { it.tagName() == "caption" }
+                .filter { e -> e.tagName() == "caption" }
                 .forEach {
                     withTextStyle(NestedTextStyle.CAPTION) {
                         appendTextChildren(
@@ -1010,8 +1010,8 @@ private fun EagerComposer.tableColFirst(
         val rowData by remember {
             derivedStateOf {
                 element.children()
-                    .filter {
-                        it.tagName() in
+                    .filter { e ->
+                        e.tagName() in
                             setOf(
                                 "thead",
                                 "tbody",
@@ -1065,7 +1065,7 @@ private fun EagerComposer.tableColFirst(
                                         },
                                 ) {
                                     rowElement.children()
-                                        .filter { it.tagName() in setOf("th", "td") }
+                                        .filter { e -> e.tagName() in setOf("th", "td") }
                                         .elementAtOrNullWithSpans(colIndex)
                                         ?.let { colElement ->
                                             withParagraph {
@@ -1160,8 +1160,8 @@ private fun Element.firstBestDescendantImg(baseUrl: String): Element? {
                 srcSet = element.attr("srcset") ?: "",
                 absSrc = element.attr("abs:src") ?: "",
                 dataImgUrl = element.attr("data-img-src") ?: "",
-                width = element.attr("width")?.toIntOrNull(),
-                height = element.attr("height")?.toIntOrNull(),
+                width = element.attr("width").toIntOrNull(),
+                height = element.attr("height").toIntOrNull(),
             ).hasImage
         }
         // Return first just to show error image instead then
@@ -1260,8 +1260,8 @@ internal fun getImageSource(
     srcSet = element.attr("srcset") ?: "",
     absSrc = element.attr("abs:src") ?: "",
     dataImgUrl = element.attr("data-img-url") ?: "",
-    width = element.attr("width")?.toIntOrNull(),
-    height = element.attr("height")?.toIntOrNull(),
+    width = element.attr("width").toIntOrNull(),
+    height = element.attr("height").toIntOrNull(),
 )
 
 internal class ImageCandidates(
@@ -1293,7 +1293,7 @@ internal class ImageCandidates(
                                 // Assume it corresponds to 1x pixel density
                                 (1.0f / pixelDensity) to
                                     ImageCandidateFromSetWithPixelDensity(
-                                        url = StringUtil.resolve(baseUrl, candidate.first()),
+                                        url = resolve(baseUrl, candidate.first()),
                                         pixelDensity = 1.0f,
                                     )
                             } else {
@@ -1305,7 +1305,7 @@ internal class ImageCandidates(
 
                                         ratio to
                                             ImageCandidateFromSetWithWidth(
-                                                url = StringUtil.resolve(baseUrl, candidate.first()),
+                                                url = resolve(baseUrl, candidate.first()),
                                                 width = width.toInt(),
                                             )
                                     }
@@ -1316,7 +1316,7 @@ internal class ImageCandidates(
 
                                         ratio to
                                             ImageCandidateFromSetWithPixelDensity(
-                                                url = StringUtil.resolve(baseUrl, candidate.first()),
+                                                url = resolve(baseUrl, candidate.first()),
                                                 pixelDensity = density,
                                             )
                                     }
@@ -1342,7 +1342,7 @@ internal class ImageCandidates(
 
             val dataImgUrlCandidate =
                 dataImgUrl.takeIf { it.isNotBlank() }?.let {
-                    val url = StringUtil.resolve(baseUrl, it)
+                    val url = resolve(baseUrl, it)
                     if (width != null && height != null) {
                         ImageCandidateWithSize(
                             url = url,
@@ -1361,7 +1361,7 @@ internal class ImageCandidates(
             }
 
             return absSrc.takeIf { it.isNotBlank() }?.let {
-                val url = StringUtil.resolve(baseUrl, it)
+                val url = resolve(baseUrl, it)
                 if (width != null && height != null) {
                     ImageCandidateWithSize(
                         url = url,

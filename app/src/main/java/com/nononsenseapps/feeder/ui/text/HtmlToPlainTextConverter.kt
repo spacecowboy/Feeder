@@ -13,6 +13,8 @@ import java.io.IOException
 import java.io.StringReader
 import java.util.Stack
 
+// TODO try to construct this only once - it's memory expensive
+
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
  */

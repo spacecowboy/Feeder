@@ -40,7 +40,7 @@ dependencyResolutionManagement {
             version("rome", "1.7.1-f8")
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
-            version("jsoup", "1.7.3")
+            version("jsoup", "1.17.1")
             version("tagsoup", "1.2.1")
             version("readability4j", "1.0.5")
             version("retrofit", "2.9.0")

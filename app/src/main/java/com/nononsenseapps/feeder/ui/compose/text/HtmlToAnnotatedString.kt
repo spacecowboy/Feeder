@@ -17,13 +17,13 @@ fun htmlToAnnotatedString(
     baseUrl: String,
 ): List<AnnotatedString> =
     Jsoup.parse(inputStream, null, baseUrl)
-        ?.body()
-        ?.let { body ->
+        .body()
+        .let { body ->
             formatBody(
                 element = body,
                 baseUrl = baseUrl,
             )
-        } ?: emptyList()
+        }
 
 private fun formatBody(
     element: Element,
@@ -256,7 +256,9 @@ private fun AnnotatedStringComposer.appendTextChildren(
 
                     "ul" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { e ->
+                                e.tagName() == "li"
+                            }
                             .forEach { listItem ->
                                 withParagraph {
                                     // no break space
@@ -271,7 +273,9 @@ private fun AnnotatedStringComposer.appendTextChildren(
 
                     "ol" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { e ->
+                                e.tagName() == "li"
+                            }
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
                                     // no break space
@@ -296,7 +300,9 @@ private fun AnnotatedStringComposer.appendTextChildren(
                             followed optionally by a tfoot element
                              */
                             element.children()
-                                .filter { it.tagName() == "caption" }
+                                .filter { node ->
+                                    node.tagName() == "caption"
+                                }
                                 .forEach {
                                     appendTextChildren(
                                         it.childNodes(),
@@ -307,8 +313,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
 
                             element.children()
                             element.children()
-                                .filter {
-                                    it.tagName() in
+                                .filter { node ->
+                                    node.tagName() in
                                         setOf(
                                             "thead",
                                             "tbody",
