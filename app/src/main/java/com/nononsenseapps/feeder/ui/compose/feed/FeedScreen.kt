@@ -87,9 +87,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -137,6 +142,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.ui.compose.utils.rememberApplicationCoroutineScope
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
 import com.nononsenseapps.feeder.util.ActivityLauncher
@@ -1103,7 +1109,13 @@ fun FeedListContent(
                         }
                             .asPaddingValues()
                     },
-                modifier = Modifier.fillMaxSize(),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .safeSemantics {
+                            testTag = "feed_list"
+                            collectionInfo = CollectionInfo(pagedFeedItems.itemCount, 1)
+                        },
             ) {
                 /*
                 This is a trick to make the list stay at item 0 when updates come in IF it is
@@ -1187,6 +1199,17 @@ fun FeedListContent(
                                 intent = intent,
                             )
                         },
+                        modifier =
+                            Modifier
+                                .safeSemantics {
+                                    collectionItemInfo =
+                                        CollectionItemInfo(
+                                            rowIndex = itemIndex,
+                                            rowSpan = 1,
+                                            columnIndex = 1,
+                                            columnSpan = 1,
+                                        )
+                                },
                     ) {
                         onItemClick(previewItem.id)
                     }
@@ -1425,7 +1448,6 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
  * @param visible if item is visible at all
  * @param mostlyVisible if item is mostly visible
  * @param currentFeedOrTag current feed or tag at the time of display
- * @param coroutineScope a scope which will be cancelled when navigated away from feed screen
  * @param markAsRead action to run
  */
 @Composable
@@ -1436,7 +1458,7 @@ fun MarkItemAsReadOnScroll(
     currentFeedOrTag: FeedOrTag,
     markAsRead: (Long, Boolean, FeedOrTag?) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberApplicationCoroutineScope()
 
     var debounced by remember {
         mutableStateOf(false)
@@ -1451,7 +1473,7 @@ fun MarkItemAsReadOnScroll(
         DisposableEffect(null) {
             onDispose {
                 if (debounced) {
-                    coroutineScope.launch(Dispatchers.Default) {
+                    coroutineScope.launch(Dispatchers.IO) {
                         // Why Coroutine? Why a delay?
                         // Because this scope will be cancelled if the screen
                         // is navigated away from and I only want things to be marked

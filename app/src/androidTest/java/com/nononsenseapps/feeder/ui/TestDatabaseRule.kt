@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import org.junit.rules.ExternalResource
 
-class TestDatabaseRule(val context: Context) : ExternalResource() {
+class TestDatabaseRule(private val context: Context) : ExternalResource() {
     lateinit var db: AppDatabase
 
     override fun before() {
@@ -20,6 +20,6 @@ class TestDatabaseRule(val context: Context) : ExternalResource() {
     }
 
     override fun after() {
-        db.close()
+        // Don't close the databse or tests fail
     }
 }

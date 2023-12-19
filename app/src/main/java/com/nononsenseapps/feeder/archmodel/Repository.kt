@@ -96,6 +96,14 @@ class Repository(override val di: DI) : DIAware {
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
 
+    fun getUnreadCount(feedId: Long) =
+        feedItemStore.getFeedItemCountRaw(
+            feedId = feedId,
+            tag = "",
+            minReadTime = Instant.now(),
+            filter = emptyFeedListFilter,
+        )
+
     fun setCurrentFeedAndTag(
         feedId: Long,
         tag: String,
