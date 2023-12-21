@@ -223,4 +223,19 @@
     <string name="read_adjective">อ่านแล้ว</string>
     <string name="show_only_title">แสดงเฉพาะชื่อ</string>
     <string name="content_is_not_html">เนื้อหาไม่ใช่ HTML</string>
+    <string name="show_reading_time">แสดงเวลาที่ใช้ในการอ่านโดยประมาณ</string>
+    <string name="many_words">%1$s คำ</string>
+    <string name="other_minutes">%1$s นาที</string>
+    <string name="add_anyway">เพื่มไปเลย</string>
+    <string name="few_minutes">%1$s นาที</string>
+    <string name="two_words">%1$s คำ</string>
+    <string name="many_minutes">%1$s นาที</string>
+    <string name="zero_minutes">%1$s นาที</string>
+    <string name="few_words">%1$s คำ</string>
+    <string name="zero_words">%1$s คำ</string>
+    <string name="one_minute">%1$s นาที</string>
+    <string name="open_browser_in_split_screen">เปิดหน้าเบราว์เซอร์ในหน้าจอแยก</string>
+    <string name="two_minutes">%1$s นาที</string>
+    <string name="other_words">%1$s คำ</string>
+    <string name="one_word">%1$s คำ</string>
 </resources>
