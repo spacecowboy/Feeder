@@ -16,15 +16,15 @@ class HtmlToComposableUnitTest {
 
     @Before
     fun setup() {
-        every { element.attr("width") } returns null
-        every { element.attr("height") } returns null
-        every { element.attr("data-img-url") } returns null
+        every { element.attr("width") } returns ""
+        every { element.attr("height") } returns ""
+        every { element.attr("data-img-url") } returns ""
     }
 
     @Test
     fun findImageSrcWithNoSrc() {
-        every { element.attr("srcset") } returns null
-        every { element.attr("abs:src") } returns null
+        every { element.attr("srcset") } returns ""
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -32,8 +32,38 @@ class HtmlToComposableUnitTest {
     }
 
     @Test
+    fun findImageOnlySrcWithZeroPixels() {
+        every { element.attr("srcset") } returns ""
+        every { element.attr("abs:src") } returns "http://foo/image.jpg"
+        every { element.attr("width") } returns "0"
+        every { element.attr("height") } returns "0"
+
+        val result = getImageSource("http://foo", element)
+
+        assertTrue(result.notHasImage)
+    }
+
+    @Test
+    fun findImageBestZeroPixelSrcSetIsNoImage() {
+        every { element.attr("srcset") } returns "header640.png 0w"
+        every { element.attr("abs:src") } returns ""
+        every { element.attr("width") } returns ""
+        every { element.attr("height") } returns ""
+
+        val result = getImageSource("http://foo", element)
+
+        assertTrue(result.hasImage)
+
+        val maxSize = 1
+        val best = result.getBestImageForMaxSize(maxSize, 1.0f)
+        assertTrue("$best should be NoImageCandidate") {
+            best is NoImageCandidate
+        }
+    }
+
+    @Test
     fun findImageOnlySrc() {
-        every { element.attr("srcset") } returns null
+        every { element.attr("srcset") } returns ""
         every { element.attr("abs:src") } returns "http://foo/image.jpg"
 
         val result = getImageSource("http://foo", element)
@@ -46,7 +76,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageOnlySingleSrcSet() {
         every { element.attr("srcset") } returns "image.jpg"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -58,7 +88,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBestMinSrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -72,7 +102,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest640SrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -86,7 +116,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest960SrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -100,7 +130,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest650SrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -114,7 +144,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest950SrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -128,7 +158,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest1500SrcSet() {
         every { element.attr("srcset") } returns "header640.png 640w, header960.png 960w, header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -142,7 +172,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest3xSrcSet() {
         every { element.attr("srcset") } returns "header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -156,7 +186,7 @@ class HtmlToComposableUnitTest {
     @Test
     fun findImageBest1xSrcSet() {
         every { element.attr("srcset") } returns "header2x.png 2x, header3.0x.png 3.0x, header.png"
-        every { element.attr("abs:src") } returns null
+        every { element.attr("abs:src") } returns ""
 
         val result = getImageSource("http://foo", element)
 
@@ -220,8 +250,8 @@ class HtmlToComposableUnitTest {
         every {
             element.attr("abs:src")
         } returns "https://duet-cdn.vox-cdn.com/thumbor/184x0:2614x1535/2400x1600/filters:focal(1847x240:1848x241):format(webp)/cdn.vox-cdn.com/uploads/chorus_asset/file/24842461/Screenshot_2023_08_10_at_12.22.58_PM.png"
-        every { element.attr("width") } returns null
-        every { element.attr("height") } returns null
+        every { element.attr("width") } returns ""
+        every { element.attr("height") } returns ""
 
         val result = getImageSource("https://www.politico.eu/feed/", element)
 
@@ -246,12 +276,12 @@ class HtmlToComposableUnitTest {
         } returns "https://static1.xdaimages.com/wordpress/wp-content/uploads/2023/12/onedrive-app-for-microsoft-teams.png"
         every {
             element.attr("srcset")
-        } returns null
+        } returns ""
         every {
             element.attr("abs:src")
-        } returns null
-        every { element.attr("width") } returns null
-        every { element.attr("height") } returns null
+        } returns ""
+        every { element.attr("width") } returns ""
+        every { element.attr("height") } returns ""
 
         val result = getImageSource("https://www.xda-developers.com", element)
 
@@ -273,8 +303,8 @@ class HtmlToComposableUnitTest {
     fun noSourcesMeansEmptyResult() {
         every { element.attr("srcset") } returns ""
         every { element.attr("abs:src") } returns ""
-        every { element.attr("width") } returns null
-        every { element.attr("height") } returns null
+        every { element.attr("width") } returns ""
+        every { element.attr("height") } returns ""
 
         val result = getImageSource("https://www.politico.eu/feed/", element)
 
