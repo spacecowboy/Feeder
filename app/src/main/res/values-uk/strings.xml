@@ -7,7 +7,7 @@
     <string name="fetching_full_article">Отримання повної статті…</string>
     <string name="failed_to_fetch_full_article">Не вдалося отримати повну статтю</string>
     <string name="fetch_full_articles_by_default">Отримувати повну статтю типово</string>
-    <string name="fetch_full_article">Отримати статтю повністю</string>
+    <string name="fetch_full_article">Отримати повну статтю</string>
     <string name="toggle_tag_expansion">Змінити розгортання міток</string>
     <string name="open_in_web_view">Відкрити у Веб-перегляді</string>
     <string name="open_link_in_web_view">Відкрити посилання у веб-перегляді</string>
@@ -75,8 +75,8 @@
     <string name="sort_oldest_first">Спочатку старіші</string>
     <string name="sort_newest_first">Спочатку новіші</string>
     <string name="theme">Тема</string>
-    <string name="theme_night">Ніч</string>
-    <string name="theme_day">День</string>
+    <string name="theme_night">Нічна</string>
+    <string name="theme_day">Денна</string>
     <string name="theme_automatic">Автоматична</string>
     <string name="theme_system">Системна</string>
     <string name="could_not_load_url">Не можливо завантажити URL</string>
@@ -104,8 +104,8 @@
     <string name="title_activity_settings">Налаштування</string>
     <string name="share">Поширити</string>
     <string name="view_debug_log">Переглянути журнал зневадження</string>
-    <string name="import_feeds_from_opml">Імпортувати стрічки з файлу OPML</string>
-    <string name="export_feeds_to_opml">Експортувати стрічки в файл OPML</string>
+    <string name="import_feeds_from_opml">Імпортувати стрічки з OPML</string>
+    <string name="export_feeds_to_opml">Експортувати стрічки в OPML</string>
     <string name="open_enclosed_media_file">Відкрити %1$s</string>
     <string name="open_in_browser">Відкрити в браузері</string>
     <string name="new_items_available">Доступні нові записи</string>
@@ -132,11 +132,11 @@
     <string name="dark_theme_preference_black">Чорна</string>
     <string name="dark_theme_preference">Бажана темна тема</string>
     <string name="dark_theme_preference_dark">Темна</string>
-    <string name="generate_extra_unique_ids">Створити додаткові унікальні ІД</string>
+    <string name="generate_extra_unique_ids">Створити додаткові унікальні ID</string>
     <string name="only_enable_for_bad_id_feeds">Дозволити лише для стрічок із поганими ID</string>
-    <string name="syncing">Синхронування</string>
+    <string name="syncing">Синхронізація</string>
     <string name="sync_status">Стан синхронізації</string>
-    <string name="invalid_url">Не правильна URL</string>
+    <string name="invalid_url">Неправильна URL-адреса</string>
     <string name="failed_to_import_OPML">Не вдалося імпортувати OPML</string>
     <string name="failed_to_export_OPML">Не вдалося експортувати OPML</string>
     <string name="failed_to_open_article">Не можливо відкрити статтю</string>
@@ -220,7 +220,7 @@
     <string name="failed_to_parse_rss_feed">Не вдалося проаналізувати стрічку RSS</string>
     <string name="http_error">Помилка HTTP</string>
     <string name="failed_to_parse_json_feed">Не вдалося проаналізувати стрічку JSON</string>
-    <string name="no_body_in_response">Немає тіла у відповідь</string>
+    <string name="no_body_in_response">Немає тіла у відповіді</string>
     <string name="unsupported_content_type">Непідтримуваний тип вмісту</string>
     <string name="failed_to_parse_full_article">Не вдалося проаналізувати повну статтю</string>
     <string name="show_only_title">Показувати лише назву</string>
