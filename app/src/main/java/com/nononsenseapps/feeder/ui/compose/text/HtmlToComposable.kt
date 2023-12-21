@@ -1260,8 +1260,8 @@ internal fun getImageSource(
     srcSet = element.attr("srcset") ?: "",
     absSrc = element.attr("abs:src") ?: "",
     dataImgUrl = element.attr("data-img-url") ?: "",
-    width = element.attr("width")?.toIntOrNull(),
-    height = element.attr("height")?.toIntOrNull(),
+    width = element.attr("width").toIntOrNull(),
+    height = element.attr("height").toIntOrNull(),
 )
 
 internal class ImageCandidates(
@@ -1272,7 +1272,8 @@ internal class ImageCandidates(
     val width: Int?,
     val height: Int?,
 ) {
-    val hasImage: Boolean = srcSet.isNotBlank() || absSrc.isNotBlank() || dataImgUrl.isNotBlank()
+    // Explicitly width/height = 0 means no image
+    val hasImage: Boolean = width != 0 && height != 0 && (srcSet.isNotBlank() || absSrc.isNotBlank() || dataImgUrl.isNotBlank())
     val notHasImage: Boolean = !hasImage
 
     fun getBestImageForMaxSize(
@@ -1301,6 +1302,10 @@ internal class ImageCandidates(
                                 when {
                                     descriptor.endsWith("w", ignoreCase = true) -> {
                                         val width = descriptor.substringBefore("w").toFloat()
+                                        if (width < 1.0f) {
+                                            return@fold acc
+                                        }
+
                                         val ratio = width / maxWidth.toFloat()
 
                                         ratio to
