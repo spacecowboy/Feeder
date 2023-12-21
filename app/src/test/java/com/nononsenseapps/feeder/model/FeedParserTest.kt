@@ -59,6 +59,35 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun anime2youHasThumbnails() {
+        runBlocking {
+            readResource("rss_anime2you.xml") {
+                val feed =
+                    feedParser.parseFeedResponse(
+                        URL("https://www.anime2you.de/feed/"),
+                        it,
+                        null,
+                    )
+
+                val item = feed.getOrNull()?.items!!.first()
+
+                val expected =
+                    ImageFromHTML(
+                        url = "https://img.anime2you.de/2023/12/jujutsu-kaisen-6.jpg",
+                        width = 700,
+                        height = 350,
+                    )
+
+                assertEquals(
+                    expected,
+                    item.image,
+                    "Thumbnail image was unexpected",
+                )
+            }
+        }
+    }
+
+    @Test
     fun dcCreatorEndsUpAsAuthor() =
         runBlocking {
             readResource("openstreetmap.xml") {
