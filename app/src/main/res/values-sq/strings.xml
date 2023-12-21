@@ -12,8 +12,8 @@
     <string name="save">Ruaj</string>
     <string name="empty_feed_top">Asgjë për të lexuar. A dëshiron të…</string>
     <string name="empty_feed_add"><annotation style="link">Add</annotation> me shume feed-e\?</string>
-    <string name="mark_all_as_read">Shenoji te gjitha si te lexuara</string>
-    <string name="notify_for_new_items">Lajmero per artikuj te rinj</string>
+    <string name="mark_all_as_read">Shenjoji të gjitha si të lexuara</string>
+    <string name="notify_for_new_items">Lajmëro për artikuj të rinj</string>
     <string name="text_to_speech">Tekst ne te folur</string>
     <string name="export_feeds_to_opml">Eksporto feed-et si OPML</string>
     <string name="no_such_feed">Ky feed nuk gjendet. Ndoshta mund te perdoresh HTTPS\?</string>
@@ -21,16 +21,16 @@
     <string name="description_for_read_aloud">Identifiko automatikisht gjuhen e artikullit</string>
     <string name="open_link_in_web_view">Hap lidhjet ne pamje web</string>
     <string name="empty_feed_open"><annotation style="link">Hap</annotation> nje feed tjeter\?</string>
-    <string name="search_feed_empty_hint">Shkruaj adresen e nje feed-i</string>
-    <string name="mark_as_read">Shenoje si te lexuar</string>
-    <string name="mark_as_unread">Shenoje si te palexuar</string>
+    <string name="search_feed_empty_hint">Shkruaj adresën e një feed-i</string>
+    <string name="mark_as_read">Shenjoje si të lexuar</string>
+    <string name="mark_as_unread">Shenoje si të palexuar</string>
     <string name="edit_feed">Redakto feed-in</string>
     <string name="delete_feed">Fshi feed-in</string>
-    <string name="show_all_items">Tregoji te gjitha</string>
-    <string name="show_unread_items">Trego vetem te palexuarat</string>
-    <string name="new_items_available">Artikuj te rinj jane gati</string>
+    <string name="show_all_items">Trego të gjithë artikujt</string>
+    <string name="show_unread_items">Trego vetëm artikujt e palexuar</string>
+    <string name="new_items_available">Artikuj të rinj janë gati</string>
     <string name="view">Shiko</string>
-    <string name="no_tag">Pa etikete</string>
+    <string name="no_tag">Pa etiketë</string>
     <string name="dont_notify_for_new_items">Ndalo njoftimet</string>
     <string name="toggle_read_status">Ndrysho statusin e te qenit e lexuar</string>
     <string name="open_link_in_browser">Hap lidhjet ne web browser</string>
@@ -85,4 +85,33 @@
     <string name="open_item_by_default_with">Hap artikujt ne menyre te parapelqyer me</string>
     <string name="open_links_with">Hap lidhjet me</string>
     <string name="reader_settings">Lexuesi</string>
+    <string name="mark_items_below_as_read">Shenjo të gjitha më poshtë si të lexuara</string>
+    <string name="sort_oldest_first">Më të vjetrat në krye</string>
+    <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+    <string name="theme_automatic">Automatik</string>
+    <string name="open_feed">Hap feed-in</string>
+    <string name="javascript">JavaScript</string>
+    <string name="article_list_settings">Lista e artikujve</string>
+    <string name="touch_to_play_video">Prek për të luajtur videon</string>
+    <string name="open_in_web_view">Hap në pamje web</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="theme_system">Sistem</string>
+    <string name="max_feed_items">Maksimumi i artikujve për feed</string>
+    <string name="send_bug_report">Dërgo raport për problem</string>
+    <string name="mark_items_above_as_read">Shenjo të gjitha më sipër si të lexuara</string>
+    <string name="theme">Tema</string>
+    <string name="dark_theme_preference">Tema e errët e preferuar</string>
+    <string name="block_list_description">Fsheh artikujt me tituj që përmbajnë cilindo prej këtyre filtrave. Shembuj filtrash:</string>
+    <string name="dynamic_theme_use">Ngjyra dinamike</string>
+    <string name="theme_night">Natë</string>
+    <string name="no_email_client">Nuk mund të hapet klienti i postës elektronike</string>
+    <string name="theme_day">Ditë</string>
+    <string name="dark_theme_preference_black">E zezë</string>
+    <string name="sort_newest_first">Më të rejat në krye</string>
+    <string name="sort">Rendit sipas</string>
+    <string name="dark_theme_preference_dark">E errët</string>
+    <string name="open_in_custom_tab">Skedë e zakonshme</string>
+    <string name="theme_e_ink">Bojë elektronike</string>
+    <string name="notification_channel_description">Njoftimet shfaqen vetëm për artikuj të palexuar në feed-et e konfiguruara</string>
+    <string name="could_not_load_url">URL nuk mund të ngarkohet</string>
 </resources>
