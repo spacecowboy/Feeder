@@ -62,6 +62,28 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun canParseUkrnet() {
+        runBlocking {
+            readResource("rss_ukrnet.xml") {
+                val feed = exp.parseBody(it)
+//
+//                val feed =
+//                    feedParser.parseFeedResponse(
+//                        URL("https://suspilne.media/rss/ukrnet.rss"),
+//                        it,
+//                        null,
+//                    )
+
+//                feed.leftOrNull()?.throwable?.let { t ->
+//                    throw t
+//                }
+
+                assertEquals(20, feed?.items?.size, "Expected 20 items")
+            }
+        }
+    }
+
+    @Test
     fun anime2youHasThumbnails() {
         runBlocking {
             readResource("rss_anime2you.xml") {
