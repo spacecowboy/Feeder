@@ -25,9 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -50,6 +49,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feedarticle.wordsToReadTimeSecs
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
@@ -92,11 +92,7 @@ fun FeedItemCard(
             if (showThumbnail) {
                 item.image?.let { image ->
                     // Don't render known super small images. Null is OK
-                    val width = image.width
-                    val height = image.height
-                    val badHeight = (height ?: 1000) < 360
-                    val badWidth = (width ?: 1000) < 640
-                    if (!badWidth && !badHeight) {
+                    if ((image.width ?: 1000) >= 10 && (image.height ?: 1000) >= 10) {
                         val pixelDensity = LocalDensity.current.density
                         val contentScale =
                             remember(pixelDensity) {
@@ -138,7 +134,10 @@ fun FeedItemCard(
                                         .fillMaxWidth()
                                         .aspectRatio(16.0f / 9.0f)
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .alpha(alpha),
+                                        .alpha(alpha)
+                                        .safeSemantics {
+                                            testTag = "card_image"
+                                        },
                             )
                         }
                     }
