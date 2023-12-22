@@ -36,6 +36,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Run Emulator Tests
+        shell: bash
+        run: ci/install-emulator
+
       - name: gradle build
         uses: gradle/gradle-build-action@v2
         with:

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+
+yes | sdkmanager "system-images;android-30;aosp_atd;x86"
