@@ -1,0 +1,58 @@
+# Thanks to AnkiDroid
+# https://github.com/ankidroid/Anki-Android/blob/main/.github/workflows/tests_emulator.yml
+name: Emulator Tests Managed
+
+on:
+  push:
+    branches:
+    #   - master
+      - gh-actions
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  emulator_test:
+    name: Android Emulator Test
+    runs-on: macos-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+    steps:
+      - name: perform the checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      # Verify the SHA-sum
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: packageDebug packageDebugAndroidTest --daemon
+
+      - name: Run Emulator Tests
+        shell: bash
+        run: ci/logged-emulator-test
+
+      - name: Compress Emulator Log
+        if: always()
+        run: gzip -9 adb-log.txt
+        shell: bash
+
+      - name: Upload Emulator Log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.api-level }}-${{ matrix.arch }}-${{matrix.target}}-${{matrix.first-boot-delay}}-${{matrix.iteration}}-adb_logs
+          path: adb-log.txt.gz

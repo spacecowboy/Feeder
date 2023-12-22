@@ -11,8 +11,8 @@ on:
         type: string
   push:
     branches:
-    #   - master
-      - gh-actions
+      - master
+    #  - gh-actions
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

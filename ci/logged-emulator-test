@@ -1,0 +1,5 @@
+#!/bin/bash
+
+touch adb-log.txt
+"$ANDROID_HOME/platform-tools/adb" logcat '*:D' >> adb-log.txt &
+./gradlew -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect pixel2api30DebugAndroidTest --daemon
