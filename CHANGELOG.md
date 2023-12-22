@@ -1,3 +1,28 @@
+# 2.6.13
+Dritan Taulla (1):
+  * [39b9434c] Updated Albanian translation using Weblate
+
+Francesco Saltori (1):
+  * [0de8be38] Updated Italian translation using Weblate
+
+Jonas Kalderstam (4):
+  * [4e2791df] Fixed release pipeline
+  * [403133bf] Fixed mark as read on scroll
+  * [67b521a7] Fixed small thumbnails not being displayed in card style
+  * [c775fa74] Fixed crash for zero width images
+
+VfBFan (1):
+  * [2d737ef2] Updated German translation using Weblate
+
+YGXB_net (1):
+  * [384e2a22] Updated Chinese (Simplified) translation using Weblate
+
+bowornsin (1):
+  * [e5f41f6a] Updated Thai translation using Weblate
+
+Сергій (1):
+  * [b1c004f7] Updated Ukrainian translation using Weblate
+
 # 2.6.12
 Jonas Kalderstam (9):
   * [0044d6b1] Fixed small images being rendered too large and flickering on
