@@ -228,4 +228,18 @@
     <string name="could_not_load_url">URL адресът не можа да се зареди</string>
     <string name="add_feed_search_hint">URL адрес на емисия</string>
     <string name="add_feed">Добавете емисия</string>
+    <string name="show_reading_time">Показване на очакваното време за четене</string>
+    <string name="many_words">%1$s думи</string>
+    <string name="other_minutes">%1$s минути</string>
+    <string name="few_minutes">%1$s минути</string>
+    <string name="two_words">%1$s думи</string>
+    <string name="many_minutes">%1$s минути</string>
+    <string name="zero_minutes">%1$s минути</string>
+    <string name="few_words">%1$s думи</string>
+    <string name="zero_words">%1$s думи</string>
+    <string name="one_minute">%1$s минута</string>
+    <string name="open_browser_in_split_screen">Отворете браузъра на разделен екран</string>
+    <string name="two_minutes">%1$s минути</string>
+    <string name="other_words">%1$s думи</string>
+    <string name="one_word">%1$s дума</string>
 </resources>
