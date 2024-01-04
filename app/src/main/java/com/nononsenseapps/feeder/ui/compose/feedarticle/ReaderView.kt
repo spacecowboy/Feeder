@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -59,6 +60,7 @@ import com.nononsenseapps.feeder.archmodel.isImage
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
 import com.nononsenseapps.feeder.ui.compose.text.rememberMaxImageWidth
@@ -120,7 +122,10 @@ fun ReaderView(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .focusGroup(),
+                    .focusGroup()
+                    .safeSemantics {
+                        testTag = "readerColumn"
+                    },
         ) {
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
