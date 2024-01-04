@@ -1,3 +1,11 @@
+# 2.6.14
+Jonas Kalderstam (1):
+  * [ff495c38] Fixed mark as read on scroll also marking items when opening
+         items
+
+trunars (1):
+  * [958df8ca] Updated Bulgarian translation using Weblate
+
 # 2.6.13
 Dritan Taulla (1):
   * [39b9434c] Updated Albanian translation using Weblate
