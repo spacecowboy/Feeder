@@ -106,6 +106,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.FeedType
+import com.nononsenseapps.feeder.db.FAR_FUTURE
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -142,12 +143,11 @@ import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
-import com.nononsenseapps.feeder.ui.compose.utils.rememberApplicationCoroutineScope
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
-import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.emailBugReportIntent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1135,18 +1135,15 @@ fun FeedListContent(
                     val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
 
                     if (viewState.markAsReadOnScroll && previewItem.unread) {
-                        val visible: Boolean by listState.rememberIsItemVisible(
-                            key = previewItem.id,
-                        )
                         val mostlyVisible: Boolean by listState.rememberIsItemMostlyVisible(
                             key = previewItem.id,
                             screenHeightPx = screenHeightPx,
                         )
                         MarkItemAsReadOnScroll(
                             itemId = previewItem.id,
-                            visible = visible,
                             mostlyVisible = mostlyVisible,
                             currentFeedOrTag = viewState.currentFeedOrTag,
+                            coroutineScope = coroutineScope,
                             markAsRead = markAsUnread,
                         )
                     }
@@ -1335,18 +1332,15 @@ fun FeedGridContent(
                     // Very important that items don't change size or disappear when scrolling
                     // Placeholder will have no id
                     if (previewItem.id > ID_UNSET && viewState.markAsReadOnScroll && previewItem.unread) {
-                        val visible: Boolean by gridState.rememberIsItemVisible(
-                            key = previewItem.id,
-                        )
                         val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
                             key = previewItem.id,
                             screenHeightPx = screenHeightPx,
                         )
                         MarkItemAsReadOnScroll(
                             itemId = previewItem.id,
-                            visible = visible,
                             mostlyVisible = mostlyVisible,
                             currentFeedOrTag = viewState.currentFeedOrTag,
+                            coroutineScope = coroutineScope,
                             markAsRead = markAsUnread,
                         )
                     }
@@ -1445,56 +1439,55 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
 
 /**
  * @param itemId id of item to mark as read
- * @param visible if item is visible at all
  * @param mostlyVisible if item is mostly visible
  * @param currentFeedOrTag current feed or tag at the time of display
+ * @param coroutineScope a scope which will be cancelled when navigated away from feed screen
  * @param markAsRead action to run
  */
 @Composable
 fun MarkItemAsReadOnScroll(
     itemId: Long,
-    visible: Boolean,
     mostlyVisible: Boolean,
     currentFeedOrTag: FeedOrTag,
+    coroutineScope: CoroutineScope,
     markAsRead: (Long, Boolean, FeedOrTag?) -> Unit,
 ) {
-    val coroutineScope = rememberApplicationCoroutineScope()
-
-    var debounced by remember {
-        mutableStateOf(false)
+    var visibleTime by remember {
+        mutableStateOf(FAR_FUTURE)
     }
-    if (mostlyVisible) {
-        LaunchedEffect(null) {
-            delay(800)
-            debounced = true
+    LaunchedEffect(mostlyVisible) {
+        if (mostlyVisible && visibleTime == FAR_FUTURE) {
+            visibleTime = Instant.now()
         }
     }
-    if (visible) {
-        DisposableEffect(null) {
-            onDispose {
-                if (debounced) {
-                    coroutineScope.launch(Dispatchers.IO) {
-                        // Why Coroutine? Why a delay?
-                        // Because this scope will be cancelled if the screen
-                        // is navigated away from and I only want things to be marked
-                        // during scroll - not during navigation.
-                        // Navigating between feeds is a special case, which is
-                        // why the currentFeedOrTag needs to be passed to the
-                        // view model.
-                        @Suppress("UNNECESSARYVARIABLE")
-                        val feedOrTag = currentFeedOrTag
-                        delay(100)
-                        markAsRead(
-                            itemId,
-                            false,
-                            feedOrTag,
-                        )
-                    }
+
+    DisposableEffect(visibleTime) {
+        onDispose {
+            // Check time BEFORE delaying action
+            if (visibleTime.isBefore(Instant.now().minusMillis(REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ))) {
+                coroutineScope.launch(Dispatchers.IO) {
+                    // Why Coroutine? Why a delay?
+                    // Because this scope will be cancelled if the screen
+                    // is navigated away from and I only want things to be marked
+                    // during scroll - not during navigation.
+                    // Navigating between feeds is a special case, which is
+                    // why the currentFeedOrTag needs to be passed to the
+                    // view model.
+                    @Suppress("UNNECESSARYVARIABLE")
+                    val feedOrTag = currentFeedOrTag
+                    delay(100)
+                    markAsRead(
+                        itemId,
+                        false,
+                        feedOrTag,
+                    )
                 }
             }
         }
     }
 }
+
+private const val REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ = 500L
 
 private val PLACEHOLDER_ITEM =
     FeedListItem(
