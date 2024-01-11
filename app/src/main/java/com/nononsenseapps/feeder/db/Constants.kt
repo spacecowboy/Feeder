@@ -50,6 +50,7 @@ const val COL_READ_TIME = "read_time"
 const val COL_SITE_FETCHED = "site_fetched"
 const val COL_WORD_COUNT = "word_count"
 const val COL_WORD_COUNT_FULL = "word_count_full"
+const val COL_EXCLUDE_FROM_ALL_FEEDS = "exclude_from_all_feeds"
 
 // year 5000
 val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

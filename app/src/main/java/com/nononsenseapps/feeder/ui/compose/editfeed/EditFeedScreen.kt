@@ -510,6 +510,11 @@ fun ColumnScope.RightContent(
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         icon = null,
     ) { viewState.alternateId = it }
+    SwitchSetting(
+        title = stringResource(id = R.string.exclude_from_all_feeds),
+        checked = viewState.excludeFromAllFeeds,
+        icon = null,
+    ) { viewState.excludeFromAllFeeds = it }
     Divider(
         modifier = Modifier.fillMaxWidth(),
     )
@@ -566,6 +571,7 @@ interface EditFeedScreenState {
     var notify: Boolean
     var articleOpener: String
     var alternateId: Boolean
+    var excludeFromAllFeeds: Boolean
     val isOkToSave: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
@@ -597,6 +603,7 @@ private class ScreenState(
     override var notify: Boolean by mutableStateOf(false)
     override var articleOpener: String by mutableStateOf("")
     override var alternateId: Boolean by mutableStateOf(false)
+    override var excludeFromAllFeeds: Boolean by mutableStateOf(false)
 }
 
 @Preview("Edit Feed Phone")

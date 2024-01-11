@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_ALTERNATE_ID
 import com.nononsenseapps.feeder.db.COL_CURRENTLY_SYNCING
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
+import com.nononsenseapps.feeder.db.COL_EXCLUDE_FROM_ALL_FEEDS
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -54,6 +55,7 @@ data class Feed
         // Only update this field when user modifies the feed
         @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_SITE_FETCHED) var siteFetched: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_EXCLUDE_FROM_ALL_FEEDS) var excludeFromAllFeeds: Boolean = false,
     ) {
         constructor() : this(id = ID_UNSET)
 

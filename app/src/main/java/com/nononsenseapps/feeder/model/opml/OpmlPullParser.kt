@@ -48,6 +48,8 @@ private const val ATTR_OPEN_ARTICLES_WITH = "openArticlesWith"
 
 private const val TAG_BLOCKED = "blocked"
 
+private const val ATTR_EXCLUDE_FROM_ALL_FEEDS = "excludeFromAllFeeds"
+
 @Suppress("NAME_SHADOWING")
 class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     private val feeds: MutableList<Feed> = mutableListOf()
@@ -296,6 +298,10 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                                         null
                                     }
                                 } ?: feed.imageUrl,
+                        excludeFromAllFeeds =
+                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_EXCLUDE_FROM_ALL_FEEDS)
+                                ?.toBoolean()
+                                ?: feed.excludeFromAllFeeds,
                     )
                 }
 

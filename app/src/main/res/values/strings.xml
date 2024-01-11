@@ -53,6 +53,7 @@
   <string name="nothing_to_display">Nothing to display!</string>
   <string name="title_activity_settings">Settings</string>
   <string name="all_feeds">All feeds</string>
+  <string name="exclude_from_all_feeds">Exclude from All feeds</string>
 
   <string name="sync_option_manually">Manually</string>
   <string name="sync_option_every_15min">Every 15 minutes</string>

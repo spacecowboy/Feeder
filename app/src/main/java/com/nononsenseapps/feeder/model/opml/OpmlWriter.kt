@@ -233,6 +233,7 @@ abstract class BodyTag(name: String) : TagWithText(name) {
             fullTextByDefault = feed.fullTextByDefault
             openArticlesWith = feed.openArticlesWith
             alternateId = feed.alternateId
+            excludeFromAllFeeds = feed.excludeFromAllFeeds
         }
 }
 
@@ -287,6 +288,11 @@ class Outline : BodyTag("outline") {
         get() = attributes["feeder:alternateId"]!!.toBoolean()
         set(value) {
             attributes["feeder:alternateId"] = value.toString()
+        }
+    var excludeFromAllFeeds: Boolean
+        get() = attributes["feeder:excludeFromAllFeeds"]!!.toBoolean()
+        set(value) {
+            attributes["feeder:excludeFromAllFeeds"] = value.toString()
         }
 }
 

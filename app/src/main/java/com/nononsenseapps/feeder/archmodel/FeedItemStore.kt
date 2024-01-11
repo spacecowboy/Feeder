@@ -134,6 +134,7 @@ class FeedItemStore(override val di: DI) : DIAware {
             onlySavedArticles -> append("AND bookmarked = 1\n")
             feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
             tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }
+            feedId <= ID_UNSET -> append("AND (SELECT exclude_from_all_feeds FROM feeds WHERE feeds.id = feed_items.feed_id) IS 0\n")
         }
     }
 

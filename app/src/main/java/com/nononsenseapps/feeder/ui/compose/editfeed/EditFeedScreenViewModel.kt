@@ -44,6 +44,7 @@ class EditFeedScreenViewModel(
     override var notify: Boolean by mutableSavedStateOf(state, false)
     override var articleOpener: String by mutableSavedStateOf(state, "")
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
+    override var excludeFromAllFeeds: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
 
     override var feedImage: String by mutableStateOf("")
@@ -103,6 +104,9 @@ class EditFeedScreenViewModel(
             if (!state.contains("alternateId")) {
                 alternateId = feed.alternateId
             }
+            if (!state.contains("excludeFromAllFeeds")) {
+                excludeFromAllFeeds = feed.excludeFromAllFeeds
+            }
 
             repository.allTags
                 .collect { value ->
@@ -127,6 +131,7 @@ class EditFeedScreenViewModel(
                     notify = notify,
                     openArticlesWith = articleOpener,
                     alternateId = alternateId,
+                    excludeFromAllFeeds = excludeFromAllFeeds,
                 )
 
             // No point in doing anything unless they actually differ

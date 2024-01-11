@@ -127,12 +127,23 @@ fun getAllMigrations(di: DI) =
         MigrationFrom29To30(di),
         MigrationFrom30To31(di),
         MigrationFrom31To32(di),
+        MigrationFrom32To33(di),
     )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+class MigrationFrom32To33(override val di: DI) : Migration(32, 33), DIAware {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            alter table feeds add column exclude_from_all_feeds integer not null default 0
+            """.trimIndent(),
+        )
+    }
+}
+
 class MigrationFrom31To32(override val di: DI) : Migration(31, 32), DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

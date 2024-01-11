@@ -44,6 +44,7 @@ class CreateFeedScreenViewModel(
     override var allTags: List<String> by mutableStateOf(emptyList())
     override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")
     override var feedImage: String by mutableStateOf(state["feedImage"] ?: "")
+    override var excludeFromAllFeeds: Boolean by mutableSavedStateOf(state, false)
 
     override val isOpenItemWithBrowser: Boolean
         get() = articleOpener == PREF_VAL_OPEN_WITH_BROWSER
@@ -90,6 +91,7 @@ class CreateFeedScreenViewModel(
                         alternateId = alternateId,
                         whenModified = Instant.now(),
                         imageUrl = sloppyLinkToStrictURLOrNull(feedImage),
+                        excludeFromAllFeeds = excludeFromAllFeeds,
                     ),
                 )
 
