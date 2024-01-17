@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
@@ -34,6 +35,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -205,6 +209,7 @@ fun RowScope.FeedItemText(
                 }
             }
         }
+    val closeMenuText = stringResource(id = R.string.close_menu)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier =
@@ -308,6 +313,18 @@ fun RowScope.FeedItemText(
                             text = stringResource(R.string.share),
                         )
                     },
+                )
+                // Hidden button for TalkBack
+                DropdownMenuItem(
+                    onClick = onDismissDropdown,
+                    text = {},
+                    modifier =
+                        Modifier
+                            .height(0.dp)
+                            .safeSemantics {
+                                contentDescription = closeMenuText
+                                role = Role.Button
+                            },
                 )
             }
         }

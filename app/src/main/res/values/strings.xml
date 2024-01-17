@@ -255,4 +255,5 @@
   <string name="few_minutes">%1$s minutes</string>
   <string name="many_minutes">%1$s minutes</string>
   <string name="other_minutes">%1$s minutes</string>
+    <string name="close_menu">Close menu</string>
 </resources>

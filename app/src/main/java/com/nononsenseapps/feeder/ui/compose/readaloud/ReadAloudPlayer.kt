@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Pause
@@ -31,13 +32,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.AppSetting
 import com.nononsenseapps.feeder.model.ForcedAuto
 import com.nononsenseapps.feeder.model.ForcedLocale
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
@@ -91,6 +97,7 @@ fun TTSPlayer(
     var showMenu by remember {
         mutableStateOf(false)
     }
+    val closeMenuText = stringResource(id = R.string.close_menu)
     PaddedBottomAppBar(
         modifier = modifier,
         floatingActionButton = floatingActionButton,
@@ -167,6 +174,20 @@ fun TTSPlayer(
                             showMenu = false
                         },
                 ) {
+                    // Hidden button for TalkBack
+                    DropdownMenuItem(
+                        onClick = {
+                            showMenu = false
+                        },
+                        text = {},
+                        modifier =
+                            Modifier
+                                .height(0.dp)
+                                .safeSemantics {
+                                    contentDescription = closeMenuText
+                                    role = Role.Button
+                                },
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onSelectLanguage(AppSetting)
