@@ -33,7 +33,6 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import okhttp3.HttpUrl
 
 @Composable
 fun FeedItemEitherIndicator(
@@ -96,7 +95,8 @@ fun FeedItemImageIndicator(
                     .build(),
             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-            contentDescription = stringResource(id = R.string.feed_icon),
+            // Don't list this in screen reader
+            contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier =
                 Modifier
@@ -135,7 +135,8 @@ fun FeedItemFeedIconIndicator(
                     .build(),
             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-            contentDescription = stringResource(id = R.string.feed_icon),
+            // Don't list this in screen reader
+            contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier =
                 Modifier

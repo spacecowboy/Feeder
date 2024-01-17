@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -30,7 +29,6 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import coil.size.Size
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -133,7 +131,7 @@ fun FeedItemCompact(
                                     .build(),
                             placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
                             error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                            contentDescription = stringResource(id = R.string.article_image),
+                            contentDescription = null,
                             contentScale = scale,
                             modifier =
                                 Modifier

@@ -252,6 +252,7 @@ private fun HtmlComposer.appendTextChildren(
                     }
 
                     "br" -> append('\n')
+                    // TODO set heading() semantic tag on headers
                     "h1" -> {
                         withParagraph {
                             withComposableStyle(
