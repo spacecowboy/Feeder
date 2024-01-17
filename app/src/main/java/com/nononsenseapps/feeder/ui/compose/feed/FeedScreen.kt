@@ -92,6 +92,7 @@ import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTag
@@ -243,6 +244,7 @@ fun FeedScreen(
             viewModel.toggleTagExpansion(tag)
         },
         onDrawerItemSelected = { feedId, tag ->
+            FeedDestination.navigate(navController, feedId = feedId, tag = tag)
             FeedDestination.navigate(navController, feedId = feedId, tag = tag)
         },
         focusRequester = focusNavDrawer,
@@ -440,6 +442,7 @@ fun FeedScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val closeMenuText = stringResource(id = R.string.close_menu)
 
     FeedScreen(
         modifier = modifier,
@@ -481,9 +484,10 @@ fun FeedScreen(
                             expanded = viewState.showFilterMenu,
                             onDismissRequest = { onShowFilterMenu(false) },
                             modifier =
-                                Modifier.onKeyEventLikeEscape {
-                                    onShowFilterMenu(false)
-                                },
+                                Modifier
+                                    .onKeyEventLikeEscape {
+                                        onShowFilterMenu(false)
+                                    },
                         ) {
                             DropdownMenuItem(
                                 enabled = false,
@@ -514,6 +518,7 @@ fun FeedScreen(
                             DropdownMenuItem(
                                 onClick = {
                                     filterCallback.setSaved(!viewState.filter.saved)
+                                    onShowFilterMenu(false)
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -541,6 +546,7 @@ fun FeedScreen(
                             DropdownMenuItem(
                                 onClick = {
                                     filterCallback.setRecentlyRead(!viewState.filter.recentlyRead)
+                                    onShowFilterMenu(false)
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -568,6 +574,8 @@ fun FeedScreen(
                             DropdownMenuItem(
                                 onClick = {
                                     filterCallback.setRead(!viewState.filter.read)
+                                    // Closing it is important for accessibility
+                                    onShowFilterMenu(false)
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -590,6 +598,20 @@ fun FeedScreen(
                                                     else -> context.getString(androidx.compose.ui.R.string.not_selected)
                                                 }
                                             role = Role.Checkbox
+                                        },
+                            )
+                            // Hidden button for TalkBack
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowFilterMenu(false)
+                                },
+                                text = {},
+                                modifier =
+                                    Modifier
+                                        .height(0.dp)
+                                        .safeSemantics {
+                                            contentDescription = closeMenuText
+                                            role = Role.Button
                                         },
                             )
                         }
@@ -759,6 +781,20 @@ fun FeedScreen(
                             text = {
                                 Text(stringResource(id = R.string.send_bug_report))
                             },
+                        )
+                        // Hidden button for TalkBack
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                            },
+                            text = {},
+                            modifier =
+                                Modifier
+                                    .height(0.dp)
+                                    .safeSemantics {
+                                        contentDescription = closeMenuText
+                                        role = Role.Button
+                                    },
                         )
                     }
                 }

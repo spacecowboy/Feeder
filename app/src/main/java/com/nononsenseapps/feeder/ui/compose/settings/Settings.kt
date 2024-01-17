@@ -60,6 +60,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -763,6 +764,7 @@ fun <T> MenuSetting(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
+    val closeMenuText = stringResource(id = R.string.close_menu)
     Row(
         modifier =
             modifier
@@ -799,6 +801,20 @@ fun <T> MenuSetting(
                     expanded = false
                 },
         ) {
+            // Hidden button for TalkBack
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                },
+                text = {},
+                modifier =
+                    Modifier
+                        .height(0.dp)
+                        .safeSemantics {
+                            contentDescription = closeMenuText
+                            role = Role.Button
+                        },
+            )
             for (value in values.item) {
                 DropdownMenuItem(
                     onClick = {

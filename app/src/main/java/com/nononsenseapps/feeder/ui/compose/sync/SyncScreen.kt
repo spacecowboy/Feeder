@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -66,6 +67,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,6 +80,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.SyncDevice
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
@@ -114,6 +119,7 @@ private fun SyncScaffold(
         mutableStateOf(false)
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val closeMenuText = stringResource(R.string.close_menu)
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -164,6 +170,20 @@ private fun SyncScaffold(
                                         text = {
                                             Text(stringResource(R.string.leave_sync_chain))
                                         },
+                                    )
+                                    // Hidden button for TalkBack
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            showToolbar = false
+                                        },
+                                        text = {},
+                                        modifier =
+                                            Modifier
+                                                .height(0.dp)
+                                                .safeSemantics {
+                                                    contentDescription = closeMenuText
+                                                    role = Role.Button
+                                                },
                                     )
                                 }
                             }

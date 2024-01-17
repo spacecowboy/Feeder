@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -49,6 +50,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
@@ -58,6 +63,7 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
@@ -190,6 +196,8 @@ fun ArticleScreen(
 
     val focusArticle = remember { FocusRequester() }
     val focusTopBar = remember { FocusRequester() }
+
+    val closeMenuText = stringResource(id = R.string.close_menu)
 
     Scaffold(
         modifier =
@@ -332,6 +340,20 @@ fun ArticleScreen(
                                         Text(stringResource(id = R.string.read_article))
                                     },
                                 )
+                                // Hidden button for TalkBack
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                    },
+                                    text = {},
+                                    modifier =
+                                        Modifier
+                                            .height(0.dp)
+                                            .safeSemantics {
+                                                contentDescription = closeMenuText
+                                                role = Role.Button
+                                            },
+                                )
                             }
                         }
                     }
@@ -354,8 +376,8 @@ fun ArticleScreen(
         // Box handles the dynamic padding so ArticleContent don't have to recompose on scroll
         Box(
             modifier =
-            Modifier
-                .padding(padding),
+                Modifier
+                    .padding(padding),
         ) {
             ArticleContent(
                 viewState = viewState,
@@ -364,12 +386,12 @@ fun ArticleScreen(
                 onFeedTitleClick = onFeedTitleClick,
                 displayFullText = displayFullText,
                 modifier =
-                Modifier
-                    .focusGroup()
-                    .focusRequester(focusArticle)
-                    .focusProperties {
-                        up = focusTopBar
-                    },
+                    Modifier
+                        .focusGroup()
+                        .focusRequester(focusArticle)
+                        .focusProperties {
+                            up = focusTopBar
+                        },
             )
         }
     }
