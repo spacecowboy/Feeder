@@ -228,4 +228,19 @@
     <string name="no_url">Ingen URL</string>
     <string name="add_anyway">Tilføj alligevel</string>
     <string name="theme_e_ink">E Ink</string>
+    <string name="zero_words">%1$s ord</string>
+    <string name="few_words">%1$s ord</string>
+    <string name="two_minutes">%1$s minutter</string>
+    <string name="few_minutes">%1$s minutter</string>
+    <string name="close_menu">Luk menu</string>
+    <string name="open_browser_in_split_screen">Åbn browser i delt skærm</string>
+    <string name="show_reading_time">Vis anslået læsetid</string>
+    <string name="one_word">%1$s ord</string>
+    <string name="two_words">%1$s ord</string>
+    <string name="many_words">%1$s ord</string>
+    <string name="other_words">%1$s ord</string>
+    <string name="zero_minutes">%1$s minutter</string>
+    <string name="one_minute">%1$s minut</string>
+    <string name="many_minutes">%1$s minutter</string>
+    <string name="other_minutes">%1$s minutter</string>
 </resources>
