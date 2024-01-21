@@ -242,4 +242,5 @@
     <string name="few_minutes">%1$s минуты</string>
     <string name="other_minutes">%1$s минут</string>
     <string name="add_anyway">Всё равно добавить</string>
+    <string name="close_menu">Закрыть меню</string>
 </resources>
