@@ -16,9 +16,9 @@
     <string name="empty_feed_open"><annotation style="link">Buka</annotation> umpan lain\?</string>
     <string name="empty_feed_add"><annotation style="link">Tambah</annotation> lebih banyak umpan\?</string>
     <string name="search_feed_empty_hint">Masukkan alamat umpan</string>
-    <string name="mark_as_read">Tandai sebagai telah dibaca</string>
-    <string name="mark_as_unread">Tandai sebagai belum dibaca</string>
-    <string name="mark_all_as_read">Tandai semua sebagai sudah dibaca</string>
+    <string name="mark_as_read">Tandai sudah dibaca</string>
+    <string name="mark_as_unread">Tandai belum dibaca</string>
+    <string name="mark_all_as_read">Tandai semua sudah dibaca</string>
     <string name="edit_feed">Sunting umpan</string>
     <string name="delete_feed">Hapus umpan</string>
     <string name="show_all_items">Tampilkan semua item</string>
@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Baru berdasarkan ini</string>
     <string name="indicator_for_mark_as_read">Indikator untuk tandai sudah dibaca</string>
     <string name="share">Bagikan</string>
-    <string name="no_such_feed">Tidak ditemukan umpan. Coba gunakan HTTPS\?</string>
+    <string name="no_such_feed">Umpan tidak ditemukan. Coba gunakan HTTPS?</string>
     <string name="nothing_to_display">Tidak ada yang ditampilkan!</string>
     <string name="title_activity_settings">Pengaturan</string>
     <string name="all_feeds">Semua umpan</string>
@@ -57,8 +57,8 @@
     <string name="may_result_data_charges">Mungkin menambah penggunaan data seluler.</string>
     <string name="only_when_charging">Hanya saat mengisi daya</string>
     <string name="image_loading">Pemuatan gambar</string>
-    <string name="no_activity_for_link">Pasang sesuatu yang dapat membuka tautan ini terlebih dahulu</string>
-    <string name="check_for_updates">Cari artikel baru…</string>
+    <string name="no_activity_for_link">Pasang aplikasi untuk membuka tautan ini terlebih dahulu</string>
+    <string name="check_for_updates">Memuat artikel baru…</string>
     <string name="on_startup">Saat aplikasi mulai</string>
     <string name="show_fab">Tampilkan tombol mengambang</string>
     <string name="include_mobile_hotspots">Sertakan juga hotspot ponsel</string>
@@ -85,7 +85,7 @@
     <string name="sort_oldest_first">Terlama</string>
     <string name="sort">Urutkan</string>
     <string name="send_bug_report">Kirim laporan bug</string>
-    <string name="no_email_client">Tidak dapat membuka klien surel</string>
+    <string name="no_email_client">Tidak bisa membuka aplikasi surel</string>
     <string name="touch_to_play_video">Sentuh untuk memutar video</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Buka umpan</string>
@@ -96,13 +96,13 @@
     <string name="battery_optimization">Pengoptimalan baterai</string>
     <string name="battery_optimization_disabled">Nonaktif</string>
     <string name="battery_optimization_enabled">Aktif</string>
-    <string name="preload_custom_tab">Pramuat custom tab</string>
+    <string name="preload_custom_tab">Pramuat tab kustom</string>
     <string name="failed_to_parse">Tidak bisa mengurai %1$s</string>
     <string name="fetching_full_article">Mengambil artikel lengkap…</string>
     <string name="failed_to_fetch_full_article">Tidak bisa mengambil artikel lengkap</string>
     <string name="fetch_full_articles_by_default">Ambil artikel lengkap secara default</string>
     <string name="fetch_full_article">Ambil artikel lengkap</string>
-    <string name="failed_to_load_text_to_speech">Tidak bisa memuat text to speech</string>
+    <string name="failed_to_load_text_to_speech">Tidak bisa memuat teks ke suara</string>
     <string name="resume_reading">Teruskan membaca</string>
     <string name="pause_reading">Jeda membaca</string>
     <string name="read_article">Baca lantang</string>
@@ -110,8 +110,8 @@
     <string name="go_back">Kembali</string>
     <string name="feed_item_style">Gaya artikel</string>
     <string name="feed_item_style_compact">Ringkas</string>
-    <string name="expanded_tag">Buka tag</string>
-    <string name="contracted_tag">Tutup tag</string>
+    <string name="expanded_tag">Tag buka</string>
+    <string name="contracted_tag">Tag tutup</string>
     <string name="go_to_feed">Kunjungi %1$s</string>
     <string name="unread_adjective">Belum dibaca</string>
     <string name="already_read">Sudah dibaca</string>
@@ -133,13 +133,13 @@
     <string name="dark_theme_preference_dark">Gelap</string>
     <string name="dark_theme_preference">Preferensi mode malam</string>
     <string name="generate_extra_unique_ids">Buat ID unik ekstra</string>
-    <string name="only_enable_for_bad_id_feeds">Hanya diaktifkan untuk umpan dengan ID yang buruk</string>
+    <string name="only_enable_for_bad_id_feeds">Hanya aktifkan untuk umpan dengan ID yang buruk</string>
     <string name="syncing">Menyinkronkan</string>
     <string name="sync_status">Status sinkron</string>
     <string name="invalid_url">URL tidak valid</string>
     <string name="failed_to_import_OPML">Gagal mengimpor OPML</string>
     <string name="failed_to_export_OPML">Gagal mengekspor OPML</string>
-    <string name="failed_to_open_article">Tidak dapat membuka artikel</string>
+    <string name="failed_to_open_article">Tidak bisa membuka artikel</string>
     <string name="device_sync">Sinkronisasi perangkat</string>
     <string name="add_new_device">Tambah perangkat baru</string>
     <string name="device_sync_financed_by_community">Layanan ini dibiayai oleh komunitas. Harap pertimbangkan untuk donasi jika Anda merasa ini bermanfaat.</string>
@@ -164,7 +164,7 @@
     <string name="secret_key">Kunci rahasia</string>
     <string name="join_sync_chain">Gabung tautan sinkronisasi</string>
     <string name="are_you_sure_leave_sync_chain">Apakah Anda yakin ingin meninggalkan tautan sinkronisasi\?</string>
-    <string name="device_sync_description_1">Sinkronisasi perangkat memungkinkan Anda menyinkronisasi langganan dan membaca artikel pada perangkat Anda yang lain.</string>
+    <string name="device_sync_description_1">Sinkronisasi perangkat memungkinkan Anda menyinkronkan langganan dan membaca artikel pada perangkat Anda yang lain.</string>
     <string name="scan_or_enter_code">Pindai atau masukkan kode sinkronisasi</string>
     <string name="device_sync_description_2">Cukup pindai kode dari tautan sinkronisasi yang Anda buat pada perangkat yang lain, atau mulai tautan sinkronisasi baru.</string>
     <string name="block_list">Daftar blokir</string>
@@ -182,8 +182,8 @@
     <string name="set_language">Atur bahasa</string>
     <string name="text_to_speech">Teks ke suara</string>
     <string name="skip_to_next">Lewati ke item berikutnya</string>
-    <string name="feed_icon">Ikon feed</string>
-    <string name="text_scale">Skala teks</string>
+    <string name="feed_icon">Ikon umpan</string>
+    <string name="text_scale">Ukuran teks</string>
     <string name="block_list_description">Sembunyikan artikel dengan judul yang mengandung salah satu dari filter ini. Contoh filter:</string>
     <string name="sync_to_fetch">Sinkronasikan untuk mengambil artikel</string>
     <string name="unsave_article">Berhenti menyimpan artikel</string>
@@ -239,6 +239,8 @@
     <string name="zero_words">%1$s kata</string>
     <string name="one_minute">%1$s menit</string>
     <string name="two_minutes">%1$s menit</string>
-    <string name="other_words"></string>
+    <string name="other_words">%1$s kata</string>
     <string name="one_word">%1$s kata</string>
+    <string name="other_minutes">%1$s menit</string>
+    <string name="close_menu">Tutup menu</string>
 </resources>
