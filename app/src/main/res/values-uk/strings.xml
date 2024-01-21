@@ -242,4 +242,5 @@
     <string name="two_minutes">%1$s хвилини</string>
     <string name="other_words">%1$s слів</string>
     <string name="one_word">%1$s слово</string>
+    <string name="close_menu">Закрити меню</string>
 </resources>
