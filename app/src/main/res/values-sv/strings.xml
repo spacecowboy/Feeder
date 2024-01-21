@@ -242,4 +242,5 @@
     <string name="two_minutes">%1$s minuter</string>
     <string name="other_words">%1$s ord</string>
     <string name="one_word">%1$s ord</string>
+    <string name="close_menu">Stäng meny</string>
 </resources>
