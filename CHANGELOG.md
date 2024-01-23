@@ -1,3 +1,49 @@
+# 2.6.15
+Agnieszka C (1):
+  * [d8d3b6e0] Updated Polish translation using Weblate
+
+ERYpTION (1):
+  * [9409eb87] Updated Danish translation using Weblate
+
+Jonas Kalderstam (5):
+  * [a2465ad4] Added Galician language component
+  * [d31d028d] Removed decorative icons from TalkBack
+  * [475abdc5] Added invisible close menu buttons for TalkBack to all
+         dropdown menus
+  * [d5a7234e] Added LeakCanary to debug builds
+  * [3f9d0507] Testing not deleting galician language
+
+Matth78 (1):
+  * [06d96170] Updated French translation using Weblate
+
+Oğuz Ersen (1):
+  * [5c039435] Updated Turkish translation using Weblate
+
+bittin1ddc447d824349b2 (1):
+  * [b56cbf6e] Updated Swedish translation using Weblate
+
+gallegonovato (1):
+  * [232d5099] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [b0aa7a9c] Updated Galician translation using Weblate
+
+v1s7 (2):
+  * [39187233] Updated Russian translation using Weblate
+  * [8563c182] Updated Russian translation using Weblate
+
+zmni (1):
+  * [aa27c768] Updated Indonesian translation using Weblate
+
+Ács Zoltán (1):
+  * [286d2ac0] Updated Hungarian translation using Weblate
+
+Сергій (1):
+  * [1362067e] Updated Ukrainian translation using Weblate
+
+大王叫我来巡山 (1):
+  * [2fa7266b] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.14
 Jonas Kalderstam (1):
   * [ff495c38] Fixed mark as read on scroll also marking items when opening
