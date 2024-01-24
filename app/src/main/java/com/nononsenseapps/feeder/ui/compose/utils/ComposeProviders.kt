@@ -10,8 +10,12 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
 import org.kodein.di.compose.withDI
 
+@Suppress("ktlint:compose:mutable-params-check")
 @Composable
-fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
+fun DIAwareComponentActivity.withAllProviders(
+    handlers: MutableList<KeyEventHandler>,
+    content: @Composable () -> Unit,
+) {
     withDI {
         val viewModel: CommonActivityViewModel = diAwareViewModel()
         val currentTheme by viewModel.currentTheme.collectAsStateWithLifecycle()
@@ -25,8 +29,10 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
                 dynamicColors = dynamicColors,
             ) {
                 withWindowSize {
-                    ProvideFontScale(fontScale = textScale) {
-                        WithFeederTextToolbar(content)
+                    ProvideKeyEventHandler(handlers) {
+                        ProvideFontScale(fontScale = textScale) {
+                            WithFeederTextToolbar(content)
+                        }
                     }
                 }
             }

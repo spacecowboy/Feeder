@@ -16,12 +16,15 @@ import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
+import com.nononsenseapps.feeder.ui.compose.utils.KeyEventHandler
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 
 /**
  * This activity should only be started via a Send (share) or Open URL/Text intent.
  */
 class AddFeedFromShareActivity : DIAwareComponentActivity() {
+    private val keyEventHandlers = mutableListOf<KeyEventHandler>()
+
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +37,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
             (intent?.dataString ?: intent?.getStringExtra(Intent.EXTRA_TEXT))?.trim()
 
         setContent {
-            withAllProviders {
+            withAllProviders(keyEventHandlers) {
                 val navController = rememberAnimatedNavController()
                 AnimatedNavHost(navController, startDestination = "search") {
                     composable(

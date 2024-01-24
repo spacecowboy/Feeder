@@ -9,12 +9,15 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
+import com.nononsenseapps.feeder.ui.compose.utils.KeyEventHandler
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 
 /**
  * Should only be opened from the MANAGE SETTINGS INTENT
  */
 class ManageSettingsActivity : DIAwareComponentActivity() {
+    private val keyEventHandlers = mutableListOf<KeyEventHandler>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -23,7 +26,7 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            withAllProviders {
+            withAllProviders(keyEventHandlers) {
                 SettingsScreen(
                     onNavigateUp = {
                         onNavigateUpFromIntentActivities()

@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.content.Intent
+import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +16,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -79,6 +83,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.toArgb
@@ -141,6 +146,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.ListenKeyEvents
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
@@ -1089,6 +1095,39 @@ fun FeedListContent(
     val coroutineScope = rememberCoroutineScope()
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
+    val screenHeightPx =
+        with(LocalDensity.current) {
+            LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
+        }
+
+    ListenKeyEvents { keyCode ->
+        when (keyCode) {
+            KeyEvent.KEYCODE_P, KeyEvent.KEYCODE_PAGE_UP -> {
+                // Hard to figure which item would be first one page up so just scroll one
+                // screen's worth of pixels when going up
+                coroutineScope.launch {
+                    listState.animateScrollBy(-screenHeightPx.toFloat())
+                }
+                true
+            }
+
+            KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_PAGE_DOWN -> {
+                // Last item can be partially visible, so scroll to it
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index
+                    ?.let { lastVisible ->
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(lastVisible)
+                        }
+                    }
+                true
+            }
+
+            else -> false
+        }
+    }
+
     Box(modifier = modifier) {
         AnimatedVisibility(
             enter = fadeIn(),
@@ -1122,10 +1161,6 @@ fun FeedListContent(
             exit = fadeOut(),
             visible = viewState.haveVisibleFeedItems,
         ) {
-            val screenHeightPx =
-                with(LocalDensity.current) {
-                    LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
-                }
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
