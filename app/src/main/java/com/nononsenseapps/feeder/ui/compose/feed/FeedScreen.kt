@@ -112,6 +112,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.model.export.exportSavedArticles
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
@@ -175,6 +176,17 @@ fun FeedScreen(
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
 
     val di = LocalDI.current
+    val savedArticleExporter =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument("text/x-opml"),
+        ) { uri ->
+            if (uri != null) {
+                val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
+                applicationCoroutineScope.launch {
+                    exportSavedArticles(di, uri)
+                }
+            }
+        }
     val opmlExporter =
         rememberLauncherForActivityResult(
             ActivityResultContracts.CreateDocument("text/x-opml"),
@@ -331,13 +343,23 @@ fun FeedScreen(
                     }
                 }
             },
-            onExport = {
+            onExportOPML = {
                 try {
                     opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml")
                 } catch (e: Exception) {
                     // ActivityNotFoundException in particular
                     coroutineScope.launch {
                         toastMaker.makeToast(R.string.failed_to_export_OPML)
+                    }
+                }
+            },
+            onExportSavedArticles = {
+                try {
+                    savedArticleExporter.launch("feeder-saved-articles-${LocalDateTime.now()}.txt")
+                } catch (e: Exception) {
+                    // ActivityNotFoundException in particular
+                    coroutineScope.launch {
+                        toastMaker.makeToast(R.string.failed_to_export_saved_articles)
                     }
                 }
             },
@@ -425,7 +447,8 @@ fun FeedScreen(
     onSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
-    onExport: () -> Unit,
+    onExportOPML: () -> Unit,
+    onExportSavedArticles: () -> Unit,
     drawerState: DrawerState,
     markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
@@ -738,7 +761,7 @@ fun FeedScreen(
                         DropdownMenuItem(
                             onClick = {
                                 onShowToolbarMenu(false)
-                                onExport()
+                                onExportOPML()
                             },
                             leadingIcon = {
                                 Icon(
@@ -748,6 +771,21 @@ fun FeedScreen(
                             },
                             text = {
                                 Text(stringResource(id = R.string.export_feeds_to_opml))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onExportSavedArticles()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.ImportExport,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.export_saved_articles))
                             },
                         )
                         Divider()
