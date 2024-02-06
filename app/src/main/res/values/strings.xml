@@ -45,6 +45,7 @@
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
   <string name="import_feeds_from_opml">Import feeds from OPML</string>
+  <string name="export_saved_articles">Export saved articles</string>
   <string name="view_debug_log">View debug log</string>
   <string name="new_based_on_this">New based on this</string>
   <string name="indicator_for_mark_as_read">Indicator for mark as read</string>
@@ -163,6 +164,7 @@
   <string name="invalid_url">Not a valid URL</string>
   <string name="failed_to_import_OPML">"Failed to import OPML"</string>
   <string name="failed_to_export_OPML">"Failed to export OPML"</string>
+  <string name="failed_to_export_saved_articles">"Failed to export saved articles"</string>
   <string name="device_sync">Device sync</string>
   <string name="add_new_device">Add new device</string>
   <string name="device_sync_financed_by_community">This service is paid for by the community. Please consider donating if you find it useful.</string>

@@ -320,6 +320,9 @@ interface FeedItemDao {
         bookmarked: Boolean,
     )
 
+    @Query("SELECT link FROM feed_items WHERE bookmarked = 1 order by link")
+    suspend fun getLinksOfBookmarks(): List<String?>
+
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
     suspend fun markAsNotified(
         ids: List<Long>,
