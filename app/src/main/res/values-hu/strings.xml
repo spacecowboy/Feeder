@@ -45,7 +45,7 @@
     <string name="sync_option_every_3_hours">Minden 3 órában</string>
     <string name="sync_option_every_6_hours">Minden 6 órában</string>
     <string name="sync_option_every_12_hours">Minden 12 órában</string>
-    <string name="sync_option_every_day">MInden nap</string>
+    <string name="sync_option_every_day">Minden nap</string>
     <string name="synchronization">Szinkronizálás alatt</string>
     <string name="syncing">Szinkronizálás alatt</string>
     <string name="only_on_wifi">Csak Wi-Fi-n</string>
@@ -242,4 +242,5 @@
     <string name="two_minutes">%1$s perc</string>
     <string name="other_words">%1$s szó</string>
     <string name="one_word">%1$s szó</string>
+    <string name="close_menu">Menü bezárása</string>
 </resources>
