@@ -9,7 +9,7 @@
     <string name="add_feed_search_hint">URL do feed</string>
     <string name="title">Título</string>
     <string name="save">Salvar</string>
-    <string name="empty_feed_top">Nada para ler. Você gostaria de…</string>
+    <string name="empty_feed_top">Nada para ler aqui. Você gostaria de…</string>
     <string name="empty_feed_open"><annotation style="link">Abrir</annotation> um outro feed?</string>
     <string name="empty_feed_add"><annotation style="link">Adicionar</annotation> mais feeds?</string>
     <string name="search_feed_empty_hint">Digite o endereço de um feed</string>
@@ -96,7 +96,7 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
-    <string name="url">url</string>
+    <string name="url">URL</string>
     <string name="failed_to_parse">Não foi possível analisar %1$s</string>
     <string name="use_app_default">Usar app padrão</string>
     <string name="failed_to_load_text_to_speech">Não foi possível carregar o texto para fala</string>
