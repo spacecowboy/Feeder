@@ -243,4 +243,6 @@
     <string name="other_words">%1$s kelime</string>
     <string name="one_word">%1$s kelime</string>
     <string name="close_menu">Menüyü kapat</string>
+    <string name="export_saved_articles">Kaydedilen makaleleri dışa aktar</string>
+    <string name="failed_to_export_saved_articles">Kaydedilen makaleler dışa aktarılamadı</string>
 </resources>
