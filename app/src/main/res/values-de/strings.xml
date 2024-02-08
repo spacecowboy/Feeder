@@ -242,4 +242,7 @@
     <string name="two_minutes">%1$s Minuten</string>
     <string name="other_words">%1$s Wörter</string>
     <string name="one_word">%1$s Wort</string>
+    <string name="close_menu">Menü schließen</string>
+    <string name="export_saved_articles">Gespeicherte Artikel exportieren</string>
+    <string name="failed_to_export_saved_articles">Gespeicherte Artikel konnten nicht exportiert werden</string>
 </resources>
