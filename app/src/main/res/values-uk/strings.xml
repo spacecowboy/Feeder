@@ -243,4 +243,6 @@
     <string name="other_words">%1$s слів</string>
     <string name="one_word">%1$s слово</string>
     <string name="close_menu">Закрити меню</string>
+    <string name="export_saved_articles">Експортувати збережені статті</string>
+    <string name="failed_to_export_saved_articles">Не вдалося експортувати збережені статті</string>
 </resources>
