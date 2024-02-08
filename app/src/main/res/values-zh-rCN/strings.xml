@@ -243,4 +243,6 @@
     <string name="other_words">%1$s 字</string>
     <string name="one_word">%1$s 字</string>
     <string name="close_menu">关闭菜单</string>
+    <string name="export_saved_articles">导出已保存的文章</string>
+    <string name="failed_to_export_saved_articles">未能导出已保存的文章</string>
 </resources>
