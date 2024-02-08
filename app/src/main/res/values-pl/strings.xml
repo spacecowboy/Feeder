@@ -243,4 +243,6 @@
     <string name="other_words">%1$s słów</string>
     <string name="one_word">%1$s słowo</string>
     <string name="close_menu">Zamknij menu</string>
+    <string name="export_saved_articles">Eksportuj zapisane artykuły</string>
+    <string name="failed_to_export_saved_articles">Nie udało się wyeksportować zapisanych artykułów</string>
 </resources>
