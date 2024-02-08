@@ -243,4 +243,6 @@
     <string name="many_minutes">%1$s minutos</string>
     <string name="other_minutes">%1$s minutos</string>
     <string name="close_menu">Pechar menú</string>
+    <string name="failed_to_export_saved_articles">Fallou a exportación dos artigos</string>
+    <string name="export_saved_articles">Exportar artigos gardados</string>
 </resources>
