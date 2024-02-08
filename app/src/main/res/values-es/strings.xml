@@ -243,4 +243,6 @@
     <string name="other_words">%1$s palabras</string>
     <string name="one_word">%1$s palabra</string>
     <string name="close_menu">Cerrar el menú</string>
+    <string name="export_saved_articles">Exportar los artículos guardados</string>
+    <string name="failed_to_export_saved_articles">Error al exportar artículos guardados</string>
 </resources>
