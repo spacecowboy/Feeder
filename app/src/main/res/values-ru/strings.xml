@@ -243,4 +243,6 @@
     <string name="other_minutes">%1$s минут</string>
     <string name="add_anyway">Всё равно добавить</string>
     <string name="close_menu">Закрыть меню</string>
+    <string name="export_saved_articles">Экспортировать созранённые статьи</string>
+    <string name="failed_to_export_saved_articles">Не удалось экспортировать созранённые статьи</string>
 </resources>
