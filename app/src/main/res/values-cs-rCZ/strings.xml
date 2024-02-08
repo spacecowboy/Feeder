@@ -242,4 +242,7 @@
     <string name="two_minutes">%1$s minuty</string>
     <string name="other_words">%1$s slov</string>
     <string name="one_word">%1$s slovo</string>
+    <string name="close_menu">Zavřít menu</string>
+    <string name="export_saved_articles">Export uložených článků</string>
+    <string name="failed_to_export_saved_articles">Nepodařilo se exportovat uložené články</string>
 </resources>
