@@ -218,6 +218,8 @@ dependencies {
     implementation(libs.bundles.okhttp.android)
     implementation(libs.bundles.kotlin)
 
+    implementation(files("/home/jonas/workspace/feeder-gofeed/build/hello.aar"))
+
     // Only for debug
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
 

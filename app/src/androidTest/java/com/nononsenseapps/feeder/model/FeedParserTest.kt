@@ -3,6 +3,7 @@
 package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.model.gofeed.Experiment
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -40,6 +41,8 @@ class FeedParserTest : DIAware {
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
     }
+
+    private val exp = Experiment()
 
     @Test
     @Ignore
@@ -817,6 +820,9 @@ class FeedParserTest : DIAware {
         runBlocking {
             val feed = contentTypeHtml.use { feedParser.parseFeedResponse(it) }
 
+            val gofeed = contentTypeHtml.use { exp.parseBody(it.body?.string() ?: "") }
+            print(gofeed)
+
             val item = feed.getOrNull()?.items!!.single()
 
             assertFalse(
@@ -839,6 +845,9 @@ class FeedParserTest : DIAware {
                 )
 
             val item = feed.getOrNull()?.items!!.single()
+
+            val gofeed = exp.parseBody(rssWithHtmlEscapedDescription)
+            print(gofeed)
 
             assertEquals(
                 "http://cowboyprogrammer.org/hello.jpg&cached=true",
