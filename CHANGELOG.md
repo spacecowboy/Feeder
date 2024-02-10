@@ -1,3 +1,49 @@
+# 2.6.16
+Jonas Kalderstam (1):
+  * [78919404] Added ability to export saved articles
+
+Adam Jermstad (1):
+  * [95d1979a] Update README screenshot references
+
+Agnieszka C (1):
+  * [832cfce5] Updated Polish translation using Weblate
+
+Eduardo (1):
+  * [9067ff5d] Updated Portuguese (Brazil) translation using Weblate
+
+Matth78 (1):
+  * [dd821aad] Updated French translation using Weblate
+
+Mattia (1):
+  * [e32b060d] Updated Italian translation using Weblate
+
+Oğuz Ersen (1):
+  * [4976c3ee] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [54334b82] Updated German translation using Weblate
+
+gallegonovato (1):
+  * [304771ad] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [3baf1030] Updated Galician translation using Weblate
+
+pchelium (1):
+  * [e971b340] Updated Czech translation using Weblate
+
+v1s7 (1):
+  * [1e571b0a] Updated Russian translation using Weblate
+
+Ács Zoltán (1):
+  * [02b01162] Updated Hungarian translation using Weblate
+
+Сергій (1):
+  * [117a61e9] Updated Ukrainian translation using Weblate
+
+大王叫我来巡山 (1):
+  * [01ccc9d2] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.15
 Agnieszka C (1):
   * [d8d3b6e0] Updated Polish translation using Weblate
