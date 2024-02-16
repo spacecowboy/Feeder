@@ -740,6 +740,14 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.updateWordCountFull(id, wordCount)
     }
 
+    suspend fun duplicateStoryExists(
+        id: Long,
+        title: String,
+        link: String?,
+    ): Boolean {
+        return feedItemStore.duplicateStoryExists(id = id, title = title, link = link)
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_REPO"
     }

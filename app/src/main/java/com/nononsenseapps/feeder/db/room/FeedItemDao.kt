@@ -488,6 +488,21 @@ interface FeedItemDao {
         articleGuid: String,
     ): Long?
 
+    @Query(
+        """
+            select exists(
+                select id
+                from feed_items
+                where id <> :id and (plain_title = :plainTitle or link = :link) and plain_title <> '' and link is not null and link <> ''
+            )
+        """,
+    )
+    suspend fun duplicationExists(
+        id: Long,
+        plainTitle: String,
+        link: String?,
+    ): Boolean
+
     companion object {
         // These are backed by a database index
         const val FEED_ITEM_LIST_SORT_ORDER_DESC =
