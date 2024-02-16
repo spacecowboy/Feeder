@@ -234,7 +234,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                             it to guid
                         }
                         ?.reversed()
-                        ?.map { (item, guid) ->
+                        ?.mapNotNull { (item, guid) ->
                             // Always attempt to load existing items using both id schemes
                             // Id is rewritten to preferred on update
                             val feedItemSql =
@@ -246,16 +246,22 @@ class RssLocalSync(override val di: DI) : DIAware {
                                     feedId = feedSql.id,
                                 ) ?: FeedItem(firstSyncedTime = downloadTime)
 
-                            feedItemSql.updateFromParsedEntry(item, guid, feed)
-                            feedItemSql.feedId = feedSql.id
+                            // If new item, see if duplicates exist
+                            if (feedItemSql.id != ID_UNSET || !repository.duplicateStoryExists(id = feedItemSql.id, title = item.title ?: "", link = item.url)) {
+                                feedItemSql.updateFromParsedEntry(item, guid, feed)
+                                feedItemSql.feedId = feedSql.id
 
-                            if (feedItemSql.guid in alreadyReadGuids) {
-                                // TODO get read time from sync service
-                                feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
-                                feedItemSql.notified = true
+                                if (feedItemSql.guid in alreadyReadGuids) {
+                                    // TODO get read time from sync service
+                                    feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
+                                    feedItemSql.notified = true
+                                }
+
+                                feedItemSql to (item.content_html ?: item.content_text ?: "")
+                            } else {
+                                Log.i(LOG_TAG, "Duplicate story ignored: ${item.title}")
+                                null
                             }
-
-                            feedItemSql to (item.content_html ?: item.content_text ?: "")
                         } ?: emptyList()
 
                 repository.upsertFeedItems(feedItemSqls) { feedItem, text ->

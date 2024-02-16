@@ -313,6 +313,18 @@ class FeedItemStore(override val di: DI) : DIAware {
     ) {
         dao.updateWordCountFull(id, wordCount)
     }
+
+    suspend fun duplicateStoryExists(
+        id: Long,
+        title: String,
+        link: String?,
+    ): Boolean {
+        return dao.duplicationExists(
+            id = id,
+            plainTitle = title,
+            link = link,
+        )
+    }
 }
 
 val mediumDateTimeFormat: DateTimeFormatter =
