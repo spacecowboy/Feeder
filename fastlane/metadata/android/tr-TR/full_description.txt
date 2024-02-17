@@ -1,19 +1,19 @@
-<p>Kişisel bilgilerinizi çalan, özgür olmayan ve şişirilmiş okuyuculardan bıktınız mı?<br/>
-Saatlerce sunucu yapılandırması gerektiren karmaşık eşzamanlama kurulumlarından sıkıldınız mı?<br/>
-Her yerde hesap oluşturmaktan gına mı geldi?<br/></p>
+<p>Feeder, 2014 yılında oluşturulan Android için açık kaynaklı bir yayın (RSS/Atom/JSONFeed) okuyucusudur.</p>
 
-<p>O zaman Feeder'ı deneyin!</p>
+<p>Feeder ile sevdiğiniz sitelerdeki en son haberleri ve gönderileri okuyabilirsiniz.</p>
 
-<p>Feeder, tamamen özgür bir yayın okuyucusudur. JSONFeed dahil tüm yaygın yayın biçimlerini destekler. Sizi takip etmez. Herhangi bir kurulum gerektirmez. Hesap oluşturmanıza bile gerek yok! Yayın akışılarınızı ayarlayın veya eski okuyucunuzdan OPML aracılığıyla içe aktarın, ardından eşzamanlayıp okumaya başlayın.</p>
+<p>Feeder normal uzak arka uçlarla eşzamanlanmaz, bu nedenle herhangi bir hesap kaydı gerekli değildir.</p>
+
+<p>Feeder'ın kullanımı ücretsizdir ve aygıtınızda yerel olarak çalışır. Verileriniz %100 gizlidir.</p>
 
 <p><b>Özellikler</b></p>
 
 <ul>
-<li>HTML'yi ayrıştırır ve yerel bir TextView'da görüntüler</li>
+<li>HTML'yi ayrıştırır ve yerel bir TextView içinde görüntüler</li>
 <li>Çevrim dışı okuma</li>
 <li>Arka planda eşzamanlama</li>
 <li>Bildirimler</li>
 <li>OPML içe/dışa aktarma</li>
-<li>Ek bağlantılara pratik erişim</li>
-<li>Materyal tasarım</li>
+<li>Bağlantılara kullanışlı erişim</li>
+<li>Material tasarımı</li>
 </ul>
