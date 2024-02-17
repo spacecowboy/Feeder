@@ -242,4 +242,7 @@
     <string name="two_minutes">%1$s минути</string>
     <string name="other_words">%1$s думи</string>
     <string name="one_word">%1$s дума</string>
+    <string name="close_menu">Затваряне на менюто</string>
+    <string name="export_saved_articles">Експортиране на запазени статии</string>
+    <string name="failed_to_export_saved_articles">Неуспешно експортиране на запазени статии</string>
 </resources>
