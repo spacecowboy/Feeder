@@ -242,4 +242,7 @@
     <string name="two_minutes">%1$s minuuttia</string>
     <string name="other_words">%1$s sanaa</string>
     <string name="one_word">%1$s sana</string>
+    <string name="close_menu">Sulje valikko</string>
+    <string name="export_saved_articles">Vie tallennetut artikkelit</string>
+    <string name="failed_to_export_saved_articles">Tallennettujen artikkeleiden vienti epäonnistui</string>
 </resources>
