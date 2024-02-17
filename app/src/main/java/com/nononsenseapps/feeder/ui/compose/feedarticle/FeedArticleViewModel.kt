@@ -609,19 +609,19 @@ object RotatingArticleItemKeyHolder : ArticleItemKeyHolder {
     }
 }
 
-class FullArticleItemKeyHolder : ArticleItemKeyHolder {
+class FullArticleItemKeyHolder(private val articleId: Long) : ArticleItemKeyHolder {
     private var key: Long = 0L
 
     override fun getAndIncrementKey(): Any {
-        return "Full ${key++}"
+        return "Full $articleId ${key++}"
     }
 }
 
-class DefaultArticleItemKeyHolder : ArticleItemKeyHolder {
+class DefaultArticleItemKeyHolder(private val articleId: Long) : ArticleItemKeyHolder {
     private var key: Long = 0L
 
     override fun getAndIncrementKey(): Any {
-        return "Default ${key++}"
+        return "Default $articleId ${key++}"
     }
 }
 

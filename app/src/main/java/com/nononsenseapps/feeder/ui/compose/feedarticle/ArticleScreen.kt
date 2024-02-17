@@ -469,7 +469,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = DefaultArticleItemKeyHolder(),
+                                    keyHolder = DefaultArticleItemKeyHolder(viewState.articleId),
                                 ) { link ->
                                     activityLauncher.openLink(
                                         link = link,
@@ -508,7 +508,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = FullArticleItemKeyHolder(),
+                                    keyHolder = FullArticleItemKeyHolder(viewState.articleId),
                                 ) { link ->
                                     activityLauncher.openLink(
                                         link = link,
