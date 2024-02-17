@@ -243,4 +243,6 @@
     <string name="other_words">%1$s ord</string>
     <string name="one_word">%1$s ord</string>
     <string name="close_menu">Stäng meny</string>
+    <string name="export_saved_articles">Exportera sparade artiklar</string>
+    <string name="failed_to_export_saved_articles">Misslyckades att exportera sparade artiklar</string>
 </resources>
