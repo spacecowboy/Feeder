@@ -14,8 +14,8 @@
     <string name="action_settings">Beállítások</string>
     <string name="add_feed">Hírfolyam hozzáadása</string>
     <string name="title_activity_edit_feed">Feliratkozás hírfolyamra</string>
-    <string name="empty_feed_open"><annotation style="link">Megnyitni</annotation> egy másik hírfolyamot?</string>
-    <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadáni</annotation>\?</string>
+    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">Megnyitni</annotation> ?</string>
+    <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadni</annotation>\?</string>
     <string name="search_feed_empty_hint">Adjon meg egy hírfolyam címet</string>
     <string name="mark_as_read">Megjelölés olvasottként</string>
     <string name="mark_as_unread">Megjelölés olvasatlanként</string>
@@ -55,7 +55,7 @@
     <string name="image_loading">Kép betöltése</string>
     <string name="no_activity_for_link">Először telepítsen valamit a link megnyitásához</string>
     <string name="on_startup">Alkalmazás indításkor</string>
-    <string name="block_list">Blokklista</string>
+    <string name="block_list">Blokkolási lista</string>
     <string name="add_item">Elem hozzáadása</string>
     <string name="show_fab">Lebegő akciógomb megjelenítése</string>
     <string name="include_mobile_hotspots">Mobil hotspotokat is beleértve</string>
@@ -198,7 +198,7 @@
     <string name="mark_as_read_on_scroll">Megjelölés olvasottként görgetésnél</string>
     <string name="skip_to_next">Ugrás a következőre</string>
     <string name="set_language">Nyelv beállítása</string>
-    <string name="only_available_on_android_n">Csak Android %1$s és újabb rendszereken érhető el</string>
+    <string name="only_available_on_android_n">Csak Android %1$s-n és újabb rendszereken érhető el</string>
     <string name="description_for_read_aloud">Cikk nyelvének automatikus felismerése</string>
     <string name="unsave_article">Cikk mentésének leállítása</string>
     <string name="article_image">Cikk képe</string>
@@ -243,4 +243,6 @@
     <string name="other_words">%1$s szó</string>
     <string name="one_word">%1$s szó</string>
     <string name="close_menu">Menü bezárása</string>
+    <string name="export_saved_articles">Mentett cikkek exportálása</string>
+    <string name="failed_to_export_saved_articles">Nem sikerült a mentett cikkek exportálása</string>
 </resources>
