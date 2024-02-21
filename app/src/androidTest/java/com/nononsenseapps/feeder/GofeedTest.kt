@@ -35,7 +35,7 @@ class GofeedTest {
     @Test
     fun testParse() {
         val j =
-            feedergofeed.Feedergofeed.parseBody(
+            feedergofeed.Feedergofeed.parseBodyString(
                 """
                 <rss version="2.0">
                     <channel>

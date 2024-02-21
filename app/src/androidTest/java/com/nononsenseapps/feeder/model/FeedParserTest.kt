@@ -4,6 +4,7 @@ package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.gofeed.Experiment
+import com.nononsenseapps.feeder.util.getOrElse
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -65,20 +66,23 @@ class FeedParserTest : DIAware {
     fun canParseUkrnet() {
         runBlocking {
             readResource("rss_ukrnet.xml") {
-                val feed = exp.parseBody(it)
+//                val feed = exp.parseBody(it)
 //
-//                val feed =
-//                    feedParser.parseFeedResponse(
-//                        URL("https://suspilne.media/rss/ukrnet.rss"),
-//                        it,
-//                        null,
-//                    )
 
-//                feed.leftOrNull()?.throwable?.let { t ->
-//                    throw t
-//                }
+//                assertEquals(20, feed?.items?.size, "Expected 20 items")
 
-                assertEquals(20, feed?.items?.size, "Expected 20 items")
+                val feed =
+                    feedParser.parseFeedResponse(
+                        URL("https://suspilne.media/rss/ukrnet.rss"),
+                        it,
+                        null,
+                    )
+
+                feed.leftOrNull()?.throwable?.let { t ->
+                    throw t
+                }
+
+                assertEquals(20, feed.getOrNull()?.items?.size, "Expected 20 items")
             }
         }
     }
@@ -725,7 +729,11 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun londoner() =
         runBlocking {
-            val feed = londoner.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
+            val feed =
+                londoner.use { feedParser.parseFeedResponse(it) }.getOrElse {
+                    System.err.println(it)
+                    throw it.throwable!!
+                }
 
             assertEquals("http://londonist.com/", feed.home_page_url)
             assertEquals("http://londonist.com/feed", feed.feed_url)

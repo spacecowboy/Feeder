@@ -16,13 +16,20 @@ class Experiment {
     private val goFeedAdapter = moshi.adapter<GoFeed>()
 
     @Throws(IOException::class)
-    fun fromJson(json: ByteArray): GoFeed? {
+    private fun fromJson(json: ByteArray): GoFeed? {
         return goFeedAdapter.fromJson(json.decodeToString())
     }
 
     @Throws(IOException::class)
     fun parseBody(body: String): GoFeed? {
-        return feedergofeed.Feedergofeed.parseBody(body)?.let {
+        return feedergofeed.Feedergofeed.parseBodyString(body)?.let {
+            return fromJson(it)
+        }
+    }
+
+    @Throws(IOException::class)
+    fun parseBody(body: ByteArray): GoFeed? {
+        return feedergofeed.Feedergofeed.parseBodyBytes(body)?.let {
             return fromJson(it)
         }
     }

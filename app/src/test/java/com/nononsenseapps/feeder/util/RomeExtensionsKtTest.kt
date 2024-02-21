@@ -5,7 +5,7 @@ import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.ParsedArticle
 import com.nononsenseapps.feeder.model.ParsedAuthor
 import com.nononsenseapps.feeder.model.ParsedEnclosure
-import com.nononsenseapps.feeder.model.ParsedFeed
+import com.nononsenseapps.feeder.model.ParsedFeedDeleteme
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.MediaContent
@@ -44,7 +44,7 @@ class RomeExtensionsKtTest {
     fun feedLinkButNoLinks() =
         runBlocking {
             assertEquals(
-                ParsedFeed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                ParsedFeedDeleteme(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
                 mockSyndFeed(link = "homepage").asFeed(baseUrl),
             )
         }
@@ -53,7 +53,7 @@ class RomeExtensionsKtTest {
     fun feedLinks() =
         runBlocking {
             assertEquals(
-                ParsedFeed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                ParsedFeedDeleteme(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
                 mockSyndFeed(
                     links =
                         listOf(
@@ -71,7 +71,7 @@ class RomeExtensionsKtTest {
     fun itemFallsBackToFeedAuthor() =
         runBlocking {
             assertEquals(
-                ParsedFeed(
+                ParsedFeedDeleteme(
                     author = ParsedAuthor(name = "bob"),
                     title = "",
                     items =

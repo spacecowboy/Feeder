@@ -35,8 +35,8 @@ data class GoFeed(
     val updatedParsed: String?,
     val published: String?,
     val publishedParsed: String?,
-    val author: GoPersion?,
-    val authors: List<GoPersion?>?,
+    val author: GoPerson?,
+    val authors: List<GoPerson?>?,
     val language: String?,
     val image: GoImage?,
     val copyright: String?,
@@ -82,8 +82,8 @@ data class GoItem(
     val updatedParsed: String?,
     val published: String?,
     val publishedParsed: String?,
-    val author: GoPersion?,
-    val authors: List<GoPersion?>?,
+    val author: GoPerson?,
+    val authors: List<GoPerson?>?,
     val guid: String?,
     val image: GoImage?,
     val categories: List<String>?,
@@ -93,14 +93,14 @@ data class GoItem(
     val extensions: GoExtensions?,
 )
 
-data class GoPersion(
-    val name: String,
-    val email: String,
+data class GoPerson(
+    val name: String?,
+    val email: String?,
 )
 
 data class GoImage(
-    val url: String,
-    val title: String,
+    val url: String?,
+    val title: String?,
 )
 
 /*
