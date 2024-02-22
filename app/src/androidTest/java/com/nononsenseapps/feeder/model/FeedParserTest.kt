@@ -540,8 +540,9 @@ class FeedParserTest : DIAware {
         }
 
     @Test
-    fun doesNotFetchVideos(): Unit =
+    fun doesNotFetchVideoContentType(): Unit =
         runBlocking {
+            // This request uses a feed but the content type is video and should be ignored
             val result = videoResponse.use { feedParser.parseFeedResponse(it) }
             assertTrue {
                 result.isLeft()
@@ -646,7 +647,7 @@ class FeedParserTest : DIAware {
                 item.image?.url,
             )
 
-            assertEquals<List<Any>?>(emptyList(), item.attachments)
+            assertEquals<List<Any>?>(emptyList(), item.attachments ?: emptyList())
         }
 
     @Test
@@ -656,7 +657,7 @@ class FeedParserTest : DIAware {
             val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
             assertEquals("http://cornucopia.cornubot.se/", feed.home_page_url)
-            assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed.feed_url)
+            assertEquals("https://cornucopia.cornubot.se/feeds/posts/default", feed.feed_url)
 
             assertEquals(25, feed.items!!.size)
             val item = feed.items!!.first()
@@ -680,7 +681,7 @@ class FeedParserTest : DIAware {
                 item.image?.url,
             )
 
-            assertEquals<List<Any>?>(emptyList(), item.attachments)
+            assertEquals<List<Any>?>(emptyList(), item.attachments ?: emptyList())
         }
 
     @Test

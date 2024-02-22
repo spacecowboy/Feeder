@@ -93,6 +93,8 @@ data class GoItem(
     val extensions: GoExtensions?,
 )
 
+typealias GoExtensions = Map<String, Map<String, List<GoExtension>>>
+
 data class GoPerson(
     val name: String?,
     val email: String?,
@@ -251,9 +253,9 @@ type Extension struct {
 	Children map[string][]Extension `json:"children"`
 }
  */
-data class GoExtensions(
+data class GoExtension(
     val name: String?,
     val value: String?,
     val attrs: Map<String, String>?,
-    val children: Map<String, List<GoExtensions>>?,
+    val children: Map<String, List<GoExtension>>?,
 )

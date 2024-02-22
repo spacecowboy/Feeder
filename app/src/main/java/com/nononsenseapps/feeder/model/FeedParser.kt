@@ -4,9 +4,9 @@ import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.nononsenseapps.feeder.model.gofeed.Experiment
+import com.nononsenseapps.feeder.model.gofeed.FeederGoItem
 import com.nononsenseapps.feeder.model.gofeed.GoEnclosure
 import com.nononsenseapps.feeder.model.gofeed.GoFeed
-import com.nononsenseapps.feeder.model.gofeed.GoItem
 import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
@@ -211,6 +211,7 @@ class FeedParser(override val di: DI) : DIAware {
         }
             .map {
                 // Preserve original URL to maintain authentication data and/or tokens in query params
+                // but this is also done inside parse from the request URL
                 it.copy(feed_url = url.toString())
             }
     }
@@ -343,35 +344,34 @@ class FeedParser(override val di: DI) : DIAware {
 private fun GoFeed.asFeed(url: URL): ParsedFeed =
     ParsedFeed(
         title = title,
-        home_page_url = link,
+        home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
         // Keep original URL to maintain authentication data and/or tokens in query params
         feed_url = url.toString(),
         description = description,
         user_comment = "",
         next_url = "",
-        icon = image?.url,
+        icon = image?.url?.let { relativeLinkIntoAbsolute(url, it) },
         favicon = null,
         author = author?.asParsedAuthor(),
         expired = null,
-        items = items?.mapNotNull { it?.asParsedArticle(author) },
+        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
     )
 
-private fun GoItem.asParsedArticle(feedAuthor: GoPerson?) =
+private fun FeederGoItem.asParsedArticle() =
     ParsedArticle(
         id = guid,
         url = link,
         external_url = null,
         title = title,
-        content_html = content ?: description,
-        content_text = content ?: description,
-        summary = (description ?: content)?.take(200),
-        // TODO image hunt logic from RomeExtensions
-        image = image?.url?.let { MediaImage(url = it, width = null, height = null) },
-        date_published = publishedParsed,
-        date_modified = updatedParsed,
-        author = (author ?: feedAuthor)?.asParsedAuthor(),
+        content_html = content,
+        content_text = plainContent,
+        summary = snippet,
+        image = thumbnail,
+        date_published = published,
+        date_modified = updated,
+        author = author?.asParsedAuthor(),
         tags = categories,
-        attachments = enclosures?.mapNotNull { it?.asParsedEnclosure() },
+        attachments = enclosures?.map { it.asParsedEnclosure() },
     )
 
 private fun GoEnclosure.asParsedEnclosure() =
