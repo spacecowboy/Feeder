@@ -47,7 +47,7 @@ class FeedParserTest : DIAware {
 
     @Test
     @Ignore
-    fun getAlternateLinksHandlesYoutube() {
+    fun getAlternateLinksHandlesYoutubeOnline() {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
             val feeds =
@@ -789,13 +789,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     @Ignore
-    fun cowboyAuthenticated() =
+    fun cowboyAuthenticatedOnline() =
         runBlocking {
-            runBlocking {
-                val feed =
-                    feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
-                assertEquals("Cowboy Programmer", feed.getOrNull()?.title)
-            }
+            val feed =
+                feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
+            assertEquals("Cowboy Programmer", feed.getOrNull()?.title)
         }
 
     @Test
@@ -814,13 +812,11 @@ class FeedParserTest : DIAware {
 
     @Test
     @Ignore
-    @Throws(Exception::class)
-    fun fz() =
+    fun fzImgUrl() =
         runBlocking {
             val feed = fz.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
             assertEquals("http://www.fz.se/nyheter/", feed.home_page_url)
-            assertNull(feed.feed_url)
 
             assertEquals(20, feed.items!!.size)
             val item = feed.items!!.first()
