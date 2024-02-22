@@ -15,7 +15,11 @@ class FeederGoItem(
     private val feedAuthor: GoPerson?,
     private val feedBaseUrl: URL,
 ) {
-    val title: String? = goItem.title
+    val title: String? by lazy {
+        goItem.title?.let {
+            HtmlToPlainTextConverter().convert(it)
+        }
+    }
 
     /**
      * Potentially with HTML
@@ -41,7 +45,13 @@ class FeederGoItem(
     }
 
     val plainContent: String by lazy {
-        content.let { HtmlToPlainTextConverter().convert(it) }
+        val result = content.let { HtmlToPlainTextConverter().convert(it) }
+
+        // Description consists of at least one image, avoid opening browser for this item
+        when {
+            result.isBlank() && content.contains("img") -> "<image>"
+            else -> result
+        }
     }
 
     val snippet: String by lazy { plainContent.take(200) }

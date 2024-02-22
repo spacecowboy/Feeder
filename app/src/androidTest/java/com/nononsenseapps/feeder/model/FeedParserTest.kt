@@ -926,7 +926,7 @@ class FeedParserTest : DIAware {
                 xhtml.image?.url,
             )
             assertTrue("Actual:\n${xhtml.content_html}") {
-                "<img src=\"hello.jpg&amp;cached=true\" />" in xhtml.content_html!!
+                "<img src=\"hello.jpg&amp;cached=true\"/>" in xhtml.content_html!!
             }
         }
 

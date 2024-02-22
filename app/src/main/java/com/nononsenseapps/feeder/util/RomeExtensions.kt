@@ -193,6 +193,7 @@ fun SyndEntry.contentText(): String {
 
     val result = HtmlToPlainTextConverter().convert(possiblyHtml ?: "")
 
+    // TODO add test before removing JONAS GOFEED
     // Description consists of at least one image, avoid opening browser for this item
     return when {
         result.isBlank() && possiblyHtml?.contains("img") == true ->

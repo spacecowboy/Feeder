@@ -24,6 +24,7 @@ class GoFeedExtensionsKtTest {
                         description = html,
                     ),
                 feedBaseUrl = baseUrl,
+                feedAuthor = null,
             )
 
         assertEquals(
