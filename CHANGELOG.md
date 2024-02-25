@@ -1,3 +1,51 @@
+# 2.6.17
+Agnieszka C (1):
+  * [735920e6] Translated using Weblate (Polish)
+
+Anonymous (1):
+  * [b65a7a11] Translated using Weblate (Basque)
+
+Jonas Kalderstam (3):
+  * [bcac30c7] Updated README and store descriptions
+  * [c6b79e3d] Changed so duplicate stories are ignored
+  * [d661f9b5] Fixed articles getting mixed with other articles sometimes
+
+Nitin Khalia (1):
+  * [aa584e20] Translated using Weblate (Hindi)
+
+Oğuz Ersen (1):
+  * [85ace16d] Translated using Weblate (Turkish)
+
+VfBFan (1):
+  * [22759475] Translated using Weblate (German)
+
+Vitor Henrique (1):
+  * [5a3b2222] Updated Portuguese (Brazil) translation using Weblate
+
+bittin1ddc447d824349b2 (1):
+  * [752755c4] Updated Swedish translation using Weblate
+
+gallegonovato (1):
+  * [4b412585] Translated using Weblate (Spanish)
+
+homocomputeris (1):
+  * [cac3ead4] Updated Russian translation using Weblate
+
+trunars (1):
+  * [a52a8f04] Translated using Weblate (Bulgarian)
+
+v1s7 (1):
+  * [49917664] Translated using Weblate (Russian)
+
+Ács Zoltán (1):
+  * [bc0f49cd] Updated Hungarian translation using Weblate
+
+Åzze (1):
+  * [7b6bc6b2] Updated Finnish translation using Weblate
+
+Сергій (1):
+  * [d7392440] Translated using Weblate (Ukrainian)
+
 # 2.6.16
 Jonas Kalderstam (1):
   * [78919404] Added ability to export saved articles
