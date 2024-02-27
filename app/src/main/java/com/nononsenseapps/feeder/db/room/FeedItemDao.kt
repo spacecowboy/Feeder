@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PREVIEW_COLUMNS
 import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.util.DoNotUseInProd
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
@@ -99,7 +100,7 @@ interface FeedItemDao {
     )
     suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
-    @Deprecated("Only used for migration and in tests")
+    @DoNotUseInProd
     @Query(
         """
         SELECT *

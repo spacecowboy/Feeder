@@ -505,6 +505,12 @@ fun ColumnScope.RightContent(
         icon = null,
     ) { viewState.notify = it }
     SwitchSetting(
+        title = stringResource(id = R.string.skip_duplicate_articles),
+        description = stringResource(id = R.string.skip_duplicate_articles_desc),
+        checked = viewState.skipDuplicates,
+        icon = null,
+    ) { viewState.skipDuplicates = it }
+    SwitchSetting(
         title = stringResource(id = R.string.generate_extra_unique_ids),
         checked = viewState.alternateId,
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
@@ -564,6 +570,7 @@ interface EditFeedScreenState {
     var feedTag: String
     var fullTextByDefault: Boolean
     var notify: Boolean
+    var skipDuplicates: Boolean
     var articleOpener: String
     var alternateId: Boolean
     val isOkToSave: Boolean
@@ -595,6 +602,7 @@ private class ScreenState(
     override var feedTag: String by mutableStateOf("")
     override var fullTextByDefault: Boolean by mutableStateOf(false)
     override var notify: Boolean by mutableStateOf(false)
+    override var skipDuplicates: Boolean by mutableStateOf(false)
     override var articleOpener: String by mutableStateOf("")
     override var alternateId: Boolean by mutableStateOf(false)
 }
