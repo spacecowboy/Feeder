@@ -117,6 +117,7 @@ class RssLocalSyncKtTest : DIAware {
         raw: String,
         isJson: Boolean = true,
         useAlternateId: Boolean = false,
+        skipDuplicates: Boolean = false,
     ): Long {
         val id =
             testDb.db.feedDao().insertFeed(
@@ -125,6 +126,7 @@ class RssLocalSyncKtTest : DIAware {
                     url = url,
                     tag = "",
                     alternateId = useAlternateId,
+                    skipDuplicates = skipDuplicates,
                 ),
             )
 
@@ -657,7 +659,7 @@ class RssLocalSyncKtTest : DIAware {
     fun duplicateItemsAreNotSaved(): Unit =
         runBlocking {
             val atomUrl = server.url("/atom.xml").toUrl()
-            val cowboyAtomId = insertFeed("cowboyAtom", atomUrl, cowboyAtom, isJson = false)
+            val cowboyAtomId = insertFeed("cowboyAtom", atomUrl, cowboyAtom, isJson = false, skipDuplicates = true)
 
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyAtomId)
@@ -670,7 +672,7 @@ class RssLocalSyncKtTest : DIAware {
             )
 
             val jsonUrl = server.url("/feed.json").toUrl()
-            val cowboyJsonId = insertFeed("cowboyJson", jsonUrl, cowboyJson, isJson = true)
+            val cowboyJsonId = insertFeed("cowboyJson", jsonUrl, cowboyJson, isJson = true, skipDuplicates = true)
 
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId)
