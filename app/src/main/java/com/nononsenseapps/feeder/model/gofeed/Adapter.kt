@@ -8,8 +8,6 @@ import java.io.IOException
 class Experiment {
     private val moshi =
         Moshi.Builder()
-//        .add(InstantAdapter())
-//        .add(URLAdapter())
             .addLast(KotlinJsonAdapterFactory())
             .build()
 
@@ -22,14 +20,14 @@ class Experiment {
 
     @Throws(IOException::class)
     fun parseBody(body: String): GoFeed? {
-        return feedergofeed.Feedergofeed.parseBodyString(body)?.let {
+        return gofeedandroid.Gofeedandroid.parseBodyString(body)?.let {
             return fromJson(it)
         }
     }
 
     @Throws(IOException::class)
     fun parseBody(body: ByteArray): GoFeed? {
-        return feedergofeed.Feedergofeed.parseBodyBytes(body)?.let {
+        return gofeedandroid.Gofeedandroid.parseBodyBytes(body)?.let {
             return fromJson(it)
         }
     }

@@ -12,6 +12,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        mavenLocal()
     }
 
     versionCatalogs {
@@ -38,6 +39,7 @@ dependencyResolutionManagement {
             version("kodein", "7.5.0")
             version("coroutines", "1.7.3")
             version("rome", "1.7.1-f8")
+            version("gofeed", "0.1.0")
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
             version("jsoup", "1.7.3")
@@ -208,6 +210,7 @@ dependencyResolutionManagement {
             // RSS
             library("rome", "com.rometools", "rome").versionRef("rome")
             library("rome-modules", "com.rometools", "rome-modules").versionRef("rome")
+            library("gofeed-android", "com.nononsenseapps.gofeed", "gofeed-android").versionRef("gofeed")
 
             // For better fetching
             library("okhttp", "com.squareup.okhttp3", "okhttp").withoutVersion()
@@ -358,6 +361,7 @@ dependencyResolutionManagement {
                     "moshi-kotlin",
                     "moshi-adapters",
                     "qrgen",
+                    "gofeed-android"
                 ),
             )
 
