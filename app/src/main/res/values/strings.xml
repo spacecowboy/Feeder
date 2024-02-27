@@ -257,5 +257,7 @@
   <string name="few_minutes">%1$s minutes</string>
   <string name="many_minutes">%1$s minutes</string>
   <string name="other_minutes">%1$s minutes</string>
-    <string name="close_menu">Close menu</string>
+  <string name="close_menu">Close menu</string>
+  <string name="skip_duplicate_articles">Skip duplicate articles</string>
+  <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
 </resources>
