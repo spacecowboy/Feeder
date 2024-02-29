@@ -75,7 +75,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://suspilne.media/rss/ukrnet.rss"),
                         it,
-                        null,
                     )
 
                 feed.leftOrNull()?.throwable?.let { t ->
@@ -95,7 +94,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://www.anime2you.de/feed/"),
                         it,
-                        null,
                     )
 
                 val item = feed.getOrNull()?.items!!.first()
@@ -124,7 +122,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("http://https://www.openstreetmap.org/diary/rss"),
                         it,
-                        null,
                     )
                 val item = feed.getOrNull()?.items!!.first()
 
@@ -142,7 +139,6 @@ class FeedParserTest : DIAware {
                         "http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask",
                     ),
                     it,
-                    null,
                 )
 
             val item = feed.getOrNull()?.items!![0]
@@ -169,7 +165,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("http://www.lemonde.fr/rss/une.xml"),
                     it,
-                    null,
                 )
 
             val item = feed.getOrNull()?.items!![0]
@@ -188,7 +183,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("http://www.youtube.com/feeds/videos.xml"),
                         it,
-                        null,
                     )
                 }
 
@@ -206,7 +200,7 @@ class FeedParserTest : DIAware {
         runBlocking {
             val feed =
                 readResource("rss_peertube.xml") {
-                    feedParser.parseFeedResponse(URL("https://framatube.org/feeds/videos.xml"), it, null)
+                    feedParser.parseFeedResponse(URL("https://framatube.org/feeds/videos.xml"), it)
                 }
 
             val item = feed.getOrNull()?.items!!.first()
@@ -229,7 +223,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://rutube.ru/mrss/video/person/11234072/"),
                         it,
-                        null,
                     )
                 }
 
@@ -250,7 +243,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://myanimelist.net/rss/news.xml"),
                         it,
-                        null,
                     )
                 }
 
@@ -270,7 +262,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://www.theguardian.com/world/rss"),
                         it,
-                        null,
                     )
                 }
 
@@ -290,7 +281,6 @@ class FeedParserTest : DIAware {
                     feedParser.parseFeedResponse(
                         URL("https://nitter.weiler.rocks/lawnchairapp/rss"),
                         it,
-                        null,
                     )
                 }
 
@@ -420,7 +410,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("http://cowboyprogrammer.org/feed.atom"),
                     atomRelative,
-                    null,
                 )
             assertTrue { feed.isRight() }
 
@@ -435,7 +424,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("http://cowboyprogrammer.org/feed.atom"),
                     atomRelativeNoBase,
-                    null,
                 )
             assertTrue { feed.isRight() }
 
@@ -549,6 +537,15 @@ class FeedParserTest : DIAware {
             }
             assertTrue {
                 result.leftOrNull()!!.description.contains("video/mp4")
+            }
+        }
+
+    @Test
+    fun fetchesNullContentType(): Unit =
+        runBlocking {
+            val result = nullContentTypeResponse.use { feedParser.parseFeedResponse(it) }
+            assertTrue {
+                result.isRight()
             }
         }
 
@@ -868,7 +865,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("http://cowboyprogrammer.org"),
                     rssWithHtmlEscapedDescription,
-                    null,
                 )
 
             val item = feed.getOrNull()?.items!!.single()
@@ -893,7 +889,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("http://cowboyprogrammer.org"),
                     atomWithHtmlEscapedContents,
-                    null,
                 )
 
             val text = feed.getOrNull()?.items!!.first()
@@ -933,7 +928,6 @@ class FeedParserTest : DIAware {
                 feedParser.parseFeedResponse(
                     URL("https://gemini.circumlunar.space"),
                     atomWithUnknownProtocol,
-                    null,
                 )
 
             assertEquals(8, feed.getOrNull()?.items!!.size)
@@ -1039,6 +1033,14 @@ class FeedParserTest : DIAware {
                 "video/mp4",
             )
 
+    private val nullContentTypeResponse: Response
+        get() =
+            bytesToResponse(
+                "rss_nixers_newsletter.xml",
+                "https://foo.bar/feed.xml",
+                null,
+            )
+
     private val diskuse: Response
         get() =
             bytesToResponse(
@@ -1059,12 +1061,12 @@ class FeedParserTest : DIAware {
     private fun bytesToResponse(
         resourceName: String,
         url: String,
-        contentType: String = "application/xml",
+        contentType: String? = "application/xml",
     ): Response {
         val responseBody: ResponseBody =
             javaClass.getResourceAsStream(resourceName)!!
                 .use { it.readBytes() }
-                .toResponseBody(contentType.toMediaTypeOrNull())
+                .toResponseBody(contentType?.toMediaTypeOrNull())
 
         return Response.Builder()
             .body(responseBody)

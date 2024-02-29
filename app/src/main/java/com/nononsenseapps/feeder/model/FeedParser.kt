@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
 import okhttp3.Credentials
-import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -240,46 +239,36 @@ class FeedParser(override val di: DI) : DIAware {
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, ParsedFeed> {
-        return Either.catching(
-            onCatch = { t ->
-                RSSParseError(url = url.toString(), throwable = t)
-            },
-        ) {
-            responseBody.byteStream().use { bs ->
-                parseFeedBytes(url, bs.readBytes())
-                    ?: throw NullPointerException("Parsed feed is null")
-            }
-        }
+        val subType = responseBody.contentType()?.subtype
+        return when {
+            subType == null || subType.contains("json") || subType.contains("xml") ->
+                Either.catching(
+                    onCatch = { t ->
+                        RSSParseError(url = url.toString(), throwable = t)
+                    },
+                ) {
+                    responseBody.byteStream().use { bs ->
+                        parseFeedBytes(url, bs.readBytes())
+                            ?: throw NullPointerException("Parsed feed is null")
+                    }
+                }
 
-//        return when (responseBody.contentType()?.subtype?.contains("json")) {
-//            true ->
-//                Either.catching(
-//                    onCatch = { t ->
-//                        JsonFeedParseError(url = url.toString(), throwable = t)
-//                    },
-//                ) {
-//                    jsonFeedParser.parseJson(responseBody).asParsedFeed()
-//                }
-//
-//            else -> parseRssAtom(url, responseBody)
-//        }
-//            .map { feed ->
-//                if (feed.feed_url == null) {
-//                    // Nice to return non-null value here
-//                    feed.copy(feed_url = url.toString())
-//                } else {
-//                    feed
-//                }
-//            }
+            else -> return Either.Left(
+                UnsupportedContentType(
+                    url = url.toString(),
+                    mimeType = responseBody.contentType().toString(),
+                ),
+            )
+        }
     }
 
     /**
      * Takes body as bytes to handle encoding correctly
      */
+    @VisibleForTesting
     internal fun parseFeedResponse(
         url: URL,
         body: String,
-        contentType: MediaType?,
     ): Either<FeedParserError, ParsedFeed> {
         return Either.catching(
             onCatch = { t ->
@@ -290,51 +279,6 @@ class FeedParser(override val di: DI) : DIAware {
                 ?: throw NullPointerException("Parsed feed is null")
         }
     }
-//        return when (contentType?.subtype?.contains("json")) {
-//            true ->
-//                Either.catching(
-//                    onCatch = { t ->
-//                        JsonFeedParseError(url = url.toString(), throwable = t)
-//                    },
-//                ) {
-//                    jsonFeedParser.parseJson(body).asParsedFeed()
-//                }
-//
-//            else -> parseRssAtom(url, body)
-//        }.map { feed ->
-//
-//            if (feed.feed_url == null) {
-//                // Nice to return non-null value here
-//                feed.copy(feed_url = url.toString())
-//            } else {
-//                feed
-//            }
-//        }
-//    }
-
-//    @Throws(FeedParsingError::class)
-//    internal fun parseRssAtom(
-//        baseUrl: URL,
-//        body: String,
-//    ): Either<FeedParserError, ParsedFeedDeleteme> {
-//        return Either.catching(
-//            onCatch = { t ->
-//                RSSParseError(url = baseUrl.toString(), throwable = t)
-//            },
-//        ) {
-//            body.byteInputStream().use { bs ->
-//                val feed =
-//                    XmlReader(bs, true).use {
-//                        SyndFeedInput()
-//                            .apply {
-//                                isPreserveWireFeed = true
-//                            }
-//                            .build(it)
-//                    }
-//                feed.asFeed(baseUrl = baseUrl)
-//            }
-//        }
-//    }
 
     companion object {
         private const val LOG_TAG = "FEEDER_FEEDPARSER"
@@ -389,56 +333,6 @@ private fun GoPerson.asParsedAuthor() =
         url = null,
         avatar = null,
     )
-
-// private fun Feed.asParsedFeed() =
-//    ParsedFeed(
-//        title = title,
-//        home_page_url = home_page_url,
-//        feed_url = feed_url,
-//        description = description,
-//        user_comment = user_comment,
-//        next_url = next_url,
-//        icon = icon,
-//        favicon = favicon,
-//        author = author?.asParsedAuthor(),
-//        expired = expired,
-//        items = items?.map { it.asParsedArticle() },
-//    )
-//
-// private fun Item.asParsedArticle() =
-//    ParsedArticle(
-//        id = id,
-//        url = url,
-//        external_url = external_url,
-//        title = title,
-//        content_html = content_html,
-//        content_text = content_text,
-//        summary = summary,
-//        image = image?.let { MediaImage(url = it, width = null, height = null) },
-//        date_published = date_published,
-//        date_modified = date_modified,
-//        author = author?.asParsedAuthor(),
-//        tags = tags,
-//        attachments = attachments?.map { it.asParsedEnclosure() },
-//    )
-//
-// private fun Attachment.asParsedEnclosure() =
-//    ParsedEnclosure(
-//        title = title,
-//        url = url,
-//        mime_type = mime_type,
-//        size_in_bytes = size_in_bytes,
-//        duration_in_seconds = duration_in_seconds,
-//    )
-//
-// private fun Author?.asParsedAuthor() =
-//    ParsedAuthor(
-//        name = this?.name,
-//        url = this?.url,
-//        avatar = this?.avatar,
-//    )
-
-class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 
 suspend fun OkHttpClient.getResponse(
     url: URL,
