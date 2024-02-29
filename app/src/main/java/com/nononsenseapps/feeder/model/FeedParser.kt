@@ -3,10 +3,10 @@ package com.nononsenseapps.feeder.model
 import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import com.nononsenseapps.feeder.model.gofeed.Experiment
 import com.nononsenseapps.feeder.model.gofeed.FeederGoItem
 import com.nononsenseapps.feeder.model.gofeed.GoEnclosure
 import com.nononsenseapps.feeder.model.gofeed.GoFeed
+import com.nononsenseapps.feeder.model.gofeed.GoFeedAdapter
 import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
@@ -40,7 +40,7 @@ private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
 class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
-    private val exp = Experiment()
+    private val goFeedAdapter = GoFeedAdapter()
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -230,7 +230,7 @@ class FeedParser(override val di: DI) : DIAware {
         url: URL,
         body: ByteArray,
     ): ParsedFeed? {
-        return exp.parseBody(body)?.asFeed(url)
+        return goFeedAdapter.parseBody(body)?.asFeed(url)
     }
 
     /**

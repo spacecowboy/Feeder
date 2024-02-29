@@ -3,7 +3,7 @@
 package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
-import com.nononsenseapps.feeder.model.gofeed.Experiment
+import com.nononsenseapps.feeder.model.gofeed.GoFeedAdapter
 import com.nononsenseapps.feeder.util.getOrElse
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
@@ -43,7 +43,7 @@ class FeedParserTest : DIAware {
         import(networkModule)
     }
 
-    private val exp = Experiment()
+    private val exp = GoFeedAdapter()
 
     @Test
     @Ignore

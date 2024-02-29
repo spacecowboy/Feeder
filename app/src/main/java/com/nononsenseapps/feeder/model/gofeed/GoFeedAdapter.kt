@@ -5,7 +5,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.IOException
 
-class Experiment {
+class GoFeedAdapter {
     private val moshi =
         Moshi.Builder()
             .addLast(KotlinJsonAdapterFactory())
