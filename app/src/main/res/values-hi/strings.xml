@@ -245,4 +245,6 @@
     <string name="one_minute">%1$s मिनट</string>
     <string name="two_tags">%1$s टैग्स</string>
     <string name="two_minutes">%1$s मिनट</string>
+    <string name="skip_duplicate_articles">दोहरा लेख छोड़ें</string>
+    <string name="skip_duplicate_articles_desc">मौजूदा लेखों के समान लिंक या शीर्षक वाले लेखों को नजरअंदाज कर दिया जाता है</string>
 </resources>
