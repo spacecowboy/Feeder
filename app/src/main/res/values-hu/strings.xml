@@ -245,4 +245,6 @@
     <string name="close_menu">Menü bezárása</string>
     <string name="export_saved_articles">Mentett cikkek exportálása</string>
     <string name="failed_to_export_saved_articles">Nem sikerült a mentett cikkek exportálása</string>
+    <string name="skip_duplicate_articles">Duplázott cikkek kihagyása</string>
+    <string name="skip_duplicate_articles_desc">Ugyanolyan már létező című és linkű cikk esetén az újat mellőzi</string>
 </resources>
