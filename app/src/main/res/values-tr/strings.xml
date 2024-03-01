@@ -245,4 +245,6 @@
     <string name="close_menu">Menüyü kapat</string>
     <string name="export_saved_articles">Kaydedilen makaleleri dışa aktar</string>
     <string name="failed_to_export_saved_articles">Kaydedilen makaleler dışa aktarılamadı</string>
+    <string name="skip_duplicate_articles">Yinelenen makaleleri atla</string>
+    <string name="skip_duplicate_articles_desc">Var olan makalelerle aynı bağlantılara veya başlıklara sahip makaleler göz ardı edilir</string>
 </resources>
