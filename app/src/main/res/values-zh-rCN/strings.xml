@@ -245,4 +245,6 @@
     <string name="close_menu">关闭菜单</string>
     <string name="export_saved_articles">导出已保存的文章</string>
     <string name="failed_to_export_saved_articles">未能导出已保存的文章</string>
+    <string name="skip_duplicate_articles">跳过重复的文章</string>
+    <string name="skip_duplicate_articles_desc">忽略链接或标题和现存文章相同的新文章</string>
 </resources>
