@@ -242,4 +242,7 @@
     <string name="two_minutes">%1$s 分</string>
     <string name="other_words">%1$s 語</string>
     <string name="one_word">%1$s 語</string>
+    <string name="close_menu">メニューを閉じる</string>
+    <string name="export_saved_articles">保存した記事をエクスポート</string>
+    <string name="failed_to_export_saved_articles">保存した記事のエクスポートに失敗しました</string>
 </resources>
