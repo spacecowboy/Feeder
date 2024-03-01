@@ -38,8 +38,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -59,6 +59,7 @@ import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.isImage
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
@@ -67,7 +68,6 @@ import com.nononsenseapps.feeder.ui.compose.text.rememberMaxImageWidth
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
@@ -319,6 +319,11 @@ fun ReaderView(
                         ) {
                             WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) { innerModifier ->
                                 val maxImageWidth by rememberMaxImageWidth()
+                                val pixelDensity = LocalDensity.current.density
+                                val contentScale =
+                                    remember(pixelDensity) {
+                                        RestrainedCropScaling(pixelDensity)
+                                    }
                                 AsyncImage(
                                     model =
                                         ImageRequest.Builder(LocalContext.current)
@@ -333,12 +338,8 @@ fun ReaderView(
                                             Icons.Outlined.Terrain,
                                         ),
                                     error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                    contentScale =
-                                        if (dimens.hasImageAspectRatioInReader) {
-                                            ContentScale.Fit
-                                        } else {
-                                            ContentScale.FillWidth
-                                        },
+                                    contentScale = contentScale,
+                                    alignment = Alignment.Center,
                                     modifier =
                                         innerModifier
                                             .fillMaxWidth()
