@@ -39,7 +39,7 @@ dependencyResolutionManagement {
             version("kodein", "7.5.0")
             version("coroutines", "1.7.3")
             version("rome", "1.7.1-f8")
-            version("gofeed", "0.1.0")
+            version("gofeed", "0.1.2")
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
             version("jsoup", "1.7.3")
