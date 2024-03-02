@@ -724,6 +724,40 @@ class FeedParserTest : DIAware {
         }
 
     @Test
+    fun testSlashdot() =
+        runBlocking {
+            val feed = slashdotResponse.use { feedParser.parseFeedResponse(it) }.getOrElse { throw it.throwable!! }
+
+            assertEquals("https://slashdot.org/", feed.home_page_url)
+            assertEquals("https://rss.slashdot.org/Slashdot/slashdotMain", feed.feed_url)
+
+            assertEquals(15, feed.items!!.size)
+            val item = feed.items!!.first()
+
+            assertEquals(
+                "https://a.fsdn.com/sd/topics/topicslashdot.gif",
+                feed.icon,
+            )
+
+            assertEquals(
+                "https://yro.slashdot.org/story/24/03/02/071229/ransomware-attack-hampers-prescription-drug-sales-at-90-of-us-pharmacies?utm_source=rss1.0mainlinkanon&utm_medium=feed",
+                item.url,
+            )
+
+            assertEquals(
+                "Ransomware Attack Hampers Prescription Drug Sales at 90% of US Pharmacies",
+                item.title,
+            )
+
+            assertEquals(
+                "\"A ransomware gang once thought to have been crippled by law enforcement has snarled prescription processing for millions of Americans over the past week...\" reports the Washington Post. \"The hackers ",
+                item.summary,
+            )
+
+            assertNull(item.image, "No image should be present")
+        }
+
+    @Test
     @Throws(Exception::class)
     fun londoner() =
         runBlocking {
@@ -973,6 +1007,9 @@ class FeedParserTest : DIAware {
                 "atom_utdelningsseglaren.xml",
                 "http://utdelningsseglaren.blogspot.com/feeds/posts/default",
             )
+
+    private val slashdotResponse: Response
+        get() = bytesToResponse("rdf_slashdot.xml", "https://rss.slashdot.org/Slashdot/slashdotMain")
 
     private val lineageosRss: Response
         get() = bytesToResponse("rss_lineageos.xml", "https://lineageos.org/feed.xml")
