@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
+import com.nononsenseapps.feeder.ui.compose.utils.KeyEventHandler
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
@@ -31,6 +33,8 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
+
+    private val keyEventHandlers = mutableListOf<KeyEventHandler>()
 
     override fun onStart() {
         super.onStart()
@@ -71,10 +75,23 @@ class MainActivity : DIAwareComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            withAllProviders {
+            withAllProviders(keyEventHandlers) {
                 AppContent()
             }
         }
+    }
+
+    // Enables key actions without focus
+    override fun onKeyUp(
+        keyCode: Int,
+        event: KeyEvent?,
+    ): Boolean {
+        for (i in keyEventHandlers.indices.reversed()) {
+            if (keyEventHandlers[i].invoke(keyCode)) {
+                return true
+            }
+        }
+        return super.onKeyUp(keyCode, event)
     }
 
     @OptIn(ExperimentalAnimationApi::class)

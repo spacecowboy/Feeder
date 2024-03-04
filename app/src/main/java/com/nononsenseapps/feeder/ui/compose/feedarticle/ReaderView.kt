@@ -1,10 +1,15 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.util.Log
+import android.view.KeyEvent.KEYCODE_N
+import android.view.KeyEvent.KEYCODE_P
+import android.view.KeyEvent.KEYCODE_PAGE_DOWN
+import android.view.KeyEvent.KEYCODE_PAGE_UP
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -34,12 +39,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -68,9 +77,11 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
+import com.nononsenseapps.feeder.ui.compose.utils.ListenKeyEvents
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -80,7 +91,7 @@ val dateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ReaderView(
     screenType: ScreenType,
@@ -98,11 +109,38 @@ fun ReaderView(
     articleBody: LazyListScope.() -> Unit,
 ) {
     val dimens = LocalDimens.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val scrollHeightPx =
+        with(LocalDensity.current) {
+            // Remove top and bottom bars from size and reduce slightly
+            (LocalConfiguration.current.screenHeightDp.dp - 64.dp).toPx() * 0.8f
+        }
 
     val readTimeSecs =
         remember(wordCount) {
             wordsToReadTimeSecs(wordCount)
         }
+
+    ListenKeyEvents { keyCode ->
+        when (keyCode) {
+            KEYCODE_P, KEYCODE_PAGE_UP -> {
+                coroutineScope.launch {
+                    articleListState.animateScrollBy(-scrollHeightPx)
+                }
+                true
+            }
+
+            KEYCODE_N, KEYCODE_PAGE_DOWN -> {
+                coroutineScope.launch {
+                    articleListState.animateScrollBy(scrollHeightPx)
+                }
+                true
+            }
+
+            else -> false
+        }
+    }
 
     SelectionContainer {
         LazyColumn(

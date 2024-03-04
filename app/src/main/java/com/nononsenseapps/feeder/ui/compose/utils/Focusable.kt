@@ -8,8 +8,11 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
 
@@ -22,7 +25,7 @@ fun Modifier.onKeyEventLikeEscape(action: () -> Unit) =
                 properties["action"] = action
             },
     ) {
-        onKeyEvent {
+        onKeyUp {
             when (it.key) {
                 Key.Escape, Key.Back, Key.NavigateOut -> {
                     action()
@@ -30,6 +33,23 @@ fun Modifier.onKeyEventLikeEscape(action: () -> Unit) =
                 }
 
                 else -> false
+            }
+        }
+    }
+
+fun Modifier.onKeyUp(action: (keyEvent: KeyEvent) -> Boolean) =
+    composed(
+        inspectorInfo =
+            debugInspectorInfo {
+                name = "onKeyUp"
+                properties["action"] = action
+            },
+    ) {
+        onKeyEvent {
+            return@onKeyEvent if (it.type == KeyEventType.KeyDown) {
+                action(it)
+            } else {
+                false
             }
         }
     }

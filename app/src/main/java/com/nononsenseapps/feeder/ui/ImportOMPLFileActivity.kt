@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.ui.compose.ompl.OpmlImportScreen
+import com.nononsenseapps.feeder.ui.compose.utils.KeyEventHandler
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
@@ -22,6 +23,8 @@ import com.nononsenseapps.feeder.util.logDebug
  * This activity should only be started via a Open File Intent.
  */
 class ImportOMPLFileActivity : DIAwareComponentActivity() {
+    private val keyEventHandlers = mutableListOf<KeyEventHandler>()
+
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +37,7 @@ class ImportOMPLFileActivity : DIAwareComponentActivity() {
         logDebug(LOG_TAG, "Uri: $uri")
 
         setContent {
-            withAllProviders {
+            withAllProviders(keyEventHandlers) {
                 val navController = rememberAnimatedNavController()
                 AnimatedNavHost(navController, startDestination = "import") {
                     composable(
