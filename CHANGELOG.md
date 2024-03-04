@@ -1,3 +1,41 @@
+# 2.6.18
+Agnieszka C (1):
+  * [2a4acaef] Updated Polish translation using Weblate
+
+H Tamás (2):
+  * [17053d16] Updated Hungarian translation using Weblate
+  * [aced2492] Translated using Weblate (Hungarian)
+
+Jonas Kalderstam (1):
+  * [c640f0c9] Added skip duplicates as option for feeds
+
+Kazushi Hayama (1):
+  * [abf942ea] Updated Japanese translation using Weblate
+
+Oğuz Ersen (1):
+  * [e9d7eee2] Updated Turkish translation using Weblate
+
+Scrambled777 (1):
+  * [386b3bc5] Updated Hindi translation using Weblate
+
+VfBFan (1):
+  * [3ae52e2b] Updated German translation using Weblate
+
+gallegonovato (1):
+  * [425fa2fe] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [747dba1d] Updated Galician translation using Weblate
+
+pchelium (1):
+  * [ff73f6d9] Updated Czech translation using Weblate
+
+v1s7 (1):
+  * [0fa8c78e] Updated Russian translation using Weblate
+
+大王叫我来巡山 (1):
+  * [dc9417bb] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.17
 Agnieszka C (1):
   * [735920e6] Translated using Weblate (Polish)
