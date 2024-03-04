@@ -245,4 +245,6 @@
     <string name="close_menu">Zavřít menu</string>
     <string name="export_saved_articles">Export uložených článků</string>
     <string name="failed_to_export_saved_articles">Nepodařilo se exportovat uložené články</string>
+    <string name="skip_duplicate_articles">Přeskočit duplicitní články</string>
+    <string name="skip_duplicate_articles_desc">Články s odkazy nebo názvy shodnými s existujícími články jsou ignorovány</string>
 </resources>
