@@ -245,4 +245,6 @@
     <string name="close_menu">Menü schließen</string>
     <string name="export_saved_articles">Gespeicherte Artikel exportieren</string>
     <string name="failed_to_export_saved_articles">Gespeicherte Artikel konnten nicht exportiert werden</string>
+    <string name="skip_duplicate_articles">Doppelte Artikel überspringen</string>
+    <string name="skip_duplicate_articles_desc">Artikel mit Links oder Titeln, die mit bestehenden Artikeln identisch sind, werden ignoriert</string>
 </resources>
