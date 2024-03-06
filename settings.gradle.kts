@@ -38,7 +38,6 @@ dependencyResolutionManagement {
             // Rest
             version("kodein", "7.5.0")
             version("coroutines", "1.7.3")
-            version("rome", "1.7.1-f8")
             version("gofeed", "0.1.2")
             version("moshi", "1.12.0")
             version("desugar", "2.0.3")
@@ -208,8 +207,6 @@ dependencyResolutionManagement {
             library("jsoup", "org.jsoup", "jsoup").versionRef("jsoup")
             library("tagsoup", "org.ccil.cowan.tagsoup", "tagsoup").versionRef("tagsoup")
             // RSS
-            library("rome", "com.rometools", "rome").versionRef("rome")
-            library("rome-modules", "com.rometools", "rome-modules").versionRef("rome")
             library("gofeed-android", "com.nononsenseapps.gofeed", "gofeed-android").versionRef("gofeed")
 
             // For better fetching
@@ -352,8 +349,6 @@ dependencyResolutionManagement {
                 listOf(
                     "jsoup",
                     "tagsoup",
-                    "rome",
-                    "rome-modules",
                     "readability4j",
                     "retrofit",
                     "retrofit-converter-moshi",
@@ -451,5 +446,3 @@ dependencyResolutionManagement {
 rootProject.name = "feeder"
 
 include(":app")
-
-includeBuild("rome")
