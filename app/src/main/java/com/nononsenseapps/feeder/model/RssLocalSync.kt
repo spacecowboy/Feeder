@@ -259,7 +259,7 @@ class RssLocalSync(override val di: DI) : DIAware {
 
                                 feedItemSql to (item.content_html ?: item.content_text ?: "")
                             } else {
-                                Log.i(LOG_TAG, "Duplicate story ignored: ${item.title}")
+                                Log.i(LOG_TAG, "Duplicate story ignored: [${item.title}] [${feed.title}]")
                                 null
                             }
                         } ?: emptyList()

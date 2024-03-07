@@ -3,25 +3,21 @@ package com.nononsenseapps.feeder.model
 import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import com.nononsenseapps.feeder.model.gofeed.FeederGoItem
+import com.nononsenseapps.feeder.model.gofeed.GoEnclosure
+import com.nononsenseapps.feeder.model.gofeed.GoFeed
+import com.nononsenseapps.feeder.model.gofeed.GoFeedAdapter
+import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
-import com.nononsenseapps.feeder.util.asFeed
 import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
-import com.nononsenseapps.jsonfeed.Attachment
-import com.nononsenseapps.jsonfeed.Author
-import com.nononsenseapps.jsonfeed.Feed
-import com.nononsenseapps.jsonfeed.Item
-import com.nononsenseapps.jsonfeed.JsonFeedParser
-import com.rometools.rome.io.SyndFeedInput
-import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
 import okhttp3.Credentials
-import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -32,6 +28,7 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import java.io.IOException
+import java.lang.NullPointerException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
@@ -42,7 +39,7 @@ private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
 class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
-    private val jsonFeedParser: JsonFeedParser by instance()
+    private val goFeedAdapter = GoFeedAdapter()
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -213,6 +210,7 @@ class FeedParser(override val di: DI) : DIAware {
         }
             .map {
                 // Preserve original URL to maintain authentication data and/or tokens in query params
+                // but this is also done inside parse from the request URL
                 it.copy(feed_url = url.toString())
             }
     }
@@ -227,6 +225,13 @@ class FeedParser(override val di: DI) : DIAware {
         } ?: Either.Left(NoBody(url = response.request.url.toString()))
     }
 
+    private fun parseFeedBytes(
+        url: URL,
+        body: ByteArray,
+    ): ParsedFeed? {
+        return goFeedAdapter.parseBody(body)?.asFeed(url)
+    }
+
     /**
      * Takes body as bytes to handle encoding correctly
      */
@@ -234,126 +239,44 @@ class FeedParser(override val di: DI) : DIAware {
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, ParsedFeed> {
-        return when (responseBody.contentType()?.subtype?.contains("json")) {
-            true ->
+        val subType = responseBody.contentType()?.subtype
+        return when {
+            subType == null || subType.contains("json") || subType.contains("xml") ->
                 Either.catching(
                     onCatch = { t ->
-                        JsonFeedParseError(url = url.toString(), throwable = t)
+                        RSSParseError(url = url.toString(), throwable = t)
                     },
                 ) {
-                    jsonFeedParser.parseJson(responseBody).asParsedFeed()
+                    responseBody.byteStream().use { bs ->
+                        parseFeedBytes(url, bs.readBytes())
+                            ?: throw NullPointerException("Parsed feed is null")
+                    }
                 }
 
-            else -> parseRssAtom(url, responseBody)
+            else -> return Either.Left(
+                UnsupportedContentType(
+                    url = url.toString(),
+                    mimeType = responseBody.contentType().toString(),
+                ),
+            )
         }
-            .map { feed ->
-                if (feed.feed_url == null) {
-                    // Nice to return non-null value here
-                    feed.copy(feed_url = url.toString())
-                } else {
-                    feed
-                }
-            }
     }
 
     /**
      * Takes body as bytes to handle encoding correctly
      */
+    @VisibleForTesting
     internal fun parseFeedResponse(
         url: URL,
         body: String,
-        contentType: MediaType?,
     ): Either<FeedParserError, ParsedFeed> {
-        return when (contentType?.subtype?.contains("json")) {
-            true ->
-                Either.catching(
-                    onCatch = { t ->
-                        JsonFeedParseError(url = url.toString(), throwable = t)
-                    },
-                ) {
-                    jsonFeedParser.parseJson(body).asParsedFeed()
-                }
-
-            else -> parseRssAtom(url, body)
-        }.map { feed ->
-
-            if (feed.feed_url == null) {
-                // Nice to return non-null value here
-                feed.copy(feed_url = url.toString())
-            } else {
-                feed
-            }
-        }
-    }
-
-    private fun parseRssAtom(
-        url: URL,
-        responseBody: ResponseBody,
-    ): Either<FeedParserError, ParsedFeed> {
-        val contentType = responseBody.contentType()
-        val validMimeType =
-            when (contentType?.type) {
-                "application" -> {
-                    when {
-                        contentType.subtype.contains("xml") -> true
-                        else -> false
-                    }
-                }
-
-                "text" -> {
-                    // So many sites on the internet return mimetype text/html for rss feeds...
-                    // So try to parse it despite it being wrong
-                    true
-                }
-
-                else -> false
-            }
-        if (!validMimeType) {
-            return Either.Left(
-                UnsupportedContentType(url = url.toString(), mimeType = contentType.toString()),
-            )
-        }
-
         return Either.catching(
             onCatch = { t ->
                 RSSParseError(url = url.toString(), throwable = t)
             },
         ) {
-            responseBody.byteStream().use { bs ->
-                val feed =
-                    XmlReader(bs, true, responseBody.contentType()?.charset()?.name()).use {
-                        SyndFeedInput()
-                            .apply {
-                                isPreserveWireFeed = true
-                            }
-                            .build(it)
-                    }
-                feed.asFeed(baseUrl = url)
-            }
-        }
-    }
-
-    @Throws(FeedParsingError::class)
-    internal fun parseRssAtom(
-        baseUrl: URL,
-        body: String,
-    ): Either<FeedParserError, ParsedFeed> {
-        return Either.catching(
-            onCatch = { t ->
-                RSSParseError(url = baseUrl.toString(), throwable = t)
-            },
-        ) {
-            body.byteInputStream().use { bs ->
-                val feed =
-                    XmlReader(bs, true).use {
-                        SyndFeedInput()
-                            .apply {
-                                isPreserveWireFeed = true
-                            }
-                            .build(it)
-                    }
-                feed.asFeed(baseUrl = baseUrl)
-            }
+            parseFeedBytes(url, body.toByteArray())
+                ?: throw NullPointerException("Parsed feed is null")
         }
     }
 
@@ -362,55 +285,54 @@ class FeedParser(override val di: DI) : DIAware {
     }
 }
 
-private fun Feed.asParsedFeed() =
+private fun GoFeed.asFeed(url: URL): ParsedFeed =
     ParsedFeed(
         title = title,
-        home_page_url = home_page_url,
-        feed_url = feed_url,
+        home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
+        // Keep original URL to maintain authentication data and/or tokens in query params
+        feed_url = url.toString(),
         description = description,
-        user_comment = user_comment,
-        next_url = next_url,
-        icon = icon,
-        favicon = favicon,
+        user_comment = "",
+        next_url = "",
+        icon = image?.url?.let { relativeLinkIntoAbsolute(url, it) },
+        favicon = null,
         author = author?.asParsedAuthor(),
-        expired = expired,
-        items = items?.map { it.asParsedArticle() },
+        expired = null,
+        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
     )
 
-private fun Item.asParsedArticle() =
+private fun FeederGoItem.asParsedArticle() =
     ParsedArticle(
-        id = id,
-        url = url,
-        external_url = external_url,
+        id = guid,
+        url = link,
+        external_url = null,
         title = title,
-        content_html = content_html,
-        content_text = content_text,
-        summary = summary,
-        image = image?.let { MediaImage(url = it, width = null, height = null) },
-        date_published = date_published,
-        date_modified = date_modified,
+        content_html = content,
+        content_text = plainContent,
+        summary = snippet,
+        image = thumbnail,
+        date_published = published,
+        date_modified = updated,
         author = author?.asParsedAuthor(),
-        tags = tags,
-        attachments = attachments?.map { it.asParsedEnclosure() },
+        tags = categories,
+        attachments = enclosures?.map { it.asParsedEnclosure() },
     )
 
-private fun Attachment.asParsedEnclosure() =
+private fun GoEnclosure.asParsedEnclosure() =
     ParsedEnclosure(
-        title = title,
         url = url,
-        mime_type = mime_type,
-        size_in_bytes = size_in_bytes,
-        duration_in_seconds = duration_in_seconds,
+        title = null,
+        mime_type = type,
+        size_in_bytes = length?.toLongOrNull(),
+        duration_in_seconds = null,
     )
 
-private fun Author?.asParsedAuthor() =
+private fun GoPerson.asParsedAuthor() =
     ParsedAuthor(
-        name = this?.name,
-        url = this?.url,
-        avatar = this?.avatar,
+        name = name,
+        url = null,
+        avatar = null,
     )
-
-class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 
 suspend fun OkHttpClient.getResponse(
     url: URL,
