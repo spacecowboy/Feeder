@@ -245,4 +245,6 @@
     <string name="close_menu">Fechar menu</string>
     <string name="export_saved_articles">Exportar artigos salvos</string>
     <string name="failed_to_export_saved_articles">Falha ao exportar artigos salvos</string>
+    <string name="skip_duplicate_articles">Ignorar artigos duplicados</string>
+    <string name="skip_duplicate_articles_desc">Artigos com links ou títulos idênticos aos artigos existentes são ignorados</string>
 </resources>
