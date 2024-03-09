@@ -229,4 +229,21 @@
     <string name="content_is_not_html">Conținutul nu este HTML</string>
     <string name="other_tags">%1$s etichete</string>
     <string name="open_browser_in_split_screen">Deschideți browserul în ecran divizat</string>
+    <string name="close_menu">Închideți meniul</string>
+    <string name="export_saved_articles">Exportați articolele salvate</string>
+    <string name="zero_words">%1$s cuvinte</string>
+    <string name="one_word">%1$s cuvânt</string>
+    <string name="two_words">%1$s cuvinte</string>
+    <string name="few_words">%1$s cuvinte</string>
+    <string name="other_words">%1$s cuvinte</string>
+    <string name="zero_minutes">%1$s minute</string>
+    <string name="one_minute">%1$s minut</string>
+    <string name="two_minutes">%1$s minute</string>
+    <string name="few_minutes">%1$s minute</string>
+    <string name="many_minutes">%1$s minute</string>
+    <string name="other_minutes">%1$s minute</string>
+    <string name="show_reading_time">Afișați timpul estimat de citire</string>
+    <string name="failed_to_export_saved_articles">Nu a reușit să exporte articolele salvate</string>
+    <string name="many_words">%1$s cuvinte</string>
+    <string name="skip_duplicate_articles">Treceți peste articolele duplicate</string>
 </resources>
