@@ -245,4 +245,6 @@
     <string name="close_menu">Закрити меню</string>
     <string name="export_saved_articles">Експортувати збережені статті</string>
     <string name="failed_to_export_saved_articles">Не вдалося експортувати збережені статті</string>
+    <string name="skip_duplicate_articles_desc">Статті з посиланнями або назвами, ідентичними вже існуючим статтям, ігноруватимуться</string>
+    <string name="skip_duplicate_articles">Пропускати статті, що повторюються</string>
 </resources>
