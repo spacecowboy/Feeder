@@ -86,7 +86,7 @@ then
 fi
 
 echo "Verifying build"
-./gradlew check pixel2api30DebugAndroidTest
+./gradlew check pixel2api30DebugAndroidTest || echo >&2 "Build failed"
 
 read -r -p "Commit changes? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]

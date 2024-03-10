@@ -1,3 +1,25 @@
+# 2.6.19
+Eduardo (1):
+  * [b128dfdc] Translated using Weblate (Portuguese (Brazil))
+
+Jonas Kalderstam (1):
+  * [ef92b203] Changed feed parsing library to Gofeed
+
+Matth78 (1):
+  * [4f6116ee] Updated French translation using Weblate
+
+Simona Iacob (1):
+  * [03b68324] Updated Romanian translation using Weblate
+
+ikanakova (1):
+  * [ac47c2b7] Translated using Weblate (Czech)
+
+trunars (1):
+  * [1823402c] Updated Bulgarian translation using Weblate
+
+Сергій (1):
+  * [c3ac47bd] Updated Ukrainian translation using Weblate
+
 # 2.6.18
 Agnieszka C (1):
   * [2a4acaef] Updated Polish translation using Weblate
