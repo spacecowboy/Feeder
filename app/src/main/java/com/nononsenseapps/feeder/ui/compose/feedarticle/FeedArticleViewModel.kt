@@ -204,15 +204,7 @@ class FeedArticleViewModel(
         deleteDialogVisible.update { visible }
     }
 
-    /**
-     * This determines if the main screen is article or list on small screens - it does not impact
-     * visibility of article on large landscape screens
-     */
-    fun setArticleOpen(value: Boolean) {
-        repository.setIsArticleOpen(value)
-    }
-
-    suspend fun setCurrentArticle(itemId: Long) {
+    private suspend fun setCurrentArticle(itemId: Long) {
         repository.setCurrentArticle(itemId)
 
         // Now wait until article has been loaded until opening the article view
@@ -226,7 +218,7 @@ class FeedArticleViewModel(
             }
         }
 
-        setArticleOpen(true)
+        repository.setIsArticleOpen(true)
     }
 
     fun openArticle(
@@ -671,6 +663,6 @@ data class FeedArticleScreenViewState(
 
 sealed class TSSError
 
-object TTSFileNotFound : TSSError()
+data object TTSFileNotFound : TSSError()
 
-object TTSUnknownError : TSSError()
+data object TTSUnknownError : TSSError()
