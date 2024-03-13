@@ -56,9 +56,6 @@ fun DeleteFeedDialog(
         isChecked = { feedId ->
             feedsToDelete[feedId] ?: false
         },
-        isSelectAllChecked = {
-            if (feedsToDelete.isEmpty()) false else feedsToDelete.all { it.value }
-        },
         onDismiss = onDismiss,
         onOk = {
             onDelete(feedsToDelete.filterValues { it }.keys)
@@ -80,7 +77,6 @@ fun DeleteFeedDialog(
 fun DeleteFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
     isChecked: (Long) -> Boolean,
-    isSelectAllChecked: () -> Boolean,
     onDismiss: () -> Unit,
     onOk: () -> Unit,
     onToggleFeed: (Long, Boolean?) -> Unit,
@@ -125,13 +121,11 @@ fun DeleteFeedDialog(
 
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(text = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = isSelectAllChecked(), onCheckedChange = { checked ->
-                                    onSelectAll(checked)
-                                    selectAllSelected = checked
-                                    menuExpanded = false
-                                }, modifier = Modifier.clearAndSetSemantics { })
-                                Spacer(modifier = Modifier.width(4.dp))
+                            Row(modifier = Modifier.clickable {
+                                onSelectAll(!selectAllSelected)
+                                selectAllSelected = !selectAllSelected
+                                menuExpanded = false
+                            }, verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = stringResource(id = android.R.string.selectAll),
                                     style = MaterialTheme.typography.titleMedium,
