@@ -56,6 +56,9 @@ fun DeleteFeedDialog(
         isChecked = { feedId ->
             feedsToDelete[feedId] ?: false
         },
+        isSelectAllChecked = {
+            if (feedsToDelete.isEmpty()) false else feedsToDelete.all { it.value }
+        },
         onDismiss = onDismiss,
         onOk = {
             onDelete(feedsToDelete.filterValues { it }.keys)
@@ -66,7 +69,7 @@ fun DeleteFeedDialog(
         },
         onSelectAll = { checked ->
             feeds.item.forEach { item ->
-                feedsToDelete = feedsToDelete + (item.id to (checked ?: !feedsToDelete.contains(item.id)))
+                feedsToDelete = feeds.item.associate { item.id to checked }
             }
         },
         modifier = modifier,
@@ -77,16 +80,17 @@ fun DeleteFeedDialog(
 fun DeleteFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
     isChecked: (Long) -> Boolean,
+    isSelectAllChecked: () -> Boolean,
     onDismiss: () -> Unit,
     onOk: () -> Unit,
     onToggleFeed: (Long, Boolean?) -> Unit,
-    onSelectAll: (Boolean?) -> Unit,
+    onSelectAll: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectAllSelected by rememberSaveable {
         mutableStateOf(false)
     }
-    var selectAllButton by rememberSaveable {
+    var menuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
     AlertDialog(
@@ -115,16 +119,17 @@ fun DeleteFeedDialog(
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
                 Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                    IconButton(onClick = { selectAllButton = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Select All")
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(android.R.string.selectAll))
                     }
 
-                    DropdownMenu(expanded = selectAllButton, onDismissRequest = { selectAllButton = false }) {
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = selectAllSelected, onCheckedChange = { checked ->
+                                Checkbox(checked = isSelectAllChecked(), onCheckedChange = { checked ->
                                     onSelectAll(checked)
                                     selectAllSelected = checked
+                                    menuExpanded = false
                                 }, modifier = Modifier.clearAndSetSemantics { })
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
@@ -135,6 +140,7 @@ fun DeleteFeedDialog(
                         }, onClick = {
                             onSelectAll(!selectAllSelected)
                             selectAllSelected = !selectAllSelected
+                            menuExpanded = false
                         }, modifier = Modifier.safeSemantics(mergeDescendants = selectAllSelected) {
                             stateDescription = stateLabel
                         })
