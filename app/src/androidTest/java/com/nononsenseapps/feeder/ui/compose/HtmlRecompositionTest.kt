@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.ReaderView
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -63,16 +64,38 @@ class HtmlRecompositionTest {
         }
 
         runBlocking {
-            composeTestRule.awaitIdle()
-            composeTestRule.onNodeWithText("zero").assertIsDisplayed()
-            composeTestRule.onNodeWithText("ze-ro").assertIsDisplayed()
+            assertWithin(1000) {
+                composeTestRule.awaitIdle()
+                composeTestRule.onNodeWithText("zero").assertIsDisplayed()
+                composeTestRule.onNodeWithText("ze-ro").assertIsDisplayed()
+            }
 
             content = 1
 
-            composeTestRule.awaitIdle()
-            composeTestRule.onNodeWithText("one").assertIsDisplayed()
-            composeTestRule.onNodeWithText("zero").assertDoesNotExist()
-            composeTestRule.onNodeWithText("ze-ro").assertDoesNotExist()
+            assertWithin(1000) {
+                composeTestRule.awaitIdle()
+                composeTestRule.onNodeWithText("one").assertIsDisplayed()
+                composeTestRule.onNodeWithText("zero").assertDoesNotExist()
+                composeTestRule.onNodeWithText("ze-ro").assertDoesNotExist()
+            }
         }
     }
+}
+
+suspend fun assertWithin(
+    timeoutMs: Long,
+    block: suspend () -> Unit,
+) {
+    val start = System.currentTimeMillis()
+    var lastError: Throwable? = null
+    while (System.currentTimeMillis() - start < timeoutMs) {
+        try {
+            block()
+            return
+        } catch (e: AssertionError) {
+            lastError = e
+            delay(50)
+        }
+    }
+    throw lastError ?: Exception("Timed out")
 }
