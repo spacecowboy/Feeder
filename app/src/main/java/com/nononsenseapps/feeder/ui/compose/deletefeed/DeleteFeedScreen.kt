@@ -23,8 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,15 +52,17 @@ fun DeleteFeedDialog(
     var feedsToDelete by rememberSaveable {
         mutableStateOf(emptyMap<Long, Boolean>())
     }
-
+    val selectAllSelected by remember {
+        derivedStateOf {
+            feeds.item.all { feed -> feedsToDelete[feed.id] ?: false }
+        }
+    }
     DeleteFeedDialog(
         feeds = feeds,
         isChecked = { feedId ->
             feedsToDelete[feedId] ?: false
         },
-        isSelectAllChecked = {
-            if (feedsToDelete.isEmpty()) false else feedsToDelete.all { it.value }
-        },
+        selectAllSelected = selectAllSelected,
         onDismiss = onDismiss,
         onOk = {
             onDelete(feedsToDelete.filterValues { it }.keys)
@@ -68,9 +72,7 @@ fun DeleteFeedDialog(
             feedsToDelete = feedsToDelete + (feedId to (checked ?: !feedsToDelete.contains(feedId)))
         },
         onSelectAll = { checked ->
-            feeds.item.forEach { item ->
-                feedsToDelete = feeds.item.associate { item.id to checked }
-            }
+            feedsToDelete = feeds.item.associate { it.id to checked }
         },
         modifier = modifier,
     )
@@ -80,16 +82,13 @@ fun DeleteFeedDialog(
 fun DeleteFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
     isChecked: (Long) -> Boolean,
-    isSelectAllChecked: () -> Boolean,
+    selectAllSelected: Boolean,
     onDismiss: () -> Unit,
     onOk: () -> Unit,
     onToggleFeed: (Long, Boolean?) -> Unit,
     onSelectAll: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectAllSelected by rememberSaveable {
-        mutableStateOf(false)
-    }
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
@@ -126,9 +125,8 @@ fun DeleteFeedDialog(
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = isSelectAllChecked(), onCheckedChange = { checked ->
+                                Checkbox(checked = selectAllSelected, onCheckedChange = { checked ->
                                     onSelectAll(checked)
-                                    selectAllSelected = checked
                                     menuExpanded = false
                                 }, modifier = Modifier.clearAndSetSemantics { })
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -139,7 +137,6 @@ fun DeleteFeedDialog(
                             }
                         }, onClick = {
                             onSelectAll(!selectAllSelected)
-                            selectAllSelected = !selectAllSelected
                             menuExpanded = false
                         }, modifier = Modifier.safeSemantics(mergeDescendants = selectAllSelected) {
                             stateDescription = stateLabel
