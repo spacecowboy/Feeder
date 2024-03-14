@@ -956,6 +956,21 @@ class FeedParserTest : DIAware {
         }
 
     @Test
+    fun timestampsAreParsedWithCorrectTimezone() {
+        runBlocking {
+            val feed =
+                feedParser.parseFeedResponse(URL("https://www.bleepingcomputer.com/feed/"), rssBleepingComputer)
+                    .getOrElse { throw it.throwable!! }
+
+            // Thu, 14 Mar 2024 14:08:43 -0400"
+            assertEquals(
+                "2024-03-14T18:08:43Z",
+                feed.items!!.first().date_published,
+            )
+        }
+    }
+
+    @Test
     fun handlesUnknownProtocols() =
         runBlocking {
             val feed =
@@ -1118,6 +1133,32 @@ class FeedParserTest : DIAware {
             .build()
     }
 }
+
+@Language("xml")
+const val rssBleepingComputer = """
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rss version="2.0">
+  <channel>
+    <title>BleepingComputer</title>
+    <link>https://www.bleepingcomputer.com/</link>
+    <description>BleepingComputer - All Stories</description>
+    <pubDate>Thu, 14 Mar 2024 14:13:50 EDT</pubDate>
+    <generator>https://www.bleepingcomputer.com/</generator>
+    <language>en</language>
+    <atom:link href="https://www.bleepingcomputer.com/feed/" rel="self" type="application/rss+xml" />
+    
+    <item>
+        <title>SIM swappers now stealing phone numbers from eSIMs</title>
+        <link>https://www.bleepingcomputer.com/news/security/sim-swappers-now-stealing-phone-numbers-from-esims/</link>
+        <pubDate>Thu, 14 Mar 2024 14:08:43 -0400</pubDate>
+        <dc:creator>Bill Toulas</dc:creator>
+        <category><![CDATA[Security]]></category>
+        <guid>https://www.bleepingcomputer.com/news/security/sim-swappers-now-stealing-phone-numbers-from-esims/</guid>
+	    <description><![CDATA[SIM swappers have adapted their attacks to steal a target's phone number from an eSIM card, a rewritable SIM chip present on many recent smartphone models. [...]]]></description>
+    </item>
+  </channel>
+</rss>
+"""
 
 @Language("xml")
 const val atomRelative = """

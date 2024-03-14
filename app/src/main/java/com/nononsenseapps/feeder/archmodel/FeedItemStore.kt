@@ -31,6 +31,7 @@ import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -340,7 +341,7 @@ private fun PreviewItem.toFeedListItem() =
         snippet = plainSnippet,
         feedTitle = feedDisplayTitle,
         unread = readTime == null,
-        pubDate = pubDate?.toLocalDateTime()?.formatDynamically() ?: "",
+        pubDate = pubDate?.withZoneSameInstant(ZoneId.systemDefault())?.toLocalDateTime()?.formatDynamically() ?: "",
         image = image,
         link = link,
         bookmarked = bookmarked,

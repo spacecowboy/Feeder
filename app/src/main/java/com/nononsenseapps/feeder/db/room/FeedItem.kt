@@ -35,7 +35,6 @@ import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import java.net.URI
 import java.time.Instant
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 const val MAX_TITLE_LENGTH = 200
@@ -172,7 +171,7 @@ data class FeedItem
                     ZonedDateTime.parse(entry.date_published)
                 } catch (t: Throwable) {
                     // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
+                    this.pubDate ?: ZonedDateTime.now()
                 }
             primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
         }

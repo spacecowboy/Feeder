@@ -78,6 +78,7 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.unicodeWrap
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Composable
@@ -440,7 +441,7 @@ fun ArticleContent(
                 viewState.author == null && viewState.pubDate != null ->
                     stringResource(
                         R.string.on_date,
-                        (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
+                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(dateTimeFormat),
                     )
 
                 viewState.author != null && viewState.pubDate != null ->
@@ -449,7 +450,7 @@ fun ArticleContent(
                         // Must wrap author in unicode marks to ensure it formats
                         // correctly in RTL
                         context.unicodeWrap(viewState.author ?: ""),
-                        (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
+                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(dateTimeFormat),
                     )
 
                 else -> null
