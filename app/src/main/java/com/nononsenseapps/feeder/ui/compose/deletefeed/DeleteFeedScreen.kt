@@ -138,7 +138,7 @@ fun DeleteFeedDialog(
                         }, onClick = {
                             onSelectAll(!selectAllSelected)
                             menuExpanded = false
-                        }, modifier = Modifier.safeSemantics(mergeDescendants = selectAllSelected) {
+                        }, modifier = Modifier.safeSemantics(mergeDescendants = true) {
                             stateDescription = stateLabel
                         })
                     }
