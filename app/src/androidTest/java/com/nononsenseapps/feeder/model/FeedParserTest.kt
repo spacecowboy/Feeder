@@ -550,6 +550,15 @@ class FeedParserTest : DIAware {
         }
 
     @Test
+    fun fetchesTextContentType(): Unit =
+        runBlocking {
+            val result = textContentTypeResponse.use { feedParser.parseFeedResponse(it) }
+            assertTrue {
+                result.isRight()
+            }
+        }
+
+    @Test
     @Throws(Exception::class)
     fun cyklist() =
         runBlocking {
@@ -1091,6 +1100,14 @@ class FeedParserTest : DIAware {
                 "rss_nixers_newsletter.xml",
                 "https://foo.bar/feed.xml",
                 null,
+            )
+
+    private val textContentTypeResponse: Response
+        get() =
+            bytesToResponse(
+                "rss_nixers_newsletter.xml",
+                "https://foo.bar/feed.xml",
+                "text/html",
             )
 
     private val diskuse: Response

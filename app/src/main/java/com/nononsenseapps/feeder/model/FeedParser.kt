@@ -239,9 +239,10 @@ class FeedParser(override val di: DI) : DIAware {
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, ParsedFeed> {
-        val subType = responseBody.contentType()?.subtype
+        val primaryType = responseBody.contentType()?.type
+        val subType = responseBody.contentType()?.subtype ?: ""
         return when {
-            subType == null || subType.contains("json") || subType.contains("xml") ->
+            primaryType == null || primaryType == "text" || subType.contains("json") || subType.contains("xml") ->
                 Either.catching(
                     onCatch = { t ->
                         RSSParseError(url = url.toString(), throwable = t)
