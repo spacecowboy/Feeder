@@ -443,6 +443,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Feeder"
+rootProject.name = "feeder"
 
 include(":app")
