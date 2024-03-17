@@ -1,3 +1,55 @@
+# 2.6.20
+Agnieszka C (1):
+  * [f13c3c3f] Updated Polish translation using Weblate
+
+Alex Gavrishev (1):
+  * [80fd92f3] Added new article style: compact card layout (#243)
+
+Jonas Kalderstam (6):
+  * [3684b5d7] Changed "already read" label to "read" instead
+  * [233d6ce9] Fixed talkback for delete dialog
+  * [edc8966d] Fixed some timezone handling in publication dates
+  * [0845a3b4] Tried to make a test less flaky
+  * [e0219f24] Made feed parsing more lenient because I'm sick of bug
+         reports for sites with incorrect content-types
+  * [bec3f1eb] Updated Japanese translation using Weblate
+
+Kartikeya Hegde (1):
+  * [10437fa2] Added select all button to delete feed dialog (#234)
+
+Matth78 (1):
+  * [c4a15c31] Updated French translation using Weblate
+
+Mikachu (1):
+  * [d3f877f0] Translated using Weblate (Dutch)
+
+Muro (1):
+  * [95c0b910] Updated Turkish translation using Weblate
+
+Oğuz Ersen (1):
+  * [4df745ff] Updated Turkish translation using Weblate
+
+Scrambled777 (1):
+  * [75247321] Updated Hindi translation using Weblate
+
+bowornsin (1):
+  * [3d094c7d] Translated using Weblate (Thai)
+
+gallegonovato (1):
+  * [6e7caea3] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [a83ad85f] Updated Galician translation using Weblate
+
+pchelium (1):
+  * [72fdcc0f] Updated Czech translation using Weblate
+
+Ács Zoltán (1):
+  * [2d57c635] Updated Hungarian translation using Weblate
+
+大王叫我来巡山 (1):
+  * [8dd7ee20] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.19
 Eduardo (1):
   * [b128dfdc] Translated using Weblate (Portuguese (Brazil))
