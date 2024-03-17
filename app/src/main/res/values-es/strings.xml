@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Error al exportar artículos guardados</string>
     <string name="skip_duplicate_articles">Omitir artículos duplicados</string>
     <string name="skip_duplicate_articles_desc">Se ignoran los artículos con enlaces o títulos idénticos a artículos existentes</string>
+    <string name="feed_item_style_compact_card">Tarjeta compacta</string>
 </resources>
