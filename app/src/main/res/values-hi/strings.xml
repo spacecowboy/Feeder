@@ -247,4 +247,5 @@
     <string name="two_minutes">%1$s मिनट</string>
     <string name="skip_duplicate_articles">दोहरा लेख छोड़ें</string>
     <string name="skip_duplicate_articles_desc">मौजूदा लेखों के समान लिंक या शीर्षक वाले लेखों को नजरअंदाज कर दिया जाता है</string>
+    <string name="feed_item_style_compact_card">कॉम्पैक्ट कार्ड</string>
 </resources>
