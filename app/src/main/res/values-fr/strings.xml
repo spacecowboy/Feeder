@@ -247,4 +247,5 @@
     <string name="export_saved_articles">Exporter les articles sauvegardés</string>
     <string name="skip_duplicate_articles">Ignorer les doublons d\'article</string>
     <string name="skip_duplicate_articles_desc">Les articles avec des liens ou titres identiques à des articles déjà existants seront ignorés</string>
+    <string name="feed_item_style_compact_card">Carte compact</string>
 </resources>
