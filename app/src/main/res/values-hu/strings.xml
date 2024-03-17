@@ -14,7 +14,7 @@
     <string name="action_settings">Beállítások</string>
     <string name="add_feed">Hírfolyam hozzáadása</string>
     <string name="title_activity_edit_feed">Feliratkozás hírfolyamra</string>
-    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">Megnyitni</annotation> ?</string>
+    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">megnyitni</annotation> ?</string>
     <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadni</annotation>\?</string>
     <string name="search_feed_empty_hint">Adjon meg egy hírfolyam címet</string>
     <string name="mark_as_read">Megjelölés olvasottként</string>
@@ -137,7 +137,7 @@
     <string name="or_open_device_sync_link">Vagy nyissa meg a linket az eszközén.</string>
     <string name="device_sync_description_1">Az eszköz szinkronizálás lehetővé teszi, hogy a hírfolyam feliratkozásait és olvasott cikkeit szinkronizálja különböző eszközei között.</string>
     <string name="device_sync_description_2">Egyszerűen szkennelje be a kódot a szinkronizálási láncból, amit egy másik eszközön hozott létre, vagy hozzon létre egy újat.</string>
-    <string name="scan_or_enter_code">Szkennelje be vagy adjon meg szinkronizálási kódot</string>
+    <string name="scan_or_enter_code">Szkenneljen be vagy adjon meg szinkronizálási kódot</string>
     <string name="start_new_sync_chain">Új szinkronizálási lánc indítása</string>
     <string name="sync_code">Szinkronizálási kód</string>
     <string name="secret_key">Titkos kulcs</string>
