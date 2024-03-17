@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Nie udało się wyeksportować zapisanych artykułów</string>
     <string name="skip_duplicate_articles_desc">Artykuły z linkami lub tytułami identycznymi z istniejącymi artykułami są ignorowane</string>
     <string name="skip_duplicate_articles">Pomijaj zduplikowane artykuły</string>
+    <string name="feed_item_style_compact_card">Karta kompaktowa</string>
 </resources>
