@@ -46,7 +46,7 @@
     <string name="only_on_wifi">ด้วย Wi-Fi เท่านั้น</string>
     <string name="show_thumbnails">แสดงรูปขนาดย่อ</string>
     <string name="may_result_data_charges">อาจมีค่าบริการข้อมูลมือถือ</string>
-    <string name="no_activity_for_link">ติดตั้งแอปที่สามารถเปิดด้วยลิงค์นี้ได้ก่อน</string>
+    <string name="no_activity_for_link">ติดตั้งแอปที่สามารถเปิดด้วยลิงก์นี้ได้ก่อน</string>
     <string name="check_for_updates">มองหาบทความใหม่…</string>
     <string name="on_startup">เมื่อแอปเรื่มต้น</string>
     <string name="text_to_speech">ข้อความเป็นคำพูด</string>
@@ -70,7 +70,7 @@
     <string name="devices_on_sync_chain">อุปกรณ์บนกลุ่มการซิงค์</string>
     <string name="open_item_by_default_with">เปิดรายการโดยเรื่มต้นด้วย</string>
     <string name="use_app_default">ใช้แอปเรื่มต้น</string>
-    <string name="open_links_with">เปิดลิงค์ด้วย</string>
+    <string name="open_links_with">เปิดลิงก์ด้วย</string>
     <string name="mark_items_below_as_read">ทำเครื่องหมายรายการด้านล่างว่าอ่านแล้ว</string>
     <string name="go_to_feed">ไปที่ %1$s</string>
     <string name="feed_icon">ไอคอนฟีด</string>
@@ -119,7 +119,7 @@
     <string name="notification_channel_name">ฟีดที่ยังไม่ได้อ่าน</string>
     <string name="sync_status">สถานะการซิงค์</string>
     <string name="reader_settings">เครื่องมืออ่าน</string>
-    <string name="open_link_in_web_view">เปิดลิงค์ใน Webview</string>
+    <string name="open_link_in_web_view">เปิดลิงก์ใน Webview</string>
     <string name="open_in_web_view">เปิดใน Webview</string>
     <string name="max_feed_items">รายการสูงสุดในแต่ละฟีด</string>
     <string name="could_not_load_url">ไม่สามารถโหลดที่อยู่เว็บ</string>
@@ -164,8 +164,8 @@
     <string name="remove">เอาออก</string>
     <string name="remove_device">เอาอุปกรณ์ออก</string>
     <string name="device_sync">การซิงค์ระหว่างอุปกรณ์</string>
-    <string name="or_open_device_sync_link">หรืออีกวีธี เปิดลิงค์นี้บนอุปกรณ์ของคุณ</string>
-    <string name="treat_like_password">สิ่งนี้จะเป็นเสมือนรหัสผ่าน ทุกคนที่มีลิงค์นี้จะสามารถอ่านและซิงค์ข้อมูลได้</string>
+    <string name="or_open_device_sync_link">หรืออีกวีธี เปิดลิงก์นี้บนอุปกรณ์ของคุณ</string>
+    <string name="treat_like_password">สิ่งนี้จะเป็นเสมือนรหัสผ่าน ทุกคนที่มีลิงก์นี้จะสามารถอ่านและซิงค์ข้อมูลได้</string>
     <string name="qr_code">รหัส QR</string>
     <string name="feeder_device_sync_code">รหัสการซิงค์ระหว่างอุปกรณ์ของ Feeder</string>
     <string name="device_sync_description_1">การซิงค์ระหว่างอุปกรณ์จะทำให้คุณสามารถซิงค์การติดตามฟีดและการอ่านบทความระหว่างอุปกรณ์</string>
@@ -238,4 +238,10 @@
     <string name="two_minutes">%1$s นาที</string>
     <string name="other_words">%1$s คำ</string>
     <string name="one_word">%1$s คำ</string>
+    <string name="close_menu">ปิดเมนู</string>
+    <string name="export_saved_articles">ส่งออกบทความที่บันทึกไว้</string>
+    <string name="failed_to_export_saved_articles">ส่งออกบทความที่บันทึกไว้ล้มเหลว</string>
+    <string name="failed_to_parse_the_page">ดึงข้อมูลหน้าไม่ได้</string>
+    <string name="skip_duplicate_articles">ข้ามบทความที่ซ้ำ</string>
+    <string name="skip_duplicate_articles_desc">บทความที่มีลิงก์หรือหัวข้อที่มีอยู่แล้วจะถูกเพิกเฉย</string>
 </resources>
