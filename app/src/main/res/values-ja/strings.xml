@@ -245,4 +245,5 @@
     <string name="close_menu">メニューを閉じる</string>
     <string name="export_saved_articles">保存した記事をエクスポート</string>
     <string name="failed_to_export_saved_articles">保存した記事のエクスポートに失敗しました</string>
+    <string name="feed_item_style_compact_card">コンパクトなカード</string>
 </resources>

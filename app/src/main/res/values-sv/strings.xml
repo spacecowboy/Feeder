@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Misslyckades att exportera sparade artiklar</string>
     <string name="skip_duplicate_articles">Hoppa över dubbletter</string>
     <string name="skip_duplicate_articles_desc">Artiklar med titlar eller länkar som redan finns ignoreras</string>
+    <string name="feed_item_style_compact_card">Kompakt kort</string>
 </resources>
