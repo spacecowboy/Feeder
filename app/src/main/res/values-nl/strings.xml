@@ -242,4 +242,9 @@
     <string name="two_minutes">%1$s minuten</string>
     <string name="other_words">%1$s woorden</string>
     <string name="one_word">%1$s woord</string>
+    <string name="close_menu">Menu sluiten</string>
+    <string name="export_saved_articles">Opgeslagen artikelen exporteer</string>
+    <string name="failed_to_export_saved_articles">Opgeslagen artikelen konden niet worden geëxporteerd</string>
+    <string name="skip_duplicate_articles">Dubbele artikelen overslaan</string>
+    <string name="skip_duplicate_articles_desc">Artikelen met links of titels die identiek zijn aan bestaande artikelen worden genegeerd</string>
 </resources>
