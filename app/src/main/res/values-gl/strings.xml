@@ -247,4 +247,5 @@
     <string name="export_saved_articles">Exportar artigos gardados</string>
     <string name="skip_duplicate_articles">Omitir artigos duplicados</string>
     <string name="skip_duplicate_articles_desc">Vanse ignorar os artigos con ligazóns ou titulares idénticos aos existentes</string>
+    <string name="feed_item_style_compact_card">Tarxeta compacta</string>
 </resources>
