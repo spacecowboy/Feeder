@@ -91,7 +91,6 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
@@ -100,6 +99,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
+import com.nononsenseapps.feeder.ui.compose.utils.withAllPreviewProviders
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
@@ -110,19 +110,21 @@ fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val viewState by settingsViewModel.viewState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
+
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier =
-            modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
@@ -132,12 +134,12 @@ fun SettingsScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.go_back),
+                            contentDescription = stringResource(R.string.go_back)
                         )
                     }
-                },
+                }
             )
-        },
+        }
     ) { padding ->
         SettingsList(
             currentThemeValue = viewState.currentTheme.asThemeOption(),
@@ -199,7 +201,10 @@ fun SettingsScreen(
             onOpenAdjacent = settingsViewModel::setIsOpenAdjacent,
             showReadingTime = viewState.showReadingTime,
             onShowReadingTimeChanged = settingsViewModel::setShowReadingTime,
-            modifier = Modifier.padding(padding),
+            onStartActivity = { intent ->
+                activityLauncher.startActivity(false, intent)
+            },
+            modifier = Modifier.padding(padding)
         )
     }
 }
@@ -208,65 +213,64 @@ fun SettingsScreen(
 @Preview(showBackground = true, device = PIXEL_C)
 @Preview(showBackground = true, device = NEXUS_5)
 private fun SettingsScreenPreview() {
-    FeederTheme(ThemeOptions.DAY) {
-        Surface {
-            SettingsList(
-                currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
-                onThemeChanged = {},
-                currentDarkThemePreference = DarkThemePreferences.BLACK.asDarkThemeOption(),
-                onDarkThemePreferenceChanged = {},
-                currentSortingValue = SortingOptions.NEWEST_FIRST.asSortOption(),
-                onSortingChanged = {},
-                showFabValue = true,
-                onShowFabChanged = {},
-                feedItemStyleValue = FeedItemStyle.CARD,
-                onFeedItemStyleChanged = {},
-                blockListValue = ImmutableHolder(emptyList()),
-                swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
-                onSwipeAsReadOptionChanged = {},
-                syncOnStartupValue = true,
-                onSyncOnStartupChanged = {},
-                syncOnlyOnWifiValue = true,
-                onSyncOnlyOnWifiChanged = {},
-                syncOnlyWhenChargingValue = true,
-                onSyncOnlyWhenChargingChanged = {},
-                loadImageOnlyOnWifiValue = true,
-                onLoadImageOnlyOnWifiChanged = {},
-                showThumbnailsValue = true,
-                onShowThumbnailsChanged = {},
-                useDetectLanguage = true,
-                onUseDetectLanguageChanged = {},
-                maxItemsPerFeedValue = 101,
-                onMaxItemsPerFeedChanged = {},
-                currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
-                onItemOpenerChanged = {},
-                currentLinkOpenerValue = LinkOpener.DEFAULT_BROWSER,
-                onLinkOpenerChanged = {},
-                currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
-                onSyncFrequencyChanged = {},
-                batteryOptimizationIgnoredValue = false,
-                onOpenSyncSettings = {},
-                useDynamicTheme = true,
-                onUseDynamicTheme = {},
-                textScale = 1.5f,
-                setTextScale = {},
-                onBlockListAdd = {},
-                onBlockListRemove = {},
-                feedsSettings = ImmutableHolder(emptyList()),
-                onToggleNotification = { _, _ -> },
-                isMarkAsReadOnScroll = false,
-                onMarkAsReadOnScroll = {},
-                maxLines = 2,
-                setMaxLines = {},
-                showOnlyTitle = false,
-                onShowOnlyTitle = {},
-                isOpenAdjacent = false,
-                onOpenAdjacent = {},
-                showReadingTime = false,
-                onShowReadingTimeChanged = {},
-                modifier = Modifier,
-            )
-        }
+    withAllPreviewProviders {
+        SettingsList(
+            currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
+            onThemeChanged = {},
+            currentDarkThemePreference = DarkThemePreferences.BLACK.asDarkThemeOption(),
+            onDarkThemePreferenceChanged = {},
+            currentSortingValue = SortingOptions.NEWEST_FIRST.asSortOption(),
+            onSortingChanged = {},
+            showFabValue = true,
+            onShowFabChanged = {},
+            feedItemStyleValue = FeedItemStyle.CARD,
+            onFeedItemStyleChanged = {},
+            blockListValue = ImmutableHolder(emptyList()),
+            swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
+            onSwipeAsReadOptionChanged = {},
+            syncOnStartupValue = true,
+            onSyncOnStartupChanged = {},
+            syncOnlyOnWifiValue = true,
+            onSyncOnlyOnWifiChanged = {},
+            syncOnlyWhenChargingValue = true,
+            onSyncOnlyWhenChargingChanged = {},
+            loadImageOnlyOnWifiValue = true,
+            onLoadImageOnlyOnWifiChanged = {},
+            showThumbnailsValue = true,
+            onShowThumbnailsChanged = {},
+            useDetectLanguage = true,
+            onUseDetectLanguageChanged = {},
+            maxItemsPerFeedValue = 101,
+            onMaxItemsPerFeedChanged = {},
+            currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
+            onItemOpenerChanged = {},
+            currentLinkOpenerValue = LinkOpener.DEFAULT_BROWSER,
+            onLinkOpenerChanged = {},
+            currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
+            onSyncFrequencyChanged = {},
+            batteryOptimizationIgnoredValue = false,
+            onOpenSyncSettings = {},
+            useDynamicTheme = true,
+            onUseDynamicTheme = {},
+            textScale = 1.5f,
+            setTextScale = {},
+            onBlockListAdd = {},
+            onBlockListRemove = {},
+            feedsSettings = ImmutableHolder(emptyList()),
+            onToggleNotification = { _, _ -> },
+            isMarkAsReadOnScroll = false,
+            onMarkAsReadOnScroll = {},
+            maxLines = 2,
+            setMaxLines = {},
+            showOnlyTitle = false,
+            onShowOnlyTitle = {},
+            isOpenAdjacent = false,
+            onOpenAdjacent = {},
+            showReadingTime = false,
+            onShowReadingTimeChanged = {},
+            onStartActivity = {},
+            modifier = Modifier
+        )
     }
 }
 
@@ -325,94 +329,98 @@ fun SettingsList(
     onOpenAdjacent: (Boolean) -> Unit,
     showReadingTime: Boolean,
     onShowReadingTimeChanged: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
+    onStartActivity: (intent: Intent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
     val dimens = LocalDimens.current
-    val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-    val isAndroidSAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val isAndroidQAndAbove = remember {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    }
+    val isAndroidSAndAbove = remember {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
-            modifier
-                .padding(horizontal = dimens.margin)
-                .fillMaxWidth()
-                .verticalScroll(scrollState),
+        modifier
+            .padding(horizontal = dimens.margin)
+            .fillMaxWidth()
+            .verticalScroll(scrollState)
     ) {
         MenuSetting(
             currentValue = currentThemeValue,
             values =
-                immutableListHolderOf(
-                    ThemeOptions.SYSTEM.asThemeOption(),
-                    ThemeOptions.DAY.asThemeOption(),
-                    ThemeOptions.NIGHT.asThemeOption(),
-                    ThemeOptions.E_INK.asThemeOption(),
-                ),
+            immutableListHolderOf(
+                ThemeOptions.SYSTEM.asThemeOption(),
+                ThemeOptions.DAY.asThemeOption(),
+                ThemeOptions.NIGHT.asThemeOption(),
+                ThemeOptions.E_INK.asThemeOption()
+            ),
             title = stringResource(id = R.string.theme),
-            onSelection = onThemeChanged,
+            onSelection = onThemeChanged
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.dynamic_theme_use),
             checked = useDynamicTheme,
             description =
-                when {
-                    isAndroidSAndAbove -> {
-                        null
-                    }
+            when {
+                isAndroidSAndAbove -> {
+                    null
+                }
 
-                    else -> {
-                        stringResource(
-                            id = R.string.only_available_on_android_n,
-                            "12",
-                        )
-                    }
-                },
+                else -> {
+                    stringResource(
+                        id = R.string.only_available_on_android_n,
+                        "12"
+                    )
+                }
+            },
             enabled = isAndroidSAndAbove,
-            onCheckedChanged = onUseDynamicTheme,
+            onCheckedChanged = onUseDynamicTheme
         )
 
         MenuSetting(
             title = stringResource(id = R.string.dark_theme_preference),
             currentValue = currentDarkThemePreference,
             values =
-                immutableListHolderOf(
-                    DarkThemePreferences.BLACK.asDarkThemeOption(),
-                    DarkThemePreferences.DARK.asDarkThemeOption(),
-                ),
-            onSelection = onDarkThemePreferenceChanged,
+            immutableListHolderOf(
+                DarkThemePreferences.BLACK.asDarkThemeOption(),
+                DarkThemePreferences.DARK.asDarkThemeOption()
+            ),
+            onSelection = onDarkThemePreferenceChanged
         )
 
         ListDialogSetting(
             title = stringResource(id = R.string.block_list),
             dialogTitle = {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = stringResource(id = R.string.block_list),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = stringResource(id = R.string.block_list_description),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace)
                     )
                 }
             },
             currentValue = blockListValue,
             onAddItem = onBlockListAdd,
-            onRemoveItem = onBlockListRemove,
+            onRemoveItem = onBlockListRemove
         )
 
         NotificationsSetting(
             items = feedsSettings,
-            onToggleItem = onToggleNotification,
+            onToggleItem = onToggleNotification
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -420,7 +428,7 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.text_scale),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
@@ -428,7 +436,7 @@ fun SettingsList(
             currentValue = textScale,
             onValueChange = setTextScale,
             valueRange = 1f..2f,
-            steps = 9,
+            steps = 9
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -436,73 +444,70 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.synchronization),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
         MenuSetting(
             currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
             values =
-                ImmutableHolder(
-                    SyncFrequency.values().map {
-                        it.asSyncFreqOption()
-                    },
-                ),
+            ImmutableHolder(
+                SyncFrequency.values().map {
+                    it.asSyncFreqOption()
+                }
+            ),
             title = stringResource(id = R.string.check_for_updates),
             onSelection = {
                 onSyncFrequencyChanged(it.syncFrequency)
-            },
+            }
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.on_startup),
             checked = syncOnStartupValue,
-            onCheckedChanged = onSyncOnStartupChanged,
+            onCheckedChanged = onSyncOnStartupChanged
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.only_on_wifi),
             checked = syncOnlyOnWifiValue,
-            onCheckedChanged = onSyncOnlyOnWifiChanged,
+            onCheckedChanged = onSyncOnlyOnWifiChanged
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.only_when_charging),
             checked = syncOnlyWhenChargingValue,
-            onCheckedChanged = onSyncOnlyWhenChargingChanged,
+            onCheckedChanged = onSyncOnlyWhenChargingChanged
         )
 
         MenuSetting(
             currentValue = maxItemsPerFeedValue,
             values =
-                immutableListHolderOf(
-                    50,
-                    100,
-                    200,
-                    500,
-                    1000,
-                ),
+            immutableListHolderOf(
+                50,
+                100,
+                200,
+                500,
+                1000
+            ),
             title = stringResource(id = R.string.max_feed_items),
-            onSelection = onMaxItemsPerFeedChanged,
+            onSelection = onMaxItemsPerFeedChanged
         )
 
         ExternalSetting(
             currentValue =
-                when (batteryOptimizationIgnoredValue) {
-                    true -> stringResource(id = R.string.battery_optimization_disabled)
-                    false -> stringResource(id = R.string.battery_optimization_enabled)
-                },
-            title = stringResource(id = R.string.battery_optimization),
+            when (batteryOptimizationIgnoredValue) {
+                true -> stringResource(id = R.string.battery_optimization_disabled)
+                false -> stringResource(id = R.string.battery_optimization_enabled)
+            },
+            title = stringResource(id = R.string.battery_optimization)
         ) {
-            activityLauncher.startActivity(
-                openAdjacentIfSuitable = false,
-                intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
-            )
+            onStartActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
         }
 
         ExternalSetting(
             currentValue = "",
-            title = stringResource(id = R.string.device_sync),
+            title = stringResource(id = R.string.device_sync)
         ) {
             onOpenSyncSettings()
         }
@@ -512,25 +517,25 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.article_list_settings),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
         MenuSetting(
             currentValue = currentSortingValue,
             values =
-                immutableListHolderOf(
-                    SortingOptions.NEWEST_FIRST.asSortOption(),
-                    SortingOptions.OLDEST_FIRST.asSortOption(),
-                ),
+            immutableListHolderOf(
+                SortingOptions.NEWEST_FIRST.asSortOption(),
+                SortingOptions.OLDEST_FIRST.asSortOption()
+            ),
             title = stringResource(id = R.string.sort),
-            onSelection = onSortingChanged,
+            onSelection = onSortingChanged
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_fab),
             checked = showFabValue,
-            onCheckedChanged = onShowFabChanged,
+            onCheckedChanged = onShowFabChanged
         )
 
         if (isCompactDevice()) {
@@ -540,7 +545,7 @@ fun SettingsList(
                 values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
                 onSelection = {
                     onFeedItemStyleChanged(it.feedItemStyle)
-                },
+                }
             )
         }
 
@@ -548,13 +553,13 @@ fun SettingsList(
             title = stringResource(id = R.string.max_lines),
             currentValue = maxLines,
             values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-            onSelection = setMaxLines,
+            onSelection = setMaxLines
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_only_title),
             checked = showOnlyTitle,
-            onCheckedChanged = onShowOnlyTitle,
+            onCheckedChanged = onShowOnlyTitle
         )
 
         MenuSetting(
@@ -563,25 +568,25 @@ fun SettingsList(
             values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
             onSelection = {
                 onSwipeAsReadOptionChanged(it.swipeAsRead)
-            },
+            }
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.mark_as_read_on_scroll),
             checked = isMarkAsReadOnScroll,
-            onCheckedChanged = onMarkAsReadOnScroll,
+            onCheckedChanged = onMarkAsReadOnScroll
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_thumbnails),
             checked = showThumbnailsValue,
-            onCheckedChanged = onShowThumbnailsChanged,
+            onCheckedChanged = onShowThumbnailsChanged
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_reading_time),
             checked = showReadingTime,
-            onCheckedChanged = onShowReadingTimeChanged,
+            onCheckedChanged = onShowReadingTimeChanged
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -589,35 +594,35 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.reader_settings),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
         MenuSetting(
             currentValue = currentItemOpenerValue.asItemOpenerOption(),
             values =
-                immutableListHolderOf(
-                    ItemOpener.READER.asItemOpenerOption(),
-                    ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
-                    ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
-                ),
+            immutableListHolderOf(
+                ItemOpener.READER.asItemOpenerOption(),
+                ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
+                ItemOpener.DEFAULT_BROWSER.asItemOpenerOption()
+            ),
             title = stringResource(id = R.string.open_item_by_default_with),
             onSelection = {
                 onItemOpenerChanged(it.itemOpener)
-            },
+            }
         )
 
         MenuSetting(
             currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
             values =
-                immutableListHolderOf(
-                    LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
-                    LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
-                ),
+            immutableListHolderOf(
+                LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
+                LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption()
+            ),
             title = stringResource(id = R.string.open_links_with),
             onSelection = {
                 onLinkOpenerChanged(it.linkOpener)
-            },
+            }
         )
 
         val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
@@ -626,7 +631,7 @@ fun SettingsList(
             SwitchSetting(
                 title = stringResource(id = R.string.open_browser_in_split_screen),
                 checked = isOpenAdjacent,
-                onCheckedChanged = onOpenAdjacent,
+                onCheckedChanged = onOpenAdjacent
             )
         }
 
@@ -635,14 +640,14 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.image_loading),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
         SwitchSetting(
             title = stringResource(id = R.string.only_on_wifi),
             checked = loadImageOnlyOnWifiValue,
-            onCheckedChanged = onLoadImageOnlyOnWifiChanged,
+            onCheckedChanged = onLoadImageOnlyOnWifiChanged
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -650,7 +655,7 @@ fun SettingsList(
         GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.text_to_speech),
-                modifier = innerModifier,
+                modifier = innerModifier
             )
         }
 
@@ -658,16 +663,16 @@ fun SettingsList(
             title = stringResource(id = R.string.use_detect_language),
             checked = useDetectLanguage,
             description =
-                when {
-                    isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
-                    else ->
-                        stringResource(
-                            id = R.string.only_available_on_android_n,
-                            "10",
-                        )
-                },
+            when {
+                isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
+                else ->
+                    stringResource(
+                        id = R.string.only_available_on_android_n,
+                        "10"
+                    )
+            },
             enabled = isAndroidQAndAbove,
-            onCheckedChanged = onUseDetectLanguageChanged,
+            onCheckedChanged = onUseDetectLanguageChanged
         )
 
         Spacer(modifier = Modifier.navigationBarsPadding())
@@ -679,34 +684,34 @@ fun GroupTitle(
     modifier: Modifier = Modifier,
     startingSpace: Boolean = true,
     height: Dp = 64.dp,
-    title: @Composable (Modifier) -> Unit,
+    title: @Composable (Modifier) -> Unit
 ) {
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth),
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (startingSpace) {
             Box(
                 modifier =
-                    Modifier
-                        .width(64.dp)
-                        .height(height),
+                Modifier
+                    .width(64.dp)
+                    .height(height)
             )
         }
         Box(
             modifier =
-                Modifier
-                    .height(height),
-            contentAlignment = Alignment.CenterStart,
+            Modifier
+                .height(height),
+            contentAlignment = Alignment.CenterStart
         ) {
             ProvideTextStyle(
                 value =
-                    MaterialTheme.typography.labelMedium.merge(
-                        TextStyle(color = MaterialTheme.colorScheme.primary),
-                    ),
+                MaterialTheme.typography.labelMedium.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.primary)
+                )
             ) {
                 title(Modifier.semantics { heading() })
             }
@@ -720,22 +725,22 @@ fun ExternalSetting(
     title: String,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { onClick() }
-                .semantics {
-                    role = Role.Button
-                },
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { onClick() }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 icon()
@@ -748,7 +753,7 @@ fun ExternalSetting(
             },
             subtitle = {
                 Text(currentValue)
-            },
+            }
         )
     }
 }
@@ -760,24 +765,24 @@ fun <T> MenuSetting(
     values: ImmutableHolder<List<T>>,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onSelection: (T) -> Unit,
+    onSelection: (T) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     val closeMenuText = stringResource(id = R.string.close_menu)
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { expanded = !expanded }
-                .semantics {
-                    role = Role.Button
-                },
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 icon()
@@ -790,16 +795,16 @@ fun <T> MenuSetting(
             },
             subtitle = {
                 Text(currentValue.toString())
-            },
+            }
         )
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier =
-                Modifier.onKeyEventLikeEscape {
-                    expanded = false
-                },
+            Modifier.onKeyEventLikeEscape {
+                expanded = false
+            }
         ) {
             // Hidden button for TalkBack
             DropdownMenuItem(
@@ -808,12 +813,12 @@ fun <T> MenuSetting(
                 },
                 text = {},
                 modifier =
-                    Modifier
-                        .height(0.dp)
-                        .safeSemantics {
-                            contentDescription = closeMenuText
-                            role = Role.Button
-                        },
+                Modifier
+                    .height(0.dp)
+                    .safeSemantics {
+                        contentDescription = closeMenuText
+                        role = Role.Button
+                    }
             )
             for (value in values.item) {
                 DropdownMenuItem(
@@ -827,17 +832,17 @@ fun <T> MenuSetting(
                                 MaterialTheme.typography.bodyLarge.merge(
                                     TextStyle(
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                    ),
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
                                 )
                             } else {
                                 MaterialTheme.typography.bodyLarge
                             }
                         Text(
                             value.toString(),
-                            style = style,
+                            style = style
                         )
-                    },
+                    }
                 )
             }
         }
@@ -852,23 +857,23 @@ fun ListDialogSetting(
     onAddItem: (String) -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onRemoveItem: (String) -> Unit,
+    onRemoveItem: (String) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { expanded = !expanded }
-                .semantics {
-                    role = Role.Button
-                },
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 icon()
@@ -883,9 +888,9 @@ fun ListDialogSetting(
                 Text(
                     text = currentValue.item.joinToString(" ", limit = 5),
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
+                    maxLines = 1
                 )
-            },
+            }
         )
 
         if (expanded) {
@@ -896,7 +901,7 @@ fun ListDialogSetting(
                     expanded = false
                 },
                 onAddItem = onAddItem,
-                onRemoveItem = onRemoveItem,
+                onRemoveItem = onRemoveItem
             )
         }
     }
@@ -908,14 +913,14 @@ fun NotificationsSetting(
     items: ImmutableHolder<List<UIFeedSettings>>,
     onToggleItem: (Long, Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit = {},
+    icon: @Composable () -> Unit = {}
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val notificationsPermissionState =
         rememberApiPermissionState(
             permission = "android.permission.POST_NOTIFICATIONS",
-            minimumApiLevel = 33,
+            minimumApiLevel = 33
         ) { value ->
             expanded = value
         }
@@ -939,29 +944,29 @@ fun NotificationsSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable {
-                    when (notificationsPermissionState.status) {
-                        is PermissionStatus.Denied -> {
-                            if (notificationsPermissionState.status.shouldShowRationale) {
-                                permissionDismissed = false
-                            } else {
-                                notificationsPermissionState.launchPermissionRequest()
-                            }
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable {
+                when (notificationsPermissionState.status) {
+                    is PermissionStatus.Denied -> {
+                        if (notificationsPermissionState.status.shouldShowRationale) {
+                            permissionDismissed = false
+                        } else {
+                            notificationsPermissionState.launchPermissionRequest()
                         }
-
-                        PermissionStatus.Granted -> expanded = true
                     }
+
+                    PermissionStatus.Granted -> expanded = true
                 }
-                .semantics {
-                    role = Role.Button
-                },
-        verticalAlignment = Alignment.CenterVertically,
+            }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.Center
         ) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 icon()
@@ -975,20 +980,20 @@ fun NotificationsSetting(
             subtitle = {
                 Text(
                     text =
-                        when (permissionDenied) {
-                            true -> stringResource(id = R.string.explanation_permission_notifications)
-                            false -> {
-                                items.item.asSequence()
-                                    .filter { it.notify }
-                                    .map { it.title }
-                                    .take(4)
-                                    .joinToString(", ", limit = 3)
-                            }
-                        },
+                    when (permissionDenied) {
+                        true -> stringResource(id = R.string.explanation_permission_notifications)
+                        false -> {
+                            items.item.asSequence()
+                                .filter { it.notify }
+                                .map { it.title }
+                                .take(4)
+                                .joinToString(", ", limit = 3)
+                        }
+                    },
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
+                    maxLines = 1
                 )
-            },
+            }
         )
 
         if (shouldShowExplanationForPermission && !permissionDismissed) {
@@ -996,7 +1001,7 @@ fun NotificationsSetting(
                 explanation = R.string.explanation_permission_notifications,
                 onDismiss = {
                     permissionDismissed = true
-                },
+                }
             ) {
                 notificationsPermissionState.launchPermissionRequest()
             }
@@ -1005,14 +1010,14 @@ fun NotificationsSetting(
                 title = {
                     Text(
                         text = stringResource(id = R.string.notify_for_new_items),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 onToggleItem = onToggleItem,
                 items = items,
                 onDismiss = {
                     expanded = false
-                },
+                }
             )
         }
     }
@@ -1025,7 +1030,7 @@ fun RadioButtonSetting(
     modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = {},
     minHeight: Dp = 64.dp,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val stateLabel =
         if (selected) {
@@ -1036,20 +1041,20 @@ fun RadioButtonSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = minHeight)
-                .clickable { onClick() }
-                .safeSemantics(mergeDescendants = true) {
-                    role = Role.RadioButton
-                    stateDescription = stateLabel
-                },
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = minHeight)
+            .clickable { onClick() }
+            .safeSemantics(mergeDescendants = true) {
+                role = Role.RadioButton
+                stateDescription = stateLabel
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
             Box(
                 modifier = Modifier.size(64.dp),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.Center
             ) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     icon()
@@ -1060,7 +1065,7 @@ fun RadioButtonSetting(
         TitleAndSubtitle(
             title = {
                 Text(title)
-            },
+            }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1068,7 +1073,7 @@ fun RadioButtonSetting(
         RadioButton(
             selected = selected,
             onClick = onClick,
-            modifier = Modifier.clearAndSetSemantics { },
+            modifier = Modifier.clearAndSetSemantics { }
         )
     }
 }
@@ -1081,33 +1086,33 @@ fun SwitchSetting(
     description: String? = null,
     icon: @Composable (() -> Unit)? = {},
     enabled: Boolean = true,
-    onCheckedChanged: (Boolean) -> Unit,
+    onCheckedChanged: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .clickable(
-                    enabled = enabled,
-                    onClick = { onCheckedChanged(!checked) },
-                )
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription =
-                        when (checked) {
-                            true -> context.getString(androidx.compose.ui.R.string.on)
-                            else -> context.getString(androidx.compose.ui.R.string.off)
-                        }
-                    role = Role.Switch
-                },
-        verticalAlignment = Alignment.CenterVertically,
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = 64.dp)
+            .clickable(
+                enabled = enabled,
+                onClick = { onCheckedChanged(!checked) }
+            )
+            .safeSemantics(mergeDescendants = true) {
+                stateDescription =
+                    when (checked) {
+                        true -> context.getString(androidx.compose.ui.R.string.on)
+                        else -> context.getString(androidx.compose.ui.R.string.off)
+                    }
+                role = Role.Switch
+            },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
             Box(
                 modifier = Modifier.size(64.dp),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.Center
             ) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     icon()
@@ -1120,9 +1125,9 @@ fun SwitchSetting(
                 Text(title)
             },
             subtitle =
-                description?.let {
-                    { Text(it) }
-                },
+            description?.let {
+                { Text(it) }
+            }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1131,7 +1136,7 @@ fun SwitchSetting(
             checked = checked,
             onCheckedChange = onCheckedChanged,
             modifier = Modifier.clearAndSetSemantics { },
-            enabled = enabled,
+            enabled = enabled
         )
     }
 }
@@ -1142,7 +1147,7 @@ fun ScaleSetting(
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val dimens = LocalDimens.current
     val safeCurrentValue = currentValue.coerceIn(valueRange)
@@ -1151,32 +1156,32 @@ fun ScaleSetting(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .padding(start = 64.dp)
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription = "%.1fx".format(safeCurrentValue)
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = 64.dp)
+            .padding(start = 64.dp)
+            .safeSemantics(mergeDescendants = true) {
+                stateDescription = "%.1fx".format(safeCurrentValue)
+            }
     ) {
         Surface(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-            tonalElevation = 3.dp,
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            tonalElevation = 3.dp
         ) {
             Text(
                 "Lorem ipsum dolor sit amet.",
                 style =
-                    MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
-                            ),
-                        ),
-                modifier = Modifier.padding(4.dp),
+                MaterialTheme.typography.bodyLarge
+                    .merge(
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue
+                        )
+                    ),
+                modifier = Modifier.padding(4.dp)
             )
         }
         SliderWithEndLabels(
@@ -1185,31 +1190,31 @@ fun ScaleSetting(
                 Text(
                     "A",
                     style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
+                    MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline()
                 )
             },
             endLabel = {
                 Text(
                     "A",
                     style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
+                    MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline()
                 )
             },
             valueRange = valueRange,
             steps = steps,
-            onValueChange = onValueChange,
+            onValueChange = onValueChange
         )
     }
 }
@@ -1217,11 +1222,11 @@ fun ScaleSetting(
 @Composable
 private fun RowScope.TitleAndSubtitle(
     title: @Composable () -> Unit,
-    subtitle: (@Composable () -> Unit)? = null,
+    subtitle: (@Composable () -> Unit)? = null
 ) {
     Column(
         modifier = Modifier.weight(1f),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         ProvideTextStyle(value = MaterialTheme.typography.titleMedium) {
             title()
@@ -1239,13 +1244,13 @@ private fun RowScope.TitleAndSubtitle(
 fun ThemeOptions.asThemeOption() =
     ThemeOption(
         currentTheme = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Immutable
 data class ThemeOption(
     val currentTheme: ThemeOptions,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1254,13 +1259,13 @@ data class ThemeOption(
 fun DarkThemePreferences.asDarkThemeOption() =
     DarkThemeOption(
         darkThemePreferences = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Immutable
 data class DarkThemeOption(
     val darkThemePreferences: DarkThemePreferences,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1269,13 +1274,13 @@ data class DarkThemeOption(
 fun SortingOptions.asSortOption() =
     SortOption(
         currentSorting = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Immutable
 data class SortOption(
     val currentSorting: SortingOptions,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1283,7 +1288,7 @@ data class SortOption(
 @Immutable
 data class FeedItemStyleOption(
     val feedItemStyle: FeedItemStyle,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1291,7 +1296,7 @@ data class FeedItemStyleOption(
 @Immutable
 data class SwipeAsReadOption(
     val swipeAsRead: SwipeAsRead,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1299,7 +1304,7 @@ data class SwipeAsReadOption(
 @Immutable
 data class SyncFreqOption(
     val syncFrequency: SyncFrequency,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1308,13 +1313,13 @@ data class SyncFreqOption(
 fun SyncFrequency.asSyncFreqOption() =
     SyncFreqOption(
         syncFrequency = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Immutable
 data class ItemOpenerOption(
     val itemOpener: ItemOpener,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1323,13 +1328,13 @@ data class ItemOpenerOption(
 fun ItemOpener.asItemOpenerOption() =
     ItemOpenerOption(
         itemOpener = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Immutable
 data class LinkOpenerOption(
     val linkOpener: LinkOpener,
-    val name: String,
+    val name: String
 ) {
     override fun toString() = name
 }
@@ -1338,19 +1343,19 @@ data class LinkOpenerOption(
 fun LinkOpener.asLinkOpenerOption() =
     LinkOpenerOption(
         linkOpener = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Composable
 fun FeedItemStyle.asFeedItemStyleOption() =
     FeedItemStyleOption(
         feedItemStyle = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )
 
 @Composable
 fun SwipeAsRead.asSwipeAsReadOption() =
     SwipeAsReadOption(
         swipeAsRead = this,
-        name = stringResource(id = stringId),
+        name = stringResource(id = stringId)
     )

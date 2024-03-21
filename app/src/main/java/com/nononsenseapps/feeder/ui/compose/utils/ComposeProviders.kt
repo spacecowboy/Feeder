@@ -1,8 +1,15 @@
 package com.nononsenseapps.feeder.ui.compose.utils
 
+import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
@@ -22,13 +29,35 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
             FeederTheme(
                 currentTheme = currentTheme,
                 darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors,
+                dynamicColors = dynamicColors
             ) {
                 withWindowSize {
                     ProvideFontScale(fontScale = textScale) {
                         WithFeederTextToolbar(content)
                     }
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+fun withAllPreviewProviders(
+    currentTheme: ThemeOptions = ThemeOptions.DAY,
+    content: @Composable () -> Unit
+) {
+    FeederTheme(currentTheme = currentTheme) {
+        val dm = LocalContext.current.resources.displayMetrics
+        val dpSize = with(LocalDensity.current) {
+            DpSize(
+                dm.widthPixels.toDp(),
+                dm.heightPixels.toDp()
+            )
+        }
+        withPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
+            Surface {
+                content()
             }
         }
     }
