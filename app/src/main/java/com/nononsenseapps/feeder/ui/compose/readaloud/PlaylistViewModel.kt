@@ -15,4 +15,5 @@ data class PlayableArticle(
     val totalSeconds: Int,
     val pubDate: LocalDate,
     val currentlyPlaying: Boolean,
+    val currentlyProcessing: Boolean
 )
