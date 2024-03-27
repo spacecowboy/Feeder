@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Gespeicherte Artikel konnten nicht exportiert werden</string>
     <string name="skip_duplicate_articles">Doppelte Artikel überspringen</string>
     <string name="skip_duplicate_articles_desc">Artikel mit Links oder Titeln, die mit bestehenden Artikeln identisch sind, werden ignoriert</string>
+    <string name="feed_item_style_compact_card">Kompakte Kartei</string>
 </resources>
