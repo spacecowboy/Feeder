@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Неуспешно експортиране на запазени статии</string>
     <string name="skip_duplicate_articles">Пропускане на дублирани статии</string>
     <string name="skip_duplicate_articles_desc">Статии с връзки или заглавия идентични на съществуващите се игнорират</string>
+    <string name="feed_item_style_compact_card">Компактна карта</string>
 </resources>
