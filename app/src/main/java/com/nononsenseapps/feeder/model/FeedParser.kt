@@ -54,7 +54,7 @@ class FeedParser(override val di: DI) : DIAware {
     @VisibleForTesting
     internal fun getSiteMetaDataInHtml(
         url: URL,
-        html: String,
+        html: String
     ): Either<FeedParserError, SiteMetaData> {
         if (!html.contains("<head>", ignoreCase = true)) {
             // Probably a a feed URL and not a page
@@ -66,12 +66,12 @@ class FeedParser(override val di: DI) : DIAware {
                 MetaDataParseError(url = url.toString(), throwable = t).also {
                     Log.w(LOG_TAG, "Error when fetching site metadata", t)
                 }
-            },
+            }
         ) {
             SiteMetaData(
                 url = url,
                 alternateFeedLinks = getAlternateFeedLinksInHtml(html, baseUrl = url),
-                feedImage = getFeedIconInHtml(html, baseUrl = url),
+                feedImage = getFeedIconInHtml(html, baseUrl = url)
             )
         }
     }
@@ -79,7 +79,7 @@ class FeedParser(override val di: DI) : DIAware {
     @VisibleForTesting
     internal fun getFeedIconInHtml(
         html: String,
-        baseUrl: URL? = null,
+        baseUrl: URL? = null
     ): String? {
         val doc =
             html.byteInputStream().use {
@@ -90,14 +90,14 @@ class FeedParser(override val di: DI) : DIAware {
             doc.getElementsByAttributeValue("rel", "apple-touch-icon") +
                 doc.getElementsByAttributeValue("rel", "icon") +
                 doc.getElementsByAttributeValue("rel", "shortcut icon")
-        )
+            )
             .filter { it.hasAttr("href") }
             .firstNotNullOfOrNull { e ->
                 when {
                     baseUrl != null ->
                         relativeLinkIntoAbsolute(
                             base = baseUrl,
-                            link = e.attr("href"),
+                            link = e.attr("href")
                         )
 
                     else -> sloppyLinkToStrictURLOrNull(e.attr("href"))?.toString()
@@ -110,7 +110,7 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private fun getAlternateFeedLinksInHtml(
         html: String,
-        baseUrl: URL? = null,
+        baseUrl: URL? = null
     ): List<AlternateLink> {
         val doc =
             html.byteInputStream().use {
@@ -150,10 +150,10 @@ class FeedParser(override val di: DI) : DIAware {
                                 AlternateLink(
                                     type = e.attr("type"),
                                     link =
-                                        relativeLinkIntoAbsoluteOrThrow(
-                                            base = baseUrl,
-                                            link = e.attr("href"),
-                                        ),
+                                    relativeLinkIntoAbsoluteOrThrow(
+                                        base = baseUrl,
+                                        link = e.attr("href")
+                                    )
                                 )
                             } catch (e: Exception) {
                                 null
@@ -164,7 +164,7 @@ class FeedParser(override val di: DI) : DIAware {
                             sloppyLinkToStrictURLOrNull(e.attr("href"))?.let { l ->
                                 AlternateLink(
                                     type = e.attr("type"),
-                                    link = l,
+                                    link = l
                                 )
                             }
                     }
@@ -174,7 +174,7 @@ class FeedParser(override val di: DI) : DIAware {
             feeds.isNotEmpty() -> feeds
             baseUrl?.host == "www.youtube.com" || baseUrl?.host == "youtube.com" ->
                 findFeedLinksForYoutube(
-                    doc,
+                    doc
                 )
 
             else -> emptyList()
@@ -193,8 +193,8 @@ class FeedParser(override val di: DI) : DIAware {
                 listOf(
                     AlternateLink(
                         type = "atom",
-                        link = URL("https://www.youtube.com/feeds/videos.xml?channel_id=$channelId"),
-                    ),
+                        link = URL("https://www.youtube.com/feeds/videos.xml?channel_id=$channelId")
+                    )
                 )
         }
     }
@@ -220,14 +220,14 @@ class FeedParser(override val di: DI) : DIAware {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
                 response.request.url.toUrl(),
-                it,
+                it
             )
         } ?: Either.Left(NoBody(url = response.request.url.toString()))
     }
 
     private fun parseFeedBytes(
         url: URL,
-        body: ByteArray,
+        body: ByteArray
     ): ParsedFeed? {
         return goFeedAdapter.parseBody(body)?.asFeed(url)
     }
@@ -237,7 +237,7 @@ class FeedParser(override val di: DI) : DIAware {
      */
     fun parseFeedResponse(
         url: URL,
-        responseBody: ResponseBody,
+        responseBody: ResponseBody
     ): Either<FeedParserError, ParsedFeed> {
         val primaryType = responseBody.contentType()?.type
         val subType = responseBody.contentType()?.subtype ?: ""
@@ -246,7 +246,7 @@ class FeedParser(override val di: DI) : DIAware {
                 Either.catching(
                     onCatch = { t ->
                         RSSParseError(url = url.toString(), throwable = t)
-                    },
+                    }
                 ) {
                     responseBody.byteStream().use { bs ->
                         parseFeedBytes(url, bs.readBytes())
@@ -257,8 +257,8 @@ class FeedParser(override val di: DI) : DIAware {
             else -> return Either.Left(
                 UnsupportedContentType(
                     url = url.toString(),
-                    mimeType = responseBody.contentType().toString(),
-                ),
+                    mimeType = responseBody.contentType().toString()
+                )
             )
         }
     }
@@ -269,12 +269,12 @@ class FeedParser(override val di: DI) : DIAware {
     @VisibleForTesting
     internal fun parseFeedResponse(
         url: URL,
-        body: String,
+        body: String
     ): Either<FeedParserError, ParsedFeed> {
         return Either.catching(
             onCatch = { t ->
                 RSSParseError(url = url.toString(), throwable = t)
-            },
+            }
         ) {
             parseFeedBytes(url, body.toByteArray())
                 ?: throw NullPointerException("Parsed feed is null")
@@ -299,7 +299,7 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed =
         favicon = null,
         author = author?.asParsedAuthor(),
         expired = null,
-        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
+        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } }
     )
 
 private fun FeederGoItem.asParsedArticle() =
@@ -316,7 +316,7 @@ private fun FeederGoItem.asParsedArticle() =
         date_modified = updated,
         author = author?.asParsedAuthor(),
         tags = categories,
-        attachments = enclosures?.map { it.asParsedEnclosure() },
+        attachments = enclosures?.map { it.asParsedEnclosure() }
     )
 
 private fun GoEnclosure.asParsedEnclosure() =
@@ -325,37 +325,34 @@ private fun GoEnclosure.asParsedEnclosure() =
         title = null,
         mime_type = type,
         size_in_bytes = length?.toLongOrNull(),
-        duration_in_seconds = null,
+        duration_in_seconds = null
     )
 
 private fun GoPerson.asParsedAuthor() =
     ParsedAuthor(
         name = name,
         url = null,
-        avatar = null,
+        avatar = null
     )
 
 suspend fun OkHttpClient.getResponse(
     url: URL,
-    forceNetwork: Boolean = false,
+    forceNetwork: Boolean = false
 ): Response {
     val request =
         Request.Builder()
             .url(url)
-            .cacheControl(
-                CacheControl.Builder()
-                    // The time between cache re-validations
-                    .maxAge(
-                        if (forceNetwork) {
-                            0
-                        } else {
-                            // Matches fastest sync schedule
-                            15
-                        },
-                        TimeUnit.MINUTES,
+            .run {
+                if (forceNetwork) {
+                    cacheControl(
+                        CacheControl.Builder()
+                            .maxAge(1, TimeUnit.MINUTES)
+                            .build()
                     )
-                    .build(),
-            )
+                } else {
+                    this
+                }
+            }
             .build()
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -421,16 +418,16 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
                                 onCatch = { throwable ->
                                     FetchError(
                                         throwable = throwable,
-                                        url = url.toString(),
+                                        url = url.toString()
                                     )
-                                },
+                                }
                             ) {
                                 body.string()
                             }
                         } ?: Either.Left(
                             NoBody(
-                                url = url.toString(),
-                            ),
+                                url = url.toString()
+                            )
                         )
                     }
 
@@ -438,8 +435,8 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
                         Either.Left(
                             UnsupportedContentType(
                                 url = url.toString(),
-                                mimeType = contentType.toString(),
-                            ),
+                                mimeType = contentType.toString()
+                            )
                         )
                 }
             }
@@ -448,8 +445,8 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
                 Either.Left(
                     UnsupportedContentType(
                         url = url.toString(),
-                        mimeType = contentType.toString(),
-                    ),
+                        mimeType = contentType.toString()
+                    )
                 )
         }
     }
@@ -457,12 +454,12 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
 
 suspend fun <T> OkHttpClient.curlAndOnResponse(
     url: URL,
-    block: (suspend (Response) -> Either<FeedParserError, T>),
+    block: (suspend (Response) -> Either<FeedParserError, T>)
 ): Either<FeedParserError, T> {
     return Either.catching(
         onCatch = { t ->
             FetchError(url = url.toString(), throwable = t)
-        },
+        }
     ) {
         getResponse(url)
     }.flatMap { response ->
@@ -475,8 +472,8 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
                 HttpError(
                     url = url.toString(),
                     code = response.code,
-                    message = response.message,
-                ),
+                    message = response.message
+                )
             )
         }
     }
@@ -496,49 +493,49 @@ sealed class FeedParserError : Parcelable {
 data class NotInitializedYet(
     override val url: String = "",
     override val description: String = "",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
 data class FetchError(
     override val url: String,
     override val throwable: Throwable?,
-    override val description: String = throwable?.message ?: "",
+    override val description: String = throwable?.message ?: ""
 ) : FeedParserError()
 
 @Parcelize
 data class NotHTML(
     override val url: String,
     override val description: String = "",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
 data class MetaDataParseError(
     override val url: String,
     override val throwable: Throwable?,
-    override val description: String = throwable?.message ?: "",
+    override val description: String = throwable?.message ?: ""
 ) : FeedParserError()
 
 @Parcelize
 data class RSSParseError(
     override val throwable: Throwable?,
     override val url: String,
-    override val description: String = throwable?.message ?: "",
+    override val description: String = throwable?.message ?: ""
 ) : FeedParserError()
 
 @Parcelize
 data class JsonFeedParseError(
     override val throwable: Throwable?,
     override val url: String,
-    override val description: String = throwable?.message ?: "",
+    override val description: String = throwable?.message ?: ""
 ) : FeedParserError()
 
 @Parcelize
 data class NoAlternateFeeds(
     override val url: String,
     override val description: String = "",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
@@ -547,7 +544,7 @@ data class HttpError(
     val code: Int,
     val message: String,
     override val description: String = "$code: $message",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
@@ -555,26 +552,26 @@ data class UnsupportedContentType(
     override val url: String,
     val mimeType: String,
     override val description: String = mimeType,
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
 data class NoBody(
     override val url: String,
     override val description: String = "",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
 data class NoUrl(
     override val description: String = "",
     override val url: String = "",
-    override val throwable: Throwable? = null,
+    override val throwable: Throwable? = null
 ) : FeedParserError()
 
 @Parcelize
 data class FullTextDecodingFailure(
     override val url: String,
     override val throwable: Throwable?,
-    override val description: String = throwable?.message ?: "",
+    override val description: String = throwable?.message ?: ""
 ) : FeedParserError()
