@@ -83,6 +83,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
@@ -206,6 +207,10 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
+            openAISettings = viewState.openAISettings,
+            openAIModels = viewState.openAIModels,
+            openAIEdit = viewState.openAIEdit,
+            onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             modifier = Modifier.padding(padding),
         )
     }
@@ -273,6 +278,10 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
+            openAISettings = OpenAISettings(),
+            openAIModels = OpenAIModelsState.None,
+            openAIEdit = false,
+            onOpenAIEvent = { _ -> },
             modifier = Modifier,
         )
     }
@@ -336,6 +345,10 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
+    openAISettings: OpenAISettings,
+    openAIModels: OpenAIModelsState,
+    openAIEdit: Boolean,
+    onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -688,6 +701,24 @@ fun SettingsList(
             enabled = isAndroidQAndAbove,
             onCheckedChange = onUseDetectLanguageChange,
         )
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { innerModifier ->
+            Text(
+                stringResource(id = R.string.openai_settings),
+                modifier = innerModifier,
+            )
+        }
+
+        OpenAISection(
+            openAISettings = openAISettings,
+            openAIModels = openAIModels,
+            openAIEdit = openAIEdit,
+            onEvent = onOpenAIEvent,
+        )
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
         Spacer(modifier = Modifier.navigationBarsPadding())
     }
