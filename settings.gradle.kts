@@ -57,6 +57,7 @@ dependencyResolutionManagement {
             version("testRunner", "1.4.0")
             version("lifecycle", "2.6.2")
             version("room", "2.5.2")
+            version("openai-client", "3.8.2")
             // Compose related below
             version("compose", "2024.04.00")
             val activityCompose = "1.7.0"
@@ -87,6 +88,11 @@ dependencyResolutionManagement {
             library("okhttp-bom", "com.squareup.okhttp3", "okhttp-bom").versionRef("okhttp")
             library("coil-bom", "io.coil-kt", "coil-bom").versionRef("coil")
             library("compose-bom", "androidx.compose", "compose-bom").versionRef("compose")
+
+            // OpenAI
+            library("openai-client-bom", "com.aallam.openai", "openai-client-bom").versionRef("openai-client")
+            library("openai-client", "com.aallam.openai", "openai-client").withoutVersion()
+            library("ktor-client-okhttp", "io.ktor", "ktor-client-okhttp").withoutVersion()
 
             // Libraries
             library("ktlint-compose", "io.nlopez.compose.rules", "ktlint").versionRef("ktlint-compose")

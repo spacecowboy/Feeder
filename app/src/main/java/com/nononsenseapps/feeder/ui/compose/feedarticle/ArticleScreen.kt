@@ -7,6 +7,8 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -16,20 +18,25 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -54,6 +62,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.html.linearArticleContent
@@ -130,6 +139,9 @@ fun ArticleScreen(
         },
         articleListState = articleListState,
         onNavigateUp = onNavigateUp,
+        onSummarize = {
+            viewModel.summarize()
+        }
     )
 }
 
@@ -154,6 +166,7 @@ fun ArticleScreen(
     articleListState: LazyListState,
     modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit,
+    onSummarize: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -251,6 +264,24 @@ fun ArticleScreen(
                                         Text(stringResource(id = R.string.share))
                                     },
                                 )
+
+                                if (viewState.showSummarize) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            onShowToolbarMenu(false)
+                                            onSummarize()
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.AutoFixHigh,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        text = {
+                                            Text(stringResource(id = R.string.summarize))
+                                        },
+                                    )
+                                }
 
                                 DropdownMenuItem(
                                     onClick = {
@@ -412,6 +443,11 @@ fun ArticleContent(
         modifier = modifier,
         articleListState = articleListState,
     ) {
+        if (viewState.openAiSummary !is OpenAISummaryState.Empty) {
+            item {
+                SummarySection(viewState.openAiSummary)
+            }
+        }
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
@@ -455,6 +491,24 @@ fun ArticleContent(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SummarySection(summary: OpenAISummaryState) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        when(summary) {
+            OpenAISummaryState.Empty -> {}
+            OpenAISummaryState.Loading -> LinearProgressIndicator(
+                modifier = Modifier.padding(16.dp).fillMaxWidth()
+            )
+            is OpenAISummaryState.Result -> Text(
+                modifier = Modifier.padding(8.dp),
+                text = summary.value.content
+            )
         }
     }
 }
