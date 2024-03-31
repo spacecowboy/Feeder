@@ -242,4 +242,10 @@
     <string name="two_minutes">%1$s λεπτά</string>
     <string name="other_words">%1$s λέξεις</string>
     <string name="one_word">%1$s λέξη</string>
+    <string name="close_menu">Κλείσιμο μενού</string>
+    <string name="failed_to_export_saved_articles">Αποτυχία εξαγωγής αποθηκευμένων άρθρων</string>
+    <string name="skip_duplicate_articles">Παράλειψη διπλότυπων άρθρων</string>
+    <string name="skip_duplicate_articles_desc">Άρθρα με συνδέσμους ή τίτλους πανομοιότυπους με τα υπάρχοντα άρθρα αγνοούνται</string>
+    <string name="feed_item_style_compact_card">Συμπαγής Κάρτα</string>
+    <string name="export_saved_articles">Εξαγωγή αποθηκευμένων άρθρων</string>
 </resources>
