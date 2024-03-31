@@ -226,7 +226,7 @@
     <string name="add_anyway">Adicionar de qualquer maneira</string>
     <string name="no_feeds_in_the_page">Sem feeds na página</string>
     <string name="max_lines">Linhas máximas</string>
-    <string name="read_adjective">Ler</string>
+    <string name="read_adjective">Lido completamente</string>
     <string name="show_reading_time">Mostrar tempo de leitura estimado</string>
     <string name="many_words">%1$s palavras</string>
     <string name="other_minutes">%1$s minutos</string>
