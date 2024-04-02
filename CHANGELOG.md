@@ -1,3 +1,30 @@
+# 2.6.21
+Jonas Kalderstam (2):
+  * [0d564b74] Fixed Settings preview
+  * [1090fcba] Tweaked Cache-Control headers to respect site headers even
+         more
+
+Naxvog (1):
+  * [0dec77a1] Updated German translation using Weblate
+
+Open Contribution (1):
+  * [84b03798] Updated Greek translation using Weblate
+
+Pablo Wildson (1):
+  * [7e7febbf] Updated Portuguese (Brazil) translation using Weblate
+
+Paulius Šukys (1):
+  * [0c2c3a8b] Updated Lithuanian translation using Weblate
+
+trunars (1):
+  * [b8eb2edd] Updated Bulgarian translation using Weblate
+
+Ács Zoltán (1):
+  * [2556b909] Updated Hungarian translation using Weblate
+
+Сергій (1):
+  * [f8961a42] Updated Ukrainian translation using Weblate
+
 # 2.6.20
 Agnieszka C (1):
   * [f13c3c3f] Updated Polish translation using Weblate
