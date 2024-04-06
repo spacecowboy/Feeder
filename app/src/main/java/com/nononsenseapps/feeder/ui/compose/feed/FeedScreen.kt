@@ -174,6 +174,7 @@ fun FeedScreen(
     val toastMaker: ToastMaker by instance()
     val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
+    val pagedNavDrawerItems = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
 
     val di = LocalDI.current
     val savedArticleExporter =
@@ -248,24 +249,26 @@ fun FeedScreen(
     // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
     val workaroundNavDrawerListState = rememberLazyListState()
 
+    val navDrawerListStateToUse by remember {
+        derivedStateOf {
+            when (pagedNavDrawerItems.itemCount) {
+                0 -> workaroundNavDrawerListState
+                else -> navDrawerListState
+            }
+        }
+    }
+
     ScreenWithNavDrawer(
-        feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-        expandedTags = ImmutableHolder(viewState.expandedTags),
-        unreadBookmarksCount = viewState.unreadBookmarksCount,
+        feedsAndTags = pagedNavDrawerItems,
         onToggleTagExpansion = { tag ->
             viewModel.toggleTagExpansion(tag)
         },
         onDrawerItemSelected = { feedId, tag ->
             FeedDestination.navigate(navController, feedId = feedId, tag = tag)
-            FeedDestination.navigate(navController, feedId = feedId, tag = tag)
         },
         focusRequester = focusNavDrawer,
         drawerState = drawerState,
-        navDrawerListState =
-            when (viewState.drawerItemsWithUnreadCounts.size) {
-                0 -> workaroundNavDrawerListState
-                else -> navDrawerListState
-            },
+        navDrawerListState = navDrawerListStateToUse,
     ) {
         FeedScreen(
             viewState = viewState,
@@ -1287,8 +1290,9 @@ fun FeedListContent(
                         onItemClick(previewItem.id)
                     }
 
-                    if (viewState.feedItemStyle != FeedItemStyle.CARD
-                        && viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD) {
+                    if (viewState.feedItemStyle != FeedItemStyle.CARD &&
+                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD
+                    ) {
                         if (itemIndex < pagedFeedItems.itemCount - 1) {
                             Divider(
                                 modifier =

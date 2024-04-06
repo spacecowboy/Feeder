@@ -3,17 +3,12 @@ package com.nononsenseapps.feeder.archmodel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
-import com.nononsenseapps.feeder.model.FeedUnreadCount
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -123,38 +118,6 @@ class FeedStoreTest : DIAware {
         coVerify {
             dao.updateFeed(Feed(id = 5L))
         }
-    }
-
-    @Test
-    fun drawerItemsWithUnreadCounts() {
-        every { dao.loadFlowOfFeedsWithUnreadCounts() } returns
-            flow {
-                emit(
-                    listOf(
-                        FeedUnreadCount(id = 1, title = "zob", unreadCount = 3, currentlySyncing = true),
-                        FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4, currentlySyncing = false),
-                        FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5, currentlySyncing = true),
-                        FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7, currentlySyncing = false),
-                    ),
-                )
-            }
-        val drawerItems =
-            runBlocking {
-                store.drawerItemsWithUnreadCounts.toList().first()
-            }
-
-        assertEquals(
-            listOf(
-                DrawerTop(unreadCount = 19, totalChildren = 4),
-                DrawerTag("alpha", 12, -1002, totalChildren = 2),
-                DrawerFeed(3, "alpha", "alice", unreadCount = 5),
-                DrawerFeed(4, "alpha", "argh", unreadCount = 7),
-                DrawerTag("zork", 4, -1001, totalChildren = 1),
-                DrawerFeed(2, "zork", "bob", unreadCount = 4),
-                DrawerFeed(1, "", "zob", unreadCount = 3),
-            ),
-            drawerItems,
-        )
     }
 
     @Test

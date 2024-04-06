@@ -1,19 +1,16 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.database.sqlite.SQLiteConstraintException
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapLatest
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -64,59 +61,19 @@ class FeedStore(override val di: DI) : DIAware {
 
     val feedForSettings: Flow<List<FeedForSettings>> = feedDao.loadFlowOfFeedsForSettings()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
-        feedDao.loadFlowOfFeedsWithUnreadCounts()
-            .mapLatest { feeds ->
-                // TODO would like to have a throttle here. Emit first immediately
-                // then at most every X ms (including latest item
-                // Must emit first immediately or the feed list will have a delay
-                mapFeedsToSortedDrawerItems(feeds)
-            }
-
-    private fun mapFeedsToSortedDrawerItems(feeds: List<FeedUnreadCount>): List<DrawerItemWithUnreadCount> {
-        var topTag = DrawerTop(unreadCount = 0, totalChildren = 0)
-        val tags: MutableMap<String, DrawerTag> = mutableMapOf()
-        val data: MutableList<DrawerItemWithUnreadCount> = mutableListOf()
-
-        for (feedDbo in feeds) {
-            val feed =
-                DrawerFeed(
-                    unreadCount = feedDbo.unreadCount,
-                    tag = feedDbo.tag,
-                    id = feedDbo.id,
-                    displayTitle = feedDbo.displayTitle,
-                    imageUrl = feedDbo.imageUrl,
-                )
-
-            data.add(feed)
-            topTag =
-                topTag.copy(
-                    unreadCount = topTag.unreadCount + feed.unreadCount,
-                    totalChildren = topTag.totalChildren + 1,
-                )
-
-            if (feed.tag.isNotEmpty()) {
-                val tag =
-                    tags[feed.tag] ?: DrawerTag(
-                        tag = feed.tag,
-                        unreadCount = 0,
-                        uiId = getTagUiId(feed.tag),
-                        totalChildren = 0,
-                    )
-                tags[feed.tag] =
-                    tag.copy(
-                        unreadCount = tag.unreadCount + feed.unreadCount,
-                        totalChildren = tag.totalChildren + 1,
-                    )
-            }
+    fun getPagedNavDrawerItems(expandedTags: Set<String>): Flow<PagingData<FeedUnreadCount>> =
+        Pager(
+            config =
+                PagingConfig(
+                    pageSize = 10,
+                    initialLoadSize = 50,
+                    prefetchDistance = 50,
+                    jumpThreshold = 50,
+                ),
+        ) {
+            feedDao.getPagedNavDrawerItems(expandedTags)
         }
-
-        data.add(topTag)
-        data.addAll(tags.values)
-
-        return data.sorted()
-    }
+            .flow
 
     fun getFeedTitles(
         feedId: Long,
@@ -163,10 +120,6 @@ class FeedStore(override val di: DI) : DIAware {
 
     suspend fun getFeedsOrderedByUrl(): List<Feed> {
         return feedDao.getFeedsOrderedByUrl()
-    }
-
-    fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {
-        return feedDao.getFlowOfFeedsOrderedByUrl()
     }
 
     suspend fun deleteFeed(url: URL) {
