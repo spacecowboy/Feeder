@@ -3,14 +3,17 @@ package com.nononsenseapps.feeder.model.workmanager
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.model.notify
@@ -30,7 +33,7 @@ const val UNIQUE_PERIODIC_NAME = "feeder_periodic_3"
 val oldPeriodics =
     listOf(
         "feeder_periodic",
-        "feeder_periodic_2",
+        "feeder_periodic_2"
     )
 private const val UNIQUE_FEEDSYNC_NAME = "feeder_sync_onetime"
 private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
@@ -60,7 +63,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                     feedId = feedId,
                     feedTag = feedTag,
                     forceNetwork = forceNetwork,
-                    minFeedAgeMinutes = minFeedAgeMinutes,
+                    minFeedAgeMinutes = minFeedAgeMinutes
                 )
         } catch (e: Exception) {
             success = false
@@ -81,19 +84,29 @@ fun requestFeedSync(
     di: DI,
     feedId: Long = ID_UNSET,
     feedTag: String = "",
-    forceNetwork: Boolean = false,
+    forceNetwork: Boolean = false
 ) {
+    val repository: Repository by di.instance()
+    val constraints = Constraints.Builder()
+
+    if (!forceNetwork && repository.syncOnlyOnWifi.value) {
+        constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+    } else {
+        constraints.setRequiredNetworkType(NetworkType.CONNECTED)
+    }
+
     val workRequest =
         OneTimeWorkRequestBuilder<FeedSyncer>()
             .addTag("feeder")
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+            .setConstraints(constraints.build())
 
     val data =
         workDataOf(
             ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
-            ARG_FORCE_NETWORK to forceNetwork,
+            ARG_FORCE_NETWORK to forceNetwork
         )
 
     workRequest.setInputData(data)
@@ -101,6 +114,6 @@ fun requestFeedSync(
     workManager.enqueueUniqueWork(
         UNIQUE_FEEDSYNC_NAME,
         ExistingWorkPolicy.KEEP,
-        workRequest.build(),
+        workRequest.build()
     )
 }
