@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
@@ -33,7 +34,6 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.logDebug
@@ -495,8 +495,10 @@ class Repository(override val di: DI) : DIAware {
 
     val allTags: Flow<List<String>> = feedStore.allTags
 
-    val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
-        feedStore.drawerItemsWithUnreadCounts
+    fun getPagedNavDrawerItems(): Flow<PagingData<FeedUnreadCount>> =
+        expandedTags.flatMapLatest {
+            feedStore.getPagedNavDrawerItems(it)
+        }
 
     val getUnreadBookmarksCount
         get() =

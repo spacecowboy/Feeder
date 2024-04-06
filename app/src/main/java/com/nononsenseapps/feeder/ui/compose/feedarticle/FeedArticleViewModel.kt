@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.FullTextParser
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.NoBody
@@ -37,7 +38,6 @@ import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -76,6 +76,10 @@ class FeedArticleViewModel(
         repository.getCurrentFeedListItems()
             .cachedIn(viewModelScope)
 
+    val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
+        repository.getPagedNavDrawerItems()
+            .cachedIn(viewModelScope)
+
     private val visibleFeedItemCount: StateFlow<Int> =
         repository.getCurrentFeedListVisibleItemCount()
             .stateIn(
@@ -99,6 +103,14 @@ class FeedArticleViewModel(
                 viewModelScope,
                 SharingStarted.Eagerly,
                 emptyList(),
+            )
+
+    private val expandedTags: StateFlow<Set<String>> =
+        repository.expandedTags
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                emptySet(),
             )
 
     fun deleteFeeds(feedIds: List<Long>) =
@@ -275,9 +287,8 @@ class FeedArticleViewModel(
             repository.showThumbnails,
             repository.currentTheme,
             repository.currentlySyncingLatestTimestamp,
-            repository.drawerItemsWithUnreadCounts,
             repository.feedItemStyle,
-            repository.expandedTags,
+            expandedTags,
             toolbarVisible,
             visibleFeedItemCount,
             screenTitleForCurrentFeedOrTag,
@@ -294,7 +305,6 @@ class FeedArticleViewModel(
             textToDisplayTrigger,
             repository.useDetectLanguage,
             ttsStateHolder.availableLanguages,
-            repository.getUnreadBookmarksCount,
             repository.isMarkAsReadOnScroll,
             repository.maxLines,
             filterMenuVisible,
@@ -302,13 +312,13 @@ class FeedArticleViewModel(
             repository.showOnlyTitle,
             repository.showReadingTime,
         ) { params: Array<Any> ->
-            val article = params[16] as Article
+            val article = params[15] as Article
 
-            val ttsState = params[17] as PlaybackStatus
+            val ttsState = params[16] as PlaybackStatus
 
-            val haveVisibleFeedItems = (params[8] as Int) > 0
+            val haveVisibleFeedItems = (params[7] as Int) > 0
 
-            val currentFeedOrTag = params[15] as FeedOrTag
+            val currentFeedOrTag = params[14] as FeedOrTag
 
             val textToDisplay = getTextToDisplayFor(article.id)
 
@@ -318,18 +328,17 @@ class FeedArticleViewModel(
                 showThumbnails = params[1] as Boolean,
                 currentTheme = params[2] as ThemeOptions,
                 latestSyncTimestamp = params[3] as Instant,
-                drawerItemsWithUnreadCounts = params[4] as List<DrawerItemWithUnreadCount>,
-                feedItemStyle = params[5] as FeedItemStyle,
-                expandedTags = params[6] as Set<String>,
-                showToolbarMenu = params[7] as Boolean,
+                feedItemStyle = params[4] as FeedItemStyle,
+                expandedTags = params[5] as Set<String>,
+                showToolbarMenu = params[6] as Boolean,
                 haveVisibleFeedItems = haveVisibleFeedItems,
-                feedScreenTitle = params[9] as ScreenTitle,
-                showEditDialog = params[10] as Boolean,
-                showDeleteDialog = params[11] as Boolean,
-                visibleFeeds = params[12] as List<FeedTitle>,
+                feedScreenTitle = params[8] as ScreenTitle,
+                showEditDialog = params[9] as Boolean,
+                showDeleteDialog = params[10] as Boolean,
+                visibleFeeds = params[11] as List<FeedTitle>,
                 articleFeedUrl = article.feedUrl,
                 articleFeedId = article.feedId,
-                linkOpener = params[14] as LinkOpener,
+                linkOpener = params[13] as LinkOpener,
                 pubDate = article.pubDate,
                 author = article.author,
                 enclosure = article.enclosure,
@@ -341,18 +350,17 @@ class FeedArticleViewModel(
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
                 isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
                 articleId = article.id,
-                isArticleOpen = params[13] as Boolean,
-                swipeAsRead = params[18] as SwipeAsRead,
+                isArticleOpen = params[12] as Boolean,
+                swipeAsRead = params[17] as SwipeAsRead,
                 isBookmarked = article.bookmarked,
-                useDetectLanguage = params[20] as Boolean,
-                ttsLanguages = params[21] as List<Locale>,
-                unreadBookmarksCount = params[22] as Int,
-                markAsReadOnScroll = params[23] as Boolean,
-                maxLines = params[24] as Int,
-                showFilterMenu = params[25] as Boolean,
-                filter = params[26] as FeedListFilter,
-                showOnlyTitle = params[27] as Boolean,
-                showReadingTime = params[28] as Boolean,
+                useDetectLanguage = params[19] as Boolean,
+                ttsLanguages = params[20] as List<Locale>,
+                markAsReadOnScroll = params[21] as Boolean,
+                maxLines = params[22] as Int,
+                showFilterMenu = params[23] as Boolean,
+                filter = params[24] as FeedListFilter,
+                showOnlyTitle = params[25] as Boolean,
+                showReadingTime = params[26] as Boolean,
                 wordCount =
                     when (textToDisplay) {
                         TextToDisplay.DEFAULT -> article.wordCount
@@ -522,8 +530,6 @@ interface FeedScreenViewState {
     val latestSyncTimestamp: Instant
     val feedScreenTitle: ScreenTitle
     val visibleFeeds: List<FeedTitle>
-    val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount>
-    val unreadBookmarksCount: Int
     val feedItemStyle: FeedItemStyle
     val expandedTags: Set<String>
     val isBottomBarVisible: Boolean
@@ -635,8 +641,6 @@ data class FeedArticleScreenViewState(
     // Defaults to empty string to avoid rendering until loading complete
     override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED),
     override val visibleFeeds: List<FeedTitle> = emptyList(),
-    override val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount> = emptyList(),
-    override val unreadBookmarksCount: Int = 0,
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     override val expandedTags: Set<String> = emptySet(),
     override val isBottomBarVisible: Boolean = false,

@@ -1,11 +1,13 @@
 package com.nononsenseapps.feeder.db.room
 
 import android.database.Cursor
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import androidx.room.Update
 import androidx.room.Upsert
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
@@ -104,20 +106,35 @@ interface FeedDao {
     @Query("SELECT id FROM feeds WHERE notify IS 1")
     suspend fun loadFeedIdsToNotify(): List<Long>
 
+    // Suppressing sort fields
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     @Query(
         """
-        SELECT id, title, url, tag, custom_title, notify, currently_syncing, image_url, unread_count
-        FROM feeds
-        LEFT JOIN (SELECT COUNT(1) AS unread_count, feed_id
-          FROM feed_items
-          WHERE read_time is null
-            AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-          GROUP BY feed_id
-        )
-        ON feeds.id = feed_id
-    """,
+            -- all items
+            select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
+            from feeds_with_items_for_nav_drawer
+            -- starred
+            union
+            select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
+            from feeds_with_items_for_nav_drawer
+            where bookmarked
+            -- tags
+            union
+            select $ID_UNSET as id, tag as display_title, tag, '' as image_url, sum(unread) as unread_count, tag in (:expandedTags) as expanded, 2 as sort_section, 0 as sort_tag_or_feed
+            from feeds_with_items_for_nav_drawer
+            where tag is not ''
+            group by tag
+            -- feeds
+            union
+            select feed_id as id, display_title, tag, image_url, sum(unread) as unread_count, 0 as expanded, case when tag is '' then 3 else 2 end as sort_section, 1 as sort_tag_or_feed
+            from feeds_with_items_for_nav_drawer
+            where tag is '' or tag in (:expandedTags)
+            group by feed_id
+            -- sort them
+            order by sort_section, tag, sort_tag_or_feed, display_title
+        """,
     )
-    fun loadFlowOfFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
+    fun getPagedNavDrawerItems(expandedTags: Set<String>): PagingSource<Int, FeedUnreadCount>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(

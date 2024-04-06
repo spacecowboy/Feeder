@@ -1,14 +1,9 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,23 +19,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.minimumInteractiveComponentSize
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,8 +40,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
@@ -60,6 +51,9 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
@@ -67,23 +61,19 @@ import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
-import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import kotlinx.coroutines.launch
-import java.net.URL
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ScreenWithNavDrawer(
-    feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
-    expandedTags: ImmutableHolder<Set<String>>,
-    unreadBookmarksCount: Int,
+    feedsAndTags: LazyPagingItems<FeedUnreadCount>,
     onToggleTagExpansion: (String) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     drawerState: DrawerState,
@@ -117,16 +107,13 @@ fun ScreenWithNavDrawer(
                         Modifier
                             .focusRequester(focusRequester),
                     feedsAndTags = feedsAndTags,
-                    expandedTags = expandedTags,
-                    unreadBookmarksCount = unreadBookmarksCount,
                     onToggleTagExpansion = onToggleTagExpansion,
-                    onItemClick = { item ->
-                        coroutineScope.launch {
-                            onDrawerItemSelected(item.id, item.tag)
-                            drawerState.close()
-                        }
-                    },
-                )
+                ) { item ->
+                    coroutineScope.launch {
+                        onDrawerItemSelected(item.id, item.tag)
+                        drawerState.close()
+                    }
+                }
             }
         },
         content = content,
@@ -135,94 +122,13 @@ fun ScreenWithNavDrawer(
 
 @ExperimentalAnimationApi
 @Composable
-@Preview(showBackground = true)
-private fun ListOfFeedsAndTagsPreview() {
-    FeederTheme {
-        Surface {
-            ListOfFeedsAndTags(
-                feedsAndTags =
-                    immutableListHolderOf(
-                        DrawerTop(unreadCount = 100, totalChildren = 4),
-                        DrawerSavedArticles(unreadCount = 5),
-                        DrawerTag(
-                            tag = "News tag",
-                            unreadCount = 0,
-                            -1111,
-                            totalChildren = 2,
-                        ),
-                        DrawerFeed(
-                            id = 1,
-                            displayTitle = "Times",
-                            tag = "News tag",
-                            unreadCount = 0,
-                        ),
-                        DrawerFeed(
-                            id = 2,
-                            displayTitle = "Post",
-                            imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
-                            tag = "News tag",
-                            unreadCount = 2,
-                        ),
-                        DrawerTag(
-                            tag = "Funny tag",
-                            unreadCount = 6,
-                            -2222,
-                            totalChildren = 1,
-                        ),
-                        DrawerFeed(
-                            id = 3,
-                            displayTitle = "Hidden",
-                            tag = "Funny tag",
-                            unreadCount = 6,
-                        ),
-                        DrawerFeed(
-                            id = 4,
-                            displayTitle = "Top Dog",
-                            unreadCount = 99,
-                            tag = "",
-                        ),
-                        DrawerFeed(
-                            id = 5,
-                            imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
-                            displayTitle = "Cowboy Programmer",
-                            unreadCount = 7,
-                            tag = "",
-                        ),
-                    ),
-                expandedTags =
-                    ImmutableHolder(
-                        setOf(
-                            "News tag",
-                            "Funny tag",
-                        ),
-                    ),
-                unreadBookmarksCount = 1,
-                onToggleTagExpansion = {},
-                state = rememberLazyListState(),
-            ) {}
-        }
-    }
-}
-
-@ExperimentalAnimationApi
-@Composable
 fun ListOfFeedsAndTags(
-    feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
-    expandedTags: ImmutableHolder<Set<String>>,
-    unreadBookmarksCount: Int,
+    feedsAndTags: LazyPagingItems<FeedUnreadCount>,
     onToggleTagExpansion: (String) -> Unit,
     state: LazyListState,
     modifier: Modifier = Modifier,
     onItemClick: (FeedIdTag) -> Unit,
 ) {
-    val firstTopFeed by remember(feedsAndTags) {
-        derivedStateOf {
-            feedsAndTags.item.asSequence()
-                .filterIsInstance<DrawerFeed>()
-                .filter { it.tag.isEmpty() }
-                .firstOrNull()
-        }
-    }
     LazyColumn(
         state = state,
         contentPadding = WindowInsets.systemBars.asPaddingValues(),
@@ -231,105 +137,105 @@ fun ListOfFeedsAndTags(
                 .fillMaxSize()
                 .semantics {
                     testTag = "feedsAndTags"
+                    collectionInfo = CollectionInfo(feedsAndTags.itemCount, 1)
                 },
     ) {
-        item(
-            key = ID_ALL_FEEDS,
-            contentType = ID_ALL_FEEDS,
-        ) {
-            val item =
-                feedsAndTags.item.firstOrNull() ?: DrawerTop(
-                    { stringResource(id = R.string.all_feeds) },
-                    0,
-                    0,
-                )
-            AllFeeds(
-                unreadCount = item.unreadCount,
-                title = stringResource(id = R.string.all_feeds),
-                onItemClick = {
-                    onItemClick(item)
-                },
-            )
-        }
-        item(
-            key = ID_SAVED_ARTICLES,
-            contentType = ID_SAVED_ARTICLES,
-        ) {
-            SavedArticles(
-                unreadCount = unreadBookmarksCount,
-                title = stringResource(id = R.string.saved_articles),
-                onItemClick = {
-                    onItemClick(DrawerSavedArticles(unreadCount = 1))
-                },
-            )
-        }
         items(
-            feedsAndTags.item.drop(1),
-            key = { it.uiId },
-            contentType = {
-                when (it) {
-                    is DrawerFeed -> 1L
-                    is DrawerTag -> it.id
-                    is DrawerSavedArticles -> it.id
-                    is DrawerTop -> it.id
+            count = feedsAndTags.itemCount,
+            key =
+                feedsAndTags.itemKey {
+                    when (it.id) {
+                        ID_ALL_FEEDS -> ID_ALL_FEEDS
+                        ID_SAVED_ARTICLES -> ID_SAVED_ARTICLES
+                        ID_UNSET -> it.tag
+                        else -> it.id
+                    }
+                },
+            contentType =
+                feedsAndTags.itemContentType {
+                    it.contentType
+                },
+        ) { itemIndex ->
+            val item = feedsAndTags[itemIndex]
+            when (item?.contentType) {
+                null -> {
+                    Placeholder()
                 }
-            },
-        ) { item ->
-            when (item) {
-                is DrawerTag -> {
-                    ExpandableTag(
-                        expanded = item.tag in expandedTags.item,
-                        onToggleExpansion = onToggleTagExpansion,
+                ContentType.AllFeeds -> {
+                    AllFeeds(
                         unreadCount = item.unreadCount,
-                        title = item.title(),
+                        title = stringResource(id = R.string.all_feeds),
                         onItemClick = {
                             onItemClick(item)
                         },
                     )
                 }
-
-                is DrawerFeed -> {
-                    when {
-                        item.tag.isEmpty() -> {
-                            if (item.id == firstTopFeed?.id) {
-                                Divider(
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                            TopLevelFeed(
-                                unreadCount = item.unreadCount,
-                                title = item.title(),
-                                imageUrl = item.imageUrl?.toString(),
-                                onItemClick = {
-                                    onItemClick(item)
-                                },
-                            )
-                        }
-
-                        else -> {
-                            ChildFeed(
-                                unreadCount = item.unreadCount,
-                                title = item.title(),
-                                imageUrl = item.imageUrl?.toString(),
-                                visible = item.tag in expandedTags.item,
-                                onItemClick = {
-                                    onItemClick(item)
-                                },
-                            )
-                        }
-                    }
+                ContentType.SavedArticles -> {
+                    SavedArticles(
+                        unreadCount = item.unreadCount,
+                        title = stringResource(id = R.string.saved_articles),
+                        onItemClick = {
+                            onItemClick(item)
+                        },
+                    )
                 }
-
-                is DrawerTop -> {
-                    // Handled at top
+                ContentType.Tag -> {
+                    ExpandableTag(
+                        expanded = item.expanded,
+                        onToggleExpansion = onToggleTagExpansion,
+                        unreadCount = item.unreadCount,
+                        title = item.tag,
+                        onItemClick = {
+                            onItemClick(item)
+                        },
+                    )
                 }
-
-                is DrawerSavedArticles -> {
-                    // Handled at top
+                ContentType.ChildFeed -> {
+                    ChildFeed(
+                        unreadCount = item.unreadCount,
+                        title = item.displayTitle,
+                        imageUrl = item.imageUrl?.toString(),
+                        onItemClick = {
+                            onItemClick(item)
+                        },
+                    )
+                }
+                ContentType.TopLevelFeed -> {
+                    TopLevelFeed(
+                        unreadCount = item.unreadCount,
+                        title = item.displayTitle,
+                        imageUrl = item.imageUrl?.toString(),
+                        onItemClick = {
+                            onItemClick(item)
+                        },
+                    )
                 }
             }
         }
     }
+}
+
+val FeedUnreadCount.contentType: ContentType
+    get() =
+        when (this.id) {
+            ID_UNSET -> ContentType.Tag
+            ID_ALL_FEEDS -> ContentType.AllFeeds
+            ID_SAVED_ARTICLES -> ContentType.SavedArticles
+            else -> {
+                if (this.tag.isNotEmpty()) {
+                    ContentType.ChildFeed
+                } else {
+                    ContentType.TopLevelFeed
+                }
+            }
+        }
+
+enum class ContentType {
+    AllFeeds,
+    SavedArticles,
+    Tag,
+    ChildFeed,
+    TopLevelFeed,
 }
 
 @ExperimentalAnimationApi
@@ -345,6 +251,7 @@ private fun ExpandableTag(
     val angle: Float by animateFloatAsState(
         targetValue = if (expanded) 0f else 180f,
         animationSpec = tween(),
+        label = "angle",
     )
 
     val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
@@ -472,20 +379,25 @@ private fun ChildFeed(
     title: String = "Foo",
     imageUrl: String? = null,
     unreadCount: Int = 99,
-    visible: Boolean = true,
     onItemClick: () -> Unit = {},
 ) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
+    Feed(
+        title = title,
+        imageUrl = imageUrl,
+        unreadCount = unreadCount,
+        onItemClick = onItemClick,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun Placeholder() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(48.dp),
     ) {
-        Feed(
-            title = title,
-            imageUrl = imageUrl,
-            unreadCount = unreadCount,
-            onItemClick = onItemClick,
-        )
     }
 }
 
