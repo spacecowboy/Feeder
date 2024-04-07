@@ -4,7 +4,7 @@
 
 <p>O Feeder NÃO sincroniza com back-ends remotos normais, portanto, nenhum tipo de registro de conta é necessário.</p>
 
-<p>O Feeder é gratuito e funciona localmente no seu dispositivo.  Seus dados são 100% privados.</p>
+<p>O Feeder é gratuito e funciona localmente no seu dispositivo. Seus dados são 100% privados.</p>
 
 <p><b>Funcionalidades</b></p>
 
