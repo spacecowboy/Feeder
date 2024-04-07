@@ -79,7 +79,7 @@ interface FeedDao {
     @Query("SELECT * FROM feeds WHERE tag IS :tag")
     suspend fun loadFeeds(tag: String): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime")
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime ORDER BY last_sync")
     suspend fun loadFeedsIfStale(
         tag: String,
         staleTime: Long,
@@ -97,7 +97,7 @@ interface FeedDao {
     )
     fun loadFeedsForContentProvider(): Cursor
 
-    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime")
+    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime ORDER BY last_sync")
     suspend fun loadFeedsIfStale(staleTime: Long): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE url IS :url")

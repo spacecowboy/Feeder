@@ -5,6 +5,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
+import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.sync.SyncRestClient
@@ -14,8 +15,6 @@ import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -38,6 +37,9 @@ import kotlin.system.measureTimeMillis
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
 
+/**
+ * WARNING. DO NOT CHANGE THE DISPATCHER WITHIN THE LOGIC!
+ */
 class RssLocalSync(override val di: DI) : DIAware {
     private val repository: Repository by instance()
     private val syncClient: SyncRestClient by instance()
@@ -103,47 +105,33 @@ class RssLocalSync(override val di: DI) : DIAware {
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
-                        val coroutineContext =
-                            this.coroutineContext +
-                                CoroutineExceptionHandler { _, throwable ->
-                                    Log.e(LOG_TAG, "Error during sync", throwable)
-                                }
+                        needFullTextSync = feedsToFetch.any { it.fullTextByDefault }
 
+                        // These coroutines are concurrent but on a single thread,
+                        // so they are not truly parallel by design to ensure
+                        // IO waits are minimized
+                        val concurrentJobs = 2
                         val jobs =
-                            feedsToFetch.map {
-                                needFullTextSync = needFullTextSync || it.fullTextByDefault
-                                launch(coroutineContext) {
-                                    try {
-                                        // Want unique sync times so UI gets updated state
-                                        repository.setCurrentlySyncingOn(
-                                            feedId = it.id,
-                                            syncing = true,
-                                            lastSync = Instant.now(),
-                                        )
-                                        syncFeed(
-                                            feedSql = it,
-                                            maxFeedItemCount = maxFeedItemCount,
-                                            forceNetwork = forceNetwork,
-                                            downloadTime = downloadTime,
-                                        ).onLeft { feedParserError ->
-                                            Log.e(
-                                                LOG_TAG,
-                                                "Failed to sync ${it.displayTitle}: ${it.url} because:\n${feedParserError.description}",
-                                            )
-                                        }
-                                    } catch (e: Throwable) {
-                                        Log.e(
-                                            LOG_TAG,
-                                            "Failed to sync ${it.displayTitle}: ${it.url}",
-                                            e,
-                                        )
-                                    } finally {
-                                        repository.setCurrentlySyncingOn(feedId = it.id, syncing = false)
+                            (0 until concurrentJobs)
+                                .map { jobIndex ->
+                                    launch {
+                                        feedsToFetch.asSequence()
+                                            .filterIndexed { index, _ ->
+                                                index % concurrentJobs == jobIndex
+                                            }
+                                            .forEach { feed ->
+                                                handleFeed(
+                                                    feed = feed,
+                                                    maxFeedItemCount = maxFeedItemCount,
+                                                    forceNetwork = forceNetwork,
+                                                    downloadTime = downloadTime,
+                                                )
+                                            }
                                     }
                                 }
-                            }
 
                         jobs.joinAll()
+
                         try {
                             repository.applyRemoteReadMarks()
                         } catch (e: Exception) {
@@ -166,8 +154,41 @@ class RssLocalSync(override val di: DI) : DIAware {
         return result
     }
 
+    private suspend fun handleFeed(
+        feed: Feed,
+        maxFeedItemCount: Int,
+        forceNetwork: Boolean,
+        downloadTime: Instant,
+    ) {
+        try {
+            // Want unique sync times. UI doesn't use syncing flag anymore
+            repository.setCurrentlySyncingOn(
+                feedId = feed.id,
+                syncing = false,
+                lastSync = Instant.now(),
+            )
+            syncFeed(
+                feedSql = feed,
+                maxFeedItemCount = maxFeedItemCount,
+                forceNetwork = forceNetwork,
+                downloadTime = downloadTime,
+            ).onLeft { feedParserError ->
+                Log.e(
+                    LOG_TAG,
+                    "Failed to sync ${feed.displayTitle}: ${feed.url} because:\n${feedParserError.description}",
+                )
+            }
+        } catch (e: Throwable) {
+            Log.e(
+                LOG_TAG,
+                "Failed to sync ${feed.displayTitle}: ${feed.url}",
+                e,
+            )
+        }
+    }
+
     private suspend fun syncFeed(
-        feedSql: com.nononsenseapps.feeder.db.room.Feed,
+        feedSql: Feed,
         maxFeedItemCount: Int,
         forceNetwork: Boolean = false,
         downloadTime: Instant,
@@ -265,13 +286,11 @@ class RssLocalSync(override val di: DI) : DIAware {
                         } ?: emptyList()
 
                 repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
-                    withContext(Dispatchers.IO) {
-                        filePathProvider.articleDir.mkdirs()
-                        blobOutputStream(feedItem.id, filePathProvider.articleDir).bufferedWriter()
-                            .use {
-                                it.write(text)
-                            }
-                    }
+                    filePathProvider.articleDir.mkdirs()
+                    blobOutputStream(feedItem.id, filePathProvider.articleDir).bufferedWriter()
+                        .use {
+                            it.write(text)
+                        }
                 }
                 // Try to look for image if not done before
                 if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
@@ -346,6 +365,8 @@ class RssLocalSync(override val di: DI) : DIAware {
 
                 repository.deleteFeedItems(ids)
                 repository.deleteStaleRemoteReadMarks()
+
+                logDebug(LOG_TAG, "Fetched ${feedSql.displayTitle}")
             }
         }
     }
@@ -354,7 +375,7 @@ class RssLocalSync(override val di: DI) : DIAware {
         feedId: Long,
         tag: String,
         staleTime: Long = -1L,
-    ): List<com.nononsenseapps.feeder.db.room.Feed> {
+    ): List<Feed> {
         return when {
             feedId > 0 -> {
                 val feed =
