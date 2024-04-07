@@ -205,21 +205,21 @@ class RssLocalSync(override val di: DI) : DIAware {
         ) {
             okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
         }.flatMap { response ->
-            if (response.isSuccessful) {
-                response.use {
+            response.use {
+                if (response.isSuccessful) {
                     response.body?.let { responseBody ->
                         feedParser.parseFeedResponse(
                             response.request.url.toUrl(),
                             responseBody,
                         )
                     } ?: NoBody(url = url.toString()).left()
+                } else {
+                    HttpError(
+                        url = url.toString(),
+                        code = response.code,
+                        message = response.message,
+                    ).left()
                 }
-            } else {
-                HttpError(
-                    url = url.toString(),
-                    code = response.code,
-                    message = response.message,
-                ).left()
             }
         }.map {
             // Double check that icon is not base64
