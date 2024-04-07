@@ -245,4 +245,7 @@
     <string name="close_menu">Chiudi menù</string>
     <string name="export_saved_articles">Esporta articoli salvati</string>
     <string name="failed_to_export_saved_articles">Impossibile esportare articoli salvati</string>
+    <string name="skip_duplicate_articles">Saltare articoli doppi</string>
+    <string name="skip_duplicate_articles_desc">Gli articoli con link o titoli identici ad articoli esistenti vengono ignorati</string>
+    <string name="feed_item_style_compact_card">Scheda compatta</string>
 </resources>
