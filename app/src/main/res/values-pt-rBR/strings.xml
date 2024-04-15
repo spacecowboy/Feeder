@@ -123,7 +123,7 @@
     <string name="open_enclosed_media_file">Abrir %1$s</string>
     <string name="contracted_tag">Categoria fechada</string>
     <string name="two_unread_articles">%1$s artigos não lidos</string>
-    <string name="feed_item_style_card">Cartões</string>
+    <string name="feed_item_style_card">Cartão</string>
     <string name="syncing">Sincronizando</string>
     <string name="dark_theme_preference">Tema escuro preferido</string>
     <string name="go_back">Voltar</string>
@@ -247,5 +247,5 @@
     <string name="failed_to_export_saved_articles">Falha ao exportar artigos salvos</string>
     <string name="skip_duplicate_articles">Ignorar artigos duplicados</string>
     <string name="skip_duplicate_articles_desc">Artigos com links ou títulos idênticos aos artigos existentes são ignorados</string>
-    <string name="feed_item_style_compact_card">Cartão Compacto</string>
+    <string name="feed_item_style_compact_card">Cartão compacto</string>
 </resources>
