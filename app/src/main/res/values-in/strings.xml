@@ -243,4 +243,9 @@
     <string name="one_word">%1$s kata</string>
     <string name="other_minutes">%1$s menit</string>
     <string name="close_menu">Tutup menu</string>
+    <string name="skip_duplicate_articles">Lewati artikel duplikat</string>
+    <string name="skip_duplicate_articles_desc">Artikel dengan tautan atau judul identik dengan yang ada akan diabaikan</string>
+    <string name="feed_item_style_compact_card">Kartu Ringkas</string>
+    <string name="export_saved_articles">Ekspor artikel yang disimpan</string>
+    <string name="failed_to_export_saved_articles">Gagal mengekspor artikel yang disimpan</string>
 </resources>
