@@ -8,9 +8,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.ui.compose.ompl.OpmlImportScreen
@@ -35,8 +35,8 @@ class ImportOMPLFileActivity : DIAwareComponentActivity() {
 
         setContent {
             withAllProviders {
-                val navController = rememberAnimatedNavController()
-                AnimatedNavHost(navController, startDestination = "import") {
+                val navController = rememberNavController()
+                NavHost(navController, startDestination = "import") {
                     composable(
                         "import",
                         enterTransition = { fadeIn() },

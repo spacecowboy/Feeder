@@ -11,8 +11,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.model.workmanager.scheduleGetUpdates
@@ -80,10 +80,10 @@ class MainActivity : DIAwareComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun AppContent() {
-        val navController = rememberAnimatedNavController()
+        val navController = rememberNavController()
         val navDrawerListState = rememberLazyListState()
 
-        AnimatedNavHost(navController, startDestination = FeedDestination.route) {
+        NavHost(navController, startDestination = FeedDestination.route) {
             FeedDestination.register(this, navController, navDrawerListState)
             ArticleDestination.register(this, navController, navDrawerListState)
             // Feed editing

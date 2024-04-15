@@ -44,7 +44,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -81,6 +80,7 @@ import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
+import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
@@ -147,7 +147,6 @@ private fun SyncScaffold(
                             Box {
                                 IconButton(
                                     onClick = { showToolbar = true },
-                                    modifier = Modifier.tooltipAnchor(),
                                 ) {
                                     Icon(
                                         Icons.Default.MoreVert,
