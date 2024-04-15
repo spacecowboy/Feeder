@@ -61,10 +61,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -495,11 +498,14 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         toolbarActions = {
             if (viewState.currentFeedOrTag.isNotSavedArticles) {
-                PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter_noun)) }) {
+                PlainTooltipBox(
+                    tooltip = {
+                        Text(stringResource(id = R.string.filter_noun))
+                    }
+                ) {
                     Box {
                         IconButton(
                             onClick = { onShowFilterMenu(true) },
-                            modifier = Modifier.tooltipAnchor(),
                         ) {
                             Icon(
                                 Icons.Default.FilterList,
@@ -633,12 +639,12 @@ fun FeedScreen(
                                 },
                                 text = {},
                                 modifier =
-                                    Modifier
-                                        .height(0.dp)
-                                        .safeSemantics {
-                                            contentDescription = closeMenuText
-                                            role = Role.Button
-                                        },
+                                Modifier
+                                    .height(0.dp)
+                                    .safeSemantics {
+                                        contentDescription = closeMenuText
+                                        role = Role.Button
+                                    },
                             )
                         }
                     }
@@ -649,7 +655,6 @@ fun FeedScreen(
                 Box {
                     IconButton(
                         onClick = { onShowToolbarMenu(true) },
-                        modifier = Modifier.tooltipAnchor(),
                     ) {
                         Icon(
                             Icons.Default.MoreVert,
@@ -830,12 +835,12 @@ fun FeedScreen(
                             },
                             text = {},
                             modifier =
-                                Modifier
-                                    .height(0.dp)
-                                    .safeSemantics {
-                                        contentDescription = closeMenuText
-                                        role = Role.Button
-                                    },
+                            Modifier
+                                .height(0.dp)
+                                .safeSemantics {
+                                    contentDescription = closeMenuText
+                                    role = Role.Button
+                                },
                         )
                     }
                 }
@@ -970,8 +975,7 @@ fun FeedScreen(
                 onClick = onMarkAllAsRead,
                 modifier =
                     Modifier
-                        .navigationBarsPadding()
-                        .tooltipAnchor(),
+                        .navigationBarsPadding(),
             ) {
                 Icon(
                     Icons.Default.DoneAll,
@@ -1056,11 +1060,11 @@ fun FeedScreen(
             }
         },
         modifier =
-            modifier
-                // The order is important! PullToRefresh MUST come first
-                .pullRefresh(state = pullRefreshState)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        modifier
+            // The order is important! PullToRefresh MUST come first
+            .pullRefresh(state = pullRefreshState)
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
         Box(
@@ -1140,9 +1144,9 @@ fun FeedListContent(
             // Separate box because scrollable will ignore max size.
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = Modifier,
@@ -1189,12 +1193,12 @@ fun FeedListContent(
                             .asPaddingValues()
                     },
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .safeSemantics {
-                            testTag = "feed_list"
-                            collectionInfo = CollectionInfo(pagedFeedItems.itemCount, 1)
-                        },
+                Modifier
+                    .fillMaxSize()
+                    .safeSemantics {
+                        testTag = "feed_list"
+                        collectionInfo = CollectionInfo(pagedFeedItems.itemCount, 1)
+                    },
             ) {
                 /*
                 This is a trick to make the list stay at item 0 when updates come in IF it is
@@ -1296,9 +1300,9 @@ fun FeedListContent(
                         if (itemIndex < pagedFeedItems.itemCount - 1) {
                             Divider(
                                 modifier =
-                                    Modifier
-                                        .height(1.dp)
-                                        .fillMaxWidth(),
+                                Modifier
+                                    .height(1.dp)
+                                    .fillMaxWidth(),
                             )
                         }
                     }
@@ -1313,9 +1317,9 @@ fun FeedListContent(
                     ) {
                         Spacer(
                             modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height((56 + 16).dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .height((56 + 16).dp),
                         )
                     }
                 }
@@ -1358,9 +1362,9 @@ fun FeedGridContent(
             // Separate box because scrollable will ignore max size.
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = Modifier,
@@ -1587,3 +1591,21 @@ private val PLACEHOLDER_ITEM =
         rawPubDate = null,
         wordCount = 0,
     )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlainTooltipBox(
+    tooltip: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                tooltip()
+            }
+        },
+        content = content,
+    )
+}

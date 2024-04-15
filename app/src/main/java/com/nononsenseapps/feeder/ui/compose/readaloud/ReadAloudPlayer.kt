@@ -23,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,6 +43,7 @@ import com.nononsenseapps.feeder.model.ForcedLocale
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
+import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
@@ -105,7 +105,6 @@ fun TTSPlayer(
             PlainTooltipBox(tooltip = { Text(stringResource(R.string.stop_reading)) }) {
                 IconButton(
                     onClick = onStop,
-                    modifier = Modifier.tooltipAnchor(),
                 ) {
                     Icon(
                         Icons.Default.Stop,
@@ -118,7 +117,6 @@ fun TTSPlayer(
                     PlainTooltipBox(tooltip = { Text(stringResource(R.string.pause_reading)) }) {
                         IconButton(
                             onClick = onPause,
-                            modifier = Modifier.tooltipAnchor(),
                         ) {
                             Icon(
                                 Icons.Default.Pause,
@@ -130,7 +128,6 @@ fun TTSPlayer(
                     PlainTooltipBox(tooltip = { Text(stringResource(R.string.resume_reading)) }) {
                         IconButton(
                             onClick = onPlay,
-                            modifier = Modifier.tooltipAnchor(),
                         ) {
                             Icon(
                                 // TextToSpeech
@@ -144,7 +141,6 @@ fun TTSPlayer(
             PlainTooltipBox(tooltip = { Text(stringResource(R.string.skip_to_next)) }) {
                 IconButton(
                     onClick = onSkipNext,
-                    modifier = Modifier.tooltipAnchor(),
                 ) {
                     Icon(
                         Icons.Default.SkipNext,
@@ -158,7 +154,6 @@ fun TTSPlayer(
                         onClick = {
                             showMenu = true
                         },
-                        modifier = Modifier.tooltipAnchor(),
                     ) {
                         Icon(
                             Icons.Default.Translate,

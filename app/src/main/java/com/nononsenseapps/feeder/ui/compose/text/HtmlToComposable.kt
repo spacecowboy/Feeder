@@ -31,7 +31,6 @@ import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +39,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +65,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFillWidthScaling
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleItemKeyHolder
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
@@ -833,7 +832,7 @@ private fun ColumnScope.renderImage(
                     }
                 }
 
-            WithTooltipIfNotBlank(tooltip = alt) { modifier ->
+            WithTooltipIfNotBlank(tooltip = alt) {
                 val contentScale =
                     remember(pixelDensity, dimens.hasImageAspectRatioInReader) {
                         if (dimens.hasImageAspectRatioInReader) {
@@ -863,7 +862,7 @@ private fun ColumnScope.renderImage(
                     error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
                     contentScale = contentScale,
                     modifier =
-                        modifier
+                        Modifier
                             .widthIn(max = maxWidth)
                             .fillMaxWidth(),
 //                            .run {
@@ -1508,15 +1507,14 @@ fun stripHtml(html: String): String {
 @Composable
 fun WithTooltipIfNotBlank(
     tooltip: String,
-    modifier: Modifier = Modifier,
-    content: @Composable (Modifier) -> Unit,
+    content: @Composable () -> Unit,
 ) {
     if (tooltip.isNotBlank()) {
         PlainTooltipBox(tooltip = { Text(tooltip) }) {
-            content(modifier.tooltipAnchor())
+            content()
         }
     } else {
-        content(modifier)
+        content()
     }
 }
 

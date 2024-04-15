@@ -317,7 +317,7 @@ fun ReaderView(
                                     .clip(RectangleShape)
                                     .fillMaxWidth(),
                         ) {
-                            WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) { innerModifier ->
+                            WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) {
                                 val maxImageWidth by rememberMaxImageWidth()
                                 val pixelDensity = LocalDensity.current.density
                                 val contentScale =
@@ -341,7 +341,7 @@ fun ReaderView(
                                     contentScale = contentScale,
                                     alignment = Alignment.Center,
                                     modifier =
-                                        innerModifier
+                                        Modifier
                                             .fillMaxWidth()
                                             .run {
                                                 dimens.imageAspectRatioInReader?.let { ratio ->

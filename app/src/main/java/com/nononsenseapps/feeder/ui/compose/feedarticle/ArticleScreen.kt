@@ -33,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -64,6 +63,7 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
+import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
@@ -229,7 +229,6 @@ fun ArticleScreen(
                     PlainTooltipBox(tooltip = { Text(stringResource(R.string.fetch_full_article)) }) {
                         IconButton(
                             onClick = onToggleFullText,
-                            modifier = Modifier.tooltipAnchor(),
                         ) {
                             Icon(
                                 Icons.Default.Article,
@@ -241,7 +240,6 @@ fun ArticleScreen(
                     PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_in_web_view)) }) {
                         IconButton(
                             onClick = onOpenInCustomTab,
-                            modifier = Modifier.tooltipAnchor(),
                         ) {
                             Icon(
                                 Icons.Default.OpenInBrowser,
@@ -254,9 +252,6 @@ fun ArticleScreen(
                         Box {
                             IconButton(
                                 onClick = { onShowToolbarMenu(true) },
-                                modifier =
-                                    Modifier
-                                        .tooltipAnchor(),
                             ) {
                                 Icon(
                                     Icons.Default.MoreVert,

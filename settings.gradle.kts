@@ -19,14 +19,14 @@ dependencyResolutionManagement {
         create("libs") {
             // Compose compiler is highly coupled to Kotlin version
             // See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-            val kotlinVersion = "1.9.20"
-            val kspVersion = "1.9.20-1.0.14"
+            val kotlinVersion = "1.9.23"
+            val kspVersion = "1.9.23-1.0.20"
             val kotlinxSerialization = "1.6.1"
             version("kotlin", kotlinVersion)
             version("ksp", kspVersion)
             version("kotlinxSerialization", kotlinxSerialization)
-            version("androidPlugin", "8.1.0")
-            version("composeCompiler", "1.5.4")
+            version("androidPlugin", "8.3.0")
+            version("composeCompiler", "1.5.11")
 
             // BEGIN These should be upgraded in unison
             version("okhttp", "4.10.0")
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
             version("lifecycle", "2.6.2")
             version("room", "2.5.2")
             // Compose related below
-            version("compose", "2023.06.01")
+            version("compose", "2024.04.00")
             val activityCompose = "1.7.0"
             version("paging", "3.2.1")
             version("accompanist", "0.30.1")
@@ -147,7 +147,8 @@ dependencyResolutionManagement {
                 "androidx.compose.foundation",
                 "foundation-layout",
             ).withoutVersion()
-            library("compose-material3", "androidx.compose.material3", "material3").version {
+            library("compose-material3", "androidx.compose.material3", "material3")
+                .version {
                 // 1.1.0 introduced tooltips, not part of compose 05 bom at least
                 require("1.1.0")
             }
@@ -168,7 +169,7 @@ dependencyResolutionManagement {
                 "navigation-compose",
                 "androidx.navigation",
                 "navigation-compose",
-            ).withoutVersion()
+            ).version("2.7.7")
             library(
                 "paging-compose",
                 "androidx.paging",
@@ -189,11 +190,6 @@ dependencyResolutionManagement {
                 "accompanist-systemuicontroller",
                 "com.google.accompanist",
                 "accompanist-systemuicontroller",
-            ).versionRef("accompanist")
-            library(
-                "accompanist-navigation-animation",
-                "com.google.accompanist",
-                "accompanist-navigation-animation",
             ).versionRef("accompanist")
             library(
                 "accompanist-adaptive",
@@ -402,7 +398,6 @@ dependencyResolutionManagement {
                     "android-material",
                     "accompanist-permissions",
                     "accompanist-systemuicontroller",
-                    "accompanist-navigation-animation",
                     "accompanist-adaptive",
                     "compose-material3-windowsizeclass",
                     "lifecycle-runtime-compose",

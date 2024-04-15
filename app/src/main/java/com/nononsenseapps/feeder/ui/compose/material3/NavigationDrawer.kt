@@ -926,14 +926,6 @@ internal value class Strings private constructor(private val value: Int) {
     companion object {
         val NavigationMenu = Strings(0)
         val CloseDrawer = Strings(1)
-        val CloseSheet = Strings(2)
-        val DefaultErrorMessage = Strings(3)
-        val ExposedDropdownMenu = Strings(4)
-        val SliderRangeStart = Strings(5)
-        val SliderRangeEnd = Strings(6)
-        val Dialog = Strings(7)
-        val MenuExpanded = Strings(8)
-        val MenuCollapsed = Strings(9)
     }
 }
 
@@ -944,14 +936,6 @@ internal fun getString(string: Strings): String {
     return when (string) {
         Strings.NavigationMenu -> resources.getString(androidx.compose.ui.R.string.navigation_menu)
         Strings.CloseDrawer -> resources.getString(androidx.compose.ui.R.string.close_drawer)
-        Strings.CloseSheet -> resources.getString(androidx.compose.ui.R.string.close_sheet)
-        Strings.DefaultErrorMessage -> resources.getString(androidx.compose.ui.R.string.default_error_message)
-        Strings.ExposedDropdownMenu -> resources.getString(androidx.compose.ui.R.string.dropdown_menu)
-        Strings.SliderRangeStart -> resources.getString(androidx.compose.ui.R.string.range_start)
-        Strings.SliderRangeEnd -> resources.getString(androidx.compose.ui.R.string.range_end)
-        Strings.Dialog -> resources.getString(androidx.compose.material3.R.string.dialog)
-        Strings.MenuExpanded -> resources.getString(androidx.compose.material3.R.string.expanded)
-        Strings.MenuCollapsed -> resources.getString(androidx.compose.material3.R.string.collapsed)
         else -> ""
     }
 }

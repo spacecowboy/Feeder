@@ -8,9 +8,9 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.view.WindowCompat
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
@@ -35,8 +35,8 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
 
         setContent {
             withAllProviders {
-                val navController = rememberAnimatedNavController()
-                AnimatedNavHost(navController, startDestination = "search") {
+                val navController = rememberNavController()
+                NavHost(navController, startDestination = "search") {
                     composable(
                         "search",
                         enterTransition = { fadeIn() },
