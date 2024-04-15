@@ -62,7 +62,7 @@
     <string name="on_startup">Pri pokretanju</string>
     <string name="show_fab">Prikaži plutajuće dugme aktivnosti</string>
     <string name="include_mobile_hotspots">Uvrsti mobilne hotspotove</string>
-    <string name="updated_feeds">Ažuriraj izvore (feedove)</string>
+    <string name="updated_feeds">Ažurirani izvori (feedovi)</string>
     <string name="notification_channel_name">Nepročitani izvori (feedovi)</string>
     <string name="notification_channel_description">Obavještenja se prikazuju samo za nepročitane članke u postavljenim izvorima (feedovima)</string>
     <string name="open_in_reader">Čitač</string>
@@ -229,4 +229,23 @@
     <string name="other_tags">%1$s oznaka</string>
     <string name="add_anyway">Dodaj svakako</string>
     <string name="open_browser_in_split_screen">Otvori preglednik na podijeljenom ekranu</string>
+    <string name="close_menu">Zatvori meni</string>
+    <string name="export_saved_articles">Izvezi sačuvane članke</string>
+    <string name="zero_words">%1$s riječi</string>
+    <string name="two_minutes">%1$s minute</string>
+    <string name="few_minutes">%1$s minute</string>
+    <string name="zero_minutes">%1$s minuta</string>
+    <string name="one_minute">%1$s minuta</string>
+    <string name="few_words">%1$s riječi</string>
+    <string name="skip_duplicate_articles">Preskoči duple članke</string>
+    <string name="skip_duplicate_articles_desc">Članci s linkovima i naslovima identičnim s postojećim člancima se ignorišu</string>
+    <string name="feed_item_style_compact_card">Kompaktna kartica</string>
+    <string name="failed_to_export_saved_articles">Izvoz sačuvanih članaka nije uspio</string>
+    <string name="one_word">%1$s riječ</string>
+    <string name="two_words">%1$s riječi</string>
+    <string name="many_words">%1$s riječi</string>
+    <string name="other_words">%1$s riječi</string>
+    <string name="many_minutes">%1$s minuta</string>
+    <string name="other_minutes">%1$s minuta</string>
+    <string name="show_reading_time">Prikaži procijenjeno vrijeme čitanja</string>
 </resources>
