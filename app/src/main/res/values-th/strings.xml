@@ -244,4 +244,5 @@
     <string name="failed_to_parse_the_page">ดึงข้อมูลหน้าไม่ได้</string>
     <string name="skip_duplicate_articles">ข้ามบทความที่ซ้ำ</string>
     <string name="skip_duplicate_articles_desc">บทความที่มีลิงก์หรือหัวข้อที่มีอยู่แล้วจะถูกเพิกเฉย</string>
+    <string name="feed_item_style_compact_card">การ์ดแบบกระทัดรัด</string>
 </resources>
