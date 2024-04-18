@@ -37,9 +37,6 @@
 # For Jsoup
 -keep class org.jsoup.**  { *; }
 
-# For Rome
--keep class com.rometools.** { *; }
-
 # For Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
 -keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
