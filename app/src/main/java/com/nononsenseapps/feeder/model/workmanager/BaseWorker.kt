@@ -12,9 +12,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.ForegroundInfo
 import com.nononsenseapps.feeder.R
 
-private const val syncNotificationId = 42623
-private const val syncChannelId = "feederSyncNotifications"
-private const val syncNotificationGroup = "com.nononsenseapps.feeder.SYNC"
+private const val SYNC_NOTIFICATION_ID = 42623
+private const val SYNC_CHANNEL_ID = "feederSyncNotifications"
+private const val SYNC_NOTIFICATION_GROUP = "com.nononsenseapps.feeder.SYNC"
 
 /**
  * This is safe to call multiple times
@@ -29,7 +29,7 @@ private fun createNotificationChannel(
     val description = context.getString(R.string.sync_status)
 
     val channel =
-        NotificationChannel(syncChannelId, name, NotificationManager.IMPORTANCE_LOW)
+        NotificationChannel(SYNC_CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW)
     channel.description = description
 
     notificationManager.createNotificationChannel(channel)
@@ -46,21 +46,21 @@ fun createForegroundInfo(
     val syncingText = context.getString(R.string.syncing)
 
     val notification =
-        NotificationCompat.Builder(context.applicationContext, syncChannelId)
+        NotificationCompat.Builder(context.applicationContext, SYNC_CHANNEL_ID)
             .setContentTitle(syncingText)
             .setTicker(syncingText)
-            .setGroup(syncNotificationGroup)
+            .setGroup(SYNC_NOTIFICATION_GROUP)
             .setSmallIcon(R.drawable.ic_stat_sync)
             .setOngoing(true)
             .build()
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         ForegroundInfo(
-            syncNotificationId,
+            SYNC_NOTIFICATION_ID,
             notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
         )
     } else {
-        ForegroundInfo(syncNotificationId, notification)
+        ForegroundInfo(SYNC_NOTIFICATION_ID, notification)
     }
 }

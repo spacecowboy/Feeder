@@ -166,7 +166,6 @@ private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
 )
 @Composable
 fun FeedScreen(
@@ -501,7 +500,7 @@ fun FeedScreen(
                 PlainTooltipBox(
                     tooltip = {
                         Text(stringResource(id = R.string.filter_noun))
-                    }
+                    },
                 ) {
                     Box {
                         IconButton(
@@ -639,12 +638,12 @@ fun FeedScreen(
                                 },
                                 text = {},
                                 modifier =
-                                Modifier
-                                    .height(0.dp)
-                                    .safeSemantics {
-                                        contentDescription = closeMenuText
-                                        role = Role.Button
-                                    },
+                                    Modifier
+                                        .height(0.dp)
+                                        .safeSemantics {
+                                            contentDescription = closeMenuText
+                                            role = Role.Button
+                                        },
                             )
                         }
                     }
@@ -835,12 +834,12 @@ fun FeedScreen(
                             },
                             text = {},
                             modifier =
-                            Modifier
-                                .height(0.dp)
-                                .safeSemantics {
-                                    contentDescription = closeMenuText
-                                    role = Role.Button
-                                },
+                                Modifier
+                                    .height(0.dp)
+                                    .safeSemantics {
+                                        contentDescription = closeMenuText
+                                        role = Role.Button
+                                    },
                         )
                     }
                 }
@@ -931,29 +930,13 @@ fun FeedScreen(
     var manuallyTriggeredRefresh by rememberSaveable {
         mutableStateOf(false)
     }
-    var syncIndicatorMax by rememberSaveable {
-        mutableStateOf(Instant.EPOCH)
-    }
-    val isRefreshing by remember(viewState.latestSyncTimestamp, manuallyTriggeredRefresh) {
-        derivedStateOf {
-            // latestSync is equal to EPOCH when nothing is syncing
-            when {
-                manuallyTriggeredRefresh -> true
-                viewState.latestSyncTimestamp == Instant.EPOCH -> false
-                else -> {
-                    // In case an error happens in sync then this might never go back to EPOCH
-                    minOf(
-                        viewState.latestSyncTimestamp,
-                        syncIndicatorMax,
-                    )
-                        .isAfter(Instant.now().minusSeconds(10))
-                }
-            }
+    val isRefreshing =
+        remember(manuallyTriggeredRefresh, viewState.currentlySyncing) {
+            (manuallyTriggeredRefresh || viewState.currentlySyncing)
         }
-    }
 
-    LaunchedEffect(viewState.latestSyncTimestamp) {
-        if (manuallyTriggeredRefresh && viewState.latestSyncTimestamp.isAfter(Instant.EPOCH)) {
+    LaunchedEffect(viewState.currentlySyncing) {
+        if (manuallyTriggeredRefresh && viewState.currentlySyncing) {
             // A sync has happened so can safely set this to false now
             manuallyTriggeredRefresh = false
         }
@@ -1002,7 +985,6 @@ fun FeedScreen(
             refreshing = isRefreshing,
             onRefresh = {
                 manuallyTriggeredRefresh = true
-                syncIndicatorMax = Instant.now().plusSeconds(10)
                 onRefreshVisible()
             },
         )
@@ -1060,11 +1042,11 @@ fun FeedScreen(
             }
         },
         modifier =
-        modifier
-            // The order is important! PullToRefresh MUST come first
-            .pullRefresh(state = pullRefreshState)
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+            modifier
+                // The order is important! PullToRefresh MUST come first
+                .pullRefresh(state = pullRefreshState)
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
         Box(
@@ -1144,9 +1126,9 @@ fun FeedListContent(
             // Separate box because scrollable will ignore max size.
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = Modifier,
@@ -1193,12 +1175,12 @@ fun FeedListContent(
                             .asPaddingValues()
                     },
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .safeSemantics {
-                        testTag = "feed_list"
-                        collectionInfo = CollectionInfo(pagedFeedItems.itemCount, 1)
-                    },
+                    Modifier
+                        .fillMaxSize()
+                        .safeSemantics {
+                            testTag = "feed_list"
+                            collectionInfo = CollectionInfo(pagedFeedItems.itemCount, 1)
+                        },
             ) {
                 /*
                 This is a trick to make the list stay at item 0 when updates come in IF it is
@@ -1300,9 +1282,9 @@ fun FeedListContent(
                         if (itemIndex < pagedFeedItems.itemCount - 1) {
                             Divider(
                                 modifier =
-                                Modifier
-                                    .height(1.dp)
-                                    .fillMaxWidth(),
+                                    Modifier
+                                        .height(1.dp)
+                                        .fillMaxWidth(),
                             )
                         }
                     }
@@ -1317,9 +1299,9 @@ fun FeedListContent(
                     ) {
                         Spacer(
                             modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height((56 + 16).dp),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height((56 + 16).dp),
                         )
                     }
                 }
@@ -1362,9 +1344,9 @@ fun FeedGridContent(
             // Separate box because scrollable will ignore max size.
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = Modifier,

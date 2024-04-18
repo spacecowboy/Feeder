@@ -42,6 +42,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
@@ -262,14 +263,15 @@ class Repository(override val di: DI) : DIAware {
     }
 
     /**
-     * Returns EPOCH is no sync is currently happening
+     * Returns true if the latest sync timestamp is within the last 10 seconds
      */
-    val currentlySyncingLatestTimestamp: Flow<Instant>
+    val currentlySyncing: Flow<Boolean>
         get() =
             feedStore.getCurrentlySyncingLatestTimestamp()
                 .mapLatest { value ->
-                    value ?: Instant.EPOCH
+                    (value ?: Instant.EPOCH).isAfter(Instant.now().minusSeconds(10))
                 }
+                .distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> =
@@ -748,6 +750,12 @@ class Repository(override val di: DI) : DIAware {
         link: String?,
     ): Boolean {
         return feedItemStore.duplicateStoryExists(id = id, title = title, link = link)
+    }
+
+    val syncWorkerRunning: StateFlow<Boolean> = sessionStore.syncWorkerRunning
+
+    fun setSyncWorkerRunning(running: Boolean) {
+        sessionStore.setSyncWorkerRunning(running)
     }
 
     companion object {

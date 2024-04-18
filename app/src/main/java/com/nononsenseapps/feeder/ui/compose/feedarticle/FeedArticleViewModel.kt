@@ -56,7 +56,6 @@ import kotlinx.coroutines.withTimeout
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.FileNotFoundException
-import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.Locale
 
@@ -103,14 +102,6 @@ class FeedArticleViewModel(
                 viewModelScope,
                 SharingStarted.Eagerly,
                 emptyList(),
-            )
-
-    private val expandedTags: StateFlow<Set<String>> =
-        repository.expandedTags
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                emptySet(),
             )
 
     fun deleteFeeds(feedIds: List<Long>) =
@@ -286,9 +277,9 @@ class FeedArticleViewModel(
             repository.showFab,
             repository.showThumbnails,
             repository.currentTheme,
-            repository.currentlySyncingLatestTimestamp,
+            repository.currentlySyncing,
             repository.feedItemStyle,
-            expandedTags,
+            repository.expandedTags,
             toolbarVisible,
             visibleFeedItemCount,
             screenTitleForCurrentFeedOrTag,
@@ -311,6 +302,7 @@ class FeedArticleViewModel(
             repository.feedListFilter,
             repository.showOnlyTitle,
             repository.showReadingTime,
+            repository.syncWorkerRunning,
         ) { params: Array<Any> ->
             val article = params[15] as Article
 
@@ -327,7 +319,7 @@ class FeedArticleViewModel(
                 showFab = haveVisibleFeedItems && (params[0] as Boolean),
                 showThumbnails = params[1] as Boolean,
                 currentTheme = params[2] as ThemeOptions,
-                latestSyncTimestamp = params[3] as Instant,
+                currentlySyncing = (params[27] as Boolean) && (params[3] as Boolean),
                 feedItemStyle = params[4] as FeedItemStyle,
                 expandedTags = params[5] as Set<String>,
                 showToolbarMenu = params[6] as Boolean,
@@ -527,7 +519,7 @@ interface FeedScreenViewState {
     val showFab: Boolean
     val showThumbnails: Boolean
     val currentTheme: ThemeOptions
-    val latestSyncTimestamp: Instant
+    val currentlySyncing: Boolean
     val feedScreenTitle: ScreenTitle
     val visibleFeeds: List<FeedTitle>
     val feedItemStyle: FeedItemStyle
@@ -637,7 +629,7 @@ data class FeedArticleScreenViewState(
     override val showFab: Boolean = true,
     override val showThumbnails: Boolean = true,
     override val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
-    override val latestSyncTimestamp: Instant = Instant.EPOCH,
+    override val currentlySyncing: Boolean = false,
     // Defaults to empty string to avoid rendering until loading complete
     override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED),
     override val visibleFeeds: List<FeedTitle> = emptyList(),
