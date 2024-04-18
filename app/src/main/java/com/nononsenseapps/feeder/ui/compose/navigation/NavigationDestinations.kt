@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.navigation
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -34,7 +35,6 @@ import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
-import com.nononsenseapps.feeder.util.urlEncode
 
 private const val LOG_TAG = "FEEDER_NAV"
 
@@ -130,7 +130,6 @@ class PathParamArgument(
     builder: NavArgumentBuilder.() -> Unit,
 ) : NavigationArgument(name, builder)
 
-
 data object SearchFeedDestination : NavigationDestination(
     path = "search/feed",
     navArguments =
@@ -180,7 +179,6 @@ data object SearchFeedDestination : NavigationDestination(
     }
 }
 
-
 data object AddFeedDestination : NavigationDestination(
     path = "add/feed",
     navArguments =
@@ -211,7 +209,7 @@ data object AddFeedDestination : NavigationDestination(
                 +("feedImage" to feedImage)
             }
 
-        navController.navigate("$path/${feedUrl.urlEncode()}$params") {
+        navController.navigate("$path/${Uri.encode(feedUrl)}$params") {
             launchSingleTop = true
         }
     }
@@ -234,7 +232,6 @@ data object AddFeedDestination : NavigationDestination(
         }
     }
 }
-
 
 data object EditFeedDestination : NavigationDestination(
     path = "edit/feed",
@@ -273,7 +270,6 @@ data object EditFeedDestination : NavigationDestination(
     }
 }
 
-
 data object SettingsDestination : NavigationDestination(
     path = "settings",
     navArguments = emptyList(),
@@ -308,7 +304,6 @@ data object SettingsDestination : NavigationDestination(
         )
     }
 }
-
 
 data object FeedDestination : NavigationDestination(
     path = "feed",
@@ -392,7 +387,6 @@ data object FeedDestination : NavigationDestination(
     }
 }
 
-
 data object ArticleDestination : NavigationDestination(
     path = "reader",
     navArguments =
@@ -449,7 +443,6 @@ data object ArticleDestination : NavigationDestination(
         )
     }
 }
-
 
 data object SyncScreenDestination : NavigationDestination(
     path = "sync",
@@ -534,7 +527,7 @@ class QueryParamsBuilder {
             else -> sb.append("&")
         }
 
-        sb.append("$name=${value.urlEncode()}")
+        sb.append("$name=${Uri.encode(value)}")
     }
 
     override fun toString(): String = sb.toString()
