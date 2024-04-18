@@ -22,9 +22,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Divider
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -216,7 +216,7 @@ fun EditFeedScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.go_back),
                         )
                     }
@@ -310,9 +310,7 @@ fun EditFeedView(
                     rightFocusRequester = rightFocusRequester,
                 )
 
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
                 RightContent(
                     viewState = viewState,
@@ -516,9 +514,7 @@ fun ColumnScope.RightContent(
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         icon = null,
     ) { viewState.alternateId = it }
-    Divider(
-        modifier = Modifier.fillMaxWidth(),
-    )
+    HorizontalDivider(modifier = Modifier.fillMaxWidth())
     GroupTitle(
         startingSpace = false,
         height = 48.dp,
