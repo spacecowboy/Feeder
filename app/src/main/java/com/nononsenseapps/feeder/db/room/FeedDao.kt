@@ -76,7 +76,7 @@ interface FeedDao {
         staleTime: Long,
     ): Feed?
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag")
+    @Query("SELECT * FROM feeds WHERE tag IS :tag ORDER BY last_sync")
     suspend fun loadFeeds(tag: String): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime ORDER BY last_sync")
@@ -85,7 +85,7 @@ interface FeedDao {
         staleTime: Long,
     ): List<Feed>
 
-    @Query("SELECT * FROM feeds")
+    @Query("SELECT * FROM feeds ORDER BY last_sync")
     suspend fun loadFeeds(): List<Feed>
 
     @Query(
@@ -173,11 +173,12 @@ interface FeedDao {
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
     fun getAllFeedTitles(): Flow<List<FeedTitle>>
 
+    // Not filtering on currently_syncing so the refresh indicator doesn't go up and down due to
+    // single threaded sync.
     @Query(
         """
             SELECT MAX(last_sync)
             FROM feeds
-            WHERE currently_syncing
         """,
     )
     fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?>

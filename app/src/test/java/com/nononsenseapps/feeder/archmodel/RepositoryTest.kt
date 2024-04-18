@@ -40,6 +40,7 @@ import org.kodein.di.singleton
 import java.net.URL
 import java.time.Instant
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RepositoryTest : DIAware {
@@ -406,11 +407,11 @@ class RepositoryTest : DIAware {
 
         val result =
             runBlocking {
-                repository.currentlySyncingLatestTimestamp.toList()
+                repository.currentlySyncing.toList()
             }
 
         assertEquals(1, result.size)
-        assertEquals(Instant.EPOCH, result.first())
+        assertFalse(result.first())
 
         verify {
             feedStore.getCurrentlySyncingLatestTimestamp()

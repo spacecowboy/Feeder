@@ -56,13 +56,19 @@ class RssLocalSync(override val di: DI) : DIAware {
         logDebug(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
         return syncMutex.withLock {
             withContext(singleThreadedSync) {
-                syncFeeds(
-                    feedId = feedId,
-                    feedTag = feedTag,
-                    maxFeedItemCount = repository.maximumCountPerFeed.value,
-                    forceNetwork = forceNetwork,
-                    minFeedAgeMinutes = minFeedAgeMinutes,
-                )
+                try {
+                    repository.setSyncWorkerRunning(true)
+
+                    syncFeeds(
+                        feedId = feedId,
+                        feedTag = feedTag,
+                        maxFeedItemCount = repository.maximumCountPerFeed.value,
+                        forceNetwork = forceNetwork,
+                        minFeedAgeMinutes = minFeedAgeMinutes,
+                    )
+                } finally {
+                    repository.setSyncWorkerRunning(false)
+                }
             }
         }
     }
@@ -161,10 +167,10 @@ class RssLocalSync(override val di: DI) : DIAware {
         downloadTime: Instant,
     ) {
         try {
-            // Want unique sync times. UI doesn't use syncing flag anymore
+            // Want unique sync times.
             repository.setCurrentlySyncingOn(
                 feedId = feed.id,
-                syncing = false,
+                syncing = true,
                 lastSync = Instant.now(),
             )
             syncFeed(
@@ -183,6 +189,11 @@ class RssLocalSync(override val di: DI) : DIAware {
                 LOG_TAG,
                 "Failed to sync ${feed.displayTitle}: ${feed.url}",
                 e,
+            )
+        } finally {
+            repository.setCurrentlySyncingOn(
+                feedId = feed.id,
+                syncing = false,
             )
         }
     }

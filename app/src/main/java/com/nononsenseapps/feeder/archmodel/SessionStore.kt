@@ -33,4 +33,13 @@ class SessionStore {
             }
         }
     }
+
+    private val _syncWorkerRunning = MutableStateFlow(false)
+    val syncWorkerRunning: StateFlow<Boolean> = _syncWorkerRunning.asStateFlow()
+
+    fun setSyncWorkerRunning(running: Boolean) {
+        _syncWorkerRunning.update {
+            running
+        }
+    }
 }
