@@ -20,7 +20,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
@@ -220,7 +221,7 @@ fun ArticleScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.go_back),
                         )
                     }
@@ -231,7 +232,7 @@ fun ArticleScreen(
                             onClick = onToggleFullText,
                         ) {
                             Icon(
-                                Icons.Default.Article,
+                                Icons.AutoMirrored.Filled.Article,
                                 contentDescription = stringResource(R.string.fetch_full_article),
                             )
                         }
