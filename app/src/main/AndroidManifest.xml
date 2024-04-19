@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:installLocation="internalOnly">
   <!-- Import export feeds -->
   <uses-permission
@@ -13,6 +14,8 @@
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <!-- For expedited work manager jobs that run in foreground service -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
   <permission
     android:name="${applicationId}.permission.read"
@@ -195,5 +198,11 @@
       android:authorities="${applicationId}.rssprovider"
       android:exported="true"
       android:readPermission="${applicationId}.permission.read" />
+
+    <service
+       android:name="androidx.work.impl.foreground.SystemForegroundService"
+       android:foregroundServiceType="dataSync"
+       tools:node="merge" />
+
   </application>
 </manifest>
