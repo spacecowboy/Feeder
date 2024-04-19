@@ -242,4 +242,10 @@
     <string name="two_minutes">%1$s phút</string>
     <string name="other_words">%1$s từ</string>
     <string name="one_word">%1$s từ</string>
+    <string name="feed_item_style_compact_card">Thẻ nhỏ gọn</string>
+    <string name="failed_to_export_saved_articles">Không thể xuất các bài viết đã lưu</string>
+    <string name="skip_duplicate_articles_desc">Các bài viết có liên kết hoặc tiêu đề giống hệt với bài viết hiện có sẽ bị bỏ qua</string>
+    <string name="close_menu">Đóng trình đơn</string>
+    <string name="export_saved_articles">Xuất các bài viết đã lưu</string>
+    <string name="skip_duplicate_articles">Bỏ qua bài viết trùng lặp</string>
 </resources>
