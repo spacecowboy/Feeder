@@ -115,7 +115,7 @@ interface FeedDao {
             from feeds_with_items_for_nav_drawer
             -- starred
             union
-            select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
+            select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(bookmarked) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
             from feeds_with_items_for_nav_drawer
             where bookmarked
             -- tags
