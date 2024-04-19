@@ -35,6 +35,10 @@ private fun createNotificationChannel(
     notificationManager.createNotificationChannel(channel)
 }
 
+/**
+ * Necessary for expedited work.
+ * Pre Android 12 they will run as foreground services, but on Android 12+ they will run as expedited Jobs.
+ */
 fun createForegroundInfo(
     context: Context,
     notificationManager: NotificationManagerCompat,

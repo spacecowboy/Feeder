@@ -48,7 +48,7 @@ dependencyResolutionManagement {
             version("qrgen", "2.6.0")
             version("androidxCore", "1.10.1")
             version("androidxTestcore", "1.5.0")
-            version("workmanager", "2.8.1")
+            version("workmanager", "2.9.0")
             version("appcompat", "1.6.1")
             version("material", "1.6.1")
             version("preference", "1.2.1")
