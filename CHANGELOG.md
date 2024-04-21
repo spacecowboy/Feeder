@@ -1,3 +1,33 @@
+# 2.6.23
+Aitor Salaberria (1):
+  * [d719ced2] Translated using Weblate (Basque)
+
+Belmar Begić (1):
+  * [42e567d5] Updated Bosnian translation using Weblate
+
+Jonas Kalderstam (7):
+  * [f2486f3c] Upgraded some dependency versions
+  * [e69ed180] Fixed sync indicator: should now stay on screen as long as
+         sync is running
+  * [10358f20] Fixed deprecation warnings
+  * [05e1066c] Removed unused proguard rule
+  * [8d87a2a1] Fixed broken navigation after version upgrade
+  * [cd1d3df0] Fixed foreground service changes in Android 14
+  * [7939495a] Fixed Saved Articles count only showing unread instead of
+         total
+
+Vitor Henrique (1):
+  * [67ab5429] Updated Portuguese (Brazil) translation using Weblate
+
+bowornsin (1):
+  * [e699f62a] Updated Thai translation using Weblate
+
+ngocanhtve (1):
+  * [fa7eb98a] Translated using Weblate (Vietnamese)
+
+zmni (1):
+  * [b56e987b] Updated Indonesian translation using Weblate
+
 # 2.6.22
 Jonas Kalderstam (4):
   * [166390e5] Fixed so sync will never run when no network available
