@@ -168,10 +168,11 @@ class RssLocalSync(override val di: DI) : DIAware {
     ) {
         try {
             // Want unique sync times.
+            val syncTime = Instant.now()
             repository.setCurrentlySyncingOn(
                 feedId = feed.id,
                 syncing = true,
-                lastSync = Instant.now(),
+                lastSync = syncTime,
             )
             syncFeed(
                 feedSql = feed,
@@ -183,6 +184,8 @@ class RssLocalSync(override val di: DI) : DIAware {
                     LOG_TAG,
                     "Failed to sync ${feed.displayTitle}: ${feed.url} because:\n${feedParserError.description}",
                 )
+            }.onRight {
+                repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
         } catch (e: Throwable) {
             Log.e(

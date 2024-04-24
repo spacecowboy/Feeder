@@ -115,7 +115,7 @@ interface FeedItemDao {
         """
         SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
         FROM feed_items
-        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+        WHERE block_time is null
         ORDER BY primary_sort_time DESC, pub_date DESC
         """,
     )
@@ -126,7 +126,7 @@ interface FeedItemDao {
         SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
         FROM feed_items
         WHERE feed_items.feed_id = :feedId
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY primary_sort_time DESC, pub_date DESC
         """,
     )
@@ -166,7 +166,7 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
@@ -184,7 +184,7 @@ interface FeedItemDao {
         WHERE tag IS :tag
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
@@ -201,7 +201,7 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
@@ -218,7 +218,7 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
@@ -236,7 +236,7 @@ interface FeedItemDao {
         WHERE tag IS :tag 
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
@@ -253,7 +253,7 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
@@ -268,7 +268,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND read_time is null
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+          AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         LIMIT 20
         """,
@@ -403,7 +403,7 @@ interface FeedItemDao {
             JOIN feeds f ON feed_id = f.id
             WHERE f.fulltext_by_default = 1
                 AND fi.fulltext_downloaded <> 1
-                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+                and block_time is null
         """,
     )
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>>
@@ -424,7 +424,7 @@ interface FeedItemDao {
             WHERE
               (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
-              and NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+              and block_time is null
         """,
     )
     fun getFeedItemCount(
@@ -440,7 +440,7 @@ interface FeedItemDao {
             WHERE f.tag IS :tag
               and (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+              and block_time is null
         """,
     )
     fun getFeedItemCount(
@@ -456,7 +456,7 @@ interface FeedItemDao {
             WHERE fi.feed_id IS :feedId
               and (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+              and block_time is null
         """,
     )
     fun getFeedItemCount(
@@ -471,7 +471,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.notify IS 1 AND fi.notified IS 0 AND fi.read_time is null
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+              and block_time is null
         """,
     )
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>>

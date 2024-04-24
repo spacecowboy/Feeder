@@ -10,7 +10,7 @@ import androidx.room.DatabaseView
     left join (
         select id as item_id, feed_id, read_time is null as unread, bookmarked
         from feed_items
-        where not exists(select 1 from blocklist where lower(feed_items.plain_title) glob blocklist.glob_pattern)
+        where block_time is null
     )
     ON feeds.id = feed_id
     """,

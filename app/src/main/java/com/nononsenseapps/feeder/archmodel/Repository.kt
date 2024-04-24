@@ -26,6 +26,7 @@ import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.model.workmanager.BlockListWorker
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.DeviceListResponse
@@ -187,9 +188,22 @@ class Repository(override val di: DI) : DIAware {
 
     val blockList: Flow<List<String>> = settingsStore.blockListPreference
 
-    suspend fun addBlocklistPattern(pattern: String) = settingsStore.addBlocklistPattern(pattern)
+    suspend fun addBlocklistPattern(pattern: String) {
+        settingsStore.addBlocklistPattern(pattern)
+        scheduleBlockListUpdate(0)
+    }
 
-    suspend fun removeBlocklistPattern(pattern: String) = settingsStore.removeBlocklistPattern(pattern)
+    suspend fun removeBlocklistPattern(pattern: String) {
+        settingsStore.removeBlocklistPattern(pattern)
+        scheduleBlockListUpdate(0)
+    }
+
+    suspend fun setBlockStatusForNewInFeed(
+        feedId: Long,
+        blockTime: Instant,
+    ) {
+        feedItemStore.setBlockStatusForNewInFeed(feedId, blockTime)
+    }
 
     val currentSorting: StateFlow<SortingOptions> = settingsStore.currentSorting
 
@@ -696,6 +710,26 @@ class Repository(override val di: DI) : DIAware {
 
         workManager.enqueueUniqueWork(
             SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest.build(),
+        )
+    }
+
+    fun scheduleBlockListUpdate(delaySeconds: Long) {
+        logDebug(LOG_TAG, "Scheduling work")
+
+        val constraints =
+            Constraints.Builder()
+
+        val workRequest =
+            OneTimeWorkRequestBuilder<BlockListWorker>()
+                .addTag("feeder")
+                .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+                .setConstraints(constraints.build())
+                .setInitialDelay(delaySeconds, TimeUnit.SECONDS)
+
+        workManager.enqueueUniqueWork(
+            BlockListWorker.UNIQUE_BLOCKLIST_NAME,
             ExistingWorkPolicy.REPLACE,
             workRequest.build(),
         )
