@@ -7,6 +7,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_BLOCK_TIME
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_ENCLOSURE_TYPE
@@ -47,6 +48,7 @@ private val patternWhitespace = "\\s+".toRegex()
     indices = [
         Index(value = [COL_GUID, COL_FEEDID], unique = true),
         Index(value = [COL_FEEDID]),
+        Index(value = [COL_BLOCK_TIME]),
         Index(
             name = "idx_feed_items_cursor",
             value = [COL_PRIMARYSORTTIME, COL_PUBDATE, COL_ID],
@@ -116,6 +118,7 @@ data class FeedItem
         ) var readTime: Instant? = null,
         @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
         @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+        @ColumnInfo(name = COL_BLOCK_TIME) var blockTime: Instant? = null,
     ) : FeedItemForFetching, FeedItemCursor {
         constructor() : this(id = ID_UNSET)
 

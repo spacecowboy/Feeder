@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -38,7 +39,15 @@ import java.util.Locale
 
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
+    private val blocklistDao: BlocklistDao by instance()
     private val appDatabase: AppDatabase by instance()
+
+    suspend fun setBlockStatusForNewInFeed(
+        feedId: Long,
+        blockTime: Instant,
+    ) {
+        blocklistDao.setItemBlockStatusForNewInFeed(feedId, blockTime)
+    }
 
     fun getFeedItemCountRaw(
         feedId: Long,
@@ -109,7 +118,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         val onlySavedArticles = feedId == ID_SAVED_ARTICLES
 
         // Always blocklist
-        append("NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)\n")
+        append("block_time is null\n")
         // List filter
         if (!onlySavedArticles) {
             append("AND (\n")
