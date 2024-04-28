@@ -53,7 +53,7 @@ jobs:
       - name: release
         uses: softprops/action-gh-release@v1
         # Ignore if play store fails because Google sucks
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           draft: false
           #tag_name: 2.4.20
