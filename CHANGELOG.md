@@ -1,3 +1,7 @@
+# 2.6.24
+Jonas Kalderstam (1):
+  * [8a86acbd] Fixed performance when many entries in blocklist
+
 # 2.6.23
 Aitor Salaberria (1):
   * [d719ced2] Translated using Weblate (Basque)
