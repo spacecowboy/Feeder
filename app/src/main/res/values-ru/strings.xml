@@ -127,7 +127,7 @@
     <string name="open_enclosed_media_file">Открыть %1$s</string>
     <string name="feed_item_style_super_compact">Очень компактный</string>
     <string name="feed_item_style_compact">Компактный</string>
-    <string name="feed_item_style_card">Карточка</string>
+    <string name="feed_item_style_card">Карточный</string>
     <string name="feed_item_style">Стиль статьи</string>
     <string name="dark_theme_preference_black">Чёрная</string>
     <string name="dark_theme_preference_dark">Тёмная</string>
@@ -247,4 +247,5 @@
     <string name="failed_to_export_saved_articles">Не удалось экспортировать созранённые статьи</string>
     <string name="skip_duplicate_articles">Пропускать повторяющиеся статьи</string>
     <string name="skip_duplicate_articles_desc">Новейшие из статей со схожими заголовками или ссылками будут игнорироваться</string>
+    <string name="feed_item_style_compact_card">Компактный карточный</string>
 </resources>
