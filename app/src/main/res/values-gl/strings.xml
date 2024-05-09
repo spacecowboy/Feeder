@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="add_feed">Engadir fonte</string>
-    <string name="title_activity_edit_feed">Subscríbete á fonte</string>
+    <string name="add_feed">Engadir canle</string>
+    <string name="title_activity_edit_feed">Subscríbete á canle</string>
     <string name="sync">Sincr</string>
     <string name="view_debug_log">Ver rexistro depuración</string>
     <string name="share">Compartir</string>
@@ -17,7 +17,7 @@
     <string name="many_tags">%1$s etiquetas</string>
     <string name="other_tags">%1$s etiquetas</string>
     <string name="failed_to_fetch_full_article_missing_body">Non hai nada que descargar</string>
-    <string name="failed_to_fetch_full_article_missing_link">Falta a ligazón ao artigo na fonte</string>
+    <string name="failed_to_fetch_full_article_missing_link">Falta a ligazón ao artigo na canle</string>
     <string name="failed_to_fetch_full_article_not_html">A ligazón non é un documento HTML</string>
     <string name="max_lines">Máx liñas</string>
     <string name="filter_noun">Filtrar</string>
@@ -26,20 +26,20 @@
     <string name="action_settings">Axustes</string>
     <string name="url">URL</string>
     <string name="tag">Etiqueta</string>
-    <string name="add_feed_search_hint">URL da fonte</string>
+    <string name="add_feed_search_hint">URL da canle</string>
     <string name="title">Título</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Gardar</string>
     <string name="empty_feed_top">Non hai nada para ler. Igual queres…</string>
-    <string name="empty_feed_open"><annotation style="link">Abrir</annotation> outra fonte?</string>
-    <string name="empty_feed_add"><annotation style="link">Engadir</annotation> máis fontes?</string>
-    <string name="search_feed_empty_hint">Escribe o enderezo dunha fonte</string>
+    <string name="empty_feed_open"><annotation style="link">Abrir</annotation> outra canle?</string>
+    <string name="empty_feed_add"><annotation style="link">Engadir</annotation> máis canles?</string>
+    <string name="search_feed_empty_hint">Escribe o enderezo dunha canle</string>
     <string name="mark_as_read">Marcar como lido</string>
     <string name="mark_as_unread">Marcar como non lido</string>
     <string name="mark_all_as_read">Marcar todo como lido</string>
-    <string name="edit_feed">Editar fonte</string>
-    <string name="delete_feed">Eliminar fonte</string>
+    <string name="edit_feed">Editar canle</string>
+    <string name="delete_feed">Eliminar canle</string>
     <string name="show_all_items">Mostrar todo</string>
     <string name="show_unread_items">Mostrar elementos sen ler</string>
     <string name="new_items_available">Hai novos contidos</string>
@@ -59,14 +59,14 @@
     <string name="stop_reading">Deixar de ler</string>
     <string name="skip_to_next">Ir ao seguinte</string>
     <string name="set_language">Establecer idioma</string>
-    <string name="export_feeds_to_opml">Exportar fontes a OPML</string>
-    <string name="import_feeds_from_opml">Importar fontes desde OPML</string>
+    <string name="export_feeds_to_opml">Exportar canles a OPML</string>
+    <string name="import_feeds_from_opml">Importar canles desde OPML</string>
     <string name="new_based_on_this">Novo en función disto</string>
     <string name="indicator_for_mark_as_read">Indicador para marcar como lido</string>
-    <string name="no_such_feed">Non se atopa esa fonte. Intentámolo con HTTPS?</string>
+    <string name="no_such_feed">Non se atopa esa canle. Intentámolo con HTTPS?</string>
     <string name="nothing_to_display">Nada que mostrar!</string>
     <string name="title_activity_settings">Axustes</string>
-    <string name="all_feeds">Todas as fontes</string>
+    <string name="all_feeds">Todas as canles</string>
     <string name="sync_option_manually">Manualmente</string>
     <string name="sync_option_every_15min">Cada 15 minutos</string>
     <string name="sync_option_every_30min">Cada 30 minutos</string>
@@ -92,9 +92,9 @@
     <string name="block_list_description">Oculta os artigos que teñen no título algunha destas expresións. Exemplos:</string>
     <string name="add_item">Engadir elemento</string>
     <string name="include_mobile_hotspots">Incluír puntos de acceso móbil</string>
-    <string name="updated_feeds">Fontes actualizadas</string>
-    <string name="notification_channel_name">Fontes sen ler</string>
-    <string name="notification_channel_description">Só se mostran notificacións para elementos ser ler das fontes seleccionadas</string>
+    <string name="updated_feeds">Canles actualizadas</string>
+    <string name="notification_channel_name">Canles sen ler</string>
+    <string name="notification_channel_description">Só se mostran notificacións para elementos ser ler das canles seleccionadas</string>
     <string name="sync_status">Estado da sincr</string>
     <string name="open_in_reader">Lector</string>
     <string name="open_in_webview">Vista web</string>
@@ -107,7 +107,7 @@
     <string name="article_list_settings">Lista de artigos</string>
     <string name="open_link_in_web_view">Abrir ligazón na vista web</string>
     <string name="open_in_web_view">Abrir en vista Web</string>
-    <string name="max_feed_items">Máx elementos por fonte</string>
+    <string name="max_feed_items">Máx. elementos por canle</string>
     <string name="could_not_load_url">Non cargou o URL</string>
     <string name="theme_system">Sistema</string>
     <string name="theme_automatic">Auto</string>
@@ -126,10 +126,10 @@
     <string name="no_email_client">Non se puido abrir cliente de correo</string>
     <string name="touch_to_play_video">Toca para reproducir vídeo</string>
     <string name="javascript">JavaScript</string>
-    <string name="open_feed">Abrir fonte</string>
+    <string name="open_feed">Abrir canle</string>
     <string name="mark_items_above_as_read">Marcar o superior como lido</string>
     <string name="mark_items_below_as_read">Marcar o inferior como lido</string>
-    <string name="discovered_feeds_list">Lista de fontes atopadas</string>
+    <string name="discovered_feeds_list">Lista de canles atopadas</string>
     <string name="toggle_tag_expansion">Activar Despregar etiqueta</string>
     <string name="expanded_tag">Abrir etiqueta</string>
     <string name="contracted_tag">Etiqueta pechada</string>
@@ -151,7 +151,7 @@
     <string name="already_read">Xa lido</string>
     <string name="showing_only_unread_articles">Só se mostran artigos non lidos</string>
     <string name="showing_all_articles">A mostrar todos os artigos</string>
-    <string name="synchronize_feeds">Sincr fontes</string>
+    <string name="synchronize_feeds">Sincr. canles</string>
     <string name="zero_unread_articles">%1$s artigos sen ler</string>
     <string name="one_unread_article">%1$s artigo sen ler</string>
     <string name="two_unread_articles">%1$s artigos sen ler</string>
@@ -159,7 +159,7 @@
     <string name="many_unread_articles">%1$s artigos sen ler</string>
     <string name="feed_item_style_super_compact">Moi compacto</string>
     <string name="generate_extra_unique_ids">Crear IDs únicos extra</string>
-    <string name="only_enable_for_bad_id_feeds">Activar só para fontes con IDs incorrectos</string>
+    <string name="only_enable_for_bad_id_feeds">Activar só para canles con IDs incorrectos</string>
     <string name="invalid_url">URL non válido</string>
     <string name="failed_to_import_OPML">Fallou a importación OPML</string>
     <string name="failed_to_export_OPML">Fallou a exportación OPML</string>
@@ -178,7 +178,7 @@
     <string name="qr_code">Código QR</string>
     <string name="feeder_device_sync_code">Código de sincr de dispositivo Feeder</string>
     <string name="leave_sync_chain">Saír da rolda de sincronización</string>
-    <string name="device_sync_description_1">A sincronización de dispositivos permíteche sincronizar a subscrición a fontes e artigos lidos entre os teus dispositivos.</string>
+    <string name="device_sync_description_1">A sincronización de dispositivos permíteche sincronizar a subscrición a canles e artigos lidos entre os teus dispositivos.</string>
     <string name="device_sync_description_2">Simplemente escanea o código da túa rolda de sincronización que creaches noutro dispositivo, ou inicia aquí dito mecanismo.</string>
     <string name="start_new_sync_chain">Iniciar novo servizo de sincr</string>
     <string name="sync_code">Código sincr</string>
@@ -191,24 +191,24 @@
     <string name="are_you_sure_leave_sync_chain">Tes a certeza de querer saír da rolda de sincronización?</string>
     <string name="no_barcode_scanner_installed">Non se atopa o escáner de códigos de barras</string>
     <string name="new_indicator">Novo</string>
-    <string name="permission_read_desc">Permite á aplicación ler fontes e artigos</string>
+    <string name="permission_read_desc">Permite á aplicación ler canles e artigos</string>
     <string name="permission_read_label">Acceso de só-lectura para Feeder</string>
     <string name="explanation_permission_notifications">Debes conceder o permiso antes de poder activar as notificacións.</string>
     <string name="article_image">Imaxe do artigo</string>
-    <string name="feed_icon">Icona da fonte</string>
+    <string name="feed_icon">Icona da canle</string>
     <string name="text_scale">Tamaño do texto</string>
     <string name="saved_articles">Artigos gardados</string>
     <string name="saved_article">Artigo gardado</string>
     <string name="save_article">Gardar artigo</string>
     <string name="unsave_article">Deixar de gardar o artigo</string>
     <string name="mark_as_read_on_scroll">Marcar como lido ao desprazarse</string>
-    <string name="no_feeds">Sen fontes</string>
-    <string name="zero_feeds">%1$s fontes</string>
-    <string name="one_feed">%1$s fonte</string>
-    <string name="two_feeds">%1$s fontes</string>
-    <string name="few_feeds">%1$s fontes</string>
-    <string name="many_feeds">%1$s fontes</string>
-    <string name="other_feeds">%1$s fontes</string>
+    <string name="no_feeds">Sen canles</string>
+    <string name="zero_feeds">%1$s canles</string>
+    <string name="one_feed">%1$s canle</string>
+    <string name="two_feeds">%1$s canles</string>
+    <string name="few_feeds">%1$s canles</string>
+    <string name="many_feeds">%1$s canles</string>
+    <string name="other_feeds">%1$s canles</string>
     <string name="import_x_feeds_with_y_tags">Importar %1$s con %2$s?</string>
     <string name="zero_tags">%1$s etiquetas</string>
     <string name="one_tags">%1$s etiqueta</string>
@@ -218,11 +218,11 @@
     <string name="show_only_title">Mostrar só o título</string>
     <string name="failed_to_download">Fallou a descarga</string>
     <string name="failed_to_parse_the_page">Non se puido procesar a páxina</string>
-    <string name="no_feeds_in_the_page">Non hai fontes na páxina</string>
+    <string name="no_feeds_in_the_page">Non hai canles na páxina</string>
     <string name="content_is_not_html">Non é contido HTML</string>
-    <string name="failed_to_parse_rss_feed">Non se puido procesar a fonte RSS</string>
+    <string name="failed_to_parse_rss_feed">Non se puido procesar a canle RSS</string>
     <string name="http_error">Erro HTTP</string>
-    <string name="failed_to_parse_json_feed">Non se puido procesar a fonte JSON</string>
+    <string name="failed_to_parse_json_feed">Non se puido procesar a canle JSON</string>
     <string name="no_body_in_response">Sen corpo na resposta</string>
     <string name="unsupported_content_type">Sen soporte para este tipo de contido</string>
     <string name="failed_to_parse_full_article">Fallou o procesamento do artigo completo</string>
