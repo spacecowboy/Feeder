@@ -125,6 +125,9 @@ fun CodeBlockStyle(): TextStyle =
 fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 
 @Composable
+fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
+
+@Composable
 fun BlockQuoteStyle(): SpanStyle =
     MaterialTheme.typography.bodyLarge.toSpanStyle().merge(
         SpanStyle(

@@ -2,19 +2,9 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-
-abstract class HtmlComposer : HtmlParser() {
-    abstract fun appendImage(
-        link: String? = null,
-        onLinkClick: (String) -> Unit,
-        block: @Composable (() -> Unit) -> Unit,
-    )
-}
 
 abstract class HtmlParser {
     protected val spanStack: MutableList<Span> = mutableListOf()
-    protected val textStyleStack: MutableList<TextStyler> = mutableListOf()
 
     // The identity of this will change - do not reference it in blocks
     protected var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
@@ -42,38 +32,7 @@ abstract class HtmlParser {
         annotation: String,
     ): Int = builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
-    fun pushComposableStyle(style: @Composable () -> SpanStyle): Int = builder.pushComposableStyle(style)
-
-    fun popComposableStyle(index: Int) = builder.popComposableStyle(index)
-
-    fun pushTextStyle(style: TextStyler) = textStyleStack.add(style)
-
-    fun popTextStyle() = textStyleStack.removeLastOrNull()
-
     fun popSpan() = spanStack.removeLast()
-
-    protected fun findClosestLink(): String? {
-        for (span in spanStack.reversed()) {
-            if (span is SpanWithAnnotation && span.tag == "URL") {
-                return span.annotation
-            }
-        }
-        return null
-    }
-}
-
-inline fun <R : Any> HtmlComposer.withTextStyle(
-    textStyler: TextStyler,
-    crossinline block: HtmlComposer.() -> R,
-): R {
-    emitParagraph()
-    pushTextStyle(textStyler)
-    return try {
-        block()
-    } finally {
-        emitParagraph()
-        popTextStyle()
-    }
 }
 
 inline fun <R : Any> HtmlParser.withParagraph(crossinline block: HtmlParser.() -> R): R {
@@ -97,20 +56,6 @@ inline fun <R : Any> HtmlParser.withStyle(
         block()
     } finally {
         pop(index)
-        popSpan()
-    }
-}
-
-inline fun <R : Any> HtmlComposer.withComposableStyle(
-    noinline style: @Composable () -> SpanStyle,
-    crossinline block: HtmlComposer.() -> R,
-): R {
-    pushSpan(SpanWithComposableStyle(style))
-    val index = pushComposableStyle(style)
-    return try {
-        block()
-    } finally {
-        popComposableStyle(index)
         popSpan()
     }
 }
@@ -148,8 +93,3 @@ data class SpanWithComposableStyle(
 data class SpanWithVerbatim(
     val verbatim: String,
 ) : Span()
-
-interface TextStyler {
-    @Composable
-    fun textStyle(): TextStyle
-}

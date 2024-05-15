@@ -26,12 +26,12 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
         val dynamicColors by viewModel.dynamicColors.collectAsStateWithLifecycle()
         val textScale by viewModel.textScale.collectAsStateWithLifecycle()
         withFoldableHinge {
-            FeederTheme(
-                currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors,
-            ) {
-                withWindowSize {
+            withWindowSize {
+                FeederTheme(
+                    currentTheme = currentTheme,
+                    darkThemePreference = darkThemePreference,
+                    dynamicColors = dynamicColors,
+                ) {
                     ProvideFontScale(fontScale = textScale) {
                         WithFeederTextToolbar(content)
                     }
@@ -48,16 +48,16 @@ fun WithAllPreviewProviders(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
     content: @Composable () -> Unit,
 ) {
-    FeederTheme(currentTheme = currentTheme) {
-        val dm = LocalContext.current.resources.displayMetrics
-        val dpSize =
-            with(LocalDensity.current) {
-                DpSize(
-                    dm.widthPixels.toDp(),
-                    dm.heightPixels.toDp(),
-                )
-            }
-        WithPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
+    val dm = LocalContext.current.resources.displayMetrics
+    val dpSize =
+        with(LocalDensity.current) {
+            DpSize(
+                dm.widthPixels.toDp(),
+                dm.heightPixels.toDp(),
+            )
+        }
+    WithPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
+        FeederTheme(currentTheme = currentTheme) {
             Surface {
                 content()
             }

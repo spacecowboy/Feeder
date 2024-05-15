@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,7 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
@@ -35,6 +37,8 @@ import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.UnsupportedContentType
+import com.nononsenseapps.feeder.model.html.HtmlLinearizer
+import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
@@ -255,6 +259,7 @@ class FeedArticleViewModel(
     }
 
     // Used to trigger state update
+    // TODO remove
     private val textToDisplayTrigger: MutableStateFlow<Int> = MutableStateFlow(0)
 
     private suspend fun getTextToDisplayFor(itemId: Long): TextToDisplay =
@@ -368,6 +373,7 @@ class FeedArticleViewModel(
                         -> 0
                     },
                 image = article.image,
+                articleContent = parseArticleContent(article, textToDisplay),
             )
         }
             .stateIn(
@@ -387,8 +393,61 @@ class FeedArticleViewModel(
         }
     }
 
+    private fun parseArticleContent(
+        article: Article,
+        textToDisplay: TextToDisplay,
+    ): LinearArticle {
+        // Can't use view state here because this function is called before view state is updated
+        val htmlLinearizer = HtmlLinearizer()
+        return when (textToDisplay) {
+            TextToDisplay.DEFAULT -> {
+                if (blobFile(article.id, filePathProvider.articleDir).isFile) {
+                    try {
+                        blobInputStream(article.id, filePathProvider.articleDir).use {
+                            htmlLinearizer.linearize(
+                                inputStream = it,
+                                baseUrl = article.feedUrl ?: "",
+                            )
+                        }
+                    } catch (e: Exception) {
+                        // EOFException is possible
+                        Log.e(LOG_TAG, "Could not open blob", e)
+                        LinearArticle(elements = emptyList())
+                    }
+                } else {
+                    Log.e(LOG_TAG, "No default file to parse")
+                    setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
+                    LinearArticle(elements = emptyList())
+                }
+            }
+            TextToDisplay.FULLTEXT -> {
+                if (blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
+                    try {
+                        blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
+                            htmlLinearizer.linearize(
+                                inputStream = it,
+                                baseUrl = article.feedUrl ?: "",
+                            )
+                        }
+                    } catch (e: Exception) {
+                        // EOFException is possible
+                        Log.e(LOG_TAG, "Could not open blob", e)
+                        LinearArticle(elements = emptyList())
+                    }
+                } else {
+                    Log.e(LOG_TAG, "No fulltext file to parse")
+                    setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
+                    LinearArticle(elements = emptyList())
+                }
+            }
+            else -> {
+                LinearArticle(elements = emptyList())
+            }
+        }
+    }
+
     private suspend fun loadFullTextThenDisplayIt(itemId: Long) {
-        if (blobFullFile(viewState.value.articleId, filePathProvider.fullArticleDir).isFile) {
+        if (blobFullFile(itemId, filePathProvider.fullArticleDir).isFile) {
             setTextToDisplayFor(itemId, TextToDisplay.FULLTEXT)
             return
         }
@@ -398,7 +457,7 @@ class FeedArticleViewModel(
         val result =
             fullTextParser.parseFullArticleIfMissing(
                 object : FeedItemForFetching {
-                    override val id = viewState.value.articleId
+                    override val id = itemId
                     override val link = link
                 },
             )
@@ -511,6 +570,10 @@ class FeedArticleViewModel(
     override fun setRead(value: Boolean) {
         repository.setFeedListFilterRead(value)
     }
+
+    companion object {
+        private const val LOG_TAG = "FEEDERArticleViewModel"
+    }
 }
 
 @Immutable
@@ -562,6 +625,7 @@ interface ArticleScreenViewState {
     val keyHolder: ArticleItemKeyHolder
     val wordCount: Int
     val image: ThumbnailImage?
+    val articleContent: LinearArticle
 }
 
 interface ArticleItemKeyHolder {
@@ -667,6 +731,7 @@ data class FeedArticleScreenViewState(
     val isArticleOpen: Boolean = false,
     override val wordCount: Int = 0,
     override val image: ThumbnailImage? = null,
+    override val articleContent: LinearArticle = LinearArticle(elements = emptyList()),
 ) : FeedScreenViewState, ArticleScreenViewState
 
 sealed class TSSError
