@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -7,7 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 
 @Immutable
 class Dimensions(
@@ -56,8 +60,8 @@ val Dimensions.hasImageAspectRatioInReader: Boolean
 
 val phoneDimensions =
     Dimensions(
-        maxContentWidth = 840.dp,
-        maxReaderWidth = 840.dp,
+        maxContentWidth = 600.dp,
+        maxReaderWidth = 600.dp,
         imageAspectRatioInReader = null,
         navIconMargin = 16.dp,
         margin = 16.dp,
@@ -66,19 +70,19 @@ val phoneDimensions =
         feedScreenColumns = 1,
     )
 
-fun tabletDimensions(screenWidthDp: Int): Dimensions {
+fun tabletDimensions(windowWidthDp: Dp): Dimensions {
     // Items look good at around 300dp width. Account for 32dp margin at the sides, and the gutters
     // 3 columns: 3*300 + 4*32 = 1028
     val columns =
         when {
-            screenWidthDp > 1360 -> 4
-            screenWidthDp > 1028 -> 3
+            windowWidthDp > 1360.dp -> 4
+            windowWidthDp > 1028.dp -> 3
             else -> 2
         }
     return Dimensions(
-        maxContentWidth = 840.dp,
-        maxReaderWidth = 640.dp,
-        imageAspectRatioInReader = 16.0f / 9.0f,
+        maxContentWidth = 840.dp.coerceAtMost(windowWidthDp),
+        maxReaderWidth = 640.dp.coerceAtMost(windowWidthDp),
+        imageAspectRatioInReader = null,
         navIconMargin = 32.dp,
         margin = 32.dp,
         gutter = 32.dp,
@@ -106,14 +110,31 @@ val LocalDimens =
 
 @Composable
 fun ProvideDimens(content: @Composable () -> Unit) {
+    val windowSizeClass = LocalWindowSize.current
     val config = LocalConfiguration.current
+
     val dimensionSet =
         remember {
-            when {
-                config.screenWidthDp == 960 && config.screenHeightDp == 540 -> tvDimensions
-                config.smallestScreenWidthDp >= 600 -> tabletDimensions(config.screenWidthDp)
-                else -> phoneDimensions
+            if (config.screenWidthDp == 960 && config.screenHeightDp == 540) {
+                // TV dimensions are special case
+                tvDimensions
+            } else {
+                when (val widthClass = windowSizeClass.widthSizeClass) {
+                    WindowWidthSizeClass.Compact -> phoneDimensions
+                    else -> {
+                        when (windowSizeClass.heightSizeClass) {
+                            WindowHeightSizeClass.Compact -> phoneDimensions
+                            else ->
+                                if (widthClass == WindowWidthSizeClass.Medium) {
+                                    tabletDimensions(600.dp)
+                                } else {
+                                    tabletDimensions(840.dp)
+                                }
+                        }
+                    }
+                }
             }
         }
+
     CompositionLocalProvider(LocalDimens provides dimensionSet, content = content)
 }

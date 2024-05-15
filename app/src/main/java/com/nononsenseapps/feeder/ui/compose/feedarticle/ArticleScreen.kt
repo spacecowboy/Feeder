@@ -1,13 +1,11 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.height
@@ -57,18 +55,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
-import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
-import com.nononsenseapps.feeder.blob.blobFullInputStream
-import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
+import com.nononsenseapps.feeder.ui.compose.html.linearArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
-import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -461,71 +456,22 @@ fun ArticleContent(
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
-                TextToDisplay.DEFAULT -> {
-                    if (blobFile(viewState.articleId, filePathProvider.articleDir).isFile) {
-                        try {
-                            blobInputStream(viewState.articleId, filePathProvider.articleDir).use {
-                                htmlFormattedText(
-                                    inputStream = it,
-                                    baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = DefaultArticleItemKeyHolder(viewState.articleId),
-                                ) { link ->
-                                    activityLauncher.openLink(
-                                        link = link,
-                                        toolbarColor = toolbarColor,
-                                    )
-                                }
-                            }
-                        } catch (e: Exception) {
-                            // EOFException is possible
-                            Log.e(LOG_TAG, "Could not open blob", e)
-                            item {
-                                Text(text = stringResource(id = R.string.failed_to_open_article))
-                            }
-                        }
-                    } else {
-                        item {
-                            Column {
-                                Text(text = stringResource(id = R.string.failed_to_open_article))
-                                Text(text = stringResource(id = R.string.sync_to_fetch))
-                            }
-                        }
-                    }
+                TextToDisplay.DEFAULT,
+                TextToDisplay.FULLTEXT,
+                -> {
+                    linearArticleContent(
+                        articleContent = viewState.articleContent,
+                        onLinkClick = { link ->
+                            activityLauncher.openLink(
+                                link = link,
+                                toolbarColor = toolbarColor,
+                            )
+                        },
+                    )
                 }
 
                 TextToDisplay.LOADING_FULLTEXT -> {
                     LoadingItem()
-                }
-
-                TextToDisplay.FULLTEXT -> {
-                    if (blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile) {
-                        try {
-                            blobFullInputStream(
-                                viewState.articleId,
-                                filePathProvider.fullArticleDir,
-                            ).use {
-                                htmlFormattedText(
-                                    inputStream = it,
-                                    baseUrl = viewState.articleFeedUrl ?: "",
-                                    keyHolder = FullArticleItemKeyHolder(viewState.articleId),
-                                ) { link ->
-                                    activityLauncher.openLink(
-                                        link = link,
-                                        toolbarColor = toolbarColor,
-                                    )
-                                }
-                            }
-                        } catch (e: Exception) {
-                            // EOFException is possible
-                            Log.e(LOG_TAG, "Could not open blob", e)
-                            item {
-                                Text(text = stringResource(id = R.string.failed_to_open_article))
-                            }
-                        }
-                    } else {
-                        // Already trigger load in effect above
-                        LoadingItem()
-                    }
                 }
 
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {

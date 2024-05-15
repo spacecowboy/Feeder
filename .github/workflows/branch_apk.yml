@@ -3,7 +3,7 @@ name: Signed APKs
 on:
   push:
     branches:
-      - upgrades
+      - table-layout
 
 jobs:
   signed_apk:
