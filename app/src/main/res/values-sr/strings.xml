@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="fetching_full_article">Преузимање целог чланка…</string>
+    <string name="fetching_full_article">Преузима се цео чланак…</string>
     <string name="failed_to_fetch_full_article">Није успело преузимање целог чланка</string>
     <string name="fetch_full_articles_by_default">Подразумевано преузимање целих чланака</string>
     <string name="fetch_full_article">Преузми цео чланак</string>
@@ -28,13 +28,13 @@
     <string name="theme_system">Систем</string>
     <string name="could_not_load_url">Мрежна адреса није могла да се учита</string>
     <string name="max_feed_items">Ограничење броја ставки по извору</string>
-    <string name="open_in_web_view">Отвори у WebView-у</string>
-    <string name="open_link_in_web_view">Отвори мрежну везу са WebView</string>
+    <string name="open_in_web_view">Отвори у веб приказу</string>
+    <string name="open_link_in_web_view">Отвори линк у веб приказу</string>
     <string name="reader_settings">Читач</string>
-    <string name="open_links_with">Отвори мрежне везе помоћу</string>
+    <string name="open_links_with">Отвори линкове помоћу</string>
     <string name="open_item_by_default_with">Подразумевано отварање ставки помоћу</string>
     <string name="open_in_custom_tab">Прилагођена картица</string>
-    <string name="open_in_webview">WebView</string>
+    <string name="open_in_webview">Веб приказ</string>
     <string name="open_in_default_browser">Подразумевани прегледач</string>
     <string name="open_in_reader">Читач</string>
     <string name="notification_channel_description">Обавештења се приказују само за непрочитане ставке у подешеним изворима</string>
@@ -44,7 +44,7 @@
     <string name="show_fab">Приказ плутајућег акцијског дугмета</string>
     <string name="on_startup">При покретању апликације</string>
     <string name="check_for_updates">Проверавање нових чланака…</string>
-    <string name="no_activity_for_link">Најпре инсталирајте нешто чиме можете да отворите везу</string>
+    <string name="no_activity_for_link">Најпре инсталирајте нешто чиме можете да отворите овај линк</string>
     <string name="image_loading">Учитавање слика</string>
     <string name="only_when_charging">Само током пуњења</string>
     <string name="may_result_data_charges">Може довести до потрошње мобилних података.</string>
@@ -61,7 +61,7 @@
     <string name="sync_option_manually">Ручно</string>
     <string name="all_feeds">Сви извори</string>
     <string name="title_activity_settings">Поставке</string>
-    <string name="nothing_to_display">Нема ничега за приказати!</string>
+    <string name="nothing_to_display">Нема шта да се прикаже!</string>
     <string name="no_such_feed">Такав извор не може да се пронађе. Можда да покушам преко HTTPS\?</string>
     <string name="share">Подели</string>
     <string name="indicator_for_mark_as_read">Индикатор за ознаку прочитаности</string>
@@ -72,13 +72,13 @@
     <string name="sync">Синхронизуј</string>
     <string name="open_enclosed_media">Отвори приложене медије</string>
     <string name="open_in_browser">Отвори у веб прегледачу</string>
-    <string name="open_link_in_browser">Отвори повезницу у прегледнику</string>
+    <string name="open_link_in_browser">Отвори линк у прегледачу</string>
     <string name="toggle_read_status">Промени стање прочитаности</string>
-    <string name="dont_notify_for_new_items">Искључи обавести</string>
+    <string name="dont_notify_for_new_items">Искључи обавештења</string>
     <string name="notify_for_new_items">Обавести за нове ставке</string>
     <string name="no_tag">Без ознаке</string>
     <string name="view">Преглед</string>
-    <string name="new_items_available">Нове ставке су доступне</string>
+    <string name="new_items_available">Доступне су нове ставке</string>
     <string name="show_unread_items">Прикажи непрочитане ставке</string>
     <string name="show_all_items">Прикажи све ставке</string>
     <string name="delete_feed">Избриши извор</string>
@@ -160,8 +160,8 @@
     <string name="device_sync">Синхронизација уређаја</string>
     <string name="device_sync_financed_by_community">Овај сервис плаћа заједница. Размотрите могућност да приложите донацију ако сматрате да је користан.</string>
     <string name="remove_device">Уклони уређај</string>
-    <string name="or_open_device_sync_link">Друга могућност је да отворите везу на свом уређају.</string>
-    <string name="treat_like_password">Чувајте ово као лозинку. Ако поседује ову везу, свако може да чита ваше синхронизоване податке.</string>
+    <string name="or_open_device_sync_link">Друга могућност је да отворите линк на свом уређају.</string>
+    <string name="treat_like_password">Чувајте ово као лозинку. Свако може ко поседује овај линк може да чита ваше синхронизоване податке.</string>
     <string name="scan_or_enter_code">Скенирајте или унесите кôд</string>
     <string name="press_scan_sync">На вашем уређају, поставите се на синхронизацију уређаја и притисните скенирај кôд за синхронизацију.</string>
     <string name="device_sync_description_1">Синхронизација уређаја вам омогућава да на различитим уређајима које поседујете синхронизујете претплате на изворе и прочитане чланке.</string>
@@ -175,7 +175,7 @@
     <string name="block_list_description">Сакрива чланке са насловима који садржи неки од ових филтера. Пример филтера:</string>
     <string name="dynamic_theme_use">Динамичке боје</string>
     <string name="new_indicator">Ново</string>
-    <string name="permission_read_desc">Омогућава да апликација чита објаве и чланке</string>
+    <string name="permission_read_desc">Омогућава да апликација чита изворе и чланке</string>
     <string name="explanation_permission_notifications">Пре укључивања обавештења, потребно је да се одобри дозвола.</string>
     <string name="article_image">Слика чланка</string>
     <string name="feed_icon">Икона објаве</string>
@@ -228,4 +228,24 @@
     <string name="no_url">Нема URL адресе</string>
     <string name="add_anyway">Ипак додај</string>
     <string name="theme_e_ink">E Ink</string>
+    <string name="failed_to_export_saved_articles">Није успео извоз сачуваних чланака</string>
+    <string name="few_words">%1$s речи</string>
+    <string name="skip_duplicate_articles_desc">Чланци са линковима или насловом који су идентични са већ постојећим чланцима се игноришу</string>
+    <string name="close_menu">Затвори мени</string>
+    <string name="export_saved_articles">Извези сачуване чланке</string>
+    <string name="open_browser_in_split_screen">Отвори прегледач у подељеном прозору</string>
+    <string name="zero_words">%1$s речи</string>
+    <string name="one_word">%1$s реч</string>
+    <string name="many_words">%1$s речи</string>
+    <string name="many_minutes">%1$s минута</string>
+    <string name="two_minutes">%1$s минута</string>
+    <string name="other_minutes">%1$s минута</string>
+    <string name="other_words">%1$s речи</string>
+    <string name="zero_minutes">%1$s минута</string>
+    <string name="one_minute">%1$s минут</string>
+    <string name="few_minutes">%1$s минута</string>
+    <string name="feed_item_style_compact_card">Компактна картица</string>
+    <string name="two_words">%1$s речи</string>
+    <string name="skip_duplicate_articles">Прескочи дуплиране чланке</string>
+    <string name="show_reading_time">Прикажи процењено време читања</string>
 </resources>
