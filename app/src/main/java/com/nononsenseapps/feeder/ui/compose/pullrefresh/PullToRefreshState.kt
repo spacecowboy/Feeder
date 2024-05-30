@@ -8,6 +8,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -102,11 +103,11 @@ class PullRefreshState internal constructor(
     internal val refreshing get() = _refreshing
     internal val position get() = _position
 
-    private val adjustedDistancePulled by derivedStateOf { distancePulled * DragMultiplier }
+    private val adjustedDistancePulled by derivedStateOf { distancePulled * DRAG_MULTIPLIER }
 
     private var _refreshing by mutableStateOf(false)
-    private var _position by mutableStateOf(0f)
-    private var distancePulled by mutableStateOf(0f)
+    private var _position by mutableFloatStateOf(0f)
+    private var distancePulled by mutableFloatStateOf(0f)
 
     internal fun onPull(pullDelta: Float): Float {
         if (this._refreshing) return 0f // Already refreshing, do nothing.
@@ -185,4 +186,4 @@ object PullRefreshDefaults {
  * the refresh threshold, it is the indicator position, otherwise the indicator position is
  * derived from the progress).
  */
-private const val DragMultiplier = 0.5f
+private const val DRAG_MULTIPLIER = 0.5f

@@ -30,7 +30,10 @@ fun Activity.withWindowSize(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun withPreviewWindowSize(windowSizeclass: WindowSizeClass, content: @Composable () -> Unit) {
+fun WithPreviewWindowSize(
+    windowSizeclass: WindowSizeClass,
+    content: @Composable () -> Unit,
+) {
     CompositionLocalProvider(LocalWindowSize provides windowSizeclass) {
         content()
     }
@@ -51,7 +54,7 @@ fun isCompactDevice(): Boolean {
 
 enum class ScreenType {
     DUAL,
-    SINGLE
+    SINGLE,
 }
 
 fun getScreenType(windowSize: WindowSizeClass) =

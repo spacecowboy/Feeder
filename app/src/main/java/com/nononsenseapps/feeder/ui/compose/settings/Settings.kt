@@ -95,11 +95,11 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
-import com.nononsenseapps.feeder.ui.compose.utils.withAllPreviewProviders
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
@@ -143,44 +143,44 @@ fun SettingsScreen(
     ) { padding ->
         SettingsList(
             currentThemeValue = viewState.currentTheme.asThemeOption(),
-            onThemeChanged = { value ->
+            onThemeChange = { value ->
                 settingsViewModel.setCurrentTheme(value.currentTheme)
             },
             currentDarkThemePreference = viewState.darkThemePreference.asDarkThemeOption(),
-            onDarkThemePreferenceChanged = { value ->
+            onDarkThemePreferenceChange = { value ->
                 settingsViewModel.setPreferredDarkTheme(value.darkThemePreferences)
             },
             currentSortingValue = viewState.currentSorting.asSortOption(),
-            onSortingChanged = { value ->
+            onSortingChange = { value ->
                 settingsViewModel.setCurrentSorting(value.currentSorting)
             },
             showFabValue = viewState.showFab,
-            onShowFabChanged = settingsViewModel::setShowFab,
+            onShowFabChange = settingsViewModel::setShowFab,
             feedItemStyleValue = viewState.feedItemStyle,
-            onFeedItemStyleChanged = settingsViewModel::setFeedItemStyle,
+            onFeedItemStyleChange = settingsViewModel::setFeedItemStyle,
             blockListValue = ImmutableHolder(viewState.blockList.sorted()),
             swipeAsReadValue = viewState.swipeAsRead,
-            onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
+            onSwipeAsReadOptionChange = settingsViewModel::setSwipeAsRead,
             syncOnStartupValue = viewState.syncOnResume,
-            onSyncOnStartupChanged = settingsViewModel::setSyncOnResume,
+            onSyncOnStartupChange = settingsViewModel::setSyncOnResume,
             syncOnlyOnWifiValue = viewState.syncOnlyOnWifi,
-            onSyncOnlyOnWifiChanged = settingsViewModel::setSyncOnlyOnWifi,
+            onSyncOnlyOnWifiChange = settingsViewModel::setSyncOnlyOnWifi,
             syncOnlyWhenChargingValue = viewState.syncOnlyWhenCharging,
-            onSyncOnlyWhenChargingChanged = settingsViewModel::setSyncOnlyWhenCharging,
+            onSyncOnlyWhenChargingChange = settingsViewModel::setSyncOnlyWhenCharging,
             loadImageOnlyOnWifiValue = viewState.loadImageOnlyOnWifi,
-            onLoadImageOnlyOnWifiChanged = settingsViewModel::setLoadImageOnlyOnWifi,
+            onLoadImageOnlyOnWifiChange = settingsViewModel::setLoadImageOnlyOnWifi,
             showThumbnailsValue = viewState.showThumbnails,
-            onShowThumbnailsChanged = settingsViewModel::setShowThumbnails,
+            onShowThumbnailsChange = settingsViewModel::setShowThumbnails,
             useDetectLanguage = viewState.useDetectLanguage,
-            onUseDetectLanguageChanged = settingsViewModel::setUseDetectLanguage,
+            onUseDetectLanguageChange = settingsViewModel::setUseDetectLanguage,
             maxItemsPerFeedValue = viewState.maximumCountPerFeed,
-            onMaxItemsPerFeedChanged = settingsViewModel::setMaxCountPerFeed,
+            onMaxItemsPerFeedChange = settingsViewModel::setMaxCountPerFeed,
             currentItemOpenerValue = viewState.itemOpener,
-            onItemOpenerChanged = settingsViewModel::setItemOpener,
+            onItemOpenerChange = settingsViewModel::setItemOpener,
             currentLinkOpenerValue = viewState.linkOpener,
-            onLinkOpenerChanged = settingsViewModel::setLinkOpener,
+            onLinkOpenerChange = settingsViewModel::setLinkOpener,
             currentSyncFrequencyValue = viewState.syncFrequency,
-            onSyncFrequencyChanged = settingsViewModel::setSyncFrequency,
+            onSyncFrequencyChange = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
             useDynamicTheme = viewState.useDynamicTheme,
@@ -200,7 +200,7 @@ fun SettingsScreen(
             isOpenAdjacent = viewState.isOpenAdjacent,
             onOpenAdjacent = settingsViewModel::setIsOpenAdjacent,
             showReadingTime = viewState.showReadingTime,
-            onShowReadingTimeChanged = settingsViewModel::setShowReadingTime,
+            onShowReadingTimeChange = settingsViewModel::setShowReadingTime,
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
@@ -213,41 +213,41 @@ fun SettingsScreen(
 @Preview(showBackground = true, device = PIXEL_C)
 @Preview(showBackground = true, device = NEXUS_5)
 private fun SettingsScreenPreview() {
-    withAllPreviewProviders {
+    WithAllPreviewProviders {
         SettingsList(
             currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
-            onThemeChanged = {},
+            onThemeChange = {},
             currentDarkThemePreference = DarkThemePreferences.BLACK.asDarkThemeOption(),
-            onDarkThemePreferenceChanged = {},
+            onDarkThemePreferenceChange = {},
             currentSortingValue = SortingOptions.NEWEST_FIRST.asSortOption(),
-            onSortingChanged = {},
+            onSortingChange = {},
             showFabValue = true,
-            onShowFabChanged = {},
+            onShowFabChange = {},
             feedItemStyleValue = FeedItemStyle.CARD,
-            onFeedItemStyleChanged = {},
+            onFeedItemStyleChange = {},
             blockListValue = ImmutableHolder(emptyList()),
             swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
-            onSwipeAsReadOptionChanged = {},
+            onSwipeAsReadOptionChange = {},
             syncOnStartupValue = true,
-            onSyncOnStartupChanged = {},
+            onSyncOnStartupChange = {},
             syncOnlyOnWifiValue = true,
-            onSyncOnlyOnWifiChanged = {},
+            onSyncOnlyOnWifiChange = {},
             syncOnlyWhenChargingValue = true,
-            onSyncOnlyWhenChargingChanged = {},
+            onSyncOnlyWhenChargingChange = {},
             loadImageOnlyOnWifiValue = true,
-            onLoadImageOnlyOnWifiChanged = {},
+            onLoadImageOnlyOnWifiChange = {},
             showThumbnailsValue = true,
-            onShowThumbnailsChanged = {},
+            onShowThumbnailsChange = {},
             useDetectLanguage = true,
-            onUseDetectLanguageChanged = {},
+            onUseDetectLanguageChange = {},
             maxItemsPerFeedValue = 101,
-            onMaxItemsPerFeedChanged = {},
+            onMaxItemsPerFeedChange = {},
             currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
-            onItemOpenerChanged = {},
+            onItemOpenerChange = {},
             currentLinkOpenerValue = LinkOpener.DEFAULT_BROWSER,
-            onLinkOpenerChanged = {},
+            onLinkOpenerChange = {},
             currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
-            onSyncFrequencyChanged = {},
+            onSyncFrequencyChange = {},
             batteryOptimizationIgnoredValue = false,
             onOpenSyncSettings = {},
             useDynamicTheme = true,
@@ -267,7 +267,7 @@ private fun SettingsScreenPreview() {
             isOpenAdjacent = false,
             onOpenAdjacent = {},
             showReadingTime = false,
-            onShowReadingTimeChanged = {},
+            onShowReadingTimeChange = {},
             onStartActivity = {},
             modifier = Modifier,
         )
@@ -277,38 +277,38 @@ private fun SettingsScreenPreview() {
 @Composable
 fun SettingsList(
     currentThemeValue: ThemeOption,
-    onThemeChanged: (ThemeOption) -> Unit,
+    onThemeChange: (ThemeOption) -> Unit,
     currentDarkThemePreference: DarkThemeOption,
-    onDarkThemePreferenceChanged: (DarkThemeOption) -> Unit,
+    onDarkThemePreferenceChange: (DarkThemeOption) -> Unit,
     currentSortingValue: SortOption,
-    onSortingChanged: (SortOption) -> Unit,
+    onSortingChange: (SortOption) -> Unit,
     showFabValue: Boolean,
-    onShowFabChanged: (Boolean) -> Unit,
+    onShowFabChange: (Boolean) -> Unit,
     feedItemStyleValue: FeedItemStyle,
-    onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
+    onFeedItemStyleChange: (FeedItemStyle) -> Unit,
     blockListValue: ImmutableHolder<List<String>>,
     swipeAsReadValue: SwipeAsRead,
-    onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
+    onSwipeAsReadOptionChange: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
-    onSyncOnStartupChanged: (Boolean) -> Unit,
+    onSyncOnStartupChange: (Boolean) -> Unit,
     syncOnlyOnWifiValue: Boolean,
-    onSyncOnlyOnWifiChanged: (Boolean) -> Unit,
+    onSyncOnlyOnWifiChange: (Boolean) -> Unit,
     syncOnlyWhenChargingValue: Boolean,
-    onSyncOnlyWhenChargingChanged: (Boolean) -> Unit,
+    onSyncOnlyWhenChargingChange: (Boolean) -> Unit,
     loadImageOnlyOnWifiValue: Boolean,
-    onLoadImageOnlyOnWifiChanged: (Boolean) -> Unit,
+    onLoadImageOnlyOnWifiChange: (Boolean) -> Unit,
     showThumbnailsValue: Boolean,
-    onShowThumbnailsChanged: (Boolean) -> Unit,
+    onShowThumbnailsChange: (Boolean) -> Unit,
     useDetectLanguage: Boolean,
-    onUseDetectLanguageChanged: (Boolean) -> Unit,
+    onUseDetectLanguageChange: (Boolean) -> Unit,
     maxItemsPerFeedValue: Int,
-    onMaxItemsPerFeedChanged: (Int) -> Unit,
+    onMaxItemsPerFeedChange: (Int) -> Unit,
     currentItemOpenerValue: ItemOpener,
-    onItemOpenerChanged: (ItemOpener) -> Unit,
+    onItemOpenerChange: (ItemOpener) -> Unit,
     currentLinkOpenerValue: LinkOpener,
-    onLinkOpenerChanged: (LinkOpener) -> Unit,
+    onLinkOpenerChange: (LinkOpener) -> Unit,
     currentSyncFrequencyValue: SyncFrequency,
-    onSyncFrequencyChanged: (SyncFrequency) -> Unit,
+    onSyncFrequencyChange: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
@@ -328,7 +328,7 @@ fun SettingsList(
     isOpenAdjacent: Boolean,
     onOpenAdjacent: (Boolean) -> Unit,
     showReadingTime: Boolean,
-    onShowReadingTimeChanged: (Boolean) -> Unit,
+    onShowReadingTimeChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -361,7 +361,7 @@ fun SettingsList(
                     ThemeOptions.E_INK.asThemeOption(),
                 ),
             title = stringResource(id = R.string.theme),
-            onSelection = onThemeChanged,
+            onSelection = onThemeChange,
         )
 
         SwitchSetting(
@@ -381,7 +381,7 @@ fun SettingsList(
                     }
                 },
             enabled = isAndroidSAndAbove,
-            onCheckedChanged = onUseDynamicTheme,
+            onCheckedChange = onUseDynamicTheme,
         )
 
         MenuSetting(
@@ -392,7 +392,7 @@ fun SettingsList(
                     DarkThemePreferences.BLACK.asDarkThemeOption(),
                     DarkThemePreferences.DARK.asDarkThemeOption(),
                 ),
-            onSelection = onDarkThemePreferenceChanged,
+            onSelection = onDarkThemePreferenceChange,
         )
 
         ListDialogSetting(
@@ -460,26 +460,26 @@ fun SettingsList(
                 ),
             title = stringResource(id = R.string.check_for_updates),
             onSelection = {
-                onSyncFrequencyChanged(it.syncFrequency)
+                onSyncFrequencyChange(it.syncFrequency)
             },
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.on_startup),
             checked = syncOnStartupValue,
-            onCheckedChanged = onSyncOnStartupChanged,
+            onCheckedChange = onSyncOnStartupChange,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.only_on_wifi),
             checked = syncOnlyOnWifiValue,
-            onCheckedChanged = onSyncOnlyOnWifiChanged,
+            onCheckedChange = onSyncOnlyOnWifiChange,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.only_when_charging),
             checked = syncOnlyWhenChargingValue,
-            onCheckedChanged = onSyncOnlyWhenChargingChanged,
+            onCheckedChange = onSyncOnlyWhenChargingChange,
         )
 
         MenuSetting(
@@ -493,7 +493,7 @@ fun SettingsList(
                     1000,
                 ),
             title = stringResource(id = R.string.max_feed_items),
-            onSelection = onMaxItemsPerFeedChanged,
+            onSelection = onMaxItemsPerFeedChange,
         )
 
         ExternalSetting(
@@ -531,13 +531,13 @@ fun SettingsList(
                     SortingOptions.OLDEST_FIRST.asSortOption(),
                 ),
             title = stringResource(id = R.string.sort),
-            onSelection = onSortingChanged,
+            onSelection = onSortingChange,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_fab),
             checked = showFabValue,
-            onCheckedChanged = onShowFabChanged,
+            onCheckedChange = onShowFabChange,
         )
 
         if (isCompactDevice()) {
@@ -546,7 +546,7 @@ fun SettingsList(
                 currentValue = feedItemStyleValue.asFeedItemStyleOption(),
                 values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
                 onSelection = {
-                    onFeedItemStyleChanged(it.feedItemStyle)
+                    onFeedItemStyleChange(it.feedItemStyle)
                 },
             )
         }
@@ -561,7 +561,7 @@ fun SettingsList(
         SwitchSetting(
             title = stringResource(id = R.string.show_only_title),
             checked = showOnlyTitle,
-            onCheckedChanged = onShowOnlyTitle,
+            onCheckedChange = onShowOnlyTitle,
         )
 
         MenuSetting(
@@ -569,26 +569,26 @@ fun SettingsList(
             currentValue = swipeAsReadValue.asSwipeAsReadOption(),
             values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
             onSelection = {
-                onSwipeAsReadOptionChanged(it.swipeAsRead)
+                onSwipeAsReadOptionChange(it.swipeAsRead)
             },
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.mark_as_read_on_scroll),
             checked = isMarkAsReadOnScroll,
-            onCheckedChanged = onMarkAsReadOnScroll,
+            onCheckedChange = onMarkAsReadOnScroll,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_thumbnails),
             checked = showThumbnailsValue,
-            onCheckedChanged = onShowThumbnailsChanged,
+            onCheckedChange = onShowThumbnailsChange,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.show_reading_time),
             checked = showReadingTime,
-            onCheckedChanged = onShowReadingTimeChanged,
+            onCheckedChange = onShowReadingTimeChange,
         )
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -610,7 +610,7 @@ fun SettingsList(
                 ),
             title = stringResource(id = R.string.open_item_by_default_with),
             onSelection = {
-                onItemOpenerChanged(it.itemOpener)
+                onItemOpenerChange(it.itemOpener)
             },
         )
 
@@ -623,7 +623,7 @@ fun SettingsList(
                 ),
             title = stringResource(id = R.string.open_links_with),
             onSelection = {
-                onLinkOpenerChanged(it.linkOpener)
+                onLinkOpenerChange(it.linkOpener)
             },
         )
 
@@ -633,7 +633,7 @@ fun SettingsList(
             SwitchSetting(
                 title = stringResource(id = R.string.open_browser_in_split_screen),
                 checked = isOpenAdjacent,
-                onCheckedChanged = onOpenAdjacent,
+                onCheckedChange = onOpenAdjacent,
             )
         }
 
@@ -649,7 +649,7 @@ fun SettingsList(
         SwitchSetting(
             title = stringResource(id = R.string.only_on_wifi),
             checked = loadImageOnlyOnWifiValue,
-            onCheckedChanged = onLoadImageOnlyOnWifiChanged,
+            onCheckedChange = onLoadImageOnlyOnWifiChange,
         )
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -674,7 +674,7 @@ fun SettingsList(
                         )
                 },
             enabled = isAndroidQAndAbove,
-            onCheckedChanged = onUseDetectLanguageChanged,
+            onCheckedChange = onUseDetectLanguageChange,
         )
 
         Spacer(modifier = Modifier.navigationBarsPadding())
@@ -1088,7 +1088,7 @@ fun SwitchSetting(
     description: String? = null,
     icon: @Composable (() -> Unit)? = {},
     enabled: Boolean = true,
-    onCheckedChanged: (Boolean) -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val dimens = LocalDimens.current
@@ -1099,7 +1099,7 @@ fun SwitchSetting(
                 .heightIn(min = 64.dp)
                 .clickable(
                     enabled = enabled,
-                    onClick = { onCheckedChanged(!checked) },
+                    onClick = { onCheckedChange(!checked) },
                 )
                 .safeSemantics(mergeDescendants = true) {
                     stateDescription =
@@ -1136,7 +1136,7 @@ fun SwitchSetting(
 
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChanged,
+            onCheckedChange = onCheckedChange,
             modifier = Modifier.clearAndSetSemantics { },
             enabled = enabled,
         )

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,7 +53,7 @@ fun FeedItemCompact(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
@@ -74,7 +75,7 @@ fun FeedItemCompact(
             onMarkAboveAsRead = onMarkAboveAsRead,
             onMarkBelowAsRead = onMarkBelowAsRead,
             onShareItem = onShareItem,
-            onToggleBookmarked = onToggleBookmarked,
+            onToggleBookmark = onToggleBookmark,
             dropDownMenuExpanded = dropDownMenuExpanded,
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
@@ -211,7 +212,7 @@ private fun PreviewRead() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
@@ -251,7 +252,7 @@ private fun PreviewUnread() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
@@ -294,7 +295,7 @@ private fun PreviewWithImage() {
                     onMarkAboveAsRead = {},
                     onMarkBelowAsRead = {},
                     onShareItem = {},
-                    onToggleBookmarked = {},
+                    onToggleBookmark = {},
                     dropDownMenuExpanded = false,
                     onDismissDropdown = {},
                     bookmarkIndicator = true,

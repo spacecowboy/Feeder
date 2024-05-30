@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
-import org.junit.Assert.*
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class SessionStoreTest {
     private val store = SessionStore()

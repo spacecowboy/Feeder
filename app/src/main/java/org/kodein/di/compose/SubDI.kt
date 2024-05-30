@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:compose:param-order-check", "ktlint:compose:modifier-composed-check")
+
 package org.kodein.di.compose
 
 import androidx.compose.runtime.Composable
@@ -18,7 +20,7 @@ import org.kodein.di.DI
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-fun subDI(
+fun SubDI(
     parentDI: DI,
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
@@ -43,11 +45,11 @@ fun subDI(
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-fun subDI(
+fun SubDI(
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
     diBuilder: DI.MainBuilder.() -> Unit,
     content:
         @Composable()
         () -> Unit,
-) = subDI(LocalDI.current, allowSilentOverride, copy, diBuilder, content)
+) = SubDI(LocalDI.current, allowSilentOverride, copy, diBuilder, content)

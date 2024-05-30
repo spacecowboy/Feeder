@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.nononsenseapps.feeder.archmodel
 
 import android.content.SharedPreferences

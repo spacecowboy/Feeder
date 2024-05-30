@@ -63,7 +63,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemSnippetTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
-import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
 import java.time.Instant
@@ -75,7 +75,7 @@ fun FeedItemCard(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
@@ -165,7 +165,7 @@ fun FeedItemCard(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    onToggleBookmarked = onToggleBookmarked,
+                    onToggleBookmark = onToggleBookmark,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = onDismissDropdown,
                     maxLines = maxLines,
@@ -183,7 +183,7 @@ fun RowScope.FeedItemText(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     maxLines: Int,
@@ -267,7 +267,7 @@ fun RowScope.FeedItemText(
                 DropdownMenuItem(
                     onClick = {
                         onDismissDropdown()
-                        onToggleBookmarked()
+                        onToggleBookmark()
                     },
                     text = {
                         Text(
@@ -376,7 +376,7 @@ fun RowScope.FeedItemText(
 }
 
 @Composable
-@ThemePreviews
+@PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun Preview() {
     FeederTheme {
@@ -401,7 +401,7 @@ private fun Preview() {
             onMarkAboveAsRead = {},
             onMarkBelowAsRead = {},
             onShareItem = {},
-            onToggleBookmarked = {},
+            onToggleBookmark = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
             bookmarkIndicator = true,
@@ -413,7 +413,7 @@ private fun Preview() {
 }
 
 @Composable
-@ThemePreviews
+@PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageUnread() {
     FeederTheme {
@@ -441,7 +441,7 @@ private fun PreviewWithImageUnread() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
@@ -454,7 +454,7 @@ private fun PreviewWithImageUnread() {
 }
 
 @Composable
-@ThemePreviews
+@PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageRead() {
     FeederTheme {
@@ -482,7 +482,7 @@ private fun PreviewWithImageRead() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ktlint.gradle)
 }
 
 android {
@@ -45,16 +46,16 @@ android {
         }
         if (project.hasProperty("STORE_FILE")) {
             create("release") {
-                @Suppress("LocalVariableName")
+                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
                 val STORE_FILE: String by project.properties
 
-                @Suppress("LocalVariableName")
+                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
                 val STORE_PASSWORD: String by project.properties
 
-                @Suppress("LocalVariableName")
+                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
                 val KEY_ALIAS: String by project.properties
 
-                @Suppress("LocalVariableName")
+                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
                 val KEY_PASSWORD: String by project.properties
                 storeFile = file(STORE_FILE)
                 storePassword = STORE_PASSWORD
@@ -183,14 +184,16 @@ android {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java) {
     kotlinOptions {
         if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}"
-            )
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}"
-            )
+            freeCompilerArgs +=
+                listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}",
+                )
+            freeCompilerArgs +=
+                listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}",
+                )
         }
     }
 }
@@ -202,6 +205,7 @@ configurations.all {
 }
 
 dependencies {
+    ktlintRuleset(libs.ktlint.compose)
     ksp(libs.room)
     // For java time
     coreLibraryDesugaring(libs.desugar)

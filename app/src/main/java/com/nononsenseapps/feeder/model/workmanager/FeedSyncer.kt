@@ -33,7 +33,7 @@ const val UNIQUE_PERIODIC_NAME = "feeder_periodic_3"
 val oldPeriodics =
     listOf(
         "feeder_periodic",
-        "feeder_periodic_2"
+        "feeder_periodic_2",
     )
 private const val UNIQUE_FEEDSYNC_NAME = "feeder_sync_onetime"
 private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
@@ -63,7 +63,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                     feedId = feedId,
                     feedTag = feedTag,
                     forceNetwork = forceNetwork,
-                    minFeedAgeMinutes = minFeedAgeMinutes
+                    minFeedAgeMinutes = minFeedAgeMinutes,
                 )
         } catch (e: Exception) {
             success = false
@@ -84,7 +84,7 @@ fun requestFeedSync(
     di: DI,
     feedId: Long = ID_UNSET,
     feedTag: String = "",
-    forceNetwork: Boolean = false
+    forceNetwork: Boolean = false,
 ) {
     val repository: Repository by di.instance()
     val constraints = Constraints.Builder()
@@ -106,7 +106,7 @@ fun requestFeedSync(
         workDataOf(
             ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
-            ARG_FORCE_NETWORK to forceNetwork
+            ARG_FORCE_NETWORK to forceNetwork,
         )
 
     workRequest.setInputData(data)
@@ -114,6 +114,6 @@ fun requestFeedSync(
     workManager.enqueueUniqueWork(
         UNIQUE_FEEDSYNC_NAME,
         ExistingWorkPolicy.KEEP,
-        workRequest.build()
+        workRequest.build(),
     )
 }

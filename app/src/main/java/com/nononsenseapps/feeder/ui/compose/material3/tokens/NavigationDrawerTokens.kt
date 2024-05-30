@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.nononsenseapps.feeder.ui.compose.material3.tokens
 
 import androidx.compose.runtime.Composable

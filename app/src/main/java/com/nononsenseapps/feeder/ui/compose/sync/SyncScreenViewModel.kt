@@ -33,16 +33,19 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
 
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
+    @Suppress("ktlint:standard:property-naming")
     private val _syncCode: MutableStateFlow<String> =
         MutableStateFlow(
             state["syncCode"] ?: "",
         )
 
+    @Suppress("ktlint:standard:property-naming")
     private val _secretKey: MutableStateFlow<String> =
         MutableStateFlow(
             state["secretKey"] ?: "",
         )
 
+    @Suppress("ktlint:standard:property-naming")
     private val _screenToShow: MutableStateFlow<SyncScreenToShow> =
         MutableStateFlow(
             state["syncScreen"] ?: SyncScreenToShow.SETUP,

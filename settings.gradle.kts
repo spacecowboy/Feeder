@@ -36,6 +36,8 @@ dependencyResolutionManagement {
             // END Unison
 
             // Rest
+            version("ktlint-gradle", "12.1.1")
+            version("ktlint-compose", "0.4.3")
             version("kodein", "7.5.0")
             version("coroutines", "1.7.3")
             version("gofeed", "0.1.2")
@@ -78,6 +80,7 @@ dependencyResolutionManagement {
             plugin("kotlin-ksp", "com.google.devtools.ksp").versionRef("ksp")
             plugin("kotlin-parcelize", "org.jetbrains.kotlin.plugin.parcelize").versionRef("kotlin")
             plugin("kotlin-serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
+            plugin("ktlint-gradle", "org.jlleitschuh.gradle.ktlint").versionRef("ktlint-gradle")
 
             // BOMS
             library("okhttp-bom", "com.squareup.okhttp3", "okhttp-bom").versionRef("okhttp")
@@ -85,6 +88,7 @@ dependencyResolutionManagement {
             library("compose-bom", "androidx.compose", "compose-bom").versionRef("compose")
 
             // Libraries
+            library("ktlint-compose", "io.nlopez.compose.rules", "ktlint").versionRef("ktlint-compose")
             library("room", "androidx.room", "room-compiler").versionRef("room")
             library("room-ktx", "androidx.room", "room-ktx").versionRef("room")
             library("room-paging", "androidx.room", "room-paging").versionRef("room")

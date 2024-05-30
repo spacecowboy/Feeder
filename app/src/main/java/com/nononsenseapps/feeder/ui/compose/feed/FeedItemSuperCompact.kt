@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URL
 import java.time.Instant
 
@@ -25,7 +24,7 @@ fun FeedItemSuperCompact(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     bookmarkIndicator: Boolean,
@@ -53,7 +52,7 @@ fun FeedItemSuperCompact(
             onMarkAboveAsRead = onMarkAboveAsRead,
             onMarkBelowAsRead = onMarkBelowAsRead,
             onShareItem = onShareItem,
-            onToggleBookmarked = onToggleBookmarked,
+            onToggleBookmark = onToggleBookmark,
             dropDownMenuExpanded = dropDownMenuExpanded,
             onDismissDropdown = onDismissDropdown,
             maxLines = maxLines,
@@ -89,7 +88,7 @@ private fun PreviewRead() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
@@ -127,7 +126,7 @@ private fun PreviewUnread() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,
@@ -165,7 +164,7 @@ private fun PreviewWithImage() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onToggleBookmarked = {},
+                onToggleBookmark = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 bookmarkIndicator = true,

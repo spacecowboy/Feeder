@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,7 +85,7 @@ fun SwipeableFeedItemPreview(
     showReadingTime: Boolean,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     onShareItem: () -> Unit,
     modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
@@ -92,6 +93,7 @@ fun SwipeableFeedItemPreview(
     val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
+    val onSwipeCallback by rememberUpdatedState(newValue = onSwipe)
 
     val color by animateColorAsState(
         targetValue =
@@ -111,7 +113,7 @@ fun SwipeableFeedItemPreview(
     LaunchedEffect(swipeableState.currentValue, swipeableState.isAnimationRunning) {
         if (!swipeableState.isAnimationRunning && swipeableState.currentValue != FeedItemSwipeState.NONE) {
             logDebug(LOG_TAG, "onSwipe ${item.unread}")
-            onSwipe(item.unread)
+            onSwipeCallback(item.unread)
         }
     }
 
@@ -176,7 +178,7 @@ fun SwipeableFeedItemPreview(
                                     false -> saveArticleLabel
                                 },
                             ) {
-                                onToggleBookmarked()
+                                onToggleBookmark()
                                 true
                             },
                             CustomAccessibilityAction(markAboveAsReadLabel) {
@@ -243,7 +245,7 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    onToggleBookmarked = onToggleBookmarked,
+                    onToggleBookmark = onToggleBookmark,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
@@ -259,26 +261,30 @@ fun SwipeableFeedItemPreview(
 
             FeedItemStyle.COMPACT_CARD -> {
                 FeedItemCompactCard(
-                    state = FeedItemState(
-                        item = item,
-                        showThumbnail = showThumbnail && !compactLandscape,
-                        dropDownMenuExpanded = dropDownMenuExpanded,
-                        bookmarkIndicator = bookmarkIndicator,
-                        maxLines = maxLines,
-                        showReadingTime = showReadingTime
-                    ),
+                    state =
+                        FeedItemState(
+                            item = item,
+                            showThumbnail = showThumbnail && !compactLandscape,
+                            dropDownMenuExpanded = dropDownMenuExpanded,
+                            bookmarkIndicator = bookmarkIndicator,
+                            maxLines = maxLines,
+                            showReadingTime = showReadingTime,
+                        ),
+                    modifier =
+                        Modifier
+                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                            .graphicsLayer(alpha = itemAlpha),
                     onEvent = { event ->
                         when (event) {
-                            FeedItemEvent.DismissDropdown -> { dropDownMenuExpanded = false }
+                            FeedItemEvent.DismissDropdown -> {
+                                dropDownMenuExpanded = false
+                            }
                             FeedItemEvent.MarkAboveAsRead -> onMarkAboveAsRead()
                             FeedItemEvent.MarkBelowAsRead -> onMarkBelowAsRead()
                             FeedItemEvent.ShareItem -> onShareItem()
-                            FeedItemEvent.ToggleBookmarked -> onToggleBookmarked()
+                            FeedItemEvent.ToggleBookmarked -> onToggleBookmark()
                         }
                     },
-                    modifier = Modifier
-                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                        .graphicsLayer(alpha = itemAlpha),
                 )
             }
 
@@ -289,7 +295,7 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    onToggleBookmarked = onToggleBookmarked,
+                    onToggleBookmark = onToggleBookmark,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,
@@ -314,7 +320,7 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    onToggleBookmarked = onToggleBookmarked,
+                    onToggleBookmark = onToggleBookmark,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
                     bookmarkIndicator = bookmarkIndicator,

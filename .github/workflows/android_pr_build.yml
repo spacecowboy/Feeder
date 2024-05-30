@@ -29,4 +29,24 @@ jobs:
     - name: gradle build
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: build packageDebugAndroidTest :app:lint check
+        arguments: assemble bundle packageDebugAndroidTest :app:lint test
+
+    # Lint
+  ktlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: perform the checkout
+      uses: actions/checkout@v3
+
+    - name: setup JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: ktlint check
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: ktlintCheck

@@ -29,7 +29,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 fun AutoCompleteResults(
     displaySuggestions: Boolean,
     suggestions: ImmutableHolder<List<String>>,
-    onSuggestionClicked: (String) -> Unit,
+    onSuggestionClick: (String) -> Unit,
     suggestionContent: @Composable (String) -> Unit,
     modifier: Modifier = Modifier,
     maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
@@ -58,7 +58,7 @@ fun AutoCompleteResults(
                     Box(
                         modifier =
                             Modifier
-                                .clickable { onSuggestionClicked(item) },
+                                .clickable { onSuggestionClick(item) },
                     ) {
                         suggestionContent(item)
                     }
@@ -74,7 +74,7 @@ private fun PreviewAutoCompleteOutlinedText() {
     AutoCompleteResults(
         displaySuggestions = true,
         suggestions = immutableListHolderOf("One", "Two", "Three"),
-        onSuggestionClicked = {},
+        onSuggestionClick = {},
         suggestionContent = {
             Text(text = it)
         },

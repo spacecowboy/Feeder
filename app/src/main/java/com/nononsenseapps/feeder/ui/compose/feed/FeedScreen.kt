@@ -79,6 +79,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -265,7 +266,7 @@ fun FeedScreen(
         onToggleTagExpansion = { tag ->
             viewModel.toggleTagExpansion(tag)
         },
-        onDrawerItemSelected = { feedId, tag ->
+        onDrawerItemSelect = { feedId, tag ->
             FeedDestination.navigate(navController, feedId = feedId, tag = tag)
         },
         focusRequester = focusNavDrawer,
@@ -417,7 +418,7 @@ fun FeedScreen(
                     },
                 )
             },
-            onSetBookmarked = { itemId, value ->
+            onSetBookmark = { itemId, value ->
                 viewModel.setBookmarked(itemId, value)
             },
             onShowFilterMenu = viewModel::setFilterMenuVisible,
@@ -460,7 +461,7 @@ fun FeedScreen(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
-    onSetBookmarked: (Long, Boolean) -> Unit,
+    onSetBookmark: (Long, Boolean) -> Unit,
     onShowFilterMenu: (Boolean) -> Unit,
     filterCallback: FeedListFilterCallback,
     feedListState: LazyListState,
@@ -871,7 +872,7 @@ fun FeedScreen(
                     markBeforeAsRead = markBeforeAsRead,
                     markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
-                    onSetBookmarked = onSetBookmarked,
+                    onSetBookmark = onSetBookmark,
                     gridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
                     modifier = innerModifier,
@@ -895,7 +896,7 @@ fun FeedScreen(
                     markBeforeAsRead = markBeforeAsRead,
                     markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
-                    onSetBookmarked = onSetBookmarked,
+                    onSetBookmark = onSetBookmark,
                     listState = feedListState,
                     pagedFeedItems = pagedFeedItems,
                     modifier = innerModifier,
@@ -1108,7 +1109,7 @@ fun FeedListContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
-    onSetBookmarked: (Long, Boolean) -> Unit,
+    onSetBookmark: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     modifier: Modifier = Modifier,
@@ -1241,8 +1242,8 @@ fun FeedListContent(
                         onMarkBelowAsRead = {
                             markAfterAsRead(previewItem.cursor)
                         },
-                        onToggleBookmarked = {
-                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
+                        onToggleBookmark = {
+                            onSetBookmark(previewItem.id, !previewItem.bookmarked)
                         },
                         onShareItem = {
                             val intent =
@@ -1321,7 +1322,7 @@ fun FeedGridContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
-    onSetBookmarked: (Long, Boolean) -> Unit,
+    onSetBookmark: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     modifier: Modifier = Modifier,
@@ -1441,8 +1442,8 @@ fun FeedGridContent(
                         onMarkBelowAsRead = {
                             markAfterAsRead(previewItem.cursor)
                         },
-                        onToggleBookmarked = {
-                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
+                        onToggleBookmark = {
+                            onSetBookmark(previewItem.id, !previewItem.bookmarked)
                         },
                         onShareItem = {
                             val intent =
@@ -1520,6 +1521,8 @@ fun MarkItemAsReadOnScroll(
     coroutineScope: CoroutineScope,
     markAsRead: (Long, Boolean, FeedOrTag?) -> Unit,
 ) {
+    // Lambda parameters in a @Composable that are referenced directly inside of restarting effects can cause issues or unpredictable behavior.
+    val markAsReadCallback by rememberUpdatedState(newValue = markAsRead)
     var visibleTime by remember {
         mutableStateOf(FAR_FUTURE)
     }
@@ -1544,7 +1547,7 @@ fun MarkItemAsReadOnScroll(
                     @Suppress("UNNECESSARYVARIABLE")
                     val feedOrTag = currentFeedOrTag
                     delay(100)
-                    markAsRead(
+                    markAsReadCallback(
                         itemId,
                         false,
                         feedOrTag,
@@ -1578,6 +1581,7 @@ private val PLACEHOLDER_ITEM =
 @Composable
 fun PlainTooltipBox(
     tooltip: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     TooltipBox(
@@ -1588,6 +1592,7 @@ fun PlainTooltipBox(
                 tooltip()
             }
         },
+        modifier = modifier,
         content = content,
     )
 }

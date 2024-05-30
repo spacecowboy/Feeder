@@ -75,7 +75,7 @@ import kotlinx.coroutines.launch
 fun ScreenWithNavDrawer(
     feedsAndTags: LazyPagingItems<FeedUnreadCount>,
     onToggleTagExpansion: (String) -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
+    onDrawerItemSelect: (Long, String) -> Unit,
     drawerState: DrawerState,
     focusRequester: FocusRequester,
     navDrawerListState: LazyListState,
@@ -110,7 +110,7 @@ fun ScreenWithNavDrawer(
                     onToggleTagExpansion = onToggleTagExpansion,
                 ) { item ->
                     coroutineScope.launch {
-                        onDrawerItemSelected(item.id, item.tag)
+                        onDrawerItemSelect(item.id, item.tag)
                         drawerState.close()
                     }
                 }
