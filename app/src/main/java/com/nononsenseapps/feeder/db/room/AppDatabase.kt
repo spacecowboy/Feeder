@@ -150,6 +150,7 @@ class MigrationFrom34To35(override val di: DI) : Migration(34, 35), DIAware {
         database.execSQL("create index index_feed_items_block_time on feed_items (block_time)")
 
         // Room schema is anal about whitespace
+        @Suppress("ktlint:standard:max-line-length")
         val sql = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where block_time is null\n    )\n    ON feeds.id = feed_id"
         database.execSQL(sql)
 
@@ -160,6 +161,7 @@ class MigrationFrom34To35(override val di: DI) : Migration(34, 35), DIAware {
 class MigrationFrom33To34(override val di: DI) : Migration(33, 34), DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         // Room schema is anal about whitespace
+        @Suppress("ktlint:standard:max-line-length")
         val sql = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where not exists(select 1 from blocklist where lower(feed_items.plain_title) glob blocklist.glob_pattern)\n    )\n    ON feeds.id = feed_id"
         database.execSQL(sql)
     }
@@ -659,6 +661,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
     }
 }
 
+@Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_8_9 : Migration(8, 9) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -669,6 +672,7 @@ object MIGRATION_8_9 : Migration(8, 9) {
     }
 }
 
+@Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_7_8 : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -679,12 +683,14 @@ object MIGRATION_7_8 : Migration(7, 8) {
     }
 }
 
+@Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_6_7 : Migration(6, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
         legacyMigration(database, 6)
     }
 }
 
+@Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_5_7 : Migration(5, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
         legacyMigration(database, 5)

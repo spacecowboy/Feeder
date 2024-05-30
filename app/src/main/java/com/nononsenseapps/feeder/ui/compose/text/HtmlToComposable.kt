@@ -28,13 +28,11 @@ import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Terrain
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -1503,23 +1501,17 @@ fun stripHtml(html: String): String {
     return result.toString()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WithTooltipIfNotBlank(
     tooltip: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     if (tooltip.isNotBlank()) {
-        PlainTooltipBox(tooltip = { Text(tooltip) }) {
+        PlainTooltipBox(modifier = modifier, tooltip = { Text(tooltip) }) {
             content()
         }
     } else {
         content()
     }
 }
-
-@Immutable
-data class ImageSize(
-    val width: Int,
-    val height: Int,
-)

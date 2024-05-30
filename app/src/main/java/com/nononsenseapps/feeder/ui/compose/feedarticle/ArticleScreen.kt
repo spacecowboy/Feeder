@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
@@ -42,6 +41,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -155,7 +155,7 @@ fun ArticleScreen(
         ttsOnStop = viewModel::ttsStop,
         ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
-        onToggleBookmarked = {
+        onToggleBookmark = {
             viewModel.setBookmarked(viewState.articleId, !viewState.isBookmarked)
         },
         articleListState = articleListState,
@@ -182,7 +182,7 @@ fun ArticleScreen(
     ttsOnStop: () -> Unit,
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
-    onToggleBookmarked: () -> Unit,
+    onToggleBookmark: () -> Unit,
     articleListState: LazyListState,
     modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit,
@@ -302,7 +302,7 @@ fun ArticleScreen(
                                 DropdownMenuItem(
                                     onClick = {
                                         onShowToolbarMenu(false)
-                                        onToggleBookmarked()
+                                        onToggleBookmark()
                                     },
                                     leadingIcon = {
                                         Icon(
@@ -414,9 +414,11 @@ fun ArticleContent(
         viewState.textToDisplay == TextToDisplay.FULLTEXT &&
         !blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile
     ) {
+        // Lambda parameters in a @Composable that are referenced directly inside of restarting effects can cause issues or unpredictable behavior.
+        val callback by rememberUpdatedState(newValue = displayFullText)
         LaunchedEffect(viewState.articleId, viewState.textToDisplay) {
             // Trigger parse and fetch
-            displayFullText()
+            callback()
         }
     }
 

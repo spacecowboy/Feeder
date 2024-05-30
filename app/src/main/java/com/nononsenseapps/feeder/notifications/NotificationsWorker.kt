@@ -4,9 +4,9 @@ import android.app.Application
 import android.util.Log
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.model.SUMMARY_NOTIFICATION_ID
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.notify
-import com.nononsenseapps.feeder.model.summaryNotificationId
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -60,7 +60,7 @@ class NotificationsWorker(override val di: DI) : DIAware {
         current: List<Long>,
     ) {
         if (current.isEmpty()) {
-            cancelNotification(summaryNotificationId.toLong())
+            cancelNotification(SUMMARY_NOTIFICATION_ID.toLong())
         }
         prev.filter {
             it !in current

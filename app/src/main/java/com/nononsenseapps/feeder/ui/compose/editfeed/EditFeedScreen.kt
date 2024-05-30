@@ -99,7 +99,7 @@ fun CreateFeedScreen(
         }
     }
 
-    @Suppress("ktlint:twitter-compose:vm-forwarding-check")
+    @Suppress("ktlint:compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         viewState = createFeedScreenViewModel,
@@ -129,7 +129,7 @@ fun EditFeedScreen(
         }
     }
 
-    @Suppress("ktlint:twitter-compose:vm-forwarding-check")
+    @Suppress("ktlint:compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         viewState = editFeedScreenViewModel,
@@ -322,7 +322,7 @@ fun EditFeedView(
     }
 }
 
-@Suppress("ktlint:twitter-compose:modifier-missing-check")
+@Suppress("ktlint:compose:modifier-missing-check")
 @OptIn(
     ExperimentalComposeUiApi::class,
     ExperimentalFoundationApi::class,
@@ -425,7 +425,7 @@ fun ColumnScope.LeftContent(
                 },
         displaySuggestions = showTagSuggestions,
         suggestions = filteredTags,
-        onSuggestionClicked = { tag ->
+        onSuggestionClick = { tag ->
             viewState.feedTag = tag
             rightFocusRequester.requestFocus()
             showTagSuggestions = false
@@ -479,7 +479,7 @@ fun ColumnScope.LeftContent(
     }
 }
 
-@Suppress("ktlint:twitter-compose:modifier-missing-check", "UnusedReceiverParameter")
+@Suppress("ktlint:compose:modifier-missing-check", "UnusedReceiverParameter")
 @Composable
 fun ColumnScope.RightContent(
     viewState: EditFeedScreenState,

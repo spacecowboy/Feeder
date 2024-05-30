@@ -44,10 +44,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -176,7 +176,7 @@ fun SearchFeedView(
 
     SearchFeedView(
         screenType = screenType,
-        onUrlChanged = {
+        onUrlChange = {
             feedUrl = it
         },
         onSearch = { url ->
@@ -206,11 +206,10 @@ fun SearchFeedView(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchFeedView(
     screenType: ScreenType,
-    onUrlChanged: (String) -> Unit,
+    onUrlChange: (String) -> Unit,
     onSearch: (URL) -> Unit,
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<FeedParserError>>,
@@ -223,6 +222,8 @@ fun SearchFeedView(
     val dimens = LocalDimens.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val onSearchCallback by rememberUpdatedState(newValue = onSearch)
+
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
         if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() &&
@@ -230,7 +231,7 @@ fun SearchFeedView(
                 feedUrl,
             )
         ) {
-            onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+            onSearchCallback(sloppyLinkToStrictURLNoThrows(feedUrl))
         }
     }
 
@@ -239,9 +240,10 @@ fun SearchFeedView(
     Box(
         contentAlignment = Alignment.TopCenter,
         modifier =
-            modifier
+            Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .then(modifier),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
@@ -262,7 +264,7 @@ fun SearchFeedView(
                         },
                         dimens = dimens,
                         keyboardController = keyboardController,
-                        onUrlChanged = onUrlChanged,
+                        onUrlChange = onUrlChange,
                         onSearch = onSearch,
                     )
                 }
@@ -294,7 +296,7 @@ fun SearchFeedView(
             ) {
                 leftContent(
                     feedUrl = feedUrl,
-                    onUrlChanged = onUrlChanged,
+                    onUrlChange = onUrlChange,
                     onSearch = onSearch,
                     clearFocus = {
                         focusManager.clearFocus()
@@ -314,11 +316,10 @@ fun SearchFeedView(
 }
 
 @Suppress("UnusedReceiverParameter")
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.leftContent(
     feedUrl: String,
-    onUrlChanged: (String) -> Unit,
+    onUrlChange: (String) -> Unit,
     onSearch: (URL) -> Unit,
     clearFocus: () -> Unit,
     dimens: Dimensions,
@@ -337,7 +338,7 @@ fun ColumnScope.leftContent(
     }
     TextField(
         value = feedUrl,
-        onValueChange = onUrlChanged,
+        onValueChange = onUrlChange,
         label = {
             Text(stringResource(id = R.string.add_feed_search_hint))
         },
@@ -563,7 +564,7 @@ private fun SearchPreview() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
-                onUrlChanged = {},
+                onUrlChange = {},
                 onSearch = {},
                 results =
                     stableListHolderOf(
@@ -601,7 +602,7 @@ private fun ErrorPreview() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
-                onUrlChanged = {},
+                onUrlChange = {},
                 onSearch = {},
                 results = stableListHolderOf(),
                 errors =
@@ -637,7 +638,7 @@ private fun SearchPreviewLarge() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.DUAL,
-                onUrlChanged = {},
+                onUrlChange = {},
                 onSearch = {},
                 results =
                     stableListHolderOf(

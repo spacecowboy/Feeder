@@ -75,9 +75,7 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
-    private suspend fun <A> safeBlock(
-        block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<ErrorResponse, A>)?,
-    ): Either<ErrorResponse, A> {
+    private suspend fun <A> safeBlock(block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<ErrorResponse, A>)?): Either<ErrorResponse, A> {
         if (block != null) {
             repository.getSyncRemote().let { syncRemote ->
                 if (syncRemote.hasSyncChain()) {

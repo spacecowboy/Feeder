@@ -52,9 +52,9 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
-import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -296,7 +296,7 @@ data class ViewState(
     val tagCount: Int = feeds.values.asSequence().map { it.tag }.filterNot { it.isBlank() }.count()
 }
 
-@ThemePreviews
+@PreviewThemes
 @Composable
 private fun PreviewOpmlImportScreenSingle() {
     FeederTheme {

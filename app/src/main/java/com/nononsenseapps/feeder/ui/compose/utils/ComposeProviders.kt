@@ -29,7 +29,7 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
             FeederTheme(
                 currentTheme = currentTheme,
                 darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors
+                dynamicColors = dynamicColors,
             ) {
                 withWindowSize {
                     ProvideFontScale(fontScale = textScale) {
@@ -43,19 +43,21 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun withAllPreviewProviders(
+@Suppress("ktlint:compose:modifier-missing-check")
+fun WithAllPreviewProviders(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     FeederTheme(currentTheme = currentTheme) {
         val dm = LocalContext.current.resources.displayMetrics
-        val dpSize = with(LocalDensity.current) {
-            DpSize(
-                dm.widthPixels.toDp(),
-                dm.heightPixels.toDp()
-            )
-        }
-        withPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
+        val dpSize =
+            with(LocalDensity.current) {
+                DpSize(
+                    dm.widthPixels.toDp(),
+                    dm.heightPixels.toDp(),
+                )
+            }
+        WithPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
             Surface {
                 content()
             }

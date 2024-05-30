@@ -46,7 +46,7 @@ import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
-const val summaryNotificationId = 2_147_483_646
+const val SUMMARY_NOTIFICATION_ID = 2_147_483_646
 private const val CHANNEL_ID = "feederNotifications"
 private const val ARTICLE_NOTIFICATION_GROUP = "com.nononsenseapps.feeder.ARTICLE"
 
@@ -85,7 +85,7 @@ suspend fun notify(
                 }
             }
             // Shown on API Level < 24
-            nm.notify(summaryNotificationId, inboxNotification(appContext, feedItems))
+            nm.notify(SUMMARY_NOTIFICATION_ID, inboxNotification(appContext, feedItems))
         }
     } catch (e: TransactionTooLargeException) {
         // This can happen if there are too many notifications
@@ -317,7 +317,8 @@ private fun inboxNotification(
             Intent.ACTION_VIEW,
             deepLinkUri.toUri(),
             context,
-            OpenLinkInDefaultActivity::class.java, // Proxy activity to mark as read
+            // Proxy activity to mark as read
+            OpenLinkInDefaultActivity::class.java,
         ).apply {
             putExtra(
                 EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED,
@@ -329,7 +330,7 @@ private fun inboxNotification(
     val pendingIntent =
         PendingIntent.getActivity(
             context,
-            summaryNotificationId,
+            SUMMARY_NOTIFICATION_ID,
             contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
         )
@@ -414,5 +415,4 @@ private suspend fun getItemsToNotify(di: DI): List<FeedItemWithFeed> {
     }
 }
 
-fun NavDeepLinkBuilder.createPendingIntent(requestCode: Int): PendingIntent? =
-    this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)
+fun NavDeepLinkBuilder.createPendingIntent(requestCode: Int): PendingIntent? = this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)

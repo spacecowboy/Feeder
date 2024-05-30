@@ -31,25 +31,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ui.compose.material3.SwipeableDefaults.AnimationSpec
-import com.nononsenseapps.feeder.ui.compose.material3.SwipeableDefaults.StandardResistanceFactor
+import com.nononsenseapps.feeder.ui.compose.material3.SwipeableDefaults.STANDARD_RESISTANCE_FACTOR
 import com.nononsenseapps.feeder.ui.compose.material3.SwipeableDefaults.VelocityThreshold
 import com.nononsenseapps.feeder.ui.compose.material3.SwipeableDefaults.resistanceConfig
 import kotlinx.coroutines.CancellationException
@@ -110,12 +110,12 @@ internal open class SwipeableState<T>(
     val overflow: State<Float> get() = overflowState
 
     // Use `Float.NaN` as a placeholder while the state is uninitialised.
-    private val offsetState = mutableStateOf(0f)
-    private val overflowState = mutableStateOf(0f)
+    private val offsetState = mutableFloatStateOf(0f)
+    private val overflowState = mutableFloatStateOf(0f)
 
     // the source of truth for the "real"(non ui) position
     // basically position in bounds + overflow
-    private val absoluteOffset = mutableStateOf(0f)
+    private val absoluteOffset = mutableFloatStateOf(0f)
 
     // current animation target, if animating, otherwise null
     private val animationTarget = mutableStateOf<Float?>(null)
@@ -194,7 +194,7 @@ internal open class SwipeableState<T>(
 
     internal var thresholds: (Float, Float) -> Float by mutableStateOf({ _, _ -> 0f })
 
-    internal var velocityThreshold by mutableStateOf(0f)
+    internal var velocityThreshold by mutableFloatStateOf(0f)
 
     internal var resistance: ResistanceConfig? by mutableStateOf(null)
 
@@ -276,11 +276,13 @@ internal open class SwipeableState<T>(
                     to = currentValue
                     fraction = 1f
                 }
+
                 1 -> {
                     from = anchors.getValue(bounds[0])
                     to = anchors.getValue(bounds[0])
                     fraction = 1f
                 }
+
                 else -> {
                     val (a, b) =
                         if (direction > 0f) {
@@ -381,8 +383,8 @@ internal open class SwipeableState<T>(
             val targetState = anchors[targetValue]
             if (targetState != null && confirmStateChange(targetState)) {
                 animateTo(targetState)
-            } // If the user vetoed the state change, rollback to the previous state.
-            else {
+            } else {
+                // If the user vetoed the state change, rollback to the previous state.
                 animateInternalToOffset(lastAnchor, animationSpec)
             }
         }
@@ -418,7 +420,7 @@ internal open class SwipeableState<T>(
         /**
          * The default [Saver] implementation for [SwipeableState].
          */
-        fun <T : Any> Saver(
+        fun <T : Any> saver(
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (T) -> Boolean,
         ) = Saver<SwipeableState<T>, T>(
@@ -485,7 +487,7 @@ internal fun <T : Any> rememberSwipeableState(
 ): SwipeableState<T> {
     return rememberSaveable(
         saver =
-            SwipeableState.Saver(
+            SwipeableState.saver(
                 animationSpec = animationSpec,
                 confirmStateChange = confirmStateChange,
             ),
@@ -527,9 +529,10 @@ internal fun <T : Any> rememberSwipeableStateFor(
             swipeableState.animateTo(value)
         }
     }
+    val onValueChangCallback by rememberUpdatedState(newValue = onValueChange)
     DisposableEffect(swipeableState.currentValue) {
         if (value != swipeableState.currentValue) {
-            onValueChange(swipeableState.currentValue)
+            onValueChangCallback(swipeableState.currentValue)
             forceAnimationCheck.value = !forceAnimationCheck.value
         }
         onDispose { }
@@ -571,6 +574,8 @@ internal fun <T : Any> rememberSwipeableStateFor(
  * in order to animate to the next state, even if the positional [thresholds] have not been reached.
  */
 @ExperimentalMaterial3Api
+@Composable
+@Suppress("ktlint:compose:modifier-composable-check")
 internal fun <T> Modifier.swipeable(
     state: SwipeableState<T>,
     anchors: Map<Float, T>,
@@ -581,27 +586,14 @@ internal fun <T> Modifier.swipeable(
     thresholds: (from: T, to: T) -> ThresholdConfig = { _, _ -> FixedThreshold(56.dp) },
     resistance: ResistanceConfig? = resistanceConfig(anchors.keys),
     velocityThreshold: Dp = VelocityThreshold,
-) = composed(
-    inspectorInfo =
-        debugInspectorInfo {
-            name = "swipeable"
-            properties["state"] = state
-            properties["anchors"] = anchors
-            properties["orientation"] = orientation
-            properties["enabled"] = enabled
-            properties["reverseDirection"] = reverseDirection
-            properties["interactionSource"] = interactionSource
-            properties["thresholds"] = thresholds
-            properties["resistance"] = resistance
-            properties["velocityThreshold"] = velocityThreshold
-        },
-) {
+): Modifier {
     require(anchors.isNotEmpty()) {
         "You must have at least one anchor."
     }
     require(anchors.values.distinct().count() == anchors.size) {
         "You cannot have two anchors mapped to the same state."
     }
+    val thresholdsCallback by rememberUpdatedState(thresholds)
     val density = LocalDensity.current
     state.ensureInit(anchors)
     LaunchedEffect(anchors, state) {
@@ -611,7 +603,7 @@ internal fun <T> Modifier.swipeable(
         state.thresholds = { a, b ->
             val from = anchors.getValue(a)
             val to = anchors.getValue(b)
-            with(thresholds(from, to)) { density.computeThreshold(a, b) }
+            with(thresholdsCallback(from, to)) { density.computeThreshold(a, b) }
         }
         with(density) {
             state.velocityThreshold = velocityThreshold.toPx()
@@ -619,14 +611,16 @@ internal fun <T> Modifier.swipeable(
         state.processNewAnchors(oldAnchors, anchors)
     }
 
-    Modifier.draggable(
-        orientation = orientation,
-        enabled = enabled,
-        reverseDirection = reverseDirection,
-        interactionSource = interactionSource,
-        startDragImmediately = state.isAnimationRunning,
-        onDragStopped = { velocity -> launch { state.performFling(velocity) } },
-        state = state.draggableState,
+    return this.then(
+        Modifier.draggable(
+            orientation = orientation,
+            enabled = enabled,
+            reverseDirection = reverseDirection,
+            interactionSource = interactionSource,
+            startDragImmediately = state.isAnimationRunning,
+            onDragStopped = { velocity -> launch { state.performFling(velocity) } },
+            state = state.draggableState,
+        ),
     )
 }
 
@@ -709,9 +703,9 @@ internal class ResistanceConfig(
     // @FloatRange(from = 0.0, fromInclusive = false)
     val basis: Float,
     // @FloatRange(from = 0.0)
-    val factorAtMin: Float = StandardResistanceFactor,
+    val factorAtMin: Float = STANDARD_RESISTANCE_FACTOR,
     // @FloatRange(from = 0.0)
-    val factorAtMax: Float = StandardResistanceFactor,
+    val factorAtMax: Float = STANDARD_RESISTANCE_FACTOR,
 ) {
     fun computeResistance(overflow: Float): Float {
         val factor = if (overflow < 0) factorAtMin else factorAtMax
@@ -764,14 +758,17 @@ private fun findBounds(
         a == null ->
             // case 1 or 3
             listOfNotNull(b)
+
         b == null ->
             // case 4
             listOf(a)
+
         a == b ->
             // case 2
             // Can't return offset itself here since it might not be exactly equal
             // to the anchor, despite being considered an exact match.
             listOf(a)
+
         else ->
             // case 5
             listOf(a, b)
@@ -835,12 +832,12 @@ internal object SwipeableDefaults {
     /**
      * A stiff resistance factor which indicates that swiping isn't available right now.
      */
-    const val StiffResistanceFactor = 20f
+    const val STIFF_RESISTANCE_FACTOR = 20f
 
     /**
      * A standard resistance factor which indicates that the user has run out of things to see.
      */
-    const val StandardResistanceFactor = 10f
+    const val STANDARD_RESISTANCE_FACTOR = 10f
 
     /**
      * The default resistance config used by [swipeable].
@@ -850,8 +847,8 @@ internal object SwipeableDefaults {
      */
     internal fun resistanceConfig(
         anchors: Set<Float>,
-        factorAtMin: Float = StandardResistanceFactor,
-        factorAtMax: Float = StandardResistanceFactor,
+        factorAtMin: Float = STANDARD_RESISTANCE_FACTOR,
+        factorAtMax: Float = STANDARD_RESISTANCE_FACTOR,
     ): ResistanceConfig? {
         return if (anchors.size <= 1) {
             null

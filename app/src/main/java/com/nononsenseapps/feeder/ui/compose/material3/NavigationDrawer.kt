@@ -225,7 +225,7 @@ class DrawerState(
         /**
          * The default [Saver] implementation for [DrawerState].
          */
-        fun Saver(confirmStateChange: (DrawerValue) -> Boolean) =
+        fun saver(confirmStateChange: (DrawerValue) -> Boolean) =
             Saver<DrawerState, DrawerValue>(
                 save = { it.currentValue },
                 restore = { DrawerState(it, confirmStateChange) },
@@ -245,7 +245,7 @@ fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true },
 ): DrawerState {
-    return rememberSaveable(saver = DrawerState.Saver(confirmStateChange)) {
+    return rememberSaveable(saver = DrawerState.saver(confirmStateChange)) {
         DrawerState(initialValue, confirmStateChange)
     }
 }
@@ -641,7 +641,7 @@ object DrawerDefaults {
 
     /** Default color of the scrim that obscures content when the drawer is open */
     val scrimColor: Color
-        @Composable get() = ScrimTokens.ContainerColor.toColor().copy(ScrimTokens.ContainerOpacity)
+        @Composable get() = ScrimTokens.ContainerColor.toColor().copy(ScrimTokens.CONTAINER_OPACITY)
 
     /** Default container color for a navigation drawer */
     val containerColor: Color @Composable get() = NavigationDrawerTokens.ContainerColor.toColor()

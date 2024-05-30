@@ -24,10 +24,10 @@ import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkDao
 import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.model.Feeds.Companion.RSS_WITH_DUPLICATE_GUIDS
 import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyAtom
 import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyJson
 import com.nononsenseapps.feeder.model.Feeds.Companion.nixosRss
-import com.nononsenseapps.feeder.model.Feeds.Companion.rssWithDuplicateGuids
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.DoNotUseInProd
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -210,7 +210,7 @@ class RssLocalSyncKtTest : DIAware {
                 insertFeed(
                     "aussieWeather",
                     server.url("/IDZ00059.warnings_vic.xml").toUrl(),
-                    rssWithDuplicateGuids,
+                    RSS_WITH_DUPLICATE_GUIDS,
                     isJson = false,
                     useAlternateId = true,
                 )
@@ -686,27 +686,26 @@ class RssLocalSyncKtTest : DIAware {
         }
 
     private fun fooRss(itemsCount: Int = 1): String {
+        val items =
+            (1..itemsCount).joinToString("\n") {
+                """
+                <item>
+                  <title>Foo Item $it</title>
+                  <link>https://foo.bar/$it</link>
+                  <description>Woop woop $it</description>
+                </item>
+                """.trimIndent()
+            }
+
         return """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-        <channel>
-        <title>Foo Feed</title>
-        <link>https://foo.bar</link>
-        ${
-        (1..itemsCount).map {
-            """
-            <item>
-              <title>Foo Item $it</title>
-              <link>https://foo.bar/$it</link>
-              <description>Woop woop $it</description>
-            </item>
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+            <channel>
+            <title>Foo Feed</title>
+            <link>https://foo.bar</link>
+            $items
+            </channel>
+            </rss>
             """.trimIndent()
-        }.fold("") { acc, s ->
-            "$acc\n$s"
-        }
-    }
-        </channel>
-        </rss>
-        """.trimIndent()
     }
 }

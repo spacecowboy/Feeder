@@ -14,7 +14,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 fun rememberApiPermissionState(
     permission: String,
     minimumApiLevel: Int = 1,
-    onPermissionResult: (Boolean) -> Unit = {}
+    onPermissionResult: (Boolean) -> Unit = {},
 ): PermissionState =
     when {
         // When layout is being previewed

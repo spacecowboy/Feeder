@@ -86,6 +86,7 @@ class TTSStateHolder(
     private val _ttsState = MutableStateFlow(PlaybackStatus.STOPPED)
     val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
 
+    @Suppress("ktlint:standard:property-naming")
     private val _lang = MutableStateFlow<LocaleOverride>(AppSetting)
     val language: StateFlow<LocaleOverride> = _lang.asStateFlow()
 

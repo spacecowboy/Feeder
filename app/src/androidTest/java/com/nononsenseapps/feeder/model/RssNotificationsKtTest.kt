@@ -57,6 +57,7 @@ class RssNotificationsKtTest {
 
     @Test
     fun queryParameterDoesntGetGarbled() {
+        @Suppress("ktlint:standard:max-line-length")
         val magnetLink = "magnet:?xt=urn:btih:82B1726F2D1B22F383A2B2CD6977B00F908FB315&dn=Crazy+Ex+Girlfriend+S04E10+720p+HDTV+x264+LucidTV&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce"
 
         val enclosureIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, 5, link = magnetLink)

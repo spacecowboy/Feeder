@@ -4,7 +4,7 @@ import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 import androidx.compose.ui.graphics.vector.ImageVector
 
-@Suppress("ObjectPropertyName")
+@Suppress("ObjectPropertyName", "ktlint:standard:property-naming")
 private var _textToSpeech: ImageVector? = null
 
 @Suppress("UnusedReceiverParameter")

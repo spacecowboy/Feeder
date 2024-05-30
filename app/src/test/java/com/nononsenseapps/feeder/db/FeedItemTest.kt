@@ -34,6 +34,7 @@ class FeedItemTest {
     }
 
     @Test
+    @Suppress("ktlint:standard:max-line-length")
     fun magnetLinkGivesNullFilename() {
         val fi =
             FeedItem(

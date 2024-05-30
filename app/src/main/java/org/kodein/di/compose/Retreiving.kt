@@ -2,7 +2,10 @@ package org.kodein.di.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import org.kodein.di.*
+import org.kodein.di.DIProperty
+import org.kodein.di.factory
+import org.kodein.di.instance
+import org.kodein.di.provider
 
 /**
  * Gets an instance of `T` for the given type and tag.
@@ -18,7 +21,7 @@ import org.kodein.di.*
 @Composable
 inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> =
     with(LocalDI.current) {
-        remember { instance(tag) }
+        remember { instance(tag = tag) }
     }
 
 /**
@@ -36,11 +39,11 @@ inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> =
  */
 @Composable
 inline fun <reified A : Any, reified T : Any> instance(
-    tag: Any? = null,
     arg: A,
+    tag: Any? = null,
 ): DIProperty<T> =
     with(LocalDI.current) {
-        remember { instance(tag, arg) }
+        remember { instance(tag = tag, arg = arg) }
     }
 
 /**
@@ -58,7 +61,7 @@ inline fun <reified A : Any, reified T : Any> instance(
 @Composable
 inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIProperty<(A) -> T> =
     with(LocalDI.current) {
-        remember { factory(tag) }
+        remember { factory(tag = tag) }
     }
 
 /**
@@ -75,7 +78,7 @@ inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIPrope
 @Composable
 inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProperty<() -> T> =
     with(LocalDI.current) {
-        remember { provider(tag) }
+        remember { provider(tag = tag) }
     }
 
 /**
@@ -93,11 +96,11 @@ inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProp
  */
 @Composable
 inline fun <reified A : Any, reified T : Any> provider(
-    tag: Any? = null,
     arg: A,
+    tag: Any? = null,
 ): DIProperty<() -> T> =
     with(LocalDI.current) {
-        remember { provider(tag, arg) }
+        remember { provider(tag = tag, arg = arg) }
     }
 
 /**
@@ -115,9 +118,9 @@ inline fun <reified A : Any, reified T : Any> provider(
  */
 @Composable
 inline fun <reified A : Any, reified T : Any> provider(
-    tag: Any? = null,
     noinline fArg: () -> A,
+    tag: Any? = null,
 ): DIProperty<() -> T> =
     with(LocalDI.current) {
-        remember { provider(tag, fArg) }
+        remember { provider(tag = tag, arg = fArg) }
     }

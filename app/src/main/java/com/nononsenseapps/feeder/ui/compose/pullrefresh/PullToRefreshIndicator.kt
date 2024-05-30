@@ -15,12 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.center
@@ -33,7 +32,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -71,7 +69,7 @@ fun PullRefreshIndicator(
         Crossfade(
             targetState = refreshing,
             label = "PullToRefresh",
-            animationSpec = tween(durationMillis = CrossfadeDurationMs),
+            animationSpec = tween(durationMillis = CROSSFADE_DURATION_MS),
         ) { refreshing ->
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -153,7 +151,7 @@ private fun ArrowValues(progress: Float): ArrowValues {
 
     // Calculations based on SwipeRefreshLayout specification.
     val alpha = progress.coerceIn(0f, 1f)
-    val endTrim = adjustedPercent * MaxProgressArc
+    val endTrim = adjustedPercent * MAX_PROGRESS_ARC
     val rotation = (-0.25f + 0.4f * adjustedPercent + tensionPercent) * 0.5f
     val startAngle = rotation * 360
     val endAngle = (rotation + endTrim) * 360
@@ -192,8 +190,8 @@ private fun DrawScope.drawArrow(
     }
 }
 
-private const val CrossfadeDurationMs = 100
-private const val MaxProgressArc = 0.8f
+private const val CROSSFADE_DURATION_MS = 100
+private const val MAX_PROGRESS_ARC = 0.8f
 
 private val IndicatorSize = 40.dp
 private val SpinnerShape = CircleShape
@@ -203,31 +201,28 @@ private val ArrowWidth = 10.dp
 private val ArrowHeight = 5.dp
 private val Elevation = 6.dp
 
+@Composable
+@Suppress("ktlint:compose:modifier-composable-check")
 fun Modifier.pullRefreshIndicatorTransform(
     state: PullRefreshState,
     scale: Boolean = false,
-) = composed(
-    inspectorInfo =
-        debugInspectorInfo {
-            name = "pullRefreshIndicatorTransform"
-            properties["state"] = state
-            properties["scale"] = scale
-        },
-) {
-    var height by remember { mutableStateOf(0) }
+): Modifier {
+    var height by remember { mutableIntStateOf(0) }
 
-    Modifier
-        .onSizeChanged { height = it.height }
-        .graphicsLayer {
-            translationY = state.position - height
+    return this.then(
+        Modifier
+            .onSizeChanged { height = it.height }
+            .graphicsLayer {
+                translationY = state.position - height
 
-            if (scale && !state.refreshing) {
-                val scaleFraction =
-                    LinearOutSlowInEasing
-                        .transform(state.position / state.threshold)
-                        .coerceIn(0f, 1f)
-                scaleX = scaleFraction
-                scaleY = scaleFraction
-            }
-        }
+                if (scale && !state.refreshing) {
+                    val scaleFraction =
+                        LinearOutSlowInEasing
+                            .transform(state.position / state.threshold)
+                            .coerceIn(0f, 1f)
+                    scaleX = scaleFraction
+                    scaleY = scaleFraction
+                }
+            },
+    )
 }

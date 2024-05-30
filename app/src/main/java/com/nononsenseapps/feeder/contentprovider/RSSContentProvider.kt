@@ -24,15 +24,15 @@ class RSSContentProvider : ContentProvider(), DIAware {
 
     private val uriMatcher =
         UriMatcher(UriMatcher.NO_MATCH).apply {
-            addURI(AUTHORITY, RssContentProviderContract.feedsUriPathList, URI_FEED_LIST)
+            addURI(AUTHORITY, RssContentProviderContract.FEEDS_URI_PATH_LIST, URI_FEED_LIST)
             addURI(
                 AUTHORITY,
-                RssContentProviderContract.articlesUriPathList,
+                RssContentProviderContract.ARTICLES_URI_PATH_LIST,
                 URI_ARTICLE_LIST,
             )
             addURI(
                 AUTHORITY,
-                RssContentProviderContract.articlesUriPathItem,
+                RssContentProviderContract.ARTICLES_URI_PATH_ITEM,
                 URI_ARTICLE_IN_FEED_LIST,
             )
         }
@@ -51,9 +51,9 @@ class RSSContentProvider : ContentProvider(), DIAware {
 
     override fun getType(uri: Uri): String? =
         when (uriMatcher.match(uri)) {
-            URI_FEED_LIST -> RssContentProviderContract.feedsMimeTypeList
-            URI_ARTICLE_LIST -> RssContentProviderContract.articlesMimeTypeList
-            URI_ARTICLE_IN_FEED_LIST -> RssContentProviderContract.articlesMimeTypeItem
+            URI_FEED_LIST -> RssContentProviderContract.FEEDS_MIME_TYPE_LIST
+            URI_ARTICLE_LIST -> RssContentProviderContract.ARTICLES_MIME_TYPE_LIST
+            URI_ARTICLE_IN_FEED_LIST -> RssContentProviderContract.ARTICLES_MIME_TYPE_ITEM
             else -> null
         }
 

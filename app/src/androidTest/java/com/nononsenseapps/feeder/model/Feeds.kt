@@ -27,7 +27,7 @@ class Feeds {
          * All items are genuine - except the first which is taken from the feed at 2021-10-06T21:06:00
          */
         @Language("xml")
-        const val rssWithDuplicateGuids = """
+        const val RSS_WITH_DUPLICATE_GUIDS = """
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
 <channel>
 <title>Weather Warnings for Victoria. Issued by the Australian Bureau of Meteorology</title>

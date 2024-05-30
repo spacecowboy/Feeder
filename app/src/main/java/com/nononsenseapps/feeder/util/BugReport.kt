@@ -26,17 +26,17 @@ private fun bugBody(): String =
     I'd like to report an issue:
     """.trimIndent()
 
-private const val emailReportAddress: String = "feeder@nononsenseapps.com"
+private const val EMAIL_REPORT_ADDRESS: String = "feeder@nononsenseapps.com"
 
 fun emailBugReportIntent(): Intent =
     Intent(ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:$emailReportAddress")
+        data = Uri.parse("mailto:$EMAIL_REPORT_ADDRESS")
         putExtra(EXTRA_SUBJECT, "Bug report for Feeder")
-        putExtra(EXTRA_EMAIL, emailReportAddress)
+        putExtra(EXTRA_EMAIL, EMAIL_REPORT_ADDRESS)
         putExtra(Intent.EXTRA_TEXT, bugBody())
     }
 
-private const val crashReportAddress: String = "crashes@nononsenseapps.com"
+private const val CRASH_REPORT_ADDRESS: String = "crashes@nononsenseapps.com"
 
 private fun crashBody(throwable: Throwable): String =
     """
@@ -49,9 +49,9 @@ private fun crashBody(throwable: Throwable): String =
 
 fun emailCrashReportIntent(throwable: Throwable): Intent =
     Intent(ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:$crashReportAddress")
+        data = Uri.parse("mailto:$CRASH_REPORT_ADDRESS")
         putExtra(EXTRA_SUBJECT, "Crash report for Feeder")
-        putExtra(EXTRA_EMAIL, crashReportAddress)
+        putExtra(EXTRA_EMAIL, CRASH_REPORT_ADDRESS)
         putExtra(Intent.EXTRA_TEXT, crashBody(throwable))
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }

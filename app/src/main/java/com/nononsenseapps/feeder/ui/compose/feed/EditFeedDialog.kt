@@ -28,7 +28,7 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
-import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 @Composable
@@ -105,7 +105,7 @@ fun EditFeedDialog(
 }
 
 @Composable
-@ThemePreviews
+@PreviewThemes
 private fun Preview() {
     FeederTheme {
         EditFeedDialog(

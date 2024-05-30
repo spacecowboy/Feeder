@@ -17,7 +17,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,15 +44,17 @@ fun SliderWithLabel(
     Column {
         BoxWithConstraints(
             modifier =
-                modifier
-                    .fillMaxWidth(),
+                Modifier
+                    .fillMaxWidth()
+                    .then(modifier),
         ) {
             val offset =
                 getSliderOffset(
                     value = value,
                     valueRange = valueRange,
                     boxWidth = maxWidth,
-                    labelWidth = labelMinWidth + 8.dp, // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
+                    // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
+                    labelWidth = labelMinWidth + 8.dp,
                 )
 
             SliderLabel(
@@ -159,7 +161,7 @@ private fun PreviewSliderWithLabel() {
     FeederTheme {
         Surface {
             var value by remember {
-                mutableStateOf(1f)
+                mutableFloatStateOf(1f)
             }
             SliderWithLabel(
                 value = value,
@@ -178,7 +180,7 @@ private fun PreviewSliderWithEndLabels() {
     FeederTheme {
         Surface {
             var value by remember {
-                mutableStateOf(1f)
+                mutableFloatStateOf(1f)
             }
             SliderWithEndLabels(
                 value = value,
