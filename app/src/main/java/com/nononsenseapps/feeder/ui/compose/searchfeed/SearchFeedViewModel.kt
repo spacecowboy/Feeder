@@ -3,9 +3,11 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.FeedParserError
+import com.nononsenseapps.feeder.model.HttpError
 import com.nononsenseapps.feeder.model.NoAlternateFeeds
 import com.nononsenseapps.feeder.model.NotInitializedYet
 import com.nononsenseapps.feeder.model.SiteMetaData
@@ -20,13 +22,15 @@ import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.URL
+import java.time.Instant
 
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()
+    private val repository: Repository by instance()
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
-            NotInitializedYet(),
+            NotInitializedYet,
         ),
     )
 
@@ -46,6 +50,9 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                     }
                 }
                 .onLeft {
+                    if (it is HttpError) {
+                        handleHttpError(it)
+                    }
                     emit(Either.Right(initialUrl))
                 }
         }
@@ -69,9 +76,23 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                                 feedImage = siteMetaData.getOrNull()?.feedImage ?: "",
                             )
                         }
+                        .onLeft {
+                            if (it is HttpError) {
+                                handleHttpError(it)
+                            }
+                        }
                 }
             }
             .flowOn(Dispatchers.Default)
+    }
+
+    private suspend fun handleHttpError(httpError: HttpError) {
+        httpError.retryAfterSeconds?.let { retryAfterSeconds ->
+            repository.setRetryAfterForFeedsWithBaseUrl(
+                host = URL(httpError.url).host,
+                retryAfter = Instant.now().plusSeconds(retryAfterSeconds),
+            )
+        }
     }
 
     companion object {

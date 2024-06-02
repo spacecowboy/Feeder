@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
+import com.nononsenseapps.feeder.util.right
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.joinAll
@@ -23,6 +24,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -90,9 +92,10 @@ class RssLocalSync(override val di: DI) : DIAware {
                     supervisorScope {
                         val staleTime: Long =
                             if (forceNetwork) {
-                                Instant.now().toEpochMilli()
+                                // Under no circumstances should we spam servers more than once per minute intentionally
+                                Instant.now().minus(1, ChronoUnit.MINUTES).toEpochMilli()
                             } else {
-                                Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
+                                Instant.now().minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
                                     .toEpochMilli()
                             }
                         // Fetch sync stuff first - this is fast
@@ -175,7 +178,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                 lastSync = syncTime,
             )
             syncFeed(
-                feedSql = feed,
+                feedId = feed.id,
                 maxFeedItemCount = maxFeedItemCount,
                 forceNetwork = forceNetwork,
                 downloadTime = downloadTime,
@@ -184,6 +187,17 @@ class RssLocalSync(override val di: DI) : DIAware {
                     LOG_TAG,
                     "Failed to sync ${feed.displayTitle}: ${feed.url} because:\n${feedParserError.description}",
                 )
+
+                // Handle retry-after
+                if (feedParserError is HttpError) {
+                    feedParserError.retryAfterSeconds?.let { retryAfterSeconds ->
+                        // Feeds can share retry after if they are on the same server
+                        repository.setRetryAfterForFeedsWithBaseUrl(
+                            host = feed.url.host,
+                            retryAfter = Instant.now().plusSeconds(retryAfterSeconds),
+                        )
+                    }
+                }
             }.onRight {
                 repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
@@ -202,12 +216,29 @@ class RssLocalSync(override val di: DI) : DIAware {
     }
 
     private suspend fun syncFeed(
-        feedSql: Feed,
+        feedId: Long,
         maxFeedItemCount: Int,
         forceNetwork: Boolean = false,
         downloadTime: Instant,
     ): Either<FeedParserError, Unit> {
+        // Load it again to ensure we get the latest value for retry-after since this can be shared across feeds
+        // if they share the same server
+        val feedSql =
+            repository.loadFeed(feedId)
+                ?: run {
+                    // not loaded due to retry-after
+                    Log.i(LOG_TAG, "Skipping feed $feedId due to retry-after changing mid sync")
+                    return Unit.right()
+                }
+
         val url = feedSql.url
+
+        // Belts and suspenders
+        if (feedSql.retryAfter > Instant.now()) {
+            Log.i(LOG_TAG, "Skipping ${feedSql.displayTitle} due to retry-after. Earliest retry: ${feedSql.retryAfter}")
+            return Unit.right()
+        }
+
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
         // Always update the feeds last sync field
         feedSql.lastSync = Instant.now()
@@ -228,9 +259,13 @@ class RssLocalSync(override val di: DI) : DIAware {
                         )
                     } ?: NoBody(url = url.toString()).left()
                 } else {
+                    response.retryAfterSeconds?.let { retryAfterSeconds ->
+                        logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+                    }
                     HttpError(
                         url = url.toString(),
                         code = response.code,
+                        retryAfterSeconds = response.retryAfterSeconds,
                         message = response.message,
                     ).left()
                 }
@@ -390,6 +425,7 @@ class RssLocalSync(override val di: DI) : DIAware {
         tag: String,
         staleTime: Long = -1L,
     ): List<Feed> {
+        // TODO respect retry after
         return when {
             feedId > 0 -> {
                 val feed =
@@ -399,6 +435,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                             staleTime = staleTime,
                         )
                     } else {
+                        // Used internally too
                         repository.loadFeed(feedId)
                     }
                 if (feed != null) {
@@ -433,3 +470,10 @@ class RssLocalSync(override val di: DI) : DIAware {
  */
 private val ParsedArticle.alternateId: String
     get() = "$id|${content_text.hashCode()}|${title.hashCode()}"
+
+internal val Response.retryAfterSeconds: Long?
+    get() =
+        headers("retry-after").maxOfOrNull { retryAfter ->
+            // Fallback to 1 hour if response is incorrect
+            retryAfter.toLongOrNull() ?: 3600L
+        }

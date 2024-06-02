@@ -53,7 +53,7 @@ suspend fun exportOpml(
                             blockedPatterns = settingsStore.blockListPreference.first(),
                             tags = feedDao.loadTags(),
                         ) { tag ->
-                            feedDao.loadFeeds(tag = tag)
+                            feedDao.getFeedsByTitle(tag = tag)
                         }
                     }
                 }

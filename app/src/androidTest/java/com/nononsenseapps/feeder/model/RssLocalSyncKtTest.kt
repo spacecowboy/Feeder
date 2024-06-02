@@ -77,7 +77,12 @@ class RssLocalSyncKtTest : DIAware {
         bind<SyncRemoteDao>() with singleton { testDb.db.syncRemoteDao() }
         bind<FeedStore>() with singleton { FeedStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
-        bind<SettingsStore>() with singleton { SettingsStore(di) }
+        bind<SettingsStore>() with
+            singleton {
+                SettingsStore(di).also {
+                    it.setAddedFeederNews(true)
+                }
+            }
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
@@ -276,7 +281,7 @@ class RssLocalSyncKtTest : DIAware {
 
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                     // "Long time" ago, but not unset
@@ -290,7 +295,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Cached response should still have updated feed last sync",
                 999L,
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli(),
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync.toEpochMilli(),
             )
         }
 
@@ -307,7 +312,7 @@ class RssLocalSyncKtTest : DIAware {
             val fourteenMinsAgo = Instant.now().minusMinutes(14)
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
@@ -329,8 +334,57 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Last sync should not have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync,
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync,
             )
+        }
+
+    @Test
+    fun feedsGetRetryAfterSetAndWillNotSyncLater() =
+        runBlocking {
+            val cowboyJsonId =
+                testDb.db.feedDao().insertFeed(
+                    Feed(
+                        title = "feed1",
+                        url = server.url("/feed.json").toUrl(),
+                        tag = "",
+                    ),
+                )
+
+            val someOtherFeedId =
+                testDb.db.feedDao().insertFeed(
+                    Feed(
+                        title = "feed2",
+                        url = server.url("/feed2.json").toUrl(),
+                        tag = "",
+                    ),
+                )
+
+            val response =
+                MockResponse().also {
+                    it.setResponseCode(429)
+                    it.setHeader("Retry-After", "30")
+                }
+            server.enqueue(response)
+
+            rssLocalSync.syncFeeds(feedId = cowboyJsonId)
+            assertEquals("Request should have been sent ", 1, server.requestCount)
+
+            // Get the feed and check value
+            val feed = testDb.db.feedDao().getFeed(cowboyJsonId)!!
+            assertTrue("Feed should have a retry after value in the future") {
+                feed.retryAfter > Instant.now()
+            }
+
+            val feed2 = testDb.db.feedDao().getFeed(someOtherFeedId)!!
+            assertTrue("Feed should have a retry after value in the future") {
+                feed2.retryAfter > Instant.now()
+            }
+
+            rssLocalSync.syncFeeds(feedId = cowboyJsonId)
+            assertEquals("Request should not have been sent due to retry-after", 1, server.requestCount)
+
+            rssLocalSync.syncFeeds(feedId = someOtherFeedId)
+            assertEquals("Request should not have been sent due to retry-after", 1, server.requestCount)
         }
 
     @Test
@@ -346,7 +400,7 @@ class RssLocalSyncKtTest : DIAware {
             val fourteenMinsAgo = Instant.now().minusMinutes(14)
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
@@ -364,7 +418,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync,
+                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync,
             )
         }
 
@@ -395,7 +449,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have been updated",
                 Instant.EPOCH,
-                testDb.db.feedDao().loadFeed(failingJsonId)!!.lastSync,
+                testDb.db.feedDao().loadFeed(failingJsonId, now = Instant.EPOCH)!!.lastSync,
             )
 
             // Assert the feed was retrieved
