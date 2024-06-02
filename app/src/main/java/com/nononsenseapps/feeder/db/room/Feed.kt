@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.COL_LASTSYNC
 import com.nononsenseapps.feeder.db.COL_NOTIFY
 import com.nononsenseapps.feeder.db.COL_OPEN_ARTICLES_WITH
 import com.nononsenseapps.feeder.db.COL_RESPONSEHASH
+import com.nononsenseapps.feeder.db.COL_RETRY_AFTER
 import com.nononsenseapps.feeder.db.COL_SITE_FETCHED
 import com.nononsenseapps.feeder.db.COL_SKIP_DUPLICATES
 import com.nononsenseapps.feeder.db.COL_TAG
@@ -56,6 +57,8 @@ data class Feed
         @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_SITE_FETCHED) var siteFetched: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_SKIP_DUPLICATES) var skipDuplicates: Boolean = false,
+        // Time when feed is allowed to be synced again earliest, based on retry-after response header
+        @ColumnInfo(name = COL_RETRY_AFTER) var retryAfter: Instant = Instant.EPOCH,
     ) {
         constructor() : this(id = ID_UNSET)
 

@@ -52,6 +52,7 @@ const val COL_WORD_COUNT = "word_count"
 const val COL_WORD_COUNT_FULL = "word_count_full"
 const val COL_SKIP_DUPLICATES = "skip_duplicates"
 const val COL_BLOCK_TIME = "block_time"
+const val COL_RETRY_AFTER = "retry_after"
 
 // year 5000
 val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

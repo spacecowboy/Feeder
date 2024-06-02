@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
 import okhttp3.Credentials
@@ -33,7 +34,6 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -345,9 +345,8 @@ suspend fun OkHttpClient.getResponse(
             .run {
                 if (forceNetwork) {
                     cacheControl(
-                        CacheControl.Builder()
-                            .maxAge(1, TimeUnit.MINUTES)
-                            .build(),
+                        // Force network will make conditional requests for servers which support them
+                        CacheControl.FORCE_NETWORK,
                     )
                 } else {
                     this
@@ -472,6 +471,7 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
                 HttpError(
                     url = url.toString(),
                     code = response.code,
+                    retryAfterSeconds = response.retryAfterSeconds,
                     message = response.message,
                 ),
             )
@@ -486,15 +486,17 @@ sealed class FeedParserError : Parcelable {
     abstract val throwable: Throwable?
 }
 
-/*
- * Data object would be ideal for this
- */
 @Parcelize
-data class NotInitializedYet(
-    override val url: String = "",
-    override val description: String = "",
-    override val throwable: Throwable? = null,
-) : FeedParserError()
+data object NotInitializedYet : FeedParserError() {
+    @IgnoredOnParcel
+    override val url: String = ""
+
+    @IgnoredOnParcel
+    override val description: String = ""
+
+    @IgnoredOnParcel
+    override val throwable: Throwable? = null
+}
 
 @Parcelize
 data class FetchError(
@@ -543,6 +545,7 @@ data class HttpError(
     override val url: String,
     val code: Int,
     val message: String,
+    val retryAfterSeconds: Long?,
     override val description: String = "$code: $message",
     override val throwable: Throwable? = null,
 ) : FeedParserError()

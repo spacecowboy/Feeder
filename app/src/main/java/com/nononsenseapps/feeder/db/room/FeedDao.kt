@@ -49,8 +49,17 @@ interface FeedDao {
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     fun loadAllTags(): Flow<List<String>>
 
+    @Query("SELECT * FROM feeds WHERE id IS :feedId and retry_after < :now")
+    suspend fun loadFeed(
+        feedId: Long,
+        now: Instant,
+    ): Feed?
+
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
-    suspend fun loadFeed(feedId: Long): Feed?
+    suspend fun getFeed(feedId: Long): Feed?
+
+    @Query("SELECT * FROM feeds WHERE tag IS :tag ORDER BY title")
+    suspend fun getFeedsByTitle(tag: String): List<Feed>
 
     @Query(
         """
@@ -69,24 +78,36 @@ interface FeedDao {
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime
+       AND retry_after < :now
     """,
     )
     suspend fun loadFeedIfStale(
         feedId: Long,
         staleTime: Long,
+        now: Instant,
     ): Feed?
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag ORDER BY last_sync")
-    suspend fun loadFeeds(tag: String): List<Feed>
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND retry_after < :now ORDER BY last_sync")
+    suspend fun loadFeeds(
+        tag: String,
+        now: Instant,
+    ): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime ORDER BY last_sync")
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime AND retry_after < :now ORDER BY last_sync")
     suspend fun loadFeedsIfStale(
         tag: String,
         staleTime: Long,
+        now: Instant,
     ): List<Feed>
 
-    @Query("SELECT * FROM feeds ORDER BY last_sync")
-    suspend fun loadFeeds(): List<Feed>
+    @Query("SELECT * FROM feeds WHERE retry_after < :now ORDER BY last_sync")
+    suspend fun loadFeeds(now: Instant): List<Feed>
+
+    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime AND retry_after < :now ORDER BY last_sync")
+    suspend fun loadFeedsIfStale(
+        staleTime: Long,
+        now: Instant,
+    ): List<Feed>
 
     @Query(
         """
@@ -96,9 +117,6 @@ interface FeedDao {
     """,
     )
     fun loadFeedsForContentProvider(): Cursor
-
-    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime ORDER BY last_sync")
-    suspend fun loadFeedsIfStale(staleTime: Long): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE url IS :url")
     suspend fun loadFeedWithUrl(url: URL): Feed?
@@ -236,4 +254,21 @@ interface FeedDao {
 
     @Upsert
     suspend fun upsert(feed: Feed): Long
+
+    /**
+     * Using HOST because we want to match server, and the possibility of username:password
+     * means it's not as simple as SCHEME://HOST to build the prefix.
+     */
+    @Query(
+        """
+            UPDATE feeds
+            SET retry_after = :retryAfter
+            WHERE url LIKE '%' || :host || '%'
+            AND retry_after < :retryAfter
+        """,
+    )
+    suspend fun setRetryAfterForFeedsWithBaseUrl(
+        host: String,
+        retryAfter: Instant,
+    )
 }

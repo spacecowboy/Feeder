@@ -738,20 +738,31 @@ class Repository(override val di: DI) : DIAware {
     suspend fun loadFeedIfStale(
         feedId: Long,
         staleTime: Long,
-    ) = feedStore.loadFeedIfStale(feedId = feedId, staleTime = staleTime)
+        now: Instant = Instant.now(),
+    ) = feedStore.loadFeedIfStale(feedId = feedId, staleTime = staleTime, now = now)
 
-    suspend fun loadFeed(feedId: Long): Feed? = feedStore.loadFeed(feedId = feedId)
+    suspend fun loadFeed(
+        feedId: Long,
+        now: Instant = Instant.now(),
+    ): Feed? = feedStore.loadFeed(feedId = feedId, now = now)
 
     suspend fun loadFeedsIfStale(
         tag: String,
         staleTime: Long,
-    ) = feedStore.loadFeedsIfStale(tag = tag, staleTime = staleTime)
+        now: Instant = Instant.now(),
+    ) = feedStore.loadFeedsIfStale(tag = tag, staleTime = staleTime, now = now)
 
-    suspend fun loadFeedsIfStale(staleTime: Long) = feedStore.loadFeedsIfStale(staleTime = staleTime)
+    suspend fun loadFeedsIfStale(
+        staleTime: Long,
+        now: Instant = Instant.now(),
+    ) = feedStore.loadFeedsIfStale(staleTime = staleTime, now = now)
 
-    suspend fun loadFeeds(tag: String): List<Feed> = feedStore.loadFeeds(tag = tag)
+    suspend fun loadFeeds(
+        tag: String,
+        now: Instant = Instant.now(),
+    ): List<Feed> = feedStore.loadFeeds(tag = tag, now = now)
 
-    suspend fun loadFeeds(): List<Feed> = feedStore.loadFeeds()
+    suspend fun loadFeeds(now: Instant = Instant.now()): List<Feed> = feedStore.loadFeeds(now = now)
 
     suspend fun setCurrentlySyncingOn(
         feedId: Long,
@@ -790,6 +801,19 @@ class Repository(override val di: DI) : DIAware {
 
     fun setSyncWorkerRunning(running: Boolean) {
         sessionStore.setSyncWorkerRunning(running)
+    }
+
+    /**
+     * Set the retry after time for feeds with the given base URL.
+     *
+     * If a retry after time is already set, the new time will only be set if it is later than the
+     * current value.
+     */
+    suspend fun setRetryAfterForFeedsWithBaseUrl(
+        host: String,
+        retryAfter: Instant,
+    ) {
+        feedStore.setRetryAfterForFeedsWithBaseUrl(host = host, retryAfter = retryAfter)
     }
 
     companion object {

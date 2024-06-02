@@ -210,7 +210,7 @@ class MigrationFromLegacy5ToLatest {
             )
 
             roomDb.let { db ->
-                val feeds = db.feedDao().loadFeeds()
+                val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
 
                 assertEquals("Wrong number of feeds", 2, feeds.size)
 
@@ -238,7 +238,7 @@ class MigrationFromLegacy5ToLatest {
             )
 
             roomDb.let { db ->
-                val feeds = db.feedDao().loadFeeds()
+                val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
 
                 assertEquals("Wrong number of feeds", 2, feeds.size)
 
@@ -266,7 +266,7 @@ class MigrationFromLegacy5ToLatest {
             )
 
             roomDb.let { db ->
-                val feed = db.feedDao().loadFeeds()[0]
+                val feed = db.feedDao().loadFeeds(now = Instant.EPOCH)[0]
                 assertEquals("feedA", feed.title)
                 val items =
                     db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
@@ -302,7 +302,7 @@ class MigrationFromLegacy5ToLatest {
             )
 
             roomDb.let { db ->
-                val feed = db.feedDao().loadFeeds()[1]
+                val feed = db.feedDao().loadFeeds(now = Instant.EPOCH)[1]
                 assertEquals("feedB", feed.title)
                 val items =
                     db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)

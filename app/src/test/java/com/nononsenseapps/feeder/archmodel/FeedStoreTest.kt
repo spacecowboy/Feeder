@@ -40,7 +40,7 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun getFeed() {
-        coEvery { dao.loadFeed(5L) } returns Feed(id = 5L)
+        coEvery { dao.getFeed(5L) } returns Feed(id = 5L)
 
         val feed =
             runBlocking {

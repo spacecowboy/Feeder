@@ -41,6 +41,7 @@ import org.kodein.di.singleton
 import java.io.File
 import java.io.IOException
 import java.net.URL
+import java.time.Instant
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
@@ -108,7 +109,7 @@ class OPMLTest : DIAware {
                 blockedPatterns = BLOCKED_PATTERNS,
                 tags = getTags(),
             ) { tag ->
-                db.feedDao().loadFeeds(tag = tag)
+                db.feedDao().getFeedsByTitle(tag = tag)
             }
 
             // check contents of file
@@ -152,7 +153,7 @@ class OPMLTest : DIAware {
 
             // Verify database is correct
             val seen = ArrayList<Int>()
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             assertFalse("No feeds in DB!", feeds.isEmpty())
             for (feed in feeds) {
                 val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
@@ -225,7 +226,7 @@ class OPMLTest : DIAware {
 
             // should not kill the existing stuff
             val seen = ArrayList<Int>()
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             assertFalse("No feeds in DB!", feeds.isEmpty())
             for (feed in feeds) {
                 val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
@@ -315,7 +316,7 @@ class OPMLTest : DIAware {
             val parser = OpmlPullParser(opmlParserHandler)
             parser.parseFile(path!!.absolutePath)
 
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             assertTrue("Expected no feeds and no exception", feeds.isEmpty())
         }
 
@@ -339,7 +340,7 @@ class OPMLTest : DIAware {
             // Then delete all feeds again
             db.runInTransaction {
                 runBlocking {
-                    db.feedDao().loadFeeds().forEach {
+                    db.feedDao().loadFeeds(now = Instant.EPOCH).forEach {
                         db.feedDao().deleteFeed(it)
                     }
                 }
@@ -394,7 +395,7 @@ class OPMLTest : DIAware {
             parser.parseInputStreamWithFallback(opmlStream)
 
             // then
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             val tags = db.feedDao().loadTags()
             assertEquals("Expecting 8 feeds", 8, feeds.size)
             assertEquals("Expecting 1 tags (incl empty)", 1, tags.size)
@@ -451,7 +452,7 @@ class OPMLTest : DIAware {
             parser.parseInputStreamWithFallback(opmlStream)
 
             // then
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             val tags = db.feedDao().loadTags()
             assertEquals("Expecting 11 feeds", 11, feeds.size)
             assertEquals("Expecting 4 tags (incl empty)", 4, tags.size)
@@ -541,7 +542,7 @@ class OPMLTest : DIAware {
             parser.parseInputStreamWithFallback(opmlStream)
 
             // then
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             val tags = db.feedDao().loadTags()
             assertEquals("Expecting 30 feeds", 30, feeds.size)
             assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
@@ -662,7 +663,7 @@ class OPMLTest : DIAware {
             parser.parseInputStreamWithFallback(opmlStream)
 
             // then
-            val feeds = db.feedDao().loadFeeds()
+            val feeds = db.feedDao().loadFeeds(now = Instant.EPOCH)
             val tags = db.feedDao().loadTags()
             assertEquals("Expecting 30 feeds", 30, feeds.size)
             assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
