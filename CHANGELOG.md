@@ -1,3 +1,31 @@
+# 2.6.25
+Jonas Kalderstam (6):
+  * [dea0a7092] Updated release pipeline to always publish APKs even if Play
+         store is dumb
+  * [26b71e8dd] Fixed release pipeline syntax
+  * [040255905] Added ktlint to gradle
+  * [ebb5ea81a] Ensured retry-after is respected, even when feeds share the
+         same host
+  * [42ce72343] Rewrote reader layout engine. Adds real table support.
+  * [e76526be9] Fixed test
+
+eevan78 (2):
+  * [1d306a759] Updated Serbian translation using Weblate
+  * [0b19e6d44] Translated using Weblate (Serbian)
+
+hugoalh (1):
+  * [eb7fc21d5] Updated Chinese (Traditional) translation using Weblate
+
+josé m (2):
+  * [2d1bfdb2f] Updated Galician translation using Weblate
+  * [596822c61] Updated Galician translation using Weblate
+
+v1s7 (1):
+  * [d7da5ad37] Updated Russian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [817acf02f] Updated Greek translation using Weblate
+
 # 2.6.24
 Jonas Kalderstam (1):
   * [8a86acbd] Fixed performance when many entries in blocklist
