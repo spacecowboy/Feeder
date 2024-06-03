@@ -126,34 +126,34 @@ class FeedStore(override val di: DI) : DIAware {
         feedDao.deleteFeedWithUrl(url)
     }
 
-    suspend fun loadFeedIfStale(
+    suspend fun syncLoadFeedIfStale(
         feedId: Long,
         staleTime: Long,
-        now: Instant,
-    ) = feedDao.loadFeedIfStale(feedId = feedId, staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedDao.syncLoadFeedIfStale(feedId = feedId, staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeed(
+    suspend fun syncLoadFeed(
         feedId: Long,
-        now: Instant,
-    ): Feed? = feedDao.loadFeed(feedId = feedId, now = now)
+        retryAfter: Instant,
+    ): Feed? = feedDao.syncLoadFeed(feedId = feedId, retryAfter = retryAfter)
 
-    suspend fun loadFeedsIfStale(
+    suspend fun syncLoadFeedsIfStale(
         tag: String,
         staleTime: Long,
-        now: Instant,
-    ) = feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedDao.syncLoadFeedsIfStale(tag = tag, staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeedsIfStale(
+    suspend fun syncLoadFeedsIfStale(
         staleTime: Long,
-        now: Instant,
-    ) = feedDao.loadFeedsIfStale(staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedDao.syncLoadFeedsIfStale(staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeeds(
+    suspend fun syncLoadFeeds(
         tag: String,
-        now: Instant,
-    ) = feedDao.loadFeeds(tag = tag, now = now)
+        retryAfter: Instant,
+    ) = feedDao.syncLoadFeeds(tag = tag, retryAfter = retryAfter)
 
-    suspend fun loadFeeds(now: Instant) = feedDao.loadFeeds(now = now)
+    suspend fun syncLoadFeeds(retryAfter: Instant) = feedDao.syncLoadFeeds(retryAfter = retryAfter)
 
     suspend fun setRetryAfterForFeedsWithBaseUrl(
         host: String,

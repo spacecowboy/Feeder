@@ -224,7 +224,7 @@ class RssLocalSync(override val di: DI) : DIAware {
         // Load it again to ensure we get the latest value for retry-after since this can be shared across feeds
         // if they share the same server
         val feedSql =
-            repository.loadFeed(feedId)
+            repository.syncLoadFeed(feedId, retryAfter = Instant.now())
                 ?: run {
                     // not loaded due to retry-after
                     Log.i(LOG_TAG, "Skipping feed $feedId due to retry-after changing mid sync")
@@ -240,8 +240,6 @@ class RssLocalSync(override val di: DI) : DIAware {
         }
 
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
-        // Always update the feeds last sync field
-        feedSql.lastSync = Instant.now()
 
         return Either.catching(
             onCatch = { t ->
@@ -277,8 +275,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                 else -> it
             }
         }.onLeft {
-            // Nothing was parsed, only update the sync time then
-            repository.upsertFeed(feedSql)
+            // Nothing was parsed, nothing to do. lastSync time has already been updated
         }.flatMap { feed ->
             Either.catching(
                 onCatch = { t ->
@@ -425,18 +422,18 @@ class RssLocalSync(override val di: DI) : DIAware {
         tag: String,
         staleTime: Long = -1L,
     ): List<Feed> {
-        // TODO respect retry after
         return when {
             feedId > 0 -> {
                 val feed =
                     if (staleTime > 0) {
-                        repository.loadFeedIfStale(
+                        repository.syncLoadFeedIfStale(
                             feedId,
                             staleTime = staleTime,
+                            retryAfter = Instant.now(),
                         )
                     } else {
                         // Used internally too
-                        repository.loadFeed(feedId)
+                        repository.syncLoadFeed(feedId, retryAfter = Instant.now())
                     }
                 if (feed != null) {
                     listOf(feed)
@@ -447,15 +444,16 @@ class RssLocalSync(override val di: DI) : DIAware {
 
             tag.isNotEmpty() ->
                 if (staleTime > 0) {
-                    repository.loadFeedsIfStale(
+                    repository.syncLoadFeedsIfStale(
                         tag = tag,
                         staleTime = staleTime,
+                        retryAfter = Instant.now(),
                     )
                 } else {
-                    repository.loadFeeds(tag)
+                    repository.syncLoadFeeds(tag, retryAfter = Instant.now())
                 }
 
-            else -> if (staleTime > 0) repository.loadFeedsIfStale(staleTime) else repository.loadFeeds()
+            else -> if (staleTime > 0) repository.syncLoadFeedsIfStale(staleTime, retryAfter = Instant.now()) else repository.syncLoadFeeds(retryAfter = Instant.now())
         }
     }
 

@@ -735,34 +735,34 @@ class Repository(override val di: DI) : DIAware {
         )
     }
 
-    suspend fun loadFeedIfStale(
+    suspend fun syncLoadFeedIfStale(
         feedId: Long,
         staleTime: Long,
-        now: Instant = Instant.now(),
-    ) = feedStore.loadFeedIfStale(feedId = feedId, staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedStore.syncLoadFeedIfStale(feedId = feedId, staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeed(
+    suspend fun syncLoadFeed(
         feedId: Long,
-        now: Instant = Instant.now(),
-    ): Feed? = feedStore.loadFeed(feedId = feedId, now = now)
+        retryAfter: Instant,
+    ): Feed? = feedStore.syncLoadFeed(feedId = feedId, retryAfter = retryAfter)
 
-    suspend fun loadFeedsIfStale(
+    suspend fun syncLoadFeedsIfStale(
         tag: String,
         staleTime: Long,
-        now: Instant = Instant.now(),
-    ) = feedStore.loadFeedsIfStale(tag = tag, staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedStore.syncLoadFeedsIfStale(tag = tag, staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeedsIfStale(
+    suspend fun syncLoadFeedsIfStale(
         staleTime: Long,
-        now: Instant = Instant.now(),
-    ) = feedStore.loadFeedsIfStale(staleTime = staleTime, now = now)
+        retryAfter: Instant,
+    ) = feedStore.syncLoadFeedsIfStale(staleTime = staleTime, retryAfter = retryAfter)
 
-    suspend fun loadFeeds(
+    suspend fun syncLoadFeeds(
         tag: String,
-        now: Instant = Instant.now(),
-    ): List<Feed> = feedStore.loadFeeds(tag = tag, now = now)
+        retryAfter: Instant,
+    ): List<Feed> = feedStore.syncLoadFeeds(tag = tag, retryAfter = retryAfter)
 
-    suspend fun loadFeeds(now: Instant = Instant.now()): List<Feed> = feedStore.loadFeeds(now = now)
+    suspend fun syncLoadFeeds(retryAfter: Instant): List<Feed> = feedStore.syncLoadFeeds(retryAfter = retryAfter)
 
     suspend fun setCurrentlySyncingOn(
         feedId: Long,

@@ -49,10 +49,10 @@ interface FeedDao {
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     fun loadAllTags(): Flow<List<String>>
 
-    @Query("SELECT * FROM feeds WHERE id IS :feedId and retry_after < :now")
-    suspend fun loadFeed(
+    @Query("SELECT * FROM feeds WHERE id IS :feedId and retry_after < :retryAfter")
+    suspend fun syncLoadFeed(
         feedId: Long,
-        now: Instant,
+        retryAfter: Instant,
     ): Feed?
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
@@ -74,39 +74,44 @@ interface FeedDao {
     fun loadFlowOfFeedsForSettings(): Flow<List<FeedForSettings>>
 
     @Query(
+        "select * from feeds",
+    )
+    fun getAllFeeds(): List<Feed>
+
+    @Query(
         """
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime
-       AND retry_after < :now
+       AND retry_after < :retryAfter
     """,
     )
-    suspend fun loadFeedIfStale(
+    suspend fun syncLoadFeedIfStale(
         feedId: Long,
         staleTime: Long,
-        now: Instant,
+        retryAfter: Instant,
     ): Feed?
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND retry_after < :now ORDER BY last_sync")
-    suspend fun loadFeeds(
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND retry_after < :retryAfter ORDER BY last_sync")
+    suspend fun syncLoadFeeds(
         tag: String,
-        now: Instant,
+        retryAfter: Instant,
     ): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime AND retry_after < :now ORDER BY last_sync")
-    suspend fun loadFeedsIfStale(
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime AND retry_after < :retryAfter ORDER BY last_sync")
+    suspend fun syncLoadFeedsIfStale(
         tag: String,
         staleTime: Long,
-        now: Instant,
+        retryAfter: Instant,
     ): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE retry_after < :now ORDER BY last_sync")
-    suspend fun loadFeeds(now: Instant): List<Feed>
+    @Query("SELECT * FROM feeds WHERE retry_after < :retryAfter ORDER BY last_sync")
+    suspend fun syncLoadFeeds(retryAfter: Instant): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime AND retry_after < :now ORDER BY last_sync")
-    suspend fun loadFeedsIfStale(
+    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime AND retry_after < :retryAfter ORDER BY last_sync")
+    suspend fun syncLoadFeedsIfStale(
         staleTime: Long,
-        now: Instant,
+        retryAfter: Instant,
     ): List<Feed>
 
     @Query(

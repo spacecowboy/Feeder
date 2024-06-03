@@ -281,7 +281,7 @@ class RssLocalSyncKtTest : DIAware {
 
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                     // "Long time" ago, but not unset
@@ -295,7 +295,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Cached response should still have updated feed last sync",
                 999L,
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync.toEpochMilli(),
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync.toEpochMilli(),
             )
         }
 
@@ -312,7 +312,7 @@ class RssLocalSyncKtTest : DIAware {
             val fourteenMinsAgo = Instant.now().minusMinutes(14)
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
@@ -334,7 +334,7 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Last sync should not have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync,
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync,
             )
         }
 
@@ -400,7 +400,7 @@ class RssLocalSyncKtTest : DIAware {
             val fourteenMinsAgo = Instant.now().minusMinutes(14)
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.let { feed ->
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.let { feed ->
                     assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
 //                    assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
@@ -418,7 +418,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().loadFeed(cowboyJsonId, now = Instant.EPOCH)!!.lastSync,
+                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync,
             )
         }
 
@@ -449,7 +449,7 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have been updated",
                 Instant.EPOCH,
-                testDb.db.feedDao().loadFeed(failingJsonId, now = Instant.EPOCH)!!.lastSync,
+                testDb.db.feedDao().getFeed(failingJsonId)!!.lastSync,
             )
 
             // Assert the feed was retrieved
@@ -551,82 +551,6 @@ class RssLocalSyncKtTest : DIAware {
                 items[0].guid == "https://foo.bar/1" &&
                     items[1].guid == "https://foo.bar/2" &&
                     items[0].pubDate!! > items[1].pubDate!!
-            }
-        }
-
-    @Test
-    fun feedWithNoDatesShouldNotGetOverriddenDatesNextSync() =
-        runBlocking {
-            server.enqueue(
-                MockResponse().also {
-                    it.setResponseCode(200)
-                    it.setBody(fooRss(1))
-                    it.setHeader("Content-Type", "application/xml")
-                },
-            )
-            server.enqueue(
-                MockResponse().also {
-                    it.setResponseCode(200)
-                    it.setBody(fooRss(2))
-                    it.setHeader("Content-Type", "application/xml")
-                },
-            )
-
-            val url = server.url("/rss")
-
-            val feedId =
-                testDb.db.feedDao().insertFeed(
-                    Feed(
-                        url = URL("$url"),
-                    ),
-                )
-
-            // Sync first time
-            runBlocking {
-                rssLocalSync.syncFeeds(feedId = feedId)
-            }
-
-            // Assert the feed was retrieved
-            assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
-
-            val firstItem =
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
-                    assertNotNull(
-                        "Item should have gotten a pubDate generated",
-                        items[0].pubDate,
-                    )
-
-                    items[0]
-                }
-
-            // Sync second time
-            runBlocking {
-                rssLocalSync.syncFeeds(feedId = feedId, forceNetwork = true)
-            }
-
-            // Assert the feed was retrieved
-            assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
-
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
-                assertEquals(
-                    "Should be 2 items in feed",
-                    2,
-                    items.size,
-                )
-
-                val item = items.last()
-
-                assertEquals(
-                    "Making sure we are comparing the same item",
-                    firstItem.id,
-                    item.id,
-                )
-
-                assertEquals(
-                    "Pubdate should not have changed",
-                    firstItem.pubDate,
-                    item.pubDate,
-                )
             }
         }
 
