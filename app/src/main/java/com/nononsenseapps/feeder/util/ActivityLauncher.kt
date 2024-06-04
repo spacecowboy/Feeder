@@ -61,10 +61,24 @@ class ActivityLauncher(
         @ColorInt toolbarColor: Int,
         openAdjacentIfSuitable: Boolean = true,
     ): Boolean {
-        return when (repository.linkOpener.value) {
-            LinkOpener.CUSTOM_TAB -> openLinkInCustomTab(link, toolbarColor, openAdjacentIfSuitable)
-            LinkOpener.DEFAULT_BROWSER -> openLinkInBrowser(link, openAdjacentIfSuitable)
+        if (link.isBlank()) {
+            return false
         }
+        return if (link.startsWith("mailto:")) {
+            openEmailClient(link)
+        } else {
+            when (repository.linkOpener.value) {
+                LinkOpener.CUSTOM_TAB -> openLinkInCustomTab(link, toolbarColor, openAdjacentIfSuitable)
+                LinkOpener.DEFAULT_BROWSER -> openLinkInBrowser(link, openAdjacentIfSuitable)
+            }
+        }
+    }
+
+    private fun openEmailClient(link: String): Boolean {
+        // example link: mailto:email@exampl.com?subject=subject
+        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse(link))
+
+        return startActivity(openAdjacentIfSuitable = true, intent = intent)
     }
 
     /**

@@ -238,7 +238,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     }
 
                     "a" -> {
-                        withAnnotation("URL", element.attr("abs:href") ?: "") {
+                        // abs:href will be blank for mailto: links
+                        withAnnotation("URL", element.attr("abs:href").ifBlank { element.attr("href") }) {
                             appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,

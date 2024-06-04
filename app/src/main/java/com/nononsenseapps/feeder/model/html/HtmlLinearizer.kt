@@ -352,7 +352,8 @@ class HtmlLinearizer {
                         }
 
                         "a" -> {
-                            withLinearTextAnnotation(LinearTextAnnotationLink(element.attr("abs:href"))) {
+                            // abs:href will be blank for mailto: links
+                            withLinearTextAnnotation(LinearTextAnnotationLink(element.attr("abs:href").ifBlank { element.attr("href") })) {
                                 linearizeChildren(
                                     element.childNodes(),
                                     blockStyle = blockStyle,
