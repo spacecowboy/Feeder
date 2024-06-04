@@ -630,6 +630,8 @@ class HtmlLinearizer {
     }
 
     private fun ListBuilderScope<LinearElement>.parseIframeVideo(element: Element) {
+        val width = element.attr("width").toIntOrNull()
+        val height = element.attr("height").toIntOrNull()
         getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
             add(
                 LinearVideo(
@@ -639,8 +641,8 @@ class HtmlLinearizer {
                                 uri = video.src,
                                 link = video.link,
                                 imageThumbnail = video.imageUrl,
-                                widthPx = video.width,
-                                heightPx = video.height,
+                                widthPx = width ?: video.width,
+                                heightPx = height ?: video.height,
                                 mimeType = null,
                             ),
                         ),
