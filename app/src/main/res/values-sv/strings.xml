@@ -248,4 +248,5 @@
     <string name="skip_duplicate_articles">Hoppa över dubbletter</string>
     <string name="skip_duplicate_articles_desc">Artiklar med titlar eller länkar som redan finns ignoreras</string>
     <string name="feed_item_style_compact_card">Kompakt kort</string>
+    <string name="touch_to_play_audio">Tryck för att spela upp ljud</string>
 </resources>
