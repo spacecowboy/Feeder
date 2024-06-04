@@ -599,6 +599,40 @@ class HtmlLinearizerTest {
     }
 
     @Test
+    fun `iframe inside figure with youtube video`() {
+        // Seen on AlltOmElbil.se
+        val html =
+            """
+            <html><body>
+            <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+            <iframe title="Därför är el-lastbilar bättre än diesel-lastbilar" width="1170" height="658" src="https://www.youtube.com/embed/x_m02bUxfvE?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+            </div></figure>
+            </body></html>
+            """.trimIndent()
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(
+            LinearVideo(
+                sources =
+                    listOf(
+                        LinearVideoSource(
+                            "https://www.youtube.com/embed/x_m02bUxfvE?feature=oembed",
+                            "https://www.youtube.com/watch?v=x_m02bUxfvE",
+                            "http://img.youtube.com/vi/x_m02bUxfvE/hqdefault.jpg",
+                            480,
+                            360,
+                            null,
+                        ),
+                    ),
+            ),
+            result[0],
+        )
+    }
+
+    @Test
     fun `table block 2x2`() {
         val html = "<html><body><table><tr><th>1</th><td>2</td></tr><tr><td>3</td><th>4</th></tr></table></body></html>"
         val baseUrl = "https://example.com"

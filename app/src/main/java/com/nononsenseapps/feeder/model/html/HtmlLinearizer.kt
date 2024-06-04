@@ -376,36 +376,42 @@ class HtmlLinearizer {
                         "figure" -> {
                             finalizeAndAddCurrentElement(blockStyle)
 
-                            // Wordpress likes nested figures to get images side by side
-                            val imageCandidates =
-                                element.descendantImageCandidates(baseUrl = baseUrl)
-                                    // Arstechnica has its own ideas about how to structure things
-                                    ?: element.ancestorImageCandidates(baseUrl = baseUrl)
+                            // Some sites put youtube iframes inside figures
+                            val iframes = element.getElementsByTag("iframe")
+                            if (iframes.isNotEmpty()) {
+                                parseIframeVideo(iframes.first())
+                            } else {
+                                // Wordpress likes nested figures to get images side by side
+                                val imageCandidates =
+                                    element.descendantImageCandidates(baseUrl = baseUrl)
+                                        // Arstechnica has its own ideas about how to structure things
+                                        ?: element.ancestorImageCandidates(baseUrl = baseUrl)
 
-                            if (imageCandidates != null) {
-                                val link = linearTextBuilder.findClosestLink()?.takeIf { it.isNotBlank() }
+                                if (imageCandidates != null) {
+                                    val link = linearTextBuilder.findClosestLink()?.takeIf { it.isNotBlank() }
 
-                                val caption: LinearText? =
-                                    ListBuilderScope {
-                                        asElement(blockStyle = LinearTextBlockStyle.TEXT) {
-                                            linearizeChildren(
-                                                element.childNodes(),
-                                                blockStyle = it,
-                                                baseUrl = baseUrl,
-                                            )
-                                        }
-                                    }.items.firstOrNull {
-                                        // Stuffing non-text inside a caption is not supported
-                                        it is LinearText && it.text.isNotBlank()
-                                    } as? LinearText
+                                    val caption: LinearText? =
+                                        ListBuilderScope {
+                                            asElement(blockStyle = LinearTextBlockStyle.TEXT) {
+                                                linearizeChildren(
+                                                    element.childNodes(),
+                                                    blockStyle = it,
+                                                    baseUrl = baseUrl,
+                                                )
+                                            }
+                                        }.items.firstOrNull {
+                                            // Stuffing non-text inside a caption is not supported
+                                            it is LinearText && it.text.isNotBlank()
+                                        } as? LinearText
 
-                                add(
-                                    LinearImage(
-                                        sources = imageCandidates,
-                                        caption = caption,
-                                        link = link,
-                                    ),
-                                )
+                                    add(
+                                        LinearImage(
+                                            sources = imageCandidates,
+                                            caption = caption,
+                                            link = link,
+                                        ),
+                                    )
+                                }
                             }
                         }
 
@@ -580,23 +586,8 @@ class HtmlLinearizer {
                         }
 
                         "iframe" -> {
-                            getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
-                                add(
-                                    LinearVideo(
-                                        sources =
-                                            listOf(
-                                                LinearVideoSource(
-                                                    uri = video.src,
-                                                    link = video.link,
-                                                    imageThumbnail = video.imageUrl,
-                                                    widthPx = video.width,
-                                                    heightPx = video.height,
-                                                    mimeType = null,
-                                                ),
-                                            ),
-                                    ),
-                                )
-                            }
+                            finalizeAndAddCurrentElement(blockStyle)
+                            parseIframeVideo(element)
                         }
 
                         "video" -> {
@@ -635,6 +626,26 @@ class HtmlLinearizer {
             }
 
             node = node.nextSibling()
+        }
+    }
+
+    private fun ListBuilderScope<LinearElement>.parseIframeVideo(element: Element) {
+        getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
+            add(
+                LinearVideo(
+                    sources =
+                        listOf(
+                            LinearVideoSource(
+                                uri = video.src,
+                                link = video.link,
+                                imageThumbnail = video.imageUrl,
+                                widthPx = video.width,
+                                heightPx = video.height,
+                                mimeType = null,
+                            ),
+                        ),
+                ),
+            )
         }
     }
 
