@@ -83,7 +83,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
@@ -107,7 +107,7 @@ fun SearchFeedScreen(
     initialFeedUrl: String? = null,
     onClick: (SearchResult) -> Unit,
 ) {
-    val windowSize = LocalWindowSize()
+    val windowSize = LocalWindowSizeMetrics.current
     val screenType by remember(windowSize) {
         derivedStateOf {
             getScreenType(windowSize)

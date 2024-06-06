@@ -51,7 +51,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -115,7 +115,7 @@ fun OpmlImportScreen(
         }
     }
 
-    val windowSize = LocalWindowSize()
+    val windowSize = LocalWindowSizeMetrics.current
     val screenHeight by remember(windowSize) {
         derivedStateOf {
             when (getScreenType(windowSize)) {

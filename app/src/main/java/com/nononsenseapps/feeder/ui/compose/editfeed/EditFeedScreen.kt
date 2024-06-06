@@ -80,7 +80,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
@@ -91,7 +91,7 @@ fun CreateFeedScreen(
     createFeedScreenViewModel: CreateFeedScreenViewModel,
     onOk: (Long) -> Unit,
 ) {
-    val windowSize = LocalWindowSize()
+    val windowSize = LocalWindowSizeMetrics.current
 
     val screenType by remember(windowSize) {
         derivedStateOf {
@@ -121,7 +121,7 @@ fun EditFeedScreen(
     editFeedScreenViewModel: EditFeedScreenViewModel,
     onOk: (Long) -> Unit,
 ) {
-    val windowSize = LocalWindowSize()
+    val windowSize = LocalWindowSizeMetrics.current
 
     val screenType by remember(windowSize) {
         derivedStateOf {

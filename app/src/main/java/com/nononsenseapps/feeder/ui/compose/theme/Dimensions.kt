@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 
 @Immutable
 class Dimensions(
@@ -110,7 +111,8 @@ val LocalDimens =
 
 @Composable
 fun ProvideDimens(content: @Composable () -> Unit) {
-    val windowSizeClass = LocalWindowSize.current
+    val windowSize = LocalWindowSize.current
+    val windowSizeClass = LocalWindowSizeMetrics.current
     val config = LocalConfiguration.current
 
     val dimensionSet =
@@ -119,17 +121,13 @@ fun ProvideDimens(content: @Composable () -> Unit) {
                 // TV dimensions are special case
                 tvDimensions
             } else {
-                when (val widthClass = windowSizeClass.widthSizeClass) {
+                when (windowSizeClass.widthSizeClass) {
                     WindowWidthSizeClass.Compact -> phoneDimensions
                     else -> {
                         when (windowSizeClass.heightSizeClass) {
                             WindowHeightSizeClass.Compact -> phoneDimensions
                             else ->
-                                if (widthClass == WindowWidthSizeClass.Medium) {
-                                    tabletDimensions(600.dp)
-                                } else {
-                                    tabletDimensions(840.dp)
-                                }
+                                tabletDimensions(windowSize.width)
                         }
                     }
                 }
