@@ -398,51 +398,58 @@ class FeedArticleViewModel(
         textToDisplay: TextToDisplay,
     ): LinearArticle {
         // Can't use view state here because this function is called before view state is updated
-        val htmlLinearizer = HtmlLinearizer()
-        return when (textToDisplay) {
-            TextToDisplay.DEFAULT -> {
-                if (blobFile(article.id, filePathProvider.articleDir).isFile) {
-                    try {
-                        blobInputStream(article.id, filePathProvider.articleDir).use {
-                            htmlLinearizer.linearize(
-                                inputStream = it,
-                                baseUrl = article.feedUrl ?: "",
-                            )
+        return try {
+            val htmlLinearizer = HtmlLinearizer()
+            when (textToDisplay) {
+                TextToDisplay.DEFAULT -> {
+                    if (blobFile(article.id, filePathProvider.articleDir).isFile) {
+                        try {
+                            blobInputStream(article.id, filePathProvider.articleDir).use {
+                                htmlLinearizer.linearize(
+                                    inputStream = it,
+                                    baseUrl = article.feedUrl ?: "",
+                                )
+                            }
+                        } catch (e: Exception) {
+                            // EOFException is possible
+                            Log.e(LOG_TAG, "Could not open blob", e)
+                            LinearArticle(elements = emptyList())
                         }
-                    } catch (e: Exception) {
-                        // EOFException is possible
-                        Log.e(LOG_TAG, "Could not open blob", e)
+                    } else {
+                        Log.e(LOG_TAG, "No default file to parse")
+                        setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
                         LinearArticle(elements = emptyList())
                     }
-                } else {
-                    Log.e(LOG_TAG, "No default file to parse")
-                    setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
+                }
+
+                TextToDisplay.FULLTEXT -> {
+                    if (blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
+                        try {
+                            blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
+                                htmlLinearizer.linearize(
+                                    inputStream = it,
+                                    baseUrl = article.feedUrl ?: "",
+                                )
+                            }
+                        } catch (e: Exception) {
+                            // EOFException is possible
+                            Log.e(LOG_TAG, "Could not open blob", e)
+                            LinearArticle(elements = emptyList())
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "No fulltext file to parse")
+                        setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
+                        LinearArticle(elements = emptyList())
+                    }
+                }
+
+                else -> {
                     LinearArticle(elements = emptyList())
                 }
             }
-            TextToDisplay.FULLTEXT -> {
-                if (blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
-                    try {
-                        blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
-                            htmlLinearizer.linearize(
-                                inputStream = it,
-                                baseUrl = article.feedUrl ?: "",
-                            )
-                        }
-                    } catch (e: Exception) {
-                        // EOFException is possible
-                        Log.e(LOG_TAG, "Could not open blob", e)
-                        LinearArticle(elements = emptyList())
-                    }
-                } else {
-                    Log.e(LOG_TAG, "No fulltext file to parse")
-                    setTextToDisplayFor(article.id, TextToDisplay.FAILED_NOT_HTML)
-                    LinearArticle(elements = emptyList())
-                }
-            }
-            else -> {
-                LinearArticle(elements = emptyList())
-            }
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Error parsing article", t)
+            LinearArticle(elements = emptyList())
         }
     }
 
