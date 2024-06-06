@@ -485,12 +485,6 @@ fun LinearImageContent(
                             Modifier
                                 .widthIn(max = maxWidth)
                                 .fillMaxWidth(),
-//                            .run {
-//                                // This looks awful for small images
-//                                dimens.imageAspectRatioInReader?.let { ratio ->
-//                                    aspectRatio(ratio)
-//                                } ?: this
-//                            },
                     )
                 }
             }
