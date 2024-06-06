@@ -1,3 +1,40 @@
+# 2.6.26
+Agnieszka C (1):
+  * [7fd77f475] Updated Polish translation using Weblate
+
+Jonas Kalderstam (7):
+  * [769423012] Fixed email links not opening email client
+  * [4a96932ec] Added support for iframes inside figures
+  * [8ac5fa68f] Fixed parsed width/height of iframes
+  * [57490d923] Fixed some crashes related to article viewing
+  * [4bfe0f9f3] Fixed a crash in reader
+  * [0277df664] Fixed number of columns for tablets
+  * [4c09edb7c] Fixed too large images on tablets
+
+Matth78 (1):
+  * [554eaa5f8] Updated French translation using Weblate
+
+Oğuz Ersen (1):
+  * [f28fbf1ac] Updated Turkish translation using Weblate
+
+Scrambled777 (1):
+  * [4b89f1d48] Updated Hindi translation using Weblate
+
+bittin1ddc447d824349b2 (1):
+  * [c26f657f2] Updated Swedish translation using Weblate
+
+gallegonovato (1):
+  * [fb9541e5a] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [87bd74dd5] Updated Galician translation using Weblate
+
+pchelium (1):
+  * [cf1ae0f52] Updated Czech translation using Weblate
+
+大王叫我来巡山 (1):
+  * [85001e889] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.25
 Jonas Kalderstam (6):
   * [dea0a7092] Updated release pipeline to always publish APKs even if Play
