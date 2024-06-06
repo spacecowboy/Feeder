@@ -29,7 +29,6 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -109,7 +108,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
-import com.nononsenseapps.feeder.util.logDebug
 import kotlin.math.abs
 
 fun LazyListScope.linearArticleContent(
@@ -463,10 +461,6 @@ fun LinearImageContent(
                                 RestrainedFillWidthScaling(pixelDensity)
                             }
                         }
-
-                    SideEffect {
-                        logDebug("JONAS", "imgUri ${bestImage.imgUri}")
-                    }
 
                     AsyncImage(
                         model =

@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.model.html
 
+import com.nononsenseapps.feeder.util.logDebug
+
 class LinearTextBuilder : Appendable {
     private data class MutableRange<T>(
         val item: T,
@@ -125,12 +127,23 @@ class LinearTextBuilder : Appendable {
             text = trimmed,
             blockStyle = blockStyle,
             annotations =
-                annotations.map {
-                    LinearTextAnnotation(
-                        data = it.item,
-                        start = it.start.coerceAtMost(trimmed.lastIndex),
-                        end = (it.end ?: text.lastIndex).coerceAtMost(trimmed.lastIndex),
-                    )
+                annotations.mapNotNull {
+                    val start = it.start.coerceAtMost(trimmed.lastIndex)
+                    val end = (it.end ?: text.lastIndex).coerceAtMost(trimmed.lastIndex)
+
+                    if (start < 0 || end < 0 || start > end) {
+                        // This can happen if the link encloses an image for example
+                        logDebug(LOG_TAG, "Ignoring ${it.item} start: $start, end: $end")
+                        null
+                    } else {
+                        LinearTextAnnotation(
+                            data = it.item,
+                            start = start,
+                            end = end,
+                        ).also {
+                            logDebug(LOG_TAG, "$it")
+                        }
+                    }
                 },
         )
     }
@@ -158,6 +171,10 @@ class LinearTextBuilder : Appendable {
             }
         }
         return null
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_LINEARTB"
     }
 }
 
