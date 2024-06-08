@@ -248,4 +248,5 @@
     <string name="close_menu">Đóng trình đơn</string>
     <string name="export_saved_articles">Xuất các bài viết đã lưu</string>
     <string name="skip_duplicate_articles">Bỏ qua bài viết trùng lặp</string>
+    <string name="touch_to_play_audio">Chạm để phát âm thanh</string>
 </resources>
