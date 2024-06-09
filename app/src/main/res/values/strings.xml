@@ -261,5 +261,7 @@
   <string name="close_menu">Close menu</string>
   <string name="skip_duplicate_articles">Skip duplicate articles</string>
   <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
-    <string name="touch_to_play_audio">Touch to play audio</string>
+  <string name="touch_to_play_audio">Touch to play audio</string>
+  <string name="title_unread_count" translatable="false">(%1$d)</string>
+  <string name="show_title_unread_count">Show unread article count in title</string>
 </resources>

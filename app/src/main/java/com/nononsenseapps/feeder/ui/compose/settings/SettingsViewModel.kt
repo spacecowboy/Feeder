@@ -147,6 +147,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowReadingTime(value)
     }
 
+    fun setShowTitleUnreadCount(value: Boolean) {
+        repository.setShowTitleUnreadCount(value)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
         repository.feedNotificationSettings
@@ -199,6 +203,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.showOnlyTitle,
                 repository.isOpenAdjacent,
                 repository.showReadingTime,
+                repository.showTitleUnreadCount,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -228,6 +233,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     showOnlyTitle = params[23] as Boolean,
                     isOpenAdjacent = params[24] as Boolean,
                     showReadingTime = params[25] as Boolean,
+                    showTitleUnreadCount = params[26] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -269,6 +275,7 @@ data class SettingsViewState(
     val showOnlyTitle: Boolean = false,
     val isOpenAdjacent: Boolean = true,
     val showReadingTime: Boolean = false,
+    val showTitleUnreadCount: Boolean = false,
 )
 
 data class UIFeedSettings(
