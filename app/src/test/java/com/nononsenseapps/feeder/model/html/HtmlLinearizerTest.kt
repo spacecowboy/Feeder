@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model.html
 
 import com.nononsenseapps.feeder.ui.compose.html.toTableData
 import org.junit.Before
+import org.junit.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -534,6 +535,40 @@ class HtmlLinearizerTest {
             ),
             result[0],
         )
+    }
+
+    @Test
+    fun `content inside blockquote`() {
+        val html =
+            """
+            <p><a class="tumblr_blog" href="https://everydaylouie.tumblr.com/post/716429042034802688/challenge">everydaylouie</a>:</p>
+            <blockquote>
+            <div class="npf_row">
+            <figure class="tmblr-full" data-orig-height="624" data-orig-width="1200">
+            <img src="https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s640x960/75e2a17fad52257ac5c7326e123d125be18ecd14.png" data-orig-height="624" data-orig-width="1200" srcset="https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s75x75_c1/48387a66ca77d9e8af781b47efb733f8e5abe553.png 75w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s100x200/9387531174b8be87ae89fd6f967e274336b7f5a4.png 100w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s250x400/435ce8fba2aa5f75a548a497f1157f563245dd93.png 250w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s400x600/3fc4822b65cab32e05ed0611b6721ab3ab0ba5c8.png 400w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s500x750/f86d4df43eb0de4695d3261cca41739278c9e6bc.png 500w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s540x810/64c4028177a81a99d416b8994b07b8d228b25ea5.png 540w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s640x960/75e2a17fad52257ac5c7326e123d125be18ecd14.png 640w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s1280x1920/258a6c4e80c6403aa4163c73cf39c09183dd4b4a.png 1200w" sizes="(max-width: 1200px) 100vw, 1200px"/>
+            </figure></div><p>CHALLENGE!</p></blockquote>
+            """.trimIndent()
+
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(3, result.size, "Expected items: $result")
+
+        assertTrue { result[1] is LinearImage }
+    }
+
+    @Ignore
+    @Test
+    fun `audio in iframe`() {
+        val html =
+            """
+            <iframe 
+            class="tumblr_audio_player tumblr_audio_player_718384010494197760" 
+            src="https://pokemonmysterydungeon.tumblr.com/post/718384010494197760/audio_player_iframe/pokemonmysterydungeon/tumblr_pgyj6gSPFJ1skzors?audio_file=https%3A%2F%2Fa.tumblr.com%2Ftumblr_pgyj6gSPFJ1skzorso1.mp3"
+            frameborder="0" allowtransparency="true" scrolling="no" width="540" height="169">
+            </iframe>
+            """.trimIndent()
     }
 
     @Test

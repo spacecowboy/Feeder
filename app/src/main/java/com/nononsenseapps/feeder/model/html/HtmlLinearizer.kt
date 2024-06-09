@@ -334,21 +334,49 @@ class HtmlLinearizer {
 
                         "blockquote" -> {
                             finalizeAndAddCurrentElement(blockStyle)
-                            add(
-                                LinearBlockQuote(
-                                    cite = element.attr("cite").ifBlank { null },
-                                    content =
-                                        ListBuilderScope {
-                                            asElement(blockStyle = LinearTextBlockStyle.TEXT) {
-                                                linearizeChildren(
-                                                    element.childNodes(),
-                                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                                    baseUrl = baseUrl,
-                                                )
-                                            }
-                                        }.items,
-                                ),
-                            )
+
+                            val cite = element.attr("cite").ifBlank { null }
+
+                            // Text should be collected into LinearBlockQuote
+                            // Other types should be added separately
+                            ListBuilderScope {
+                                asElement(blockStyle = LinearTextBlockStyle.TEXT) {
+                                    linearizeChildren(
+                                        element.childNodes(),
+                                        blockStyle = LinearTextBlockStyle.TEXT,
+                                        baseUrl = baseUrl,
+                                    )
+                                }
+                            }.items
+                                .fold(mutableListOf<LinearElement>()) { acc, item ->
+                                    if (item is LinearText) {
+                                        acc.add(item)
+                                        acc
+                                    } else {
+                                        if (acc.isNotEmpty()) {
+                                            add(
+                                                LinearBlockQuote(
+                                                    cite = cite,
+                                                    content = acc,
+                                                ),
+                                            )
+                                        }
+                                        add(
+                                            item,
+                                        )
+                                        mutableListOf()
+                                    }
+                                }
+                                .let {
+                                    if (it.isNotEmpty()) {
+                                        add(
+                                            LinearBlockQuote(
+                                                cite = cite,
+                                                content = it,
+                                            ),
+                                        )
+                                    }
+                                }
                         }
 
                         "a" -> {
