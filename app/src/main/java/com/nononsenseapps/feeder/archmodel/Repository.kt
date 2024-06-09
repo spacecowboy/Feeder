@@ -422,18 +422,18 @@ class Repository(override val di: DI) : DIAware {
     ) = getUnreadCount(feedId).mapLatest { unreadCount ->
         ScreenTitle(
             title =
-            when {
-                feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                tag.isNotBlank() -> tag
-                else -> null
-            },
+                when {
+                    feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
+                    tag.isNotBlank() -> tag
+                    else -> null
+                },
             type =
-            when (feedId) {
-                ID_UNSET -> FeedType.TAG
-                ID_ALL_FEEDS -> FeedType.ALL_FEEDS
-                ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
-                else -> FeedType.FEED
-            },
+                when (feedId) {
+                    ID_UNSET -> FeedType.TAG
+                    ID_ALL_FEEDS -> FeedType.ALL_FEEDS
+                    ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                    else -> FeedType.FEED
+                },
             unreadCount = unreadCount,
         )
     }
@@ -444,18 +444,18 @@ class Repository(override val di: DI) : DIAware {
             getUnreadCount(feedId).mapLatest { unreadCount ->
                 ScreenTitle(
                     title =
-                    when {
-                        feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                        tag.isNotBlank() -> tag
-                        else -> null
-                    },
+                        when {
+                            feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
+                            tag.isNotBlank() -> tag
+                            else -> null
+                        },
                     type =
-                    when (feedId) {
-                        ID_UNSET -> FeedType.TAG
-                        ID_ALL_FEEDS -> FeedType.ALL_FEEDS
-                        ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
-                        else -> FeedType.FEED
-                    },
+                        when (feedId) {
+                            ID_UNSET -> FeedType.TAG
+                            ID_ALL_FEEDS -> FeedType.ALL_FEEDS
+                            ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                            else -> FeedType.FEED
+                        },
                     unreadCount = unreadCount,
                 )
             }

@@ -1000,10 +1000,10 @@ fun FeedScreen(
                         FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
                         FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
                     }.let { title ->
-                        if (viewState.feedScreenTitle.type == FeedType.SAVED_ARTICLES
-                            || !viewState.showTitleUnreadCount
-                            || viewState.feedScreenTitle.unreadCount == 0
-                            || title == null
+                        if (viewState.feedScreenTitle.type == FeedType.SAVED_ARTICLES ||
+                            !viewState.showTitleUnreadCount ||
+                            viewState.feedScreenTitle.unreadCount == 0 ||
+                            title == null
                         ) {
                             title
                         } else {
