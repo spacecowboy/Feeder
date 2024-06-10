@@ -249,4 +249,5 @@
     <string name="skip_duplicate_articles_desc">Artikel mit Links oder Titeln, die mit bestehenden Artikeln identisch sind, werden ignoriert</string>
     <string name="feed_item_style_compact_card">Kompakte Kartei</string>
     <string name="show_title_unread_count">Zeige Anzahl ungelesener Artikel im Titel</string>
+    <string name="touch_to_play_audio">Berühren, um Audio abzuspielen</string>
 </resources>
