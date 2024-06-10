@@ -630,8 +630,8 @@ class HtmlLinearizer {
                                                 link = src,
                                                 imageThumbnail = null,
                                                 mimeType = source.attr("type").ifBlank { null },
-                                                widthPx = width,
-                                                heightPx = height,
+                                                widthPx = width?.takeIf { it > 0 },
+                                                heightPx = height?.takeIf { it > 0 },
                                             )
                                         }
                                     }.toList()
@@ -669,8 +669,8 @@ class HtmlLinearizer {
                                 uri = video.src,
                                 link = video.link,
                                 imageThumbnail = video.imageUrl,
-                                widthPx = width ?: video.width,
-                                heightPx = height ?: video.height,
+                                widthPx = width?.takeIf { it > 0 } ?: video.width.takeIf { it > 0 },
+                                heightPx = height?.takeIf { it > 0 } ?: video.height.takeIf { it > 0 },
                                 mimeType = null,
                             ),
                         ),
@@ -791,7 +791,7 @@ class HtmlLinearizer {
                                         pixelDensity = null,
                                         heightPx = null,
                                         widthPx = null,
-                                        screenWidth = width.toInt(),
+                                        screenWidth = width.toInt().takeIf { it > 0 },
                                     ),
                                 )
                             }
@@ -806,7 +806,7 @@ class HtmlLinearizer {
                                 result.add(
                                     LinearImageSource(
                                         imgUri = StringUtil.resolve(baseUrl, candidate.first()),
-                                        pixelDensity = density,
+                                        pixelDensity = density.takeIf { it > 0 },
                                         heightPx = null,
                                         widthPx = null,
                                         screenWidth = null,
@@ -828,8 +828,8 @@ class HtmlLinearizer {
                             imgUri = url,
                             pixelDensity = null,
                             screenWidth = null,
-                            heightPx = height,
-                            widthPx = width,
+                            heightPx = height.takeIf { it > 0 },
+                            widthPx = width.takeIf { it > 0 },
                         ),
                     )
                 } else {
@@ -853,8 +853,8 @@ class HtmlLinearizer {
                             imgUri = url,
                             pixelDensity = null,
                             screenWidth = null,
-                            heightPx = height,
-                            widthPx = width,
+                            heightPx = height.takeIf { it > 0 },
+                            widthPx = width.takeIf { it > 0 },
                         ),
                     )
                 } else {

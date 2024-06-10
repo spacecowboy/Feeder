@@ -293,7 +293,13 @@ fun LinearVideoContent(
                                 else -> maxImageWidth
                             }
                         }
-                    val imageHeight: Int? = null
+                    val imageHeight: Int =
+                        remember(linearVideo.firstSource) {
+                            when {
+                                linearVideo.firstSource.heightPx != null -> linearVideo.firstSource.heightPx!!
+                                else -> imageWidth
+                            }
+                        }
                     val dimens = LocalDimens.current
 
                     val contentScale =
@@ -311,7 +317,7 @@ fun LinearVideoContent(
                                 .data(linearVideo.imageThumbnail)
                                 .scale(Scale.FIT)
                                 // DO NOT use the actualSize parameter here
-                                .size(Size(imageWidth, imageHeight ?: imageWidth))
+                                .size(Size(imageWidth, imageHeight))
                                 // If image is larger than requested size, scale down
                                 // But if image is smaller, don't scale up
                                 // Note that this is the pixels, not how it is scaled inside the ImageView

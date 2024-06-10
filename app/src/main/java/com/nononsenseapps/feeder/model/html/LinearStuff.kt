@@ -290,7 +290,22 @@ data class LinearImageSource(
     val heightPx: Int?,
     val pixelDensity: Float?,
     val screenWidth: Int?,
-)
+) {
+    init {
+        if (widthPx != null && widthPx < 1) {
+            throw IllegalArgumentException("Width must be positive: $widthPx")
+        }
+        if (heightPx != null && heightPx < 1) {
+            throw IllegalArgumentException("Height must be positive: $heightPx")
+        }
+        if (pixelDensity != null && pixelDensity <= 0) {
+            throw IllegalArgumentException("Pixel density must be positive: $pixelDensity")
+        }
+        if (screenWidth != null && screenWidth < 1) {
+            throw IllegalArgumentException("Screen width must be positive: $screenWidth")
+        }
+    }
+}
 
 /**
  * Represents a video element
@@ -318,7 +333,16 @@ data class LinearVideoSource(
     val widthPx: Int?,
     val heightPx: Int?,
     val mimeType: String?,
-)
+) {
+    init {
+        if (widthPx != null && widthPx < 1) {
+            throw IllegalArgumentException("Width must be positive: $widthPx")
+        }
+        if (heightPx != null && heightPx < 1) {
+            throw IllegalArgumentException("Height must be positive: $heightPx")
+        }
+    }
+}
 
 /**
  * Represents an audio element

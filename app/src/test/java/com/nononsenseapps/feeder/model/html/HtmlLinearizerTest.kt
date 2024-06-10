@@ -608,6 +608,44 @@ class HtmlLinearizerTest {
     }
 
     @Test
+    fun `video with 1 source and negative width`() {
+        val html = "<html><body><video controls width=\"-1\"><source src=\"video.mp4\" type=\"video/mp4\"></video></body></html>"
+        val baseUrl = "https://example.com"
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(
+            LinearVideo(
+                sources =
+                    listOf(
+                        LinearVideoSource("https://example.com/video.mp4", "https://example.com/video.mp4", null, null, null, "video/mp4"),
+                    ),
+            ),
+            result[0],
+        )
+    }
+
+    @Test
+    fun `image with negative heightPx`() {
+        val html = "<html><body><img src=\"https://example.com/image.jpg\" height=\"-1\"/></body></html>"
+        val baseUrl = "https://example.com"
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(
+            LinearImage(
+                sources =
+                    listOf(
+                        LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
+                    ),
+                caption = null,
+                link = null,
+            ),
+            result[0],
+        )
+    }
+
+    @Test
     fun `iframe with youtube video`() {
         val html = "<html><body><iframe src=\"https://www.youtube.com/embed/cjxnVO9RpaQ\"></iframe></body></html>"
         val baseUrl = "https://example.com"
