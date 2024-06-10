@@ -97,7 +97,7 @@ class FeedArticleViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                ScreenTitle("", FeedType.ALL_FEEDS),
+                ScreenTitle("", FeedType.ALL_FEEDS, 0),
             )
 
     private val visibleFeeds: StateFlow<List<FeedTitle>> =
@@ -308,6 +308,7 @@ class FeedArticleViewModel(
             repository.showOnlyTitle,
             repository.showReadingTime,
             repository.syncWorkerRunning,
+            repository.showTitleUnreadCount,
         ) { params: Array<Any> ->
             val article = params[15] as Article
 
@@ -374,6 +375,7 @@ class FeedArticleViewModel(
                     },
                 image = article.image,
                 articleContent = parseArticleContent(article, textToDisplay),
+                showTitleUnreadCount = params[28] as Boolean,
             )
         }
             .stateIn(
@@ -608,6 +610,7 @@ interface FeedScreenViewState {
     val showReadingTime: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
+    val showTitleUnreadCount: Boolean
 }
 
 @Immutable
@@ -702,7 +705,7 @@ data class FeedArticleScreenViewState(
     override val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
     override val currentlySyncing: Boolean = false,
     // Defaults to empty string to avoid rendering until loading complete
-    override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED),
+    override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED, 0),
     override val visibleFeeds: List<FeedTitle> = emptyList(),
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     override val expandedTags: Set<String> = emptySet(),
@@ -739,6 +742,7 @@ data class FeedArticleScreenViewState(
     override val wordCount: Int = 0,
     override val image: ThumbnailImage? = null,
     override val articleContent: LinearArticle = LinearArticle(elements = emptyList()),
+    override val showTitleUnreadCount: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
 
 sealed class TSSError

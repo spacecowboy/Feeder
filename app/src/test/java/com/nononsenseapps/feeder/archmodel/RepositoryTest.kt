@@ -91,6 +91,8 @@ class RepositoryTest : DIAware {
         every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
         every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
+
+        every { feedItemStore.getFeedItemCountRaw(any(), any(), any(), any()) } returns flowOf(0)
     }
 
     @Test
@@ -286,7 +288,7 @@ class RepositoryTest : DIAware {
                 repository.getScreenTitleForFeedOrTag(ID_ALL_FEEDS, "").toList().first()
             }
 
-        assertEquals(ScreenTitle(title = null, type = FeedType.ALL_FEEDS), result)
+        assertEquals(ScreenTitle(title = null, type = FeedType.ALL_FEEDS, unreadCount = 0), result)
     }
 
     @Test
@@ -296,7 +298,7 @@ class RepositoryTest : DIAware {
                 repository.getScreenTitleForFeedOrTag(ID_SAVED_ARTICLES, "").toList().first()
             }
 
-        assertEquals(ScreenTitle(title = null, type = FeedType.SAVED_ARTICLES), result)
+        assertEquals(ScreenTitle(title = null, type = FeedType.SAVED_ARTICLES, unreadCount = 0), result)
     }
 
     @Test
@@ -306,7 +308,7 @@ class RepositoryTest : DIAware {
                 repository.getScreenTitleForFeedOrTag(ID_UNSET, "fwr").toList().first()
             }
 
-        assertEquals(ScreenTitle(title = "fwr", type = FeedType.TAG), result)
+        assertEquals(ScreenTitle(title = "fwr", type = FeedType.TAG, unreadCount = 0), result)
     }
 
     @Test
@@ -318,7 +320,7 @@ class RepositoryTest : DIAware {
                 repository.getScreenTitleForFeedOrTag(5L, "fwr").toList().first()
             }
 
-        assertEquals(ScreenTitle(title = "floppa", type = FeedType.FEED), result)
+        assertEquals(ScreenTitle(title = "floppa", type = FeedType.FEED, unreadCount = 0), result)
 
         coVerify {
             feedStore.getDisplayTitle(5L)

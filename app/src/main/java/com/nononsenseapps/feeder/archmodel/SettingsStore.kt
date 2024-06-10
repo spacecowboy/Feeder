@@ -481,6 +481,14 @@ class SettingsStore(override val di: DI) : DIAware {
         }
     }
 
+    private val _showTitleUnreadCount = MutableStateFlow(sp.getBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, false))
+    val showTitleUnreadCount = _showTitleUnreadCount.asStateFlow()
+
+    fun setShowTitleUnreadCount(value: Boolean) {
+        _showTitleUnreadCount.value = value
+        sp.edit().putBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, value).apply()
+    }
+
     fun getAllSettings(): Map<String, String> {
         val all = sp.all ?: emptyMap()
 
@@ -577,6 +585,11 @@ const val PREF_LIST_SHOW_READING_TIME = "pref_show_reading_time"
  * Read Aloud Settings
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
+
+/**
+ * Appearance settings
+ */
+const val PREF_SHOW_TITLE_UNREAD_COUNT = "pref_show_title_unread_count"
 
 /**
  * Used for OPML Import/Export. Please add new (only) user configurable settings here

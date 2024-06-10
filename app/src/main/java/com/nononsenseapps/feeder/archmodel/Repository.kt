@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -276,6 +275,10 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
+    val showTitleUnreadCount = settingsStore.showTitleUnreadCount
+
+    fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)
+
     /**
      * Returns true if the latest sync timestamp is within the last 10 seconds
      */
@@ -416,44 +419,46 @@ class Repository(override val di: DI) : DIAware {
     fun getScreenTitleForFeedOrTag(
         feedId: Long,
         tag: String,
-    ) = flow {
-        emit(
-            ScreenTitle(
-                title =
-                    when {
-                        feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                        tag.isNotBlank() -> tag
-                        else -> null
-                    },
-                type =
-                    when (feedId) {
-                        ID_UNSET -> FeedType.TAG
-                        ID_ALL_FEEDS -> FeedType.ALL_FEEDS
-                        ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
-                        else -> FeedType.FEED
-                    },
-            ),
+    ) = getUnreadCount(feedId).mapLatest { unreadCount ->
+        ScreenTitle(
+            title =
+                when {
+                    feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
+                    tag.isNotBlank() -> tag
+                    else -> null
+                },
+            type =
+                when (feedId) {
+                    ID_UNSET -> FeedType.TAG
+                    ID_ALL_FEEDS -> FeedType.ALL_FEEDS
+                    ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                    else -> FeedType.FEED
+                },
+            unreadCount = unreadCount,
         )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getScreenTitleForCurrentFeedOrTag(): Flow<ScreenTitle> =
-        currentFeedAndTag.mapLatest { (feedId, tag) ->
-            ScreenTitle(
-                title =
-                    when {
-                        feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                        tag.isNotBlank() -> tag
-                        else -> null
-                    },
-                type =
-                    when (feedId) {
-                        ID_UNSET -> FeedType.TAG
-                        ID_ALL_FEEDS -> FeedType.ALL_FEEDS
-                        ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
-                        else -> FeedType.FEED
-                    },
-            )
+        currentFeedAndTag.flatMapLatest { (feedId, tag) ->
+            getUnreadCount(feedId).mapLatest { unreadCount ->
+                ScreenTitle(
+                    title =
+                        when {
+                            feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
+                            tag.isNotBlank() -> tag
+                            else -> null
+                        },
+                    type =
+                        when (feedId) {
+                            ID_UNSET -> FeedType.TAG
+                            ID_ALL_FEEDS -> FeedType.ALL_FEEDS
+                            ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                            else -> FeedType.FEED
+                        },
+                    unreadCount = unreadCount,
+                )
+            }
         }
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
@@ -834,6 +839,7 @@ private data class FeedListArgs(
 data class ScreenTitle(
     val title: String?,
     val type: FeedType,
+    val unreadCount: Int,
 )
 
 enum class FeedType {

@@ -390,4 +390,15 @@ class SettingsStoreTest : DIAware {
         val allSettings = store.getAllSettings()
         assertEquals(1, allSettings.size)
     }
+
+    @Test
+    fun showTitleUnreadCount() {
+        store.setShowTitleUnreadCount(true)
+
+        verify {
+            sp.edit().putBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, true).apply()
+        }
+
+        assertEquals(true, store.showTitleUnreadCount.value)
+    }
 }

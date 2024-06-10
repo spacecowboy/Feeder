@@ -201,6 +201,8 @@ fun SettingsScreen(
             onOpenAdjacent = settingsViewModel::setIsOpenAdjacent,
             showReadingTime = viewState.showReadingTime,
             onShowReadingTimeChange = settingsViewModel::setShowReadingTime,
+            showTitleUnreadCount = viewState.showTitleUnreadCount,
+            onShowTitleUnreadCountChange = settingsViewModel::setShowTitleUnreadCount,
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
@@ -268,6 +270,8 @@ private fun SettingsScreenPreview() {
             onOpenAdjacent = {},
             showReadingTime = false,
             onShowReadingTimeChange = {},
+            showTitleUnreadCount = false,
+            onShowTitleUnreadCountChange = {},
             onStartActivity = {},
             modifier = Modifier,
         )
@@ -329,6 +333,8 @@ fun SettingsList(
     onOpenAdjacent: (Boolean) -> Unit,
     showReadingTime: Boolean,
     onShowReadingTimeChange: (Boolean) -> Unit,
+    showTitleUnreadCount: Boolean,
+    onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -589,6 +595,12 @@ fun SettingsList(
             title = stringResource(id = R.string.show_reading_time),
             checked = showReadingTime,
             onCheckedChange = onShowReadingTimeChange,
+        )
+
+        SwitchSetting(
+            title = stringResource(id = R.string.show_title_unread_count),
+            checked = showTitleUnreadCount,
+            onCheckedChange = onShowTitleUnreadCountChange,
         )
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))

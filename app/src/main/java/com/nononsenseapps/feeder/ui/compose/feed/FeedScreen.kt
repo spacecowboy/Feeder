@@ -996,10 +996,19 @@ fun FeedScreen(
                 scrollBehavior = scrollBehavior,
                 title =
                     when (viewState.feedScreenTitle.type) {
-                        FeedType.FEED -> viewState.feedScreenTitle.title
-                        FeedType.TAG -> viewState.feedScreenTitle.title
+                        FeedType.FEED, FeedType.TAG -> viewState.feedScreenTitle.title
                         FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
                         FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
+                    }.let { title ->
+                        if (viewState.feedScreenTitle.type == FeedType.SAVED_ARTICLES ||
+                            !viewState.showTitleUnreadCount ||
+                            viewState.feedScreenTitle.unreadCount == 0 ||
+                            title == null
+                        ) {
+                            title
+                        } else {
+                            title + " ${stringResource(id = R.string.title_unread_count, viewState.feedScreenTitle.unreadCount)}"
+                        }
                     } ?: "",
                 navigationIcon = {
                     IconButton(
