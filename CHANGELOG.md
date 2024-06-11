@@ -1,3 +1,15 @@
+# 2.6.27
+Jonas Kalderstam (3):
+  * [f23390ed0] Fixed nested content inside blockquotes
+  * [5bdd17043] Fixed crash for some images
+  * [35004eee5] Added German translation
+
+Sven Jacobs (1):
+  * [a42529eab] Added option to show unread count in title (#300)
+
+ngocanhtve (1):
+  * [1e0fc0fae] Updated Vietnamese translation using Weblate
+
 # 2.6.26
 Agnieszka C (1):
   * [7fd77f475] Updated Polish translation using Weblate
