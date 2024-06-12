@@ -728,8 +728,8 @@ fun LinearTableContent(
     val borderColor = MaterialTheme.colorScheme.outlineVariant
     Table(
         tableData = linearTable.toTableData(),
-        allowHorizontalScroll = allowHorizontalScroll,
         modifier = modifier,
+        allowHorizontalScroll = allowHorizontalScroll,
         content = { row, column ->
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -1387,7 +1387,7 @@ private fun PreviewColSpanningTable() {
 }
 
 fun LinearTable.toTableData(): TableData {
-    return TableData(
+    return TableData.fromCells(
         cells =
             cells
                 .asSequence()

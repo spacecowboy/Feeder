@@ -28,7 +28,6 @@ fun Table(
     tableData: TableData,
     modifier: Modifier = Modifier,
     allowHorizontalScroll: Boolean = true,
-    caption: @Composable (() -> Unit)? = null,
     content: @Composable (row: Int, column: Int) -> Unit,
 ) {
     val columnWidths = remember { mutableStateMapOf<Int, Int>() }
@@ -57,7 +56,7 @@ fun Table(
                     }
                 }
             },
-        ) { measurables, constraints ->
+        ) { measurables, _ ->
             val placeables =
                 measurables.mapIndexed { index, measurable ->
                     val tableCell = tableData.cells[index]
@@ -170,9 +169,7 @@ private fun TableWithPaddingPreview() {
 @Composable
 private fun TableCaptionPreview() {
     Surface {
-        Table(tableData = TableData(3, 3), caption = {
-            Text("Table caption")
-        }) { row, column ->
+        Table(tableData = TableData(3, 3)) { row, column ->
             Box(
                 modifier =
                     Modifier
@@ -183,7 +180,8 @@ private fun TableCaptionPreview() {
     }
 }
 
-data class TableData(
+@Suppress("DataClassPrivateConstructor")
+data class TableData private constructor(
     val cells: List<TableCell>,
 ) {
     constructor(row: Int, column: Int) : this(
@@ -198,22 +196,57 @@ data class TableData(
     )
 
     init {
-        var lastRowSpan = 0
-        var lastColSpan = 0
+        var lastSpanned = false
         for (cell in cells) {
-            check(cell.rowSpan >= lastRowSpan) {
-                "Cells must be sorted in order of increasing spans"
+            val isSpanned = cell.rowSpan > 1 || cell.colSpan > 1
+            check(!lastSpanned && !isSpanned || isSpanned) {
+                "Spanned cells should come after non-spanned cells"
             }
-            check(cell.colSpan >= lastColSpan) {
-                "Cells must be sorted in order of increasing spans"
-            }
-            lastRowSpan = cell.rowSpan
-            lastColSpan = cell.colSpan
+            lastSpanned = isSpanned
         }
     }
 
     val rows: Int = cells.maxOf { it.row + it.rowSpan }
     val columns: Int = cells.maxOf { it.column + it.colSpan }
+
+    companion object {
+        /**
+         * Ensures the cells are correctly sorted
+         */
+        fun fromCells(cells: List<TableCell>): TableData {
+            return TableData(
+                cells =
+                    cells
+                        .sortedWith { a, b ->
+                            // Spanned in both dimensions should come last of all
+                            val aIsDoubleSpanned = a.rowSpan > 1 && a.colSpan > 1
+                            val bIsDoubleSpanned = b.rowSpan > 1 && b.colSpan > 1
+
+                            if (aIsDoubleSpanned && !bIsDoubleSpanned) {
+                                return@sortedWith 1
+                            } else if (!aIsDoubleSpanned && bIsDoubleSpanned) {
+                                return@sortedWith -1
+                            }
+
+                            // Spanned cells should come after non-spanned cells
+                            val aIsSpanned = a.rowSpan > 1 || a.colSpan > 1
+                            val bIsSpanned = b.rowSpan > 1 || b.colSpan > 1
+
+                            if (aIsSpanned && !bIsSpanned) {
+                                return@sortedWith 1
+                            } else if (!aIsSpanned && bIsSpanned) {
+                                return@sortedWith -1
+                            }
+
+                            // Then sort by location
+                            if (a.row != b.row) {
+                                return@sortedWith a.row.compareTo(b.row)
+                            }
+                            return@sortedWith a.column.compareTo(b.column)
+                        },
+            )
+        }
+    }
 }
 
 data class TableCell(
