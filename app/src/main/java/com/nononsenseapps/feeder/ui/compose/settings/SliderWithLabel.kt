@@ -41,12 +41,11 @@ fun SliderWithLabel(
     labelMinWidth: Dp = 28.dp,
     onValueChange: (Float) -> Unit,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         BoxWithConstraints(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .then(modifier),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             val offset =
                 getSliderOffset(

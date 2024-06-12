@@ -233,9 +233,7 @@ fun LinearAudioContent(
     onLinkClick: (String) -> Unit,
 ) {
     Column(
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -265,9 +263,7 @@ fun LinearVideoContent(
     onLinkClick: (String) -> Unit,
 ) {
     Column(
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -364,9 +360,7 @@ fun LinearListContent(
     onLinkClick: (String) -> Unit,
 ) {
     Column(
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.Start,
     ) {
@@ -414,9 +408,7 @@ fun LinearImageContent(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
     ) {
         DisableSelection {
             BoxWithConstraints(
@@ -551,10 +543,9 @@ fun LinearTextContent(
                     softWrap = softWrap,
                     style = LocalTextStyle.current,
                     modifier =
-                        Modifier
+                        modifier
                             .indication(interactionSource, LocalIndication.current)
-                            .focusableInNonTouchMode(interactionSource = interactionSource)
-                            .then(modifier),
+                            .focusableInNonTouchMode(interactionSource = interactionSource),
                 ) { offset ->
                     annotatedString.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
@@ -567,10 +558,9 @@ fun LinearTextContent(
                     text = annotatedString,
                     softWrap = softWrap,
                     modifier =
-                        Modifier
+                        modifier
                             .indication(interactionSource, LocalIndication.current)
-                            .focusableInNonTouchMode(interactionSource = interactionSource)
-                            .then(modifier),
+                            .focusableInNonTouchMode(interactionSource = interactionSource),
                 )
             }
         }
@@ -588,9 +578,8 @@ fun LinearBlockQuoteContent(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 2.dp,
         modifier =
-            Modifier
-                .padding(start = 8.dp)
-                .then(modifier),
+            modifier
+                .padding(start = 8.dp),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -647,7 +636,7 @@ fun LinearBlockQuoteContent(
 //        color = MaterialTheme.colorScheme.surface,
 //        shape = MaterialTheme.shapes.medium,
 //        modifier =
-//        Modifier
+//        modifier
 //            .run {
 //                if (allowHorizontalScroll) {
 //                    horizontalScroll(scrollState)
@@ -660,7 +649,6 @@ fun LinearBlockQuoteContent(
 //                LocalIndication.current,
 //            )
 //            .focusableInNonTouchMode(interactionSource = interactionSource)
-//            .then(modifier),
 //    ) {
 //        Box(modifier = Modifier.padding(all = 4.dp)) {
 //            ProvideTextStyle(
@@ -689,9 +677,7 @@ fun CodeBlock(
     val interactionSource =
         remember { MutableInteractionSource() }
     Box(
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         contentAlignment = Alignment.TopStart,
     ) {
         Surface(
@@ -743,9 +729,7 @@ fun LinearTableContent(
     Table(
         tableData = linearTable.toTableData(),
         allowHorizontalScroll = allowHorizontalScroll,
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         content = { row, column ->
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),

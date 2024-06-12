@@ -37,9 +37,7 @@ fun Table(
     val horizontalScrollState: ScrollState = rememberScrollState()
 
     Box(
-        modifier =
-            Modifier
-                .then(modifier),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         Layout(

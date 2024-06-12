@@ -240,10 +240,9 @@ fun SearchFeedView(
     Box(
         contentAlignment = Alignment.TopCenter,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState)
-                .then(modifier),
+                .verticalScroll(scrollState),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
