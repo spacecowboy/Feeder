@@ -98,13 +98,13 @@ class FullTextParser(override val di: DI) : DIAware {
         } finally {
             repository.markAsFullTextDownloaded(feedItem.id)
         }.onLeft {
-            Log.w(LOG_TAG, "Failed to parse missing full article: ${it.description}", it.throwable)
+            Log.w(LOG_TAG, "Failed to parse missing full article: $it", it.throwable)
         }
     }
 
     private suspend fun parseFullArticle(feedItem: FeedItemForFetching): Either<FeedParserError, Unit> =
         withContext(Dispatchers.Default) {
-            logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
+            logDebug(LOG_TAG, "Fetching full page ${feedItem.link}, ${feedItem.id}")
             val url = feedItem.link ?: return@withContext Either.Left(NoUrl())
 
             okHttpClient.curlAndOnResponse(URL(url)) { response ->

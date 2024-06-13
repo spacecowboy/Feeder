@@ -189,16 +189,16 @@ class RepositoryTest : DIAware {
         coEvery { feedItemStore.getFullTextByDefault(6L) } returns false
 
         assertEquals(
-            TextToDisplay.FULLTEXT,
+            true,
             runBlocking {
-                repository.getTextToDisplayForItem(5L)
+                repository.shouldDisplayFullTextForItemByDefault(5L)
             },
         )
 
         assertEquals(
-            TextToDisplay.DEFAULT,
+            false,
             runBlocking {
-                repository.getTextToDisplayForItem(6L)
+                repository.shouldDisplayFullTextForItemByDefault(6L)
             },
         )
     }

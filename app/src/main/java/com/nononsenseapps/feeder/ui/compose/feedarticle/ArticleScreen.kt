@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui.compose.feedarticle
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -37,9 +36,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -55,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
-import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
@@ -81,39 +77,21 @@ import java.time.ZonedDateTime
 fun ArticleScreen(
     onNavigateUp: () -> Unit,
     onNavigateToFeed: (Long) -> Unit,
-    viewModel: FeedArticleViewModel,
+    viewModel: ArticleViewModel,
 ) {
     BackHandler(onBack = onNavigateUp)
-    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
-
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
 
-    // Each article gets its own scroll state. Persists across device rotations, but is cleared
-    // when switching articles.
-    val articleListState =
-        key(viewState.articleId) {
-            rememberLazyListState()
-        }
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    val articleListState = rememberLazyListState()
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     ArticleScreen(
         viewState = viewState,
-        onToggleFullText = {
-            when (viewState.textToDisplay) {
-                TextToDisplay.DEFAULT -> viewModel.displayFullText()
-                TextToDisplay.LOADING_FULLTEXT,
-                TextToDisplay.FAILED_TO_LOAD_FULLTEXT,
-                TextToDisplay.FAILED_MISSING_BODY,
-                TextToDisplay.FAILED_MISSING_LINK,
-                TextToDisplay.FAILED_NOT_HTML,
-                TextToDisplay.FULLTEXT,
-                -> viewModel.displayArticleText()
-            }
-        },
-        onMarkAsUnread = {
-            viewModel.markAsUnread(viewState.articleId)
-        },
+        onToggleFullText = viewModel::toggleFullText,
+        onMarkAsUnread = viewModel::markAsUnread,
         onShare = {
             if (viewState.articleId > ID_UNSET) {
                 val intent =
@@ -141,17 +119,14 @@ fun ArticleScreen(
         onFeedTitleClick = {
             onNavigateToFeed(viewState.articleFeedId)
         },
-        onShowToolbarMenu = { visible ->
-            viewModel.setToolbarMenuVisible(visible)
-        },
-        displayFullText = viewModel::displayFullText,
+        onShowToolbarMenu = viewModel::setToolbarMenuVisible,
         ttsOnPlay = viewModel::ttsPlay,
         ttsOnPause = viewModel::ttsPause,
         ttsOnStop = viewModel::ttsStop,
         ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
         onToggleBookmark = {
-            viewModel.setBookmarked(viewState.articleId, !viewState.isBookmarked)
+            viewModel.setBookmarked(!viewState.isBookmarked)
         },
         articleListState = articleListState,
         onNavigateUp = onNavigateUp,
@@ -160,7 +135,6 @@ fun ArticleScreen(
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
 )
 @Composable
 fun ArticleScreen(
@@ -171,7 +145,6 @@ fun ArticleScreen(
     onOpenInCustomTab: () -> Unit,
     onFeedTitleClick: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
-    displayFullText: () -> Unit,
     ttsOnPlay: () -> Unit,
     ttsOnPause: () -> Unit,
     ttsOnStop: () -> Unit,
@@ -376,7 +349,6 @@ fun ArticleScreen(
                 screenType = ScreenType.SINGLE,
                 articleListState = articleListState,
                 onFeedTitleClick = onFeedTitleClick,
-                displayFullText = displayFullText,
                 modifier =
                     Modifier
                         .focusGroup()
@@ -395,7 +367,6 @@ fun ArticleContent(
     screenType: ScreenType,
     onFeedTitleClick: () -> Unit,
     articleListState: LazyListState,
-    displayFullText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val filePathProvider by LocalDI.current.instance<FilePathProvider>()
@@ -404,18 +375,6 @@ fun ArticleContent(
 
     val context = LocalContext.current
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
-
-    if (viewState.articleId > ID_UNSET &&
-        viewState.textToDisplay == TextToDisplay.FULLTEXT &&
-        !blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile
-    ) {
-        // Lambda parameters in a @Composable that are referenced directly inside of restarting effects can cause issues or unpredictable behavior.
-        val callback by rememberUpdatedState(newValue = displayFullText)
-        LaunchedEffect(viewState.articleId, viewState.textToDisplay) {
-            // Trigger parse and fetch
-            callback()
-        }
-    }
 
     ReaderView(
         screenType = screenType,
@@ -449,16 +408,14 @@ fun ArticleContent(
                 else -> null
             },
         image = viewState.image,
-        isFeedText = viewState.textToDisplay == TextToDisplay.DEFAULT,
+        isFeedText = viewState.textToDisplay == TextToDisplay.CONTENT,
         modifier = modifier,
         articleListState = articleListState,
     ) {
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
-                TextToDisplay.DEFAULT,
-                TextToDisplay.FULLTEXT,
-                -> {
+                TextToDisplay.CONTENT -> {
                     linearArticleContent(
                         articleContent = viewState.articleContent,
                         onLinkClick = { link ->

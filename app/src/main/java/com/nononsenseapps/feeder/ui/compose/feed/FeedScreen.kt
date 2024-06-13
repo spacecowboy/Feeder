@@ -123,10 +123,9 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreenViewState
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnreadAndSaved
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
@@ -171,11 +170,11 @@ private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 @Composable
 fun FeedScreen(
     navController: NavController,
-    viewModel: FeedArticleViewModel,
+    viewModel: FeedViewModel,
     navDrawerListState: LazyListState,
 ) {
     val toastMaker: ToastMaker by instance()
-    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val viewState: FeedScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
     val pagedNavDrawerItems = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
 

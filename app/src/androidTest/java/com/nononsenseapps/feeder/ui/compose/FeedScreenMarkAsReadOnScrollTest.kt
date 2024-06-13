@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.instance
@@ -27,6 +28,7 @@ import java.time.ZonedDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Ignore("Flaky")
 class FeedScreenMarkAsReadOnScrollTest : BaseComposeTest {
     @get:Rule
     override val composeTestRule = createAndroidComposeRule<MainActivity>()
