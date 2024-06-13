@@ -140,7 +140,7 @@ interface FeedItemDao {
         WHERE feed_items.id IS :id
         """,
     )
-    fun loadFeedItemFlow(id: Long): Flow<FeedItemWithFeed?>
+    fun getFeedItemFlow(id: Long): Flow<FeedItemWithFeed?>
 
     @Query(
         """

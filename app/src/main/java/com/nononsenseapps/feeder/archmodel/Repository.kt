@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -176,6 +177,12 @@ class Repository(override val di: DI) : DIAware {
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
 
     fun setCurrentArticle(articleId: Long) = settingsStore.setCurrentArticle(articleId)
+
+    suspend fun getCurrentArticle() = feedItemStore.getArticle(currentArticleId.value)
+
+    fun getArticleFlow(itemId: Long): Flow<Article?> =
+        feedItemStore.getFeedItem(itemId)
+            .map { Article(it) }
 
     val currentTheme: StateFlow<ThemeOptions> = settingsStore.currentTheme
 
@@ -400,11 +407,7 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.setNotSynced(itemId)
     }
 
-    suspend fun getTextToDisplayForItem(itemId: Long): TextToDisplay =
-        when (feedItemStore.getFullTextByDefault(itemId)) {
-            true -> TextToDisplay.FULLTEXT
-            false -> TextToDisplay.DEFAULT
-        }
+    suspend fun shouldDisplayFullTextForItemByDefault(itemId: Long): Boolean = feedItemStore.getFullTextByDefault(itemId)
 
     suspend fun getLink(itemId: Long): String? = feedItemStore.getLink(itemId)
 
@@ -884,16 +887,16 @@ data class Article(
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
     val bookmarked: Boolean = item?.bookmarked ?: false
+    val fullTextByDefault: Boolean = item?.fullTextByDefault ?: false
     val wordCount: Int = item?.wordCount ?: 0
     val wordCountFull: Int = item?.wordCountFull ?: 0
     val image: ThumbnailImage? = item?.thumbnailImage
 }
 
 enum class TextToDisplay {
-    DEFAULT,
+    CONTENT,
     LOADING_FULLTEXT,
     FAILED_TO_LOAD_FULLTEXT,
-    FULLTEXT,
     FAILED_MISSING_BODY,
     FAILED_MISSING_LINK,
     FAILED_NOT_HTML,

@@ -140,9 +140,7 @@ class LinearTextBuilder : Appendable {
                             data = it.item,
                             start = start,
                             end = end,
-                        ).also {
-                            logDebug(LOG_TAG, "$it")
-                        }
+                        )
                     }
                 },
         )

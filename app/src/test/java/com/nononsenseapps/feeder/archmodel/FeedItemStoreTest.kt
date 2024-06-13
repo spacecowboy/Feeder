@@ -86,7 +86,7 @@ class FeedItemStoreTest : DIAware {
 
     @Test
     fun getFeedItem() {
-        coEvery { dao.loadFeedItemFlow(5L) } returns flowOf(FeedItemWithFeed(id = 5L))
+        coEvery { dao.getFeedItemFlow(5L) } returns flowOf(FeedItemWithFeed(id = 5L))
 
         val feedItem =
             runBlocking {

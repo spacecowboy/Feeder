@@ -258,7 +258,7 @@ class FeedItemStore(override val di: DI) : DIAware {
     }
 
     fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> {
-        return dao.loadFeedItemFlow(itemId)
+        return dao.getFeedItemFlow(itemId)
     }
 
     suspend fun getFeedItemId(
@@ -334,6 +334,10 @@ class FeedItemStore(override val di: DI) : DIAware {
             plainTitle = title,
             link = link,
         )
+    }
+
+    suspend fun getArticle(id: Long): FeedItemWithFeed? {
+        return dao.getFeedItem(id)
     }
 }
 
