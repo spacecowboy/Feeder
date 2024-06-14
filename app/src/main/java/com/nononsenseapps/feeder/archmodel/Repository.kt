@@ -97,13 +97,15 @@ class Repository(override val di: DI) : DIAware {
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
 
-    fun getUnreadCount(feedId: Long) =
-        feedItemStore.getFeedItemCountRaw(
-            feedId = feedId,
-            tag = "",
-            minReadTime = Instant.now(),
-            filter = emptyFeedListFilter,
-        )
+    fun getUnreadCount(
+        feedId: Long,
+        tag: String = "",
+    ) = feedItemStore.getFeedItemCountRaw(
+        feedId = feedId,
+        tag = tag,
+        minReadTime = Instant.now(),
+        filter = emptyFeedListFilter,
+    )
 
     fun setCurrentFeedAndTag(
         feedId: Long,
@@ -419,7 +421,7 @@ class Repository(override val di: DI) : DIAware {
     fun getScreenTitleForFeedOrTag(
         feedId: Long,
         tag: String,
-    ) = getUnreadCount(feedId).mapLatest { unreadCount ->
+    ) = getUnreadCount(feedId, tag).mapLatest { unreadCount ->
         ScreenTitle(
             title =
                 when {
@@ -441,7 +443,7 @@ class Repository(override val di: DI) : DIAware {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getScreenTitleForCurrentFeedOrTag(): Flow<ScreenTitle> =
         currentFeedAndTag.flatMapLatest { (feedId, tag) ->
-            getUnreadCount(feedId).mapLatest { unreadCount ->
+            getUnreadCount(feedId, tag).mapLatest { unreadCount ->
                 ScreenTitle(
                     title =
                         when {
