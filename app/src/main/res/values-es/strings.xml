@@ -249,4 +249,5 @@
     <string name="skip_duplicate_articles_desc">Se ignoran los artículos con enlaces o títulos idénticos a artículos existentes</string>
     <string name="feed_item_style_compact_card">Tarjeta compacta</string>
     <string name="touch_to_play_audio">Toca para reproducir el audio</string>
+    <string name="show_title_unread_count">Mostrar número de artículos no leídos en el título</string>
 </resources>
