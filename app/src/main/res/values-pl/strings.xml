@@ -249,4 +249,5 @@
     <string name="skip_duplicate_articles">Pomijaj zduplikowane artykuły</string>
     <string name="feed_item_style_compact_card">Karta kompaktowa</string>
     <string name="touch_to_play_audio">Naciśnij, aby odtworzyć dźwięk</string>
+    <string name="show_title_unread_count">Pokazuj liczbę nieprzeczytanych artykułów w tytule</string>
 </resources>
