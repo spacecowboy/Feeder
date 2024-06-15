@@ -216,4 +216,17 @@
     <string name="read_adjective">مقروء</string>
     <string name="saved_adjective">محفوظ</string>
     <string name="theme_e_ink">ورق إلكتروني</string>
+    <string name="close_menu">اغلق القائمة</string>
+    <string name="one_minute">دقيقة واحدة</string>
+    <string name="zero_minutes">%1$s دقيقة</string>
+    <string name="many_minutes">%1$s دقائق</string>
+    <string name="other_minutes">%1$s دقائق</string>
+    <string name="many_words">%1$s كلمات</string>
+    <string name="few_minutes">%1$s دقائق</string>
+    <string name="zero_words">%1$s كلمة</string>
+    <string name="few_words">%1$s كلمات</string>
+    <string name="other_words">%1$s كلمات</string>
+    <string name="two_minutes">دقيقتان</string>
+    <string name="two_words">كلمتان</string>
+    <string name="one_word">كلمة واحدة</string>
 </resources>
