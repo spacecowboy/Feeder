@@ -100,12 +100,24 @@ data class LinearTable(
         rowCount: Int,
         colCount: Int,
         cells: List<LinearTableCellItem>,
+        leftToRight: Boolean,
     ) : this(
         rowCount,
         colCount,
         ArrayMap<Coordinate, LinearTableCellItem>().apply {
             cells.forEachIndexed { index, item ->
-                put(Coordinate(row = index / colCount, col = index % colCount), item)
+                put(
+                    Coordinate(
+                        row = index / colCount,
+                        col =
+                            if (leftToRight) {
+                                index % colCount
+                            } else {
+                                colCount - 1 - index % colCount
+                            },
+                    ),
+                    item,
+                )
             }
         },
     )
@@ -117,7 +129,7 @@ data class LinearTable(
         return cells[Coordinate(row = row, col = col)]
     }
 
-    class Builder {
+    class Builder(val leftToRight: Boolean) {
         private val cells: ArrayMap<Coordinate, LinearTableCellItem> = ArrayMap()
         private var rowCount: Int = 0
         private var colCount: Int = 0
@@ -165,13 +177,35 @@ data class LinearTable(
         }
 
         fun build(): LinearTable {
-            return LinearTable(rowCount, colCount, cells)
+            return LinearTable(
+                rowCount = rowCount,
+                colCount = colCount,
+                cellsReal =
+                    if (leftToRight) {
+                        cells
+                    } else {
+                        ArrayMap<Coordinate, LinearTableCellItem>().apply {
+                            cells.forEach { (ltrCoord, item) ->
+                                put(
+                                    Coordinate(
+                                        row = ltrCoord.row,
+                                        col = colCount - 1 - ltrCoord.col,
+                                    ),
+                                    item,
+                                )
+                            }
+                        }
+                    },
+            )
         }
     }
 
     companion object {
-        fun build(block: Builder.() -> Unit): LinearTable {
-            return Builder().apply(block).build()
+        fun build(
+            leftToRight: Boolean,
+            block: Builder.() -> Unit,
+        ): LinearTable {
+            return Builder(leftToRight = leftToRight).apply(block).build()
         }
     }
 }

@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model.html
 
 import android.util.Log
 import com.nononsenseapps.feeder.ui.compose.text.ancestors
+import com.nononsenseapps.feeder.ui.compose.text.attrInHierarchy
 import com.nononsenseapps.feeder.ui.compose.text.stripHtml
 import com.nononsenseapps.feeder.ui.text.getVideo
 import com.nononsenseapps.feeder.util.asUTF8Sequence
@@ -514,6 +515,9 @@ class HtmlLinearizer {
                         "table" -> {
                             finalizeAndAddCurrentElement(blockStyle)
 
+                            // This can also be auto, but for tables that's equivalent to LTR probably
+                            val leftToRight = element.attrInHierarchy("dir") != "rtl"
+
                             val rowSequence =
                                 sequence<Element> {
                                     element.children()
@@ -556,7 +560,7 @@ class HtmlLinearizer {
                                 )
                             } else {
                                 add(
-                                    LinearTable.build {
+                                    LinearTable.build(leftToRight = leftToRight) {
                                         rowSequence
                                             .forEach { row ->
                                                 newRow()

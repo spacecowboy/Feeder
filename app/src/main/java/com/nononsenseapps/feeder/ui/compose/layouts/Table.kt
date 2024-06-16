@@ -242,6 +242,7 @@ data class TableData private constructor(
                             if (a.row != b.row) {
                                 return@sortedWith a.row.compareTo(b.row)
                             }
+
                             return@sortedWith a.column.compareTo(b.column)
                         },
             )

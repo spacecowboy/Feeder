@@ -1115,6 +1115,7 @@ private fun PreviewLinearTableContent() {
         LinearTable(
             rowCount = 2,
             colCount = 2,
+            leftToRight = false,
             cells =
                 listOf(
                     LinearTableCellItem(
@@ -1178,6 +1179,7 @@ private fun PreviewNestedTableContent() {
         LinearTable(
             rowCount = 2,
             colCount = 2,
+            leftToRight = false,
             cells =
                 listOf(
                     LinearTableCellItem(
@@ -1268,6 +1270,7 @@ private fun PreviewNestedTableContent() {
                                 LinearTable(
                                     rowCount = 2,
                                     colCount = 2,
+                                    leftToRight = false,
                                     cells =
                                         listOf(
                                             LinearTableCellItem(
@@ -1410,14 +1413,6 @@ fun LinearTable.toTableData(): TableData {
                             },
                     )
                 }
-                .sortedWith(
-                    compareBy(
-                        { it.colSpan },
-                        { it.rowSpan },
-                        { it.row },
-                        { it.column },
-                    ),
-                )
                 .toList(),
     )
 }
