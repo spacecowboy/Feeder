@@ -168,7 +168,18 @@ class FullTextParser(override val di: DI) : DIAware {
         uri: String,
         html: String,
     ): String? {
-        return Readability4JExtended(uri, html).parse().contentWithUtf8Encoding
+        val article = Readability4JExtended(uri, html).parse()
+
+        val dir = article.dir
+
+        // Ensure dir is set on the outermost element
+        return article.contentWithUtf8Encoding?.let { fullHtml ->
+            if (dir?.isNotBlank() == true) {
+                fullHtml.replaceFirst("<html".toRegex(), "<html dir=\"$dir\"")
+            } else {
+                fullHtml
+            }
+        }
     }
 
     /**

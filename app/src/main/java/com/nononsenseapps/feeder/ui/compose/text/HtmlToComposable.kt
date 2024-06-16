@@ -14,6 +14,20 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import kotlin.math.roundToInt
 
+fun Element.attrInHierarchy(attr: String): String {
+    var current: Element? = this
+
+    while (current != null) {
+        val value = current.attr(attr)
+        if (value.isNotEmpty()) {
+            return value
+        }
+        current = current.parent()
+    }
+
+    return ""
+}
+
 fun Element.ancestors(predicate: (Element) -> Boolean): Sequence<Element> {
     return ancestors().filter(predicate)
 }

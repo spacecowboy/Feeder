@@ -714,13 +714,34 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearTable.build {
+            LinearTable.build(leftToRight = true) {
                 newRow()
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
                 add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
                 newRow()
                 add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
+            },
+            result[0],
+        )
+    }
+
+    @Test
+    fun `table block 2x2 rtl`() {
+        val html = "<html dir=\"rtl\"><body><table><tr><th>1</th><td>2</td></tr><tr><td>3</td><th>4</th></tr></table></body></html>"
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(
+            LinearTable.build(leftToRight = true) {
+                newRow()
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
+                newRow()
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
             },
             result[0],
         )
@@ -755,7 +776,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build {
+            LinearTable.build(leftToRight = true) {
                 newRow()
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
@@ -798,7 +819,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build {
+            LinearTable.build(leftToRight = true) {
                 newRow()
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
@@ -892,7 +913,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         val expected =
-            LinearTable.build {
+            LinearTable.build(leftToRight = true) {
                 newRow()
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
                 add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Number", LinearTextBlockStyle.TEXT))))
