@@ -1,3 +1,52 @@
+# 2.6.28
+Agnieszka C (1):
+  * [9fbe413d7] Updated Polish translation using Weblate
+
+Jonas Kalderstam (4):
+  * [0c2dfbcca] Fixed order of modifiers
+  * [98f3fa8a4] Fixed crash with table spans
+  * [d4a96558a] Fixed full text parsing sporadically showing error message
+  * [eabf243fc] Added support for RTL tables
+
+Matth78 (1):
+  * [825b37ea2] Updated French translation using Weblate
+
+Oğuz Ersen (1):
+  * [4c1323277] Updated Turkish translation using Weblate
+
+Scrambled777 (1):
+  * [57b2eedca] Updated Hindi translation using Weblate
+
+Sven Jacobs (1):
+  * [c04fdcba4] Fixed unread count in title for tags (#308)
+
+VfBFan (1):
+  * [6712f8c4b] Updated German translation using Weblate
+
+bittin1ddc447d824349b2 (1):
+  * [ca8d841c8] Updated Swedish translation using Weblate
+
+bowornsin (1):
+  * [257138d4e] Updated Thai translation using Weblate
+
+gallegonovato (1):
+  * [46f301b81] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [e96270d63] Updated Galician translation using Weblate
+
+pchelium (1):
+  * [939960bba] Updated Czech translation using Weblate
+
+trunars (1):
+  * [0194e5452] Updated Bulgarian translation using Weblate
+
+محمد (1):
+  * [451b6b6e9] Updated Arabic translation using Weblate
+
+大王叫我来巡山 (1):
+  * [e8ddc8ea7] Updated Chinese (Simplified) translation using Weblate
+
 # 2.6.27
 Jonas Kalderstam (3):
   * [f23390ed0] Fixed nested content inside blockquotes
