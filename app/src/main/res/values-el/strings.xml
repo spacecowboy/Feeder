@@ -140,7 +140,7 @@
     <string name="may_result_data_charges">Μπορεί να οδηγήσει σε χρεώσεις δεδομένων κινητής τηλεφωνίας.</string>
     <string name="dark_theme_preference">Προτίμηση σκοτεινού θέματος</string>
     <string name="empty_feed_open"><annotation style="link">Άνοιγμα</annotation> άλλης ροής;</string>
-    <string name="empty_feed_top">Δεν υπάρχει τίποτα για διάβασμα εδώ. Θα θέλατε να…</string>
+    <string name="empty_feed_top">Δεν υπάρχει τίποτα για διάβασμα εδώ. Θα θέλατε να γίνει…</string>
     <string name="search_feed_empty_hint">Εισαγάγετε μια διεύθυνση ροής</string>
     <string name="show_unread_items">Εμφάνιση μη αναγνωσμένων αντικειμένων</string>
     <string name="dont_notify_for_new_items">Διακοπή ειδοποιήσεων</string>
@@ -248,4 +248,6 @@
     <string name="skip_duplicate_articles_desc">Άρθρα με συνδέσμους ή τίτλους πανομοιότυπους με τα υπάρχοντα άρθρα αγνοούνται</string>
     <string name="feed_item_style_compact_card">Συμπαγής Κάρτα</string>
     <string name="export_saved_articles">Εξαγωγή αποθηκευμένων άρθρων</string>
+    <string name="touch_to_play_audio">Άγγιγμα για αναπαραγωγή ήχου</string>
+    <string name="show_title_unread_count">Εμφάνιση αριθμού μη αναγνωσμενων άρθρων στον τίτλο</string>
 </resources>
