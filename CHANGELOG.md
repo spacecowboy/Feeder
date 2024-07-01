@@ -1,3 +1,19 @@
+# 2.6.29
+Mattia Passeri (1):
+  * [2e709205e] Translated using Weblate (Italian)
+
+eevan78 (1):
+  * [b02523b6c] Updated Serbian translation using Weblate
+
+gallegonovato (1):
+  * [f6cb7f795] Updated Spanish translation using Weblate
+
+noSé (1):
+  * [59c675b30] Updated Spanish translation using Weblate
+
+Λευτέρης Τ (1):
+  * [6ce06cd04] Updated Greek translation using Weblate
+
 # 2.6.28
 Agnieszka C (1):
   * [9fbe413d7] Updated Polish translation using Weblate
