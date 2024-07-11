@@ -246,4 +246,7 @@
     <string name="failed_to_export_saved_articles">Nu a reușit să exporte articolele salvate</string>
     <string name="many_words">%1$s cuvinte</string>
     <string name="skip_duplicate_articles">Treceți peste articolele duplicate</string>
+    <string name="touch_to_play_audio">Atingeți pentru a reda audio</string>
+    <string name="skip_duplicate_articles_desc">Articolele cu linkuri sau titluri identice cu articole existente sunt ignorate</string>
+    <string name="feed_item_style_compact_card">Card compact</string>
 </resources>
