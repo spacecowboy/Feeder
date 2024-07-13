@@ -248,4 +248,6 @@
     <string name="skip_duplicate_articles">Ignorar artigos duplicados</string>
     <string name="skip_duplicate_articles_desc">Artigos com links ou títulos idênticos aos artigos existentes são ignorados</string>
     <string name="feed_item_style_compact_card">Cartão compacto</string>
+    <string name="touch_to_play_audio">Toque para reproduzir áudio</string>
+    <string name="show_title_unread_count">Mostrar contagem de artigos não lidos no título</string>
 </resources>
