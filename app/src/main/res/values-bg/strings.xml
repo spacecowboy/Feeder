@@ -131,14 +131,14 @@
     <string name="zero_unread_articles">%1$s непрочетени статии</string>
     <string name="fetching_full_article">Извлича се цялата статия…</string>
     <string name="view">Преглед</string>
-    <string name="import_feeds_from_opml">Импортирайте емисии от OPML</string>
+    <string name="import_feeds_from_opml">Внасяне на емисии от OPML</string>
     <string name="text_scale">Мащаб на текста</string>
     <string name="failed_to_parse_rss_feed">Неуспешно анализиране на RSS емисия</string>
     <string name="no_email_client">Не може да се отвори имейл клиент</string>
     <string name="sync">Синхронизиране</string>
     <string name="open_in_default_browser">Браузър по подразбиране</string>
     <string name="block_list">Списък с блокирани</string>
-    <string name="export_feeds_to_opml">Експортиране на емисии в OPML</string>
+    <string name="export_feeds_to_opml">Изнасяне на емисии в OPML</string>
     <string name="unsupported_content_type">Неподдържан тип съдържание</string>
     <string name="view_debug_log">Преглед на журнала за отстраняване на грешки</string>
     <string name="open_enclosed_media_file">Отвори %1$s</string>
@@ -176,7 +176,7 @@
     <string name="few_tags">%1$s етикети</string>
     <string name="read_adjective">Прочети</string>
     <string name="sort">Сортирай по</string>
-    <string name="failed_to_import_OPML">Неуспешно импортиране на OPML</string>
+    <string name="failed_to_import_OPML">Неуспешно внасяне на OPML</string>
     <string name="title_activity_edit_feed">Абонирайте се за емисия</string>
     <string name="dark_theme_preference_dark">Тъмно</string>
     <string name="article_image">Изображение на статията</string>
@@ -194,7 +194,7 @@
     <string name="action_settings">Настройки</string>
     <string name="text_to_speech">Текст в реч</string>
     <string name="already_read">Вече прочетено</string>
-    <string name="failed_to_export_OPML">Неуспешно експортиране на OPML</string>
+    <string name="failed_to_export_OPML">Неуспешно изнасяне на OPML</string>
     <string name="mark_as_read_on_scroll">Маркирайте като прочетено при превъртане</string>
     <string name="open_in_custom_tab">Персонализиран раздел</string>
     <string name="battery_optimization_disabled">Изключено</string>
@@ -243,8 +243,8 @@
     <string name="other_words">%1$s думи</string>
     <string name="one_word">%1$s дума</string>
     <string name="close_menu">Затваряне на менюто</string>
-    <string name="export_saved_articles">Експортиране на запазени статии</string>
-    <string name="failed_to_export_saved_articles">Неуспешно експортиране на запазени статии</string>
+    <string name="export_saved_articles">Изнасяне на запазени статии</string>
+    <string name="failed_to_export_saved_articles">Неуспешно изнасяне на запазени статии</string>
     <string name="skip_duplicate_articles">Пропускане на дублирани статии</string>
     <string name="skip_duplicate_articles_desc">Статии с връзки или заглавия идентични на съществуващите се игнорират</string>
     <string name="feed_item_style_compact_card">Компактна карта</string>
