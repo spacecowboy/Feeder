@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Guardar</string>
     <string name="empty_feed_top">No hay nada para leer aquí. ¿Le gustaría…</string>
-    <string name="empty_feed_open"><annotation style="link">Abrir</annotation> otro canal?</string>
-    <string name="empty_feed_add"><annotation style="link">Añadir</annotation> más canales?</string>
+    <string name="empty_feed_open">¿<annotation style="link">Abrir</annotation> otro canal?</string>
+    <string name="empty_feed_add">¿<annotation style="link">Añadir</annotation> más canales?</string>
     <string name="search_feed_empty_hint">Escribir la dirección de un canal</string>
     <string name="mark_as_read">Marcar como leído</string>
     <string name="mark_as_unread">Marcar como no leído</string>
