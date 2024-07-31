@@ -178,6 +178,7 @@ private suspend fun singleNotification(
         .setGroup(ARTICLE_NOTIFICATION_GROUP)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
+        .setSilent(true)
         .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
