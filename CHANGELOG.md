@@ -1,3 +1,31 @@
+# 2.6.30
+439JBYL80IGQTF25UXNR0X1BG (1):
+  * [e07fe830] Updated Russian translation using Weblate
+
+Eduardo (1):
+  * [e27e0590] Updated Portuguese (Brazil) translation using Weblate
+
+Jonas Kalderstam (1):
+  * [e41f0736] Explicitly silenced notifications
+
+Matth78 (1):
+  * [371ba2fb] Updated French translation using Weblate
+
+Simona Iacob (1):
+  * [e544cfaa] Updated Romanian translation using Weblate
+
+Wiccio (1):
+  * [78dac594] Translated using Weblate (Italian)
+
+gallegonovato (1):
+  * [90dbe599] Updated Spanish translation using Weblate
+
+trunars (1):
+  * [d9f81898] Updated Bulgarian translation using Weblate
+
+zmni (1):
+  * [13b2fd65] Updated Indonesian translation using Weblate
+
 # 2.6.29
 Mattia Passeri (1):
   * [2e709205e] Translated using Weblate (Italian)
