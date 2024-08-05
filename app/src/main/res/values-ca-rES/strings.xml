@@ -225,4 +225,5 @@
     <string name="unsupported_content_type">Tipus de contingut no suportat</string>
     <string name="failed_to_download">Error al descarregar</string>
     <string name="content_is_not_html">El contingut no és HTML</string>
+    <string name="export_saved_articles">Exporta els articles desats</string>
 </resources>
