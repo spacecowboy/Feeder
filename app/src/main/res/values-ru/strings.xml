@@ -103,7 +103,7 @@
     <string name="read_article">Читать вслух</string>
     <string name="failed_to_load_text_to_speech">Не удалось синтезировать речь</string>
     <string name="open_in_custom_tab">Встроенный браузер</string>
-    <string name="open_in_webview">Встроенный браузер</string>
+    <string name="open_in_webview">Открыть во встроенном браузере</string>
     <string name="resume_reading">Возобновить чтение</string>
     <string name="pause_reading">Приостановить чтение</string>
     <string name="use_app_default">По умолчанию</string>
