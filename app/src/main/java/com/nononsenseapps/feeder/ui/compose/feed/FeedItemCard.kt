@@ -125,7 +125,7 @@ fun FeedItemCard(
                                         )
                                         .scale(Scale.FIT)
                                         .size(pixels)
-                                        .precision(Precision.INEXACT)
+                                        .precision(Precision.EXACT)
                                         .build(),
                                 placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
                                 error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
