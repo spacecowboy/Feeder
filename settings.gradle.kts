@@ -64,6 +64,7 @@ dependencyResolutionManagement {
             version("accompanist", "0.30.1")
             version("coil", "2.4.0")
             version("androidWindow", "1.0.0")
+            version("lazycolumnscrollbar", "2.2.0")
             // Formerly customtabs
             version("androidxBrowser", "1.5.0")
             // Tests
@@ -285,6 +286,7 @@ dependencyResolutionManagement {
             library("moshi-kotlin", "com.squareup.moshi", "moshi-kotlin").versionRef("moshi")
             library("moshi-adapters", "com.squareup.moshi", "moshi-adapters").versionRef("moshi")
             library("qrgen", "com.github.kenglxn.qrgen", "android").versionRef("qrgen")
+            library("lazycolumnscrollbar", "com.github.nanihadesuka", "LazyColumnScrollbar").versionRef("lazycolumnscrollbar")
 
             // Feel free to upgrade once we move to later sdk
             // Only necessary to fix a bad transitive dependency by Google
@@ -356,7 +358,7 @@ dependencyResolutionManagement {
                     "moshi-kotlin",
                     "moshi-adapters",
                     "qrgen",
-                    "gofeed-android"
+                    "gofeed-android",
                 ),
             )
 
@@ -406,6 +408,7 @@ dependencyResolutionManagement {
                     "compose-material3-windowsizeclass",
                     "lifecycle-runtime-compose",
                     "coil-compose",
+                    "lazycolumnscrollbar",
                 ),
             )
 
