@@ -1,3 +1,16 @@
+# 2.6.31
+George Bogdanoff (1):
+  * [05df6c71] Updated Russian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [65fef39a] Added scrollbar to reader
+
+XblateX (1):
+  * [fb42d60e] Updated Ukrainian translation using Weblate
+
+sprin (1):
+  * [7e094471] Updated Catalan translation using Weblate
+
 # 2.6.30
 439JBYL80IGQTF25UXNR0X1BG (1):
   * [e07fe830] Updated Russian translation using Weblate
