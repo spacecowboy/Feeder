@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "com.nononsenseapps.feeder"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
         versionCode = 316
         versionName = "2.6.31"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
 
         vectorDrawables.useSupportLibrary = true
 
