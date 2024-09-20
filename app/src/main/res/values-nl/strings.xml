@@ -20,7 +20,7 @@
     <string name="dont_notify_for_new_items">Meldingen stoppen</string>
     <string name="mark_all_as_read">Alle als gelezen markeren</string>
     <string name="show_unread_items">Ongelezen items weergeven</string>
-    <string name="show_all_items">Alle artikelen tonen</string>
+    <string name="show_all_items">Alle artikelen weergeven</string>
     <string name="notify_for_new_items">Nieuwe artikelen melden</string>
     <string name="open_link_in_browser">Link in browser openen</string>
     <string name="open_in_browser">In browser openen</string>
@@ -95,12 +95,12 @@
     <string name="few_unread_articles">%1$s ongelezen artikelen</string>
     <string name="many_unread_articles">%1$s ongelezen artikelen</string>
     <string name="feed_item_style_card">Kaart</string>
-    <string name="feed_item_style_compact">Kort</string>
+    <string name="feed_item_style_compact">Compact</string>
     <string name="feed_item_style">Opmaak van artikel</string>
     <string name="generate_extra_unique_ids">Genereer extra unieke ID\'s</string>
     <string name="invalid_url">Geen geldige URL</string>
-    <string name="failed_to_import_OPML">OPML import mislukt</string>
-    <string name="feed_item_style_super_compact">Zeer kort</string>
+    <string name="failed_to_import_OPML">OPML-import mislukt</string>
+    <string name="feed_item_style_super_compact">Super compact</string>
     <string name="only_enable_for_bad_id_feeds">Alleen voor feeds met slechte ID\'s</string>
     <string name="title_activity_edit_feed">Op feed abonneren</string>
     <string name="save">Opslaan</string>
@@ -133,19 +133,19 @@
     <string name="unread_adjective">Niet gelezen</string>
     <string name="synchronize_feeds">Feeds synchroniseren</string>
     <string name="zero_unread_articles">%1$s ongelezen artikelen</string>
-    <string name="failed_to_export_OPML">OPML export mislukt</string>
+    <string name="failed_to_export_OPML">OPML-export mislukt</string>
     <string name="other_unread_articles">%1$s ongelezen artikelen</string>
     <string name="notification_channel_description">Meldingen tonen voor ongelezen artikelen in geconfigureerde feeds</string>
     <string name="fetch_full_articles_by_default">Artikelen standaard volledig ophalen</string>
     <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets weer te geven!</string>
     <string name="failed_to_open_article">Kon artikel niet openen</string>
-    <string name="device_sync_financed_by_community">Deze dienst wordt betaald door de gemeenschap. Overweeg een donatie als u het nuttig vindt.</string>
+    <string name="device_sync_financed_by_community">Deze dienst wordt gefinancierd door de gemeenschap. Overweeg een donatie als u het nuttig vindt.</string>
     <string name="press_scan_sync">Ga naar \'Toestellen-synchroniseren\' en klik op \'Sync-code scannen of invoeren\'.</string>
-    <string name="devices_on_sync_chain">Toestellen in de Sync-keten</string>
+    <string name="devices_on_sync_chain">Toestellen in de sync-keten</string>
     <string name="device_sync">Toestellen synchroniseren</string>
-    <string name="feeder_device_sync_code">Feeder Sync-code</string>
-    <string name="device_sync_description_2">Scan de Sync-code voor de keten van een ander toestel, of start een nieuwe Sync-keten.</string>
+    <string name="feeder_device_sync_code">Feeder sync-code</string>
+    <string name="device_sync_description_2">Scan de sync-code voor de keten van een ander toestel, of start een nieuwe sync-keten.</string>
     <string name="add_new_device">Nieuw toestel toevoegen</string>
     <string name="this_device">%1$s (dit toestel)</string>
     <string name="disconnect_device_from_sync">Het toestel van de Sync-keten loskoppelen</string>
@@ -153,14 +153,14 @@
     <string name="remove_device_question">Toestel %1$s inderdaad verwijderen\?</string>
     <string name="or_open_device_sync_link">Of open de link op uw toestel.</string>
     <string name="treat_like_password">Behandel dit als een wachtwoord. Iedereen kan gesynchroniseerde gegevens lezen als ze de link hebben.</string>
-    <string name="qr_code">QR-Code</string>
+    <string name="qr_code">QR-code</string>
     <string name="leave_sync_chain">Sync-keten verlaten</string>
-    <string name="device_sync_description_1">Met Toestel-sync worden abonnementen en gelezen artikelen ge synchroniseerd tussen meerdere toestellen.</string>
+    <string name="device_sync_description_1">Met toestel-sync worden abonnementen en gelezen artikelen gesynchroniseerd tussen meerdere toestellen.</string>
     <string name="scan_or_enter_code">Sync-code scannen of invoeren</string>
-    <string name="start_new_sync_chain">Nieuwe Sync-keten starten</string>
+    <string name="start_new_sync_chain">Nieuwe sync-keten starten</string>
     <string name="sync_code">Sync-code</string>
     <string name="secret_key">Geheime sleutel</string>
-    <string name="join_sync_chain">Aan Sync-keten deelnemen</string>
+    <string name="join_sync_chain">Aan sync-keten deelnemen</string>
     <string name="disabled">Uitgeschakeld</string>
     <string name="swipe_to_mark_as_read">Vegen om als gelezen te markeren</string>
     <string name="from_anywhere">Van overal</string>
@@ -210,7 +210,7 @@
     <string name="failed_to_fetch_full_article_not_html">De link is geen HTML-document</string>
     <string name="max_lines">Max. aantal lijnen</string>
     <string name="filter_noun">Filter</string>
-    <string name="show_only_title">Enkel titel tonen</string>
+    <string name="show_only_title">Enkel titel weergeven</string>
     <string name="article_list_settings">Lijst van artikels</string>
     <string name="recently_read_adjective">Recent gelezen</string>
     <string name="read_adjective">Gelezen</string>
@@ -247,4 +247,7 @@
     <string name="failed_to_export_saved_articles">Opgeslagen artikelen konden niet worden geëxporteerd</string>
     <string name="skip_duplicate_articles">Dubbele artikelen overslaan</string>
     <string name="skip_duplicate_articles_desc">Artikelen met links of titels die identiek zijn aan bestaande artikelen worden genegeerd</string>
+    <string name="touch_to_play_audio">Tik om audio af te spelen</string>
+    <string name="feed_item_style_compact_card">Compacte Kaart</string>
+    <string name="show_title_unread_count">Toon het aantal ongelezen artikelen in de titel</string>
 </resources>
