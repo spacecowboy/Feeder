@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             version("kotlin", kotlinVersion)
             version("ksp", kspVersion)
             version("kotlinxSerialization", kotlinxSerialization)
-            version("androidPlugin", "8.3.0")
+            version("androidPlugin", "8.6.0")
             version("composeCompiler", "1.5.11")
 
             // BEGIN These should be upgraded in unison
