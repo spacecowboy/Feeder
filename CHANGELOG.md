@@ -1,3 +1,12 @@
+# 2.6.32
+Jonas Kalderstam (3):
+  * [24022416] Bumped targetSDK
+  * [050f3cff] Fixed runtime issue in Kotlin code
+  * [77ee1feb] Upgraded Android Gradle Plugin
+
+fincent (1):
+  * [c8440a92] Translated using Weblate (Dutch)
+
 # 2.6.31
 George Bogdanoff (1):
   * [05df6c71] Updated Russian translation using Weblate
