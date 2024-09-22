@@ -32,7 +32,7 @@ abstract class HtmlParser {
         annotation: String,
     ): Int = builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
-    fun popSpan() = spanStack.removeLast()
+    fun popSpan() = spanStack.removeAt(spanStack.lastIndex)
 }
 
 inline fun <R : Any> HtmlParser.withParagraph(crossinline block: HtmlParser.() -> R): R {

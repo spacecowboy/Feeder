@@ -104,7 +104,7 @@ class LinearTextBuilder : Appendable {
     fun pop() {
         check(annotationsStack.isNotEmpty()) { "No annotation to pop" }
         // pop the last element
-        val item = annotationsStack.removeLast()
+        val item = annotationsStack.removeAt(annotationsStack.lastIndex)
         item.end = text.lastIndex
     }
 
@@ -190,7 +190,7 @@ private fun CharSequence.secondToLast(): Char {
 private fun <T> MutableList<T>.pushMaxTwo(item: T) {
     this.add(0, item)
     if (count() > 2) {
-        this.removeLast()
+        this.removeAt(this.lastIndex)
     }
 }
 
