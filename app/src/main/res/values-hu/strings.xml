@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tag">Címke</string>
-    <string name="url">URL</string>
-    <string name="add_feed_search_hint">Hírfolyam URL</string>
+    <string name="url">Webcím</string>
+    <string name="add_feed_search_hint">Hírfolyam webcím</string>
     <string name="empty_feed_top">Nincs itt semmi olvasnivaló. Szeretne inkább…</string>
     <string name="title">Cím</string>
     <string name="save">Mentés</string>
@@ -170,7 +170,7 @@
     <string name="battery_optimization_enabled">Be</string>
     <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_super_compact">Szuper kompakt</string>
-    <string name="invalid_url">Nem érvényes URL</string>
+    <string name="invalid_url">Nem érvényes webcím</string>
     <string name="remove_device">Eszköz eltávolítása</string>
     <string name="sync_to_fetch">Szinkronizálás a cikk lekéréséhez</string>
     <string name="new_indicator">Új</string>
@@ -184,11 +184,11 @@
     <string name="many_feeds">%1$s hírfolyam</string>
     <string name="other_feeds">%1$s hírfolyam</string>
     <string name="import_x_feeds_with_y_tags">%1$s importálása ezzel: %2$s?</string>
-    <string name="zero_tags">%1$s címkék</string>
+    <string name="zero_tags">%1$s címke</string>
     <string name="one_tags">%1$s címke</string>
     <string name="two_tags">%1$s címke</string>
     <string name="few_tags">%1$s címke</string>
-    <string name="many_tags">%1$s címkék</string>
+    <string name="many_tags">%1$s címke</string>
     <string name="other_tags">%1$s címke</string>
     <string name="failed_to_fetch_full_article_missing_link">A hírfolyamból hiányzik a cikk linkje</string>
     <string name="failed_to_fetch_full_article_not_html">A link nem egy HTML dokumentum</string>
@@ -248,4 +248,6 @@
     <string name="skip_duplicate_articles">Duplázott cikkek kihagyása</string>
     <string name="skip_duplicate_articles_desc">Ugyanolyan már létező című és linkű cikk esetén az újat mellőzi</string>
     <string name="feed_item_style_compact_card">Kompakt kártya</string>
+    <string name="touch_to_play_audio">Érintse meg a hang lejátszásához</string>
+    <string name="show_title_unread_count">Olvasatlan cikkek számának megjelenítése a címben</string>
 </resources>
