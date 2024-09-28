@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Help & Support
+    url: https://matrix.to/#/#feeder-support:matrix.org
+    about: Reduce developer's support workload by asking other users on the Matrix server.
+
