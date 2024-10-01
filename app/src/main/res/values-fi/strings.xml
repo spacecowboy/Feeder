@@ -245,4 +245,9 @@
     <string name="close_menu">Sulje valikko</string>
     <string name="export_saved_articles">Vie tallennetut artikkelit</string>
     <string name="failed_to_export_saved_articles">Tallennettujen artikkeleiden vienti epäonnistui</string>
+    <string name="touch_to_play_audio">Toista ääntä koskettamalla</string>
+    <string name="skip_duplicate_articles">Ohita monistetut artikkelit</string>
+    <string name="feed_item_style_compact_card">Kompakti kortti</string>
+    <string name="skip_duplicate_articles_desc">Artikkelit, joiden linkit tai otsikot ovat identtisiä olemassa olevien artikkelien kanssa sivuutetaan</string>
+    <string name="show_title_unread_count">Näytä lukemattomien artikkeleiden määrä otsikossa</string>
 </resources>
