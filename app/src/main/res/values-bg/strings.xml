@@ -22,17 +22,17 @@
     <string name="only_from_end">Само от края</string>
     <string name="open_link_in_web_view">Отворете връзката в уеб изглед</string>
     <string name="leave_sync_chain">Напускане на синхронизиращата верига</string>
-    <string name="failed_to_load_text_to_speech">Текст в говор не можа да се зареди</string>
-    <string name="only_on_wifi">Само на Wi-Fi</string>
+    <string name="failed_to_load_text_to_speech">Не може да зареди текст към реч</string>
+    <string name="only_on_wifi">Само през Wi-Fi</string>
     <string name="feed_item_style">Стил на статията</string>
     <string name="discovered_feeds_list">Списък с открити емисии</string>
     <string name="devices_on_sync_chain">Устройства във верига за синхронизиране</string>
-    <string name="open_menu">Отворете менюто</string>
+    <string name="open_menu">Отвори менюто</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="add_anyway">Добавете все пак</string>
     <string name="theme_automatic">Автоматично</string>
     <string name="remove">Премахване</string>
-    <string name="feed_item_style_compact">Компактен</string>
+    <string name="feed_item_style_compact">Компактна</string>
     <string name="show_fab">Показване на плаващ бутон за действие</string>
     <string name="sync_option_every_6_hours">На всеки 6 часа</string>
     <string name="open_feed">Отворете емисия</string>
@@ -66,7 +66,7 @@
     <string name="edit_feed">Редактиране на емисия</string>
     <string name="max_feed_items">Максимум елементи на емисия</string>
     <string name="set_language">Задайте език</string>
-    <string name="go_to_feed">Отидете на %1$s</string>
+    <string name="go_to_feed">Отиди на %1$s</string>
     <string name="send_bug_report">Изпратете доклад за грешка</string>
     <string name="sync_status">Състояние на синхронизиране</string>
     <string name="failed_to_fetch_full_article_not_html">Връзката не е HTML документ</string>
@@ -78,7 +78,7 @@
     <string name="theme">Тема</string>
     <string name="navigation_drawer_open">Отворете чекмеджето за навигация</string>
     <string name="add_item">Добавете артикул</string>
-    <string name="save_article">Запазете статията</string>
+    <string name="save_article">Запазете статия</string>
     <string name="new_indicator">Нов</string>
     <string name="empty_feed_top">Тук няма нищо за четене. Искате ли да…</string>
     <string name="only_when_charging">Само при зареждане</string>
@@ -86,7 +86,7 @@
     <string name="no_body_in_response">Няма отговор</string>
     <string name="dark_theme_preference">Предпочитана тъмна тема</string>
     <string name="sync_option_manually">Ръчно</string>
-    <string name="fetch_full_article">Изтеглете цялата статия</string>
+    <string name="fetch_full_article">Извлечи цялата статия</string>
     <string name="dont_notify_for_new_items">Спри известията</string>
     <string name="new_items_available">Налични нови елементи</string>
     <string name="include_mobile_hotspots">Включете мобилна гореща точка</string>
@@ -107,7 +107,7 @@
     <string name="block_list_description">Скрива статии със заглавия, съдържащи някой от тези филтри. Примерни филтри:</string>
     <string name="search_feed_empty_hint">Въведете адрес на емисия</string>
     <string name="permission_read_label">Feeder достъп само за четене</string>
-    <string name="preload_custom_tab">Предварително зареждане на потребителски раздел</string>
+    <string name="preload_custom_tab">Предварително зареждане на персонализиран раздел</string>
     <string name="no_url">Няма URL</string>
     <string name="contracted_tag">Затворен етикет</string>
     <string name="max_lines">Максимум редове</string>
@@ -125,7 +125,7 @@
     <string name="no_activity_for_link">Първо инсталирайте нещо, с което да отворите тази връзка</string>
     <string name="battery_optimization_enabled">Включено</string>
     <string name="explanation_permission_notifications">Трябва да се даде разрешение, преди да могат да се активират известията.</string>
-    <string name="fetch_full_articles_by_default">Извличане на пълни статии по подразбиране</string>
+    <string name="fetch_full_articles_by_default">Извличане на цели статии по подразбиране</string>
     <string name="zero_tags">%1$s етикети</string>
     <string name="sync_option_every_day">Всеки ден</string>
     <string name="zero_unread_articles">%1$s непрочетени статии</string>
@@ -142,7 +142,7 @@
     <string name="unsupported_content_type">Неподдържан тип съдържание</string>
     <string name="view_debug_log">Преглед на журнала за отстраняване на грешки</string>
     <string name="open_enclosed_media_file">Отвори %1$s</string>
-    <string name="pause_reading">Поставяне четенето на пауза</string>
+    <string name="pause_reading">Пауза на четенето</string>
     <string name="open_item_by_default_with">Отворете елементи по подразбиране с</string>
     <string name="notification_channel_name">Непрочетени емисии</string>
     <string name="failed_to_download">Неуспешно изтегляне</string>
@@ -157,14 +157,14 @@
     <string name="mark_all_as_read">Маркирай всичко като прочетено</string>
     <string name="treat_like_password">Отнасяйте се към това като към парола. Всеки може да прочете вашите синхронизирани данни, ако има връзката.</string>
     <string name="title_activity_settings">Настройки</string>
-    <string name="dark_theme_preference_black">Черно</string>
-    <string name="feed_item_style_super_compact">Супер компактен</string>
+    <string name="dark_theme_preference_black">Черна</string>
+    <string name="feed_item_style_super_compact">Супер компактна</string>
     <string name="syncing">Синхронизация</string>
     <string name="swipe_to_mark_as_read">Плъзнете за да маркирате като прочетено</string>
     <string name="permission_read_desc">Позволява на приложението да чете емисии и статии</string>
     <string name="no_such_feed">Не може да бъде намерена такава емисия. Опитайте да използвате HTTPS може би\?</string>
     <string name="no_feeds">Няма емисии</string>
-    <string name="disabled">Деактивиран</string>
+    <string name="disabled">Деактивирано</string>
     <string name="go_back">Върни се</string>
     <string name="sort_newest_first">Първо най-новите</string>
     <string name="showing_all_articles">Покажи всички статии</string>
@@ -178,8 +178,8 @@
     <string name="sort">Сортирай по</string>
     <string name="failed_to_import_OPML">Неуспешно внасяне на OPML</string>
     <string name="title_activity_edit_feed">Абонирайте се за емисия</string>
-    <string name="dark_theme_preference_dark">Тъмно</string>
-    <string name="article_image">Изображение на статията</string>
+    <string name="dark_theme_preference_dark">Тъмна</string>
+    <string name="article_image">Изображение на статия</string>
     <string name="many_tags">%1$s етикети</string>
     <string name="show_only_title">Показване само на заглавие</string>
     <string name="sync_option_every_30min">На всеки 30 минути</string>
@@ -199,7 +199,7 @@
     <string name="open_in_custom_tab">Персонализиран раздел</string>
     <string name="battery_optimization_disabled">Изключено</string>
     <string name="only_available_on_android_n">Предлага се само за Android %1$s и нагоре</string>
-    <string name="unsave_article">Спрете да запазвате статията</string>
+    <string name="unsave_article">Спрете да запазвате статия</string>
     <string name="sync_option_every_12_hours">На всеки 12 часа</string>
     <string name="or_open_device_sync_link">Друга възможност е да отворите връзката на вашето устройство.</string>
     <string name="resume_reading">Възобновете четенето</string>
