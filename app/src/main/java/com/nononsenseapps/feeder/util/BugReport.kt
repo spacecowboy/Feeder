@@ -56,9 +56,9 @@ fun emailCrashReportIntent(throwable: Throwable): Intent =
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-fun openGitlabIssues(): Intent =
+fun openGithubIssues(): Intent =
     Intent(ACTION_VIEW).also {
-        it.data = Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues")
+        it.data = Uri.parse("https://github.com/spacecowboy/feeder/issues")
     }
 
 const val KOFI_URL = "https://ko-fi.com/spacecowboy"

@@ -51,9 +51,9 @@ class BugReportKTest {
 
     @Test
     fun issuesIntentIsCorrect() {
-        val intent = openGitlabIssues()
+        val intent = openGithubIssues()
 
         assertEquals(ACTION_VIEW, intent.action)
-        assertEquals(Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues"), intent.data)
+        assertEquals(Uri.parse("https://github.com/spacecowboy/feeder/issues"), intent.data)
     }
 }

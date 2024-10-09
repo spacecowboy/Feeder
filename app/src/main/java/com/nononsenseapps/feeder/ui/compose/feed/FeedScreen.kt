@@ -41,12 +41,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
@@ -151,7 +151,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
-import com.nononsenseapps.feeder.util.emailBugReportIntent
+import com.nononsenseapps.feeder.util.openGithubIssues
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -324,7 +324,7 @@ fun FeedScreen(
             onSendFeedback = {
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = true,
-                    intent = emailBugReportIntent(),
+                    intent = openGithubIssues(),
                 )
             },
             onImport = {
@@ -819,7 +819,7 @@ fun FeedScreen(
                             },
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.Email,
+                                    Icons.Default.BugReport,
                                     contentDescription = null,
                                 )
                             },
