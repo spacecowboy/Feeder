@@ -1,3 +1,21 @@
+# 2.6.33
+AlekseySaenko (1):
+  * [0fc8893a] Updated Russian translation using Weblate
+
+Jonas Kalderstam (2):
+  * [63b1b7ab] Added github issue templates
+  * [350f599b] Changed so bug report button opens github issues instead of
+         email
+
+Priit Jõerüüt (1):
+  * [ee7652e6] Updated Finnish translation using Weblate
+
+summoner001 (1):
+  * [326a5f81] Updated Hungarian translation using Weblate
+
+trunars (1):
+  * [cb0dcf4a] Updated Bulgarian translation using Weblate
+
 # 2.6.32
 Jonas Kalderstam (3):
   * [24022416] Bumped targetSDK
