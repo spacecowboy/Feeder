@@ -143,12 +143,7 @@ class SettingsStore(override val di: DI) : DIAware {
             PrefsFeedListFilter(
                 saved = sp.getBoolean(PREFS_FILTER_SAVED, false),
                 recentlyRead = sp.getBoolean(PREFS_FILTER_RECENTLY_READ, true),
-                read =
-                    sp.getBoolean(
-                        PREFS_FILTER_READ,
-                        // Migration
-                        !sp.getBoolean("pref_show_only_unread", true),
-                    ),
+                read = sp.getBoolean(PREFS_FILTER_READ, true),
             ),
         )
     val feedListFilter: StateFlow<FeedListFilter> = _feedListFilter.asStateFlow()
