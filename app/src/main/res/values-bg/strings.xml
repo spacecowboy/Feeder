@@ -59,7 +59,7 @@
     <string name="theme_system">Система</string>
     <string name="device_sync_description_2">Просто сканирайте кода от вашата верига за синхронизиране, която сте създали на друго устройство, или започнете нова верига за синхронизиране.</string>
     <string name="many_feeds">%1$s емисии</string>
-    <string name="sync_to_fetch">Синхронизиране за извличане на статия</string>
+    <string name="sync_to_fetch">Синхронизирай за извличане на статия</string>
     <string name="no_barcode_scanner_installed">Не можах да намеря скенер за баркод</string>
     <string name="image_loading">Зареди изображение</string>
     <string name="navigation_drawer_close">Затвори чекмеджето за навигация</string>
@@ -70,7 +70,7 @@
     <string name="send_bug_report">Изпрати доклад за грешка</string>
     <string name="sync_status">Състояние на синхронизиране</string>
     <string name="failed_to_fetch_full_article_not_html">Връзката не е HTML документ</string>
-    <string name="skip_to_next">Премини към следваща</string>
+    <string name="skip_to_next">Премини към следващ</string>
     <string name="no_feeds_in_the_page">Няма емисии в страницата</string>
     <string name="toggle_read_status">Превключи състояние на четене</string>
     <string name="this_device">%1$s (това устройство)</string>
@@ -142,7 +142,7 @@
     <string name="unsupported_content_type">Неподдържан тип съдържание</string>
     <string name="view_debug_log">Преглед на журнал за отстраняване на грешки</string>
     <string name="open_enclosed_media_file">Отвори %1$s</string>
-    <string name="pause_reading">Пауза на четене</string>
+    <string name="pause_reading">Пауза на четенето</string>
     <string name="open_item_by_default_with">Отвори елементи по подразбиране с</string>
     <string name="notification_channel_name">Непрочетени емисии</string>
     <string name="failed_to_download">Неуспешно изтегляне</string>
@@ -202,7 +202,7 @@
     <string name="unsave_article">Спри да запазваш статия</string>
     <string name="sync_option_every_12_hours">На всеки 12 часа</string>
     <string name="or_open_device_sync_link">Друга възможност е да отворите връзката на вашето устройство.</string>
-    <string name="resume_reading">Възобнови четене</string>
+    <string name="resume_reading">Възобнови четенето</string>
     <string name="join_sync_chain">Присъедини се към верига за синхронизиране</string>
     <string name="failed_to_fetch_full_article">Не можа да се извлече цялата статия</string>
     <string name="notification_channel_description">Известията се показват само за непрочетени елементи в конфигурирани канали</string>
@@ -212,7 +212,7 @@
     <string name="other_unread_articles">%1$s непрочетена статии</string>
     <string name="other_feeds">%1$s емисии</string>
     <string name="share">Сподели</string>
-    <string name="stop_reading">Спри четене</string>
+    <string name="stop_reading">Спри четенето</string>
     <string name="two_tags">%1$s етикети</string>
     <string name="two_unread_articles">%1$s непрочетена статии</string>
     <string name="sync_code">Код за синхронизиране</string>
