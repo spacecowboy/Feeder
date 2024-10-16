@@ -247,7 +247,7 @@
     <string name="failed_to_export_saved_articles">Impossibile esportare articoli salvati</string>
     <string name="skip_duplicate_articles">Saltare articoli doppi</string>
     <string name="skip_duplicate_articles_desc">Gli articoli con link o titoli identici ad articoli esistenti vengono ignorati</string>
-    <string name="feed_item_style_compact_card">Scheda compatta</string>
+    <string name="feed_item_style_compact_card">Scheda Compatta</string>
     <string name="touch_to_play_audio">Tocca per riprodurre l\'audio</string>
     <string name="show_title_unread_count">Mostra il numero di articoli non letti nel titolo</string>
 </resources>
