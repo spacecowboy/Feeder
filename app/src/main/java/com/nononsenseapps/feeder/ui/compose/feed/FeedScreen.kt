@@ -955,7 +955,10 @@ fun FeedScreen(
     val floatingActionButton: @Composable () -> Unit = {
         PlainTooltipBox(tooltip = { Text(stringResource(R.string.mark_all_as_read)) }) {
             FloatingActionButton(
-                onClick = onMarkAllAsRead,
+                onClick = {
+                    onMarkAllAsRead()
+                    onOpenNavDrawer()
+                },
                 modifier =
                     Modifier
                         .navigationBarsPadding(),
