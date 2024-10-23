@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalContracts::class)
-
 package com.nononsenseapps.feeder.sync
 
 import android.util.Log
@@ -24,7 +22,6 @@ import org.kodein.di.instance
 import retrofit2.Response
 import java.net.URL
 import java.time.Instant
-import kotlin.contracts.ExperimentalContracts
 
 class SyncRestClient(override val di: DI) : DIAware {
     private val repository: Repository by instance()
@@ -605,14 +602,15 @@ class SyncRestClient(override val di: DI) : DIAware {
 
     private suspend fun ErrorResponse.leaveChainIfKickedOutElseLog() {
         Log.e(LOG_TAG, "leaveChainIfKickedOutElseLog: $code, $body", throwable)
-        if (code == 400 && body?.contains("Device not registered", ignoreCase = true) == true) {
-            // Forbidden, this device has been removed from the chain from another device
+        if (body?.contains(DEVICE_NOT_REGISTERED, ignoreCase = true) == true) {
+            // this device has been removed from the chain from another device
             leave()
         }
     }
 
     companion object {
         private const val LOG_TAG = "FEEDER_REST_CLIENT"
+        private const val DEVICE_NOT_REGISTERED = "Device not registered"
     }
 }
 
