@@ -27,8 +27,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,6 +67,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +77,8 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_C
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -83,10 +88,13 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.openai.toOpenAIHost
+import com.nononsenseapps.feeder.openai.toUrlString
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -206,6 +214,9 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
+            openAISettings = viewState.openAISettings,
+            openAIModels = viewState.openAIModels,
+            onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             modifier = Modifier.padding(padding),
         )
     }
@@ -273,6 +284,9 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
+            openAISettings = OpenAISettings(),
+            openAIModels = OpenAIModelsState.None,
+            onOpenAIEvent = { _ -> },
             modifier = Modifier,
         )
     }
@@ -336,6 +350,9 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
+    openAISettings: OpenAISettings,
+    openAIModels: OpenAIModelsState,
+    onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -689,7 +706,113 @@ fun SettingsList(
             onCheckedChange = onUseDetectLanguageChange,
         )
 
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { innerModifier ->
+            Text(
+                stringResource(id = R.string.openai_settings),
+                modifier = innerModifier
+            )
+        }
+
+        OpenAISection(
+            openAISettings = openAISettings,
+            openAIModels = openAIModels,
+            onEvent = onOpenAIEvent
+        )
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
         Spacer(modifier = Modifier.navigationBarsPadding())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OpenAISection(
+    openAISettings: OpenAISettings,
+    openAIModels: OpenAIModelsState,
+    onEvent: (OpenAISettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    val dimens = LocalDimens.current
+    Row(
+        modifier = modifier
+            .padding(start = 64.dp)
+            .width(dimens.maxContentWidth)
+    ) {
+        val transformedKey = remember(openAISettings.key) { VisualTransformationApiKey().filter(AnnotatedString(openAISettings.key))  }
+        TitleAndSubtitle(
+            title = {
+                Text("API Key")
+            },
+            subtitle = {
+                Text(transformedKey.text)
+            }
+        )
+    }
+    Row(
+        modifier = modifier
+            .padding(start = 64.dp, top = 8.dp)
+            .fillMaxWidth()
+    ) {
+        TitleAndSubtitle(
+            title = {
+                Text("Model Id")
+            },
+            subtitle = {
+                Text(openAISettings.modelId)
+            }
+        )
+    }
+
+    Row(
+        modifier = modifier
+            .padding(start = 64.dp, top = 8.dp)
+            .fillMaxWidth()
+    ) {
+        val url = remember { openAISettings.toOpenAIHost().toUrlString() }
+        TitleAndSubtitle(
+            title = {
+                Text("Url")
+            },
+            subtitle = {
+                Text(url)
+            }
+        )
+    }
+
+    Box(
+        modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        OutlinedButton(
+            onClick = { showDialog = true }
+        ) {
+            Text("Update")
+        }
+    }
+
+    if (showDialog) {
+        BasicAlertDialog(
+            onDismissRequest = { showDialog = false },
+        ) {
+            OpenAIDialog(
+                settings = openAISettings,
+                models = openAIModels,
+                onSettingsUpdate = { newValue ->
+                    onEvent(OpenAISettingsEvent.UpdateSettings(newValue))
+                    showDialog = false
+                },
+                onLoadModels = {
+                    onEvent(OpenAISettingsEvent.LoadModels)
+                },
+                onDismissRequest = {
+                    showDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -703,29 +826,29 @@ fun GroupTitle(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth),
+        modifier
+            .width(dimens.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (startingSpace) {
             Box(
                 modifier =
-                    Modifier
-                        .width(64.dp)
-                        .height(height),
+                Modifier
+                    .width(64.dp)
+                    .height(height),
             )
         }
         Box(
             modifier =
-                Modifier
-                    .height(height),
+            Modifier
+                .height(height),
             contentAlignment = Alignment.CenterStart,
         ) {
             ProvideTextStyle(
                 value =
-                    MaterialTheme.typography.labelMedium.merge(
-                        TextStyle(color = MaterialTheme.colorScheme.primary),
-                    ),
+                MaterialTheme.typography.labelMedium.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.primary),
+                ),
             ) {
                 title(Modifier.semantics { heading() })
             }
@@ -744,12 +867,12 @@ fun ExternalSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { onClick() }
-                .semantics {
-                    role = Role.Button
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { onClick() }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -786,12 +909,12 @@ fun <T> MenuSetting(
     val closeMenuText = stringResource(id = R.string.close_menu)
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { expanded = !expanded }
-                .semantics {
-                    role = Role.Button
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -816,9 +939,9 @@ fun <T> MenuSetting(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier =
-                Modifier.onKeyEventLikeEscape {
-                    expanded = false
-                },
+            Modifier.onKeyEventLikeEscape {
+                expanded = false
+            },
         ) {
             // Hidden button for TalkBack
             DropdownMenuItem(
@@ -827,12 +950,12 @@ fun <T> MenuSetting(
                 },
                 text = {},
                 modifier =
-                    Modifier
-                        .height(0.dp)
-                        .safeSemantics {
-                            contentDescription = closeMenuText
-                            role = Role.Button
-                        },
+                Modifier
+                    .height(0.dp)
+                    .safeSemantics {
+                        contentDescription = closeMenuText
+                        role = Role.Button
+                    },
             )
             for (value in values.item) {
                 DropdownMenuItem(
@@ -877,12 +1000,12 @@ fun ListDialogSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable { expanded = !expanded }
-                .semantics {
-                    role = Role.Button
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -958,24 +1081,24 @@ fun NotificationsSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .clickable {
-                    when (notificationsPermissionState.status) {
-                        is PermissionStatus.Denied -> {
-                            if (notificationsPermissionState.status.shouldShowRationale) {
-                                permissionDismissed = false
-                            } else {
-                                notificationsPermissionState.launchPermissionRequest()
-                            }
+        modifier
+            .width(dimens.maxContentWidth)
+            .clickable {
+                when (notificationsPermissionState.status) {
+                    is PermissionStatus.Denied -> {
+                        if (notificationsPermissionState.status.shouldShowRationale) {
+                            permissionDismissed = false
+                        } else {
+                            notificationsPermissionState.launchPermissionRequest()
                         }
-
-                        PermissionStatus.Granted -> expanded = true
                     }
+
+                    PermissionStatus.Granted -> expanded = true
                 }
-                .semantics {
-                    role = Role.Button
-                },
+            }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -994,16 +1117,16 @@ fun NotificationsSetting(
             subtitle = {
                 Text(
                     text =
-                        when (permissionDenied) {
-                            true -> stringResource(id = R.string.explanation_permission_notifications)
-                            false -> {
-                                items.item.asSequence()
-                                    .filter { it.notify }
-                                    .map { it.title }
-                                    .take(4)
-                                    .joinToString(", ", limit = 3)
-                            }
-                        },
+                    when (permissionDenied) {
+                        true -> stringResource(id = R.string.explanation_permission_notifications)
+                        false -> {
+                            items.item.asSequence()
+                                .filter { it.notify }
+                                .map { it.title }
+                                .take(4)
+                                .joinToString(", ", limit = 3)
+                        }
+                    },
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -1055,14 +1178,14 @@ fun RadioButtonSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = minHeight)
-                .clickable { onClick() }
-                .safeSemantics(mergeDescendants = true) {
-                    role = Role.RadioButton
-                    stateDescription = stateLabel
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = minHeight)
+            .clickable { onClick() }
+            .safeSemantics(mergeDescendants = true) {
+                role = Role.RadioButton
+                stateDescription = stateLabel
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -1106,21 +1229,21 @@ fun SwitchSetting(
     val dimens = LocalDimens.current
     Row(
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .clickable(
-                    enabled = enabled,
-                    onClick = { onCheckedChange(!checked) },
-                )
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription =
-                        when (checked) {
-                            true -> context.getString(androidx.compose.ui.R.string.on)
-                            else -> context.getString(androidx.compose.ui.R.string.off)
-                        }
-                    role = Role.Switch
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = 64.dp)
+            .clickable(
+                enabled = enabled,
+                onClick = { onCheckedChange(!checked) },
+            )
+            .safeSemantics(mergeDescendants = true) {
+                stateDescription =
+                    when (checked) {
+                        true -> context.getString(androidx.compose.ui.R.string.on)
+                        else -> context.getString(androidx.compose.ui.R.string.off)
+                    }
+                role = Role.Switch
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -1139,9 +1262,9 @@ fun SwitchSetting(
                 Text(title)
             },
             subtitle =
-                description?.let {
-                    { Text(it) }
-                },
+            description?.let {
+                { Text(it) }
+            },
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1170,31 +1293,31 @@ fun ScaleSetting(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .padding(start = 64.dp)
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription = "%.1fx".format(safeCurrentValue)
-                },
+        modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = 64.dp)
+            .padding(start = 64.dp)
+            .safeSemantics(mergeDescendants = true) {
+                stateDescription = "%.1fx".format(safeCurrentValue)
+            },
     ) {
         Surface(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             tonalElevation = 3.dp,
         ) {
             Text(
                 "Lorem ipsum dolor sit amet.",
                 style =
-                    MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
-                            ),
+                MaterialTheme.typography.bodyLarge
+                    .merge(
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
                         ),
+                    ),
                 modifier = Modifier.padding(4.dp),
             )
         }
@@ -1204,12 +1327,12 @@ fun ScaleSetting(
                 Text(
                     "A",
                     style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
-                                ),
+                    MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
                             ),
+                        ),
                     modifier = Modifier.alignByBaseline(),
                 )
             },
@@ -1217,12 +1340,12 @@ fun ScaleSetting(
                 Text(
                     "A",
                     style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
-                                ),
+                    MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
                             ),
+                        ),
                     modifier = Modifier.alignByBaseline(),
                 )
             },

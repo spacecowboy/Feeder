@@ -481,6 +481,24 @@ class SettingsStore(override val di: DI) : DIAware {
         }
     }
 
+    private val _openAiSettings = MutableStateFlow(OpenAISettings(
+        key = sp.getStringNonNull(PREF_OPENAI_KEY, ""),
+        modelId = sp.getStringNonNull(PREF_OPENAI_MODEL_ID, "gpt-4o-mini"),
+        baseUrl = sp.getStringNonNull(PREF_OPENAI_URL, ""),
+        azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, "")
+    ))
+    val openAiSettings = _openAiSettings.asStateFlow()
+
+    fun setOpenAiSettings(value: OpenAISettings) {
+        _openAiSettings.value = value
+        sp.edit()
+            .putString(PREF_OPENAI_KEY, value.key)
+            .putString(PREF_OPENAI_MODEL_ID, value.modelId)
+            .putString(PREF_OPENAI_URL, value.baseUrl)
+            .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
+            .apply()
+    }
+
     private val _showTitleUnreadCount = MutableStateFlow(sp.getBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, false))
     val showTitleUnreadCount = _showTitleUnreadCount.asStateFlow()
 
@@ -585,6 +603,14 @@ const val PREF_LIST_SHOW_READING_TIME = "pref_show_reading_time"
  * Read Aloud Settings
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
+
+/**
+ * OpenAI integration
+ */
+const val PREF_OPENAI_KEY = "pref_openai_key"
+const val PREF_OPENAI_MODEL_ID = "pref_openai_model_id"
+const val PREF_OPENAI_URL = "pref_openai_url"
+const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 
 /**
  * Appearance settings
@@ -700,6 +726,15 @@ enum class SwipeAsRead(
     DISABLED(R.string.disabled),
     ONLY_FROM_END(R.string.only_from_end),
     FROM_ANYWHERE(R.string.from_anywhere),
+}
+
+data class OpenAISettings(
+    val modelId: String = "",
+    val baseUrl: String = "",
+    val azureApiVersion: String = "",
+    val key: String = ""
+) {
+    val isValid: Boolean = modelId.isNotEmpty() && key.isNotEmpty()
 }
 
 fun String.dropEnds(

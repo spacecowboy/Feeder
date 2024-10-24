@@ -284,6 +284,10 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
+    val openAISettings = settingsStore.openAiSettings
+
+    fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
+
     val showTitleUnreadCount = settingsStore.showTitleUnreadCount
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)

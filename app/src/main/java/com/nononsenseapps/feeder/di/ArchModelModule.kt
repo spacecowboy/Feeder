@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.base.bindWithActivityViewModelScope
 import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
+import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -22,6 +23,8 @@ import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
+import org.kodein.di.compose.instance
+import org.kodein.di.instance
 import org.kodein.di.singleton
 
 val archModelModule =
@@ -33,6 +36,7 @@ val archModelModule =
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+        bind<OpenAIApi>() with singleton { OpenAIApi(instance()) }
 
         bindWithActivityViewModelScope<MainActivityViewModel>()
         bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
