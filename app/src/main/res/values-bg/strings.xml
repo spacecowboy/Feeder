@@ -135,7 +135,7 @@
     <string name="text_scale">Размер на текста</string>
     <string name="failed_to_parse_rss_feed">Неуспешно анализиране на RSS емисия</string>
     <string name="no_email_client">Не може да се отвори имейл клиент</string>
-    <string name="sync">Синхронизиране</string>
+    <string name="sync">Синхронизирай</string>
     <string name="open_in_default_browser">Браузър по подразбиране</string>
     <string name="block_list">Списък с блокирани</string>
     <string name="export_feeds_to_opml">Изнасяне на емисии в OPML</string>
