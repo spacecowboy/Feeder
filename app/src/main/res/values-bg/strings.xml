@@ -48,7 +48,7 @@
     <string name="saved_article">Запазена статия</string>
     <string name="on_startup">При стартиране на приложението</string>
     <string name="touch_to_play_video">Докосни за изпълнение на видео</string>
-    <string name="one_tags">%1$s етикет</string>
+    <string name="one_tags">%1$s категория</string>
     <string name="press_scan_sync">На вашето устройство, отворете синхронизиране на устройството, и натиснете сканиране на кода за синхронизиране.</string>
     <string name="disconnect_device_from_sync">Изключи устройството от веригата за синхронизиране</string>
     <string name="open_in_web_view">Отвори в уеб изглед</string>
@@ -95,7 +95,7 @@
     <string name="read_article">Чети на глас</string>
     <string name="feed_icon">Икона на емисия</string>
     <string name="new_based_on_this">Ново въз основа на това</string>
-    <string name="tag">Етикет</string>
+    <string name="tag">Категория</string>
     <string name="device_sync_financed_by_community">Тази услуга се заплаща от общността. Моля, помислете за дарение, ако го намерите за полезно.</string>
     <string name="failed_to_parse">Не можа да анализира %1$s</string>
     <string name="open_in_webview">Уеб изглед</string>
@@ -109,7 +109,7 @@
     <string name="permission_read_label">Feeder достъп само за четене</string>
     <string name="preload_custom_tab">Предварително зареждане на персонализиран раздел</string>
     <string name="no_url">Няма URL</string>
-    <string name="contracted_tag">Затвори етикет</string>
+    <string name="contracted_tag">Затвори категория</string>
     <string name="max_lines">Максимум редове</string>
     <string name="open_in_browser">Отвори в уеб браузър</string>
     <string name="may_result_data_charges">Може да доведе до такси за мобилни данни.</string>
@@ -126,7 +126,7 @@
     <string name="battery_optimization_enabled">Включи</string>
     <string name="explanation_permission_notifications">Трябва да се даде разрешение, преди да могат да се активират известията.</string>
     <string name="fetch_full_articles_by_default">Извлечи цели статии по подразбиране</string>
-    <string name="zero_tags">%1$s етикети</string>
+    <string name="zero_tags">%1$s категории</string>
     <string name="sync_option_every_day">Всеки ден</string>
     <string name="zero_unread_articles">%1$s непрочетени статии</string>
     <string name="fetching_full_article">Извлича се цялата статия…</string>
@@ -153,7 +153,7 @@
     <string name="battery_optimization">Оптимизация на батерията</string>
     <string name="theme_day">Ден</string>
     <string name="feed_item_style_card">Карта</string>
-    <string name="toggle_tag_expansion">Превключи разширяване на етикета</string>
+    <string name="toggle_tag_expansion">Превключи разширяване на категория</string>
     <string name="mark_all_as_read">Маркирай всичко като прочетено</string>
     <string name="treat_like_password">Отнасяйте се към това като към парола. Всеки може да прочете вашите синхронизирани данни, ако има връзката.</string>
     <string name="title_activity_settings">Настройки</string>
@@ -173,14 +173,14 @@
     <string name="one_unread_article">%1$s непрочетена статия</string>
     <string name="showing_only_unread_articles">Показване само на непрочетени статии</string>
     <string name="synchronize_feeds">Синхронизиране на емисии</string>
-    <string name="few_tags">%1$s етикети</string>
+    <string name="few_tags">%1$s категории</string>
     <string name="read_adjective">Прочетено</string>
     <string name="sort">Сортирай по</string>
     <string name="failed_to_import_OPML">Неуспешно внасяне на OPML</string>
     <string name="title_activity_edit_feed">Абонирай се за емисия</string>
     <string name="dark_theme_preference_dark">Тъмна</string>
     <string name="article_image">Изображение на статия</string>
-    <string name="many_tags">%1$s етикети</string>
+    <string name="many_tags">%1$s категории</string>
     <string name="show_only_title">Покажи само заглавие</string>
     <string name="sync_option_every_30min">На всеки 30 минути</string>
     <string name="are_you_sure_leave_sync_chain">Сигурни ли сте, че искате да напуснете верига за синхронизиране?</string>
@@ -189,7 +189,7 @@
     <string name="empty_feed_open"><annotation style="link">Отвори</annotation> друга емисия?</string>
     <string name="few_unread_articles">%1$s непрочетена статии</string>
     <string name="few_feeds">%1$s емисии</string>
-    <string name="expanded_tag">Отвори етикет</string>
+    <string name="expanded_tag">Отвори категория</string>
     <string name="all_feeds">Всички емисии</string>
     <string name="action_settings">Настройки</string>
     <string name="text_to_speech">Текст към реч</string>
@@ -213,15 +213,15 @@
     <string name="other_feeds">%1$s емисии</string>
     <string name="share">Сподели</string>
     <string name="stop_reading">Спри четенето</string>
-    <string name="two_tags">%1$s етикети</string>
+    <string name="two_tags">%1$s категории</string>
     <string name="two_unread_articles">%1$s непрочетена статии</string>
     <string name="sync_code">Код за синхронизиране</string>
     <string name="updated_feeds">Актуализирани емисии</string>
     <string name="content_is_not_html">Съдържанието не е HTML</string>
     <string name="mark_as_read">Маркирай като прочетено</string>
     <string name="show_unread_items">Покажи непрочетени елементи</string>
-    <string name="other_tags">%1$s етикети</string>
-    <string name="no_tag">Без етикет</string>
+    <string name="other_tags">%1$s категории</string>
+    <string name="no_tag">Без категория</string>
     <string name="device_sync">Синхронизиране на устройството</string>
     <string name="from_anywhere">Отвсякъде</string>
     <string name="mark_as_unread">Маркирай като непрочетено</string>
