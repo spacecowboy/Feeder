@@ -14,13 +14,13 @@
     <string name="save">Guardar</string>
     <string name="empty_feed_top">No hay nada para leer aquí. ¿Le gustaría…</string>
     <string name="empty_feed_open">¿<annotation style="link">Abrir</annotation> otro canal?</string>
-    <string name="empty_feed_add">¿<annotation style="link">Añadir</annotation> más canales?</string>
+    <string name="empty_feed_add">¿<annotation style="link">Añadir</annotation> más fuentes?</string>
     <string name="search_feed_empty_hint">Escribir la dirección de un canal</string>
     <string name="mark_as_read">Marcar como leído</string>
     <string name="mark_as_unread">Marcar como no leído</string>
     <string name="mark_all_as_read">Marcar todo como leído</string>
-    <string name="edit_feed">Editar canal</string>
-    <string name="delete_feed">Borrar canal</string>
+    <string name="edit_feed">Editar fuente</string>
+    <string name="delete_feed">Borrar fuente</string>
     <string name="show_all_items">Mostrar todas las entradas</string>
     <string name="show_unread_items">Mostrar entradas no leídas</string>
     <string name="new_items_available">Nuevas entradas disponibles</string>
@@ -33,8 +33,8 @@
     <string name="open_in_browser">Abrir en navegador</string>
     <string name="open_enclosed_media">Abrir medio adjunto</string>
     <string name="sync">Sincronizar</string>
-    <string name="export_feeds_to_opml">Exportar canales a OPML</string>
-    <string name="import_feeds_from_opml">Importar canales de OPML</string>
+    <string name="export_feeds_to_opml">Exportar fuentes a OPML</string>
+    <string name="import_feeds_from_opml">Importar fuentes de OPML</string>
     <string name="view_debug_log">Ver traza de depuración</string>
     <string name="new_based_on_this">Nuevo basado en este</string>
     <string name="indicator_for_mark_as_read">Indicador para marcar como leído</string>
@@ -42,7 +42,7 @@
     <string name="no_such_feed">No se pudo encontrar el canal. ¿Puedes probar con HTTPS\?</string>
     <string name="nothing_to_display">¡Nada que mostrar!</string>
     <string name="title_activity_settings">Configuraciones</string>
-    <string name="all_feeds">Todos los canales</string>
+    <string name="all_feeds">Todas las fuentes</string>
     <string name="sync_option_manually">Manualmente</string>
     <string name="sync_option_every_15min">Cada 15 minutos</string>
     <string name="sync_option_every_30min">Cada 30 minutos</string>
@@ -62,9 +62,9 @@
     <string name="on_startup">Al arrancar</string>
     <string name="show_fab">Mostrar botón flotante</string>
     <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
-    <string name="updated_feeds">Canales actualizados</string>
+    <string name="updated_feeds">Fuentes actualizadas</string>
     <string name="notification_channel_name">Entradas no leídas</string>
-    <string name="notification_channel_description">Notificaciones solo se muestran para elementos no leídos canales configurados</string>
+    <string name="notification_channel_description">Notificaciones solo se muestran para elementos no leídos fuentes configuradas</string>
     <string name="open_in_reader">Lector</string>
     <string name="open_in_webview">Vista Web</string>
     <string name="open_in_default_browser">Navegador por defecto</string>
@@ -74,7 +74,7 @@
     <string name="reader_settings">Lector</string>
     <string name="open_link_in_web_view">Abrir enlace en vista Web</string>
     <string name="open_in_web_view">Abrir en vista Web</string>
-    <string name="max_feed_items">Número máximo de entradas por canal</string>
+    <string name="max_feed_items">Número máximo de entradas por fuente</string>
     <string name="could_not_load_url">No se pudo cargar la URL</string>
     <string name="theme_system">Tema del sistema</string>
     <string name="theme_automatic">Automático</string>
@@ -91,10 +91,10 @@
     <string name="no_email_client">No se puede abrir un cliente de correo</string>
     <string name="touch_to_play_video">Tocar para reproducir vídeo</string>
     <string name="javascript">Javascript</string>
-    <string name="open_feed">Abrir canal</string>
+    <string name="open_feed">Abrir fuente</string>
     <string name="mark_items_above_as_read">Marcar anteriores como leídos</string>
     <string name="mark_items_below_as_read">Marcar siguientes como leídos</string>
-    <string name="discovered_feeds_list">Lista de canales descubiertos</string>
+    <string name="discovered_feeds_list">Lista de fuentes descubiertas</string>
     <string name="toggle_tag_expansion">Alternar expansión de etiquetas</string>
     <string name="battery_optimization">Optimización de batería</string>
     <string name="battery_optimization_disabled">Optimización de batería deshabilitada</string>
@@ -182,7 +182,7 @@
     <string name="dynamic_theme_use">Colores dinámicos</string>
     <string name="new_indicator">Nuevo</string>
     <string name="article_image">Imagen del artículo</string>
-    <string name="feed_icon">Icono de canal</string>
+    <string name="feed_icon">Icono de fuente</string>
     <string name="text_scale">Escalar texto</string>
     <string name="block_list_description">Oculta los artículos cuyos títulos contengan alguno de estos filtros. Filtros de ejemplo:</string>
     <string name="sync_to_fetch">Sincronizar para obtener el artículo</string>
@@ -191,18 +191,18 @@
     <string name="saved_articles">Artículos guardados</string>
     <string name="saved_article">Artículo guardado</string>
     <string name="mark_as_read_on_scroll">Marcar como leído al desplazar</string>
-    <string name="zero_feeds">%1$s canales</string>
-    <string name="other_feeds">%1$s canales</string>
+    <string name="zero_feeds">%1$s fuentes</string>
+    <string name="other_feeds">%1$s fuentes</string>
     <string name="import_x_feeds_with_y_tags">¿Importar %1$s con %2$s\?</string>
     <string name="zero_tags">%1$s etiquetas</string>
     <string name="one_tags">%1$s etiqueta</string>
     <string name="other_tags">%1$s etiquetas</string>
     <string name="few_tags">%1$s etiquetas</string>
-    <string name="no_feeds">Sin canales</string>
-    <string name="one_feed">%1$s canal</string>
-    <string name="two_feeds">%1$s canales</string>
-    <string name="few_feeds">%1$s canales</string>
-    <string name="many_feeds">%1$s canales</string>
+    <string name="no_feeds">Sin fuentes</string>
+    <string name="one_feed">%1$s fuente</string>
+    <string name="two_feeds">%1$s fuentes</string>
+    <string name="few_feeds">%1$s fuentes</string>
+    <string name="many_feeds">%1$s fuentes</string>
     <string name="two_tags">%1$s etiquetas</string>
     <string name="many_tags">%1$s etiquetas</string>
     <string name="failed_to_fetch_full_article_missing_body">No se ha encontrado nada</string>
