@@ -10,10 +10,13 @@ class VisualTransformationApiKey : VisualTransformation {
         if (text.isBlank() || text.length < 10) {
             return VisualTransformation.None.filter(text)
         }
-        val prefixLength = 3
-        val suffixLength = 4
-        val stars = "*".repeat(text.length - prefixLength - suffixLength)
-        val transformed = "${text.subSequence(0..prefixLength)}$stars${text.subSequence(text.length - prefixLength, text.length)}"
+        val stars = "*".repeat(text.length - PREFIX_LENGTH - SUFFIX_LENGTH)
+        val transformed = "${text.subSequence(0..PREFIX_LENGTH)}$stars${text.subSequence(text.length - PREFIX_LENGTH, text.length)}"
         return TransformedText(AnnotatedString(transformed), OffsetMapping.Identity)
+    }
+
+    companion object {
+        const val PREFIX_LENGTH = 3
+        const val SUFFIX_LENGTH = 4
     }
 }
