@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
-import com.nononsenseapps.feeder.openai.toOpenAIHost
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
@@ -267,9 +266,7 @@ private fun OpenAIModelsDropdown(
 }
 
 @Composable
-private fun OpenAIModelsStatus(
-    state: OpenAIModelsState,
-) {
+private fun OpenAIModelsStatus(state: OpenAIModelsState) {
     when (state) {
         is OpenAIModelsState.Success -> {
             if (state.ids.isEmpty()) {
