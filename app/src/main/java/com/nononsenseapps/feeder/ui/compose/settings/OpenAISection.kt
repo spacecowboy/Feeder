@@ -146,8 +146,8 @@ fun OpenAISectionEdit(
     modifier: Modifier = Modifier,
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
-    LaunchedEffect(true) {
-        latestOnEvent(OpenAISettingsEvent.LoadModels)
+    LaunchedEffect(settings) {
+        latestOnEvent(OpenAISettingsEvent.LoadModels(settings = settings))
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
@@ -164,7 +164,6 @@ fun OpenAISectionEdit(
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(key = it)))
-                onEvent(OpenAISettingsEvent.LoadModels)
             },
             visualTransformation = VisualTransformationApiKey(),
         )
@@ -177,7 +176,6 @@ fun OpenAISectionEdit(
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(modelId = it)))
-                onEvent(OpenAISettingsEvent.LoadModels)
             },
             trailingIcon = {
                 IconButton(
@@ -188,23 +186,26 @@ fun OpenAISectionEdit(
                         CircularProgressIndicator()
                     } else {
                         Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
+                        if (models is OpenAIModelsState.Success) {
+                            OpenAIModelsDropdown(
+                                menuExpanded = modelsMenuExpanded,
+                                state = models,
+                                onValueChange = {
+                                    onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(modelId = it)))
+                                },
+                                onDismissRequest = { modelsMenuExpanded = false },
+                            )
+                        }
                     }
                 }
             },
         )
 
-        OpenAIModelsSection(
-            menuExpanded = modelsMenuExpanded,
-            state = models,
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(modelId = it)))
-            },
-            onDismissRequest = { modelsMenuExpanded = false },
-        )
+        OpenAIModelsStatus(state = models)
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.toOpenAIHost(withAzureDeploymentId = false).baseUrl,
+            value = settings.baseUrl,
             placeholder = {
                 Text(OpenAIHost.OpenAI.baseUrl)
             },
@@ -213,7 +214,6 @@ fun OpenAISectionEdit(
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(baseUrl = it)))
-                onEvent(OpenAISettingsEvent.LoadModels)
             },
         )
         TextField(
@@ -224,7 +224,6 @@ fun OpenAISectionEdit(
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(azureDeploymentId = it)))
-                onEvent(OpenAISettingsEvent.LoadModels)
             },
         )
 
@@ -239,18 +238,37 @@ fun OpenAISectionEdit(
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(azureApiVersion = it)))
-                onEvent(OpenAISettingsEvent.LoadModels)
             },
         )
     }
 }
 
 @Composable
-private fun OpenAIModelsSection(
+private fun OpenAIModelsDropdown(
     menuExpanded: Boolean,
-    state: OpenAIModelsState,
+    state: OpenAIModelsState.Success,
     onValueChange: (String) -> Unit,
     onDismissRequest: () -> Unit,
+) {
+    DropdownMenu(
+        expanded = menuExpanded,
+        onDismissRequest = onDismissRequest,
+    ) {
+        state.ids.forEach { id ->
+            DropdownMenuItem(
+                text = { Text(text = id) },
+                onClick = {
+                    onValueChange(id)
+                    onDismissRequest()
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun OpenAIModelsStatus(
+    state: OpenAIModelsState,
 ) {
     when (state) {
         is OpenAIModelsState.Success -> {
@@ -258,23 +276,8 @@ private fun OpenAIModelsSection(
                 OutlinedCard {
                     Text(
                         text = stringResource(R.string.no_models_were_found),
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(8.dp),
                     )
-                }
-            } else {
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = onDismissRequest,
-                ) {
-                    state.ids.forEach { id ->
-                        DropdownMenuItem(
-                            text = { Text(text = id) },
-                            onClick = {
-                                onValueChange(id)
-                                onDismissRequest()
-                            },
-                        )
-                    }
                 }
             }
         }

@@ -92,20 +92,20 @@ class OpenAIApi(
     private val openAI: OpenAI
         get() = OpenAI(config = openAISettings.toOpenAIConfig())
 
-    suspend fun listModelIds(): ModelsResult {
-        if (openAISettings.key.isEmpty()) {
+    suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
+        if (settings.key.isEmpty()) {
             return ModelsResult.MissingToken
         }
-        if (openAISettings.isAzure) {
-            if (openAISettings.azureApiVersion.isBlank()) {
+        if (settings.isAzure) {
+            if (settings.azureApiVersion.isBlank()) {
                 return ModelsResult.AzureApiVersionRequired
             }
-            if (openAISettings.azureDeploymentId.isBlank()) {
+            if (settings.azureDeploymentId.isBlank()) {
                 return ModelsResult.AzureDeploymentIdRequired
             }
         }
         return try {
-            openAI.models()
+            OpenAI(config = settings.toOpenAIConfig()).models()
                 .sortedByDescending { it.created }
                 .map { it.id.id }.let { ModelsResult.Success(it) }
         } catch (e: Exception) {

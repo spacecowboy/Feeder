@@ -157,7 +157,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
-            OpenAISettingsEvent.LoadModels -> loadOpenAIModels()
+            is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
             is OpenAISettingsEvent.UpdateSettings -> repository.setOpenAiSettings(event.settings)
             is OpenAISettingsEvent.SwitchEditMode -> {
                 _viewState.value = _viewState.value.copy(openAIEdit = event.enabled)
@@ -262,11 +262,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         }
     }
 
-    private fun loadOpenAIModels() {
+    private fun loadOpenAIModels(settings: OpenAISettings) {
         viewModelScope.launch(Dispatchers.IO) {
             openAIModelsState.value = OpenAIModelsState.Loading
             openAIModelsState.value =
-                openAIApi.listModelIds().let { res ->
+                openAIApi.listModelIds(settings).let { res ->
                     when (res) {
                         is OpenAIApi.ModelsResult.Error -> OpenAIModelsState.Error(res.message ?: "")
                         OpenAIApi.ModelsResult.MissingToken -> OpenAIModelsState.None
@@ -337,7 +337,7 @@ sealed interface OpenAIModelsState {
 sealed interface OpenAISettingsEvent {
     data class UpdateSettings(val settings: OpenAISettings) : OpenAISettingsEvent
 
-    data object LoadModels : OpenAISettingsEvent
+    data class LoadModels(val settings: OpenAISettings) : OpenAISettingsEvent
 
     data class SwitchEditMode(val enabled: Boolean) : OpenAISettingsEvent
 }
