@@ -1265,12 +1265,13 @@ fun ScaleSetting(
 }
 
 @Composable
-private fun RowScope.TitleAndSubtitle(
+fun RowScope.TitleAndSubtitle(
     title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     subtitle: (@Composable () -> Unit)? = null,
 ) {
     Column(
-        modifier = Modifier.weight(1f),
+        modifier = modifier.weight(1f),
         verticalArrangement = Arrangement.Center,
     ) {
         ProvideTextStyle(value = MaterialTheme.typography.titleMedium) {
