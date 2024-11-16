@@ -10,12 +10,15 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.openai.OpenAIApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +36,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val context: Application by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val openAIApi: OpenAIApi by instance()
 
     fun setCurrentTheme(value: ThemeOptions) {
         repository.setCurrentTheme(value)
@@ -151,6 +155,18 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowTitleUnreadCount(value)
     }
 
+    fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
+        when (event) {
+            is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
+            is OpenAISettingsEvent.UpdateSettings -> repository.setOpenAiSettings(event.settings)
+            is OpenAISettingsEvent.SwitchEditMode -> {
+                _viewState.value = _viewState.value.copy(openAIEdit = event.enabled)
+            }
+        }
+    }
+
+    private val openAIModelsState = MutableStateFlow<OpenAIModelsState>(OpenAIModelsState.None)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
         repository.feedNotificationSettings
@@ -204,6 +220,8 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.isOpenAdjacent,
                 repository.showReadingTime,
                 repository.showTitleUnreadCount,
+                repository.openAISettings,
+                openAIModelsState,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -234,10 +252,29 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     isOpenAdjacent = params[24] as Boolean,
                     showReadingTime = params[25] as Boolean,
                     showTitleUnreadCount = params[26] as Boolean,
+                    openAISettings = params[27] as OpenAISettings,
+                    openAIModels = params[28] as OpenAIModelsState,
+                    openAIEdit = _viewState.value.openAIEdit,
                 )
             }.collect {
                 _viewState.value = it
             }
+        }
+    }
+
+    private fun loadOpenAIModels(settings: OpenAISettings) {
+        viewModelScope.launch(Dispatchers.IO) {
+            openAIModelsState.value = OpenAIModelsState.Loading
+            openAIModelsState.value =
+                openAIApi.listModelIds(settings).let { res ->
+                    when (res) {
+                        is OpenAIApi.ModelsResult.Error -> OpenAIModelsState.Error(res.message ?: "")
+                        OpenAIApi.ModelsResult.MissingToken -> OpenAIModelsState.None
+                        is OpenAIApi.ModelsResult.Success -> OpenAIModelsState.Success(res.ids)
+                        OpenAIApi.ModelsResult.AzureApiVersionRequired -> OpenAIModelsState.None
+                        OpenAIApi.ModelsResult.AzureDeploymentIdRequired -> OpenAIModelsState.None
+                    }
+                }
         }
     }
 
@@ -274,6 +311,9 @@ data class SettingsViewState(
     val maxLines: Int = 2,
     val showOnlyTitle: Boolean = false,
     val isOpenAdjacent: Boolean = true,
+    val openAISettings: OpenAISettings = OpenAISettings(),
+    val openAIModels: OpenAIModelsState = OpenAIModelsState.None,
+    val openAIEdit: Boolean = false,
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
 )
@@ -283,3 +323,21 @@ data class UIFeedSettings(
     val title: String,
     val notify: Boolean,
 )
+
+sealed interface OpenAIModelsState {
+    data object None : OpenAIModelsState
+
+    data object Loading : OpenAIModelsState
+
+    data class Success(val ids: List<String>) : OpenAIModelsState
+
+    data class Error(val message: String) : OpenAIModelsState
+}
+
+sealed interface OpenAISettingsEvent {
+    data class UpdateSettings(val settings: OpenAISettings) : OpenAISettingsEvent
+
+    data class LoadModels(val settings: OpenAISettings) : OpenAISettingsEvent
+
+    data class SwitchEditMode(val enabled: Boolean) : OpenAISettingsEvent
+}

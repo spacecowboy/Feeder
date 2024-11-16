@@ -7,6 +7,7 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
@@ -29,7 +31,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -130,6 +134,9 @@ fun ArticleScreen(
         },
         articleListState = articleListState,
         onNavigateUp = onNavigateUp,
+        onSummarize = {
+            viewModel.summarize()
+        },
     )
 }
 
@@ -152,8 +159,9 @@ fun ArticleScreen(
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onToggleBookmark: () -> Unit,
     articleListState: LazyListState,
-    modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit,
+    onSummarize: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -251,6 +259,24 @@ fun ArticleScreen(
                                         Text(stringResource(id = R.string.share))
                                     },
                                 )
+
+                                if (viewState.showSummarize) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            onShowToolbarMenu(false)
+                                            onSummarize()
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.AutoFixHigh,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        text = {
+                                            Text(stringResource(id = R.string.summarize))
+                                        },
+                                    )
+                                }
 
                                 DropdownMenuItem(
                                     onClick = {
@@ -412,6 +438,11 @@ fun ArticleContent(
         modifier = modifier,
         articleListState = articleListState,
     ) {
+        if (viewState.openAiSummary !is OpenAISummaryState.Empty) {
+            item {
+                SummarySection(viewState.openAiSummary)
+            }
+        }
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
@@ -455,6 +486,26 @@ fun ArticleContent(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SummarySection(summary: OpenAISummaryState) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        when (summary) {
+            OpenAISummaryState.Empty -> {}
+            OpenAISummaryState.Loading ->
+                LinearProgressIndicator(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                )
+            is OpenAISummaryState.Result ->
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = summary.value.content,
+                )
         }
     }
 }

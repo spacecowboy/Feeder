@@ -214,6 +214,7 @@ dependencies {
     implementation(platform(libs.okhttp.bom))
     implementation(platform(libs.coil.bom))
     implementation(platform(libs.compose.bom))
+    implementation(platform(libs.openai.client.bom))
 
     // Dependencies
     implementation(libs.bundles.android)
@@ -221,6 +222,8 @@ dependencies {
     implementation(libs.bundles.jvm)
     implementation(libs.bundles.okhttp.android)
     implementation(libs.bundles.kotlin)
+    implementation(libs.openai.client)
+    implementation(libs.ktor.client.okhttp)
 
     // Only for debug
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
