@@ -53,7 +53,7 @@
     <string name="feed_item_style_card">Κάρτα</string>
     <string name="show_thumbnails">Εμφάνιση μικρογραφιών</string>
     <string name="theme_system">Σύστημα</string>
-    <string name="remove_device">Αφαίρεση της συσκευής</string>
+    <string name="remove_device">Αφαίρεση συσκευής</string>
     <string name="qr_code">Κωδικός QR</string>
     <string name="secret_key">Μυστικό κλειδί</string>
     <string name="new_items_available">Νέα στοιχεία διαθέσιμα</string>
@@ -85,23 +85,23 @@
     <string name="only_when_charging">Μόνο κατά τη φόρτιση</string>
     <string name="pause_reading">Παύση ανάγνωσης</string>
     <string name="on_startup">Κατά την εκκίνηση της εφαρμογής</string>
-    <string name="synchronization">Συγχρονίζεται</string>
+    <string name="synchronization">Συγχρονισμός</string>
     <string name="open_in_default_browser">Προεπιλεγμένος περιηγητής</string>
     <string name="sort_newest_first">Νεότερα πρώτα</string>
-    <string name="sort_oldest_first">Τα παλαιότερα πρώτα</string>
+    <string name="sort_oldest_first">Παλαιότερα πρώτα</string>
     <string name="device_sync">Συγχρονισμός συσκευής</string>
     <string name="sync_code">Κωδικός συγχρονισμού</string>
     <string name="include_mobile_hotspots">Να συμπεριλαμβάνονται κινητά hotspot</string>
     <string name="open_in_webview">Προβολή ιστού</string>
     <string name="open_in_custom_tab">Προσαρμοσμένη καρτέλα</string>
-    <string name="use_app_default">Χρησιμοποιήστε προεπιλογή εφαρμογής</string>
+    <string name="use_app_default">Χρήση προεπιλογή εφαρμογής</string>
     <string name="send_bug_report">Αποστολή αναφοράς σφάλματος</string>
     <string name="no_email_client">Αποτυχία έναρξης εφαρμογής e-mail</string>
     <string name="failed_to_open_article">Αποτυχία ανοίγματος άρθρου</string>
     <string name="zero_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="join_sync_chain">Συμμετοχή σε αλυσίδα συγχρονισμού</string>
     <string name="swipe_to_mark_as_read">Σύρετε για να επισημάνετε ως αναγνωσμένο</string>
-    <string name="are_you_sure_leave_sync_chain">Είστε βέβαιοι ότι θέλετε να βγείτε από την αλυσίδα συγχρονισμού;</string>
+    <string name="are_you_sure_leave_sync_chain">Σίγουρα θέλετε να βγείτε από την αλυσίδα συγχρονισμού;</string>
     <string name="could_not_load_url">Δεν ήταν δυνατή η φόρτωση της διεύθυνσης URL</string>
     <string name="sync_status">Κατάσταση συγχρονισμού</string>
     <string name="open_item_by_default_with">Ανοίξτε τα στοιχεία με προεπιλογή το</string>
@@ -109,7 +109,7 @@
     <string name="max_feed_items">Μέγιστα αντικείμενα ανά ροή</string>
     <string name="contracted_tag">Κλειστή ετικέτα</string>
     <string name="preload_custom_tab">Προφόρτωση προσαρμοσμένης καρτέλας</string>
-    <string name="touch_to_play_video">Αγγίξτε για να αναπαραγωγή βίντεο</string>
+    <string name="touch_to_play_video">Αγγίξτε για αναπαραγωγή βίντεο</string>
     <string name="failed_to_parse">Αποτυχία ανάλυσης του %1$s</string>
     <string name="fetch_full_article">Ανάκτηση πλήρους άρθρου</string>
     <string name="failed_to_fetch_full_article">Αποτυχία ανάκτησης πλήρους άρθρου</string>
@@ -140,7 +140,7 @@
     <string name="may_result_data_charges">Μπορεί να οδηγήσει σε χρεώσεις δεδομένων κινητής τηλεφωνίας.</string>
     <string name="dark_theme_preference">Προτίμηση σκοτεινού θέματος</string>
     <string name="empty_feed_open"><annotation style="link">Άνοιγμα</annotation> άλλης ροής;</string>
-    <string name="empty_feed_top">Δεν υπάρχει τίποτα για διάβασμα εδώ. Θα θέλατε να γίνει…</string>
+    <string name="empty_feed_top">Δεν υπάρχει τίποτα για ανάγνωση εδώ. Θα θέλατε να γίνει…</string>
     <string name="search_feed_empty_hint">Εισαγάγετε μια διεύθυνση ροής</string>
     <string name="show_unread_items">Εμφάνιση μη αναγνωσμένων αντικειμένων</string>
     <string name="dont_notify_for_new_items">Διακοπή ειδοποιήσεων</string>
@@ -163,7 +163,7 @@
     <string name="remove">Αφαίρεση</string>
     <string name="device_sync_financed_by_community">Αυτή η υπηρεσία πληρώνεται από την κοινότητα. Εξετάστε το ενδεχόμενο να κάνετε δωρεά αν το βρίσκετε χρήσιμο.</string>
     <string name="devices_on_sync_chain">Συσκευές στην αλυσίδα συγχρονισμού</string>
-    <string name="remove_device_question">Είστε βέβαιοι ότι θέλετε να διαγράψετε τη συσκευή %1$s;</string>
+    <string name="remove_device_question">Σίγουρα θέλετε να διαγράψετε τη συσκευή %1$s;</string>
     <string name="disconnect_device_from_sync">Αποσύνδεση της συσκευής από την αλυσίδα συγχρονισμού</string>
     <string name="leave_sync_chain">Έξοδος από την αλυσίδα συγχρονισμού</string>
     <string name="feeder_device_sync_code">Κωδικός συγχρονισμού συσκευής Feeder</string>
@@ -190,7 +190,7 @@
     <string name="unsave_article">Σταματήστε την αποθήκευση του άρθρου</string>
     <string name="saved_articles">Αποθηκευμένα άρθρα</string>
     <string name="saved_article">Αποθηκευμένο άρθρο</string>
-    <string name="no_feeds">Δεν υπάρχουν ροές</string>
+    <string name="no_feeds">Χωρίς ροές</string>
     <string name="zero_feeds">%1$s ροές</string>
     <string name="one_feed">%1$s ροή</string>
     <string name="other_feeds">%1$s ροές</string>
