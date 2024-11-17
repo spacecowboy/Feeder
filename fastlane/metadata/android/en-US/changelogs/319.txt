@@ -1,0 +1,17 @@
+# 2.7.0
+Alex Gavrishev (1):
+  * [ca13fd47] added article summary with OpenAI integration (#399)
+
+Anonymous (1):
+  * [7f17b353] Updated Norwegian Bokmål translation using Weblate
+
+ERYpTION (1):
+  * [d16c3677] Updated Danish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [a0d05834] cleaned up some sync code
+  * [de1c7dd2] Changed default for read-filter to reduce confusion for new
+         users
+
+Mateusz Maksimowicz (1):
+  * [0348b6d8] Changed: Open drawer after hitting fab mark all article

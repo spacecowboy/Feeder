@@ -1,3 +1,57 @@
+# 2.7.0
+Alex Gavrishev (1):
+  * [ca13fd47] added article summary with OpenAI integration (#399)
+
+Anonymous (1):
+  * [7f17b353] Updated Norwegian Bokmål translation using Weblate
+
+ERYpTION (1):
+  * [d16c3677] Updated Danish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [a0d05834] cleaned up some sync code
+  * [de1c7dd2] Changed default for read-filter to reduce confusion for new
+         users
+
+Mateusz Maksimowicz (1):
+  * [0348b6d8] Changed: Open drawer after hitting fab mark all articles fab
+         (#386)
+
+Matth78 (1):
+  * [aeb9b8e8] Translated using Weblate (French)
+
+Sven Jacobs (1):
+  * [bed721c4] fix: feed title empty on initial app start
+
+Wiccio (1):
+  * [574c478d] Updated Esperanto translation using Weblate
+
+bittin1ddc447d824349b2 (1):
+  * [5ba3edf9] Updated Swedish translation using Weblate
+
+gallegonovato (1):
+  * [0c97a6e8] Updated Spanish translation using Weblate
+
+josé m (1):
+  * [e9eb6968] Updated Galician translation using Weblate
+
+sergio (2):
+  * [cd4f4524] Updated Spanish translation using Weblate
+  * [63288adb] Updated Spanish translation using Weblate
+
+summoner001 (2):
+  * [6f5fdd3b] Updated Hungarian translation using Weblate
+  * [0b6b1783] Updated Hungarian translation using Weblate
+
+trunars (4):
+  * [411f8e4d] Updated Bulgarian translation using Weblate
+  * [5a82fdc6] Updated Bulgarian translation using Weblate
+  * [7a75ca93] Updated Bulgarian translation using Weblate
+  * [f97b9868] Updated Bulgarian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [10417ac9] Updated Greek translation using Weblate
+
 # 2.6.33
 AlekseySaenko (1):
   * [0fc8893a] Updated Russian translation using Weblate
