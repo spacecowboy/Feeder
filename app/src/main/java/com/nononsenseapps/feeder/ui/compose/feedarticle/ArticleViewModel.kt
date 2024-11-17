@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -29,6 +30,8 @@ import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.html.HtmlLinearizer
 import com.nononsenseapps.feeder.model.html.LinearArticle
+import com.nononsenseapps.feeder.openai.OpenAIApi
+import com.nononsenseapps.feeder.openai.isValid
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -44,6 +47,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.FileNotFoundException
@@ -58,6 +62,7 @@ class ArticleViewModel(
     private val ttsStateHolder: TTSStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
+    private val openAIApi: OpenAIApi by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -108,6 +113,8 @@ class ArticleViewModel(
     private val toolbarVisible: MutableStateFlow<Boolean> =
         MutableStateFlow(state["toolbarMenuVisible"] ?: false)
 
+    private val openAiSummary: MutableStateFlow<OpenAISummaryState> = MutableStateFlow(OpenAISummaryState.Empty)
+
     val viewState: StateFlow<ArticleScreenViewState> =
         combine(
             articleFlow,
@@ -118,6 +125,8 @@ class ArticleViewModel(
             repository.useDetectLanguage,
             ttsStateHolder.ttsState,
             ttsStateHolder.availableLanguages,
+            repository.openAISettings,
+            openAiSummary,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -129,6 +138,9 @@ class ArticleViewModel(
 
             @Suppress("UNCHECKED_CAST")
             val ttsLanguages = params[7] as List<Locale>
+
+            val showSummarize = (params[8] as OpenAISettings).isValid && !article?.link.isNullOrEmpty()
+            val openAiSummary = (params[9] as OpenAISummaryState)
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -155,6 +167,8 @@ class ArticleViewModel(
                         article?.wordCount ?: 0
                     },
                 image = article?.image,
+                showSummarize = showSummarize,
+                openAiSummary = openAiSummary,
                 articleContent = articleContent,
             )
         }
@@ -349,6 +363,52 @@ class ArticleViewModel(
         ttsStateHolder.setLanguage(lang)
     }
 
+    fun summarize() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                openAiSummary.value = OpenAISummaryState.Loading
+                val content = loadArticleContent()
+                openAiSummary.value =
+                    OpenAISummaryState.Result(
+                        value = openAIApi.summarize(content),
+                    )
+            } catch (e: Exception) {
+                openAiSummary.value =
+                    OpenAISummaryState.Result(
+                        value = OpenAIApi.SummaryResult.Error(content = e.message ?: "Unknown error"),
+                    )
+            }
+        }
+    }
+
+    private suspend fun loadArticleContent(): String {
+        val viewState = viewState.value
+        val blobFile = blobFullFile(viewState.articleId, filePathProvider.fullArticleDir)
+        val contentStream =
+            if (blobFile.isFile) {
+                blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir)
+            } else {
+                fullTextParser.parseFullArticleIfMissing(
+                    object : FeedItemForFetching {
+                        override val id = viewState.articleId
+                        override val link = viewState.articleLink
+                    },
+                ).let {
+                    val error = it.leftOrNull()
+                    if (error == null) {
+                        blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir)
+                    } else {
+                        throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
+                    }
+                }
+            }
+
+        val content =
+            Jsoup.parse(contentStream, null, viewState.articleFeedUrl ?: "")?.body()?.text()
+                ?: throw IllegalStateException("Cannot parse content")
+        return content
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"
     }
@@ -375,6 +435,8 @@ private data class ArticleState(
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
     override val wordCount: Int = 0,
     override val image: ThumbnailImage? = null,
+    override val showSummarize: Boolean = false,
+    override val openAiSummary: OpenAISummaryState = OpenAISummaryState.Empty,
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -400,7 +462,17 @@ interface ArticleScreenViewState {
     val keyHolder: ArticleItemKeyHolder
     val wordCount: Int
     val image: ThumbnailImage?
+    val showSummarize: Boolean
+    val openAiSummary: OpenAISummaryState
     val articleContent: LinearArticle
+}
+
+sealed interface OpenAISummaryState {
+    data object Empty : OpenAISummaryState
+
+    data object Loading : OpenAISummaryState
+
+    data class Result(val value: OpenAIApi.SummaryResult) : OpenAISummaryState
 }
 
 interface ArticleItemKeyHolder {

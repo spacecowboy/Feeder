@@ -122,7 +122,7 @@
     <string name="sort_newest_first">Primeiro novidades</string>
     <string name="sort_oldest_first">Primeiro os antigos</string>
     <string name="sort">Orde por</string>
-    <string name="send_bug_report">Enviar informe de problemas</string>
+    <string name="send_bug_report">Informar sobre problemas</string>
     <string name="no_email_client">Non se puido abrir cliente de correo</string>
     <string name="touch_to_play_video">Toca para reproducir vídeo</string>
     <string name="javascript">JavaScript</string>

@@ -284,6 +284,10 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
+    val openAISettings = settingsStore.openAiSettings
+
+    fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
+
     val showTitleUnreadCount = settingsStore.showTitleUnreadCount
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)
@@ -455,10 +459,10 @@ class Repository(override val di: DI) : DIAware {
                             else -> null
                         },
                     type =
-                        when (feedId) {
-                            ID_UNSET -> FeedType.TAG
-                            ID_ALL_FEEDS -> FeedType.ALL_FEEDS
-                            ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                        when {
+                            tag.isNotBlank() -> FeedType.TAG
+                            feedId == ID_UNSET || feedId == ID_ALL_FEEDS -> FeedType.ALL_FEEDS
+                            feedId == ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
                             else -> FeedType.FEED
                         },
                     unreadCount = unreadCount,
