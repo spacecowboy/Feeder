@@ -250,4 +250,13 @@
     <string name="feed_item_style_compact_card">Tarjeta compacta</string>
     <string name="touch_to_play_audio">Toca para reproducir el audio</string>
     <string name="show_title_unread_count">Mostrar número de artículos no leídos en el título</string>
+    <string name="openai_settings">Integración de OpenAI</string>
+    <string name="no_models_were_found">Sin modelos</string>
+    <string name="summarize">Resumir</string>
+    <string name="model_id">Identificación del modelo</string>
+    <string name="azure_api_version">Versión de la API de Azure</string>
+    <string name="api_key">Clave API</string>
+    <string name="unable_to_load_models">No se pueden cargar modelos.</string>
+    <string name="list_of_available_models">Lista de modelos disponibles</string>
+    <string name="azure_deployment_id">Identificación de implementación de Azure</string>
 </resources>
