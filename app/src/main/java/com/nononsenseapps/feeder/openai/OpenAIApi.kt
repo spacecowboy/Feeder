@@ -5,54 +5,19 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatResponseFormat
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.chat.TextContent
-import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.client.LoggingConfig
-import com.aallam.openai.client.OpenAI
-import com.aallam.openai.client.OpenAIConfig
 import com.aallam.openai.client.OpenAIHost
-import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
-import io.ktor.client.plugins.HttpSend
-import io.ktor.client.plugins.plugin
-import io.ktor.client.request.url
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.http.takeFrom
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-
-private fun OpenAISettings.toOpenAIConfig(): OpenAIConfig =
-    OpenAIConfig(
-        token = key,
-        logging = LoggingConfig(logLevel = LogLevel.Headers, sanitize = !BuildConfig.DEBUG),
-        host = toOpenAIHost(withAzureDeploymentId = false),
-        httpClientConfig = {
-            if (isAzure) {
-                install(HttpSend)
-                install("azure-interceptor") {
-                    plugin(HttpSend).intercept { request ->
-                        request.headers.remove("Authorization")
-                        request.headers.append("api-key", key)
-                        // models path doesn't include azureDeploymentId
-                        val path = request.url.pathSegments.takeLastWhile { it != "openai" || it.isEmpty() }
-                        val url =
-                            toOpenAIHost(withAzureDeploymentId = path.last() != "models")
-                                .toUrl()
-                                .appendPathSegments(path)
-                                .build()
-                        request.url(url)
-                        execute(request)
-                    }
-                }
-            }
-        },
-    )
 
 class OpenAIApi(
     private val repository: Repository,
     private val appLang: String,
+    private val openAIClientFactory: (OpenAISettings) -> OpenAIClient,
 ) {
     @Serializable
     data class SummaryResponse(val lang: String, val content: String)
@@ -86,15 +51,22 @@ class OpenAIApi(
         data class Error(val message: String?) : ModelsResult
     }
 
+    companion object {
+        private val LANG_REGEX = Regex("^Lang: \"?([a-zA-Z]+)\"?$")
+    }
+
     private val openAISettings: OpenAISettings
         get() = repository.openAISettings.value
 
-    private val openAI: OpenAI
-        get() = OpenAI(config = openAISettings.toOpenAIConfig())
+    private val openAI: OpenAIClient
+        get() = openAIClientFactory(openAISettings)
 
     suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
         if (settings.key.isEmpty()) {
             return ModelsResult.MissingToken
+        }
+        if (settings.isPerplexity) {
+            return ModelsResult.Success(ids = emptyList())
         }
         if (settings.isAzure) {
             if (settings.azureApiVersion.isBlank()) {
@@ -105,9 +77,9 @@ class OpenAIApi(
             }
         }
         return try {
-            OpenAI(config = settings.toOpenAIConfig()).models()
+            openAIClientFactory(settings).models()
                 .sortedByDescending { it.created }
-                .map { it.id.id }.let { ModelsResult.Success(it) }
+                .map { it.id.id }.let { ModelsResult.Success(ids = it) }
         } catch (e: Exception) {
             ModelsResult.Error(message = e.message ?: e.cause?.message)
         }
@@ -121,10 +93,9 @@ class OpenAIApi(
                     requestOptions = null,
                 )
             val summaryResponse: SummaryResponse =
-                response.choices.firstOrNull()?.message?.content?.let { text ->
-                    Json.decodeFromString(text)
-                } ?: throw IllegalStateException("Response content is null")
-
+                parseSummaryResponse(
+                    response.choices.firstOrNull()?.message?.content ?: throw IllegalStateException("Response content is null"),
+                )
             return SummaryResult.Success(
                 id = response.id,
                 model = response.model.id,
@@ -140,6 +111,15 @@ class OpenAIApi(
         }
     }
 
+    private fun parseSummaryResponse(content: String): SummaryResponse {
+        val firstLine = content.lineSequence().firstOrNull() ?: ""
+        val result = LANG_REGEX.find(firstLine)
+        return SummaryResponse(
+            lang = result?.groupValues?.getOrNull(1) ?: "",
+            content = content.replaceFirst(firstLine, "").trim(),
+        )
+    }
+
     private fun summaryRequest(content: String): ChatCompletionRequest {
         return ChatCompletionRequest(
             model = ModelId(id = openAISettings.modelId),
@@ -153,7 +133,7 @@ class OpenAIApi(
                                     "You are an assistant in an RSS reader app, summarizing article content.",
                                     "The app language is '$appLang'.",
                                     "Provide summaries in the article's language if 99% recognizable; otherwise, use the app language.",
-                                    "Format response as JSON: { \"lang\": \"ISO code\", \"content\": \"summary\" }.",
+                                    "First line must be: 'Lang: \"ISO code\"'",
                                     "Keep summaries up to 100 words, 3 paragraphs, with up to 3 bullet points per paragraph.",
                                     "For readability use bullet points, titles, quotes and new lines using plain text only.",
                                     "Use only single language.",
@@ -166,13 +146,16 @@ class OpenAIApi(
                         messageContent = TextContent("Summarize:\n\n$content"),
                     ),
                 ),
-            responseFormat = ChatResponseFormat.JsonObject,
+            responseFormat = ChatResponseFormat.Text,
         )
     }
 }
 
 val OpenAISettings.isAzure: Boolean
     get() = baseUrl.contains("openai.azure.com", ignoreCase = true)
+
+val OpenAISettings.isPerplexity: Boolean
+    get() = baseUrl.contains("api.perplexity.ai", ignoreCase = true)
 
 val OpenAISettings.isValid: Boolean
     get() =
