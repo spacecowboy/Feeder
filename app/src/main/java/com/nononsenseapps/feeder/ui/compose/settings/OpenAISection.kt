@@ -313,7 +313,7 @@ private fun OpenAIModelsStatus(
                         if (hasError) {
                             Icon(
                                 imageVector = if (showError) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                contentDescription = "Show message",
+                                contentDescription = stringResource(R.string.show_message),
                             )
                         }
                     }
