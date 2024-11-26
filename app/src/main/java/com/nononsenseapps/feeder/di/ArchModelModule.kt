@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.di
 
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
 import com.nononsenseapps.feeder.archmodel.SettingsStore
@@ -11,6 +12,8 @@ import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
 import com.nononsenseapps.feeder.openai.OpenAIApi
+import com.nononsenseapps.feeder.openai.OpenAIClient
+import com.nononsenseapps.feeder.openai.OpenAIClientDefault
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -23,7 +26,8 @@ import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.compose.instance
+import org.kodein.di.bindFactory
+import org.kodein.di.factory
 import org.kodein.di.instance
 import org.kodein.di.singleton
 import java.util.Locale
@@ -37,7 +41,8 @@ val archModelModule =
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
-        bind<OpenAIApi>() with singleton { OpenAIApi(instance(), appLang = Locale.getDefault().getISO3Language()) }
+        bindFactory<OpenAISettings, OpenAIClient> { settings -> OpenAIClientDefault(settings) }
+        bind<OpenAIApi>() with singleton { OpenAIApi(instance(), appLang = Locale.getDefault().getISO3Language(), factory()) }
 
         bindWithActivityViewModelScope<MainActivityViewModel>()
         bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()

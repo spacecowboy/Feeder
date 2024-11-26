@@ -83,7 +83,6 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
-import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
@@ -207,9 +206,7 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
-            openAISettings = viewState.openAISettings,
-            openAIModels = viewState.openAIModels,
-            openAIEdit = viewState.openAIEdit,
+            openAIState = viewState.openAIState,
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             modifier = Modifier.padding(padding),
         )
@@ -278,9 +275,7 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
-            openAISettings = OpenAISettings(),
-            openAIModels = OpenAIModelsState.None,
-            openAIEdit = false,
+            openAIState = OpenAISettingsState(),
             onOpenAIEvent = { _ -> },
             modifier = Modifier,
         )
@@ -345,9 +340,7 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
-    openAISettings: OpenAISettings,
-    openAIModels: OpenAIModelsState,
-    openAIEdit: Boolean,
+    openAIState: OpenAISettingsState,
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -712,9 +705,7 @@ fun SettingsList(
         }
 
         OpenAISection(
-            openAISettings = openAISettings,
-            openAIModels = openAIModels,
-            openAIEdit = openAIEdit,
+            state = openAIState,
             onEvent = onOpenAIEvent,
         )
 
