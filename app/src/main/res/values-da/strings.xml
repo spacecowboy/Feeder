@@ -250,4 +250,13 @@
     <string name="feed_item_style_compact_card">Kompakt kort</string>
     <string name="skip_duplicate_articles_desc">Artikler med links eller titler, der er identiske med eksisterende artikler, ignoreres</string>
     <string name="show_title_unread_count">Vis antallet af ulæste artikler i titlen</string>
+    <string name="summarize">Opsummer</string>
+    <string name="openai_settings">OpenAI-integration</string>
+    <string name="api_key">API-nøgle</string>
+    <string name="model_id">Model-id</string>
+    <string name="azure_api_version">Azure API version</string>
+    <string name="unable_to_load_models">Kan ikke indlæse modeller.</string>
+    <string name="no_models_were_found">Der blev ikke fundet nogen modeller</string>
+    <string name="azure_deployment_id">Azure implementerings-id</string>
+    <string name="list_of_available_models">Liste over tilgængelige modeller</string>
 </resources>
