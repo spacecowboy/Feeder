@@ -160,7 +160,7 @@
     <string name="dark_theme_preference_black">Черна</string>
     <string name="feed_item_style_super_compact">Супер компактна</string>
     <string name="syncing">Синхронизиране</string>
-    <string name="swipe_to_mark_as_read">Плъзнете за да маркирате като прочетено</string>
+    <string name="swipe_to_mark_as_read">Маркирай като прочетено при плъзгане</string>
     <string name="permission_read_desc">Позволява на приложението да чете емисии и статии</string>
     <string name="no_such_feed">Не може да бъде намерена такава емисия. Опитайте да използвате HTTPS може би\?</string>
     <string name="no_feeds">Няма емисии</string>
@@ -259,4 +259,5 @@
     <string name="no_models_were_found">Няма намерени модели</string>
     <string name="list_of_available_models">Списък на налични модели</string>
     <string name="api_key">API ключ</string>
+    <string name="show_message">Покажи съобщение</string>
 </resources>
