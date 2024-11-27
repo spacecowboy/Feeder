@@ -259,4 +259,5 @@
     <string name="unable_to_load_models">无法加载模型。</string>
     <string name="azure_deployment_id">Azure 部署 id</string>
     <string name="list_of_available_models">可用模型列表</string>
+    <string name="show_message">显示消息</string>
 </resources>
