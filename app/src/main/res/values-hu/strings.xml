@@ -259,4 +259,5 @@
     <string name="summarize">Összefoglalás</string>
     <string name="openai_settings">OpenAI integráció</string>
     <string name="unable_to_load_models">Nem lehet betölteni a modelleket.</string>
+    <string name="show_message">Üzenet megjelenítése</string>
 </resources>
