@@ -259,4 +259,5 @@
     <string name="unable_to_load_models">No se pueden cargar modelos.</string>
     <string name="list_of_available_models">Lista de modelos disponibles</string>
     <string name="azure_deployment_id">Identificación de implementación de Azure</string>
+    <string name="show_message">Mostrar mensaje</string>
 </resources>
