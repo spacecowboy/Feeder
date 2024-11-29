@@ -1,3 +1,48 @@
+# 2.7.1
+Agnieszka C (2):
+  * [93f7ff7b] Updated Polish translation using Weblate
+  * [55f6499b] Updated Polish translation using Weblate
+
+Alex Gavrishev (1):
+  * [7f1fe86a] added Perplexity AI support (need to set custom URL) (#433)
+
+ERYpTION (1):
+  * [338ec167] Translated using Weblate (Danish)
+
+Matth78 (2):
+  * [a53bdd2a] Updated French translation using Weblate
+  * [27c73f1b] Updated French translation using Weblate
+
+VfBFan (1):
+  * [e544e4f4] Updated German translation using Weblate
+
+eevan78 (1):
+  * [6b19ca53] Updated Serbian translation using Weblate
+
+gallegonovato (2):
+  * [99ca73cb] Updated Spanish translation using Weblate
+  * [e085841c] Updated Spanish translation using Weblate
+
+pchelium (1):
+  * [fb7e4716] Updated Czech translation using Weblate
+
+summoner001 (2):
+  * [3381d81a] Updated Hungarian translation using Weblate
+  * [3dcb2fd1] Updated Hungarian translation using Weblate
+
+trunars (2):
+  * [b48d556f] Updated Bulgarian translation using Weblate
+  * [666a0267] Updated Bulgarian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [c1d91bc9] Updated Greek translation using Weblate
+
+大王叫我来巡山 (2):
+  * [9ebf8873] Updated Chinese (Simplified Han script) translation using
+         Weblate
+  * [820af2d3] Updated Chinese (Simplified Han script) translation using
+         Weblate
+
 # 2.7.0
 Alex Gavrishev (1):
   * [ca13fd47] added article summary with OpenAI integration (#399)

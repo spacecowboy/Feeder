@@ -1,0 +1,19 @@
+# 2.7.1
+Agnieszka C (2):
+  * [93f7ff7b] Updated Polish translation using Weblate
+  * [55f6499b] Updated Polish translation using Weblate
+
+Alex Gavrishev (1):
+  * [7f1fe86a] added Perplexity AI support (need to set custom URL) (#433)
+
+ERYpTION (1):
+  * [338ec167] Translated using Weblate (Danish)
+
+Matth78 (2):
+  * [a53bdd2a] Updated French translation using Weblate
+  * [27c73f1b] Updated French translation using Weblate
+
+VfBFan (1):
+  * [e544e4f4] Updated German translation using Weblate
+
+eevan78
