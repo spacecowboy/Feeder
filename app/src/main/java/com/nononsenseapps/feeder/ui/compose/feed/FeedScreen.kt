@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -906,7 +905,6 @@ fun FeedScreen(
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalAnimationApi::class,
 )
 @Composable
 fun FeedScreen(
@@ -957,7 +955,9 @@ fun FeedScreen(
             FloatingActionButton(
                 onClick = {
                     onMarkAllAsRead()
-                    onOpenNavDrawer()
+                    if (viewState.isOpenDrawerOnFab) {
+                        onOpenNavDrawer()
+                    }
                 },
                 modifier =
                     Modifier

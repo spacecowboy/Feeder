@@ -507,6 +507,14 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, value).apply()
     }
 
+    private val _openDrawerOnFab = MutableStateFlow(sp.getBoolean(PREF_OPEN_DRAWER_ON_FAB, false))
+    val isOpenDrawerOnFab = _openDrawerOnFab.asStateFlow()
+
+    fun setOpenDrawerOnFab(value: Boolean) {
+        _openDrawerOnFab.value = value
+        sp.edit().putBoolean(PREF_OPEN_DRAWER_ON_FAB, value).apply()
+    }
+
     fun getAllSettings(): Map<String, String> {
         val all = sp.all ?: emptyMap()
 
@@ -598,6 +606,8 @@ const val PREFS_FILTER_READ = "prefs_filter_read"
 const val PREF_LIST_SHOW_ONLY_TITLES = "prefs_list_show_only_titles"
 
 const val PREF_LIST_SHOW_READING_TIME = "pref_show_reading_time"
+
+const val PREF_OPEN_DRAWER_ON_FAB = "pref_open_drawer_on_fab"
 
 /**
  * Read Aloud Settings

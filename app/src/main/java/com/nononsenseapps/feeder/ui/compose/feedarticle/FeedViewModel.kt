@@ -250,6 +250,8 @@ class FeedViewModel(
             repository.showReadingTime,
             repository.showTitleUnreadCount,
             repository.syncWorkerRunning,
+            // 25
+            repository.isOpenDrawerOnFab,
         ) { params: Array<Any> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
@@ -286,6 +288,7 @@ class FeedViewModel(
                 showOnlyTitle = params[21] as Boolean,
                 showReadingTime = params[22] as Boolean,
                 showTitleUnreadCount = params[23] as Boolean,
+                isOpenDrawerOnFab = params[25] as Boolean,
             )
         }
             .stateIn(
@@ -417,6 +420,7 @@ data class FeedState(
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
     override val showTitleUnreadCount: Boolean = false,
+    override val isOpenDrawerOnFab: Boolean = false,
 ) : FeedScreenViewState
 
 @Immutable
@@ -445,6 +449,7 @@ interface FeedScreenViewState {
     val filter: FeedListFilter
     val showFilterMenu: Boolean
     val showTitleUnreadCount: Boolean
+    val isOpenDrawerOnFab: Boolean
 }
 
 @Immutable
