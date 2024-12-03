@@ -99,7 +99,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScroll
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
-import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 import com.nononsenseapps.feeder.util.ActivityLauncher
@@ -556,16 +555,14 @@ fun SettingsList(
                 onCheckedChange = onOpenDrawerOnFab,
             )
 
-            if (isCompactDevice()) {
-                MenuSetting(
-                    title = stringResource(id = R.string.feed_item_style),
-                    currentValue = feedItemStyleValue.asFeedItemStyleOption(),
-                    values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
-                    onSelection = {
-                        onFeedItemStyleChange(it.feedItemStyle)
-                    },
-                )
-            }
+            MenuSetting(
+                title = stringResource(id = R.string.feed_item_style),
+                currentValue = feedItemStyleValue.asFeedItemStyleOption(),
+                values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
+                onSelection = {
+                    onFeedItemStyleChange(it.feedItemStyle)
+                },
+            )
 
             MenuSetting(
                 title = stringResource(id = R.string.max_lines),
