@@ -225,6 +225,9 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
 
+    //Nostr
+    implementation("org.rust-nostr:nostr-sdk:0.37.0")
+
     // Only for debug
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
 
