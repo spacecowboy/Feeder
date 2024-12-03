@@ -155,6 +155,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowTitleUnreadCount(value)
     }
 
+    fun setOpenDrawerOnFab(value: Boolean) {
+        repository.setOpenDrawerOnFab(value)
+    }
+
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
             is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
@@ -227,6 +231,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.showTitleUnreadCount,
                 repository.openAISettings,
                 openAIModelsState,
+                repository.isOpenDrawerOnFab,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -262,6 +267,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                             settings = params[27] as OpenAISettings,
                             modelsResult = params[28] as OpenAIModelsState,
                         ),
+                    isOpenDrawerOnFab = params[29] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -321,6 +327,7 @@ data class SettingsViewState(
     val openAIState: OpenAISettingsState = OpenAISettingsState(),
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
+    val isOpenDrawerOnFab: Boolean = false,
 )
 
 data class UIFeedSettings(

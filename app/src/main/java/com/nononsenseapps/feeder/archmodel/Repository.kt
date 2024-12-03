@@ -292,6 +292,10 @@ class Repository(override val di: DI) : DIAware {
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)
 
+    val isOpenDrawerOnFab = settingsStore.isOpenDrawerOnFab
+
+    fun setOpenDrawerOnFab(value: Boolean) = settingsStore.setOpenDrawerOnFab(value)
+
     /**
      * Returns true if the latest sync timestamp is within the last 10 seconds
      */
