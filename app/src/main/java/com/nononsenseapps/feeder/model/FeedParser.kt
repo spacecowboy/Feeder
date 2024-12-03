@@ -28,6 +28,10 @@ import org.jsoup.nodes.Document
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import rust.nostr.sdk.Nip19Profile
+import rust.nostr.sdk.Nip21
+import rust.nostr.sdk.Nip21Enum
+import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
 import java.lang.NullPointerException
 import java.net.MalformedURLException
@@ -203,6 +207,28 @@ class FeedParser(override val di: DI) : DIAware {
      * @throws IOException if request fails due to network issue for example
      */
     private suspend fun curl(url: URL) = client.curl(url)
+
+//    private suspend fun nreq(nostrUri: URI): Either<FeedParserError, SiteMetaData> {
+//        val possibleNostrProfile = parseNostrUri(nostrUri.toString())
+//        val parsedUri = Nip21.parse(nostrUri.toString())
+//
+//    }
+
+    private suspend fun parseNostrUri(nostrUri: String): Nip19Profile {
+        if (nostrUri.contains("@")) { // It means it is a Nip05 address
+            val rawString = nostrUri.removePrefix("nostr:")
+            val parsedNip5 = getNip05Profile(rawString)
+            val (pubkey, relays) = parsedNip5.publicKey() to parsedNip5.relays()
+            return Nip19Profile(pubkey, relays)
+        } else {
+            val parsedProfile = Nip21.parse(nostrUri).asEnum()
+            when(parsedProfile) {
+                is Nip21Enum.Pubkey -> return Nip19Profile(parsedProfile.publicKey)
+                is Nip21Enum.Profile -> return Nip19Profile(parsedProfile.profile.publicKey(), parsedProfile.profile.relays())
+                else -> throw Throwable(message = "Could not find the user's info: $nostrUri")
+            }
+        }
+    }
 
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
         return client.curlAndOnResponse(url) {
