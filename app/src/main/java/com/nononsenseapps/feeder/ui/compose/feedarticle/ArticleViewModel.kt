@@ -206,8 +206,8 @@ class ArticleViewModel(
                             }
                         } else {
                             Log.e(LOG_TAG, "No default file to parse")
-                            textToDisplay.update { TextToDisplay.FAILED_MISSING_BODY }
-                            LinearArticle(elements = emptyList())
+                            textToDisplay.update { TextToDisplay.CONTENT }
+                            htmlLinearizer.linearize(article.snippet, article.feedUrl ?: "")
                         }
                     }
 

@@ -881,6 +881,7 @@ data class Article(
     val link: String? = item?.link
     val feedDisplayTitle: String = item?.feedDisplayTitle ?: ""
     val title: String = item?.plainTitle ?: ""
+    val snippet: String = item?.plainSnippet ?: ""
     val enclosure: Enclosure =
         item?.enclosureLink?.let { link ->
             Enclosure(
