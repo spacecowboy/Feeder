@@ -259,4 +259,6 @@
     <string name="summarize">Zusammenfassen</string>
     <string name="api_key">API-Schlüssel</string>
     <string name="azure_api_version">Azure-API-Version</string>
+    <string name="show_message">Nachricht anzeigen</string>
+    <string name="open_drawer_on_fab">Feeds anzeigen, nachdem alle als gelesen markiert wurden</string>
 </resources>
