@@ -260,4 +260,5 @@
     <string name="azure_deployment_id">ИД Azure постављања</string>
     <string name="list_of_available_models">Листа доступних модела</string>
     <string name="show_message">Прикажи поруку</string>
+    <string name="open_drawer_on_fab">Када се све обележи као прочитано, прикажи изворе</string>
 </resources>
