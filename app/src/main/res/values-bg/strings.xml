@@ -260,4 +260,5 @@
     <string name="list_of_available_models">Списък на налични модели</string>
     <string name="api_key">API ключ</string>
     <string name="show_message">Покажи съобщение</string>
+    <string name="open_drawer_on_fab">Покажи емисии след маркиране на всичко като прочетено</string>
 </resources>
