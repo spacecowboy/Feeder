@@ -250,4 +250,14 @@
     <string name="feed_item_style_compact_card">Kompakti kortti</string>
     <string name="skip_duplicate_articles_desc">Artikkelit, joiden linkit tai otsikot ovat identtisiä olemassa olevien artikkelien kanssa sivuutetaan</string>
     <string name="show_title_unread_count">Näytä lukemattomien artikkeleiden määrä otsikossa</string>
+    <string name="show_message">Näytä viesti</string>
+    <string name="summarize">Tee yhteenveto</string>
+    <string name="openai_settings">OpenAI-integraatio</string>
+    <string name="api_key">API-avain</string>
+    <string name="model_id">Mallin tunnus</string>
+    <string name="azure_api_version">Azure API -versio</string>
+    <string name="unable_to_load_models">Malleja ei voi ladata.</string>
+    <string name="no_models_were_found">Malleja ei löytynyt</string>
+    <string name="azure_deployment_id">Azure-käyttöönottotunnus</string>
+    <string name="list_of_available_models">Luettelo saatavilla olevista malleista</string>
 </resources>

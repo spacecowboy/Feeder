@@ -250,4 +250,14 @@
     <string name="failed_to_export_saved_articles">Gagal mengekspor artikel yang disimpan</string>
     <string name="touch_to_play_audio">Sentuh untuk memainkan audio</string>
     <string name="show_title_unread_count">Tampilkan artikel belum dibaca pada judul</string>
+    <string name="show_message">Tampilkan pesan</string>
+    <string name="open_drawer_on_fab">Tampilkan umpan setelah menandai semua telah dibaca</string>
+    <string name="summarize">Ringkasan</string>
+    <string name="openai_settings">Integrasi OpenAI</string>
+    <string name="api_key">Kunci API</string>
+    <string name="azure_api_version">Versi API Azure</string>
+    <string name="unable_to_load_models">Tidak bisa memuat model.</string>
+    <string name="no_models_were_found">Model tidak ditemukan</string>
+    <string name="list_of_available_models">Daftar model yang tersedia</string>
+    <string name="model_id">ID Model</string>
 </resources>

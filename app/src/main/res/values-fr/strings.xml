@@ -260,4 +260,5 @@
     <string name="unable_to_load_models">Échec du chargement des modèles.</string>
     <string name="list_of_available_models">Liste des modèles disponibles</string>
     <string name="show_message">Montrer le message</string>
+    <string name="open_drawer_on_fab">Montrer les flux après avoir marqué tout lu</string>
 </resources>

@@ -260,4 +260,5 @@
     <string name="openai_settings">OpenAI integráció</string>
     <string name="unable_to_load_models">Nem lehet betölteni a modelleket.</string>
     <string name="show_message">Üzenet megjelenítése</string>
+    <string name="open_drawer_on_fab">A hírfolyam megjelenítése miután az összes meg lett jelölve olvasottként</string>
 </resources>
