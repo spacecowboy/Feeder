@@ -188,7 +188,7 @@
     <string name="device_sync_description_1">Laitteen synkronointi mahdollistaa syötteiden tilausten ja lukemiesi artikkeleiden synkronoinnin eri laitteidesi välillä.</string>
     <string name="saved_article">Tallennettu artikkeli</string>
     <string name="save_article">Tallenna Artikkeli</string>
-    <string name="mark_as_read_on_scroll">Merkitse luetuksi vieritettäessä</string>
+    <string name="mark_as_read_on_scroll">Merkitse luetuksi vierityksellä</string>
     <string name="saved_articles">Tallennetut artikkelit</string>
     <string name="unsave_article">Lopeta artikkelin tallentaminen</string>
     <string name="no_feeds">Ei syötteitä</string>
