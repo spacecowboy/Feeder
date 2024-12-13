@@ -127,4 +127,22 @@
     <string name="article_list_settings">Listo de artikoloj</string>
     <string name="dynamic_theme_use">Dinamikaj koloroj</string>
     <string name="dark_theme_preference">Preferata malhela temo</string>
+    <string name="many_unread_articles">%1$s nelegitaj artikoloj</string>
+    <string name="go_back">Reiru</string>
+    <string name="open_menu">Malfermu menuon</string>
+    <string name="go_to_feed">Iru al %1$s</string>
+    <string name="unread_adjective">Nelegita</string>
+    <string name="already_read">Jam legis</string>
+    <string name="showing_only_unread_articles">Montrante nur nelegitajn artikolojn</string>
+    <string name="one_unread_article">%1$s nelegita artikolo</string>
+    <string name="failed_to_open_article">Ne eblis malfermi artikolon</string>
+    <string name="synchronize_feeds">Sinkronigi nutras</string>
+    <string name="two_unread_articles">%1$s nelegitaj artikoloj</string>
+    <string name="zero_unread_articles">%1$s nelegitaj artikoloj</string>
+    <string name="expanded_tag">Malfermu etikedon</string>
+    <string name="contracted_tag">Fermita etikedo</string>
+    <string name="sync_to_fetch">Sinkronigi por preni artikolon</string>
+    <string name="showing_all_articles">Montrante ĉiujn artikolojn</string>
+    <string name="other_unread_articles">%1$s nelegitaj artikoloj</string>
+    <string name="few_unread_articles">%1$s nelegitaj artikoloj</string>
 </resources>
