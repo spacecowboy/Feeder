@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="navigation_drawer_open">Abrir cajón de navegación</string>
-    <string name="navigation_drawer_close">Cerrar cajón de navegación</string>
+    <string name="navigation_drawer_open">Abrir menú de navegación</string>
+    <string name="navigation_drawer_close">Cerrar menú de navegación</string>
     <string name="action_settings">Ajustes</string>
     <string name="add_feed">Añadir canal</string>
     <string name="title_activity_edit_feed">Suscríbete al feed</string>
