@@ -43,6 +43,7 @@
     <string name="all_feeds">Все ленты</string>
     <string name="sync_option_manually">Вручную</string>
     <string name="sync_option_every_15min">Каждые 15 минут</string>
+    <string name="sync_option_every_5min">Каждые 5 минут</string>
     <string name="sync_option_every_30min">Каждые 30 минут</string>
     <string name="sync_option_every_hour">Каждый час</string>
     <string name="sync_option_every_3_hours">Каждые 3 часа</string>

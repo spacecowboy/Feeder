@@ -45,6 +45,7 @@
     <string name="all_feeds">Wszystkie kanały</string>
     <string name="sync_option_manually">Ręcznie</string>
     <string name="sync_option_every_15min">Co 15 minut</string>
+    <string name="sync_option_every_5min">Co 5 minut</string>
     <string name="sync_option_every_30min">Co 30 minut</string>
     <string name="sync_option_every_hour">Co godzinę</string>
     <string name="sync_option_every_3_hours">Co 3 godziny</string>

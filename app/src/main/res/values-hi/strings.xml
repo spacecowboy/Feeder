@@ -62,6 +62,7 @@
     <string name="sync_option_every_hour">हर घंटे</string>
     <string name="sync_option_every_30min">हर 30 मिनट</string>
     <string name="sync_option_every_15min">हर 15 मिनट</string>
+    <string name="sync_option_every_5min">हर 5 मिनट</string>
     <string name="sync_option_manually">हस्तचालित</string>
     <string name="all_feeds">सभी फीड</string>
     <string name="title_activity_settings">सेटिंग</string>

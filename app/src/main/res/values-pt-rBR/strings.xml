@@ -42,6 +42,7 @@
     <string name="all_feeds">Todos os feeds</string>
     <string name="sync_option_manually">Manualmente</string>
     <string name="sync_option_every_15min">A cada 15min</string>
+    <string name="sync_option_every_5min">A cada 5min</string>
     <string name="sync_option_every_30min">A cada 30min</string>
     <string name="sync_option_every_hour">A cada hora</string>
     <string name="sync_option_every_3_hours">A cada 3h</string>

@@ -63,6 +63,7 @@
     <string name="sync_option_every_hour">ஒவ்வொரு மணி நேரமும்</string>
     <string name="sync_option_every_30min">ஒவ்வொரு 30 நிமிடங்களுக்கும்</string>
     <string name="sync_option_every_15min">ஒவ்வொரு 15 நிமிடங்களுக்கும்</string>
+    <string name="sync_option_every_5min">ஒவ்வொரு 5 நிமிடங்களுக்கும்</string>
     <string name="sync_option_manually">கைமுறையாக</string>
     <string name="all_feeds">அனைத்து ஊட்டங்களும்</string>
     <string name="title_activity_settings">அமைப்புகள்</string>

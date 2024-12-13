@@ -90,6 +90,7 @@
     <string name="show_thumbnails">Afficher les miniatures</string>
     <string name="sync_option_every_30min">Toutes les 30 minutes</string>
     <string name="sync_option_every_15min">Toutes les 15 minutes</string>
+    <string name="sync_option_every_5min">Toutes les 5 minutes</string>
     <string name="open_in_browser">Ouvrir dans le navigateur</string>
     <string name="dont_notify_for_new_items">Arrêter les notifications</string>
     <string name="mark_as_unread">Marquer comme non lu</string>

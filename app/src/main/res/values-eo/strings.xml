@@ -16,6 +16,7 @@
     <string name="sync_option_every_hour">Ĉiuhore</string>
     <string name="sync_option_every_30min">Ĉiuduonhore</string>
     <string name="sync_option_every_15min">Ĉiukvaronhore</string>
+    <string name="sync_option_every_5min">Ĉiukvaronhore</string>
     <string name="sync_option_manually">Mane</string>
     <string name="all_feeds">Ĉiuj fluoj</string>
     <string name="title_activity_settings">Agordoj</string>

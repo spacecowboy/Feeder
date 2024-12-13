@@ -54,6 +54,7 @@
     <string name="all_feeds">Te gjitha feed-et</string>
     <string name="sync_option_manually">Manualisht</string>
     <string name="sync_option_every_15min">Cdo 15 minuta</string>
+    <string name="sync_option_every_5min">Cdo 5 minuta</string>
     <string name="sync_option_every_30min">Cdo 30 minuta</string>
     <string name="sync_option_every_3_hours">Cdo 3 ore</string>
     <string name="sync_option_every_6_hours">Cdo 6 ore</string>

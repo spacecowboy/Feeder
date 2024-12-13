@@ -45,6 +45,7 @@
     <string name="all_feeds">Semua umpan</string>
     <string name="sync_option_manually">Manual</string>
     <string name="sync_option_every_15min">Setiap 15 menit</string>
+    <string name="sync_option_every_5min">Setiap 5 menit</string>
     <string name="sync_option_every_30min">Setiap 30 menit</string>
     <string name="sync_option_every_hour">Setiap 1 jam</string>
     <string name="sync_option_every_3_hours">Setiap 3 jam</string>

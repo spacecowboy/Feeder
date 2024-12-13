@@ -43,6 +43,7 @@
     <string name="all_feeds">Tutti i feed</string>
     <string name="sync_option_manually">Manualmente</string>
     <string name="sync_option_every_15min">Ogni 15 minuti</string>
+    <string name="sync_option_every_5min">Ogni 5 minuti</string>
     <string name="sync_option_every_30min">Ogni 30 minuti</string>
     <string name="sync_option_every_hour">Ogni ora</string>
     <string name="sync_option_every_3_hours">Ogni 3 ore</string>

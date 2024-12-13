@@ -80,6 +80,7 @@
     <string name="all_feeds">كل الخلاصات</string>
     <string name="sync_option_manually">يدويا</string>
     <string name="sync_option_every_15min">كلّ ١٥ دقيقة</string>
+    <string name="sync_option_every_5min">كلّ ٥ دقيقة</string>
     <string name="sync_option_every_30min">كلّ ٣٠ دقيقة</string>
     <string name="synchronization">يُزامن</string>
     <string name="syncing">يُزامن</string>

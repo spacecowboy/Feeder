@@ -60,6 +60,7 @@
     <string name="sync_option_every_hour">Mỗi 1 giờ</string>
     <string name="sync_option_every_30min">Mỗi 30 phút</string>
     <string name="sync_option_every_15min">Mỗi 15 phút</string>
+    <string name="sync_option_every_5min">Mỗi 5 phút</string>
     <string name="sync_option_manually">Thủ công</string>
     <string name="all_feeds">Tất cả nguồn cấp dữ liệu</string>
     <string name="title_activity_settings">Cài đặt</string>

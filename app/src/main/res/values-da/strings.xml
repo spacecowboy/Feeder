@@ -30,6 +30,7 @@
     <string name="all_feeds">Alle feeds</string>
     <string name="sync_option_manually">Manuelt</string>
     <string name="sync_option_every_15min">Hvert 15. minut</string>
+    <string name="sync_option_every_5min">Hvert 5. minut</string>
     <string name="sync_option_every_30min">Hvert 30. minut</string>
     <string name="sync_option_every_3_hours">Hver 3. time</string>
     <string name="sync_option_every_6_hours">Hver 6. time</string>

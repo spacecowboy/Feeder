@@ -45,6 +45,7 @@
     <string name="all_feeds">Alla flöden</string>
     <string name="sync_option_manually">Manuellt</string>
     <string name="sync_option_every_15min">Var 15:e minut</string>
+    <string name="sync_option_every_5min">Var 5:e minut</string>
     <string name="sync_option_every_30min">Var 30:e minut</string>
     <string name="sync_option_every_hour">Varje timme</string>
     <string name="sync_option_every_3_hours">Var 3e timme</string>

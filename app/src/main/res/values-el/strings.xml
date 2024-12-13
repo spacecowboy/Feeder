@@ -3,6 +3,7 @@
     <string name="delete_feed">Διαγραφή ροής</string>
     <string name="sync">Συγχρονισμός</string>
     <string name="sync_option_every_15min">Κάθε 15 λεπτά</string>
+    <string name="sync_option_every_5min">Κάθε 5 λεπτά</string>
     <string name="all_feeds">Όλες οι ροές</string>
     <string name="title_activity_settings">Ρυθμίσεις</string>
     <string name="sync_option_every_12_hours">Κάθε 12 ώρες</string>

@@ -36,6 +36,7 @@
     <string name="indicator_for_mark_as_read">Indicator om als gelezen te markeren</string>
     <string name="title_activity_settings">Instellingen</string>
     <string name="sync_option_every_15min">Elke 15 minuten</string>
+    <string name="sync_option_every_5min">Elke 5 minuten</string>
     <string name="sync_option_every_30min">Elke 30 minuten</string>
     <string name="sync_option_every_hour">Elk uur</string>
     <string name="sync_option_every_day">Dagelijks</string>

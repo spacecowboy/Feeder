@@ -80,6 +80,7 @@
     <string name="sync_option_every_hour">هر ساعت</string>
     <string name="sync_option_every_30min">هر ۳۰ دقیقه</string>
     <string name="sync_option_every_15min">هر ۱۵ دقیقه</string>
+    <string name="sync_option_every_5min">هر ۵ دقیقه</string>
     <string name="sync_option_manually">دستی</string>
     <string name="all_feeds">همه خوراک‌ها</string>
     <string name="title_activity_settings">تنظیمات</string>

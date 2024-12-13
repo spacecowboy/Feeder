@@ -6,6 +6,7 @@
     <string name="invalid_url">Невалиден URL адрес</string>
     <string name="mark_items_below_as_read">Маркирай по-долу като прочетено</string>
     <string name="sync_option_every_15min">На всеки 15 минути</string>
+    <string name="sync_option_every_5min">На всеки 5 минути</string>
     <string name="remove_device_question">Сигурни ли сте, че искате да изтриете устройство %1$s?</string>
     <string name="open_links_with">Отвори връзки с</string>
     <string name="failed_to_fetch_full_article_missing_body">Не намерих нищо за извличане</string>

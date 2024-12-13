@@ -40,6 +40,7 @@
     <string name="all_feeds">Všechny zdroje</string>
     <string name="sync_option_manually">Ručně</string>
     <string name="sync_option_every_15min">Každých 15 minut</string>
+    <string name="sync_option_every_5min">Každých 5 minut</string>
     <string name="sync_option_every_30min">Každých 30 minut</string>
     <string name="sync_option_every_hour">Každou hodinu</string>
     <string name="sync_option_every_3_hours">Každé 3 hodiny</string>

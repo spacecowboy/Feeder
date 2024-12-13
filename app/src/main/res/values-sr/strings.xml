@@ -58,6 +58,7 @@
     <string name="sync_option_every_3_hours">Свака 3 часа</string>
     <string name="sync_option_every_30min">Сваких 30 минута</string>
     <string name="sync_option_every_15min">Сваких 15 минута</string>
+    <string name="sync_option_every_5min">Сваких 5 минута</string>
     <string name="sync_option_manually">Ручно</string>
     <string name="all_feeds">Сви извори</string>
     <string name="title_activity_settings">Поставке</string>

@@ -45,6 +45,7 @@
     <string name="all_feeds">Tüm yayınlar</string>
     <string name="sync_option_manually">El ile</string>
     <string name="sync_option_every_15min">15 dakikada bir</string>
+    <string name="sync_option_every_5min">5 dakikada bir</string>
     <string name="sync_option_every_30min">30 dakikada bir</string>
     <string name="sync_option_every_hour">Saat başı</string>
     <string name="sync_option_every_3_hours">3 saatte bir</string>

@@ -45,6 +45,7 @@
     <string name="all_feeds">Todas las fuentes</string>
     <string name="sync_option_manually">Manualmente</string>
     <string name="sync_option_every_15min">Cada 15 minutos</string>
+    <string name="sync_option_every_5min">Cada 5 minutos</string>
     <string name="sync_option_every_30min">Cada 30 minutos</string>
     <string name="sync_option_every_hour">Cada hora</string>
     <string name="sync_option_every_3_hours">Cada 3 horas</string>

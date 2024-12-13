@@ -45,6 +45,7 @@
     <string name="all_feeds">全部订阅</string>
     <string name="sync_option_manually">手动</string>
     <string name="sync_option_every_15min">每 15 分钟</string>
+    <string name="sync_option_every_5min">每 5 分钟</string>
     <string name="sync_option_every_30min">每 30 分钟</string>
     <string name="sync_option_every_hour">每小时</string>
     <string name="sync_option_every_3_hours">每 3 小时</string>

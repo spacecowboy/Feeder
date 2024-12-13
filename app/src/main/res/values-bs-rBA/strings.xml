@@ -45,6 +45,7 @@
     <string name="all_feeds">Svi izvori (feedovi)</string>
     <string name="sync_option_manually">Ručno</string>
     <string name="sync_option_every_15min">Svakih 15 minuta</string>
+    <string name="sync_option_every_5min">Svakih 5 minuta</string>
     <string name="sync_option_every_30min">Svakih 30 minuta</string>
     <string name="sync_option_every_hour">Svakog sata</string>
     <string name="sync_option_every_3_hours">Svaka 3 sata</string>

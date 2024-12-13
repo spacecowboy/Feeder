@@ -14,6 +14,7 @@
     <string name="sync_option_every_hour">每小時</string>
     <string name="sync_option_every_30min">每 30 分鐘</string>
     <string name="sync_option_every_15min">每 15 分鐘</string>
+    <string name="sync_option_every_5min">每 5 分鐘</string>
     <string name="share">分享</string>
     <string name="view_debug_log">查看除錯日誌</string>
     <string name="import_feeds_from_opml">從 OPML 匯入訂閱</string>

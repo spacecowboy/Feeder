@@ -40,6 +40,7 @@
     <string name="title_activity_settings">Beállítások</string>
     <string name="sync_option_manually">Kézileg</string>
     <string name="sync_option_every_15min">Minden 15 percben</string>
+    <string name="sync_option_every_5min">Minden 5 percben</string>
     <string name="sync_option_every_30min">Minden 30 percben</string>
     <string name="sync_option_every_hour">Minden órában</string>
     <string name="sync_option_every_3_hours">Minden 3 órában</string>

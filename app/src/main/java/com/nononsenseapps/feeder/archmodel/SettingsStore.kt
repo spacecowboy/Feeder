@@ -713,6 +713,7 @@ enum class SyncFrequency(
     @StringRes val stringId: Int,
 ) {
     MANUAL(-1L, R.string.sync_option_manually),
+    EVERY_5_MIN(5L, R.string.sync_option_every_5min),
     EVERY_15_MIN(15L, R.string.sync_option_every_15min),
     EVERY_30_MIN(30L, R.string.sync_option_every_30min),
     EVERY_1_HOURS(60L, R.string.sync_option_every_hour),

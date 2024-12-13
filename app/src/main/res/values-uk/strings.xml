@@ -99,6 +99,7 @@
     <string name="sync_option_every_hour">Щогодини</string>
     <string name="sync_option_every_30min">Що 30 хвилин</string>
     <string name="sync_option_every_15min">Що 15 хвилин</string>
+    <string name="sync_option_every_5min">Що 5 хвилин</string>
     <string name="sync_option_manually">Вручну</string>
     <string name="all_feeds">Всі стрічки</string>
     <string name="title_activity_settings">Налаштування</string>

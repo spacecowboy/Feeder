@@ -8,6 +8,7 @@
     <string name="sync">ସୀଙ୍କ୍</string>
     <string name="title_activity_settings">ସେଟିଂ</string>
     <string name="sync_option_every_15min">ପ୍ରତି ୧୫ ମିନିଟରେ</string>
+    <string name="sync_option_every_5min">ପ୍ରତି ୧୫ ମିନିଟରେ</string>
     <string name="sync_option_every_30min">ପ୍ରତି ୩୦ ମିନିଟରେ</string>
     <string name="sync_option_every_3_hours">ପ୍ରତି ୩ ଘଣ୍ଟାରେ</string>
     <string name="sync_option_every_6_hours">ପ୍ରତି ୬ ଘଣ୍ଟାରେ</string>

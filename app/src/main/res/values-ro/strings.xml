@@ -60,6 +60,7 @@
     <string name="sync_option_every_hour">În fiecare oră</string>
     <string name="sync_option_every_30min">La fiecare 30 minute</string>
     <string name="sync_option_every_15min">La fiecare 15 minute</string>
+    <string name="sync_option_every_5min">La fiecare 5 minute</string>
     <string name="sync_option_manually">Manual</string>
     <string name="all_feeds">Toate fluxurile</string>
     <string name="title_activity_settings">Setări</string>

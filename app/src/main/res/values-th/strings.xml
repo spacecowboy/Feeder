@@ -56,6 +56,7 @@
     <string name="no_such_feed">หาฟีดไม่พบ ลองใช้ HTTPS ดูไหม\?</string>
     <string name="sync_option_manually">ด้วยตนเอง</string>
     <string name="sync_option_every_15min">ทุก 15 นาที</string>
+    <string name="sync_option_every_5min">ทุก 5 นาที</string>
     <string name="sync_option_every_hour">ทุกชั่วโมง</string>
     <string name="sync_option_every_3_hours">ทุก 3 ชั่วโมง</string>
     <string name="sync_option_every_6_hours">ทุก 6 ชั่วโมง</string>

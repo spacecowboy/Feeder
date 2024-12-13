@@ -45,6 +45,7 @@
     <string name="all_feeds">Alle Feeds</string>
     <string name="sync_option_manually">Manuell</string>
     <string name="sync_option_every_15min">Alle 15 Minuten</string>
+    <string name="sync_option_every_5min">Alle 5 Minuten</string>
     <string name="sync_option_every_30min">Alle 30 Minuten</string>
     <string name="sync_option_every_hour">Stündlich</string>
     <string name="sync_option_every_3_hours">Alle 3 Stunden</string>

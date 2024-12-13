@@ -53,6 +53,7 @@
     <string name="sync_option_every_hour">Cada hora</string>
     <string name="sync_option_every_30min">Cada 30 minuts</string>
     <string name="sync_option_every_15min">Cada 15 minuts</string>
+    <string name="sync_option_every_5min">Cada 5 minuts</string>
     <string name="sync_option_manually">Manualment</string>
     <string name="all_feeds">Tots els canals</string>
     <string name="title_activity_settings">Configuració</string>

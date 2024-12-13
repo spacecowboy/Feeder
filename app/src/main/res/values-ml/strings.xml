@@ -52,6 +52,7 @@
     <string name="check_for_updates">പുതിയ ലേഖനങ്ങൾക്കായി തിരയുക…</string>
     <string name="sync_option_every_30min">എല്ലാ 30 മിനിറ്റും</string>
     <string name="sync_option_every_15min">എല്ലാ 15 മിനിറ്റും</string>
+    <string name="sync_option_every_5min">എല്ലാ 5 മിനിറ്റും</string>
     <string name="no_such_feed">അത്തരം ഫീഡുകളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല. ഒരുപക്ഷേ https ഉപയോഗിച്ചു നോക്കൂ.</string>
     <string name="show_fab">ഫ്ലോട്ടിംഗ് ആക്ഷൻ ബട്ടൺ കാണിക്കുക</string>
     <string name="empty_feed_add">കൂടുതൽ ഫീഡുകൾ <annotation style="link"> ചേർക്കണോ</annotation>\?</string>

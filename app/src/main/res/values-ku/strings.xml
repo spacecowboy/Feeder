@@ -4,6 +4,7 @@
     <string name="invalid_url">Ne lînkekî derbasdar e</string>
     <string name="mark_items_below_as_read">Ya jêrîn wekî hatine xwendin bijmêre</string>
     <string name="sync_option_every_15min">Her serê 15 deqîqeyan carekê</string>
+    <string name="sync_option_every_5min">Her serê 5 deqîqeyan carekê</string>
     <string name="remove_device_question">Ma tu bi rastî dixwazî pergala %1$s jê bibî?</string>
     <string name="open_links_with">Lînkan bi vê vekin</string>
     <string name="nothing_to_display">Tiştek ji bo nîşandanê tune!</string>

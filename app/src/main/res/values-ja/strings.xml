@@ -63,6 +63,7 @@
     <string name="synchronization">同期</string>
     <string name="sync_option_every_30min">30分ごと</string>
     <string name="sync_option_every_15min">15分ごと</string>
+    <string name="sync_option_every_5min">5分ごと</string>
     <string name="all_feeds">すべてのフィード</string>
     <string name="open_in_browser">ウェブブラウザで開く</string>
     <string name="dont_notify_for_new_items">通知を停止</string>

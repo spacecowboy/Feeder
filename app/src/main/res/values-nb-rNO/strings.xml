@@ -46,6 +46,7 @@
     <string name="sync_option_every_hour">Hver time</string>
     <string name="sync_option_every_30min">Hver halvtime</string>
     <string name="sync_option_every_15min">Hvert kvarter</string>
+    <string name="sync_option_every_5min">Hvert femte minutt</string>
     <string name="sync_option_manually">Manuelt</string>
     <string name="all_feeds">Alle informasjonskanaler</string>
     <string name="title_activity_settings">Innstillinger</string>
