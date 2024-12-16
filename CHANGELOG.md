@@ -1,3 +1,63 @@
+# 2.7.2
+Agnieszka C (1):
+  * [fc652d0a] Updated Polish translation using Weblate
+
+Deleted User (1):
+  * [a58105dc] Updated Finnish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [cd8f70b4] added setting for opening feeds drawer when pressing FAB
+  * [d69df4ca] added feed item styles for tablets (no longer hidden on
+         tablet)
+
+Matth78 (1):
+  * [9bded05e] Updated French translation using Weblate
+
+Ricky Tigg (1):
+  * [8749fc38] Updated Finnish translation using Weblate
+
+VfBFan (1):
+  * [ba2a09f7] Updated German translation using Weblate
+
+Wiccio (1):
+  * [00efdb1d] Updated Esperanto translation using Weblate
+
+asl97 (3):
+  * [34009029] [Hotfix] Show snippet of feed instead of "Found nothing to
+         fetch"
+  * [814e51f8] Add an user noticable notice for why the snippet is shown
+  * [029c249c] Run ./gradlew ktlintformat
+
+eevan78 (1):
+  * [b80d561a] Updated Serbian translation using Weblate
+
+gallegonovato (1):
+  * [2d864ec3] Updated Spanish translation using Weblate
+
+hanyang cheng (1):
+  * [066a2783] Updated Chinese (Traditional Han script) translation using
+         Weblate
+
+noSé (2):
+  * [781838d7] Updated Spanish translation using Weblate
+  * [50a6aee2] Updated Spanish translation using Weblate
+
+summoner001 (1):
+  * [6adb9aa5] Updated Hungarian translation using Weblate
+
+trunars (1):
+  * [8812cb3b] Updated Bulgarian translation using Weblate
+
+zmni (1):
+  * [f661a1ef] Updated Indonesian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [f7eccb3f] Updated Greek translation using Weblate
+
+大王叫我来巡山 (1):
+  * [b7e60ecf] Updated Chinese (Simplified Han script) translation using
+         Weblate
+
 # 2.7.1
 Agnieszka C (2):
   * [93f7ff7b] Updated Polish translation using Weblate

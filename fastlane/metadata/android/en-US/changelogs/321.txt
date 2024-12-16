@@ -1,0 +1,20 @@
+# 2.7.2
+Agnieszka C (1):
+  * [fc652d0a] Updated Polish translation using Weblate
+
+Deleted User (1):
+  * [a58105dc] Updated Finnish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [cd8f70b4] added setting for opening feeds drawer when pressing FAB
+  * [d69df4ca] added feed item styles for tablets (no longer hidden on
+         tablet)
+
+Matth78 (1):
+  * [9bded05e] Updated French translation using Weblate
+
+Ricky Tigg (1):
+  * [8749fc38] Updated Finnish translation using Weblate
+
+VfBFan (1):
+  *
