@@ -249,5 +249,15 @@
     <string name="skip_duplicate_articles_desc">Gli articoli con link o titoli identici ad articoli esistenti vengono ignorati</string>
     <string name="feed_item_style_compact_card">Scheda Compatta</string>
     <string name="touch_to_play_audio">Tocca per riprodurre l\'audio</string>
-    <string name="show_title_unread_count">Mostra il numero di articoli non letti nel titolo</string>
+    <string name="show_title_unread_count">Mostra nel titolo il numero di articoli non letti</string>
+    <string name="show_message">Mostra messaggio</string>
+    <string name="api_key">Chiave API</string>
+    <string name="model_id">Id modello</string>
+    <string name="azure_api_version">Versione API Azure</string>
+    <string name="unable_to_load_models">Non è possibile caricare i modelli.</string>
+    <string name="no_models_were_found">Non sono stati trovati modelli</string>
+    <string name="openai_settings">Integrazione OpenAI</string>
+    <string name="summarize">Riepilogo</string>
+    <string name="azure_deployment_id">Id dell\'implementazione Azure</string>
+    <string name="list_of_available_models">Elenco dei modelli disponibili</string>
 </resources>

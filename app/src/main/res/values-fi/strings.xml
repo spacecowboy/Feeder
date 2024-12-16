@@ -188,7 +188,7 @@
     <string name="device_sync_description_1">Laitteen synkronointi mahdollistaa syötteiden tilausten ja lukemiesi artikkeleiden synkronoinnin eri laitteidesi välillä.</string>
     <string name="saved_article">Tallennettu artikkeli</string>
     <string name="save_article">Tallenna Artikkeli</string>
-    <string name="mark_as_read_on_scroll">Merkitse luetuksi vieritettäessä</string>
+    <string name="mark_as_read_on_scroll">Merkitse luetuksi vierityksellä</string>
     <string name="saved_articles">Tallennetut artikkelit</string>
     <string name="unsave_article">Lopeta artikkelin tallentaminen</string>
     <string name="no_feeds">Ei syötteitä</string>
@@ -209,13 +209,13 @@
     <string name="max_lines">Rivien maksimimäärä</string>
     <string name="filter_noun">Suodatin</string>
     <string name="recently_read_adjective">Luettu äskettäin</string>
-    <string name="saved_adjective">Tallennetut</string>
+    <string name="saved_adjective">Tallennettu</string>
     <string name="read_adjective">Luetut</string>
-    <string name="import_x_feeds_with_y_tags">Tuo %1$s, joissa on %2$s\?</string>
+    <string name="import_x_feeds_with_y_tags">Tuodaanko %1$s %2$s:lla?</string>
     <string name="zero_tags">%1$s tunnistetta</string>
-    <string name="failed_to_fetch_full_article_missing_link">Syötteestä puuttuu artikkelin linkki</string>
+    <string name="failed_to_fetch_full_article_missing_link">Syötteestä puuttuu linkki artikkeliin</string>
     <string name="show_only_title">Näytä vain otsikko</string>
-    <string name="failed_to_download">Lataus epäonnistui</string>
+    <string name="failed_to_download">Lataaminen epäonnistui</string>
     <string name="failed_to_parse_the_page">Sivun jäsentäminen epäonnistui</string>
     <string name="no_feeds_in_the_page">Sivulla ei ole syötteitä</string>
     <string name="content_is_not_html">Sisältö ei ole HTML-muodossa</string>
@@ -250,4 +250,14 @@
     <string name="feed_item_style_compact_card">Kompakti kortti</string>
     <string name="skip_duplicate_articles_desc">Artikkelit, joiden linkit tai otsikot ovat identtisiä olemassa olevien artikkelien kanssa sivuutetaan</string>
     <string name="show_title_unread_count">Näytä lukemattomien artikkeleiden määrä otsikossa</string>
+    <string name="show_message">Näytä viesti</string>
+    <string name="summarize">Tee yhteenveto</string>
+    <string name="openai_settings">OpenAI-integraatio</string>
+    <string name="api_key">API-avain</string>
+    <string name="model_id">Mallin tunnus</string>
+    <string name="azure_api_version">Azure API -versio</string>
+    <string name="unable_to_load_models">Malleja ei voi ladata.</string>
+    <string name="no_models_were_found">Malleja ei löytynyt</string>
+    <string name="azure_deployment_id">Azure-käyttöönottotunnus</string>
+    <string name="list_of_available_models">Luettelo saatavilla olevista malleista</string>
 </resources>

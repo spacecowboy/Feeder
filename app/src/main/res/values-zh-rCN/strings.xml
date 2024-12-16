@@ -260,4 +260,5 @@
     <string name="azure_deployment_id">Azure 部署 id</string>
     <string name="list_of_available_models">可用模型列表</string>
     <string name="show_message">显示消息</string>
+    <string name="open_drawer_on_fab">标记所有为已读后显示订阅源</string>
 </resources>
