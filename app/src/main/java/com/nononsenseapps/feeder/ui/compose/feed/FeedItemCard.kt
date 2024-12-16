@@ -67,7 +67,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
 import java.time.Instant
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.LocalContentColor
 @Composable
 fun FeedItemCard(
     item: FeedListItem,
@@ -210,6 +211,12 @@ fun RowScope.FeedItemText(
             }
         }
     val closeMenuText = stringResource(id = R.string.close_menu)
+    // The color of unread items remains unchanged, and the color of read items increases transparency
+    val titleColor = if (item.unread) {
+        Color.Unspecified // Use the default color and do not change the color of unread items
+    } else {
+        LocalContentColor.current.copy(alpha = 0.74f) //Increase transparency of read item color
+    }
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier =
@@ -219,7 +226,7 @@ fun RowScope.FeedItemText(
         WithBidiDeterminedLayoutDirection(paragraph = joinedText.text) {
             Text(
                 text = joinedText,
-                style = FeedListItemTitleTextStyle(),
+                style = FeedListItemTitleTextStyle().copy(color = titleColor),
                 fontWeight = titleFontWeight(item.unread),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = maxLines,
