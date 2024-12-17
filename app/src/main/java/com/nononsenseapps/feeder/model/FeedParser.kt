@@ -28,15 +28,20 @@ import org.jsoup.nodes.Document
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import rust.nostr.sdk.Client
+import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
+import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
 import java.lang.NullPointerException
 import java.net.MalformedURLException
+import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
+import java.time.Duration
 import java.util.Locale
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -44,6 +49,12 @@ private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
     private val goFeedAdapter = GoFeedAdapter()
+
+    // Initializing the Nostr Client
+    private val nostrClient = Client()
+    // The default relays to get info from, separated by purpose.
+    private val DEFAULT_FETCH_RELAYS = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
+    private val DEFAULT_METADATA_RELAYS = listOf("wss://purplepag.es", "wss://user.kindpag.es")
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -208,11 +219,19 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-//    private suspend fun nreq(nostrUri: URI): Either<FeedParserError, SiteMetaData> {
-//        val possibleNostrProfile = parseNostrUri(nostrUri.toString())
-//        val parsedUri = Nip21.parse(nostrUri.toString())
-//
-//    }
+    private suspend fun nreqProfile(nostrUri: URI): Either<FeedParserError, SiteMetaData> {
+        return Either.catching(
+            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
+        ) {
+            val possibleNostrProfile = parseNostrUri(nostrUri.toString())
+            val profileMetaData = getProfileMetadata(possibleNostrProfile.publicKey(), possibleNostrProfile.relays())
+            SiteMetaData(
+                url = URL(nostrUri.toString()),
+                alternateFeedLinks = emptyList(),
+                feedImage = profileMetaData.getPicture()
+            )
+        }
+    }
 
     private suspend fun parseNostrUri(nostrUri: String): Nip19Profile {
         if (nostrUri.contains("@")) { // It means it is a Nip05 address
@@ -228,6 +247,22 @@ class FeedParser(override val di: DI) : DIAware {
                 else -> throw Throwable(message = "Could not find the user's info: $nostrUri")
             }
         }
+    }
+
+    private suspend fun getProfileMetadata(publicKey: PublicKey, relayList: List<String>): Metadata {
+
+        relayList.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+        nostrClient.connect()
+        val profileInfo = nostrClient.fetchMetadata(
+            publicKey = publicKey,
+            timeout = Duration.ofSeconds(10)
+        )
+
+        println(profileInfo.asPrettyJson())
+
+        println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
+        nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
+        return profileInfo
     }
 
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
