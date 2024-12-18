@@ -33,12 +33,10 @@ import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
-import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
 import java.lang.NullPointerException
 import java.net.MalformedURLException
-import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
 import java.time.Duration
@@ -219,20 +217,6 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-    private suspend fun nreqProfile(nostrUri: URI): Either<FeedParserError, SiteMetaData> {
-        return Either.catching(
-            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
-        ) {
-            val possibleNostrProfile = parseNostrUri(nostrUri.toString())
-            val profileMetaData = getProfileMetadata(possibleNostrProfile.publicKey(), possibleNostrProfile.relays())
-            SiteMetaData(
-                url = URL(nostrUri.toString()),
-                alternateFeedLinks = emptyList(),
-                feedImage = profileMetaData.getPicture()
-            )
-        }
-    }
-
     private suspend fun parseNostrUri(nostrUri: String): Nip19Profile {
         if (nostrUri.contains("@")) { // It means it is a Nip05 address
             val rawString = nostrUri.removePrefix("nostr:")
@@ -249,20 +233,27 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    private suspend fun getProfileMetadata(publicKey: PublicKey, relayList: List<String>): Metadata {
+    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, Metadata> {
 
-        relayList.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
-        nostrClient.connect()
-        val profileInfo = nostrClient.fetchMetadata(
-            publicKey = publicKey,
-            timeout = Duration.ofSeconds(10)
-        )
+        return Either.catching(
+            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
+        ) {
+            val possibleNostrProfile = parseNostrUri(nostrUri.toString())
+            val (publicKey, relayList) = possibleNostrProfile.publicKey() to possibleNostrProfile.relays()
+            relayList.ifEmpty { DEFAULT_FETCH_RELAYS } .forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+            nostrClient.connect()
+            val profileInfo = nostrClient.fetchMetadata(
+                publicKey = publicKey,
+                timeout = Duration.ofSeconds(10)
+            )
 
-        println(profileInfo.asPrettyJson())
+            println(profileInfo.asPrettyJson())
 
-        println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
-        nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
-        return profileInfo
+            println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
+            nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
+            profileInfo
+        }
+
     }
 
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
