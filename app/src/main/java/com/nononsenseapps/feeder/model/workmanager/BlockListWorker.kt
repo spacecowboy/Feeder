@@ -1,9 +1,7 @@
 package com.nononsenseapps.feeder.model.workmanager
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -20,12 +18,7 @@ class BlockListWorker(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
 
-    private val notificationManager: NotificationManagerCompat by instance()
     private val blocklistDao: BlocklistDao by instance()
-
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        return createForegroundInfo(context, notificationManager)
-    }
 
     override suspend fun doWork(): Result {
         logDebug(LOG_TAG, "Doing work...")
