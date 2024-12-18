@@ -35,6 +35,9 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     )
 
     fun searchForFeeds(initialUrl: URL): Flow<Either<FeedParserError, SearchResult>> {
+        if (initialUrl.toString().startsWith("https://njump.me")) {
+
+        }
         return flow {
             siteMetaData = feedParser.getSiteMetaData(initialUrl)
             // Flow collection makes this block concurrent with map below

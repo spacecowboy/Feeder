@@ -88,6 +88,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
+import com.nononsenseapps.feeder.util.isNostrUri
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -335,6 +336,11 @@ fun ColumnScope.leftContent(
             isValidUrl(feedUrl)
         }
     }
+    val isNostrUri by remember(feedUrl) {
+        derivedStateOf {
+            feedUrl.isNostrUri()
+        }
+    }
     TextField(
         value = feedUrl,
         onValueChange = onUrlChange,
@@ -352,8 +358,10 @@ fun ColumnScope.leftContent(
         keyboardActions =
             KeyboardActions(
                 onSearch = {
-                    if (isValidUrl) {
-                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    if (isValidUrl || isNostrUri) {
+                        onSearch(
+                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl)
+                        )
                         keyboardController?.hide()
                     }
                 },
@@ -363,8 +371,10 @@ fun ColumnScope.leftContent(
             modifier
                 .width(dimens.maxContentWidth)
                 .interceptKey(Key.Enter) {
-                    if (isValidUrl(feedUrl)) {
-                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    if (isValidUrl(feedUrl)|| feedUrl.isNostrUri()) {
+                        onSearch(
+                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl)
+                        )
                         keyboardController?.hide()
                     }
                 }
@@ -375,7 +385,7 @@ fun ColumnScope.leftContent(
     )
 
     OutlinedButton(
-        enabled = isValidUrl,
+        enabled = isValidUrl || isNostrUri,
         onClick = {
             if (isValidUrl) {
                 try {
@@ -383,6 +393,14 @@ fun ColumnScope.leftContent(
                     clearFocus()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Can't search", e)
+                }
+            }
+            else if (isNostrUri) {
+                try {
+                    onSearch(sloppyLinkToStrictURLNoThrows("https://njump.me/$feedUrl"))
+                    clearFocus()
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Can't search Nostr URI", e)
                 }
             }
         },

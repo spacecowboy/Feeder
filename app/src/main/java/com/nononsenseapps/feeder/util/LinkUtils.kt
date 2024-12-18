@@ -98,3 +98,5 @@ fun relativeLinkIntoAbsoluteOrThrow(
     } catch (_: MalformedURLException) {
         URL(base, link)
     }
+
+fun String.isNostrUri(): Boolean = this.startsWith("nostr:")
