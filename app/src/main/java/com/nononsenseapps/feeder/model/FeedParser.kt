@@ -29,10 +29,17 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import rust.nostr.sdk.Client
+import rust.nostr.sdk.Filter
+import rust.nostr.sdk.Kind
+import rust.nostr.sdk.KindEnum
 import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
+import rust.nostr.sdk.PublicKey
+import rust.nostr.sdk.Relay
+import rust.nostr.sdk.RelayMetadata
+import rust.nostr.sdk.extractRelayList
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
 import java.lang.NullPointerException
@@ -254,6 +261,35 @@ class FeedParser(override val di: DI) : DIAware {
             nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
             profileInfo
         }
+
+    }
+
+    private suspend fun getUserPublishRelays(
+        userPubkey: PublicKey,
+        userWriteRelays: List<String>
+    ): List<Relay> {
+        val userRelaysFilter = Filter()
+            .author(userPubkey)
+            .kind(Kind.fromEnum(KindEnum.RelayList))
+
+        nostrClient.removeAllRelays()
+        nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
+        userWriteRelays.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+        nostrClient.connect()
+        val potentialUserRelays = nostrClient.fetchEventsFrom(
+            urls = userWriteRelays,
+            filters = listOf(userRelaysFilter),
+            timeout = Duration.ofSeconds(10)
+        )
+        println("------------New Fetch Relays----------------")
+        nostrClient.pool().relays().forEach { (url, relay) -> println("New Client Relay -> [$url, ${relay.status().name}]") }
+        println("User Relay Metadata:")
+        val relayList = extractRelayList(potentialUserRelays.toVec().first())
+        relayList.forEach { (relayUrl, metadata) ->
+            println("$relayUrl -> $metadata")
+        }
+
+        return relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> Relay(entry.key) }
 
     }
 
