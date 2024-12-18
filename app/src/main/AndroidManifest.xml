@@ -14,8 +14,9 @@
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-  <!-- For expedited work manager jobs that run in foreground service -->
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+  <!-- Remove foreground permission which is merged in by workmanager -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" tools:node="remove"/>
 
   <permission
     android:name="${applicationId}.permission.read"
@@ -199,10 +200,10 @@
       android:exported="true"
       android:readPermission="${applicationId}.permission.read" />
 
+    <!-- Remove foreground service which is merged in by workmanager -->
     <service
-       android:name="androidx.work.impl.foreground.SystemForegroundService"
-       android:foregroundServiceType="dataSync"
-       tools:node="merge" />
+      android:name="androidx.work.impl.foreground.SystemForegroundService"
+      tools:node="remove" />
 
   </application>
 </manifest>

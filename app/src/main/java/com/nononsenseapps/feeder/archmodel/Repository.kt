@@ -710,7 +710,6 @@ class Repository(override val di: DI) : DIAware {
 
         val constraints =
             Constraints.Builder()
-                // This prevents expedited if true
                 .setRequiresCharging(syncOnlyWhenCharging.value)
 
         if (syncOnlyOnWifi.value) {
