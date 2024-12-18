@@ -1,3 +1,9 @@
+# 2.7.3
+Jonas Kalderstam (3):
+  * [235228e4] removed foreground permission since it wasn't used
+  * [32cb38f4] fixed missing spaces inside some tags
+  * [1e7f9f68] fixed crash when a table was empty
+
 # 2.7.2
 Agnieszka C (1):
   * [fc652d0a] Updated Polish translation using Weblate
