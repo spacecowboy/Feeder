@@ -217,7 +217,8 @@ class FeedParser(override val di: DI) : DIAware {
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-    private suspend fun parseNostrUri(nostrUri: String): Nip19Profile {
+    private suspend fun parseNostrUri(adaptedNostrUri: String): Nip19Profile {
+        val nostrUri = adaptedNostrUri.removePrefix("https://njump.me/")
         if (nostrUri.contains("@")) { // It means it is a Nip05 address
             val rawString = nostrUri.removePrefix("nostr:")
             val parsedNip5 = getNip05Profile(rawString)
