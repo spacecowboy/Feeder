@@ -69,7 +69,6 @@ class HtmlLinearizer {
                     if (blockStyle.shouldSoftWrap) {
                         node.appendCorrectlyNormalizedWhiteSpace(
                             linearTextBuilder,
-                            stripLeading = linearTextBuilder.endsWithWhitespace,
                         )
                     } else {
                         append(node.wholeText)
@@ -113,7 +112,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH1) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -124,7 +122,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH2) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -135,7 +132,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH3) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -146,7 +142,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH4) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -157,7 +152,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH5) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -168,7 +162,6 @@ class HtmlLinearizer {
                                 withLinearTextAnnotation(LinearTextAnnotationH6) {
                                     element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                         linearTextBuilder,
-                                        stripLeading = linearTextBuilder.endsWithWhitespace,
                                     )
                                 }
                             }
@@ -925,13 +918,10 @@ class HtmlLinearizer {
  * Can't use JSoup's text() method because that strips invisible characters
  * such as ZWNJ which are crucial for several languages.
  */
-fun TextNode.appendCorrectlyNormalizedWhiteSpace(
-    builder: LinearTextBuilder,
-    stripLeading: Boolean,
-) {
+fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
     wholeText.asUTF8Sequence()
         .dropWhile {
-            stripLeading && isCollapsableWhiteSpace(it)
+            builder.endsWithWhitespace && isCollapsableWhiteSpace(it)
         }
         .fold(false) { lastWasWhite, char ->
             if (isCollapsableWhiteSpace(char)) {
@@ -946,17 +936,13 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
         }
 }
 
-fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
-    builder: LinearTextBuilder,
-    stripLeading: Boolean,
-) {
+fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(builder: LinearTextBuilder) {
     for (child in childNodes()) {
         when (child) {
-            is TextNode -> child.appendCorrectlyNormalizedWhiteSpace(builder, stripLeading)
+            is TextNode -> child.appendCorrectlyNormalizedWhiteSpace(builder)
             is Element ->
                 child.appendCorrectlyNormalizedWhiteSpaceRecursively(
                     builder,
-                    stripLeading,
                 )
         }
     }
