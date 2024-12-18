@@ -37,6 +37,23 @@ class HtmlLinearizerTest {
     }
 
     @Test
+    fun `spaces inside headers are kept`() {
+        val html =
+            """
+            <html><body><h2><a href="http://example.com">Link</a> <small>small</small></h2></body></html>
+            """.trimIndent()
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertEquals(
+            LinearText("Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
+            result[0],
+        )
+    }
+
+    @Test
     fun `should return annotations with bold, italic, and underline`() {
         val html = "<html><body><b><i><u>Hello, world!</u></i></b></body></html>"
         val baseUrl = "https://example.com"
