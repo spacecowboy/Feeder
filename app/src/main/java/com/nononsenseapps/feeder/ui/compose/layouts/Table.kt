@@ -180,6 +180,22 @@ private fun TableCaptionPreview() {
     }
 }
 
+@Preview
+@Composable
+private fun EmptyTableShouldNotCrashPreview() {
+    Surface {
+        Text("No table to show")
+        Table(tableData = TableData(0, 0)) { _, _ ->
+            Box(
+                modifier =
+                    Modifier
+                        .size(25.dp)
+                        .background(Color.Gray),
+            )
+        }
+    }
+}
+
 @Suppress("DataClassPrivateConstructor")
 data class TableData private constructor(
     val cells: List<TableCell>,
@@ -206,8 +222,8 @@ data class TableData private constructor(
         }
     }
 
-    val rows: Int = cells.maxOf { it.row + it.rowSpan }
-    val columns: Int = cells.maxOf { it.column + it.colSpan }
+    val rows: Int = if (cells.isEmpty()) 0 else cells.maxOf { it.row + it.rowSpan }
+    val columns: Int = if (cells.isEmpty()) 0 else cells.maxOf { it.column + it.colSpan }
 
     companion object {
         /**
