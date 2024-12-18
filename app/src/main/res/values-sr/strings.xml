@@ -250,4 +250,15 @@
     <string name="show_reading_time">Прикажи процењено време читања</string>
     <string name="touch_to_play_audio">Додирните да се пусти звук</string>
     <string name="show_title_unread_count">Прикажи број непрочитаних чланака у наслову</string>
+    <string name="openai_settings">OpenAI интеграција</string>
+    <string name="api_key">API кључ</string>
+    <string name="model_id">ИД модела</string>
+    <string name="azure_api_version">Azure API верзија</string>
+    <string name="unable_to_load_models">Нису могли да се учитају модели.</string>
+    <string name="summarize">Резимирај</string>
+    <string name="no_models_were_found">Није пронађен ниједан модел</string>
+    <string name="azure_deployment_id">ИД Azure постављања</string>
+    <string name="list_of_available_models">Листа доступних модела</string>
+    <string name="show_message">Прикажи поруку</string>
+    <string name="open_drawer_on_fab">Када се све обележи као прочитано, прикажи изворе</string>
 </resources>

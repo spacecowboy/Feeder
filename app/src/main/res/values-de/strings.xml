@@ -250,4 +250,15 @@
     <string name="feed_item_style_compact_card">Kompakte Kartei</string>
     <string name="show_title_unread_count">Anzahl ungelesener Artikel im Titel anzeigen</string>
     <string name="touch_to_play_audio">Berühren, um Audio abzuspielen</string>
+    <string name="openai_settings">OpenAI-Integration</string>
+    <string name="model_id">Modell-ID</string>
+    <string name="unable_to_load_models">Modelle konnten nicht geladen werden.</string>
+    <string name="no_models_were_found">Es wurden keine Modelle gefunden</string>
+    <string name="azure_deployment_id">Azure-Deployment-ID</string>
+    <string name="list_of_available_models">Liste der verfügbaren Modelle</string>
+    <string name="summarize">Zusammenfassen</string>
+    <string name="api_key">API-Schlüssel</string>
+    <string name="azure_api_version">Azure-API-Version</string>
+    <string name="show_message">Nachricht anzeigen</string>
+    <string name="open_drawer_on_fab">Feeds anzeigen, nachdem alle als gelesen markiert wurden</string>
 </resources>

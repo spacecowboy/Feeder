@@ -2,7 +2,7 @@
 <resources>
     <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
     <string name="navigation_drawer_close">Fermer le menu de navigation</string>
-    <string name="action_settings">Paramètres</string>
+    <string name="action_settings">Préférences</string>
     <string name="add_feed">Ajouter un flux</string>
     <string name="title_activity_edit_feed">S’abonner au flux</string>
     <string name="add_feed_search_hint">URL du flux</string>
@@ -34,7 +34,7 @@
     <string name="share">Partager</string>
     <string name="no_such_feed">Aucun flux correspondant n’a été trouvé. Essayez peut-être avec HTTPS \?</string>
     <string name="nothing_to_display">Rien à afficher !</string>
-    <string name="title_activity_settings">Paramètres</string>
+    <string name="title_activity_settings">Préférences</string>
     <string name="all_feeds">Tous les flux</string>
     <string name="sync_option_manually">Manuellement</string>
     <string name="sync_option_every_hour">Toutes les heures</string>
@@ -250,4 +250,15 @@
     <string name="feed_item_style_compact_card">Carte compact</string>
     <string name="touch_to_play_audio">Appuyer pour écouter</string>
     <string name="show_title_unread_count">Afficher le nombre d\'articles non lus dans le titre</string>
+    <string name="model_id">Id du Modèle</string>
+    <string name="no_models_were_found">Aucun modèle trouvé</string>
+    <string name="azure_deployment_id">Id de déploiement Azure</string>
+    <string name="summarize">Faire un résumé</string>
+    <string name="openai_settings">Intégration d\'OpenAI</string>
+    <string name="api_key">Clé API</string>
+    <string name="azure_api_version">Version API Azure</string>
+    <string name="unable_to_load_models">Échec du chargement des modèles.</string>
+    <string name="list_of_available_models">Liste des modèles disponibles</string>
+    <string name="show_message">Montrer le message</string>
+    <string name="open_drawer_on_fab">Montrer les flux après avoir marqué tout lu</string>
 </resources>

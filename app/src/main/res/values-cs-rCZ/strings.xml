@@ -250,4 +250,13 @@
     <string name="feed_item_style_compact_card">Kompaktní karty</string>
     <string name="touch_to_play_audio">Dotykem přehrajete zvuk</string>
     <string name="show_title_unread_count">Zobrazit počet nepřečtených článků v nadpisu</string>
+    <string name="openai_settings">Integrace OpenAI</string>
+    <string name="model_id">Id modelu</string>
+    <string name="azure_api_version">Verze API Azure</string>
+    <string name="api_key">Klíč API</string>
+    <string name="unable_to_load_models">Nelze načíst modely.</string>
+    <string name="no_models_were_found">Nebyly nalezeny žádné modely</string>
+    <string name="azure_deployment_id">Id nasazení Azure</string>
+    <string name="list_of_available_models">Seznam dostupných modelů</string>
+    <string name="summarize">Shrnutí</string>
 </resources>

@@ -1,3 +1,108 @@
+# 2.7.2
+Agnieszka C (1):
+  * [fc652d0a] Updated Polish translation using Weblate
+
+Deleted User (1):
+  * [a58105dc] Updated Finnish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [cd8f70b4] added setting for opening feeds drawer when pressing FAB
+  * [d69df4ca] added feed item styles for tablets (no longer hidden on
+         tablet)
+
+Matth78 (1):
+  * [9bded05e] Updated French translation using Weblate
+
+Ricky Tigg (1):
+  * [8749fc38] Updated Finnish translation using Weblate
+
+VfBFan (1):
+  * [ba2a09f7] Updated German translation using Weblate
+
+Wiccio (1):
+  * [00efdb1d] Updated Esperanto translation using Weblate
+
+asl97 (3):
+  * [34009029] [Hotfix] Show snippet of feed instead of "Found nothing to
+         fetch"
+  * [814e51f8] Add an user noticable notice for why the snippet is shown
+  * [029c249c] Run ./gradlew ktlintformat
+
+eevan78 (1):
+  * [b80d561a] Updated Serbian translation using Weblate
+
+gallegonovato (1):
+  * [2d864ec3] Updated Spanish translation using Weblate
+
+hanyang cheng (1):
+  * [066a2783] Updated Chinese (Traditional Han script) translation using
+         Weblate
+
+noSé (2):
+  * [781838d7] Updated Spanish translation using Weblate
+  * [50a6aee2] Updated Spanish translation using Weblate
+
+summoner001 (1):
+  * [6adb9aa5] Updated Hungarian translation using Weblate
+
+trunars (1):
+  * [8812cb3b] Updated Bulgarian translation using Weblate
+
+zmni (1):
+  * [f661a1ef] Updated Indonesian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [f7eccb3f] Updated Greek translation using Weblate
+
+大王叫我来巡山 (1):
+  * [b7e60ecf] Updated Chinese (Simplified Han script) translation using
+         Weblate
+
+# 2.7.1
+Agnieszka C (2):
+  * [93f7ff7b] Updated Polish translation using Weblate
+  * [55f6499b] Updated Polish translation using Weblate
+
+Alex Gavrishev (1):
+  * [7f1fe86a] added Perplexity AI support (need to set custom URL) (#433)
+
+ERYpTION (1):
+  * [338ec167] Translated using Weblate (Danish)
+
+Matth78 (2):
+  * [a53bdd2a] Updated French translation using Weblate
+  * [27c73f1b] Updated French translation using Weblate
+
+VfBFan (1):
+  * [e544e4f4] Updated German translation using Weblate
+
+eevan78 (1):
+  * [6b19ca53] Updated Serbian translation using Weblate
+
+gallegonovato (2):
+  * [99ca73cb] Updated Spanish translation using Weblate
+  * [e085841c] Updated Spanish translation using Weblate
+
+pchelium (1):
+  * [fb7e4716] Updated Czech translation using Weblate
+
+summoner001 (2):
+  * [3381d81a] Updated Hungarian translation using Weblate
+  * [3dcb2fd1] Updated Hungarian translation using Weblate
+
+trunars (2):
+  * [b48d556f] Updated Bulgarian translation using Weblate
+  * [666a0267] Updated Bulgarian translation using Weblate
+
+Λευτέρης Τ (1):
+  * [c1d91bc9] Updated Greek translation using Weblate
+
+大王叫我来巡山 (2):
+  * [9ebf8873] Updated Chinese (Simplified Han script) translation using
+         Weblate
+  * [820af2d3] Updated Chinese (Simplified Han script) translation using
+         Weblate
+
 # 2.7.0
 Alex Gavrishev (1):
   * [ca13fd47] added article summary with OpenAI integration (#399)

@@ -292,6 +292,10 @@ class Repository(override val di: DI) : DIAware {
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)
 
+    val isOpenDrawerOnFab = settingsStore.isOpenDrawerOnFab
+
+    fun setOpenDrawerOnFab(value: Boolean) = settingsStore.setOpenDrawerOnFab(value)
+
     /**
      * Returns true if the latest sync timestamp is within the last 10 seconds
      */
@@ -877,6 +881,7 @@ data class Article(
     val link: String? = item?.link
     val feedDisplayTitle: String = item?.feedDisplayTitle ?: ""
     val title: String = item?.plainTitle ?: ""
+    val snippet: String = item?.plainSnippet ?: ""
     val enclosure: Enclosure =
         item?.enclosureLink?.let { link ->
             Enclosure(

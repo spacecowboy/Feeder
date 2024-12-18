@@ -155,12 +155,21 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowTitleUnreadCount(value)
     }
 
+    fun setOpenDrawerOnFab(value: Boolean) {
+        repository.setOpenDrawerOnFab(value)
+    }
+
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
             is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
             is OpenAISettingsEvent.UpdateSettings -> repository.setOpenAiSettings(event.settings)
             is OpenAISettingsEvent.SwitchEditMode -> {
-                _viewState.value = _viewState.value.copy(openAIEdit = event.enabled)
+                val current = _viewState.value.openAIState
+                _viewState.value = _viewState.value.copy(openAIState = current.copy(isEditMode = event.enabled))
+            }
+            is OpenAISettingsEvent.ShowModelsError -> {
+                val current = _viewState.value.openAIState
+                _viewState.value = _viewState.value.copy(openAIState = current.copy(showModelsError = event.show))
             }
         }
     }
@@ -222,6 +231,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.showTitleUnreadCount,
                 repository.openAISettings,
                 openAIModelsState,
+                repository.isOpenDrawerOnFab,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -252,9 +262,12 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     isOpenAdjacent = params[24] as Boolean,
                     showReadingTime = params[25] as Boolean,
                     showTitleUnreadCount = params[26] as Boolean,
-                    openAISettings = params[27] as OpenAISettings,
-                    openAIModels = params[28] as OpenAIModelsState,
-                    openAIEdit = _viewState.value.openAIEdit,
+                    openAIState =
+                        _viewState.value.openAIState.copy(
+                            settings = params[27] as OpenAISettings,
+                            modelsResult = params[28] as OpenAIModelsState,
+                        ),
+                    isOpenDrawerOnFab = params[29] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -311,17 +324,23 @@ data class SettingsViewState(
     val maxLines: Int = 2,
     val showOnlyTitle: Boolean = false,
     val isOpenAdjacent: Boolean = true,
-    val openAISettings: OpenAISettings = OpenAISettings(),
-    val openAIModels: OpenAIModelsState = OpenAIModelsState.None,
-    val openAIEdit: Boolean = false,
+    val openAIState: OpenAISettingsState = OpenAISettingsState(),
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
+    val isOpenDrawerOnFab: Boolean = false,
 )
 
 data class UIFeedSettings(
     val feedId: Long,
     val title: String,
     val notify: Boolean,
+)
+
+data class OpenAISettingsState(
+    val settings: OpenAISettings = OpenAISettings(),
+    val modelsResult: OpenAIModelsState = OpenAIModelsState.None,
+    val isEditMode: Boolean = false,
+    val showModelsError: Boolean = false,
 )
 
 sealed interface OpenAIModelsState {
@@ -340,4 +359,6 @@ sealed interface OpenAISettingsEvent {
     data class LoadModels(val settings: OpenAISettings) : OpenAISettingsEvent
 
     data class SwitchEditMode(val enabled: Boolean) : OpenAISettingsEvent
+
+    data class ShowModelsError(val show: Boolean) : OpenAISettingsEvent
 }

@@ -250,4 +250,15 @@
     <string name="export_saved_articles">Εξαγωγή αποθηκευμένων άρθρων</string>
     <string name="touch_to_play_audio">Άγγιγμα για αναπαραγωγή ήχου</string>
     <string name="show_title_unread_count">Εμφάνιση αριθμού μη αναγνωσμενων άρθρων στον τίτλο</string>
+    <string name="api_key">Κλειδί API</string>
+    <string name="model_id">Id μοντέλου</string>
+    <string name="azure_api_version">Έκδοση Azure API</string>
+    <string name="azure_deployment_id">Id ανάπτυξης Azure</string>
+    <string name="summarize">Σύνοψη</string>
+    <string name="openai_settings">Ενσωμάτωση OpenAI</string>
+    <string name="unable_to_load_models">Αδυναμία φόρτωσης μοντέλων.</string>
+    <string name="no_models_were_found">Δε βρέθηκαν μοντέλα</string>
+    <string name="list_of_available_models">Λίστα διαθέσιμων μοντέλων</string>
+    <string name="show_message">Εμφάνιση μηνύματος</string>
+    <string name="open_drawer_on_fab">Εμφάνιση ροών μετά την επισήμανση όλων ως αναγνωσμένα</string>
 </resources>

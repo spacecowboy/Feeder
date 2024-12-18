@@ -160,7 +160,7 @@
     <string name="dark_theme_preference_black">Черна</string>
     <string name="feed_item_style_super_compact">Супер компактна</string>
     <string name="syncing">Синхронизиране</string>
-    <string name="swipe_to_mark_as_read">Плъзнете за да маркирате като прочетено</string>
+    <string name="swipe_to_mark_as_read">Маркирай като прочетено при плъзгане</string>
     <string name="permission_read_desc">Позволява на приложението да чете емисии и статии</string>
     <string name="no_such_feed">Не може да бъде намерена такава емисия. Опитайте да използвате HTTPS може би\?</string>
     <string name="no_feeds">Няма емисии</string>
@@ -250,4 +250,15 @@
     <string name="feed_item_style_compact_card">Компактна карта</string>
     <string name="show_title_unread_count">Покажи броя на непрочетените статии в заглавието</string>
     <string name="touch_to_play_audio">Докосни за изпълнение на аудио</string>
+    <string name="azure_api_version">Azure API версия</string>
+    <string name="model_id">ID модел</string>
+    <string name="azure_deployment_id">Azure ID внедряване</string>
+    <string name="summarize">Обобщение</string>
+    <string name="openai_settings">OpenAI интеграция</string>
+    <string name="unable_to_load_models">Не могат да се заредят модели.</string>
+    <string name="no_models_were_found">Няма намерени модели</string>
+    <string name="list_of_available_models">Списък на налични модели</string>
+    <string name="api_key">API ключ</string>
+    <string name="show_message">Покажи съобщение</string>
+    <string name="open_drawer_on_fab">Покажи емисии след маркиране на всичко като прочетено</string>
 </resources>

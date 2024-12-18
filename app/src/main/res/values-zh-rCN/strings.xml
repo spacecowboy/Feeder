@@ -250,4 +250,15 @@
     <string name="feed_item_style_compact_card">紧凑卡片</string>
     <string name="touch_to_play_audio">轻触播放音频</string>
     <string name="show_title_unread_count">在标题中显示未读数</string>
+    <string name="no_models_were_found">未找到模型</string>
+    <string name="openai_settings">OpenAI 集成</string>
+    <string name="api_key">API 密钥</string>
+    <string name="model_id">模型 Id</string>
+    <string name="summarize">概述</string>
+    <string name="azure_api_version">Azure API 版本</string>
+    <string name="unable_to_load_models">无法加载模型。</string>
+    <string name="azure_deployment_id">Azure 部署 id</string>
+    <string name="list_of_available_models">可用模型列表</string>
+    <string name="show_message">显示消息</string>
+    <string name="open_drawer_on_fab">标记所有为已读后显示订阅源</string>
 </resources>

@@ -3,10 +3,12 @@ package com.nononsenseapps.feeder.ui.compose.settings
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -83,7 +85,6 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
-import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
@@ -98,7 +99,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScroll
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
-import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 import com.nononsenseapps.feeder.util.ActivityLauncher
@@ -207,10 +207,10 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
-            openAISettings = viewState.openAISettings,
-            openAIModels = viewState.openAIModels,
-            openAIEdit = viewState.openAIEdit,
+            openAIState = viewState.openAIState,
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
+            isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
+            onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             modifier = Modifier.padding(padding),
         )
     }
@@ -278,10 +278,10 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
-            openAISettings = OpenAISettings(),
-            openAIModels = OpenAIModelsState.None,
-            openAIEdit = false,
-            onOpenAIEvent = { _ -> },
+            openAIState = OpenAISettingsState(),
+            onOpenAIEvent = {},
+            isOpenDrawerOnFab = false,
+            onOpenDrawerOnFab = {},
             modifier = Modifier,
         )
     }
@@ -345,10 +345,10 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
-    openAISettings: OpenAISettings,
-    openAIModels: OpenAIModelsState,
-    openAIEdit: Boolean,
+    openAIState: OpenAISettingsState,
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
+    isOpenDrawerOnFab: Boolean,
+    onOpenDrawerOnFab: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -446,120 +446,115 @@ fun SettingsList(
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.text_scale),
-                modifier = innerModifier,
+        SettingsGroup(
+            title = R.string.text_scale,
+        ) {
+            ScaleSetting(
+                currentValue = textScale,
+                onValueChange = setTextScale,
+                valueRange = 1f..2f,
+                steps = 9,
             )
         }
-
-        ScaleSetting(
-            currentValue = textScale,
-            onValueChange = setTextScale,
-            valueRange = 1f..2f,
-            steps = 9,
-        )
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.synchronization),
-                modifier = innerModifier,
-            )
-        }
-
-        MenuSetting(
-            currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
-            values =
-                ImmutableHolder(
-                    SyncFrequency.values().map {
-                        it.asSyncFreqOption()
-                    },
-                ),
-            title = stringResource(id = R.string.check_for_updates),
-            onSelection = {
-                onSyncFrequencyChange(it.syncFrequency)
-            },
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.on_startup),
-            checked = syncOnStartupValue,
-            onCheckedChange = onSyncOnStartupChange,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.only_on_wifi),
-            checked = syncOnlyOnWifiValue,
-            onCheckedChange = onSyncOnlyOnWifiChange,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.only_when_charging),
-            checked = syncOnlyWhenChargingValue,
-            onCheckedChange = onSyncOnlyWhenChargingChange,
-        )
-
-        MenuSetting(
-            currentValue = maxItemsPerFeedValue,
-            values =
-                immutableListHolderOf(
-                    50,
-                    100,
-                    200,
-                    500,
-                    1000,
-                ),
-            title = stringResource(id = R.string.max_feed_items),
-            onSelection = onMaxItemsPerFeedChange,
-        )
-
-        ExternalSetting(
-            currentValue =
-                when (batteryOptimizationIgnoredValue) {
-                    true -> stringResource(id = R.string.battery_optimization_disabled)
-                    false -> stringResource(id = R.string.battery_optimization_enabled)
+        SettingsGroup(
+            title = R.string.synchronization,
+        ) {
+            MenuSetting(
+                currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
+                values =
+                    ImmutableHolder(
+                        SyncFrequency.values().map {
+                            it.asSyncFreqOption()
+                        },
+                    ),
+                title = stringResource(id = R.string.check_for_updates),
+                onSelection = {
+                    onSyncFrequencyChange(it.syncFrequency)
                 },
-            title = stringResource(id = R.string.battery_optimization),
-        ) {
-            onStartActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-        }
+            )
 
-        ExternalSetting(
-            currentValue = "",
-            title = stringResource(id = R.string.device_sync),
-        ) {
-            onOpenSyncSettings()
+            SwitchSetting(
+                title = stringResource(id = R.string.on_startup),
+                checked = syncOnStartupValue,
+                onCheckedChange = onSyncOnStartupChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.only_on_wifi),
+                checked = syncOnlyOnWifiValue,
+                onCheckedChange = onSyncOnlyOnWifiChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.only_when_charging),
+                checked = syncOnlyWhenChargingValue,
+                onCheckedChange = onSyncOnlyWhenChargingChange,
+            )
+
+            MenuSetting(
+                currentValue = maxItemsPerFeedValue,
+                values =
+                    immutableListHolderOf(
+                        50,
+                        100,
+                        200,
+                        500,
+                        1000,
+                    ),
+                title = stringResource(id = R.string.max_feed_items),
+                onSelection = onMaxItemsPerFeedChange,
+            )
+
+            ExternalSetting(
+                currentValue =
+                    when (batteryOptimizationIgnoredValue) {
+                        true -> stringResource(id = R.string.battery_optimization_disabled)
+                        false -> stringResource(id = R.string.battery_optimization_enabled)
+                    },
+                title = stringResource(id = R.string.battery_optimization),
+            ) {
+                onStartActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            }
+
+            ExternalSetting(
+                currentValue = "",
+                title = stringResource(id = R.string.device_sync),
+            ) {
+                onOpenSyncSettings()
+            }
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.article_list_settings),
-                modifier = innerModifier,
+        SettingsGroup(
+            title = R.string.article_list_settings,
+        ) {
+            MenuSetting(
+                currentValue = currentSortingValue,
+                values =
+                    immutableListHolderOf(
+                        SortingOptions.NEWEST_FIRST.asSortOption(),
+                        SortingOptions.OLDEST_FIRST.asSortOption(),
+                    ),
+                title = stringResource(id = R.string.sort),
+                onSelection = onSortingChange,
             )
-        }
 
-        MenuSetting(
-            currentValue = currentSortingValue,
-            values =
-                immutableListHolderOf(
-                    SortingOptions.NEWEST_FIRST.asSortOption(),
-                    SortingOptions.OLDEST_FIRST.asSortOption(),
-                ),
-            title = stringResource(id = R.string.sort),
-            onSelection = onSortingChange,
-        )
+            SwitchSetting(
+                title = stringResource(id = R.string.show_fab),
+                checked = showFabValue,
+                onCheckedChange = onShowFabChange,
+            )
 
-        SwitchSetting(
-            title = stringResource(id = R.string.show_fab),
-            checked = showFabValue,
-            onCheckedChange = onShowFabChange,
-        )
+            SwitchSetting(
+                title = stringResource(id = R.string.open_drawer_on_fab),
+                checked = isOpenDrawerOnFab,
+                onCheckedChange = onOpenDrawerOnFab,
+            )
 
-        if (isCompactDevice()) {
             MenuSetting(
                 title = stringResource(id = R.string.feed_item_style),
                 currentValue = feedItemStyleValue.asFeedItemStyleOption(),
@@ -568,160 +563,164 @@ fun SettingsList(
                     onFeedItemStyleChange(it.feedItemStyle)
                 },
             )
-        }
 
-        MenuSetting(
-            title = stringResource(id = R.string.max_lines),
-            currentValue = maxLines,
-            values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
-            onSelection = setMaxLines,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.show_only_title),
-            checked = showOnlyTitle,
-            onCheckedChange = onShowOnlyTitle,
-        )
-
-        MenuSetting(
-            title = stringResource(id = R.string.swipe_to_mark_as_read),
-            currentValue = swipeAsReadValue.asSwipeAsReadOption(),
-            values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
-            onSelection = {
-                onSwipeAsReadOptionChange(it.swipeAsRead)
-            },
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.mark_as_read_on_scroll),
-            checked = isMarkAsReadOnScroll,
-            onCheckedChange = onMarkAsReadOnScroll,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.show_thumbnails),
-            checked = showThumbnailsValue,
-            onCheckedChange = onShowThumbnailsChange,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.show_reading_time),
-            checked = showReadingTime,
-            onCheckedChange = onShowReadingTimeChange,
-        )
-
-        SwitchSetting(
-            title = stringResource(id = R.string.show_title_unread_count),
-            checked = showTitleUnreadCount,
-            onCheckedChange = onShowTitleUnreadCountChange,
-        )
-
-        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
-
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.reader_settings),
-                modifier = innerModifier,
+            MenuSetting(
+                title = stringResource(id = R.string.max_lines),
+                currentValue = maxLines,
+                values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
+                onSelection = setMaxLines,
             )
-        }
 
-        MenuSetting(
-            currentValue = currentItemOpenerValue.asItemOpenerOption(),
-            values =
-                immutableListHolderOf(
-                    ItemOpener.READER.asItemOpenerOption(),
-                    ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
-                    ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
-                ),
-            title = stringResource(id = R.string.open_item_by_default_with),
-            onSelection = {
-                onItemOpenerChange(it.itemOpener)
-            },
-        )
-
-        MenuSetting(
-            currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
-            values =
-                immutableListHolderOf(
-                    LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
-                    LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
-                ),
-            title = stringResource(id = R.string.open_links_with),
-            onSelection = {
-                onLinkOpenerChange(it.linkOpener)
-            },
-        )
-
-        val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
-
-        if (notCompactScreen) {
             SwitchSetting(
-                title = stringResource(id = R.string.open_browser_in_split_screen),
-                checked = isOpenAdjacent,
-                onCheckedChange = onOpenAdjacent,
+                title = stringResource(id = R.string.show_only_title),
+                checked = showOnlyTitle,
+                onCheckedChange = onShowOnlyTitle,
             )
-        }
 
-        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
-
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.image_loading),
-                modifier = innerModifier,
-            )
-        }
-
-        SwitchSetting(
-            title = stringResource(id = R.string.only_on_wifi),
-            checked = loadImageOnlyOnWifiValue,
-            onCheckedChange = onLoadImageOnlyOnWifiChange,
-        )
-
-        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
-
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.text_to_speech),
-                modifier = innerModifier,
-            )
-        }
-
-        SwitchSetting(
-            title = stringResource(id = R.string.use_detect_language),
-            checked = useDetectLanguage,
-            description =
-                when {
-                    isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
-                    else ->
-                        stringResource(
-                            id = R.string.only_available_on_android_n,
-                            "10",
-                        )
+            MenuSetting(
+                title = stringResource(id = R.string.swipe_to_mark_as_read),
+                currentValue = swipeAsReadValue.asSwipeAsReadOption(),
+                values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
+                onSelection = {
+                    onSwipeAsReadOptionChange(it.swipeAsRead)
                 },
-            enabled = isAndroidQAndAbove,
-            onCheckedChange = onUseDetectLanguageChange,
-        )
+            )
 
-        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+            SwitchSetting(
+                title = stringResource(id = R.string.mark_as_read_on_scroll),
+                checked = isMarkAsReadOnScroll,
+                onCheckedChange = onMarkAsReadOnScroll,
+            )
 
-        GroupTitle { innerModifier ->
-            Text(
-                stringResource(id = R.string.openai_settings),
-                modifier = innerModifier,
+            SwitchSetting(
+                title = stringResource(id = R.string.show_thumbnails),
+                checked = showThumbnailsValue,
+                onCheckedChange = onShowThumbnailsChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.show_reading_time),
+                checked = showReadingTime,
+                onCheckedChange = onShowReadingTimeChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.show_title_unread_count),
+                checked = showTitleUnreadCount,
+                onCheckedChange = onShowTitleUnreadCountChange,
             )
         }
 
-        OpenAISection(
-            openAISettings = openAISettings,
-            openAIModels = openAIModels,
-            openAIEdit = openAIEdit,
-            onEvent = onOpenAIEvent,
-        )
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.reader_settings,
+        ) {
+            MenuSetting(
+                currentValue = currentItemOpenerValue.asItemOpenerOption(),
+                values =
+                    immutableListHolderOf(
+                        ItemOpener.READER.asItemOpenerOption(),
+                        ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
+                        ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
+                    ),
+                title = stringResource(id = R.string.open_item_by_default_with),
+                onSelection = {
+                    onItemOpenerChange(it.itemOpener)
+                },
+            )
+
+            MenuSetting(
+                currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
+                values =
+                    immutableListHolderOf(
+                        LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
+                        LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
+                    ),
+                title = stringResource(id = R.string.open_links_with),
+                onSelection = {
+                    onLinkOpenerChange(it.linkOpener)
+                },
+            )
+
+            val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
+
+            if (notCompactScreen) {
+                SwitchSetting(
+                    title = stringResource(id = R.string.open_browser_in_split_screen),
+                    checked = isOpenAdjacent,
+                    onCheckedChange = onOpenAdjacent,
+                )
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.image_loading,
+        ) {
+            SwitchSetting(
+                title = stringResource(id = R.string.only_on_wifi),
+                checked = loadImageOnlyOnWifiValue,
+                onCheckedChange = onLoadImageOnlyOnWifiChange,
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.text_to_speech,
+        ) {
+            SwitchSetting(
+                title = stringResource(id = R.string.use_detect_language),
+                checked = useDetectLanguage,
+                description =
+                    when {
+                        isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
+                        else ->
+                            stringResource(
+                                id = R.string.only_available_on_android_n,
+                                "10",
+                            )
+                    },
+                enabled = isAndroidQAndAbove,
+                onCheckedChange = onUseDetectLanguageChange,
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.openai_settings,
+        ) {
+            OpenAISection(
+                state = openAIState,
+                onEvent = onOpenAIEvent,
+            )
+        }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
         Spacer(modifier = Modifier.navigationBarsPadding())
     }
+}
+
+@Composable
+fun ColumnScope.SettingsGroup(
+    @StringRes title: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    GroupTitle(
+        modifier = modifier,
+    ) { innerModifier ->
+        Text(
+            stringResource(id = title),
+            modifier = innerModifier,
+        )
+    }
+
+    content()
 }
 
 @Composable

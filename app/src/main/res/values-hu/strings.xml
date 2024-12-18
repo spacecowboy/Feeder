@@ -14,8 +14,8 @@
     <string name="action_settings">Beállítások</string>
     <string name="add_feed">Hírfolyam hozzáadása</string>
     <string name="title_activity_edit_feed">Feliratkozás hírfolyamra</string>
-    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">megnyitni</annotation> ?</string>
-    <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadni</annotation>\?</string>
+    <string name="empty_feed_open">Másik hírfolyam <annotation style="link">megnyitása</annotation> ?</string>
+    <string name="empty_feed_add">Több hírfolyam <annotation style="link">hozzáadása</annotation>\?</string>
     <string name="search_feed_empty_hint">Adjon meg egy hírfolyam címet</string>
     <string name="mark_as_read">Megjelölés olvasottként</string>
     <string name="mark_as_unread">Megjelölés olvasatlanként</string>
@@ -24,13 +24,13 @@
     <string name="delete_feed">Hírfolyam törlése</string>
     <string name="show_all_items">Minden elem megjelenítése</string>
     <string name="show_unread_items">Olvasatlan elemek megjelenítése</string>
-    <string name="new_items_available">Új elemek elérhetők</string>
+    <string name="new_items_available">Új elemek érhetők el</string>
     <string name="view">Nézet</string>
     <string name="no_tag">Nincs címke</string>
     <string name="notify_for_new_items">Értesítés új elemeknél</string>
     <string name="dont_notify_for_new_items">Értesítések leállítása</string>
     <string name="toggle_read_status">Olvasó nézet váltása</string>
-    <string name="open_link_in_browser">Link megnyitása böngészőben</string>
+    <string name="open_link_in_browser">Hivatkozás megnyitása böngészőben</string>
     <string name="no_such_feed">Ilyen hírfolyam nem található. Esetleg próbáljon HTTPS-t használni?</string>
     <string name="export_feeds_to_opml">Hírfolyamok exportálása OPML-be</string>
     <string name="import_feeds_from_opml">Hírfolyamok importálása OPML-ből</string>
@@ -53,7 +53,7 @@
     <string name="may_result_data_charges">Adatforgalmi díjat vonhat maga után.</string>
     <string name="only_when_charging">Csak töltés alatt</string>
     <string name="image_loading">Kép betöltése</string>
-    <string name="no_activity_for_link">Először telepítsen valamit a link megnyitásához</string>
+    <string name="no_activity_for_link">Először telepítsen valamit a hivatkozás megnyitásához</string>
     <string name="on_startup">Alkalmazás indításkor</string>
     <string name="block_list">Blokkolási lista</string>
     <string name="add_item">Elem hozzáadása</string>
@@ -68,9 +68,9 @@
     <string name="open_in_custom_tab">Egyéni lap</string>
     <string name="use_app_default">Alkalmazás alapbeállításának használata</string>
     <string name="open_item_by_default_with">Elemek megnyitása alapértelmezetten a következővel</string>
-    <string name="open_links_with">Linkek megnyitása a következővel</string>
+    <string name="open_links_with">Hivatkozások megnyitása a következővel</string>
     <string name="reader_settings">Olvasó</string>
-    <string name="open_link_in_web_view">Link megnyitása webes nézetben</string>
+    <string name="open_link_in_web_view">Hivatkozás megnyitása webes nézetben</string>
     <string name="open_in_web_view">Megnyitás webes nézetben</string>
     <string name="max_feed_items">Hírfolyamonkénti maximum elem</string>
     <string name="could_not_load_url">Cím nem betölthető</string>
@@ -128,16 +128,16 @@
     <string name="disconnect_device_from_sync">Eszköz leválasztása a szinkronizálási láncról</string>
     <string name="devices_on_sync_chain">Eszközök a szinkronizálási láncon</string>
     <string name="remove">Eltávolítás</string>
-    <string name="treat_like_password">Kezelje ezt mint egy jelszót. Bárki elolvashatja a szinkronizált adatait, ha megszerzi a linket.</string>
+    <string name="treat_like_password">Kezelje ezt mint egy jelszót. Bárki elolvashatja a szinkronizált adatait, ha megszerzi a hivatkozást.</string>
     <string name="qr_code">QR-kód</string>
     <string name="feeder_device_sync_code">Feeder eszközszinkronizálási kód</string>
     <string name="leave_sync_chain">Szinkronizálási lánc elhagyása</string>
     <string name="remove_device_question">Biztosan el akarja távolítani ezt az eszközt: %1$s?</string>
     <string name="press_scan_sync">Az eszközén navigáljon az eszköz szinkronizációhoz, és nyomjon a szinkronizálási kód beolvasására.</string>
-    <string name="or_open_device_sync_link">Vagy nyissa meg a linket az eszközén.</string>
+    <string name="or_open_device_sync_link">Vagy nyissa meg a hivatkozást az eszközén.</string>
     <string name="device_sync_description_1">Az eszköz szinkronizálás lehetővé teszi, hogy a hírfolyam feliratkozásait és olvasott cikkeit szinkronizálja különböző eszközei között.</string>
     <string name="device_sync_description_2">Egyszerűen olvassa be a kódot a szinkronizálási láncból, amit egy másik eszközön hozott létre, vagy hozzon létre egy újat.</string>
-    <string name="scan_or_enter_code">Olvasson be vagy adjon meg szinkronizálási kódot</string>
+    <string name="scan_or_enter_code">Olvasson be vagy adjon meg egy szinkronizálási kódot</string>
     <string name="start_new_sync_chain">Új szinkronizálási lánc indítása</string>
     <string name="sync_code">Szinkronizálási kód</string>
     <string name="secret_key">Titkos kulcs</string>
@@ -147,7 +147,7 @@
     <string name="from_anywhere">Bárhonnan</string>
     <string name="swipe_to_mark_as_read">Húzza félre az olvasottnak jelöléshez</string>
     <string name="are_you_sure_leave_sync_chain">Biztos benne, hogy el akarja hagyni a szinkronizálási láncot?</string>
-    <string name="no_barcode_scanner_installed">Nem található vonalkód beolvasó</string>
+    <string name="no_barcode_scanner_installed">Nem található vonalkódolvasó</string>
     <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy hírfolyamokat és cikkeket olvasson</string>
     <string name="permission_read_label">Feeder csak olvasási engedély</string>
     <string name="open_enclosed_media">Média melléklet megnyitása</string>
@@ -190,8 +190,8 @@
     <string name="few_tags">%1$s címke</string>
     <string name="many_tags">%1$s címke</string>
     <string name="other_tags">%1$s címke</string>
-    <string name="failed_to_fetch_full_article_missing_link">A hírfolyamból hiányzik a cikk linkje</string>
-    <string name="failed_to_fetch_full_article_not_html">A link nem egy HTML dokumentum</string>
+    <string name="failed_to_fetch_full_article_missing_link">A hírfolyamból hiányzik a cikk hivatkozása</string>
+    <string name="failed_to_fetch_full_article_not_html">A hivatkozás nem egy HTML dokumentum</string>
     <string name="failed_to_fetch_full_article_missing_body">Semmi nem található a lekéréshez</string>
     <string name="dynamic_theme_use">Dinamikus színek</string>
     <string name="feed_icon">Hírfolyam ikon</string>
@@ -246,8 +246,19 @@
     <string name="export_saved_articles">Mentett cikkek exportálása</string>
     <string name="failed_to_export_saved_articles">Nem sikerült a mentett cikkek exportálása</string>
     <string name="skip_duplicate_articles">Duplázott cikkek kihagyása</string>
-    <string name="skip_duplicate_articles_desc">Ugyanolyan már létező című és linkű cikk esetén az újat mellőzi</string>
+    <string name="skip_duplicate_articles_desc">Azok a cikkek, amelyeknek a hivatkozásai vagy címei megegyeznek a már meglévő cikkekkel legyenek figyelmen kívül hagyva</string>
     <string name="feed_item_style_compact_card">Kompakt kártya</string>
     <string name="touch_to_play_audio">Érintse meg a hang lejátszásához</string>
     <string name="show_title_unread_count">Olvasatlan cikkek számának megjelenítése a címben</string>
+    <string name="api_key">API kulcs</string>
+    <string name="model_id">Modellazonosító</string>
+    <string name="azure_api_version">Azure API verzió</string>
+    <string name="no_models_were_found">Nem találhatók modellek</string>
+    <string name="azure_deployment_id">Azure üzembehelyezési azonosító</string>
+    <string name="list_of_available_models">Elérhető modellek listája</string>
+    <string name="summarize">Összefoglalás</string>
+    <string name="openai_settings">OpenAI integráció</string>
+    <string name="unable_to_load_models">Nem lehet betölteni a modelleket.</string>
+    <string name="show_message">Üzenet megjelenítése</string>
+    <string name="open_drawer_on_fab">A hírfolyam megjelenítése miután az összes meg lett jelölve olvasottként</string>
 </resources>

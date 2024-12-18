@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,20 +51,18 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
 fun OpenAISection(
-    openAISettings: OpenAISettings,
-    openAIModels: OpenAIModelsState,
-    openAIEdit: Boolean,
+    state: OpenAISettingsState,
     onEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OpenAISectionItem(
         modifier = modifier,
-        settings = openAISettings,
+        settings = state.settings,
         onEvent = onEvent,
     )
 
-    if (openAIEdit) {
-        var current by remember(openAISettings) { mutableStateOf(openAISettings) }
+    if (state.isEditMode) {
+        var current by remember(state.settings) { mutableStateOf(state.settings) }
         AlertDialog(
             confirmButton = {
                 Button(onClick = {
@@ -86,8 +86,8 @@ fun OpenAISection(
             text = {
                 OpenAISectionEdit(
                     modifier = modifier,
-                    settings = current,
-                    models = openAIModels,
+                    state = state,
+                    current = current,
                     onEvent = {
                         if (it is OpenAISettingsEvent.UpdateSettings) {
                             current = it.settings
@@ -139,14 +139,14 @@ private fun OpenAISectionItem(
 
 @Composable
 fun OpenAISectionEdit(
-    settings: OpenAISettings,
-    models: OpenAIModelsState,
+    state: OpenAISettingsState,
+    current: OpenAISettings,
     onEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
-    LaunchedEffect(settings) {
-        latestOnEvent(OpenAISettingsEvent.LoadModels(settings = settings))
+    LaunchedEffect(current) {
+        latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
@@ -157,40 +157,40 @@ fun OpenAISectionEdit(
     ) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.key,
+            value = current.key,
             label = {
                 Text(stringResource(R.string.api_key))
             },
             onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(key = it)))
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(key = it)))
             },
             visualTransformation = VisualTransformationApiKey(),
         )
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.modelId,
+            value = current.modelId,
             label = {
                 Text(stringResource(R.string.model_id))
             },
             onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(modelId = it)))
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
             },
             trailingIcon = {
                 IconButton(
                     onClick = { modelsMenuExpanded = true },
-                    enabled = models is OpenAIModelsState.Success,
+                    enabled = state.modelsResult is OpenAIModelsState.Success,
                 ) {
-                    if (models is OpenAIModelsState.Loading) {
+                    if (state.modelsResult is OpenAIModelsState.Loading) {
                         CircularProgressIndicator()
                     } else {
                         Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
-                        if (models is OpenAIModelsState.Success) {
+                        if (state.modelsResult is OpenAIModelsState.Success) {
                             OpenAIModelsDropdown(
                                 menuExpanded = modelsMenuExpanded,
-                                state = models,
+                                state = state.modelsResult,
                                 onValueChange = {
-                                    onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(modelId = it)))
+                                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
                                 },
                                 onDismissRequest = { modelsMenuExpanded = false },
                             )
@@ -200,11 +200,15 @@ fun OpenAISectionEdit(
             },
         )
 
-        OpenAIModelsStatus(state = models)
+        OpenAIModelsStatus(
+            state = state.modelsResult,
+            showError = state.showModelsError,
+            onEvent = onEvent,
+        )
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.baseUrl,
+            value = current.baseUrl,
             placeholder = {
                 Text(OpenAIHost.OpenAI.baseUrl)
             },
@@ -212,23 +216,23 @@ fun OpenAISectionEdit(
                 Text(stringResource(R.string.url))
             },
             onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(baseUrl = it)))
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
             },
         )
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.azureDeploymentId,
+            value = current.azureDeploymentId,
             label = {
                 Text(stringResource(R.string.azure_deployment_id))
             },
             onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(azureDeploymentId = it)))
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureDeploymentId = it)))
             },
         )
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = settings.azureApiVersion,
+            value = current.azureApiVersion,
             placeholder = {
                 Text("2024-02-15-preview")
             },
@@ -236,7 +240,7 @@ fun OpenAISectionEdit(
                 Text(stringResource(R.string.azure_api_version))
             },
             onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(settings.copy(azureApiVersion = it)))
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureApiVersion = it)))
             },
         )
     }
@@ -266,7 +270,11 @@ private fun OpenAIModelsDropdown(
 }
 
 @Composable
-private fun OpenAIModelsStatus(state: OpenAIModelsState) {
+private fun OpenAIModelsStatus(
+    state: OpenAIModelsState,
+    showError: Boolean,
+    onEvent: (OpenAISettingsEvent) -> Unit,
+) {
     when (state) {
         is OpenAIModelsState.Success -> {
             if (state.ids.isEmpty()) {
@@ -280,11 +288,43 @@ private fun OpenAIModelsStatus(state: OpenAIModelsState) {
         }
 
         is OpenAIModelsState.Error -> {
-            OutlinedCard {
-                Text(
-                    text = stringResource(R.string.unable_to_load_models) + " " + state.message,
+            val hasError by remember(state.message) { mutableStateOf(state.message.isNotEmpty()) }
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onEvent(OpenAISettingsEvent.ShowModelsError(show = !showError)) },
+            ) {
+                Column(
                     modifier = Modifier.padding(8.dp),
-                )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = stringResource(R.string.unable_to_load_models),
+                            modifier =
+                                Modifier
+                                    .padding(start = 4.dp)
+                                    .weight(1f),
+                        )
+                        if (hasError) {
+                            Icon(
+                                imageVector = if (showError) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = stringResource(R.string.show_message),
+                            )
+                        }
+                    }
+
+                    if (hasError && showError) {
+                        Text(
+                            text = state.message,
+                            modifier = Modifier.padding(8.dp),
+                        )
+                    }
+                }
             }
         }
 
@@ -293,36 +333,88 @@ private fun OpenAIModelsStatus(state: OpenAIModelsState) {
     }
 }
 
-@Preview("OpenAI section item tablet", device = Devices.PIXEL_C)
-@Preview("OpenAI section item phone", device = Devices.PIXEL_7)
+@Preview("tablet", device = Devices.PIXEL_C)
+@Preview("phone", device = Devices.PIXEL_7)
 @Composable
 private fun OpenAISectionReadPreview() {
     Surface {
         OpenAISection(
-            openAISettings =
-                OpenAISettings(
-                    key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                    modelId = "gpt-4o-mini",
+            state =
+                OpenAISettingsState(
+                    settings =
+                        OpenAISettings(
+                            key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                            modelId = "gpt-4o-mini",
+                        ),
+                    modelsResult = OpenAIModelsState.None,
+                    isEditMode = false,
                 ),
-            openAIModels = OpenAIModelsState.None,
-            openAIEdit = false,
             onEvent = { },
         )
     }
 }
 
-@Preview("OpenAI section dialog tablet", device = Devices.PIXEL_C)
-@Preview("OpenAI section dialog phone", device = Devices.PIXEL_7)
+@Preview("tablet", device = Devices.PIXEL_C)
+@Preview("phone", device = Devices.PIXEL_7)
 @Composable
 private fun OpenAISectionEditPreview() {
     OpenAISection(
-        openAISettings =
-            OpenAISettings(
-                key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                modelId = "gpt-4o-mini",
+        state =
+            OpenAISettingsState(
+                settings =
+                    OpenAISettings(
+                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                        modelId = "gpt-4o-mini",
+                    ),
+                modelsResult = OpenAIModelsState.None,
+                isEditMode = true,
             ),
-        openAIModels = OpenAIModelsState.None,
-        openAIEdit = true,
+        onEvent = { },
+    )
+}
+
+@Preview("tablet", device = Devices.PIXEL_C)
+@Preview("phone", device = Devices.PIXEL_7)
+@Composable
+private fun OpenAISectionErrorCollapsedPreview() {
+    OpenAISection(
+        state =
+            OpenAISettingsState(
+                settings =
+                    OpenAISettings(
+                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                        modelId = "gpt-4o-mini",
+                    ),
+                modelsResult =
+                    OpenAIModelsState.Error(
+                        message = "A sample error message",
+                    ),
+                isEditMode = true,
+                showModelsError = false,
+            ),
+        onEvent = { },
+    )
+}
+
+@Preview("tablet", device = Devices.PIXEL_C)
+@Preview("phone", device = Devices.PIXEL_7)
+@Composable
+private fun OpenAISectionErrorExpandedPreview() {
+    OpenAISection(
+        state =
+            OpenAISettingsState(
+                settings =
+                    OpenAISettings(
+                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                        modelId = "gpt-4o-mini",
+                    ),
+                modelsResult =
+                    OpenAIModelsState.Error(
+                        message = "A sample error message",
+                    ),
+                isEditMode = true,
+                showModelsError = true,
+            ),
         onEvent = { },
     )
 }

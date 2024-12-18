@@ -206,8 +206,15 @@ class ArticleViewModel(
                             }
                         } else {
                             Log.e(LOG_TAG, "No default file to parse")
-                            textToDisplay.update { TextToDisplay.FAILED_MISSING_BODY }
-                            LinearArticle(elements = emptyList())
+                            textToDisplay.update { TextToDisplay.CONTENT }
+                            htmlLinearizer.linearize(
+                                "Sorry, due to a coding oversight, " +
+                                    "the full offline version of this article has been permanently deleted, " +
+                                    "see <a href=\"https://github.com/spacecowboy/Feeder/issues/443\">feeder#443</a> " +
+                                    "for updates on this issue<br/><br/>" +
+                                    article.snippet,
+                                article.feedUrl ?: "",
+                            )
                         }
                     }
 
