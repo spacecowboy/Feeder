@@ -39,6 +39,7 @@ import rust.nostr.sdk.Nip21Enum
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.Relay
 import rust.nostr.sdk.RelayMetadata
+import rust.nostr.sdk.TagKind
 import rust.nostr.sdk.extractRelayList
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
@@ -247,7 +248,8 @@ class FeedParser(override val di: DI) : DIAware {
             onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
         ) {
             val possibleNostrProfile = parseNostrUri(nostrUri.toString())
-            val (publicKey, relayList) = possibleNostrProfile.publicKey() to possibleNostrProfile.relays()
+            val publicKey = possibleNostrProfile.publicKey()
+            val relayList = possibleNostrProfile.relays().ifEmpty { getUserPublishRelays(publicKey) }
             relayList.ifEmpty { DEFAULT_FETCH_RELAYS } .forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
             nostrClient.connect()
             val profileInfo = nostrClient.fetchMetadata(
@@ -265,19 +267,18 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     private suspend fun getUserPublishRelays(
-        userPubkey: PublicKey,
-        userWriteRelays: List<String>
-    ): List<Relay> {
+        userPubkey: PublicKey
+    ): List<String> {
         val userRelaysFilter = Filter()
             .author(userPubkey)
             .kind(Kind.fromEnum(KindEnum.RelayList))
 
         nostrClient.removeAllRelays()
         nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
-        userWriteRelays.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+        DEFAULT_METADATA_RELAYS.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
         nostrClient.connect()
         val potentialUserRelays = nostrClient.fetchEventsFrom(
-            urls = userWriteRelays,
+            urls = DEFAULT_METADATA_RELAYS,
             filters = listOf(userRelaysFilter),
             timeout = Duration.ofSeconds(10)
         )
@@ -289,8 +290,40 @@ class FeedParser(override val di: DI) : DIAware {
             println("$relayUrl -> $metadata")
         }
 
-        return relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> Relay(entry.key) }
+        return relayList
+            .filter { it.value == RelayMetadata.WRITE }
+            .map { entry ->
+                entry.key // This represents the relay URL.
+            }
 
+    }
+
+    private suspend fun fetchArticlesForAuthor(
+        author: PublicKey,
+        relays: List<Relay>
+    ) {
+        val articlesByAuthorFilter = Filter()
+            .author(author)
+            .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
+        println("Relay List size: -> ${relays.size}")
+
+        nostrClient.removeAllRelays()
+        relays.forEach { relay -> nostrClient.addReadRelay(relay.url()) }
+        nostrClient.connect()
+        println("-------------------FETCHING ARTICLES----------------------")
+        val firstArticleSet = nostrClient.fetchEvents(
+//            urls = relays.map { it.url() },
+            filters = listOf(articlesByAuthorFilter),
+            timeout = Duration.ofSeconds(20)
+        )
+        println("First Article set size(before merge): -> ${firstArticleSet.toVec().size}")
+
+//        relays.minus(relays.first()).forEach { nostrClient.addReadRelay(it.url()) }
+
+
+        val mergedEvents = firstArticleSet.toVec().distinctBy { it.tags().find(TagKind.Title) }
+        println("First Article set size(after merge): -> ${firstArticleSet.toVec().size}")
+        println("Merged Events Article set size: -> ${mergedEvents.size}")
     }
 
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
@@ -567,6 +600,13 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
         }
     }
 }
+
+class AuthorNostrData(
+    val name: String,
+    val publicKey: PublicKey,
+    val imageUrl: String,
+    val relayList: List<String>
+)
 
 @Parcelize
 sealed class FeedParserError : Parcelable {
