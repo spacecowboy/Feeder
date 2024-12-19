@@ -2,9 +2,11 @@ package com.nononsenseapps.feeder.model.workmanager
 
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
+import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -22,8 +24,13 @@ class SyncServiceGetUpdatesWorker(val context: Context, workerParams: WorkerPara
     CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
 
+    private val notificationManager: NotificationManagerCompat by instance()
     private val syncClient: SyncRestClient by instance()
     private val repository: Repository by instance()
+
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return createForegroundInfo(context, notificationManager)
+    }
 
     override suspend fun doWork(): Result {
         return try {

@@ -2,7 +2,9 @@ package com.nononsenseapps.feeder.model.workmanager
 
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import org.kodein.di.DI
@@ -14,7 +16,12 @@ class SyncServiceSendReadWorker(val context: Context, workerParams: WorkerParame
     CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
 
+    private val notificationManager: NotificationManagerCompat by instance()
     private val syncClient: SyncRestClient by di.instance()
+
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return createForegroundInfo(context, notificationManager)
+    }
 
     override suspend fun doWork(): Result {
         return try {
