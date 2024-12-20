@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.util.Log
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.background.runOnceFullTextSync
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
@@ -153,8 +154,9 @@ class RssLocalSync(override val di: DI) : DIAware {
                     Log.e(LOG_TAG, "Outer error", e)
                 } finally {
                     if (needFullTextSync) {
-                        scheduleFullTextParse(
+                        runOnceFullTextSync(
                             di = di,
+                            triggeredByUser = false,
                         )
                     }
                 }

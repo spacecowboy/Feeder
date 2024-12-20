@@ -38,6 +38,9 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
+    val isConfigured: Boolean
+        get() = isInitialized
+
     private val isInitialized: Boolean
         get() = feederSync != null && secretKey != null
     private val isNotInitialized

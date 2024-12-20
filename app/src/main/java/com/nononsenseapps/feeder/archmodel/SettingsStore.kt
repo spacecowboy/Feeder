@@ -6,17 +6,10 @@ import android.content.SharedPreferences
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
 import androidx.annotation.StringRes
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
-import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
-import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
@@ -31,7 +24,6 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsStore(override val di: DI) : DIAware {
@@ -227,7 +219,7 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
-        configurePeriodicSync(replace = true)
+        schedulePeriodicRssSync(di = di, replace = true)
     }
 
     private val _syncOnlyWhenCharging =
@@ -237,7 +229,7 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setSyncOnlyWhenCharging(value: Boolean) {
         _syncOnlyWhenCharging.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, value).apply()
-        configurePeriodicSync(replace = true)
+        schedulePeriodicRssSync(di = di, replace = true)
     }
 
     private val _loadImageOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_IMG_ONLY_WIFI, false))
@@ -426,54 +418,7 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setSyncFrequency(value: SyncFrequency) {
         _syncFrequency.value = value
         sp.edit().putString(PREF_SYNC_FREQ, "${value.minutes}").apply()
-        configurePeriodicSync(replace = true)
-    }
-
-    fun configurePeriodicSync(replace: Boolean) {
-        val workManager: WorkManager by instance()
-        val shouldSync = syncFrequency.value.minutes > 0
-
-        // Clear old job always to replace with new one
-        for (oldPeriodic in oldPeriodics) {
-            workManager.cancelUniqueWork(oldPeriodic)
-        }
-
-        if (shouldSync) {
-            val constraints =
-                Constraints.Builder()
-                    .setRequiresCharging(syncOnlyWhenCharging.value)
-
-            if (syncOnlyOnWifi.value) {
-                constraints.setRequiredNetworkType(NetworkType.UNMETERED)
-            } else {
-                constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-            }
-
-            val timeInterval = syncFrequency.value.minutes
-
-            val workRequestBuilder =
-                PeriodicWorkRequestBuilder<FeedSyncer>(
-                    timeInterval,
-                    TimeUnit.MINUTES,
-                )
-
-            val syncWork =
-                workRequestBuilder
-                    .setConstraints(constraints.build())
-                    .addTag("feeder")
-                    .build()
-
-            workManager.enqueueUniquePeriodicWork(
-                UNIQUE_PERIODIC_NAME,
-                when (replace) {
-                    true -> ExistingPeriodicWorkPolicy.UPDATE
-                    false -> ExistingPeriodicWorkPolicy.KEEP
-                },
-                syncWork,
-            )
-        } else {
-            workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME)
-        }
+        schedulePeriodicRssSync(di = di, replace = true)
     }
 
     private val _openAiSettings =

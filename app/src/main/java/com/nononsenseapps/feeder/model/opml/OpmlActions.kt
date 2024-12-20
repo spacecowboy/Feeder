@@ -5,9 +5,9 @@ import android.net.Uri
 import android.util.Log
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.SettingsStore
+import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
@@ -80,7 +80,7 @@ suspend fun importOpml(
                             parser.parseInputStreamWithFallback(stream)
                         }
                     }
-                requestFeedSync(di = di)
+                runOnceRssSync(di = di, triggeredByUser = true)
 
                 if (result?.isLeft() == true) {
                     val toastMaker = di.direct.instance<ToastMaker>()

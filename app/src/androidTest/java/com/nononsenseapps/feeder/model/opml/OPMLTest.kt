@@ -10,7 +10,6 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.SettingsStore
@@ -61,7 +60,6 @@ class OPMLTest : DIAware {
             bind<SettingsStore>() with singleton { SettingsStore(di) }
             bind<FeedStore>() with singleton { FeedStore(di) }
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
-            bind<WorkManager>() with singleton { WorkManager.getInstance(this@OPMLTest.context) }
             bind<ToastMaker>() with
                 instance(
                     object : ToastMaker {

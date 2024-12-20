@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ScreenTitle
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
@@ -23,7 +24,6 @@ import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
@@ -141,18 +141,20 @@ class FeedViewModel(
 
     fun requestImmediateSyncOfCurrentFeedOrTag() {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
-        requestFeedSync(
+        runOnceRssSync(
             di = di,
             feedId = feedId,
             feedTag = feedTag,
             forceNetwork = true,
+            triggeredByUser = true,
         )
     }
 
     fun requestImmediateSyncOfAll() {
-        requestFeedSync(
+        runOnceRssSync(
             di = di,
             forceNetwork = true,
+            triggeredByUser = true,
         )
     }
 
