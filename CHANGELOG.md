@@ -1,3 +1,9 @@
+# 2.7.4
+Jonas Kalderstam (2):
+  * [49f3008c] fixed tablet being hardcoded to card article style
+  * [cc8c9f7c] switched to JobScheduler to fix crash on older versions of
+         Android (#465)
+
 # 2.7.3
 Jonas Kalderstam (3):
   * [235228e4] removed foreground permission since it wasn't used
