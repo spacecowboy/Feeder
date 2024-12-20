@@ -1367,14 +1367,8 @@ fun FeedGridContent(
             )
         }
 
-        // Grid has hard-coded card
-        val feedItemStyle =
-            remember {
-                FeedItemStyle.CARD
-            }
-
         val arrangement =
-            when (feedItemStyle) {
+            when (viewState.feedItemStyle) {
                 FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
                 FeedItemStyle.COMPACT_CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
                 FeedItemStyle.COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
@@ -1405,7 +1399,7 @@ fun FeedGridContent(
                 items(
                     count = pagedFeedItems.itemCount,
                     key = pagedFeedItems.itemKey { it.id },
-                    contentType = pagedFeedItems.itemContentType { it.contentType(feedItemStyle) },
+                    contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
 
@@ -1436,7 +1430,7 @@ fun FeedGridContent(
                         filter = viewState.filter,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,
-                        feedItemStyle = feedItemStyle,
+                        feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
                         bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         maxLines = viewState.maxLines,
