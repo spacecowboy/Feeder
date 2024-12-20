@@ -28,17 +28,19 @@ import org.jsoup.nodes.Document
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import rust.nostr.sdk.Alphabet
 import rust.nostr.sdk.Client
+import rust.nostr.sdk.Coordinate
+import rust.nostr.sdk.Event
 import rust.nostr.sdk.Filter
 import rust.nostr.sdk.Kind
 import rust.nostr.sdk.KindEnum
-import rust.nostr.sdk.Metadata
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
 import rust.nostr.sdk.PublicKey
-import rust.nostr.sdk.Relay
 import rust.nostr.sdk.RelayMetadata
+import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.TagKind
 import rust.nostr.sdk.extractRelayList
 import rust.nostr.sdk.getNip05Profile
@@ -242,7 +244,7 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, Metadata> {
+    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, AuthorNostrData> {
 
         return Either.catching(
             onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
@@ -261,7 +263,13 @@ class FeedParser(override val di: DI) : DIAware {
 
             println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
             nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
-            profileInfo
+            AuthorNostrData(
+                uri = possibleNostrProfile.toNostrUri(),
+                name = profileInfo.getName().toString(),
+                publicKey = publicKey,
+                imageUrl = profileInfo.getPicture().toString(),
+                relayList = relayList
+            )
         }
 
     }
@@ -300,30 +308,35 @@ class FeedParser(override val di: DI) : DIAware {
 
     private suspend fun fetchArticlesForAuthor(
         author: PublicKey,
-        relays: List<Relay>
-    ) {
+        relays: List<String>
+    ): List<Event> {
         val articlesByAuthorFilter = Filter()
             .author(author)
             .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
         println("Relay List size: -> ${relays.size}")
 
         nostrClient.removeAllRelays()
-        relays.forEach { relay -> nostrClient.addReadRelay(relay.url()) }
+        relays.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
         println("-------------------FETCHING ARTICLES----------------------")
-        val firstArticleSet = nostrClient.fetchEvents(
+        val articleEventSet = nostrClient.fetchEvents(
 //            urls = relays.map { it.url() },
             filters = listOf(articlesByAuthorFilter),
-            timeout = Duration.ofSeconds(20)
+            timeout = Duration.ofSeconds(15)
         )
-        println("First Article set size(before merge): -> ${firstArticleSet.toVec().size}")
+        println("Article set size: -> ${articleEventSet.toVec().size}")
 
-//        relays.minus(relays.first()).forEach { nostrClient.addReadRelay(it.url()) }
+        val articleEvents = articleEventSet.toVec().distinctBy { it.tags().find(TagKind.Title) }
+        return articleEvents
+    }
 
-
-        val mergedEvents = firstArticleSet.toVec().distinctBy { it.tags().find(TagKind.Title) }
-        println("First Article set size(after merge): -> ${firstArticleSet.toVec().size}")
-        println("Merged Events Article set size: -> ${mergedEvents.size}")
+    suspend fun findNostrFeed(authorNostrData: AuthorNostrData): Either<FeedParserError, ParsedFeed> {
+        return Either.catching(
+            onCatch = { t -> FetchError(url = authorNostrData.uri, throwable = t) }
+        ) {
+            val fetchedArticles = fetchArticlesForAuthor(authorNostrData.publicKey, authorNostrData.relayList)
+            fetchedArticles.mapToFeed(authorNostrData.uri, authorNostrData.name, authorNostrData.imageUrl)
+        }
     }
 
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
@@ -406,6 +419,72 @@ class FeedParser(override val di: DI) : DIAware {
     companion object {
         private const val LOG_TAG = "FEEDER_FEEDPARSER"
     }
+}
+
+private fun List<Event>.mapToFeed(nostrUri: String, authorName: String, imageUrl: String): ParsedFeed {
+    val description = "Nostr articles by $authorName"
+    val author = ParsedAuthor(
+        name = authorName,
+        url = "https://njump.me/${first().author().toBech32()}",
+        avatar = imageUrl
+    )
+    val articles = this.map { event: Event -> event.asArticle(authorName, imageUrl) }
+
+    return ParsedFeed(
+        title = authorName,
+        home_page_url = null,
+        feed_url = nostrUri,
+        description = description,
+        user_comment = null,
+        next_url = null,
+        icon = imageUrl,
+        favicon = null,
+        author = author,
+        expired = null,
+        items = articles
+    )
+}
+
+fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
+    val articleId = id().toString()
+    val articleUri = id().toNostrUri()
+    val articleNostrAddress = Coordinate(
+        Kind.fromEnum(KindEnum.LongFormTextNote),
+        author(),
+        tags().find(
+            TagKind.SingleLetter(SingleLetterTag.lowercase(Alphabet.D))
+        )?.content().toString()
+    ).toBech32()
+    // Highlighter is a service for reading Nostr articles on the web.
+    val externalLink = "https://highlighter.com/a/$articleNostrAddress"
+    val articleAuthor = ParsedAuthor(
+        name = authorName,
+        url = "https://njump.me/${author().toBech32()}",
+        avatar = imageUrl
+    )
+    val articleTitle = tags().find(TagKind.Title)?.content()
+    val publishDate = tags().find(TagKind.PublishedAt)?.content()
+    val articleTags = tags().hashtags()
+    val articleImage = tags().find(TagKind.Image)?.content()
+    val articleSummary = tags().find(TagKind.Summary)?.content()
+    val articleContent = content()
+
+    return ParsedArticle(
+        id = articleId,
+        url = articleUri,
+        external_url = externalLink,
+        title = articleTitle,
+        content_html = null,
+        content_text = articleContent,
+        summary = articleSummary,
+        image = if (articleImage != null) MediaImage(url = articleImage.toString()) else null,
+        date_published = publishDate,
+        date_modified = null,
+        author = articleAuthor,
+        tags = articleTags,
+        attachments = null
+    )
+
 }
 
 private fun GoFeed.asFeed(url: URL): ParsedFeed =
@@ -602,6 +681,7 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
 }
 
 class AuthorNostrData(
+    val uri: String,
     val name: String,
     val publicKey: PublicKey,
     val imageUrl: String,
