@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import androidx.work.WorkManager
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -82,7 +81,6 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
 
         import(archModelModule)
 
-        bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
         bind<ContentResolver>() with singleton { contentResolver }
         bind<ToastMaker>() with
             singleton {

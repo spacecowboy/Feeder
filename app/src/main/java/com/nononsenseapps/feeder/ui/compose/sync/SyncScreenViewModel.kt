@@ -9,10 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
@@ -106,7 +106,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                     repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
                 }.await()
                     .onRight {
-                        requestFeedSync(di)
+                        runOnceRssSync(
+                            di = di,
+                            triggeredByUser = false,
+                        )
                         joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
                     }
                     .onLeft {

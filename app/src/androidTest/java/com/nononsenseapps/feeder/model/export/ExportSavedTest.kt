@@ -9,7 +9,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -60,7 +59,6 @@ class ExportSavedTest : DIAware {
             bind<SettingsStore>() with singleton { SettingsStore(di) }
             bind<FeedStore>() with singleton { FeedStore(di) }
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
-            bind<WorkManager>() with singleton { WorkManager.getInstance(this@ExportSavedTest.context) }
             bind<ToastMaker>() with
                 instance(
                     object : ToastMaker {

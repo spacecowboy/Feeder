@@ -10,9 +10,9 @@ import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -142,10 +142,10 @@ class EditFeedScreenViewModel(
                     repository.saveFeed(
                         updatedFeed,
                     )
-                requestFeedSync(
-                    di,
+                runOnceRssSync(
+                    di = di,
                     feedId = savedId,
-                    forceNetwork = false,
+                    triggeredByUser = false,
                 )
             }
 

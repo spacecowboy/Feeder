@@ -1,9 +1,6 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.Feed
@@ -11,7 +8,7 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkReadyToBeApplied
-import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
+import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import io.mockk.MockKAnnotations
@@ -68,7 +65,7 @@ class RepositoryTest : DIAware {
     private lateinit var application: FeederApplication
 
     @MockK
-    private lateinit var workManager: WorkManager
+    private lateinit var syncRestClient: SyncRestClient
 
     override val di by DI.lazy {
         bind<Repository>() with singleton { spyk(Repository(di)) }
@@ -77,8 +74,8 @@ class RepositoryTest : DIAware {
         bind<SessionStore>() with instance(sessionStore)
         bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
-        bind<WorkManager>() with instance(workManager)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
+        bind<SyncRestClient>() with instance(syncRestClient)
         bind<Application>() with instance(application)
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
     }
@@ -93,6 +90,8 @@ class RepositoryTest : DIAware {
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
 
         every { feedItemStore.getFeedItemCountRaw(any(), any(), any(), any()) } returns flowOf(0)
+
+        every { syncRestClient.isConfigured } returns false
     }
 
     @Test
@@ -370,19 +369,6 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun ensurePeriodicSyncConfigured() {
-        coEvery { settingsStore.configurePeriodicSync(any()) } just Runs
-
-        runBlocking {
-            repository.ensurePeriodicSyncConfigured()
-        }
-
-        coVerify {
-            settingsStore.configurePeriodicSync(false)
-        }
-    }
-
-    @Test
     fun getFeedsItemsWithDefaultFullTextParse() {
         coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns
             flowOf(
@@ -457,23 +443,6 @@ class RepositoryTest : DIAware {
             feedItemStore.markAsReadAndNotified(5L, any())
         }
         confirmVerified(feedItemStore, syncRemoteStore)
-    }
-
-    @Test
-    fun markAsReadSchedulesSend() {
-        runBlocking {
-            repository.markAsReadAndNotified(1L)
-        }
-
-        coVerify {
-            feedItemStore.markAsReadAndNotified(1L, any())
-            workManager.enqueueUniqueWork(
-                SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
-                ExistingWorkPolicy.REPLACE,
-                any<OneTimeWorkRequest>(),
-            )
-        }
-        confirmVerified(feedItemStore, workManager)
     }
 
     @Test

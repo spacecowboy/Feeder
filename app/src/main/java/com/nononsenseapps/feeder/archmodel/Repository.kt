@@ -4,12 +4,11 @@ import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.background.runOnceBlocklistUpdate
+import com.nononsenseapps.feeder.background.runOnceRssSync
+import com.nononsenseapps.feeder.background.runOnceSyncChainSendRead
+import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -26,9 +25,6 @@ import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.ThumbnailImage
-import com.nononsenseapps.feeder.model.workmanager.BlockListWorker
-import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.DeviceListResponse
 import com.nononsenseapps.feeder.sync.ErrorResponse
 import com.nononsenseapps.feeder.sync.SyncRestClient
@@ -37,7 +33,6 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
-import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +49,6 @@ import org.kodein.di.instance
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
-import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class Repository(override val di: DI) : DIAware {
@@ -67,7 +61,6 @@ class Repository(override val di: DI) : DIAware {
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
-    private val workManager: WorkManager by instance()
 
     init {
         addFeederNewsIfInitialStart()
@@ -84,9 +77,10 @@ class Repository(override val di: DI) : DIAware {
                         ),
                     )
                 settingsStore.setAddedFeederNews(true)
-                requestFeedSync(
+                runOnceRssSync(
                     di = di,
                     feedId = feedId,
+                    triggeredByUser = false,
                 )
             }
         }
@@ -198,12 +192,12 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun addBlocklistPattern(pattern: String) {
         settingsStore.addBlocklistPattern(pattern)
-        scheduleBlockListUpdate(0)
+        runOnceBlocklistUpdate(di)
     }
 
     suspend fun removeBlocklistPattern(pattern: String) {
         settingsStore.removeBlocklistPattern(pattern)
-        scheduleBlockListUpdate(0)
+        runOnceBlocklistUpdate(di)
     }
 
     suspend fun setBlockStatusForNewInFeed(
@@ -409,7 +403,7 @@ class Repository(override val di: DI) : DIAware {
                 feedItemStore.markAsReadAndNotified(itemId)
             }
         }
-        scheduleSendRead()
+        runOnceSyncChainSendRead(di)
     }
 
     suspend fun markAsUnread(itemId: Long) {
@@ -491,7 +485,7 @@ class Repository(override val di: DI) : DIAware {
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
             else -> feedItemStore.markAllAsRead()
         }
-        scheduleSendRead()
+        runOnceSyncChainSendRead(di)
         setMinReadTime(Instant.now())
     }
 
@@ -508,7 +502,7 @@ class Repository(override val di: DI) : DIAware {
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
         )
-        scheduleSendRead()
+        runOnceSyncChainSendRead(di)
     }
 
     suspend fun markAfterAsRead(
@@ -524,7 +518,7 @@ class Repository(override val di: DI) : DIAware {
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
         )
-        scheduleSendRead()
+        runOnceSyncChainSendRead(di)
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
@@ -553,7 +547,9 @@ class Repository(override val di: DI) : DIAware {
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
 
-    fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
+    fun ensurePeriodicSyncConfigured() {
+        schedulePeriodicRssSync(di = di, replace = false)
+    }
 
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> = feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload()
 
@@ -705,53 +701,6 @@ class Repository(override val di: DI) : DIAware {
             }
     }
 
-    private fun scheduleSendRead() {
-        logDebug(LOG_TAG, "Scheduling work")
-
-        val constraints =
-            Constraints.Builder()
-                .setRequiresCharging(syncOnlyWhenCharging.value)
-
-        if (syncOnlyOnWifi.value) {
-            constraints.setRequiredNetworkType(NetworkType.UNMETERED)
-        } else {
-            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-        }
-
-        val workRequest =
-            OneTimeWorkRequestBuilder<SyncServiceSendReadWorker>()
-                .addTag("feeder")
-                .keepResultsForAtLeast(5, TimeUnit.MINUTES)
-                .setConstraints(constraints.build())
-                .setInitialDelay(10, TimeUnit.SECONDS)
-
-        workManager.enqueueUniqueWork(
-            SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
-            ExistingWorkPolicy.REPLACE,
-            workRequest.build(),
-        )
-    }
-
-    fun scheduleBlockListUpdate(delaySeconds: Long) {
-        logDebug(LOG_TAG, "Scheduling work")
-
-        val constraints =
-            Constraints.Builder()
-
-        val workRequest =
-            OneTimeWorkRequestBuilder<BlockListWorker>()
-                .addTag("feeder")
-                .keepResultsForAtLeast(5, TimeUnit.MINUTES)
-                .setConstraints(constraints.build())
-                .setInitialDelay(delaySeconds, TimeUnit.SECONDS)
-
-        workManager.enqueueUniqueWork(
-            BlockListWorker.UNIQUE_BLOCKLIST_NAME,
-            ExistingWorkPolicy.REPLACE,
-            workRequest.build(),
-        )
-    }
-
     suspend fun syncLoadFeedIfStale(
         feedId: Long,
         staleTime: Long,
@@ -819,6 +768,9 @@ class Repository(override val di: DI) : DIAware {
     fun setSyncWorkerRunning(running: Boolean) {
         sessionStore.setSyncWorkerRunning(running)
     }
+
+    val isSyncChainConfigured: Boolean
+        get() = syncClient.isConfigured
 
     /**
      * Set the retry after time for feeds with the given base URL.

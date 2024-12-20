@@ -13,6 +13,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.background.runOnceBlocklistUpdate
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -166,7 +167,7 @@ class MigrationFrom34To35(override val di: DI) : Migration(34, 35), DIAware {
         val sql = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where block_time is null\n    )\n    ON feeds.id = feed_id"
         database.execSQL(sql)
 
-        repository.scheduleBlockListUpdate(0)
+        runOnceBlocklistUpdate(di)
     }
 }
 

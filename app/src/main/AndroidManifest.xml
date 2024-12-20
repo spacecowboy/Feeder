@@ -14,9 +14,9 @@
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-  <!-- Remove foreground permission which is merged in by workmanager -->
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove"/>
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" tools:node="remove"/>
+  <!-- For background jobs -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
 
   <permission
     android:name="${applicationId}.permission.read"
@@ -194,16 +194,10 @@
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
-    <provider
-      android:name=".contentprovider.RSSContentProvider"
-      android:authorities="${applicationId}.rssprovider"
-      android:exported="true"
-      android:readPermission="${applicationId}.permission.read" />
-
-    <!-- Remove foreground service which is merged in by workmanager -->
+    <!-- Service for background jobs -->
     <service
-      android:name="androidx.work.impl.foreground.SystemForegroundService"
-      tools:node="remove" />
+      android:name=".background.FeederJobService"
+      android:permission="android.permission.BIND_JOB_SERVICE" />
 
   </application>
 </manifest>
