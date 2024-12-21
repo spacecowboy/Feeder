@@ -50,7 +50,6 @@ dependencyResolutionManagement {
             version("qrgen", "2.6.0")
             version("androidxCore", "1.10.1")
             version("androidxTestcore", "1.5.0")
-            version("workmanager", "2.9.0")
             version("appcompat", "1.6.1")
             version("material", "1.6.1")
             version("preference", "1.2.1")
@@ -99,12 +98,6 @@ dependencyResolutionManagement {
             library("room", "androidx.room", "room-compiler").versionRef("room")
             library("room-ktx", "androidx.room", "room-ktx").versionRef("room")
             library("room-paging", "androidx.room", "room-paging").versionRef("room")
-
-            library(
-                "work-runtime-ktx",
-                "androidx.work",
-                "work-runtime-ktx",
-            ).versionRef("workmanager")
 
             library("core-ktx", "androidx.core", "core-ktx").versionRef("androidxCore")
             library("androidx-appcompat", "androidx.appcompat", "appcompat").versionRef("appcompat")
@@ -377,7 +370,6 @@ dependencyResolutionManagement {
                     "paging-runtime-ktx",
                     "room-ktx",
                     "room-paging",
-                    "work-runtime-ktx",
                     "core-ktx",
                     "androidx-appcompat",
                     "androidx-preference",

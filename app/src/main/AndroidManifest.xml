@@ -14,8 +14,9 @@
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-  <!-- For expedited work manager jobs that run in foreground service -->
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+  <!-- For background jobs -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
 
   <permission
     android:name="${applicationId}.permission.read"
@@ -193,16 +194,10 @@
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
-    <provider
-      android:name=".contentprovider.RSSContentProvider"
-      android:authorities="${applicationId}.rssprovider"
-      android:exported="true"
-      android:readPermission="${applicationId}.permission.read" />
-
+    <!-- Service for background jobs -->
     <service
-       android:name="androidx.work.impl.foreground.SystemForegroundService"
-       android:foregroundServiceType="dataSync"
-       tools:node="merge" />
+      android:name=".background.FeederJobService"
+      android:permission="android.permission.BIND_JOB_SERVICE" />
 
   </application>
 </manifest>

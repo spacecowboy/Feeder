@@ -1,18 +1,17 @@
-package com.nononsenseapps.feeder.model.workmanager
+package com.nononsenseapps.feeder.background
 
 import android.annotation.TargetApi
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.ForegroundInfo
 import com.nononsenseapps.feeder.R
 
-private const val SYNC_NOTIFICATION_ID = 42623
+const val SYNC_NOTIFICATION_ID = 42623
 private const val SYNC_CHANNEL_ID = "feederSyncNotifications"
 private const val SYNC_NOTIFICATION_GROUP = "com.nononsenseapps.feeder.SYNC"
 
@@ -36,35 +35,23 @@ private fun createNotificationChannel(
 }
 
 /**
- * Necessary for expedited work.
- * Pre Android 12 they will run as foreground services, but on Android 12+ they will run as expedited Jobs.
+ * Necessary for older Android versions.
  */
-fun createForegroundInfo(
+fun getNotification(
     context: Context,
     notificationManager: NotificationManagerCompat,
-): ForegroundInfo {
+): Notification {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(context, notificationManager)
     }
 
     val syncingText = context.getString(R.string.syncing)
 
-    val notification =
-        NotificationCompat.Builder(context.applicationContext, SYNC_CHANNEL_ID)
-            .setContentTitle(syncingText)
-            .setTicker(syncingText)
-            .setGroup(SYNC_NOTIFICATION_GROUP)
-            .setSmallIcon(R.drawable.ic_stat_sync)
-            .setOngoing(true)
-            .build()
-
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        ForegroundInfo(
-            SYNC_NOTIFICATION_ID,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
-        )
-    } else {
-        ForegroundInfo(SYNC_NOTIFICATION_ID, notification)
-    }
+    return NotificationCompat.Builder(context.applicationContext, SYNC_CHANNEL_ID)
+        .setContentTitle(syncingText)
+        .setTicker(syncingText)
+        .setGroup(SYNC_NOTIFICATION_GROUP)
+        .setSmallIcon(R.drawable.ic_stat_sync)
+        .setOngoing(true)
+        .build()
 }

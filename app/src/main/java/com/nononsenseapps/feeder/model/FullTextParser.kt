@@ -1,11 +1,6 @@
 package com.nononsenseapps.feeder.model
 
-import android.content.Context
 import android.util.Log
-import androidx.work.CoroutineWorker
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
@@ -25,40 +20,9 @@ import net.dankito.readability4j.extended.Readability4JExtended
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
-import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import java.net.URL
 import java.nio.charset.Charset
-import java.util.concurrent.TimeUnit
-
-fun scheduleFullTextParse(di: DI) {
-    Log.i(LOG_TAG, "Scheduling a full text parse work")
-    val workRequest =
-        OneTimeWorkRequestBuilder<FullTextWorker>()
-            .addTag("feeder")
-            .keepResultsForAtLeast(1, TimeUnit.MINUTES)
-
-    val workManager by di.instance<WorkManager>()
-    workManager.enqueue(workRequest.build())
-}
-
-class FullTextWorker(
-    val context: Context,
-    workerParams: WorkerParameters,
-) : CoroutineWorker(context, workerParams), DIAware {
-    override val di: DI by closestDI(context)
-    private val fullTextParser: FullTextParser by instance()
-
-    override suspend fun doWork(): Result {
-        Log.i(LOG_TAG, "Performing full text parse work")
-        return when (fullTextParser.parseFullArticlesForMissing()) {
-            true -> Result.success()
-            false -> Result.failure()
-        }.also {
-            Log.i(LOG_TAG, "Finished full text parse work")
-        }
-    }
-}
 
 class FullTextParser(override val di: DI) : DIAware {
     private val repository: Repository by instance()

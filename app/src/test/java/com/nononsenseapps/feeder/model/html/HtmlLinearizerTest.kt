@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model.html
 
 import com.nononsenseapps.feeder.ui.compose.html.toTableData
 import org.junit.Before
-import org.junit.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -34,6 +33,23 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size)
         assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[0])
+    }
+
+    @Test
+    fun `spaces inside headers are kept`() {
+        val html =
+            """
+            <html><body><h2><a href="http://example.com">Link</a> <small>small</small></h2></body></html>
+            """.trimIndent()
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertEquals(
+            LinearText("Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
+            result[0],
+        )
     }
 
     @Test
@@ -558,18 +574,18 @@ class HtmlLinearizerTest {
         assertTrue { result[1] is LinearImage }
     }
 
-    @Ignore
-    @Test
-    fun `audio in iframe`() {
-        val html =
-            """
-            <iframe 
-            class="tumblr_audio_player tumblr_audio_player_718384010494197760" 
-            src="https://pokemonmysterydungeon.tumblr.com/post/718384010494197760/audio_player_iframe/pokemonmysterydungeon/tumblr_pgyj6gSPFJ1skzors?audio_file=https%3A%2F%2Fa.tumblr.com%2Ftumblr_pgyj6gSPFJ1skzorso1.mp3"
-            frameborder="0" allowtransparency="true" scrolling="no" width="540" height="169">
-            </iframe>
-            """.trimIndent()
-    }
+//    @Ignore
+//    @Test
+//    fun `audio in iframe`() {
+//        val html =
+//            """
+//            <iframe
+//            class="tumblr_audio_player tumblr_audio_player_718384010494197760"
+//            src="https://pokemonmysterydungeon.tumblr.com/post/718384010494197760/audio_player_iframe/pokemonmysterydungeon/tumblr_pgyj6gSPFJ1skzors?audio_file=https%3A%2F%2Fa.tumblr.com%2Ftumblr_pgyj6gSPFJ1skzorso1.mp3"
+//            frameborder="0" allowtransparency="true" scrolling="no" width="540" height="169">
+//            </iframe>
+//            """.trimIndent()
+//    }
 
     @Test
     fun `video with no sources is ignored`() {

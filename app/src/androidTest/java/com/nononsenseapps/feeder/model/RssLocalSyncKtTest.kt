@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
@@ -87,7 +86,6 @@ class RssLocalSyncKtTest : DIAware {
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
-        bind<WorkManager>() with singleton { WorkManager.getInstance(getApplicationContext()) }
         bind<SharedPreferences>() with singleton { getApplicationContext<FeederApplication>().getSharedPreferences("test", Context.MODE_PRIVATE) }
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
         bind<Repository>() with singleton { Repository(di) }

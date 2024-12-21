@@ -13,9 +13,9 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.nononsenseapps.feeder.background.runOnceRssSync
+import com.nononsenseapps.feeder.background.runOnceSyncChainGetUpdates
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
-import com.nononsenseapps.feeder.model.workmanager.scheduleGetUpdates
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
@@ -45,7 +45,6 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onResume() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
-        scheduleGetUpdates(di)
         maybeRequestSync()
     }
 
@@ -53,9 +52,11 @@ class MainActivity : DIAwareComponentActivity() {
         lifecycleScope.launch {
             if (mainActivityViewModel.shouldSyncOnResume) {
                 if (mainActivityViewModel.isOkToSyncAutomatically()) {
-                    requestFeedSync(
+                    runOnceSyncChainGetUpdates(di)
+                    runOnceRssSync(
                         di = di,
                         forceNetwork = false,
+                        triggeredByUser = false,
                     )
                 }
             }
