@@ -387,20 +387,20 @@ fun ColumnScope.leftContent(
     OutlinedButton(
         enabled = isValidUrl || isNostrUri,
         onClick = {
-            if (isValidUrl) {
-                try {
-                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                    clearFocus()
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Can't search", e)
-                }
-            }
-            else if (isNostrUri) {
+            if (isNostrUri) {
                 try {
                     onSearch(sloppyLinkToStrictURLNoThrows("https://njump.me/$feedUrl"))
                     clearFocus()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Can't search Nostr URI", e)
+                }
+            }
+            else if (isValidUrl) {
+                try {
+                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    clearFocus()
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Can't search", e)
                 }
             }
         },
