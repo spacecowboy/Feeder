@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
+import com.nononsenseapps.feeder.util.isNostrUri
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -33,10 +34,12 @@ class EditFeedScreenViewModel(
     // These two are updated as a result of url updating
     override var isNotValidUrl by mutableStateOf(false)
     override var isOkToSave: Boolean by mutableStateOf(false)
+    override var isNostrUri: Boolean by mutableStateOf(false)
 
     override var feedUrl: String by mutableSavedStateOf(state, "") { value ->
         isNotValidUrl = !isValidUrl(value)
-        isOkToSave = isValidUrl(value)
+        isNostrUri = value.isNostrUri()
+        isOkToSave = isValidUrl(value) || isNostrUri
     }
     override var feedTitle: String by mutableSavedStateOf(state, "")
     override var feedTag: String by mutableSavedStateOf(state, "")

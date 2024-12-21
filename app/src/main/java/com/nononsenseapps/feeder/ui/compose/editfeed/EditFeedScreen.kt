@@ -353,7 +353,7 @@ fun ColumnScope.LeftContent(
         label = {
             Text(stringResource(id = R.string.url))
         },
-        isError = viewState.isNotValidUrl,
+        isError = !viewState.isNostrUri && viewState.isNotValidUrl,
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -376,7 +376,7 @@ fun ColumnScope.LeftContent(
                     focusManager.moveFocus(FocusDirection.Down)
                 },
     )
-    AnimatedVisibility(visible = viewState.isNotValidUrl) {
+    AnimatedVisibility(visible = !viewState.isNostrUri && viewState.isNotValidUrl) {
         Text(
             textAlign = TextAlign.Center,
             text = stringResource(R.string.invalid_url),
@@ -570,6 +570,7 @@ interface EditFeedScreenState {
     var articleOpener: String
     var alternateId: Boolean
     val isOkToSave: Boolean
+    val isNostrUri: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
     val isOpenItemWithCustomTab: Boolean
@@ -584,6 +585,7 @@ fun EditFeedScreenState(): EditFeedScreenState = ScreenState()
 
 private class ScreenState(
     override val isOkToSave: Boolean = false,
+    override val isNostrUri: Boolean = false,
     override val isNotValidUrl: Boolean = false,
     override val isOpenItemWithBrowser: Boolean = false,
     override val isOpenItemWithCustomTab: Boolean = false,
