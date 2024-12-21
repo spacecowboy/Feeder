@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.model.NotInitializedYet
 import com.nononsenseapps.feeder.model.SiteMetaData
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
+import com.nononsenseapps.feeder.util.right
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,10 +36,32 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     )
 
     fun searchForFeeds(initialUrl: URL): Flow<Either<FeedParserError, SearchResult>> {
-        if (initialUrl.toString().startsWith("https://njump.me")) {
-
+        return if (initialUrl.toString().startsWith("https://njump.me")) {
+            flow {
+                val nostrProfile = feedParser.getProfileMetadata(initialUrl)
+                nostrProfile
+                    .onRight {
+                        emit(Either.Right(it))
+                    }
+                    .onLeft {
+                        emit(Either.Left(it))
+                    }
+            }.map { profileResult ->
+                profileResult.flatMap { metadata ->
+                    feedParser.findNostrFeed(metadata)
+                        .map { nostrFeed ->
+                            SearchResult(
+                                title = nostrFeed.title ?: "",
+                                url = nostrFeed.feed_url ?: metadata.uri,
+                                description = nostrFeed.description ?: "",
+                                feedImage = nostrFeed.icon ?: ""
+                            )
+                        }
+                }
+            }
         }
-        return flow {
+        else
+         flow {
             siteMetaData = feedParser.getSiteMetaData(initialUrl)
             // Flow collection makes this block concurrent with map below
             val initialSiteMetaData = siteMetaData
