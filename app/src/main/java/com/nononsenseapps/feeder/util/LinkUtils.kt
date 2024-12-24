@@ -100,3 +100,4 @@ fun relativeLinkIntoAbsoluteOrThrow(
     }
 
 fun String.isNostrUri(): Boolean = this.startsWith("nostr:")
+fun URL.isAdaptedUrlFromNostrUri(): Boolean = this.toString().startsWith("https://njump.me")
