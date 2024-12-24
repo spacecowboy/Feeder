@@ -256,7 +256,7 @@ class FeedParser(override val di: DI) : DIAware {
             nostrClient.connect()
             val profileInfo = nostrClient.fetchMetadata(
                 publicKey = publicKey,
-                timeout = Duration.ofSeconds(10)
+                timeout = Duration.ofSeconds(5)
             )
 
             println(profileInfo.asPrettyJson())
@@ -288,7 +288,7 @@ class FeedParser(override val di: DI) : DIAware {
         val potentialUserRelays = nostrClient.fetchEventsFrom(
             urls = DEFAULT_METADATA_RELAYS,
             filters = listOf(userRelaysFilter),
-            timeout = Duration.ofSeconds(10)
+            timeout = Duration.ofSeconds(5)
         )
         println("------------New Fetch Relays----------------")
         nostrClient.pool().relays().forEach { (url, relay) -> println("New Client Relay -> [$url, ${relay.status().name}]") }
@@ -322,7 +322,7 @@ class FeedParser(override val di: DI) : DIAware {
         val articleEventSet = nostrClient.fetchEvents(
 //            urls = relays.map { it.url() },
             filters = listOf(articlesByAuthorFilter),
-            timeout = Duration.ofSeconds(15)
+            timeout = Duration.ofSeconds(10)
         )
         println("Article set size: -> ${articleEventSet.toVec().size}")
 

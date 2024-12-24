@@ -13,7 +13,6 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatMap
-import com.nononsenseapps.feeder.util.getOrElse
 import com.nononsenseapps.feeder.util.isAdaptedUrlFromNostrUri
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
