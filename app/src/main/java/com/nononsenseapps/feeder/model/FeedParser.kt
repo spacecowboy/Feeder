@@ -50,6 +50,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
 import java.time.Duration
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Locale
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -428,7 +430,7 @@ private fun List<Event>.mapToFeed(nostrUri: String, authorName: String, imageUrl
         url = "https://njump.me/${first().author().toBech32()}",
         avatar = imageUrl
     )
-    val articles = this.map { event: Event -> event.asArticle(authorName, imageUrl) }
+    val articles = this.sortedByDescending { it.tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: 0L }.map { event: Event -> event.asArticle(authorName, imageUrl) }
 
     return ParsedFeed(
         title = authorName,
@@ -463,7 +465,9 @@ fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
         avatar = imageUrl
     )
     val articleTitle = tags().find(TagKind.Title)?.content()
-    val publishDate = tags().find(TagKind.PublishedAt)?.content()
+    val publishDate = Instant.ofEpochSecond(
+        tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond
+    ).atZone(ZoneId.systemDefault()).withFixedOffsetZone()
     val articleTags = tags().hashtags()
     val articleImage = tags().find(TagKind.Image)?.content()
     val articleSummary = tags().find(TagKind.Summary)?.content()
@@ -478,8 +482,8 @@ fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
         content_text = articleContent,
         summary = articleSummary,
         image = if (articleImage != null) MediaImage(url = articleImage.toString()) else null,
-        date_published = publishDate,
-        date_modified = null,
+        date_published = publishDate.toString(),
+        date_modified = publishDate.toString(),
         author = articleAuthor,
         tags = articleTags,
         attachments = null
