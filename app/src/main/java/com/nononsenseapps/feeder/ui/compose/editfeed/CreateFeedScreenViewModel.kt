@@ -84,7 +84,7 @@ class CreateFeedScreenViewModel(
             val feedId =
                 repository.saveFeed(
                     Feed(
-                        url = URL(feedUrl),
+                        url = URL(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl),
                         title = feedTitle,
                         customTitle = feedTitle,
                         tag = feedTag,
