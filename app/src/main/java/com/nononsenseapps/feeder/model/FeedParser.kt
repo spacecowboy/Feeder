@@ -38,6 +38,7 @@ import rust.nostr.sdk.KindEnum
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
+import rust.nostr.sdk.NostrSdkException
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
@@ -256,10 +257,21 @@ class FeedParser(override val di: DI) : DIAware {
             val relayList = possibleNostrProfile.relays().ifEmpty { getUserPublishRelays(publicKey) }
             relayList.ifEmpty { DEFAULT_FETCH_RELAYS } .forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
             nostrClient.connect()
-            val profileInfo = nostrClient.fetchMetadata(
-                publicKey = publicKey,
-                timeout = Duration.ofSeconds(5)
-            )
+            val profileInfo = try {
+                nostrClient.fetchMetadata(
+                    publicKey = publicKey,
+                    timeout = Duration.ofSeconds(5)
+                )
+            } catch (e: NostrSdkException) {
+                println("Metadata Fetch Error: ${e.message}")
+                nostrClient.removeAllRelays()
+                DEFAULT_FETCH_RELAYS.forEach { relay -> nostrClient.addReadRelay(relay) }
+                nostrClient.connect()
+                nostrClient.fetchMetadata(
+                    publicKey = publicKey,
+                    timeout = Duration.ofSeconds(5)
+                )
+            }
 
             println(profileInfo.asPrettyJson())
 
@@ -270,7 +282,7 @@ class FeedParser(override val di: DI) : DIAware {
                 name = profileInfo.getName().toString(),
                 publicKey = publicKey,
                 imageUrl = profileInfo.getPicture().toString(),
-                relayList = relayList
+                relayList = nostrClient.relays().map { relayEntry -> relayEntry.key }
             )
         }
 
