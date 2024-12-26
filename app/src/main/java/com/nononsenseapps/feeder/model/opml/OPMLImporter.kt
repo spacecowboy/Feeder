@@ -14,6 +14,8 @@ import com.nononsenseapps.feeder.archmodel.themeOptionsFromString
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.util.isAdaptedUrlFromNostrUri
+import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -25,12 +27,23 @@ open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
 
     override suspend fun saveFeed(feed: Feed) {
         val existing = feedDao.loadFeedWithUrl(feed.url)
-
+        val existingNostrFeeds = feedDao.getAllFeeds().filter { it.url.isAdaptedUrlFromNostrUri() }
         // Don't want to remove existing feed on OPML imports
         if (existing != null) {
             feedDao.updateFeed(feed.copy(id = existing.id))
         } else {
-            feedDao.insertFeed(feed)
+            if (feed.url.isAdaptedUrlFromNostrUri()) {
+                val potentialNostrFeed = existingNostrFeeds.find { it.title == feed.title }
+                if(potentialNostrFeed != null) {
+                    logDebug(LOG_TAG, "Nostr feed with title <${feed.title}> already exists. Updating feed.")
+                    feedDao.updateFeed(feed.copy(id = potentialNostrFeed.id))
+                }
+                else {
+                    feedDao.insertFeed(feed)
+                }
+            } else {
+                feedDao.insertFeed(feed)
+            }
         }
     }
 
