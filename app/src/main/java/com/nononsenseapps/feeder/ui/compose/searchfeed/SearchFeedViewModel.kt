@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.FeedParserError
+import com.nononsenseapps.feeder.model.FetchError
 import com.nononsenseapps.feeder.model.HttpError
 import com.nononsenseapps.feeder.model.NoAlternateFeeds
 import com.nononsenseapps.feeder.model.NotInitializedYet
@@ -48,18 +49,30 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                     }
             }.map { profileResult ->
                 profileResult.flatMap { metadata ->
-                    feedParser.findNostrFeed(metadata)
-                        .map { nostrFeed ->
-                            SearchResult(
-                                title = nostrFeed.title ?: "",
-                                url = nostrFeed.feed_url ?: metadata.uri,
-                                description = nostrFeed.description ?: "",
-                                feedImage = nostrFeed.icon ?: ""
-                            )
-                        }
-                        .onLeft {
 
-                        }
+                    Either.catching(
+                        onCatch = { t -> FetchError(url = metadata.uri, throwable = t) }
+                    ) {
+                        SearchResult(
+                            title = metadata.name,
+                            url = metadata.uri,
+                            description = "Nostr Articles by ${metadata.name}",
+                            feedImage = metadata.imageUrl
+                        )
+                    }
+
+//                    feedParser.findNostrFeed(metadata)
+//                        .map { nostrFeed ->
+//                            SearchResult(
+//                                title = nostrFeed.title ?: "",
+//                                url = nostrFeed.feed_url ?: metadata.uri,
+//                                description = nostrFeed.description ?: "",
+//                                feedImage = nostrFeed.icon ?: ""
+//                            )
+//                        }
+//                        .onLeft {
+//
+//                        }
                 }
             }
             .flowOn(Dispatchers.Default)
