@@ -256,7 +256,10 @@ class FeedParser(override val di: DI) : DIAware {
         ) {
             val possibleNostrProfile = parseNostrUri(nostrUri.toString())
             val publicKey = possibleNostrProfile.publicKey()
-            val relayList = possibleNostrProfile.relays().ifEmpty { getUserPublishRelays(publicKey) }
+            val relayList = possibleNostrProfile.relays()
+                .takeIf { it.size < 7 }.orEmpty()
+                .ifEmpty { getUserPublishRelays(publicKey) }
+            println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
             relayList.ifEmpty { DEFAULT_FETCH_RELAYS } .forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
             nostrClient.connect()
             val profileInfo = try {
@@ -279,8 +282,9 @@ class FeedParser(override val di: DI) : DIAware {
 
             println(profileInfo.asPrettyJson())
 
-            println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
+
             nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
+            //Check if all relays in relaylist can be connected to
             AuthorNostrData(
                 uri = possibleNostrProfile.toNostrUri(),
                 name = profileInfo.getName().toString(),
@@ -344,11 +348,21 @@ class FeedParser(override val di: DI) : DIAware {
         val articleEventSet = nostrClient.fetchEvents(
 //            urls = relays.map { it.url() },
             filters = listOf(articlesByAuthorFilter),
-            timeout = Duration.ofSeconds(10)
-        )
-        println("Article set size: -> ${articleEventSet.toVec().size}")
+            timeout = Duration.ofSeconds(10L)
+        ).toVec()
+        .ifEmpty {
+            DEFAULT_ARTICLE_FETCH_RELAYS.forEach { nostrClient.addReadRelay(it) }
+            nostrClient.connect()
+            nostrClient.fetchEventsFrom(
+                urls = DEFAULT_ARTICLE_FETCH_RELAYS.toList(),
+                filters = listOf(articlesByAuthorFilter),
+                timeout = Duration.ofSeconds(10L)
+            ).toVec()
+        }
+        println("Article set size: -> ${articleEventSet.size}")
 
-        val articleEvents = articleEventSet.toVec().distinctBy { it.tags().find(TagKind.Title) }
+        val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
+        nostrClient.removeAllRelays() //This is necessary to avoid piling relays to fetch from(on each fetch).
         return articleEvents
     }
 
