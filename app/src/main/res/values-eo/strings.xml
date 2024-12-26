@@ -145,4 +145,21 @@
     <string name="showing_all_articles">Montrante ĉiujn artikolojn</string>
     <string name="other_unread_articles">%1$s nelegitaj artikoloj</string>
     <string name="few_unread_articles">%1$s nelegitaj artikoloj</string>
+    <string name="failed_to_export_saved_articles">Malsukcesis eksporti konservitajn artikolojn</string>
+    <string name="add_new_device">Aldonu novan aparaton</string>
+    <string name="device_sync_financed_by_community">Ĉi tiu servo estas pagita de la komunumo. Bonvolu konsideri donaci se vi trovas ĝin utila.</string>
+    <string name="this_device">%1$s (ĉi tiu aparato)</string>
+    <string name="disconnect_device_from_sync">Malkonekti aparaton de sinkroniga ĉeno</string>
+    <string name="devices_on_sync_chain">Aparatoj sur sinkroniga ĉeno</string>
+    <string name="feed_item_style_card">Karto</string>
+    <string name="device_sync">Aparato sinkronigi</string>
+    <string name="failed_to_export_OPML">Malsukcesis eksporti OPML</string>
+    <string name="feed_item_style">Artikolo stilo</string>
+    <string name="feed_item_style_compact">Kompakta</string>
+    <string name="feed_item_style_super_compact">Super kompakta</string>
+    <string name="only_enable_for_bad_id_feeds">Ebligu nur por nutras kun malbonaj identigiloj</string>
+    <string name="feed_item_style_compact_card">Kompakta Karto</string>
+    <string name="generate_extra_unique_ids">Generu ekstrajn unikajn identigilojn</string>
+    <string name="invalid_url">Ne valida URL</string>
+    <string name="failed_to_import_OPML">Malsukcesis importi OPML</string>
 </resources>
