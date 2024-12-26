@@ -40,6 +40,7 @@ import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
 import rust.nostr.sdk.NostrSdkException
 import rust.nostr.sdk.PublicKey
+import rust.nostr.sdk.Relay
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.TagKind
@@ -66,6 +67,7 @@ class FeedParser(override val di: DI) : DIAware {
     // The default relays to get info from, separated by purpose.
     private val DEFAULT_FETCH_RELAYS = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
     private val DEFAULT_METADATA_RELAYS = listOf("wss://purplepag.es", "wss://user.kindpag.es")
+    private val DEFAULT_ARTICLE_FETCH_RELAYS = setOf("wss://nos.lol") + DEFAULT_FETCH_RELAYS
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -265,7 +267,9 @@ class FeedParser(override val di: DI) : DIAware {
             } catch (e: NostrSdkException) {
                 println("Metadata Fetch Error: ${e.message}")
                 nostrClient.removeAllRelays()
-                DEFAULT_FETCH_RELAYS.forEach { relay -> nostrClient.addReadRelay(relay) }
+                getUserPublishRelays(publicKey)
+                    .ifEmpty { DEFAULT_FETCH_RELAYS }
+                    .forEach { relay -> nostrClient.addReadRelay(relay) }
                 nostrClient.connect()
                 nostrClient.fetchMetadata(
                     publicKey = publicKey,
@@ -312,11 +316,15 @@ class FeedParser(override val di: DI) : DIAware {
             println("$relayUrl -> $metadata")
         }
 
-        return relayList
-            .filter { it.value == RelayMetadata.WRITE }
-            .map { entry ->
-                entry.key // This represents the relay URL.
-            }
+        val relaysToUse = if (relayList.any { (_, relayType) -> relayType == RelayMetadata.WRITE }) {
+            relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> entry.key }
+        } else if (relayList.size < 7) {
+            relayList.map { entry -> entry.key } // This represents the relay URL, just as the operation above.
+        } else {
+            DEFAULT_ARTICLE_FETCH_RELAYS.map { it }
+        }
+
+        return relaysToUse
 
     }
 
