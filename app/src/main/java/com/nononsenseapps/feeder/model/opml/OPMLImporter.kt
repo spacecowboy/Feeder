@@ -34,11 +34,10 @@ open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
         } else {
             if (feed.url.isAdaptedUrlFromNostrUri()) {
                 val potentialNostrFeed = existingNostrFeeds.find { it.title == feed.title }
-                if(potentialNostrFeed != null) {
+                if (potentialNostrFeed != null) {
                     logDebug(LOG_TAG, "Nostr feed with title <${feed.title}> already exists. Updating feed.")
                     feedDao.updateFeed(feed.copy(id = potentialNostrFeed.id))
-                }
-                else {
+                } else {
                     feedDao.insertFeed(feed)
                 }
             } else {

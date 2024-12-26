@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.model.gofeed.GoFeedAdapter
 import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
@@ -66,10 +67,11 @@ class FeedParser(override val di: DI) : DIAware {
 
     // Initializing the Nostr Client
     private val nostrClient = Client()
+
     // The default relays to get info from, separated by purpose.
-    private val DEFAULT_FETCH_RELAYS = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
-    private val DEFAULT_METADATA_RELAYS = listOf("wss://purplepag.es", "wss://user.kindpag.es")
-    private val DEFAULT_ARTICLE_FETCH_RELAYS = setOf("wss://nos.lol") + DEFAULT_FETCH_RELAYS
+    private val defaultFetchRelays = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
+    private val defaultMetadataRelays = listOf("wss://purplepag.es", "wss://user.kindpag.es")
+    private val defaultArticleFetchRelays = setOf("wss://nos.lol") + defaultFetchRelays
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -243,7 +245,7 @@ class FeedParser(override val di: DI) : DIAware {
             return Nip19Profile(pubkey, relays)
         } else {
             val parsedProfile = Nip21.parse(nostrUri).asEnum()
-            when(parsedProfile) {
+            when (parsedProfile) {
                 is Nip21Enum.Pubkey -> return Nip19Profile(parsedProfile.publicKey)
                 is Nip21Enum.Profile -> return Nip19Profile(parsedProfile.profile.publicKey(), parsedProfile.profile.relays())
                 else -> throw Throwable(message = "Could not find the user's info: $nostrUri")
@@ -252,125 +254,129 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, AuthorNostrData> {
-
         return Either.catching(
-            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) }
+            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) },
         ) {
             val possibleNostrProfile = parseNostrUri(nostrUri.toString())
             val publicKey = possibleNostrProfile.publicKey()
-            val relayList = possibleNostrProfile.relays()
-                .takeIf { it.size < 7 }.orEmpty()
-                .ifEmpty { getUserPublishRelays(publicKey) }
+            val relayList =
+                possibleNostrProfile.relays()
+                    .takeIf {
+                        it.size < 7
+                    }.orEmpty()
+                    .ifEmpty { getUserPublishRelays(publicKey) }
             println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
-            relayList.ifEmpty { DEFAULT_FETCH_RELAYS } .forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+            relayList
+                .ifEmpty { defaultFetchRelays }
+                .forEach { relayUrl ->
+                    nostrClient.addReadRelay(relayUrl)
+                }
             nostrClient.connect()
-            val profileInfo = try {
-                nostrClient.fetchMetadata(
-                    publicKey = publicKey,
-                    timeout = Duration.ofSeconds(5)
-                )
-            } catch (e: NostrSdkException) {
-                println("Metadata Fetch Error: ${e.message}")
-                nostrClient.removeAllRelays()
-                getUserPublishRelays(publicKey)
-                    .ifEmpty { DEFAULT_FETCH_RELAYS }
-                    .forEach { relay -> nostrClient.addReadRelay(relay) }
-                nostrClient.connect()
-                nostrClient.fetchMetadata(
-                    publicKey = publicKey,
-                    timeout = Duration.ofSeconds(5)
-                )
-            }
-
+            val profileInfo =
+                try {
+                    nostrClient.fetchMetadata(
+                        publicKey = publicKey,
+                        timeout = Duration.ofSeconds(5),
+                    )
+                } catch (e: NostrSdkException) {
+                    println("Metadata Fetch Error: ${e.message}")
+                    nostrClient.removeAllRelays()
+                    getUserPublishRelays(publicKey)
+                        .ifEmpty { defaultFetchRelays }
+                        .forEach { relay -> nostrClient.addReadRelay(relay) }
+                    nostrClient.connect()
+                    nostrClient.fetchMetadata(
+                        publicKey = publicKey,
+                        timeout = Duration.ofSeconds(5),
+                    )
+                }
             println(profileInfo.asPrettyJson())
 
-
-            nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
-            //Check if all relays in relaylist can be connected to
+            // Check if all relays in relaylist can be connected to
             AuthorNostrData(
                 uri = possibleNostrProfile.toNostrUri(),
                 name = profileInfo.getName().toString(),
                 publicKey = publicKey,
                 imageUrl = profileInfo.getPicture().toString(),
-                relayList = nostrClient.relays().map { relayEntry -> relayEntry.key }
+                relayList = nostrClient.relays().map { relayEntry -> relayEntry.key },
             )
         }
-
     }
 
-    private suspend fun getUserPublishRelays(
-        userPubkey: PublicKey
-    ): List<String> {
-        val userRelaysFilter = Filter()
-            .author(userPubkey)
-            .kind(Kind.fromEnum(KindEnum.RelayList))
+    private suspend fun getUserPublishRelays(userPubkey: PublicKey): List<String> {
+        val userRelaysFilter =
+            Filter()
+                .author(userPubkey)
+                .kind(
+                    Kind.fromEnum(KindEnum.RelayList),
+                )
 
         nostrClient.removeAllRelays()
-        nostrClient.relays().forEach { (url, relay) -> println("Client Relay -> [$url, ${relay.status().name}]") }
-        DEFAULT_METADATA_RELAYS.forEach { relayUrl -> nostrClient.addReadRelay(relayUrl) }
+        defaultMetadataRelays.forEach { relayUrl ->
+            nostrClient.addReadRelay(relayUrl)
+        }
         nostrClient.connect()
-        val potentialUserRelays = nostrClient.fetchEventsFrom(
-            urls = DEFAULT_METADATA_RELAYS,
-            filters = listOf(userRelaysFilter),
-            timeout = Duration.ofSeconds(5)
-        )
-        println("------------New Fetch Relays----------------")
-        nostrClient.pool().relays().forEach { (url, relay) -> println("New Client Relay -> [$url, ${relay.status().name}]") }
-        println("User Relay Metadata:")
+        val potentialUserRelays =
+            nostrClient.fetchEventsFrom(
+                urls = defaultMetadataRelays,
+                filters = listOf(userRelaysFilter),
+                timeout = Duration.ofSeconds(5),
+            )
         val relayList = extractRelayList(potentialUserRelays.toVec().first())
-        relayList.forEach { (relayUrl, metadata) ->
-            println("$relayUrl -> $metadata")
-        }
-
-        val relaysToUse = if (relayList.any { (_, relayType) -> relayType == RelayMetadata.WRITE }) {
-            relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> entry.key }
-        } else if (relayList.size < 7) {
-            relayList.map { entry -> entry.key } // This represents the relay URL, just as the operation above.
-        } else {
-            DEFAULT_ARTICLE_FETCH_RELAYS.map { it }
-        }
+        val relaysToUse =
+            if (relayList.any { (_, relayType) -> relayType == RelayMetadata.WRITE }) {
+                relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> entry.key }
+            } else if (relayList.size < 7) {
+                relayList.map { entry -> entry.key } // This represents the relay URL, just as the operation above.
+            } else {
+                defaultArticleFetchRelays.map { it }
+            }
 
         return relaysToUse
-
     }
 
     private suspend fun fetchArticlesForAuthor(
         author: PublicKey,
-        relays: List<String>
+        relays: List<String>,
     ): List<Event> {
-        val articlesByAuthorFilter = Filter()
-            .author(author)
-            .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
-        println("Relay List size: -> ${relays.size}")
+        val articlesByAuthorFilter =
+            Filter()
+                .author(author)
+                .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
+        logDebug(LOG_TAG, "Relay List size: -> ${relays.size}")
 
         nostrClient.removeAllRelays()
         relays.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
-        println("-------------------FETCHING ARTICLES----------------------")
-        val articleEventSet = nostrClient.fetchEvents(
-//            urls = relays.map { it.url() },
-            filters = listOf(articlesByAuthorFilter),
-            timeout = Duration.ofSeconds(10L)
-        ).toVec()
-        .ifEmpty {
-            DEFAULT_ARTICLE_FETCH_RELAYS.forEach { nostrClient.addReadRelay(it) }
-            nostrClient.connect()
-            nostrClient.fetchEventsFrom(
-                urls = DEFAULT_ARTICLE_FETCH_RELAYS.toList(),
-                filters = listOf(articlesByAuthorFilter),
-                timeout = Duration.ofSeconds(10L)
+        logDebug(LOG_TAG, "-------------------FETCHING ARTICLES----------------------")
+        val articleEventSet =
+            nostrClient.fetchEvents(
+                filters =
+                    listOf(
+                        articlesByAuthorFilter,
+                    ),
+                timeout = Duration.ofSeconds(10L),
             ).toVec()
-        }
-        println("Article set size: -> ${articleEventSet.size}")
-
+                .ifEmpty {
+                    defaultArticleFetchRelays.forEach { nostrClient.addReadRelay(it) }
+                    nostrClient.connect()
+                    nostrClient.fetchEventsFrom(
+                        urls = defaultArticleFetchRelays.toList(),
+                        filters =
+                            listOf(
+                                articlesByAuthorFilter,
+                            ),
+                        timeout = Duration.ofSeconds(10L),
+                    ).toVec()
+                }
         val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
-        nostrClient.removeAllRelays() //This is necessary to avoid piling relays to fetch from(on each fetch).
+        nostrClient.removeAllRelays() // This is necessary to avoid piling relays to fetch from(on each fetch).
         return articleEvents
     }
 
     suspend fun findNostrFeed(authorNostrData: AuthorNostrData): Either<FeedParserError, ParsedFeed> {
         return Either.catching(
-            onCatch = { t -> FetchError(url = authorNostrData.uri, throwable = t) }
+            onCatch = { t -> FetchError(url = authorNostrData.uri, throwable = t) },
         ) {
             val fetchedArticles = fetchArticlesForAuthor(authorNostrData.publicKey, authorNostrData.relayList)
             fetchedArticles.mapToFeed(authorNostrData.uri, authorNostrData.name, authorNostrData.imageUrl)
@@ -459,14 +465,24 @@ class FeedParser(override val di: DI) : DIAware {
     }
 }
 
-private fun List<Event>.mapToFeed(nostrUri: String, authorName: String, imageUrl: String): ParsedFeed {
+private fun List<Event>.mapToFeed(
+    nostrUri: String,
+    authorName: String,
+    imageUrl: String,
+): ParsedFeed {
     val description = "Nostr articles by $authorName"
-    val author = ParsedAuthor(
-        name = authorName,
-        url = "https://njump.me/${first().author().toBech32()}",
-        avatar = imageUrl
-    )
-    val articles = this.sortedByDescending { it.tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: 0L }.map { event: Event -> event.asArticle(authorName, imageUrl) }
+    val author =
+        ParsedAuthor(
+            name = authorName,
+            url = "https://njump.me/${first().author().toBech32()}",
+            avatar = imageUrl,
+        )
+    val articles =
+        this.sortedByDescending {
+            it.tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: 0L
+        }.map { event: Event ->
+            event.asArticle(authorName, imageUrl)
+        }
 
     return ParsedFeed(
         title = authorName,
@@ -479,31 +495,39 @@ private fun List<Event>.mapToFeed(nostrUri: String, authorName: String, imageUrl
         favicon = null,
         author = author,
         expired = null,
-        items = articles
+        items = articles,
     )
 }
 
-fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
+fun Event.asArticle(
+    authorName: String,
+    imageUrl: String,
+): ParsedArticle {
     val articleId = id().toString()
     val articleUri = id().toNostrUri()
-    val articleNostrAddress = Coordinate(
-        Kind.fromEnum(KindEnum.LongFormTextNote),
-        author(),
-        tags().find(
-            TagKind.SingleLetter(SingleLetterTag.lowercase(Alphabet.D))
-        )?.content().toString()
-    ).toBech32()
+    val articleNostrAddress =
+        Coordinate(
+            Kind.fromEnum(KindEnum.LongFormTextNote),
+            author(),
+            tags().find(
+                TagKind.SingleLetter(
+                    SingleLetterTag.lowercase(Alphabet.D),
+                ),
+            )?.content().toString(),
+        ).toBech32()
     // Highlighter is a service for reading Nostr articles on the web.
     val externalLink = "https://highlighter.com/a/$articleNostrAddress"
-    val articleAuthor = ParsedAuthor(
-        name = authorName,
-        url = "https://njump.me/${author().toBech32()}",
-        avatar = imageUrl
-    )
+    val articleAuthor =
+        ParsedAuthor(
+            name = authorName,
+            url = "https://njump.me/${author().toBech32()}",
+            avatar = imageUrl,
+        )
     val articleTitle = tags().find(TagKind.Title)?.content()
-    val publishDate = Instant.ofEpochSecond(
-        tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond
-    ).atZone(ZoneId.systemDefault()).withFixedOffsetZone()
+    val publishDate =
+        Instant.ofEpochSecond(
+            tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond,
+        ).atZone(ZoneId.systemDefault()).withFixedOffsetZone()
     val articleTags = tags().hashtags()
     val articleImage = tags().find(TagKind.Image)?.content()
     val articleSummary = tags().find(TagKind.Summary)?.content()
@@ -524,9 +548,8 @@ fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
         date_modified = publishDate.toString(),
         author = articleAuthor,
         tags = articleTags,
-        attachments = null
+        attachments = null,
     )
-
 }
 
 private fun GoFeed.asFeed(url: URL): ParsedFeed =
@@ -729,7 +752,7 @@ class AuthorNostrData(
     val name: String,
     val publicKey: PublicKey,
     val imageUrl: String,
-    val relayList: List<String>
+    val relayList: List<String>,
 )
 
 @Parcelize

@@ -100,7 +100,8 @@ fun relativeLinkIntoAbsoluteOrThrow(
     }
 
 fun String.isNostrUri(): Boolean {
-    val NOSTR_PREFIX = "nostr:"
-    return this.startsWith(NOSTR_PREFIX) && length > NOSTR_PREFIX.length
+    val nostrPrefix = "nostr:"
+    return this.startsWith(nostrPrefix) && length > nostrPrefix.length
 }
+
 fun URL.isAdaptedUrlFromNostrUri(): Boolean = this.toString().startsWith("https://njump.me")

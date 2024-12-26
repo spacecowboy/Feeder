@@ -232,8 +232,8 @@ fun SearchFeedView(
         ) {
             onSearchCallback(
                 sloppyLinkToStrictURLNoThrows(
-                    if (feedUrl.isNostrUri()) "https://njump.me/$feedUrl" else feedUrl
-                )
+                    if (feedUrl.isNostrUri()) "https://njump.me/$feedUrl" else feedUrl,
+                ),
             )
         }
     }
@@ -363,7 +363,7 @@ fun ColumnScope.leftContent(
                 onSearch = {
                     if (isValidUrl || isNostrUri) {
                         onSearch(
-                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl)
+                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl),
                         )
                         keyboardController?.hide()
                     }
@@ -374,9 +374,9 @@ fun ColumnScope.leftContent(
             modifier
                 .width(dimens.maxContentWidth)
                 .interceptKey(Key.Enter) {
-                    if (isValidUrl(feedUrl)|| feedUrl.isNostrUri()) {
+                    if (isValidUrl(feedUrl) || feedUrl.isNostrUri()) {
                         onSearch(
-                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl)
+                            sloppyLinkToStrictURLNoThrows(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl),
                         )
                         keyboardController?.hide()
                     }
@@ -397,8 +397,7 @@ fun ColumnScope.leftContent(
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Can't search Nostr URI", e)
                 }
-            }
-            else if (isValidUrl) {
+            } else if (isValidUrl) {
                 try {
                     onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
                     clearFocus()

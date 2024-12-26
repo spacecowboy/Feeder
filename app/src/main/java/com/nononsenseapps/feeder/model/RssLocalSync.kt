@@ -247,15 +247,14 @@ class RssLocalSync(override val di: DI) : DIAware {
 
         return if (url.isAdaptedUrlFromNostrUri()) {
             Either.catching(
-                onCatch = { t -> FetchError(url = url.toString(), throwable = t) }
+                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
             ) {
                 feedParser.getProfileMetadata(url)
                     .getOrNull()!!
             }.flatMap { profile ->
                 feedParser.findNostrFeed(profile)
             }
-        }
-        else {
+        } else {
             Either.catching(
                 onCatch = { t ->
                     FetchError(url = url.toString(), throwable = t)

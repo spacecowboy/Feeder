@@ -51,13 +51,13 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                 profileResult.flatMap { metadata ->
 
                     Either.catching(
-                        onCatch = { t -> FetchError(url = metadata.uri, throwable = t) }
+                        onCatch = { t -> FetchError(url = metadata.uri, throwable = t) },
                     ) {
                         SearchResult(
                             title = metadata.name,
                             url = metadata.uri,
                             description = "Nostr Articles by ${metadata.name}",
-                            feedImage = metadata.imageUrl
+                            feedImage = metadata.imageUrl,
                         )
                     }
 
@@ -75,9 +75,8 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
 //                        }
                 }
             }
-            .flowOn(Dispatchers.Default)
-        }
-        else {
+                .flowOn(Dispatchers.Default)
+        } else {
             flow {
                 siteMetaData = feedParser.getSiteMetaData(initialUrl)
                 // Flow collection makes this block concurrent with map below
@@ -128,7 +127,6 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                 }
                 .flowOn(Dispatchers.Default)
         }
-
     }
 
     private suspend fun handleHttpError(httpError: HttpError) {
