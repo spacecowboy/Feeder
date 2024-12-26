@@ -248,4 +248,11 @@
     <string name="touch_to_play_audio">แตะเพื่อเล่นเสียง</string>
     <string name="no_body_in_response">ไม่มี body ในข้อมูลที่ตอบกลับมาจากเว็บ</string>
     <string name="show_title_unread_count">แสดงจำนวนบทความที่ไม่ได้อ่านในหัวเรื่อง</string>
+    <string name="show_message">แสดงข้อความ</string>
+    <string name="open_drawer_on_fab">แสดงฟีดที่ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว</string>
+    <string name="summarize">สรุป</string>
+    <string name="openai_settings">การทำงานร่วมกับ OpenAI</string>
+    <string name="unable_to_load_models">โหลดโมเดลไม่ได้</string>
+    <string name="no_models_were_found">ไม่พบโมเดลดังกล่าว</string>
+    <string name="list_of_available_models">รายการโมเดลที่ใช้งานได้</string>
 </resources>
