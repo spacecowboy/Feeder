@@ -228,11 +228,13 @@ fun SearchFeedView(
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
         if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() &&
-            isValidUrl(
-                feedUrl,
-            )
+            (isValidUrl(feedUrl) || feedUrl.isNostrUri())
         ) {
-            onSearchCallback(sloppyLinkToStrictURLNoThrows(feedUrl))
+            onSearchCallback(
+                sloppyLinkToStrictURLNoThrows(
+                    if (feedUrl.isNostrUri()) "https://njump.me/$feedUrl" else feedUrl
+                )
+            )
         }
     }
 
@@ -341,13 +343,14 @@ fun ColumnScope.leftContent(
             feedUrl.isNostrUri()
         }
     }
+
     TextField(
         value = feedUrl,
         onValueChange = onUrlChange,
         label = {
             Text(stringResource(id = R.string.add_feed_search_hint))
         },
-        isError = isNotValidUrl,
+        isError = isNotValidUrl && !isNostrUri,
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
