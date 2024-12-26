@@ -225,10 +225,10 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
 
-    //Nostr
+    // Nostr
     implementation("org.rust-nostr:nostr-sdk:0.37.0")
 
-    //Markdown
+    // Markdown
     implementation("org.jetbrains:markdown:0.7.3")
 
     // Only for debug
