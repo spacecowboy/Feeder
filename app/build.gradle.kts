@@ -228,6 +228,9 @@ dependencies {
     //Nostr
     implementation("org.rust-nostr:nostr-sdk:0.37.0")
 
+    //Markdown
+    implementation("org.jetbrains:markdown:0.7.3")
+
     // Only for debug
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
 

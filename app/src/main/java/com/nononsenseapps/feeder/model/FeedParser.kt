@@ -23,6 +23,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
+import org.intellij.markdown.html.HtmlGenerator
+import org.intellij.markdown.parser.MarkdownParser
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
@@ -40,7 +43,6 @@ import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
 import rust.nostr.sdk.NostrSdkException
 import rust.nostr.sdk.PublicKey
-import rust.nostr.sdk.Relay
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.TagKind
@@ -506,13 +508,15 @@ fun Event.asArticle(authorName: String, imageUrl: String): ParsedArticle {
     val articleImage = tags().find(TagKind.Image)?.content()
     val articleSummary = tags().find(TagKind.Summary)?.content()
     val articleContent = content()
+    val parsedMarkdown = markDownParser.buildMarkdownTreeFromString(articleContent)
+    val htmlFromContent = HtmlGenerator(articleContent, parsedMarkdown, CommonMarkFlavourDescriptor()).generateHtml()
 
     return ParsedArticle(
         id = articleId,
         url = articleUri,
         external_url = externalLink,
         title = articleTitle,
-        content_html = null,
+        content_html = htmlFromContent,
         content_text = articleContent,
         summary = articleSummary,
         image = if (articleImage != null) MediaImage(url = articleImage.toString()) else null,
@@ -717,6 +721,8 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
         }
     }
 }
+
+private val markDownParser = MarkdownParser(CommonMarkFlavourDescriptor())
 
 class AuthorNostrData(
     val uri: String,
