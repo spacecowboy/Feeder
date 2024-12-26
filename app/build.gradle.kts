@@ -226,7 +226,7 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
 
     // Nostr
-    implementation("org.rust-nostr:nostr-sdk:0.37.0")
+    implementation(libs.rust.nostr)
 
     // Markdown
     implementation("org.jetbrains:markdown:0.7.3")
