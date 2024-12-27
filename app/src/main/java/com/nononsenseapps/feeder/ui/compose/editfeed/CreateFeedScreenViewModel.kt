@@ -88,7 +88,7 @@ class CreateFeedScreenViewModel(
                         title = feedTitle,
                         customTitle = feedTitle,
                         tag = feedTag,
-                        fullTextByDefault = fullTextByDefault,
+                        fullTextByDefault = if (isNostrUri) false else fullTextByDefault,
                         notify = notify,
                         skipDuplicates = skipDuplicates,
                         openArticlesWith = articleOpener,

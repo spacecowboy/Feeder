@@ -264,7 +264,7 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                             parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
                                 ?.toBoolean()
                                 ?: feed.notify,
-                        fullTextByDefault =
+                        fullTextByDefault = if (parsedUrlOrUri.isNostrUri()) false else
                             (
                                 parser.getAttributeValue(
                                     OPML_FEEDER_NAMESPACE,

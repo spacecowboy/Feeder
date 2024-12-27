@@ -126,11 +126,11 @@ class EditFeedScreenViewModel(
 
             val updatedFeed =
                 feed.copy(
-                    url = URL(feedUrl),
+                    url = URL(if (isNostrUri) "https://njump.me/$feedUrl" else feedUrl),
                     title = feedTitle,
                     customTitle = feedTitle,
                     tag = feedTag,
-                    fullTextByDefault = fullTextByDefault,
+                    fullTextByDefault = if (isNostrUri) false else fullTextByDefault,
                     notify = notify,
                     skipDuplicates = skipDuplicates,
                     openArticlesWith = articleOpener,

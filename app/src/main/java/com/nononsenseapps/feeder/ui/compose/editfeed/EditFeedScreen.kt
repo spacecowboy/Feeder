@@ -488,7 +488,8 @@ fun ColumnScope.RightContent(
 ) {
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
-        checked = viewState.fullTextByDefault,
+        checked = if (viewState.isNostrUri) false else viewState.fullTextByDefault,
+        enabled = !viewState.isNostrUri,
         icon = null,
         modifier =
             Modifier
