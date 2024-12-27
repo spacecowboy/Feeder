@@ -358,6 +358,7 @@ class FeedParser(override val di: DI) : DIAware {
                 timeout = Duration.ofSeconds(10L),
             ).toVec()
                 .ifEmpty {
+                    nostrClient.removeAllRelays()
                     defaultArticleFetchRelays.forEach { nostrClient.addReadRelay(it) }
                     nostrClient.connect()
                     nostrClient.fetchEventsFrom(
