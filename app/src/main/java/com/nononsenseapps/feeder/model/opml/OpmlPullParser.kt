@@ -264,17 +264,21 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                             parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
                                 ?.toBoolean()
                                 ?: feed.notify,
-                        fullTextByDefault = if (parsedUrlOrUri.isNostrUri()) false else
-                            (
-                                parser.getAttributeValue(
-                                    OPML_FEEDER_NAMESPACE,
-                                    ATTR_FULL_TEXT_BY_DEFAULT,
-                                )
-                                    ?.toBoolean()
-                                    // Support Flym's value for this
-                                    ?: parser.getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+                        fullTextByDefault =
+                            if (parsedUrlOrUri.isNostrUri()) {
+                                false
+                            } else {
+                                (
+                                    parser.getAttributeValue(
+                                        OPML_FEEDER_NAMESPACE,
+                                        ATTR_FULL_TEXT_BY_DEFAULT,
+                                    )
                                         ?.toBoolean()
-                            ) ?: feed.fullTextByDefault,
+                                        // Support Flym's value for this
+                                        ?: parser.getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+                                            ?.toBoolean()
+                                ) ?: feed.fullTextByDefault
+                            },
                         alternateId =
                             parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)
                                 ?.toBoolean()

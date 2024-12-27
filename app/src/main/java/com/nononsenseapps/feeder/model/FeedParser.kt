@@ -271,10 +271,11 @@ class FeedParser(override val di: DI) : DIAware {
                     nostrClient.addReadRelay(relayUrl)
                 }
             nostrClient.connect()
-            val profileInfo = nostrClient.fetchMetadata(
-                publicKey = publicKey,
-                timeout = Duration.ofSeconds(5L),
-            )
+            val profileInfo =
+                nostrClient.fetchMetadata(
+                    publicKey = publicKey,
+                    timeout = Duration.ofSeconds(5L),
+                )
             println(profileInfo.asPrettyJson())
 
             // Check if all relays in relaylist can be connected to
@@ -331,8 +332,9 @@ class FeedParser(override val di: DI) : DIAware {
         logDebug(LOG_TAG, "Relay List size: -> ${relays.size}")
 
         nostrClient.removeAllRelays()
-        val relaysToUse = relays.take(2).plus(defaultArticleFetchRelays.random())
-            .ifEmpty { defaultFetchRelays }
+        val relaysToUse =
+            relays.take(2).plus(defaultArticleFetchRelays.random())
+                .ifEmpty { defaultFetchRelays }
         relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
         logDebug(LOG_TAG, "-------------------FETCHING ARTICLES----------------------")
