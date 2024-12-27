@@ -38,7 +38,8 @@
 -keep class org.jsoup.**  { *; }
 
 # For Nostr
--keep class rust.nostr.sdk.** {  }
+-keep class com.sun.jna.** { *; }
+-keep class * implements com.sun.jna.** { *; }
 
 # For Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
