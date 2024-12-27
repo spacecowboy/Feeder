@@ -37,6 +37,9 @@
 # For Jsoup
 -keep class org.jsoup.**  { *; }
 
+# For Nostr
+-keep class rust.nostr.sdk.** {  }
+
 # For Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
 -keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
