@@ -42,7 +42,6 @@ import rust.nostr.sdk.KindEnum
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
-import rust.nostr.sdk.NostrSdkException
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
@@ -262,7 +261,7 @@ class FeedParser(override val di: DI) : DIAware {
             val relayList =
                 possibleNostrProfile.relays()
                     .takeIf {
-                        it.size < 7
+                        it.size < 4
                     }.orEmpty()
                     .ifEmpty { getUserPublishRelays(publicKey) }
             println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
@@ -272,24 +271,10 @@ class FeedParser(override val di: DI) : DIAware {
                     nostrClient.addReadRelay(relayUrl)
                 }
             nostrClient.connect()
-            val profileInfo =
-                try {
-                    nostrClient.fetchMetadata(
-                        publicKey = publicKey,
-                        timeout = Duration.ofSeconds(5),
-                    )
-                } catch (e: NostrSdkException) {
-                    println("Metadata Fetch Error: ${e.message}")
-                    nostrClient.removeAllRelays()
-                    getUserPublishRelays(publicKey)
-                        .ifEmpty { defaultFetchRelays }
-                        .forEach { relay -> nostrClient.addReadRelay(relay) }
-                    nostrClient.connect()
-                    nostrClient.fetchMetadata(
-                        publicKey = publicKey,
-                        timeout = Duration.ofSeconds(5),
-                    )
-                }
+            val profileInfo = nostrClient.fetchMetadata(
+                publicKey = publicKey,
+                timeout = Duration.ofSeconds(5L),
+            )
             println(profileInfo.asPrettyJson())
 
             // Check if all relays in relaylist can be connected to
@@ -346,30 +331,20 @@ class FeedParser(override val di: DI) : DIAware {
         logDebug(LOG_TAG, "Relay List size: -> ${relays.size}")
 
         nostrClient.removeAllRelays()
-        relays.forEach { relay -> nostrClient.addReadRelay(relay) }
+        val relaysToUse = relays.take(2).plus(defaultArticleFetchRelays.random())
+            .ifEmpty { defaultFetchRelays }
+        relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
         logDebug(LOG_TAG, "-------------------FETCHING ARTICLES----------------------")
         val articleEventSet =
-            nostrClient.fetchEvents(
+            nostrClient.fetchEventsFrom(
+                urls = relaysToUse,
                 filters =
                     listOf(
                         articlesByAuthorFilter,
                     ),
                 timeout = Duration.ofSeconds(10L),
             ).toVec()
-                .ifEmpty {
-                    nostrClient.removeAllRelays()
-                    defaultArticleFetchRelays.forEach { nostrClient.addReadRelay(it) }
-                    nostrClient.connect()
-                    nostrClient.fetchEventsFrom(
-                        urls = defaultArticleFetchRelays.toList(),
-                        filters =
-                            listOf(
-                                articlesByAuthorFilter,
-                            ),
-                        timeout = Duration.ofSeconds(10L),
-                    ).toVec()
-                }
         val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
         nostrClient.removeAllRelays() // This is necessary to avoid piling relays to fetch from(on each fetch).
         return articleEvents
