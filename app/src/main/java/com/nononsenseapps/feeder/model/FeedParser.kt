@@ -311,7 +311,7 @@ class FeedParser(override val di: DI) : DIAware {
         val relaysToUse =
             if (relayList.any { (_, relayType) -> relayType == RelayMetadata.WRITE }) {
                 relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> entry.key }
-            } else if (relayList.size < 7) {
+            } else if (relayList.size < 4) {
                 relayList.map { entry -> entry.key } // This represents the relay URL, just as the operation above.
             } else {
                 defaultArticleFetchRelays.map { it }
@@ -331,7 +331,7 @@ class FeedParser(override val di: DI) : DIAware {
         logDebug(LOG_TAG, "Relay List size: -> ${relays.size}")
 
         nostrClient.removeAllRelays()
-        val relaysToUse = relays.take(2).plus(defaultArticleFetchRelays.random())
+        val relaysToUse = relays.plus(defaultArticleFetchRelays.random())
             .ifEmpty { defaultFetchRelays }
         relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
