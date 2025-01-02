@@ -121,7 +121,7 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="add_feed_search_hint">URL-адреса стрічки</string>
     <string name="tag">Мітка</string>
-    <string name="url_or_uri">URL-адреса</string>
+    <string name="url">URL-адреса</string>
     <string name="title_activity_edit_feed">Підписатися на стрічку</string>
     <string name="add_feed">Додати стрічку</string>
     <string name="action_settings">Параметри</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Дозволити лише для стрічок із поганими ID</string>
     <string name="syncing">Синхронізація</string>
     <string name="sync_status">Стан синхронізації</string>
-    <string name="invalid_url_or_uri">Неправильна URL-адреса</string>
+    <string name="invalid_url">Неправильна URL-адреса</string>
     <string name="failed_to_import_OPML">Не вдалося імпортувати OPML</string>
     <string name="failed_to_export_OPML">Не вдалося експортувати OPML</string>
     <string name="failed_to_open_article">Не можливо відкрити статтю</string>

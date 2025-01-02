@@ -213,7 +213,7 @@ fun OpenAISectionEdit(
                 Text(OpenAIHost.OpenAI.baseUrl)
             },
             label = {
-                Text(stringResource(R.string.url_or_uri))
+                Text(stringResource(R.string.url))
             },
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))

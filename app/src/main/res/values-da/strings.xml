@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Åbn navigationsskuffen</string>
     <string name="mark_all_as_read">Markér alle som læst</string>
     <string name="title_activity_edit_feed">Abonner på feed</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="tag">Etiket</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -92,7 +92,7 @@
     <string name="one_unread_article">%1$s ulæst artikel</string>
     <string name="many_unread_articles">%1$s ulæste artikler</string>
     <string name="feed_item_style_compact">Kompakt</string>
-    <string name="invalid_url_or_uri">Ikke en gyldig URL</string>
+    <string name="invalid_url">Ikke en gyldig URL</string>
     <string name="failed_to_import_OPML">Import af OPML mislykkedes</string>
     <string name="failed_to_export_OPML">Kunne ikke eksportere OPML</string>
     <string name="device_sync">Synkronisering af enhed</string>

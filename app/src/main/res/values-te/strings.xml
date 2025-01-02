@@ -24,7 +24,7 @@
     <string name="read_article">గట్టిగ చదువుము</string>
     <string name="new_based_on_this">దీని ఆధారంగా కొత్తది</string>
     <string name="tag">ట్యాగ్</string>
-    <string name="url_or_uri">యూఆర్ఎల్</string>
+    <string name="url">యూఆర్ఎల్</string>
     <string name="search_feed_empty_hint">ఫీడ్ చిరునామాను నమోదు చేయండి</string>
     <string name="no_url">URL లేదు</string>
     <string name="open_in_browser">వెబ్ బ్రౌజర్‌లో తెరవండి</string>

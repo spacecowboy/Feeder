@@ -5,7 +5,7 @@
     <string name="action_settings">Inställningar</string>
     <string name="add_feed">Lägg till flöde</string>
     <string name="title_activity_edit_feed">Prenumerera på flöde</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="tag">Tagg</string>
     <string name="add_feed_search_hint">FlödesURL</string>
     <string name="title">Titel</string>
@@ -134,7 +134,7 @@
     <string name="feed_item_style">Artikelstil</string>
     <string name="only_enable_for_bad_id_feeds">Använd endast för flöden med dåliga IDn</string>
     <string name="generate_extra_unique_ids">Skapa extraunika IDn</string>
-    <string name="invalid_url_or_uri">Felaktig URL</string>
+    <string name="invalid_url">Felaktig URL</string>
     <string name="failed_to_import_OPML">Misslyckades med att importera OPML</string>
     <string name="failed_to_export_OPML">Misslyckades med att exportera OPML</string>
     <string name="syncing">Synkroniseras</string>

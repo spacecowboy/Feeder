@@ -37,7 +37,7 @@
     <string name="action_settings">إعدادات</string>
     <string name="add_feed">أضف خلاصة</string>
     <string name="title_activity_edit_feed">اشترك بخلاصة</string>
-    <string name="url_or_uri">العنوان/الرابط</string>
+    <string name="url">العنوان/الرابط</string>
     <string name="tag">الوسم</string>
     <string name="add_feed_search_hint">مسار الخلاصة</string>
     <string name="title">العنوان</string>
@@ -154,7 +154,7 @@
     <string name="new_indicator">جديد</string>
     <string name="generate_extra_unique_ids">ولّد معرفات فريدة إضافية</string>
     <string name="only_enable_for_bad_id_feeds">فعله للخلاصات ذات المعرفات السيئة فقط</string>
-    <string name="invalid_url_or_uri">عنوان غير صالح</string>
+    <string name="invalid_url">عنوان غير صالح</string>
     <string name="failed_to_import_OPML">فشل استيراد OPML</string>
     <string name="failed_to_export_OPML">أخفق تصدير OPML</string>
     <string name="device_sync">مزامنة جهاز</string>

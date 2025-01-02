@@ -96,7 +96,7 @@
     <string name="mark_as_read">Marquer comme lu</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="tag">Étiquette</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="failed_to_parse">Impossible d’analyser %1$s</string>
     <string name="fetching_full_article">Récupération de l’article complet…</string>
     <string name="failed_to_fetch_full_article">Impossible de récupérer l’article complet</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Activer uniquement pour les flux avec de mauvais ID</string>
     <string name="syncing">Synchronisation</string>
     <string name="sync_status">État de la synchronisation</string>
-    <string name="invalid_url_or_uri">URL invalide</string>
+    <string name="invalid_url">URL invalide</string>
     <string name="failed_to_export_OPML">Échec de l’exportation OPML</string>
     <string name="failed_to_import_OPML">Échec de l’importation OPML</string>
     <string name="failed_to_open_article">Impossible d’ouvrir l’article</string>

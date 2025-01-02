@@ -3,7 +3,7 @@
     <string name="theme_e_ink">Електронно мастило</string>
     <string name="failed_to_parse_json_feed">Неуспешно анализиране на JSON емисия</string>
     <string name="only_enable_for_bad_id_feeds">Активирай само за емисии с лоши идентификатори</string>
-    <string name="invalid_url_or_uri">Невалиден URL адрес</string>
+    <string name="invalid_url">Невалиден URL адрес</string>
     <string name="mark_items_below_as_read">Маркирай по-долу като прочетено</string>
     <string name="sync_option_every_15min">На всеки 15 минути</string>
     <string name="remove_device_question">Сигурни ли сте, че искате да изтриете устройство %1$s?</string>
@@ -100,7 +100,7 @@
     <string name="failed_to_parse">Не можа да анализира %1$s</string>
     <string name="open_in_webview">Уеб изглед</string>
     <string name="synchronization">Синхронизация</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="open_in_reader">Четец</string>
     <string name="remove_device">Премахни устройство</string>
     <string name="use_app_default">Използвай приложение по подразбиране</string>

@@ -101,7 +101,7 @@
     <string name="title">Título</string>
     <string name="add_feed_search_hint">URL do feed</string>
     <string name="tag">Categoria</string>
-    <string name="url_or_uri">url</string>
+    <string name="url">url</string>
     <string name="title_activity_edit_feed">Inscreva-se no feed</string>
     <string name="add_feed">Adicionar um feed</string>
     <string name="action_settings">Configurações</string>
@@ -156,7 +156,7 @@
     <string name="feed_item_style_super_compact">Super compacto</string>
     <string name="generate_extra_unique_ids">Gerar IDs únicos extra</string>
     <string name="only_enable_for_bad_id_feeds">Ativar somente para feeds com IDs inválidos</string>
-    <string name="invalid_url_or_uri">Não é uma URL válida</string>
+    <string name="invalid_url">Não é uma URL válida</string>
     <string name="failed_to_import_OPML">Falha ao importar OPML</string>
     <string name="failed_to_export_OPML">Falha ao exportar OPML</string>
     <string name="device_sync">Sincronização de aparelhos</string>

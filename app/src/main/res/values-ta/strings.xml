@@ -102,7 +102,7 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="title">தலைப்பு</string>
     <string name="tag">குறிச்சொல்</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="add_feed">ஊட்டத்தை சேர்க்கவும்</string>
     <string name="action_settings">அமைப்புகள்</string>
     <string name="navigation_drawer_close">வழிசெலுத்தல் அலமாரியை மூடு</string>
@@ -125,7 +125,7 @@
     <string name="few_unread_articles">%1$s படிக்காத கட்டுரைகள்</string>
     <string name="only_enable_for_bad_id_feeds">மோசமான ஐடிகளைக் கொண்ட ஊட்டங்களை மட்டுமே இயக்கவும்</string>
     <string name="one_unread_article">%1$s படிக்காத கட்டுரை</string>
-    <string name="invalid_url_or_uri">சரியான URL அல்ல</string>
+    <string name="invalid_url">சரியான URL அல்ல</string>
     <string name="open_enclosed_media_file">%1$sஐத் திறக்கவும்</string>
     <string name="stop_reading">படிப்பதை நிறுத்து</string>
     <string name="showing_only_unread_articles">படிக்காத கட்டுரைகளை மட்டும் காட்டுகிறது</string>

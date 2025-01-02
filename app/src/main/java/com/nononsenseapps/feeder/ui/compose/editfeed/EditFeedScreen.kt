@@ -352,7 +352,7 @@ fun ColumnScope.LeftContent(
         value = viewState.feedUrl,
         onValueChange = { viewState.feedUrl = it.trim() },
         label = {
-            Text(stringResource(id = R.string.url_or_uri))
+            Text(stringResource(id = R.string.url))
         },
         isError = viewState.isNotValidUrl,
         keyboardOptions =
@@ -380,7 +380,7 @@ fun ColumnScope.LeftContent(
     AnimatedVisibility(visible = viewState.isNotValidUrl) {
         Text(
             textAlign = TextAlign.Center,
-            text = stringResource(R.string.invalid_url_or_uri),
+            text = stringResource(R.string.invalid_url),
             style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
         )
     }

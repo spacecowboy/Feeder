@@ -5,7 +5,7 @@
     <string name="action_settings">Ustawienia</string>
     <string name="add_feed">Dodaj kanał</string>
     <string name="title_activity_edit_feed">Subskrybuj kanał</string>
-    <string name="url_or_uri">Adres URL</string>
+    <string name="url">Adres URL</string>
     <string name="tag">Grupa</string>
     <string name="add_feed_search_hint">Adres URL kanału</string>
     <string name="title">Tytuł</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Włącz tylko dla kanałów z nieprawidłowymi identyfikatorami</string>
     <string name="syncing">Synchronizowanie</string>
     <string name="sync_status">Status synchronizacji</string>
-    <string name="invalid_url_or_uri">Nieprawidłowy adres URL</string>
+    <string name="invalid_url">Nieprawidłowy adres URL</string>
     <string name="failed_to_import_OPML">Nie udało się zaimportować OPML</string>
     <string name="failed_to_export_OPML">Nie udało się wyeksportować OPML</string>
     <string name="failed_to_open_article">Nie udało się otworzyć artykułu</string>

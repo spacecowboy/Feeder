@@ -96,7 +96,7 @@
     <string name="title">Назив</string>
     <string name="add_feed_search_hint">Мрежна адреса извора</string>
     <string name="tag">Ознака</string>
-    <string name="url_or_uri">Мрежна адреса</string>
+    <string name="url">Мрежна адреса</string>
     <string name="navigation_drawer_close">Затвори управљачку полицу</string>
     <string name="navigation_drawer_open">Отвори управљачку полицу</string>
     <string name="title_activity_edit_feed">Пријава на извор</string>
@@ -136,7 +136,7 @@
     <string name="from_anywhere">Из било ког смера</string>
     <string name="swipe_to_mark_as_read">Превуците да означите као прочитано</string>
     <string name="go_to_feed">Пређи на %1$s</string>
-    <string name="invalid_url_or_uri">Неважећа мрежна адреса</string>
+    <string name="invalid_url">Неважећа мрежна адреса</string>
     <string name="failed_to_export_OPML">Није успео извоз OPML фајла</string>
     <string name="are_you_sure_leave_sync_chain">Да ли сте сигурни да желите напустити ланац синхронизације\?</string>
     <string name="no_barcode_scanner_installed">Не може да се пронађе скенер бар кодова</string>

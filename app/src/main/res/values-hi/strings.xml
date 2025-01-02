@@ -103,7 +103,7 @@
     <string name="title">शीर्षक</string>
     <string name="add_feed_search_hint">फीड URL</string>
     <string name="tag">टैग</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="title_activity_edit_feed">फीड की सदस्यता लें</string>
     <string name="add_feed">फीड जोड़ें</string>
     <string name="action_settings">सेटिंग</string>
@@ -186,7 +186,7 @@
     <string name="one_unread_article">%1$s अपठित आलेख</string>
     <string name="generate_extra_unique_ids">अतिरिक्त विशिष्ट आईडी उत्पन्न करें</string>
     <string name="only_enable_for_bad_id_feeds">केवल खराब आईडी वाले फीड के लिए सक्षम करें</string>
-    <string name="invalid_url_or_uri">मान्य यूआरएल नहीं</string>
+    <string name="invalid_url">मान्य यूआरएल नहीं</string>
     <string name="are_you_sure_leave_sync_chain">क्या आप वाकई सिंक श्रृंखला छोड़ना चाहते हैं?</string>
     <string name="scan_or_enter_code">सिंक कोड स्कैन करें या दर्ज करें</string>
     <string name="already_read">पहले ही पढ़ चुके हैं</string>

@@ -6,9 +6,9 @@
   <string name="action_settings">Settings</string>
   <string name="add_feed">Add feed</string>
   <string name="title_activity_edit_feed">Subscribe to feed</string>
-  <string name="url_or_uri">URL/URI</string>
+  <string name="url">URL</string>
   <string name="tag">Tag</string>
-  <string name="add_feed_search_hint">Feed URL/URI</string>
+  <string name="add_feed_search_hint">Feed URL</string>
   <string name="title">Title</string>
   <string name="nostr_feed_description">Nostr articles by %1$s</string>
 
@@ -163,7 +163,7 @@
   <string name="feed_item_style_super_compact">Super compact</string>
   <string name="generate_extra_unique_ids">Generate extra unique IDs</string>
   <string name="only_enable_for_bad_id_feeds">Only enable for feeds with bad IDs</string>
-  <string name="invalid_url_or_uri">Not a valid URL/URI</string>
+  <string name="invalid_url">Not a valid URL</string>
   <string name="failed_to_import_OPML">"Failed to import OPML"</string>
   <string name="failed_to_export_OPML">"Failed to export OPML"</string>
   <string name="failed_to_export_saved_articles">"Failed to export saved articles"</string>

@@ -5,7 +5,7 @@
     <string name="action_settings">Pengaturan</string>
     <string name="add_feed">Tambah umpan</string>
     <string name="title_activity_edit_feed">Berlangganan ke umpan</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="tag">Tag</string>
     <string name="add_feed_search_hint">URL umpan</string>
     <string name="title">Judul</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Hanya aktifkan untuk umpan dengan ID yang buruk</string>
     <string name="syncing">Menyinkronkan</string>
     <string name="sync_status">Status sinkron</string>
-    <string name="invalid_url_or_uri">URL tidak valid</string>
+    <string name="invalid_url">URL tidak valid</string>
     <string name="failed_to_import_OPML">Gagal mengimpor OPML</string>
     <string name="failed_to_export_OPML">Gagal mengekspor OPML</string>
     <string name="failed_to_open_article">Tidak bisa membuka artikel</string>

@@ -101,7 +101,7 @@
     <string name="title">Titlu</string>
     <string name="add_feed_search_hint">URL de alimentare</string>
     <string name="tag">Etichetă</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="title_activity_edit_feed">Abonează-te la flux</string>
     <string name="add_feed">Adăugați fluxul</string>
     <string name="action_settings">Setări</string>
@@ -136,7 +136,7 @@
     <string name="generate_extra_unique_ids">Generarea de ID-uri unice suplimentare</string>
     <string name="syncing">Sincronizare</string>
     <string name="sync_status">Starea sincronizării</string>
-    <string name="invalid_url_or_uri">Nu este un URL valid</string>
+    <string name="invalid_url">Nu este un URL valid</string>
     <string name="failed_to_import_OPML">Nu a reușit să importe OPML</string>
     <string name="failed_to_export_OPML">Nu a reușit să exporte OPML</string>
     <string name="failed_to_open_article">Nu s-a putut deschide articolul</string>

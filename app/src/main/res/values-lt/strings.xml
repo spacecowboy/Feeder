@@ -8,7 +8,7 @@
     <string name="open_enclosed_media">Atidaryti uždarą laikmeną</string>
     <string name="toggle_read_status">Perjungti perskaitymo būseną</string>
     <string name="add_feed_search_hint">Sklaidos kanalo URL</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="navigation_drawer_close">Uždaryti naršymo stalčių</string>
     <string name="navigation_drawer_open">Atidaryti naršymo stalčių</string>
     <string name="notification_channel_description">Pranešimai rodomi tik neskaitytiems sukonfigūruotų kanalų elementams</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Įgalinti tik sklaidos kanalams su netinkamais ID</string>
     <string name="sync_status">Sinchronizavimo būsena</string>
     <string name="syncing">Sinchronizuojama</string>
-    <string name="invalid_url_or_uri">Netinkamas URL adresas</string>
+    <string name="invalid_url">Netinkamas URL adresas</string>
     <string name="this_device">%1$s (šis įrenginys)</string>
     <string name="disconnect_device_from_sync">Atjungti įrenginį nuo sinchronizavimo grandinės</string>
     <string name="start_new_sync_chain">Pradėti naują sinchronizavimo grandinę</string>

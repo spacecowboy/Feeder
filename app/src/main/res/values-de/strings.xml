@@ -5,7 +5,7 @@
     <string name="action_settings">Einstellungen</string>
     <string name="add_feed">Feed hinzufügen</string>
     <string name="title_activity_edit_feed">Feed abonnieren</string>
-    <string name="url_or_uri">Adresse</string>
+    <string name="url">Adresse</string>
     <string name="tag">Gruppe</string>
     <string name="add_feed_search_hint">Feed-Adresse</string>
     <string name="title">Name</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Nur für Feeds mit fehlerhaften IDs aktivieren</string>
     <string name="syncing">Synchronisierung</string>
     <string name="sync_status">Synchronisierungsstatus</string>
-    <string name="invalid_url_or_uri">Keine gültige Adresse</string>
+    <string name="invalid_url">Keine gültige Adresse</string>
     <string name="failed_to_import_OPML">OPML-Import fehlgeschlagen</string>
     <string name="failed_to_export_OPML">OPML-Export fehlgeschlagen</string>
     <string name="failed_to_open_article">Artikel konnte nicht geöffnet werden</string>

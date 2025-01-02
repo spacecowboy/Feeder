@@ -69,7 +69,7 @@
     <string name="mark_as_unread">未読にする</string>
     <string name="mark_as_read">既読にする</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="open_links_with">リンクを開く</string>
     <string name="preload_custom_tab">カスタムタブのプリロード</string>
     <string name="battery_optimization_enabled">オン</string>
@@ -138,7 +138,7 @@
     <string name="failed_to_open_article">記事を開けませんでした</string>
     <string name="one_unread_article">%1$s件の未読記事</string>
     <string name="generate_extra_unique_ids">ユニークなIDを生成する</string>
-    <string name="invalid_url_or_uri">有効なURLではありません</string>
+    <string name="invalid_url">有効なURLではありません</string>
     <string name="failed_to_export_OPML">OPMLのエクスポートに失敗しました</string>
     <string name="device_sync_financed_by_community">このサービスはコミュニティによって支えられています。便利だと思われましたら寄付をご検討ください。</string>
     <string name="disconnect_device_from_sync">同期チェーンからデバイスを切断</string>

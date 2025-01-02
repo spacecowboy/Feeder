@@ -5,7 +5,7 @@
     <string name="action_settings">Ayarlar</string>
     <string name="add_feed">Yayın ekle</string>
     <string name="title_activity_edit_feed">Yayına abone ol</string>
-    <string name="url_or_uri">Bağlantı</string>
+    <string name="url">Bağlantı</string>
     <string name="tag">Etiket</string>
     <string name="add_feed_search_hint">Yayın bağlantısı</string>
     <string name="title">Başlık</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Yalnızca hatalı kimliklere sahip yayınlar için etkinleştir</string>
     <string name="sync_status">Eşzamanlama durumu</string>
     <string name="syncing">Eşzamanlama</string>
-    <string name="invalid_url_or_uri">Geçerli bir URL değil</string>
+    <string name="invalid_url">Geçerli bir URL değil</string>
     <string name="failed_to_import_OPML">OPML içe aktarılamadı</string>
     <string name="failed_to_export_OPML">OPML dışa aktarılamadı</string>
     <string name="failed_to_open_article">Makale açılamadı</string>

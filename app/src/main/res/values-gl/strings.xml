@@ -24,7 +24,7 @@
     <string name="navigation_drawer_open">Abrir cadro de navegación</string>
     <string name="navigation_drawer_close">Pechar cadro de navegación</string>
     <string name="action_settings">Axustes</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="tag">Etiqueta</string>
     <string name="add_feed_search_hint">URL da canle</string>
     <string name="title">Título</string>
@@ -160,7 +160,7 @@
     <string name="feed_item_style_super_compact">Moi compacto</string>
     <string name="generate_extra_unique_ids">Crear IDs únicos extra</string>
     <string name="only_enable_for_bad_id_feeds">Activar só para canles con IDs incorrectos</string>
-    <string name="invalid_url_or_uri">URL non válido</string>
+    <string name="invalid_url">URL non válido</string>
     <string name="failed_to_import_OPML">Fallou a importación OPML</string>
     <string name="failed_to_export_OPML">Fallou a exportación OPML</string>
     <string name="device_sync">Sincr dispositivo</string>

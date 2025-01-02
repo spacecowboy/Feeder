@@ -5,7 +5,7 @@
     <string name="stop_reading">หยุดอ่าน</string>
     <string name="title_activity_edit_feed">สมัครรับข้อมูลฟีด</string>
     <string name="resume_reading">เรื่มอ่านต่อ</string>
-    <string name="url_or_uri">ที่อยู่เว็บ</string>
+    <string name="url">ที่อยู่เว็บ</string>
     <string name="title_activity_settings">การตั้งค่า</string>
     <string name="set_language">ตั้งค่าภาษา</string>
     <string name="nothing_to_display">ไม่มีอะไรให้แสดง!</string>
@@ -156,7 +156,7 @@
     <string name="feed_item_style_super_compact">กระทัดรัดมากๆ</string>
     <string name="generate_extra_unique_ids">สร้าง ID เฉพาะตัวเพื่มเติม</string>
     <string name="only_enable_for_bad_id_feeds">เปิดใช้งานเฉพาะฟีดที่มี ID ไม่ถูกต้อง</string>
-    <string name="invalid_url_or_uri">ไม่ใช่ที่อยู่ URL ที่ใช้ได้</string>
+    <string name="invalid_url">ไม่ใช่ที่อยู่ URL ที่ใช้ได้</string>
     <string name="failed_to_import_OPML">นำเข้าไฟล์ OPML ล้มเหลว</string>
     <string name="failed_to_export_OPML">ส่งออกไฟล์ OPML ล้มเหลว</string>
     <string name="add_new_device">เพื่มอุปกรณ์ใหม่</string>

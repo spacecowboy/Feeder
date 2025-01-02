@@ -96,7 +96,7 @@
     <string name="mark_items_above_as_read">Segna gli elementi sopra come letti</string>
     <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="failed_to_parse">Impossibile analizzare %1$s</string>
     <string name="fetching_full_article">Recupero dell\'articolo completo…</string>
     <string name="failed_to_fetch_full_article">Impossibile recuperare l’articolo completo</string>
@@ -136,7 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Attivare solo per i feed con ID errati</string>
     <string name="sync_status">Stato di sincronizzazione</string>
     <string name="syncing">Sincronizzazione</string>
-    <string name="invalid_url_or_uri">URL non valido</string>
+    <string name="invalid_url">URL non valido</string>
     <string name="failed_to_import_OPML">Impossibile importare OPML</string>
     <string name="failed_to_export_OPML">Impossibile esportare OPML</string>
     <string name="failed_to_open_article">Impossibile aprire l\'articolo</string>

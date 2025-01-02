@@ -82,7 +82,7 @@
     <string name="title">Tittel</string>
     <string name="add_feed_search_hint">Nettadresse til informasjonskanal</string>
     <string name="tag">Etikett</string>
-    <string name="url_or_uri">Nettadresse</string>
+    <string name="url">Nettadresse</string>
     <string name="add_feed">Legg til informasjonskanal</string>
     <string name="title_activity_edit_feed">Abonner på informasjonskanal</string>
     <string name="action_settings">Innstillinger</string>
@@ -139,7 +139,7 @@
     <string name="failed_to_export_OPML">Klarte ikke å eksportere OPML</string>
     <string name="failed_to_import_OPML">Klarte ikke å importere OPML</string>
     <string name="failed_to_open_article">Kunne ikke åpne artikkel</string>
-    <string name="invalid_url_or_uri">Ikke en gyldig nettadresse</string>
+    <string name="invalid_url">Ikke en gyldig nettadresse</string>
     <string name="use_detect_language">Oppdag språk</string>
     <string name="description_for_read_aloud">Oppdager artikkelspråk automatisk</string>
     <string name="device_sync_description_2">Skann koden fra din synkronisering som du opprettet på en annen enhet, eller opprett en ny.</string>

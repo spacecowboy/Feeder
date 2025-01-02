@@ -91,7 +91,7 @@
     <string name="mark_items_above_as_read">Označit výše uvedené články za přečtené</string>
     <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
-    <string name="url_or_uri">URL</string>
+    <string name="url">URL</string>
     <string name="failed_to_parse">Nelze zpracovat %1$s</string>
     <string name="fetching_full_article">Načítání celého článku…</string>
     <string name="failed_to_fetch_full_article">Nepodařilo se načíst celý článek</string>
@@ -137,7 +137,7 @@
     <string name="feed_item_style_card">Jako karty</string>
     <string name="feed_item_style_super_compact">Velmi nahuštěný</string>
     <string name="generate_extra_unique_ids">Generovat unikátní ID navíc</string>
-    <string name="invalid_url_or_uri">Neplatná URL</string>
+    <string name="invalid_url">Neplatná URL</string>
     <string name="failed_to_import_OPML">Nepodařilo se importovat OPML</string>
     <string name="dark_theme_preference">Upřednostňováný noční režim</string>
     <string name="add_new_device">Přidat nové zařízení</string>
