@@ -123,7 +123,7 @@
     <string name="title">عنوان</string>
     <string name="add_feed_search_hint">نشانی خوراک</string>
     <string name="tag">برچسب</string>
-    <string name="url">نشانی</string>
+    <string name="url_or_uri">نشانی</string>
     <string name="title_activity_edit_feed">اشتراک یک خوراک</string>
     <string name="add_feed">افزودن خوراک</string>
     <string name="action_settings">تنظیمات</string>

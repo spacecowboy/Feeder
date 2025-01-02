@@ -101,7 +101,7 @@
     <string name="title">Tiêu đề</string>
     <string name="add_feed_search_hint">URL nguồn cấp</string>
     <string name="tag">Thẻ</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="title_activity_edit_feed">Đăng ký nguồn cấp</string>
     <string name="add_feed">Thêm nguồn cấp</string>
     <string name="action_settings">Cài đặt</string>
@@ -134,7 +134,7 @@
     <string name="dark_theme_preference">Chủ đề tối được ưu tiên</string>
     <string name="sync_status">Trạng thái đồng bộ</string>
     <string name="only_enable_for_bad_id_feeds">Chỉ bật cho các nguồn cấp có ID không hợp lệ</string>
-    <string name="invalid_url">Không phải URL hợp lệ</string>
+    <string name="invalid_url_or_uri">Không phải URL hợp lệ</string>
     <string name="generate_extra_unique_ids">Tạo thêm các ID độc nhất</string>
     <string name="syncing">Đang đồng bộ</string>
     <string name="failed_to_import_OPML">Nhập OPML thất bại</string>

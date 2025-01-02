@@ -50,7 +50,7 @@
     <string name="title">標題</string>
     <string name="add_feed_search_hint">訂閱來源 URL</string>
     <string name="tag">標籤</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="title_activity_edit_feed">訂閱 Feed</string>
     <string name="add_feed">新增訂閱</string>
     <string name="failed_to_export_OPML">匯出 OPML 失敗</string>
@@ -72,7 +72,7 @@
     <string name="open_menu">打開選單</string>
     <string name="battery_optimization">電池最佳化</string>
     <string name="failed_to_load_text_to_speech">無法讀取朗讀文字</string>
-    <string name="invalid_url">不正確的 URL</string>
+    <string name="invalid_url_or_uri">不正確的 URL</string>
     <string name="no_email_client">無法打開 E-mail 程式</string>
     <string name="javascript">Javascript</string>
     <string name="title_activity_settings">設定</string>

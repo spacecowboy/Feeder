@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tag">Címke</string>
-    <string name="url">Webcím</string>
+    <string name="url_or_uri">Webcím</string>
     <string name="add_feed_search_hint">Hírfolyam webcím</string>
     <string name="empty_feed_top">Nincs itt semmi olvasnivaló. Szeretne inkább…</string>
     <string name="title">Cím</string>
@@ -170,7 +170,7 @@
     <string name="battery_optimization_enabled">Be</string>
     <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_super_compact">Szuper kompakt</string>
-    <string name="invalid_url">Nem érvényes webcím</string>
+    <string name="invalid_url_or_uri">Nem érvényes webcím</string>
     <string name="remove_device">Eszköz eltávolítása</string>
     <string name="sync_to_fetch">Szinkronizálás a cikk lekéréséhez</string>
     <string name="new_indicator">Új</string>

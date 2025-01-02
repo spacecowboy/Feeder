@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="only_enable_for_bad_id_feeds">Tenê ji bo postên bi nasnameyên çewt çalak bike</string>
-    <string name="invalid_url">Ne lînkekî derbasdar e</string>
+    <string name="invalid_url_or_uri">Ne lînkekî derbasdar e</string>
     <string name="mark_items_below_as_read">Ya jêrîn wekî hatine xwendin bijmêre</string>
     <string name="sync_option_every_15min">Her serê 15 deqîqeyan carekê</string>
     <string name="remove_device_question">Ma tu bi rastî dixwazî pergala %1$s jê bibî?</string>
@@ -85,7 +85,7 @@
     <string name="failed_to_parse">%1$s nehat derandin</string>
     <string name="open_in_webview">dîtina webê</string>
     <string name="synchronization">Hevdemkirin</string>
-    <string name="url">Lînk</string>
+    <string name="url_or_uri">Lînk</string>
     <string name="open_in_reader">Xwîner</string>
     <string name="remove_device">Pergalê jêbibe</string>
     <string name="use_app_default">Bernameya jixweber bikar bînin</string>

@@ -2,7 +2,7 @@
 <resources>
     <string name="action_settings">Parametrat</string>
     <string name="add_feed">Shto feed</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="tag">Etiketa</string>
     <string name="title">Titulli</string>
     <string name="navigation_drawer_open">Hap navigimim</string>

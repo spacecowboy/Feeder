@@ -5,7 +5,7 @@
     <string name="action_settings">Asetukset</string>
     <string name="add_feed">Lisää syöte</string>
     <string name="title_activity_edit_feed">Tilaa syöte</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="tag">Tunniste</string>
     <string name="add_feed_search_hint">Syöte-URL</string>
     <string name="title">Otsikko</string>
@@ -133,7 +133,7 @@
     <string name="dark_theme_preference_dark">Tumma</string>
     <string name="dark_theme_preference">Suosittu tumma teema</string>
     <string name="syncing">Synkronoidaan</string>
-    <string name="invalid_url">Ei kelvollinen URL-osoite</string>
+    <string name="invalid_url_or_uri">Ei kelvollinen URL-osoite</string>
     <string name="sync_status">Synkronoinnin tila</string>
     <string name="failed_to_open_article">Artikkelia ei voitu avata</string>
     <string name="generate_extra_unique_ids">Luo ylimääräisiä yksilöllisiä tunnuksia</string>

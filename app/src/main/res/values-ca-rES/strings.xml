@@ -91,7 +91,7 @@
     <string name="title">Títol</string>
     <string name="add_feed_search_hint">URL del canal</string>
     <string name="tag">Etiqueta</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="title_activity_edit_feed">Subscriure\'s al canal</string>
     <string name="add_feed">Afegeix un canal</string>
     <string name="action_settings">Configuració</string>
@@ -170,7 +170,7 @@
     <string name="unread_adjective">Sense llegir</string>
     <string name="already_read">Ja llegit</string>
     <string name="one_unread_article">%1$s article sense llegir</string>
-    <string name="invalid_url">URL no vàlida</string>
+    <string name="invalid_url_or_uri">URL no vàlida</string>
     <string name="device_sync">Sincronització del dispositiu</string>
     <string name="disconnect_device_from_sync">Desconnecta el dispositiu de la cadena de sincronització</string>
     <string name="press_scan_sync">Al seu dispositiu, navegui a la sincronització del dispositiu i premi «Escaneja el codi de sincronització».</string>

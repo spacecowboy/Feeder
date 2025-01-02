@@ -23,7 +23,7 @@
     <string name="sync_option_manually">Χειροκίνητα</string>
     <string name="sync_option_every_3_hours">Κάθε 3 ώρες</string>
     <string name="open_in_browser">Άνοιγμα σε περιηγητή ιστού</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="navigation_drawer_open">Άνοιγμα συρταριού πλοήγησης</string>
     <string name="navigation_drawer_close">Κλείσιμο συρταριού πλοήγησης</string>
     <string name="open_enclosed_media_file">Άνοιγμα %1$s</string>
@@ -75,7 +75,7 @@
     <string name="from_anywhere">Από οπουδήποτε</string>
     <string name="only_from_end">Μόνο από το τέλος</string>
     <string name="feed_item_style_compact">Συμπαγής</string>
-    <string name="invalid_url">Εισαγάγετε μια έγκυρη διεύθυνση URL</string>
+    <string name="invalid_url_or_uri">Εισαγάγετε μια έγκυρη διεύθυνση URL</string>
     <string name="failed_to_import_OPML">Απέτυχε η εισαγωγή OPML</string>
     <string name="mark_as_read">Σήμανση ως αναγνωσμένο</string>
     <string name="show_all_items">Εμφάνιση όλων των αντικειμένων</string>

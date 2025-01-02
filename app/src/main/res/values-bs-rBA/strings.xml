@@ -5,7 +5,7 @@
     <string name="action_settings">Postavke</string>
     <string name="add_feed">Dodaj izvor vijesti (feed)</string>
     <string name="title_activity_edit_feed">Pretplata na izvor vijesti</string>
-    <string name="url">URL</string>
+    <string name="url_or_uri">URL</string>
     <string name="tag">Oznaka</string>
     <string name="add_feed_search_hint">Adresa izvora vijesti</string>
     <string name="title">Naslov</string>
@@ -137,7 +137,7 @@
     <string name="swipe_to_mark_as_read">Prevucite prstom za označavanje kao pročitano</string>
     <string name="from_anywhere">Iz bilo kojeg smjera</string>
     <string name="failed_to_open_article">Nemoguće otvoriti članak</string>
-    <string name="invalid_url">Nevažeći URL</string>
+    <string name="invalid_url_or_uri">Nevažeći URL</string>
     <string name="failed_to_export_OPML">Neuspješan izvoz OPML-a</string>
     <string name="are_you_sure_leave_sync_chain">Jeste li sigurni da napustite sinhronizacijsku mrežu\?</string>
     <string name="no_barcode_scanner_installed">Nemoguće pronaći skener bar kodova</string>
