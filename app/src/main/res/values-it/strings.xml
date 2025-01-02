@@ -260,4 +260,5 @@
     <string name="summarize">Riepilogo</string>
     <string name="azure_deployment_id">Id dell\'implementazione Azure</string>
     <string name="list_of_available_models">Elenco dei modelli disponibili</string>
+    <string name="open_drawer_on_fab">Mostra i feed dopo averli contrassegnati come letti</string>
 </resources>
