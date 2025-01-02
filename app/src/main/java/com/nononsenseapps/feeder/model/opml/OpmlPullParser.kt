@@ -6,6 +6,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
+import com.nononsenseapps.feeder.util.getOrCreateFromUri
 import com.nononsenseapps.feeder.util.isNostrUri
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
@@ -249,7 +250,7 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
             )
         try {
             val parsedUrlOrUri = parser.getAttributeValue(null, ATTR_XMLURL)
-            val feedUrl = URL(if (parsedUrlOrUri.isNostrUri()) "https://njump.me/$parsedUrlOrUri" else parsedUrlOrUri)
+            val feedUrl = URL(parsedUrlOrUri.getOrCreateFromUri())
             val feed =
                 Feed(
                     // Ensure not both are empty string: title will get replaced on sync

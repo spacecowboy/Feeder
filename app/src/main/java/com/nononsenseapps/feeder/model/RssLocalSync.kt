@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.model
 
 import android.util.Log
+import com.nononsenseapps.feeder.FeederApplication
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceFullTextSync
 import com.nononsenseapps.feeder.blob.blobFile
@@ -50,6 +52,7 @@ class RssLocalSync(override val di: DI) : DIAware {
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val filePathProvider: FilePathProvider by instance()
+    private val application: FeederApplication by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
@@ -249,10 +252,12 @@ class RssLocalSync(override val di: DI) : DIAware {
             Either.catching(
                 onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
             ) {
-                feedParser.getProfileMetadata(url)
-                    .getOrNull()!!
+                feedParser.getProfileMetadata(url).getOrNull() ?: throw NostrMetadataException("Could not find metadata for $url")
             }.flatMap { profile ->
                 feedParser.findNostrFeed(profile)
+                    .map {
+                        it.copy(description = application.applicationContext.getString(R.string.nostr_feed_description, profile.name))
+                    }
             }
         } else {
             Either.catching(

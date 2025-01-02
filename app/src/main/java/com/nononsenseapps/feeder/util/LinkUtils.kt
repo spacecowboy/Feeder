@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.util
 
+import com.nononsenseapps.feeder.ui.NOSTR_URI_PREFIX
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
@@ -99,9 +100,8 @@ fun relativeLinkIntoAbsoluteOrThrow(
         URL(base, link)
     }
 
-fun String.isNostrUri(): Boolean {
-    val nostrPrefix = "nostr:"
-    return this.startsWith(nostrPrefix) && length > nostrPrefix.length
-}
+fun String.isNostrUri(): Boolean = startsWith(NOSTR_URI_PREFIX) && length > NOSTR_URI_PREFIX.length
 
 fun URL.isAdaptedUrlFromNostrUri(): Boolean = this.toString().startsWith("https://njump.me")
+
+fun String.getOrCreateFromUri(): String = if (isNostrUri()) "https://njump.me/$this" else this

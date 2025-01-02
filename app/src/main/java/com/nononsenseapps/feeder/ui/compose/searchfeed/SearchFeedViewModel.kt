@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.nononsenseapps.feeder.FeederApplication
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
@@ -29,6 +31,7 @@ import java.time.Instant
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()
     private val repository: Repository by instance()
+    private val application: FeederApplication by instance()
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
@@ -56,23 +59,10 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                         SearchResult(
                             title = metadata.name,
                             url = metadata.uri,
-                            description = "Nostr Articles by ${metadata.name}",
+                            description = application.applicationContext.getString(R.string.nostr_feed_description, metadata.name),
                             feedImage = metadata.imageUrl,
                         )
                     }
-
-//                    feedParser.findNostrFeed(metadata)
-//                        .map { nostrFeed ->
-//                            SearchResult(
-//                                title = nostrFeed.title ?: "",
-//                                url = nostrFeed.feed_url ?: metadata.uri,
-//                                description = nostrFeed.description ?: "",
-//                                feedImage = nostrFeed.icon ?: ""
-//                            )
-//                        }
-//                        .onLeft {
-//
-//                        }
                 }
             }
                 .flowOn(Dispatchers.Default)

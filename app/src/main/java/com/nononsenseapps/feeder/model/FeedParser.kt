@@ -247,7 +247,7 @@ class FeedParser(override val di: DI) : DIAware {
             when (parsedProfile) {
                 is Nip21Enum.Pubkey -> return Nip19Profile(parsedProfile.publicKey)
                 is Nip21Enum.Profile -> return Nip19Profile(parsedProfile.profile.publicKey(), parsedProfile.profile.relays())
-                else -> throw Throwable(message = "Could not find the user's info: $nostrUri")
+                else -> throw NostrUriParserException(message = "Could not find the user's info: $nostrUri")
             }
         }
     }
@@ -264,7 +264,7 @@ class FeedParser(override val di: DI) : DIAware {
                         it.size < 4
                     }.orEmpty()
                     .ifEmpty { getUserPublishRelays(publicKey) }
-            println("Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
+            logDebug(LOG_TAG, "Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
             relayList
                 .ifEmpty { defaultFetchRelays }
                 .forEach { relayUrl ->
@@ -276,7 +276,7 @@ class FeedParser(override val di: DI) : DIAware {
                     publicKey = publicKey,
                     timeout = Duration.ofSeconds(5L),
                 )
-            println(profileInfo.asPrettyJson())
+            logDebug(LOG_TAG, profileInfo.asPrettyJson())
 
             // Check if all relays in relaylist can be connected to
             AuthorNostrData(
@@ -329,7 +329,7 @@ class FeedParser(override val di: DI) : DIAware {
             Filter()
                 .author(author)
                 .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
-        logDebug(LOG_TAG, "Relay List size: -> ${relays.size}")
+        logDebug(LOG_TAG, "Relay List size: ${relays.size}")
 
         nostrClient.removeAllRelays()
         val relaysToUse =
@@ -337,7 +337,7 @@ class FeedParser(override val di: DI) : DIAware {
                 .ifEmpty { defaultFetchRelays }
         relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
-        logDebug(LOG_TAG, "-------------------FETCHING ARTICLES----------------------")
+        logDebug(LOG_TAG, "FETCHING ARTICLES")
         val articleEventSet =
             nostrClient.fetchEventsFrom(
                 urls = relaysToUse,
@@ -448,7 +448,7 @@ private fun List<Event>.mapToFeed(
     authorName: String,
     imageUrl: String,
 ): ParsedFeed {
-    val description = "Nostr articles by $authorName"
+    val description = "Nostr: $authorName"
     val author =
         ParsedAuthor(
             name = authorName,
@@ -511,14 +511,14 @@ fun Event.asArticle(
     val articleSummary = tags().find(TagKind.Summary)?.content()
     val articleContent = content()
     val parsedMarkdown = markDownParser.buildMarkdownTreeFromString(articleContent)
-    val htmlFromContent = HtmlGenerator(articleContent, parsedMarkdown, CommonMarkFlavourDescriptor()).generateHtml()
+    val htmlContent = HtmlGenerator(articleContent, parsedMarkdown, CommonMarkFlavourDescriptor()).generateHtml()
 
     return ParsedArticle(
         id = articleId,
         url = articleUri,
         external_url = externalLink,
         title = articleTitle,
-        content_html = htmlFromContent,
+        content_html = htmlContent,
         content_text = articleContent,
         summary = articleSummary,
         image = if (articleImage != null) MediaImage(url = articleImage.toString()) else null,
@@ -732,6 +732,12 @@ class AuthorNostrData(
     val imageUrl: String,
     val relayList: List<String>,
 )
+
+sealed class NostrException(message: String) : Exception(message)
+
+class NostrUriParserException(override val message: String) : NostrException(message)
+
+class NostrMetadataException(override val message: String) : NostrException(message)
 
 @Parcelize
 sealed class FeedParserError : Parcelable {

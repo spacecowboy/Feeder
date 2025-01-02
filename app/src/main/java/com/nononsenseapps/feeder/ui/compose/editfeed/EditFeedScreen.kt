@@ -84,6 +84,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
+import com.nononsenseapps.feeder.util.isNostrUri
 
 @Composable
 fun CreateFeedScreen(
@@ -351,9 +352,9 @@ fun ColumnScope.LeftContent(
         value = viewState.feedUrl,
         onValueChange = { viewState.feedUrl = it.trim() },
         label = {
-            Text(stringResource(id = R.string.url))
+            Text(stringResource(id = R.string.url_or_uri))
         },
-        isError = !viewState.isNostrUri && viewState.isNotValidUrl,
+        isError = viewState.isNotValidUrl,
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
@@ -376,10 +377,10 @@ fun ColumnScope.LeftContent(
                     focusManager.moveFocus(FocusDirection.Down)
                 },
     )
-    AnimatedVisibility(visible = !viewState.isNostrUri && viewState.isNotValidUrl) {
+    AnimatedVisibility(visible = viewState.isNotValidUrl) {
         Text(
             textAlign = TextAlign.Center,
-            text = stringResource(R.string.invalid_url),
+            text = stringResource(R.string.invalid_url_or_uri),
             style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
         )
     }
@@ -488,8 +489,8 @@ fun ColumnScope.RightContent(
 ) {
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
-        checked = if (viewState.isNostrUri) false else viewState.fullTextByDefault,
-        enabled = !viewState.isNostrUri,
+        checked = viewState.fullTextByDefault,
+        enabled = !viewState.feedUrl.isNostrUri(),
         icon = null,
         modifier =
             Modifier
@@ -571,7 +572,6 @@ interface EditFeedScreenState {
     var articleOpener: String
     var alternateId: Boolean
     val isOkToSave: Boolean
-    val isNostrUri: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
     val isOpenItemWithCustomTab: Boolean
@@ -586,7 +586,6 @@ fun EditFeedScreenState(): EditFeedScreenState = ScreenState()
 
 private class ScreenState(
     override val isOkToSave: Boolean = false,
-    override val isNostrUri: Boolean = false,
     override val isNotValidUrl: Boolean = false,
     override val isOpenItemWithBrowser: Boolean = false,
     override val isOpenItemWithCustomTab: Boolean = false,
