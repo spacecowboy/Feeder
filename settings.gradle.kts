@@ -214,6 +214,8 @@ dependencyResolutionManagement {
                 "org.rust-nostr",
                 "nostr-sdk"
             ).version("0.37.0")
+            //Markdown
+            library("jetbrains-markdown", "org.jetbrains", "markdown").version("0.7.3")
 
             // For better fetching
             library("okhttp", "com.squareup.okhttp3", "okhttp").withoutVersion()
