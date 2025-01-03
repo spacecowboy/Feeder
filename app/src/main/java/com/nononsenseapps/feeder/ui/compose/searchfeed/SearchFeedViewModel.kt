@@ -31,7 +31,7 @@ import java.time.Instant
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()
     private val repository: Repository by instance()
-    private val application: FeederApplication by instance()
+    private val application = getApplication<FeederApplication>()
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
