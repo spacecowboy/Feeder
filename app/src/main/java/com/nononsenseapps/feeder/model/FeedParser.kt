@@ -42,6 +42,7 @@ import rust.nostr.sdk.KindEnum
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
+import rust.nostr.sdk.NostrSdkException
 import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
@@ -272,10 +273,20 @@ class FeedParser(override val di: DI) : DIAware {
                 }
             nostrClient.connect()
             val profileInfo =
-                nostrClient.fetchMetadata(
-                    publicKey = publicKey,
-                    timeout = Duration.ofSeconds(5L),
-                )
+                try {
+                    nostrClient.fetchMetadata(
+                        publicKey = publicKey,
+                        timeout = Duration.ofSeconds(5L),
+                    )
+                } catch (e: NostrSdkException) {
+                    //We will use a default relay regardless of whether it is added above, to keep things simple.
+                    nostrClient.addReadRelay(defaultFetchRelays.random())
+                    nostrClient.connect()
+                    nostrClient.fetchMetadata(
+                        publicKey = publicKey,
+                        timeout = Duration.ofSeconds(5L),
+                    )
+                }
             logDebug(LOG_TAG, profileInfo.asPrettyJson())
 
             // Check if all relays in relaylist can be connected to
@@ -333,7 +344,7 @@ class FeedParser(override val di: DI) : DIAware {
 
         nostrClient.removeAllRelays()
         val relaysToUse =
-            relays.take(2).plus(defaultArticleFetchRelays.random())
+            relays.take(3).plus(defaultArticleFetchRelays.random())
                 .ifEmpty { defaultFetchRelays }
         relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
