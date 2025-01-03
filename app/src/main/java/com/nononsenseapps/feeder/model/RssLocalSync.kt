@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.model
 
+import android.app.Application
 import android.util.Log
-import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceFullTextSync
@@ -52,7 +52,7 @@ class RssLocalSync(override val di: DI) : DIAware {
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val filePathProvider: FilePathProvider by instance()
-    private val application: FeederApplication by instance()
+    private val application: Application by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,

@@ -279,7 +279,7 @@ class FeedParser(override val di: DI) : DIAware {
                         timeout = Duration.ofSeconds(5L),
                     )
                 } catch (e: NostrSdkException) {
-                    //We will use a default relay regardless of whether it is added above, to keep things simple.
+                    // We will use a default relay regardless of whether it is added above, to keep things simple.
                     nostrClient.addReadRelay(defaultFetchRelays.random())
                     nostrClient.connect()
                     nostrClient.fetchMetadata(
