@@ -261,4 +261,5 @@
     <string name="list_of_available_models">Lista dostępnych modeli</string>
     <string name="show_message">Pokaż wiadomość</string>
     <string name="open_drawer_on_fab">Pokazuj kanały po oznaczeniu wszystkiego jako przeczytane</string>
+    <string name="nostr_feed_description">Artykuły Nostr od %1$s</string>
 </resources>
