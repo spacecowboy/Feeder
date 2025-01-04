@@ -13,8 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
-        versionCode = 323
-        versionName = "2.7.4"
+        versionCode = 324
+        versionName = "2.8.0"
         minSdk = 23
         targetSdk = 35
 

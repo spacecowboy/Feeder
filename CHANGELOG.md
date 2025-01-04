@@ -1,3 +1,29 @@
+# 2.8.0
+Agnieszka C (1):
+  * [6dbedc6c] Updated Polish translation using Weblate
+
+Jonas Kalderstam (2):
+  * [719ead9b] Updated Swedish translation using Weblate
+  * [fef585f8] Fixed emulator test crash
+
+KotlinGeekDev (1):
+  * [7fae5a36] added Nostr feed support (#471)
+
+Wiccio (1):
+  * [c6d9c850] Updated Esperanto translation using Weblate
+
+bowornsin (1):
+  * [e0093389] Updated Thai translation using Weblate
+
+summoner001 (1):
+  * [e6ab1a1b] Updated Hungarian translation using Weblate
+
+trunars (1):
+  * [27585e48] Updated Bulgarian translation using Weblate
+
+தமிழ்நேரம் (1):
+  * [49a559dc] Translated using Weblate (Tamil)
+
 # 2.7.4
 Jonas Kalderstam (2):
   * [49f3008c] fixed tablet being hardcoded to card article style
