@@ -14,6 +14,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.danielrampelt.coil.ico.IcoDecoder
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -167,6 +168,11 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                             .maxSizeBytes(250L * 1024 * 1024)
                             .build(),
                     )
+                    .memoryCache {
+                        MemoryCache.Builder(this@FeederApplication)
+                            .maxSizeBytes(50 * 1024 * 1024)
+                            .build()
+                    }
                     .components {
                         add(TooLargeImageInterceptor())
                         add(SvgDecoder.Factory())
