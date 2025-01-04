@@ -88,6 +88,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
+import com.nononsenseapps.feeder.util.getOrCreateFromUri
+import com.nononsenseapps.feeder.util.isNostrUri
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -227,11 +229,13 @@ fun SearchFeedView(
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
         if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() &&
-            isValidUrl(
-                feedUrl,
-            )
+            (isValidUrl(feedUrl))
         ) {
-            onSearchCallback(sloppyLinkToStrictURLNoThrows(feedUrl))
+            onSearchCallback(
+                sloppyLinkToStrictURLNoThrows(
+                    feedUrl.getOrCreateFromUri(),
+                ),
+            )
         }
     }
 
@@ -335,6 +339,12 @@ fun ColumnScope.leftContent(
             isValidUrl(feedUrl)
         }
     }
+    val isNostrUri by remember(feedUrl) {
+        derivedStateOf {
+            feedUrl.isNostrUri()
+        }
+    }
+
     TextField(
         value = feedUrl,
         onValueChange = onUrlChange,
@@ -352,8 +362,10 @@ fun ColumnScope.leftContent(
         keyboardActions =
             KeyboardActions(
                 onSearch = {
-                    if (isValidUrl) {
-                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    if (isValidUrl || isNostrUri) {
+                        onSearch(
+                            sloppyLinkToStrictURLNoThrows(feedUrl.getOrCreateFromUri()),
+                        )
                         keyboardController?.hide()
                     }
                 },
@@ -364,7 +376,9 @@ fun ColumnScope.leftContent(
                 .width(dimens.maxContentWidth)
                 .interceptKey(Key.Enter) {
                     if (isValidUrl(feedUrl)) {
-                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                        onSearch(
+                            sloppyLinkToStrictURLNoThrows(feedUrl.getOrCreateFromUri()),
+                        )
                         keyboardController?.hide()
                     }
                 }
@@ -379,7 +393,7 @@ fun ColumnScope.leftContent(
         onClick = {
             if (isValidUrl) {
                 try {
-                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl.getOrCreateFromUri()))
                     clearFocus()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Can't search", e)
@@ -668,12 +682,16 @@ private fun isValidUrl(url: String): Boolean {
         return false
     }
     return try {
-        try {
-            URL(url)
+        if (url.isNostrUri()) {
             true
-        } catch (_: MalformedURLException) {
-            URL("http://$url")
-            true
+        } else {
+            try {
+                URL(url)
+                true
+            } catch (_: MalformedURLException) {
+                URL("http://$url")
+                true
+            }
         }
     } catch (e: Exception) {
         false

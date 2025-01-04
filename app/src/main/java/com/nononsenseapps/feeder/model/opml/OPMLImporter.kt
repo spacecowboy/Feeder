@@ -25,7 +25,6 @@ open class OPMLImporter(override val di: DI) : OPMLParserHandler, DIAware {
 
     override suspend fun saveFeed(feed: Feed) {
         val existing = feedDao.loadFeedWithUrl(feed.url)
-
         // Don't want to remove existing feed on OPML imports
         if (existing != null) {
             feedDao.updateFeed(feed.copy(id = existing.id))

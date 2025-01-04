@@ -99,6 +99,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            matchingFallbacks.add("release")
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -107,7 +108,6 @@ android {
 //            }
         }
     }
-
     testOptions {
         unitTests {
             isReturnDefaultValues = true
@@ -224,6 +224,12 @@ dependencies {
     implementation(libs.bundles.kotlin)
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
+
+    // Nostr
+    implementation(libs.rust.nostr)
+
+    // Markdown
+    implementation(libs.jetbrains.markdown)
 
     // Only for debug
     debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")

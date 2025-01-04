@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.model
 
+import android.app.Application
 import android.util.Log
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceFullTextSync
 import com.nononsenseapps.feeder.blob.blobFile
@@ -13,6 +15,7 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatMap
+import com.nononsenseapps.feeder.util.isAdaptedUrlFromNostrUri
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.right
@@ -49,6 +52,7 @@ class RssLocalSync(override val di: DI) : DIAware {
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val filePathProvider: FilePathProvider by instance()
+    private val application: Application by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
@@ -242,32 +246,46 @@ class RssLocalSync(override val di: DI) : DIAware {
         }
 
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
+        // Alternate based on Nostr feed
 
-        return Either.catching(
-            onCatch = { t ->
-                FetchError(url = url.toString(), throwable = t)
-            },
-        ) {
-            okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
-        }.flatMap { response ->
-            response.use {
-                if (response.isSuccessful) {
-                    response.body?.let { responseBody ->
-                        feedParser.parseFeedResponse(
-                            response.request.url.toUrl(),
-                            responseBody,
-                        )
-                    } ?: NoBody(url = url.toString()).left()
-                } else {
-                    response.retryAfterSeconds?.let { retryAfterSeconds ->
-                        logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+        return if (url.isAdaptedUrlFromNostrUri()) {
+            Either.catching(
+                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+            ) {
+                feedParser.getProfileMetadata(url).getOrNull() ?: throw NostrMetadataException("Could not find metadata for $url")
+            }.flatMap { profile ->
+                feedParser.findNostrFeed(profile)
+                    .map {
+                        it.copy(description = application.applicationContext.getString(R.string.nostr_feed_description, profile.name))
                     }
-                    HttpError(
-                        url = url.toString(),
-                        code = response.code,
-                        retryAfterSeconds = response.retryAfterSeconds,
-                        message = response.message,
-                    ).left()
+            }
+        } else {
+            Either.catching(
+                onCatch = { t ->
+                    FetchError(url = url.toString(), throwable = t)
+                },
+            ) {
+                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
+            }.flatMap { response ->
+                response.use {
+                    if (response.isSuccessful) {
+                        response.body?.let { responseBody ->
+                            feedParser.parseFeedResponse(
+                                response.request.url.toUrl(),
+                                responseBody,
+                            )
+                        } ?: NoBody(url = url.toString()).left()
+                    } else {
+                        response.retryAfterSeconds?.let { retryAfterSeconds ->
+                            logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+                        }
+                        HttpError(
+                            url = url.toString(),
+                            code = response.code,
+                            retryAfterSeconds = response.retryAfterSeconds,
+                            message = response.message,
+                        ).left()
+                    }
                 }
             }
         }.map {

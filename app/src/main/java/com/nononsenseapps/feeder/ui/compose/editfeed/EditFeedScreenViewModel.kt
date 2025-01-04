@@ -14,6 +14,8 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
+import com.nononsenseapps.feeder.util.getOrCreateFromUri
+import com.nononsenseapps.feeder.util.isNostrUri
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -35,8 +37,8 @@ class EditFeedScreenViewModel(
     override var isOkToSave: Boolean by mutableStateOf(false)
 
     override var feedUrl: String by mutableSavedStateOf(state, "") { value ->
-        isNotValidUrl = !isValidUrl(value)
-        isOkToSave = isValidUrl(value)
+        isNotValidUrl = !isValidUrlOrUri(value)
+        isOkToSave = isValidUrlOrUri(value)
     }
     override var feedTitle: String by mutableSavedStateOf(state, "")
     override var feedTag: String by mutableSavedStateOf(state, "")
@@ -123,11 +125,11 @@ class EditFeedScreenViewModel(
 
             val updatedFeed =
                 feed.copy(
-                    url = URL(feedUrl),
+                    url = URL(feedUrl.getOrCreateFromUri()),
                     title = feedTitle,
                     customTitle = feedTitle,
                     tag = feedTag,
-                    fullTextByDefault = fullTextByDefault,
+                    fullTextByDefault = if (feedUrl.isNostrUri()) false else fullTextByDefault,
                     notify = notify,
                     skipDuplicates = skipDuplicates,
                     openArticlesWith = articleOpener,
@@ -153,10 +155,14 @@ class EditFeedScreenViewModel(
         }
 }
 
-internal fun isValidUrl(value: String): Boolean {
+internal fun isValidUrlOrUri(value: String): Boolean {
     return try {
-        URL(value)
-        true
+        if (value.isNostrUri()) {
+            true
+        } else {
+            URL(value)
+            true
+        }
     } catch (e: Exception) {
         false
     }

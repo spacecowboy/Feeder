@@ -14,3 +14,5 @@ const val ARG_FEED_FULL_TEXT_BY_DEFAULT = "feed_full_text_by_default"
 const val ARG_FEED_OPEN_ARTICLES_WITH = "feed_open_articles_with"
 const val ARG_URL = "url"
 const val ARG_ONLY_NEW = "only_new"
+
+const val NOSTR_URI_PREFIX = "nostr:"

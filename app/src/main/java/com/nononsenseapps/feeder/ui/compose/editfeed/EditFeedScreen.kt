@@ -84,6 +84,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
+import com.nononsenseapps.feeder.util.isNostrUri
 
 @Composable
 fun CreateFeedScreen(
@@ -489,6 +490,7 @@ fun ColumnScope.RightContent(
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
+        enabled = !viewState.feedUrl.isNostrUri(),
         icon = null,
         modifier =
             Modifier
