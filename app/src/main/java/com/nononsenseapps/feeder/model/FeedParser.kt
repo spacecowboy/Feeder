@@ -33,7 +33,6 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import rust.nostr.sdk.Alphabet
-import rust.nostr.sdk.Client
 import rust.nostr.sdk.Coordinate
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.Filter
@@ -58,6 +57,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
+import rust.nostr.sdk.Client as NostrClient
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -66,7 +66,10 @@ class FeedParser(override val di: DI) : DIAware {
     private val goFeedAdapter = GoFeedAdapter()
 
     // Initializing the Nostr Client
-    private val nostrClient = Client()
+    // This can crash in emulator tests so initialize it lazily.
+    private val nostrClient by lazy {
+        NostrClient()
+    }
 
     // The default relays to get info from, separated by purpose.
     private val defaultFetchRelays = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
