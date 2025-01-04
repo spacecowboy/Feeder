@@ -250,4 +250,16 @@
     <string name="feed_item_style_compact_card">Kompakt kort</string>
     <string name="touch_to_play_audio">Tryck för att spela upp ljud</string>
     <string name="show_title_unread_count">Visa antalet olästa artiklar i rubrik</string>
+    <string name="nostr_feed_description">Nostr artiklar av %1$s</string>
+    <string name="open_drawer_on_fab">Visa flöden efter alla markerats som lästa</string>
+    <string name="summarize">Sammanfatta</string>
+    <string name="openai_settings">OpenAI integrering</string>
+    <string name="api_key">API-nyckel</string>
+    <string name="model_id">Model-id</string>
+    <string name="azure_api_version">Azure API-version</string>
+    <string name="unable_to_load_models">Kunde inte ladda modeller.</string>
+    <string name="no_models_were_found">Hittade inga modeller</string>
+    <string name="azure_deployment_id">Azure deployment id</string>
+    <string name="list_of_available_models">Lista av tillgängliga modeller</string>
+    <string name="show_message">Visa meddelande</string>
 </resources>
