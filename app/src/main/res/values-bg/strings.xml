@@ -261,4 +261,5 @@
     <string name="api_key">API ключ</string>
     <string name="show_message">Покажи съобщение</string>
     <string name="open_drawer_on_fab">Покажи емисии след маркиране на всичко като прочетено</string>
+    <string name="nostr_feed_description">Nostr статии от %1$s</string>
 </resources>
