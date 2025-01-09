@@ -259,4 +259,7 @@
     <string name="azure_deployment_id">Id nasazení Azure</string>
     <string name="list_of_available_models">Seznam dostupných modelů</string>
     <string name="summarize">Shrnutí</string>
+    <string name="nostr_feed_description">Nostr články od %1$s</string>
+    <string name="open_drawer_on_fab">Zobrazit kanály poté, co označíte všechny jako přečtené</string>
+    <string name="show_message">Zobrazit zprávu</string>
 </resources>
