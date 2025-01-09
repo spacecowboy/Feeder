@@ -14,8 +14,8 @@
     <string name="action_settings">Beállítások</string>
     <string name="add_feed">Hírfolyam hozzáadása</string>
     <string name="title_activity_edit_feed">Feliratkozás hírfolyamra</string>
-    <string name="empty_feed_open">Másik hírfolyam <annotation style="link">megnyitása</annotation> ?</string>
-    <string name="empty_feed_add">Több hírfolyam <annotation style="link">hozzáadása</annotation>\?</string>
+    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">megnyitni</annotation>\?</string>
+    <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadni</annotation>\?</string>
     <string name="search_feed_empty_hint">Adjon meg egy hírfolyam címet</string>
     <string name="mark_as_read">Megjelölés olvasottként</string>
     <string name="mark_as_unread">Megjelölés olvasatlanként</string>
@@ -32,8 +32,8 @@
     <string name="toggle_read_status">Olvasónézet átváltása</string>
     <string name="open_link_in_browser">Hivatkozás megnyitása böngészőben</string>
     <string name="no_such_feed">Nem található ilyen hírfolyam. Próbálja meg a HTTPS használatát.</string>
-    <string name="export_feeds_to_opml">Hírfolyamok exportálása OPML-be</string>
-    <string name="import_feeds_from_opml">Hírfolyamok importálása OPML-ből</string>
+    <string name="export_feeds_to_opml">Hírfolyamok exportálása OPML fájlba</string>
+    <string name="import_feeds_from_opml">Hírfolyamok importálása OPML fájlból</string>
     <string name="indicator_for_mark_as_read">Megjelölés olvasottként jelző</string>
     <string name="share">Megosztás</string>
     <string name="nothing_to_display">Nincs mint megjeleníteni!</string>
@@ -119,8 +119,8 @@
     <string name="feed_item_style_card">Kártya</string>
     <string name="generate_extra_unique_ids">Extra egyéni azonosítók generálása</string>
     <string name="only_enable_for_bad_id_feeds">Csak rossz azonosítókkal rendelkező hírfolyamok számára engedélyezze</string>
-    <string name="failed_to_import_OPML">Nem sikerült az adatok importálás az OPML fájlból</string>
-    <string name="failed_to_export_OPML">Nem sikerült az adatok exportálása OPML fájlba</string>
+    <string name="failed_to_import_OPML">Nem sikerült a hírfolyamok importálás az OPML fájlból</string>
+    <string name="failed_to_export_OPML">Nem sikerült a hírfolyamok exportálása az OPML fájlba</string>
     <string name="device_sync">Eszköz-szinkronizáció</string>
     <string name="add_new_device">Új eszköz hozzáadása</string>
     <string name="device_sync_financed_by_community">Ezt a szolgáltatást a közösség fizeti. Fontolja meg az adományozást, ha hasznosnak találja.</string>
@@ -183,7 +183,7 @@
     <string name="few_feeds">%1$s hírfolyam</string>
     <string name="many_feeds">%1$s hírfolyam</string>
     <string name="other_feeds">%1$s hírfolyam</string>
-    <string name="import_x_feeds_with_y_tags">%1$s importálása ezzel: %2$s?</string>
+    <string name="import_x_feeds_with_y_tags">%1$s importálása a következővel: %2$s?</string>
     <string name="zero_tags">%1$s címke</string>
     <string name="one_tags">%1$s címke</string>
     <string name="two_tags">%1$s címke</string>
