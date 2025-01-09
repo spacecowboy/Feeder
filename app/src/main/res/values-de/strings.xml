@@ -261,4 +261,5 @@
     <string name="azure_api_version">Azure-API-Version</string>
     <string name="show_message">Nachricht anzeigen</string>
     <string name="open_drawer_on_fab">Feeds anzeigen, nachdem alle als gelesen markiert wurden</string>
+    <string name="nostr_feed_description">Nostr-Artikel von %1$s</string>
 </resources>
