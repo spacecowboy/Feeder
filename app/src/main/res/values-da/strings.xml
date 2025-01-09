@@ -259,4 +259,7 @@
     <string name="no_models_were_found">Der blev ikke fundet nogen modeller</string>
     <string name="azure_deployment_id">Azure implementerings-id</string>
     <string name="list_of_available_models">Liste over tilgængelige modeller</string>
+    <string name="open_drawer_on_fab">Vis feeds efter markering af alt som læst</string>
+    <string name="show_message">Vis besked</string>
+    <string name="nostr_feed_description">Nostr-artikler af %1$s</string>
 </resources>
