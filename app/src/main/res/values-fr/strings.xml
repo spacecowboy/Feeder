@@ -261,4 +261,5 @@
     <string name="list_of_available_models">Liste des modèles disponibles</string>
     <string name="show_message">Montrer le message</string>
     <string name="open_drawer_on_fab">Montrer les flux après avoir marqué tout lu</string>
+    <string name="nostr_feed_description">Articles Nostr par %1$s</string>
 </resources>
