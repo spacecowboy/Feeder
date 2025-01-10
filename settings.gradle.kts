@@ -213,7 +213,7 @@ dependencyResolutionManagement {
                 "rust-nostr",
                 "org.rust-nostr",
                 "nostr-sdk"
-            ).version("0.37.0")
+            ).version("0.38.3")
             //Markdown
             library("jetbrains-markdown", "org.jetbrains", "markdown").version("0.7.3")
 
