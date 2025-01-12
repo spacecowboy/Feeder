@@ -107,6 +107,15 @@ android {
 //                signingConfig = signingConfigs.getByName("shareddebug")
 //            }
         }
+
+        splits {
+            abi {
+                isEnable = true
+                reset()
+                include("arm64-v8a", "armeabi-v7a")
+                isUniversalApk = true
+            }
+        }
     }
     testOptions {
         unitTests {
