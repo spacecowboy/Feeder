@@ -1,0 +1,22 @@
+# 2.8.1
+ERYpTION (1):
+  * [82a2b196] Updated Danish translation using Weblate
+
+Fordas (1):
+  * [30330d78] Updated Spanish translation using Weblate
+
+Jonas Kalderstam (1):
+  * [7824c6f1] Changed memory caching of images to be max 50MB instead of
+         25% of RAM
+
+Matth78 (1):
+  * [a0223640] Updated French translation using Weblate
+
+NostrDev (2):
+  * [bb16f879] Nostr Mention in Readme
+  * [05dd5b0e] removing example
+
+VfBFan (1):
+  * [e2fd0870] Updated German translation using Weblate
+
+Yuki Kish

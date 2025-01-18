@@ -1,3 +1,43 @@
+# 2.8.1
+ERYpTION (1):
+  * [82a2b196] Updated Danish translation using Weblate
+
+Fordas (1):
+  * [30330d78] Updated Spanish translation using Weblate
+
+Jonas Kalderstam (1):
+  * [7824c6f1] Changed memory caching of images to be max 50MB instead of
+         25% of RAM
+
+Matth78 (1):
+  * [a0223640] Updated French translation using Weblate
+
+NostrDev (2):
+  * [bb16f879] Nostr Mention in Readme
+  * [05dd5b0e] removing example
+
+VfBFan (1):
+  * [e2fd0870] Updated German translation using Weblate
+
+Yuki Kishimoto (1):
+  * [d02e9d2a] Bump `org.rust-nostr:nostr-sdk` to 0.38.3
+
+eevan78 (1):
+  * [734535c2] Updated Serbian translation using Weblate
+
+ikanakova (1):
+  * [00e2909c] Updated Czech translation using Weblate
+
+summoner001 (1):
+  * [00574952] Updated Hungarian translation using Weblate
+
+zmni (1):
+  * [c3cc563d] Updated Indonesian translation using Weblate
+
+大王叫我来巡山 (1):
+  * [4787d55b] Updated Chinese (Simplified Han script) translation using
+         Weblate
+
 # 2.8.0
 Agnieszka C (1):
   * [6dbedc6c] Updated Polish translation using Weblate
