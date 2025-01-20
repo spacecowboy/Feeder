@@ -261,4 +261,5 @@
     <string name="azure_deployment_id">Id dell\'implementazione Azure</string>
     <string name="list_of_available_models">Elenco dei modelli disponibili</string>
     <string name="open_drawer_on_fab">Mostra i feed dopo averli contrassegnati come letti</string>
+    <string name="nostr_feed_description">Nostri articoli di %1$s</string>
 </resources>

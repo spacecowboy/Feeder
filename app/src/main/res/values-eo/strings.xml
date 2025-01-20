@@ -162,4 +162,5 @@
     <string name="generate_extra_unique_ids">Generu ekstrajn unikajn identigilojn</string>
     <string name="invalid_url">Ne valida URL</string>
     <string name="failed_to_import_OPML">Malsukcesis importi OPML</string>
+    <string name="nostr_feed_description">Nostr artikoloj de %1$s</string>
 </resources>
