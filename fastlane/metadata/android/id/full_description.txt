@@ -1,19 +1,19 @@
-<p> Apakah Anda muak dengan bloated reader yang mencuri informasi pribadi Anda? <br/>
-Apakah Anda bosan dengan pengaturan sinkronisasi berbelit-belit yang membutuhkan jam konfigurasi server? <br/>
-Apakah Anda muak dengan harus membuat akun di mana-mana? <br/> </p>
+<p>Feeder adalah pembaca feed sumber terbuka (RSS/Atom/JSONFeed) untuk Android yang dibuat pada tahun 2014.</p>
 
-<p> Cobalah Feeder sebagai gantinya! </p>
+<p>Dengan Feeder, Anda dapat membaca berita dan postingan terbaru dari situs-situs favorit Anda.</p>
 
-<p> Feeder adalah pembaca umpan gratis / libre. Mendukung semua format umpan termasuk JSONFeed. Kami tidak melacakmu dan tidak memerlukan pengaturan apapun. Bahkan tidak perlu Anda membuat akun! Cukup atur umpan Anda, atau impor dari reader lama Anda melalui OPML, lalu lanjutkan dengan sinkronisasi dan membaca. </p>
+<p>Feeder TIDAK disinkronkan dengan backend jarak jauh yang biasa, sehingga tidak perlu registrasi akun dalam bentuk apapun</p>
 
-<p> <b> Fitur</b></p>
+<p>Feeder gratis digunakan dan berjalan secara lokal di perangkat Anda. Data Anda 100% bersifat pribadi.</p>
+
+<p><b>Fitur</b></p>
 
 <ul>
-<li> Mengurai HTML dan menampilkannya dalam TextView asli</li>
-<li> Membaca secara offline</li>
-<li> Sinkronisasi latar belakang</li>
-<li> Notifikasi</li>
-<li> Impor/Ekspor OPML</li>
-<li> Akses berguna ke tautan</li>
-<li> Desain material</li>
+<li>Mengurai HTML dan menampilkannya dalam TextView asli</li>
+<li>Pembacaan offline</li>
+<li>Sinkronisasi latar belakang</li>
+<li>Pemberitahuan</li>
+<li>Impor/Ekspor OPML</li>
+<li>Akses praktis ke tautan penutup</li>
+<li>Material design</li>
 </ul>
