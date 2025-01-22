@@ -1,12 +1,12 @@
 [versions]
 # Compose compiler is highly coupled to Kotlin version
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-kotlin = "1.9.23"
-ksp = "1.9.23-1.0.20"
-kotlinxSerialization = "1.6.1"
-androidPlugin = "8.6.0"
+kotlin = "1.9.25"
+ksp = "1.9.25-1.0.20"
+kotlinxSerialization = "1.8.0"
+androidPlugin = "8.8.0"
 # androidx.compose.compiler:compiler
-composeCompiler = "1.5.11"
+composeCompiler = "1.5.15"
 # BEGIN These should be upgraded in unison
 okhttp = "4.10.0"
 okio = "3.2.0"
@@ -15,7 +15,7 @@ conscrypt = "2.5.2"
 ktlint-gradle = "12.1.1"
 ktlint-compose = "0.4.3"
 kodein = "7.5.0"
-coroutines = "1.7.3"
+coroutines = "1.10.1"
 gofeed = "0.1.2"
 moshi = "1.12.0"
 desugar = "2.0.3"
