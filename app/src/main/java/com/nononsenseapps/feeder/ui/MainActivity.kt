@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -65,8 +64,6 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        installExceptionHandler()
-
         mainActivityViewModel.ensurePeriodicSyncConfigured()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -78,7 +75,6 @@ class MainActivity : DIAwareComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun AppContent() {
         val navController = rememberNavController()
