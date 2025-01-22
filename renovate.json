@@ -10,7 +10,7 @@
                 "libs\\.versions\\.toml"
             ],
             "matchStrings": [
-                "composeCompiler = \"(?<currentValue>v\\d+\\.\\d+\\.\\d+.*)\""
+                "composeCompiler = \"(?<currentValue>\\d+\\.\\d+\\.\\d+.*)\""
             ],
             "datasourceTemplate": "maven",
             "depNameTemplate": "androidx.compose.compiler:compiler",
