@@ -3,18 +3,15 @@
     "extends": [
         "config:recommended"
     ],
-    "customManagers": [
+    "packageRules": [
         {
-            "customType": "regex",
-            "fileMatch": [
-                "libs\\.versions\\.toml"
+            "matchPackagePatterns": [
+                "^org.jetbrains.kotlin",
+                "^com.google.devtools.ksp",
+                "^androidx.compose.compiler",
+                "^com.android.application"
             ],
-            "matchStrings": [
-                "composeCompiler = \"(?<currentValue>\\d+\\.\\d+\\.\\d+.*)\""
-            ],
-            "datasourceTemplate": "maven",
-            "depNameTemplate": "androidx.compose.compiler:compiler",
-            "versioningTemplate": "semver-coerced"
+            "groupName": "kotlin"
         }
     ]
 }
