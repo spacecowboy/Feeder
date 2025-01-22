@@ -20,6 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
+import org.kodein.di.instanceOrNull
 import java.time.Duration
 
 const val ARG_FORCE_NETWORK = "force_network"
@@ -109,7 +110,7 @@ fun schedulePeriodicRssSync(
 ) {
     val repository: Repository by di.instance()
     val context: Application by di.instance()
-    val jobScheduler: JobScheduler? = context.getSystemService()
+    val jobScheduler: JobScheduler? by di.instanceOrNull()
 
     if (jobScheduler == null) {
         Log.e(RssSyncJob.LOG_TAG, "JobScheduler not available")
@@ -118,7 +119,7 @@ fun schedulePeriodicRssSync(
 
     if (repository.syncFrequency.value.minutes < 1) {
         // Cancel and return
-        jobScheduler.cancel(BackgroundJobId.RSS_SYNC_PERIODIC.jobId)
+        jobScheduler?.cancel(BackgroundJobId.RSS_SYNC_PERIODIC.jobId)
         return
     }
 
@@ -139,8 +140,8 @@ fun schedulePeriodicRssSync(
             .setPersisted(true)
             .build()
 
-    if (replace || jobScheduler.getMyPendingJob(BackgroundJobId.RSS_SYNC_PERIODIC.jobId) == null) {
-        jobScheduler.schedule(jobInfo)
+    if (replace || jobScheduler?.getMyPendingJob(BackgroundJobId.RSS_SYNC_PERIODIC.jobId) == null) {
+        jobScheduler?.schedule(jobInfo)
     }
 }
 

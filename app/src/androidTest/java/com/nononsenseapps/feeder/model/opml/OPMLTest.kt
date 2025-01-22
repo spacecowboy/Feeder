@@ -124,13 +124,15 @@ class OPMLTest : DIAware {
             writeSampleFile()
 
             val parser = OpmlPullParser(opmlParserHandler)
-            parser.parseFile(path!!.canonicalPath)
+            parser.parseFile(path!!.canonicalPath).leftOrNull()?.let { e ->
+                fail("Failed to parse file: ${e.throwable}")
+            }
 
             // Verify database is correct
             val actual = settingsStore.getAllSettings()
 
-            ALL_SETTINGS_WITH_VALUES.forEach { (key, expected) ->
-                assertEquals(expected, actual[key].toString())
+            ALL_SETTINGS_WITH_VALUES.toList().forEachIndexed { index, (key, expected) ->
+                assertEquals("$index: Setting $key, expected $expected but was ${actual[key]}", expected, actual[key].toString())
             }
 
             val actualBlocked = settingsStore.blockListPreference.first()
@@ -146,14 +148,23 @@ class OPMLTest : DIAware {
             writeSampleFile()
 
             val parser = OpmlPullParser(opmlParserHandler)
-            parser.parseFile(path!!.canonicalPath)
+            parser.parseFile(path!!.canonicalPath).leftOrNull()?.let { e ->
+                fail("Failed to parse file: ${e.throwable}")
+            }
 
             // Verify database is correct
             val seen = ArrayList<Int>()
             val feeds = db.feedDao().getAllFeeds()
             assertFalse("No feeds in DB!", feeds.isEmpty())
             for (feed in feeds) {
-                val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
+                val i =
+                    try {
+                        val title = feed.customTitle.replace("[custom \"]".toRegex(), "").ifBlank { feed.title }
+                        Integer.parseInt(title.replace("[custom \"]".toRegex(), ""))
+                    } catch (e: NumberFormatException) {
+                        fail("Failed to parse title: ${feed.title}, ${feed.customTitle}")
+                        continue
+                    }
                 seen.add(i)
                 assertEquals("URL doesn't match", URL("http://example.com/$i/rss.xml"), feed.url)
 
@@ -219,14 +230,23 @@ class OPMLTest : DIAware {
 
             // Read file
             val parser = OpmlPullParser(opmlParserHandler)
-            parser.parseFile(path!!.canonicalPath)
+            parser.parseFile(path!!.canonicalPath).leftOrNull()?.let { e ->
+                fail("Failed to parse file: ${e.throwable}")
+            }
 
             // should not kill the existing stuff
             val seen = ArrayList<Int>()
             val feeds = db.feedDao().getAllFeeds()
             assertFalse("No feeds in DB!", feeds.isEmpty())
             for (feed in feeds) {
-                val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
+                val i =
+                    try {
+                        val title = feed.customTitle.replace("[custom \"]".toRegex(), "").ifBlank { feed.title }
+                        Integer.parseInt(title.replace("[custom \"]".toRegex(), ""))
+                    } catch (e: NumberFormatException) {
+                        fail("Failed to parse title: ${feed.title}, ${feed.customTitle}")
+                        continue
+                    }
                 seen.add(i)
                 assertEquals(URL("http://example.com/$i/rss.xml"), feed.url)
 
