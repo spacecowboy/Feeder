@@ -2,5 +2,19 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "config:recommended"
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "libs\\.versions\\.toml"
+            ],
+            "matchStrings": [
+                "composeCompiler = \"(?<currentValue>v\\d+\\.\\d+\\.\\d+.*)\""
+            ],
+            "datasourceTemplate": "maven",
+            "depNameTemplate": "androidx.compose.compiler:compiler",
+            "versioningTemplate": "semver-coerced"
+        }
     ]
 }

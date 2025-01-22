@@ -5,6 +5,7 @@ kotlin = "1.9.23"
 ksp = "1.9.23-1.0.20"
 kotlinxSerialization = "1.6.1"
 androidPlugin = "8.6.0"
+# androidx.compose.compiler:compiler
 composeCompiler = "1.5.11"
 # BEGIN These should be upgraded in unison
 okhttp = "4.10.0"
