@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.net.toUri
@@ -22,11 +21,8 @@ import com.nononsenseapps.feeder.util.logDebug
  * This activity should only be started via a Open File Intent.
  */
 class ImportOMPLFileActivity : DIAwareComponentActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        installExceptionHandler()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

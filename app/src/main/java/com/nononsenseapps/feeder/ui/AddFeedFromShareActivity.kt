@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.core.view.WindowCompat
@@ -22,11 +21,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
  * This activity should only be started via a Send (share) or Open URL/Text intent.
  */
 class AddFeedFromShareActivity : DIAwareComponentActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        installExceptionHandler()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
