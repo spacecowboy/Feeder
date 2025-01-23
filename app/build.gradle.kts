@@ -227,7 +227,7 @@ dependencies {
 
     // Nostr
 //    implementation(libs.rust.nostr)
-    implementation(files("libs/nostr-sdk-725.aar"))
+    implementation(files("libs/nostr-sdk-727.aar"))
     implementation("net.java.dev.jna:jna:5.15.0@aar")
 
     // Markdown

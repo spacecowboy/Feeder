@@ -15,7 +15,12 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.channels.onSuccess
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -54,9 +59,8 @@ import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.TagKind
 import rust.nostr.sdk.WebSocketAdaptor
+import rust.nostr.sdk.WebSocketAdaptorWrapper
 import rust.nostr.sdk.WebSocketMessage
-import rust.nostr.sdk.WebSocketSink
-import rust.nostr.sdk.WebSocketStreamForwarder
 import rust.nostr.sdk.extractRelayList
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
@@ -70,21 +74,133 @@ import java.util.Locale
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
-class MyCustomWebSocketSink(private val websocket: WebSocket) : WebSocketSink {
-    @OptIn(ExperimentalStdlibApi::class)
-    override suspend fun sendMsg(msg: WebSocketMessage) {
+@OptIn(ExperimentalStdlibApi::class)
+class MyOkhttpWebSocketListener(private val adapter: MyAdapter, private val channel: Channel<WebSocketMessage>) : WebSocketListener() {
+    override fun onClosed(
+        webSocket: WebSocket,
+        code: Int,
+        reason: String,
+    ) {
+        logDebug(LOG_TAG, "WebSocket closed: $code, $reason")
+        webSocket.close(code, reason)
+        adapter.onClose()
+    }
+
+    override fun onClosing(
+        webSocket: WebSocket,
+        code: Int,
+        reason: String,
+    ) {
+        logDebug(LOG_TAG, "WebSocket closing: $code, $reason")
+        webSocket.close(code, reason)
+        adapter.onClose()
+    }
+
+    override fun onFailure(
+        webSocket: WebSocket,
+        t: Throwable,
+        response: Response?,
+    ) {
+        Log.e(LOG_TAG, "WebSocket failure", t)
+        webSocket.cancel()
+        adapter.onClose()
+    }
+
+    override fun onMessage(
+        webSocket: WebSocket,
+        text: String,
+    ) {
+        logDebug(LOG_TAG, "Received WebSocket message: ${text.take(80)}")
+        val result = channel.trySendBlocking(WebSocketMessage.Text(text))
+            .onSuccess {
+                logDebug(LOG_TAG, "Successfully sent WebSocket message: ${text.take(80)}")
+            }
+            .onFailure { e ->
+                Log.e(LOG_TAG, "Error sending WebSocket message", e)
+            }
+
+        if (!result.isSuccess) {
+            Log.e(LOG_TAG, "Error sending WebSocket message")
+        }
+    }
+
+    override fun onMessage(
+        webSocket: WebSocket,
+        bytes: ByteString,
+    ) {
+        logDebug(LOG_TAG, "Received WebSocket message: ${bytes.toByteArray().toHexString().take(80)}")
+        val result = channel.trySendBlocking(WebSocketMessage.Binary(bytes.toByteArray()))
+            .onSuccess {
+                logDebug(LOG_TAG, "Successfully sent WebSocket message: ${bytes.toByteArray().toHexString().take(80)}")
+            }
+            .onFailure { e ->
+                Log.e(LOG_TAG, "Error sending WebSocket message", e)
+            }
+
+        if (!result.isSuccess) {
+            Log.e(LOG_TAG, "Error sending WebSocket message")
+        }
+    }
+
+    override fun onOpen(
+        webSocket: WebSocket,
+        response: Response,
+    ) {
+        logDebug(LOG_TAG, "WebSocket opened")
+        adapter.onOpen(webSocket)
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_WSLISTENER"
+    }
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+class MyAdapter(private val channel: Channel<WebSocketMessage>) : WebSocketAdaptor {
+    private var websocket: WebSocket? = null
+
+    fun onOpen(webSocket: WebSocket) {
+        logDebug(LOG_TAG, "Opening WebSocket myadapter")
+        this.websocket = webSocket
+    }
+
+    fun onClose() {
+        logDebug(LOG_TAG, "Closing WebSocket myadapter")
+        this.websocket = null
+        channel.close()
+    }
+
+    override suspend fun recv(): WebSocketMessage {
+        logDebug(LOG_TAG, "Waiting for message")
+        return select {
+            channel.onReceive {
+                logDebug(LOG_TAG, "Received message: $it")
+                it
+            }
+        }
+    }
+
+    override suspend fun send(msg: WebSocketMessage) {
+        // Suspend while websocket is null - connection is not open yet
+        while (websocket == null) {
+            logDebug(LOG_TAG, "Waiting for websocket to open")
+            kotlinx.coroutines.delay(50)
+        }
         when (msg) {
             is WebSocketMessage.Text -> {
-                logDebug(LOG_TAG, "Sending text message: ${msg.v1.take(80)}")
-                websocket.send(msg.v1)
+                logDebug(LOG_TAG, "Sending text message: ${msg.v1.take(80)}, ${websocket != null}")
+                websocket?.send(msg.v1)
             }
+
             is WebSocketMessage.Binary -> {
-                logDebug(LOG_TAG, "Sending binary message: ${msg.v1.toHexString().take(80)}")
-               websocket.send(msg.v1.toByteString())
+                logDebug(LOG_TAG, "Sending binary message: ${msg.v1.toHexString().take(80)}, ${websocket != null}")
+                websocket?.send(msg.v1.toByteString())
             }
+
             is WebSocketMessage.Ping -> {
                 // Not supported
             }
+
             is WebSocketMessage.Pong -> {
                 // Not supported
             }
@@ -93,101 +209,62 @@ class MyCustomWebSocketSink(private val websocket: WebSocket) : WebSocketSink {
 
     override suspend fun terminate() {
         logDebug(LOG_TAG, "Terminating WebSocket")
-        // TODO would prefer a graceful close with int code and string reason
-        websocket.cancel()
+        websocket?.cancel()
+        websocket = null
+        channel.close()
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_WSSINK"
-    }
-}
-
-@OptIn(ExperimentalStdlibApi::class)
-class MyOkhttpWebSocketListener(private val forwarder: WebSocketStreamForwarder) : WebSocketListener() {
-    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        logDebug(LOG_TAG, "WebSocket closed: $code, $reason")
-        webSocket.close(code, reason)
-    }
-
-    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-        logDebug(LOG_TAG, "WebSocket closing: $code, $reason")
-        webSocket.close(code, reason)
-    }
-
-    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-        Log.e(LOG_TAG, "WebSocket failure", t)
-        webSocket.cancel()
-    }
-
-    override fun onMessage(webSocket: WebSocket, text: String) {
-        logDebug(LOG_TAG, "WebSocket message: ${text.take(80)}")
-        runBlocking {
-            forwarder.forward(WebSocketMessage.Text(text))
-        }
-    }
-
-    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        logDebug(LOG_TAG, "WebSocket message: ${bytes.toByteArray().toHexString().take(80)}")
-        runBlocking {
-            forwarder.forward(WebSocketMessage.Binary(bytes.toByteArray()))
-        }
-    }
-
-    override fun onOpen(webSocket: WebSocket, response: Response) {
-        logDebug(LOG_TAG, "WebSocket opened")
-        // Nothing to do
-    }
-    
-    companion object {
-        private const val LOG_TAG = "FEEDER_WSLISTENER"
+        private const val LOG_TAG = "FEEDER_WSADAPTER"
     }
 }
 
 class MyCustomWebsocketTransport(override val di: DI) : DIAware, CustomWebSocketTransport {
     private val okHttpClient: OkHttpClient by instance()
-    
-    override suspend fun connect(url: String, mode: ConnectionMode, timeout: Duration): WebSocketAdaptor {
-        logDebug(LOG_TAG, "Connecting to $url, mode: $mode, timeout: $timeout")
+    override suspend fun connect(url: String, mode: ConnectionMode, timeout: Duration): WebSocketAdaptorWrapper {
+        val proxy =
+            when (mode) {
+                ConnectionMode.Direct -> null
+                is ConnectionMode.Proxy -> {
+                    // TODO would be more convenient to get host and port from mode directly
+                    // Parse mode.addr so we can extract host and port
+                    val (host, port) = mode.addr.split(':')
 
-        val proxy = when (mode) {
-            ConnectionMode.Direct -> null
-            is ConnectionMode.Proxy -> {
-                // TODO would be more convenient to get host and port from mode directly
-                // Parse mode.addr so we can extract host and port
-                val (host, port) = mode.addr.split(':')
-
-                java.net.Proxy(
-                    java.net.Proxy.Type.HTTP,
-                    java.net.InetSocketAddress(host, port.toInt()),
-                )
+                    java.net.Proxy(
+                        java.net.Proxy.Type.HTTP,
+                        java.net.InetSocketAddress(host, port.toInt()),
+                    )
+                }
             }
-        }
 
-        val customClient = okHttpClient.newBuilder()
-            .connectTimeout(timeout)
-            .readTimeout(timeout)
-            .writeTimeout(timeout)
-            .proxy(proxy)
-            .build()
+        val customClient =
+            okHttpClient.newBuilder()
+                .connectTimeout(timeout)
+                .readTimeout(timeout)
+                .writeTimeout(timeout)
+                .proxy(proxy)
+                .build()
 
-        val forwarder = WebSocketStreamForwarder()
-        val listener = MyOkhttpWebSocketListener(forwarder)
-        val websocket = customClient.newWebSocket(
-            Request.Builder().url(url).build(),
-            listener,
-        )
+        val channel = Channel<WebSocketMessage>()
 
-        val sink = MyCustomWebSocketSink(websocket)
+        val adapter = MyAdapter(channel)
+        val listener = MyOkhttpWebSocketListener(adapter, channel)
 
-        val adapter = WebSocketAdaptor(sink, forwarder)
+        val websocket =
+            customClient.newWebSocket(
+                Request.Builder().url(url).build(),
+                listener,
+            )
 
-        return adapter
+        val wrapper = WebSocketAdaptorWrapper(adapter)
+
+        return wrapper
     }
 
     override fun supportPing(): Boolean {
         return false
     }
-    
+
     companion object {
         private const val LOG_TAG = "FEEDER_WSTRANSPORT"
     }
@@ -201,7 +278,7 @@ class FeedParser(override val di: DI) : DIAware {
     // This can crash in emulator tests so initialize it lazily.
     private val nostrClient by lazy {
         rust.nostr.sdk.ClientBuilder().websocketTransport(MyCustomWebsocketTransport(di)).build()
-        //NostrClient()
+        // NostrClient()
     }
 
     // The default relays to get info from, separated by purpose.
@@ -255,10 +332,10 @@ class FeedParser(override val di: DI) : DIAware {
             }
 
         return (
-            doc.getElementsByAttributeValue("rel", "apple-touch-icon") +
-                doc.getElementsByAttributeValue("rel", "icon") +
-                doc.getElementsByAttributeValue("rel", "shortcut icon")
-        )
+                doc.getElementsByAttributeValue("rel", "apple-touch-icon") +
+                        doc.getElementsByAttributeValue("rel", "icon") +
+                        doc.getElementsByAttributeValue("rel", "shortcut icon")
+                )
             .filter { it.hasAttr("href") }
             .firstNotNullOfOrNull { e ->
                 when {
@@ -318,10 +395,10 @@ class FeedParser(override val di: DI) : DIAware {
                                 AlternateLink(
                                     type = e.attr("type"),
                                     link =
-                                        relativeLinkIntoAbsoluteOrThrow(
-                                            base = baseUrl,
-                                            link = e.attr("href"),
-                                        ),
+                                    relativeLinkIntoAbsoluteOrThrow(
+                                        base = baseUrl,
+                                        link = e.attr("href"),
+                                    ),
                                 )
                             } catch (e: Exception) {
                                 null
@@ -489,9 +566,9 @@ class FeedParser(override val di: DI) : DIAware {
             nostrClient.fetchEventsFrom(
                 urls = relaysToUse,
                 filters =
-                    listOf(
-                        articlesByAuthorFilter,
-                    ),
+                listOf(
+                    articlesByAuthorFilter,
+                ),
                 timeout = Duration.ofSeconds(10L),
             ).toVec()
         val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
