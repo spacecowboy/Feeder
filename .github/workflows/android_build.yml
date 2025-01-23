@@ -20,7 +20,7 @@ jobs:
 
     # Verify the SHA-sum
     - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v1
+      uses: gradle/wrapper-validation-action@v3
 
     - name: setup JDK
       uses: actions/setup-java@v3
