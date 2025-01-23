@@ -42,10 +42,10 @@ jobs:
       shell: bash
       run: ci/run-if-not-release fastlane bump_version_code
 
-    - name: gradle build
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: build app:bundlePlay :app:lint check
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v3
+    - name: gradle build:
+      run: ./gradlew build app:bundlePlay :app:lint check
 
     - name: validate deploy
       shell: bash

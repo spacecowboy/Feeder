@@ -26,10 +26,10 @@ jobs:
         distribution: 'temurin'
 
     # This initializes gradle and sets up caching. Default version is the wrapper version.
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v3
     - name: gradle build
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: assemble bundle packageDebugAndroidTest :app:lint test
+      run: ./gradlew assemble bundle packageDebugAndroidTest :app:lint test
 
     # Lint
   ktlint:

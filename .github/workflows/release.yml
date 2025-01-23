@@ -41,10 +41,10 @@ jobs:
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
           KEYALIAS: ${{ secrets.KEYALIAS }}
 
+      - name: gradle setup
+        uses: gradle/actions/setup-gradle@v3
       - name: gradle build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build :app:lint check app:bundlePlay
+        run: ./gradlew build :app:lint check app:bundlePlay
 
       - name: deploy to play store
         shell: bash

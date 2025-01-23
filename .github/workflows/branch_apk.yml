@@ -37,10 +37,10 @@ jobs:
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
           KEYALIAS: ${{ secrets.KEYALIAS }}
 
+      - name: gradle setup
+        uses: gradle/actions/setup-gradle@v3
       - name: gradle build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: assemble
+        run: ./gradlew assemble
 
       - name: upload the generated files
         uses: actions/upload-artifact@v3
