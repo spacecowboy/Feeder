@@ -232,7 +232,7 @@ dependencies {
     implementation(libs.jetbrains.markdown)
 
     // Only for debug
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-8")
 
     // Tests
     testImplementation(libs.bundles.kotlin)
