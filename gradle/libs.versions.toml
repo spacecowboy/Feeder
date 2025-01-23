@@ -12,7 +12,7 @@ okhttp = "4.10.0"
 okio = "3.2.0"
 conscrypt = "2.5.2"
 # END Unison
-ktlint-gradle = "12.1.1"
+ktlint-gradle = "12.1.2"
 ktlint-compose = "0.4.3"
 kodein = "7.5.0"
 coroutines = "1.7.3"
