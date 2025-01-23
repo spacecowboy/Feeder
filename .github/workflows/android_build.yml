@@ -44,7 +44,7 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v3
-    - name: gradle build:
+    - name: gradle build
       run: ./gradlew build app:bundlePlay :app:lint check
 
     - name: validate deploy
