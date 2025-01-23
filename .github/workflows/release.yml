@@ -51,7 +51,7 @@ jobs:
         run: ci/run-if-release ./deploy_playstore_fast.sh
 
       - name: release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         # Ignore if play store fails because Google sucks
         if: ${{ !cancelled() }}
         with:
