@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -24,6 +25,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
+import okio.ByteString.Companion.toByteString
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -33,11 +38,13 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import rust.nostr.sdk.Alphabet
+import rust.nostr.sdk.ConnectionMode
 import rust.nostr.sdk.Coordinate
+import rust.nostr.sdk.CustomWebSocketTransport
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.Filter
 import rust.nostr.sdk.Kind
-import rust.nostr.sdk.KindEnum
+import rust.nostr.sdk.KindStandard
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
@@ -46,10 +53,13 @@ import rust.nostr.sdk.PublicKey
 import rust.nostr.sdk.RelayMetadata
 import rust.nostr.sdk.SingleLetterTag
 import rust.nostr.sdk.TagKind
+import rust.nostr.sdk.WebSocketAdaptor
+import rust.nostr.sdk.WebSocketMessage
+import rust.nostr.sdk.WebSocketSink
+import rust.nostr.sdk.WebSocketStreamForwarder
 import rust.nostr.sdk.extractRelayList
 import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
-import java.lang.NullPointerException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
@@ -57,9 +67,131 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
-import rust.nostr.sdk.Client as NostrClient
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
+
+class MyCustomWebSocketSink(private val websocket: WebSocket) : WebSocketSink {
+    @OptIn(ExperimentalStdlibApi::class)
+    override suspend fun sendMsg(msg: WebSocketMessage) {
+        when (msg) {
+            is WebSocketMessage.Text -> {
+                logDebug(LOG_TAG, "Sending text message: ${msg.v1.take(80)}")
+                websocket.send(msg.v1)
+            }
+            is WebSocketMessage.Binary -> {
+                logDebug(LOG_TAG, "Sending binary message: ${msg.v1.toHexString().take(80)}")
+               websocket.send(msg.v1.toByteString())
+            }
+            is WebSocketMessage.Ping -> {
+                // Not supported
+            }
+            is WebSocketMessage.Pong -> {
+                // Not supported
+            }
+        }
+    }
+
+    override suspend fun terminate() {
+        logDebug(LOG_TAG, "Terminating WebSocket")
+        // TODO would prefer a graceful close with int code and string reason
+        websocket.cancel()
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_WSSINK"
+    }
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+class MyOkhttpWebSocketListener(private val forwarder: WebSocketStreamForwarder) : WebSocketListener() {
+    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        logDebug(LOG_TAG, "WebSocket closed: $code, $reason")
+        webSocket.close(code, reason)
+    }
+
+    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+        logDebug(LOG_TAG, "WebSocket closing: $code, $reason")
+        webSocket.close(code, reason)
+    }
+
+    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        Log.e(LOG_TAG, "WebSocket failure", t)
+        webSocket.cancel()
+    }
+
+    override fun onMessage(webSocket: WebSocket, text: String) {
+        logDebug(LOG_TAG, "WebSocket message: ${text.take(80)}")
+        runBlocking {
+            forwarder.forward(WebSocketMessage.Text(text))
+        }
+    }
+
+    override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+        logDebug(LOG_TAG, "WebSocket message: ${bytes.toByteArray().toHexString().take(80)}")
+        runBlocking {
+            forwarder.forward(WebSocketMessage.Binary(bytes.toByteArray()))
+        }
+    }
+
+    override fun onOpen(webSocket: WebSocket, response: Response) {
+        logDebug(LOG_TAG, "WebSocket opened")
+        // Nothing to do
+    }
+    
+    companion object {
+        private const val LOG_TAG = "FEEDER_WSLISTENER"
+    }
+}
+
+class MyCustomWebsocketTransport(override val di: DI) : DIAware, CustomWebSocketTransport {
+    private val okHttpClient: OkHttpClient by instance()
+    
+    override suspend fun connect(url: String, mode: ConnectionMode, timeout: Duration): WebSocketAdaptor {
+        logDebug(LOG_TAG, "Connecting to $url, mode: $mode, timeout: $timeout")
+
+        val proxy = when (mode) {
+            ConnectionMode.Direct -> null
+            is ConnectionMode.Proxy -> {
+                // TODO would be more convenient to get host and port from mode directly
+                // Parse mode.addr so we can extract host and port
+                val (host, port) = mode.addr.split(':')
+
+                java.net.Proxy(
+                    java.net.Proxy.Type.HTTP,
+                    java.net.InetSocketAddress(host, port.toInt()),
+                )
+            }
+        }
+
+        val customClient = okHttpClient.newBuilder()
+            .connectTimeout(timeout)
+            .readTimeout(timeout)
+            .writeTimeout(timeout)
+            .proxy(proxy)
+            .build()
+
+        val forwarder = WebSocketStreamForwarder()
+        val listener = MyOkhttpWebSocketListener(forwarder)
+        val websocket = customClient.newWebSocket(
+            Request.Builder().url(url).build(),
+            listener,
+        )
+
+        val sink = MyCustomWebSocketSink(websocket)
+
+        val adapter = WebSocketAdaptor(sink, forwarder)
+
+        return adapter
+    }
+
+    override fun supportPing(): Boolean {
+        return false
+    }
+    
+    companion object {
+        private const val LOG_TAG = "FEEDER_WSTRANSPORT"
+    }
+}
 
 class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
@@ -68,7 +200,8 @@ class FeedParser(override val di: DI) : DIAware {
     // Initializing the Nostr Client
     // This can crash in emulator tests so initialize it lazily.
     private val nostrClient by lazy {
-        NostrClient()
+        rust.nostr.sdk.ClientBuilder().websocketTransport(MyCustomWebsocketTransport(di)).build()
+        //NostrClient()
     }
 
     // The default relays to get info from, separated by purpose.
@@ -308,7 +441,7 @@ class FeedParser(override val di: DI) : DIAware {
             Filter()
                 .author(userPubkey)
                 .kind(
-                    Kind.fromEnum(KindEnum.RelayList),
+                    Kind.fromStd(KindStandard.RELAY_LIST),
                 )
 
         nostrClient.removeAllRelays()
@@ -342,7 +475,7 @@ class FeedParser(override val di: DI) : DIAware {
         val articlesByAuthorFilter =
             Filter()
                 .author(author)
-                .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
+                .kind(Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE))
         logDebug(LOG_TAG, "Relay List size: ${relays.size}")
 
         nostrClient.removeAllRelays()
@@ -499,7 +632,7 @@ fun Event.asArticle(
     val articleUri = id().toNostrUri()
     val articleNostrAddress =
         Coordinate(
-            Kind.fromEnum(KindEnum.LongFormTextNote),
+            Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE),
             author(),
             tags().find(
                 TagKind.SingleLetter(

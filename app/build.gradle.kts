@@ -226,7 +226,9 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
 
     // Nostr
-    implementation(libs.rust.nostr)
+//    implementation(libs.rust.nostr)
+    implementation(files("libs/nostr-sdk-725.aar"))
+    implementation("net.java.dev.jna:jna:5.15.0@aar")
 
     // Markdown
     implementation(libs.jetbrains.markdown)
