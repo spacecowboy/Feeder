@@ -13,6 +13,32 @@
                 "^com.android.application"
             ],
             "groupName": "compiler"
+        },
+        {
+            "matchPackagePatterns": [
+                "^com.squareup.okhttp",
+                "^com.squareup.okio",
+                "^org.conscrypt"
+            ],
+            "groupName": "okhttp"
+        },
+        {
+            "matchPackagePatterns": [
+                "^androidx.emoji2"
+            ],
+            "groupName": "emoji2"
+        },
+        {
+            "matchPackagePatterns": [
+                "^androidx.test"
+            ],
+            "groupName": "androidx.test"
+        },
+        {
+            "matchPackagePatterns": [
+                "^org.kodein.di"
+            ],
+            "groupName": "kodein di"
         }
     ]
 }
