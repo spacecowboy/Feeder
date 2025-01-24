@@ -47,7 +47,7 @@ jetbrains-markdown = "0.7.3"
 rust-nostr = "0.38.3"
 junit = "4.13.2"
 espresso = "3.3.0"
-mockk = "1.13.3"
+mockk = "1.13.16"
 mockito = "2.13.0"
 androidx-test-junit-ktx = "1.1.4"
 
