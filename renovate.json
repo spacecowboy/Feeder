@@ -4,6 +4,7 @@
         "config:recommended",
         ":semanticCommitTypeAll(chore)"
     ],
+    "rebaseWhen": "conflicted",
     "packageRules": [
         {
             "matchPackagePatterns": [
