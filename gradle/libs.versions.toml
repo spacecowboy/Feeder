@@ -8,9 +8,9 @@ androidPlugin = "8.8.0"
 # androidx.compose.compiler:compiler
 composeCompiler = "1.5.15"
 # BEGIN These should be upgraded in unison
-okhttp = "4.10.0"
-okio = "3.2.0"
-conscrypt = "2.5.2"
+okhttp = "4.12.0"
+okio = "3.10.2"
+conscrypt = "2.5.3"
 # END Unison
 ktlint-gradle = "12.1.2"
 ktlint-compose = "0.4.3"
