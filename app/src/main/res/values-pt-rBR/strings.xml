@@ -250,4 +250,10 @@
     <string name="feed_item_style_compact_card">Cartão compacto</string>
     <string name="touch_to_play_audio">Toque para reproduzir áudio</string>
     <string name="show_title_unread_count">Mostrar contagem de artigos não lidos no título</string>
+    <string name="model_id">Id do Modelo</string>
+    <string name="azure_api_version">Versão da API Azure</string>
+    <string name="unable_to_load_models">Incapaz de carregar modelos.</string>
+    <string name="summarize">Resumir</string>
+    <string name="openai_settings">Integração OpenAI</string>
+    <string name="api_key">Chave API</string>
 </resources>
