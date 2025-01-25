@@ -1146,8 +1146,8 @@ fun SwitchSetting(
                 .safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
-                            true -> context.getString(androidx.compose.ui.R.string.on)
-                            else -> context.getString(androidx.compose.ui.R.string.off)
+                            true -> context.getString(R.string.on)
+                            else -> context.getString(R.string.off)
                         }
                     role = Role.Switch
                 },

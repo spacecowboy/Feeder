@@ -87,9 +87,9 @@ fun FeedNotificationsDialog(
                     ) {
                         val stateLabel =
                             if (item.notify) {
-                                stringResource(androidx.compose.ui.R.string.on)
+                                stringResource(R.string.on)
                             } else {
-                                stringResource(androidx.compose.ui.R.string.off)
+                                stringResource(R.string.off)
                             }
                         val dimens = LocalDimens.current
                         Row(
