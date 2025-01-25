@@ -36,27 +36,27 @@ commands:
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
-#   emulator-test:
+  emulator-test:
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/developer/orbs/orb/circleci/android#executors-android-machine
-    # executor:
-    #   name: android/android-machine
-    #   tag: default
+    executor:
+      name: android/android-machine
+      tag: default
 
     # Add steps to the job
     # See: https://circleci.com/docs/jobs-steps/#steps-overview & https://circleci.com/docs/configuration-reference/#steps
-    # steps:
+    steps:
       # Checkout the code as the first step.
-    #   - checkout
+      - checkout
 
       # The next step will run the unit tests
       #- android/run-tests:
       #    test-command: ./gradlew lint testDebug --continue
 
       # Then start the emulator and run the Instrumentation tests!
-    #   - android/start-emulator-and-run-tests:
-    #       test-command: ./gradlew connectedDebugAndroidTest --parallel
-    #       system-image: system-images;android-25;google_apis;x86
+      - android/start-emulator-and-run-tests:
+          test-command: ./gradlew connectedDebugAndroidTest --parallel
+          system-image: system-images;android-25;google_apis;x86
 
       # And finally run the release build
       #- run:
@@ -83,5 +83,5 @@ workflows:
   emulator-tests: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - emulator-test
+    #   - emulator-test
       - gradle-emulator-test
