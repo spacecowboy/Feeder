@@ -18,7 +18,7 @@ commands:
       - restore_cache:
           key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
-          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+          key: v1-gradle-cache-{{ checksum "build.gradle.kts" }}
 
   save_gradle_cache:
     steps:
@@ -29,7 +29,7 @@ commands:
       - save_cache:
           paths:
             - ~/.gradle/caches
-          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+          key: v1-gradle-cache-{{ checksum "build.gradle.kts" }}
 
 
 # Define a job to be invoked later in a workflow.
