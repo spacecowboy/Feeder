@@ -43,10 +43,23 @@ jobs:
       #    command: |
       #      ./gradlew assembleRelease
 
+  gradle-emulator-test:
+    executor:
+      name: android/android-machine
+      tag: default
+
+    steps:
+      - checkout
+
+      - run:
+          name: Run Gradle Managed Emulator Tests
+          command: ./gradlew pixel2api30DebugAndroidTest
+
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
+  emulator-tests: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - emulator-test
+      - gradle-emulator-test
