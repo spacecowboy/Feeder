@@ -44,7 +44,7 @@ import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.util.Locale
@@ -224,7 +224,7 @@ fun TTSPlayer(
 @Preview
 @Composable
 private fun PlayerPreview() {
-    FeederTheme {
+    PreviewTheme {
         TTSPlayer(
             currentlyPlaying = true,
             onPlay = {},
@@ -239,7 +239,7 @@ private fun PlayerPreview() {
 @Preview
 @Composable
 private fun PlayerPreviewWithFab() {
-    FeederTheme {
+    PreviewTheme {
         TTSPlayer(
             currentlyPlaying = true,
             onPlay = {},

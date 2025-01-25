@@ -47,10 +47,9 @@ import com.nononsenseapps.feeder.model.opml.OpmlPullParser
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithNonScrollableContent
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
@@ -126,8 +125,6 @@ fun OpmlImportScreen(
     }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
 //    when (screenType) {
 //        ScreenType.DUAL -> {
@@ -299,7 +296,7 @@ data class ViewState(
 @PreviewThemes
 @Composable
 private fun PreviewOpmlImportScreenSingle() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             OpmlImportView(
                 viewState =

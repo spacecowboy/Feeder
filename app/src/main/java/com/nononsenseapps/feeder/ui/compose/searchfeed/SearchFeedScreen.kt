@@ -79,10 +79,9 @@ import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.Dimensions
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
@@ -117,8 +116,6 @@ fun SearchFeedScreen(
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier =
@@ -573,7 +570,7 @@ fun ErrorResultView(
 )
 @Composable
 private fun SearchPreview() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
@@ -611,7 +608,7 @@ private fun SearchPreview() {
 )
 @Composable
 private fun ErrorPreview() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
@@ -647,7 +644,7 @@ private fun ErrorPreview() {
 )
 @Composable
 private fun SearchPreviewLarge() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.DUAL,

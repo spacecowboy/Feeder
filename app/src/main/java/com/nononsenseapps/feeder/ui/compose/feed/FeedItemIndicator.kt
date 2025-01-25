@@ -32,7 +32,7 @@ import coil3.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 
 @Composable
 fun FeedItemEitherIndicator(
@@ -185,7 +185,7 @@ fun FeedItemSavedIndicator(
 @Preview("Light")
 @Composable
 private fun PreviewLightFeedItemIndicatorRow() {
-    FeederTheme(currentTheme = ThemeOptions.DAY) {
+    PreviewTheme(currentTheme = ThemeOptions.DAY) {
         Surface {
             Box(
                 contentAlignment = Alignment.Center,
@@ -205,7 +205,7 @@ private fun PreviewLightFeedItemIndicatorRow() {
 @Preview("Dark")
 @Composable
 private fun PreviewDarkFeedItemIndicatorRow() {
-    FeederTheme(currentTheme = ThemeOptions.NIGHT) {
+    PreviewTheme(currentTheme = ThemeOptions.NIGHT) {
         Surface {
             Box(
                 contentAlignment = Alignment.Center,

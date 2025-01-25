@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
 import org.kodein.di.compose.withDI
 
@@ -59,7 +60,7 @@ fun WithAllPreviewProviders(
             )
         }
     WithPreviewWindowSize(WindowSizeClass.calculateFromSize(dpSize)) {
-        FeederTheme(currentTheme = currentTheme) {
+        PreviewTheme(currentTheme = currentTheme) {
             Surface {
                 content()
             }

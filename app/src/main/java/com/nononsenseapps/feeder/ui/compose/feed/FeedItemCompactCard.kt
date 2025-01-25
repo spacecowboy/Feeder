@@ -42,7 +42,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.EnclosureImage
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URL
@@ -225,7 +225,7 @@ private fun FeedItemThumbnail(
 @Composable
 @PreviewThemes
 private fun Preview() {
-    FeederTheme {
+    PreviewTheme {
         FeedItemCompactCard(
             state =
                 FeedItemState(
@@ -259,7 +259,7 @@ private fun Preview() {
 @Composable
 @PreviewThemes
 private fun PreviewWithImageUnread() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {
@@ -299,7 +299,7 @@ private fun PreviewWithImageUnread() {
 @Composable
 @PreviewThemes
 private fun PreviewWithImageRead() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {

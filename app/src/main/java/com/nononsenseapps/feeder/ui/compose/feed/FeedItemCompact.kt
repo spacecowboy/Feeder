@@ -39,8 +39,8 @@ import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -188,7 +188,7 @@ data class FeedListItem(
 @Composable
 @Preview(showBackground = true)
 private fun PreviewRead() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemCompact(
                 item =
@@ -228,7 +228,7 @@ private fun PreviewRead() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewUnread() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemCompact(
                 item =
@@ -268,7 +268,7 @@ private fun PreviewUnread() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewWithImage() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             Box(
                 modifier = Modifier.width(400.dp),

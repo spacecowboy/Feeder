@@ -61,7 +61,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemSnippetTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
@@ -379,7 +379,7 @@ fun RowScope.FeedItemText(
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun Preview() {
-    FeederTheme {
+    PreviewTheme {
         FeedItemCard(
             item =
                 FeedListItem(
@@ -416,7 +416,7 @@ private fun Preview() {
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageUnread() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {
@@ -457,7 +457,7 @@ private fun PreviewWithImageUnread() {
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageRead() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {

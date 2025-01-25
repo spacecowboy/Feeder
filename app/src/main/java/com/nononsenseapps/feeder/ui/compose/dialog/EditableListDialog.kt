@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -147,7 +147,7 @@ fun EditableListDialog(
 @Preview
 @Composable
 private fun PreviewDialog() {
-    FeederTheme {
+    PreviewTheme {
         EditableListDialog(
             title = {
                 Column(

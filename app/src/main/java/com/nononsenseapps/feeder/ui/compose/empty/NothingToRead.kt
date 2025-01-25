@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.text.annotatedStringResource
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 
 @Composable
 fun NothingToRead(
@@ -109,7 +109,7 @@ fun NothingToRead(
 )
 @Composable
 private fun PreviewNothingToRead() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             NothingToRead()
         }
