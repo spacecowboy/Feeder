@@ -55,7 +55,7 @@ jobs:
 
       # Then start the emulator and run the Instrumentation tests!
       - android/start-emulator-and-run-tests:
-          test-command: ./gradlew connectedDebugAndroidTest
+          test-command: ./gradlew connectedDebugAndroidTest --parallel
           system-image: system-images;android-25;google_apis;x86
 
       # And finally run the release build
@@ -74,7 +74,7 @@ jobs:
       - restore_gradle_cache
       - run:
           name: Run Gradle Managed Emulator Tests
-          command: ./gradlew pixel2api30DebugAndroidTest
+          command: ./gradlew pixel2api30DebugAndroidTest --parallel
       - save_gradle_cache
 
 # Orchestrate jobs using workflows
