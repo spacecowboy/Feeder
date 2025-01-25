@@ -3,11 +3,11 @@ package com.nononsenseapps.feeder.util
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import coil.ImageLoader
-import coil.decode.DataSource
-import coil.decode.ImageSource
-import coil.fetch.SourceResult
-import coil.request.Options
+import coil3.ImageLoader
+import coil3.decode.DataSource
+import coil3.decode.ImageSource
+import coil3.fetch.SourceResult
+import coil3.request.Options
 import com.danielrampelt.coil.ico.IcoDecoder
 import kotlinx.coroutines.runBlocking
 import okio.buffer

@@ -212,7 +212,6 @@ dependencies {
 
     // BOMS
     implementation(platform(libs.okhttp.bom))
-    implementation(platform(libs.coil.bom))
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.openai.client.bom))
 

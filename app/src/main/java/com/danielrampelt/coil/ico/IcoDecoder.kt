@@ -5,13 +5,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
-import androidx.core.graphics.drawable.toDrawable
-import coil.ImageLoader
-import coil.decode.DecodeResult
-import coil.decode.Decoder
-import coil.decode.ImageSource
-import coil.fetch.SourceResult
-import coil.request.Options
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DecodeResult
+import coil3.decode.Decoder
+import coil3.decode.ImageSource
+import coil3.fetch.SourceFetchResult
+import coil3.request.Options
+import coil3.request.colorSpace
+import coil3.request.premultipliedAlpha
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import okio.BufferedSource
@@ -71,7 +73,7 @@ class IcoDecoder(
                 resources.getDrawable(
                     R.drawable.blank_pixel,
                     resources.newTheme(),
-                ),
+                ).asImage(),
                 false,
             )
         }
@@ -80,7 +82,7 @@ class IcoDecoder(
         outBitmap.density = options.context.resources.displayMetrics.densityDpi
 
         return DecodeResult(
-            drawable = outBitmap.toDrawable(resources),
+            image = outBitmap.asImage(),
             isSampled = inSampleSize > 1 || inScaled,
         )
     }
@@ -130,7 +132,7 @@ class IcoDecoder(
 
     class Factory(private val application: FeederApplication) : Decoder.Factory {
         override fun create(
-            result: SourceResult,
+            result: SourceFetchResult,
             options: Options,
             imageLoader: ImageLoader,
         ): Decoder? {
