@@ -18,9 +18,11 @@ class EndToEndTest : BaseComposeTest {
     @Before
     fun setup() {
         composeTestRule.setContent {
-            FeederTheme {
-                withDI {
-                    composeTestRule.activity.AppContent()
+            composeTestRule.activity.apply {
+                FeederTheme {
+                    withDI {
+                        composeTestRule.activity.AppContent()
+                    }
                 }
             }
         }

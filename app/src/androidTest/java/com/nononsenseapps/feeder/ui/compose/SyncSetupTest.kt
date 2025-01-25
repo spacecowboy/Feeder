@@ -22,13 +22,15 @@ class SyncSetupTest : BaseComposeTest {
     @Before
     fun setup() {
         composeTestRule.setContent {
-            FeederTheme {
-                withDI {
-                    val navController = rememberNavController()
-                    val navDrawerListState = rememberLazyListState()
+            composeTestRule.activity.apply {
+                FeederTheme {
+                    withDI {
+                        val navController = rememberNavController()
+                        val navDrawerListState = rememberLazyListState()
 
-                    NavHost(navController, startDestination = SyncScreenDestination.route) {
-                        SyncScreenDestination.register(this, navController, navDrawerListState)
+                        NavHost(navController, startDestination = SyncScreenDestination.route) {
+                            SyncScreenDestination.register(this, navController, navDrawerListState)
+                        }
                     }
                 }
             }
