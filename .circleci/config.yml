@@ -11,6 +11,27 @@ orbs:
   # See the Android orb documentation here: https://circleci.com/developer/orbs/orb/circleci/android
   android: circleci/android@2.4.0
 
+# For gradle managed emulator tests
+commands:
+  restore_gradle_cache:
+    steps:
+      - restore_cache:
+          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+      - restore_cache:
+          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+
+  save_gradle_cache:
+    steps:
+      - save_cache:
+          paths:
+            - ~/.gradle/wrapper
+          key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+          key: v1-gradle-cache-{{ checksum "build.gradle" }}
+
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
@@ -50,10 +71,11 @@ jobs:
 
     steps:
       - checkout
-
+      - restore_gradle_cache
       - run:
           name: Run Gradle Managed Emulator Tests
           command: ./gradlew pixel2api30DebugAndroidTest
+      - save_gradle_cache
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
