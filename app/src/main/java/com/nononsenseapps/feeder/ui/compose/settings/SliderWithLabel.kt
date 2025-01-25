@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 
 // Credit to
 // https://www.devbitsandbytes.com/jetpack-compose-configuring-slider-with-label/
@@ -157,7 +157,7 @@ private fun calcFraction(
 @Preview
 @Composable
 private fun PreviewSliderWithLabel() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             var value by remember {
                 mutableFloatStateOf(1f)
@@ -176,7 +176,7 @@ private fun PreviewSliderWithLabel() {
 @Preview
 @Composable
 private fun PreviewSliderWithEndLabels() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             var value by remember {
                 mutableFloatStateOf(1f)

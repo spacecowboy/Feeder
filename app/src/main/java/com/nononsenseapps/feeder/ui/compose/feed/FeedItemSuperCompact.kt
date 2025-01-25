@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import java.net.URL
 import java.time.Instant
 
@@ -65,7 +65,7 @@ fun FeedItemSuperCompact(
 @Composable
 @Preview(showBackground = true)
 private fun PreviewRead() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemSuperCompact(
                 item =
@@ -103,7 +103,7 @@ private fun PreviewRead() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewUnread() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemSuperCompact(
                 item =
@@ -141,7 +141,7 @@ private fun PreviewUnread() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewWithImage() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemSuperCompact(
                 item =

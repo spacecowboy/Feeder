@@ -82,11 +82,10 @@ import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -120,8 +119,6 @@ private fun SyncScaffold(
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val closeMenuText = stringResource(R.string.close_menu)
-
-    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier =
@@ -916,7 +913,7 @@ fun DeviceEntry(
 @Preview
 @Composable
 private fun PreviewDeviceEntry() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             DeviceEntry(
                 currentDeviceId = 77L,
@@ -1073,7 +1070,7 @@ fun SyncAddNewDeviceContent(
 @Preview("Device List Tablet", device = Devices.PIXEL_C)
 @Composable
 private fun PreviewDualSyncScreenDeviceList() {
-    FeederTheme {
+    PreviewTheme {
         DualSyncScreen(
             onNavigateUp = { },
             leftScreenToShow = LeftScreenToShow.DEVICELIST,
@@ -1106,7 +1103,7 @@ private fun PreviewDualSyncScreenDeviceList() {
 @Preview("Setup Foldable", device = Devices.FOLDABLE, widthDp = 720, heightDp = 360)
 @Composable
 private fun PreviewDualSyncScreenSetup() {
-    FeederTheme {
+    PreviewTheme {
         DualSyncScreen(
             onNavigateUp = { },
             leftScreenToShow = LeftScreenToShow.SETUP,
@@ -1139,7 +1136,7 @@ private fun PreviewDualSyncScreenSetup() {
 @Preview("Scan or Enter Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
 private fun PreviewJoin() {
-    FeederTheme {
+    PreviewTheme {
         SyncJoinScreen(
             onNavigateUp = {},
             onJoinSyncChain = { _, _ -> },
@@ -1156,7 +1153,7 @@ private fun PreviewJoin() {
 @Preview("Empty Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
 private fun PreviewEmpty() {
-    FeederTheme {
+    PreviewTheme {
         SyncSetupScreen(
             onNavigateUp = {},
             onScanSyncCode = {},
@@ -1170,7 +1167,7 @@ private fun PreviewEmpty() {
 @Preview("Device List Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
 private fun PreviewDeviceList() {
-    FeederTheme {
+    PreviewTheme {
         SyncDeviceListScreen(
             onNavigateUp = {},
             currentDeviceId = 5L,
@@ -1193,7 +1190,7 @@ private fun PreviewDeviceList() {
 @Preview("Add New Device Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable
 private fun PreviewAddNewDeviceContent() {
-    FeederTheme {
+    PreviewTheme {
         SyncAddNewDeviceScreen(
             onNavigateUp = {},
             onLeaveSyncChain = {},

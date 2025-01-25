@@ -4,19 +4,21 @@ import android.app.Application
 import android.app.job.JobScheduler
 import android.content.ContentResolver
 import android.content.SharedPreferences
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.getSystemService
 import androidx.preference.PreferenceManager
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.annotation.ExperimentalCoilApi
+import coil3.disk.DiskCache
+import coil3.memory.MemoryCache
+import coil3.network.cachecontrol.CacheControlCacheStrategy
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.crossfade
+import coil3.request.maxBitmapSize
+import coil3.size.Size
 import com.danielrampelt.coil.ico.IcoDecoder
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -35,7 +37,6 @@ import com.nononsenseapps.feeder.model.ForceCacheOnSomeFailuresInterceptor
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
-import com.nononsenseapps.feeder.ui.compose.coil.TooLargeImageInterceptor
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.currentlyUnmetered
@@ -47,6 +48,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
+import okio.Path.Companion.toOkioPath
 import org.conscrypt.Conscrypt
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -58,13 +60,12 @@ import java.io.File
 import java.security.Security
 import java.util.concurrent.TimeUnit
 
-class FeederApplication : Application(), DIAware, ImageLoaderFactory {
+@OptIn(ExperimentalCoilApi::class)
+class FeederApplication : Application(), DIAware, SingletonImageLoader.Factory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
 
     override val di by DI.lazy {
-        // import(androidXModule(this@FeederApplication))
-
         bind<FilePathProvider>() with
             singleton {
                 filePathProvider(cacheDir = cacheDir, filesDir = filesDir)
@@ -163,28 +164,32 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                         .build()
 
                 ImageLoader.Builder(instance())
-                    .dispatcher(Dispatchers.Default)
-                    .okHttpClient(okHttpClient = okHttpClient)
+                    .crossfade(true)
+                    .coroutineContext(applicationCoroutineScope.coroutineContext)
+                    .maxBitmapSize(Size(2500, 2500))
                     .diskCache(
                         DiskCache.Builder()
-                            .directory(filePathProvider.imageCacheDir)
+                            .directory(filePathProvider.imageCacheDir.toOkioPath())
                             .maxSizeBytes(250L * 1024 * 1024)
                             .build(),
                     )
                     .memoryCache {
-                        MemoryCache.Builder(this@FeederApplication)
+                        MemoryCache.Builder()
                             .maxSizeBytes(50 * 1024 * 1024)
                             .build()
                     }
                     .components {
-                        add(TooLargeImageInterceptor())
-                        add(SvgDecoder.Factory())
-                        if (SDK_INT >= 28) {
-                            add(ImageDecoderDecoder.Factory())
-                        } else {
-                            add(GifDecoder.Factory())
-                        }
                         add(IcoDecoder.Factory(this@FeederApplication))
+                        add(
+                            OkHttpNetworkFetcherFactory(
+                                callFactory = {
+                                    okHttpClient
+                                },
+                                cacheStrategy = {
+                                    CacheControlCacheStrategy()
+                                },
+                            ),
+                        )
                     }
                     .build()
             }
@@ -217,14 +222,14 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         super.onTerminate()
     }
 
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        return di.direct.instance()
+    }
+
     companion object {
         @Deprecated("Only used by an old database migration")
         lateinit var staticFilesDir: File
 
         private const val LOG_TAG = "FEEDER_APP"
-    }
-
-    override fun newImageLoader(): ImageLoader {
-        return di.direct.instance()
     }
 }

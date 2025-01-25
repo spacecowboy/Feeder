@@ -32,8 +32,8 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.settings.UIFeedSettings
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
 @Composable
@@ -144,7 +144,7 @@ fun FeedNotificationsDialog(
 @Preview
 @Composable
 private fun PreviewNotificationsDialog() {
-    FeederTheme {
+    PreviewTheme {
         FeedNotificationsDialog(
             title = {
                 Text(

@@ -75,10 +75,9 @@ import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -201,8 +200,6 @@ fun EditFeedScreen(
         }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier =
@@ -608,7 +605,7 @@ private class ScreenState(
 @Preview("Edit Feed Phone")
 @Composable
 private fun PreviewEditFeedScreenPhone() {
-    FeederTheme {
+    PreviewTheme {
         EditFeedScreen(
             screenType = ScreenType.SINGLE,
             onNavigateUp = {},
@@ -623,7 +620,7 @@ private fun PreviewEditFeedScreenPhone() {
 @Preview("Edit Feed Tablet", device = Devices.PIXEL_C)
 @Composable
 private fun PreviewEditFeedScreenLarge() {
-    FeederTheme {
+    PreviewTheme {
         EditFeedScreen(
             screenType = ScreenType.DUAL,
             onNavigateUp = {},

@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
-import coil.size.Scale
-import coil.size.Size
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Precision
+import coil3.size.Scale
+import coil3.size.Size
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -39,8 +39,8 @@ import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -188,7 +188,7 @@ data class FeedListItem(
 @Composable
 @Preview(showBackground = true)
 private fun PreviewRead() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemCompact(
                 item =
@@ -228,7 +228,7 @@ private fun PreviewRead() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewUnread() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             FeedItemCompact(
                 item =
@@ -268,7 +268,7 @@ private fun PreviewUnread() {
 @Composable
 @Preview(showBackground = true)
 private fun PreviewWithImage() {
-    FeederTheme {
+    PreviewTheme {
         Surface {
             Box(
                 modifier = Modifier.width(400.dp),

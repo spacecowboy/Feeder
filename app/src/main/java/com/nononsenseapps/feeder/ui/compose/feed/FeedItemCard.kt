@@ -43,11 +43,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
-import coil.size.Scale
-import coil.size.Size
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Precision
+import coil3.size.Scale
+import coil3.size.Size
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.MediaImage
@@ -61,7 +61,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemSnippetTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
@@ -379,7 +379,7 @@ fun RowScope.FeedItemText(
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun Preview() {
-    FeederTheme {
+    PreviewTheme {
         FeedItemCard(
             item =
                 FeedListItem(
@@ -416,7 +416,7 @@ private fun Preview() {
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageUnread() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {
@@ -457,7 +457,7 @@ private fun PreviewWithImageUnread() {
 @PreviewThemes
 @Suppress("ktlint:standard:max-line-length")
 private fun PreviewWithImageRead() {
-    FeederTheme {
+    PreviewTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),
         ) {

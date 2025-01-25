@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
@@ -20,7 +21,7 @@ android {
 
         vectorDrawables.useSupportLibrary = true
 
-        resourceConfigurations.addAll(getListOfSupportedLocales())
+        androidResources.localeFilters.addAll(getListOfSupportedLocales())
 
         // For espresso tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -145,9 +146,6 @@ android {
         shaders = false
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
     packaging {
         resources {
             excludes.addAll(
@@ -180,20 +178,21 @@ android {
     }
 }
 
-// gw installDebug -Pmyapp.enableComposeCompilerReports=true --rerun-tasks
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java) {
-    kotlinOptions {
+composeCompiler {
+    includeSourceInformation = true
+}
+
+kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+        // gw installDebug -Pmyapp.enableComposeCompilerReports=true --rerun-tasks
         if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
-            freeCompilerArgs +=
-                listOf(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}",
-                )
-            freeCompilerArgs +=
-                listOf(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.resolve("compose_metrics").canonicalPath}",
-                )
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.layout.buildDirectory.asFile.get().resolve("compose_metrics").canonicalPath}",
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.layout.buildDirectory.asFile.get().resolve("compose_metrics").canonicalPath}",
+            )
         }
     }
 }
@@ -212,7 +211,6 @@ dependencies {
 
     // BOMS
     implementation(platform(libs.okhttp.bom))
-    implementation(platform(libs.coil.bom))
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.openai.client.bom))
 

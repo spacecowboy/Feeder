@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ui.compose.bottomBarHeight
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 
 /**
  * Material Design bottom app bar. Forked from library because the library version does not take
@@ -81,7 +81,7 @@ fun PaddedBottomAppBar(
 @Preview
 @Composable
 private fun PreviewPaddedBottomBar() {
-    FeederTheme {
+    PreviewTheme {
         PaddedBottomAppBar(
             actions = {
                 IconButton(onClick = {}) {
