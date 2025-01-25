@@ -1,25 +1,23 @@
 [versions]
 # Compose compiler is highly coupled to Kotlin version
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-kotlin = "1.9.25"
-ksp = "1.9.25-1.0.20"
-kotlinxSerialization = "1.6.1"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.27"
+kotlinxSerialization = "1.8.0"
 androidPlugin = "8.8.0"
-# androidx.compose.compiler:compiler
-composeCompiler = "1.5.15"
 # BEGIN These should be upgraded in unison
 okhttp = "4.10.0"
 okio = "3.2.0"
-conscrypt = "2.5.3"
+conscrypt = "2.5.2"
 # END Unison
 ktlint-gradle = "12.1.2"
 ktlint-compose = "0.4.3"
 kodein = "7.5.0"
-coroutines = "1.7.3"
+coroutines = "1.9.0"
 gofeed = "0.1.2"
 moshi = "1.12.0"
-desugar = "2.0.3"
-jsoup = "1.7.3"
+desugar = "2.1.4"
+jsoup = "1.11.2"
 tagsoup = "1.2.1"
 readability4j = "1.0.5"
 retrofit = "2.9.0"
@@ -27,20 +25,20 @@ qrgen = "2.6.0"
 androidxCore = "1.15.0"
 androidxTestcore = "1.6.1"
 appcompat = "1.7.0"
-material = "1.6.1"
-material3 = "1.1.0"
-navigationCompose = "2.7.7"
+material = "1.12.0"
+material3 = "1.3.1"
+navigationCompose = "2.8.5"
 preference = "1.2.1"
 testRunner = "1.6.2"
-lifecycle = "2.6.2"
-room = "2.5.2"
+lifecycle = "2.8.7"
+room = "2.6.1"
 openai-client = "3.8.2"
-compose = "2024.04.00"
+compose = "2025.01.00"
 activityCompose = "1.10.0"
-paging = "3.2.1"
+paging = "3.3.5"
 accompanist = "0.30.1"
 coil = "3.0.4"
-androidWindow = "1.0.0"
+androidWindow = "1.3.0"
 lazycolumnscrollbar = "2.2.0"
 androidxBrowser = "1.8.0"
 jetbrains-markdown = "0.7.3"
@@ -52,8 +50,6 @@ mockito = "2.13.0"
 androidx-test-junit-ktx = "1.2.1"
 
 [libraries]
-# This is unused but it is a workaround to get Renovate to update the version of the plugin
-android-composeCompiler = {module="androidx.compose.compiler:compiler", version.ref ="composeCompiler"}
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
 openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openai-client" }
@@ -137,6 +133,7 @@ androidx-test-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidPlugin" }
+kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -145,7 +142,6 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ktlint-gradle = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
 
 [bundles]
-okhttp = ["okhttp", "okio"]
 okhttp-android = ["okhttp", "okio", "conscrypt-android"]
 kotlin = ["kotlin-stdlib", "kotlin-stdlib-common", "kotlin-coroutines-core", "kotlin-serialization-json"]
 jvm = ["jsoup", "tagsoup", "readability4j", "retrofit", "retrofit-converter-moshi", "moshi", "moshi-kotlin", "moshi-adapters", "qrgen", "gofeed-android"]

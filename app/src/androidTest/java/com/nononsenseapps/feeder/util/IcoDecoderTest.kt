@@ -6,10 +6,11 @@ import androidx.test.filters.SmallTest
 import coil3.ImageLoader
 import coil3.decode.DataSource
 import coil3.decode.ImageSource
-import coil3.fetch.SourceResult
+import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import com.danielrampelt.coil.ico.IcoDecoder
 import kotlinx.coroutines.runBlocking
+import okio.FileSystem
 import okio.buffer
 import okio.source
 import org.junit.Test
@@ -56,7 +57,7 @@ class IcoDecoderTest {
     }
 
     companion object {
-        private val gitlabIco: SourceResult
+        private val gitlabIco: SourceFetchResult
             get() {
                 val buf =
                     Companion::class.java.getResourceAsStream("gitlab.ico")!!
@@ -66,17 +67,17 @@ class IcoDecoderTest {
                 val imageSource =
                     ImageSource(
                         source = buf,
-                        context = ApplicationProvider.getApplicationContext(),
+                        fileSystem = FileSystem.SYSTEM,
                     )
 
-                return SourceResult(
+                return SourceFetchResult(
                     source = imageSource,
                     mimeType = null,
                     DataSource.DISK,
                 )
             }
 
-        private val pngIco: SourceResult
+        private val pngIco: SourceFetchResult
             get() {
                 val buf =
                     Companion::class.java.getResourceAsStream("png.ico")!!
@@ -86,10 +87,10 @@ class IcoDecoderTest {
                 val imageSource =
                     ImageSource(
                         source = buf,
-                        context = ApplicationProvider.getApplicationContext(),
+                        fileSystem = FileSystem.SYSTEM,
                     )
 
-                return SourceResult(
+                return SourceFetchResult(
                     source = imageSource,
                     mimeType = null,
                     DataSource.DISK,
