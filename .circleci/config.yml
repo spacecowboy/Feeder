@@ -16,7 +16,6 @@ orbs:
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
   emulator-test:
-    resource_class: large
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/developer/orbs/orb/circleci/android#executors-android-machine
     executor:
@@ -45,7 +44,6 @@ jobs:
       #      ./gradlew assembleRelease
 
   gradle-emulator-test:
-    resource_class: large
     executor:
       name: android/android-machine
       tag: default
