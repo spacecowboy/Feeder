@@ -68,6 +68,7 @@ jobs:
     executor:
       name: android/android-machine
       tag: default
+      resource-class: medium
 
     steps:
       - checkout
