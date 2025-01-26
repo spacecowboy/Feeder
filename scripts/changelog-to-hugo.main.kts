@@ -1,5 +1,5 @@
 #!/usr/bin/env kotlin
-@file:DependsOn("org.jetbrains:markdown-jvm:0.4.1")
+@file:DependsOn("org.jetbrains:markdown-jvm:0.7.3")
 @file:DependsOn("net.pwall.mustache:kotlin-mustache:0.10")
 
 import net.pwall.mustache.parser.Parser
