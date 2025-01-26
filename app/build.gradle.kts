@@ -185,6 +185,7 @@ composeCompiler {
 kotlin {
     jvmToolchain(17)
     compilerOptions {
+        allWarningsAsErrors = false
         // gw installDebug -Pmyapp.enableComposeCompilerReports=true --rerun-tasks
         if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
             freeCompilerArgs.addAll(

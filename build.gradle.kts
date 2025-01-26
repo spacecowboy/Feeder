@@ -22,18 +22,3 @@ allprojects {
         options.encoding = "UTF-8"
     }
 }
-
-subprojects {
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            // Treat all Kotlin warnings as errors
-            allWarningsAsErrors = false
-
-//      freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
-//      freeCompilerArgs += '-Xopt-in=kotlin.Experimental'
-
-            // Set JVM target to 1.8
-            jvmTarget = "1.8"
-        }
-    }
-}
