@@ -77,7 +77,7 @@ fun EditableListDialog(
                     keyboardOptions =
                         KeyboardOptions(
                             capitalization = KeyboardCapitalization.None,
-                            autoCorrect = true,
+                            autoCorrectEnabled = true,
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next,
                         ),

@@ -36,6 +36,7 @@
 
 # For Jsoup
 -keep class org.jsoup.**  { *; }
+-dontwarn org.jspecify.annotations.NullMarked
 
 # For Nostr
 -keep class com.sun.jna.** { *; }

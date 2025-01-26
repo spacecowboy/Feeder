@@ -204,6 +204,12 @@ configurations.all {
     }
 }
 
+// gradle ktlint are not updating ktlint as they should
+// so need to specify to make it compatible with compose rules
+ktlint {
+    version.set("1.5.0")
+}
+
 dependencies {
     ktlintRuleset(libs.ktlint.compose)
     ksp(libs.room)
@@ -214,6 +220,7 @@ dependencies {
     implementation(platform(libs.okhttp.bom))
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.openai.client.bom))
+    implementation(platform(libs.retrofit.bom))
 
     // Dependencies
     implementation(libs.bundles.android)
@@ -247,19 +254,20 @@ dependencies {
 fun getListOfSupportedLocales(): List<String> {
     val resFolder = file(projectDir.resolve("src/main/res"))
 
-    return resFolder.list { _, s ->
-        s.startsWith("values")
-    }?.filter { folder ->
-        val stringsSize = resFolder.resolve("$folder/strings.xml").length()
-        // values/strings.xml is over 13k in size so this filters out too partial translations
-        stringsSize > 10_000L
-    }?.map { folder ->
-        if (folder == "values") {
-            "en"
-        } else {
-            folder.substringAfter("values-")
-        }
-    }?.sorted()
+    return resFolder
+        .list { _, s ->
+            s.startsWith("values")
+        }?.filter { folder ->
+            val stringsSize = resFolder.resolve("$folder/strings.xml").length()
+            // values/strings.xml is over 13k in size so this filters out too partial translations
+            stringsSize > 10_000L
+        }?.map { folder ->
+            if (folder == "values") {
+                "en"
+            } else {
+                folder.substringAfter("values-")
+            }
+        }?.sorted()
         ?: listOf("en")
 }
 
@@ -267,11 +275,12 @@ tasks {
     register("generateLocalesConfig") {
         val resFolder = file(projectDir.resolve("src/main/res"))
         inputs.files(
-            resFolder.listFiles { file ->
-                file.name.startsWith("values")
-            }?.map { file ->
-                file.resolve("strings.xml")
-            } ?: error("Could not resolve values folders!"),
+            resFolder
+                .listFiles { file ->
+                    file.name.startsWith("values")
+                }?.map { file ->
+                    file.resolve("strings.xml")
+                } ?: error("Could not resolve values folders!"),
         )
 
         val localesConfigFile = file(projectDir.resolve("src/main/res/xml/locales_config.xml"))

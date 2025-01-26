@@ -355,7 +355,7 @@ fun ColumnScope.LeftContent(
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 keyboardType = KeyboardType.Uri,
                 imeAction = ImeAction.Next,
             ),
@@ -394,7 +394,7 @@ fun ColumnScope.LeftContent(
         keyboardOptions =
             KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
-                autoCorrect = true,
+                autoCorrectEnabled = true,
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
             ),
@@ -454,7 +454,7 @@ fun ColumnScope.LeftContent(
             keyboardOptions =
                 KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
-                    autoCorrect = true,
+                    autoCorrectEnabled = true,
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done,
                 ),
