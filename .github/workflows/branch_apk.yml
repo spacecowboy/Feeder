@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew assemble
 
       - name: upload the generated files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           retention-days: 7
