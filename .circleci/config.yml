@@ -9,7 +9,7 @@ version: 2.1
 # See: https://circleci.com/docs/orb-intro/
 orbs:
   # See the Android orb documentation here: https://circleci.com/developer/orbs/orb/circleci/android
-  android: circleci/android@2.5.0
+  android: circleci/android@3.0.2
 
 # For gradle managed emulator tests
 commands:
