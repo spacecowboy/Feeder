@@ -27,7 +27,7 @@ jobs:
 
     # This initializes gradle and sets up caching. Default version is the wrapper version.
     - name: gradle setup
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v4
     - name: gradle build
       run: ./gradlew assemble bundle packageDebugAndroidTest :app:lint test
 
@@ -47,6 +47,6 @@ jobs:
         distribution: 'temurin'
 
     - name: gradle setup
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v4
     - name: ktlint check
       run: ./gradlew ktlintCheck
