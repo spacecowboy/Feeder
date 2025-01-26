@@ -43,7 +43,7 @@ jobs:
       run: ci/run-if-not-release fastlane bump_version_code
 
     - name: gradle setup
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@v4
     - name: gradle build
       run: ./gradlew build app:bundlePlay :app:lint check
 

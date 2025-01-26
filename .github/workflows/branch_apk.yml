@@ -38,7 +38,7 @@ jobs:
           KEYALIAS: ${{ secrets.KEYALIAS }}
 
       - name: gradle setup
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: gradle build
         run: ./gradlew assemble
 
