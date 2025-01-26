@@ -8,11 +8,12 @@ import com.nononsenseapps.feeder.ui.text.getVideo
 import com.nononsenseapps.feeder.util.asUTF8Sequence
 import com.nononsenseapps.feeder.util.logDebug
 import org.jsoup.Jsoup
-import org.jsoup.helper.StringUtil
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import java.io.InputStream
+import java.net.MalformedURLException
+import java.net.URL
 
 class HtmlLinearizer {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
@@ -766,7 +767,7 @@ class HtmlLinearizer {
                     if (candidate.size == 1) {
                         result.add(
                             LinearImageSource(
-                                imgUri = StringUtil.resolve(baseUrl, candidate.first()),
+                                imgUri = resolve(baseUrl, candidate.first()),
                                 pixelDensity = null,
                                 heightPx = null,
                                 widthPx = null,
@@ -784,7 +785,7 @@ class HtmlLinearizer {
 
                                 result.add(
                                     LinearImageSource(
-                                        imgUri = StringUtil.resolve(baseUrl, candidate.first()),
+                                        imgUri = resolve(baseUrl, candidate.first()),
                                         pixelDensity = null,
                                         heightPx = null,
                                         widthPx = null,
@@ -802,7 +803,7 @@ class HtmlLinearizer {
 
                                 result.add(
                                     LinearImageSource(
-                                        imgUri = StringUtil.resolve(baseUrl, candidate.first()),
+                                        imgUri = resolve(baseUrl, candidate.first()),
                                         pixelDensity = density.takeIf { it > 0 },
                                         heightPx = null,
                                         widthPx = null,
@@ -818,7 +819,7 @@ class HtmlLinearizer {
             val height = element.attr("height").toIntOrNull()
 
             dataImgUrl.takeIf { it.isNotBlank() }?.let {
-                val url = StringUtil.resolve(baseUrl, it)
+                val url = resolve(baseUrl, it)
                 if (width != null && height != null) {
                     result.add(
                         LinearImageSource(
@@ -843,7 +844,7 @@ class HtmlLinearizer {
             }
 
             absSrc.takeIf { it.isNotBlank() }?.let {
-                val url = StringUtil.resolve(baseUrl, it)
+                val url = resolve(baseUrl, it)
                 if (width != null && height != null) {
                     result.add(
                         LinearImageSource(
@@ -868,7 +869,7 @@ class HtmlLinearizer {
             }
 
             backgroundImage.takeIf { it.isNotBlank() }?.let {
-                val url = StringUtil.resolve(baseUrl, it)
+                val url = resolve(baseUrl, it)
                 result.add(
                     LinearImageSource(
                         imgUri = url,
@@ -974,3 +975,39 @@ private const val NON_BREAKING_SPACE = 160.toChar()
 private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
 
 private fun isCollapsableWhiteSpace(c: Char) = c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
+
+private fun resolve(
+    baseUrl: String,
+    relUrl: String,
+): String {
+    val base: URL
+    try {
+        try {
+            base = URL(baseUrl)
+        } catch (e: MalformedURLException) {
+            // the base is unsuitable, but the attribute/rel may be abs on its own, so try that
+            val abs = URL(relUrl)
+            return abs.toExternalForm()
+        }
+        return resolve(base, relUrl).toExternalForm()
+    } catch (e: MalformedURLException) {
+        return ""
+    }
+}
+
+private fun resolve(
+    baseUrl: URL,
+    relUrl: String,
+): URL {
+    // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
+    var base = baseUrl
+    var rel = relUrl
+    if (rel.startsWith("?")) {
+        rel = base.path + rel
+    }
+    // workaround: //example.com + ./foo = //example.com/./foo, not //example.com/foo
+    if (rel.indexOf('.') == 0 && base.file.indexOf('/') != 0) {
+        base = URL(base.protocol, base.host, base.port, "/" + base.file)
+    }
+    return URL(base, rel)
+}
