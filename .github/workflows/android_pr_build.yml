@@ -11,7 +11,7 @@ jobs:
       contents: read
     steps:
     - name: perform the checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
 
@@ -38,7 +38,7 @@ jobs:
       contents: read
     steps:
     - name: perform the checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: setup JDK
       uses: actions/setup-java@v3
