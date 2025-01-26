@@ -499,7 +499,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("\nCode\n  block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText("Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
             result[0],
         )
     }

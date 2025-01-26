@@ -17,16 +17,21 @@ fun findFirstImageInHtml(
         doc.getElementsByTag("img").asSequence()
             .filterNot { it.attr("width") == "1" || it.attr("height") == "1" }
             .map {
-                // abs: will resolve relative urls against the baseurl - and non-url value will get
-                // dropped, such as invalid values and data/base64 values
+                // abs: will resolve relative urls against the baseurl
+                val url =
+                    if (it.attr("abs:src").contains("data:image", ignoreCase = true)) {
+                        return@map null
+                    } else {
+                        it.attr("abs:src")
+                    }
                 ImageFromHTML(
-                    url = it.attr("abs:src"),
+                    url = url,
                     width = it.attr("width").toIntOrNull(),
                     height = it.attr("height").toIntOrNull(),
                 )
             }
             .firstOrNull {
-                it.url.isNotBlank() &&
+                it?.url?.isNotBlank() == true &&
                     !it.url.contains("twitter_icon", ignoreCase = true) &&
                     !it.url.contains("facebook_icon", ignoreCase = true)
             }

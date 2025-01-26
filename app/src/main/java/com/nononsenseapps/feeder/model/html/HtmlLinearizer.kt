@@ -401,8 +401,10 @@ class HtmlLinearizer {
 
                             // Some sites put youtube iframes inside figures
                             val iframes = element.getElementsByTag("iframe")
-                            if (iframes.isNotEmpty()) {
-                                parseIframeVideo(iframes.first())
+                            if (iframes.isNotEmpty() && iframes.first() != null) {
+                                iframes.first()?.let {
+                                    parseIframeVideo(it)
+                                }
                             } else {
                                 // Wordpress likes nested figures to get images side by side
                                 val imageCandidates =
