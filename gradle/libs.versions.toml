@@ -46,7 +46,7 @@ rust-nostr = "0.38.3"
 junit = "4.13.2"
 espresso = "3.6.1"
 mockk = "1.13.16"
-mockito = "2.28.2"
+mockito = "5.15.2"
 androidx-test-junit-ktx = "1.2.1"
 emoji2 = "1.5.0"
 
