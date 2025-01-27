@@ -8,6 +8,7 @@
     "packageRules": [
         {
             "matchPackagePatterns": [
+                "^org.jetbrains.kotlin",
                 "^org.jetbrains.kotlin.jvm",
                 "^com.google.devtools.ksp",
                 "^androidx.compose.compiler",
