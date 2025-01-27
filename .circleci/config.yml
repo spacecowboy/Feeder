@@ -40,7 +40,7 @@ jobs:
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/developer/orbs/orb/circleci/android#executors-android-machine
     executor:
-      name: android/android-machine
+      name: android/android_machine
       tag: default
 
     # Add steps to the job
@@ -66,9 +66,8 @@ jobs:
 
   gradle-emulator-test:
     executor:
-      name: android/android-machine
+      name: android/android_machine
       tag: default
-      resource-class: medium
 
     steps:
       - checkout
