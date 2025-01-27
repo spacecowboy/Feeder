@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'gradle-wrapper.properties'
+      - 'gradle-wrapper.jar'
+      - '.github/workflows/android_build.yml'
 
 jobs:
   # this job builds and uploads the apk
