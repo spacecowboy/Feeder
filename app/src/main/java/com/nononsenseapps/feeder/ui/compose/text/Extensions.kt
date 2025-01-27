@@ -50,9 +50,8 @@ fun annotatedStringResource(
 }
 
 @Composable
-private fun getSpanStyle(name: String?): SpanStyle? {
-    return when (name) {
+private fun getSpanStyle(name: String?): SpanStyle? =
+    when (name) {
         "link" -> LinkTextStyle().toSpanStyle()
         else -> null
     }
-}

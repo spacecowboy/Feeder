@@ -85,13 +85,13 @@ suspend fun writeOutputStream(
  * *
  * @return String with xml stuff escaped
  */
-internal fun escape(s: String): String {
-    return s.replace("&", "&amp;")
+internal fun escape(s: String): String =
+    s
+        .replace("&", "&amp;")
         .replace("\"", "&quot;")
         .replace("'", "&apos;")
         .replace("<", "&lt;")
         .replace(">", "&gt;")
-}
 
 /**
 
@@ -99,13 +99,13 @@ internal fun escape(s: String): String {
  * *
  * @return String with xml stuff unescaped
  */
-internal fun unescape(s: String): String {
-    return s.replace("&quot;", "\"")
+internal fun unescape(s: String): String =
+    s
+        .replace("&quot;", "\"")
         .replace("&apos;", "'")
         .replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&amp;", "&")
-}
 
 // OPML DSL
 
@@ -122,7 +122,9 @@ interface Element {
     )
 }
 
-class TextElement(val text: String) : Element {
+class TextElement(
+    val text: String,
+) : Element {
     override fun render(
         builder: StringBuilder,
         indent: String,
@@ -131,7 +133,9 @@ class TextElement(val text: String) : Element {
     }
 }
 
-abstract class Tag(val name: String) : Element {
+abstract class Tag(
+    val name: String,
+) : Element {
     val children = arrayListOf<Element>()
     val attributes = linkedMapOf<String, String>()
 
@@ -175,7 +179,9 @@ abstract class Tag(val name: String) : Element {
     }
 }
 
-abstract class TagWithText(name: String) : Tag(name) {
+abstract class TagWithText(
+    name: String,
+) : Tag(name) {
     operator fun String.unaryPlus() {
         children.add(TextElement(this))
     }
@@ -198,7 +204,9 @@ class Head : TagWithText("head") {
 
 class Title : TagWithText("title")
 
-abstract class BodyTag(name: String) : TagWithText(name) {
+abstract class BodyTag(
+    name: String,
+) : TagWithText(name) {
     suspend fun feederSettings(init: suspend FeederSettings.() -> Unit) {
         initTag(FeederSettings(), init)
     }

@@ -43,7 +43,8 @@ class TestMigrationFrom23To24 {
 
         val blockValues = setOf("foo", "bar", "car")
 
-        sharedPrefs.edit()
+        sharedPrefs
+            .edit()
             .putStringSet("pref_block_list_values", blockValues)
             .apply()
 
@@ -51,32 +52,33 @@ class TestMigrationFrom23To24 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 24, true, MigrationFrom23To24(di))
 
-        db.query(
-            """
-            SELECT glob_pattern FROM blocklist
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 3)
+        db
+            .query(
+                """
+                SELECT glob_pattern FROM blocklist
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 3)
 
-            assert(it.moveToFirst())
+                assert(it.moveToFirst())
 
-            assertTrue(it.getString(0)) {
-                val value = it.getString(0)
-                (value in remainingValues).also { remainingValues.remove(value) }
+                assertTrue(it.getString(0)) {
+                    val value = it.getString(0)
+                    (value in remainingValues).also { remainingValues.remove(value) }
+                }
+
+                assert(it.moveToNext())
+                assertTrue(it.getString(0)) {
+                    val value = it.getString(0)
+                    (value in remainingValues).also { remainingValues.remove(value) }
+                }
+
+                assert(it.moveToNext())
+                assertTrue(it.getString(0)) {
+                    val value = it.getString(0)
+                    (value in remainingValues).also { remainingValues.remove(value) }
+                }
             }
-
-            assert(it.moveToNext())
-            assertTrue(it.getString(0)) {
-                val value = it.getString(0)
-                (value in remainingValues).also { remainingValues.remove(value) }
-            }
-
-            assert(it.moveToNext())
-            assertTrue(it.getString(0)) {
-                val value = it.getString(0)
-                (value in remainingValues).also { remainingValues.remove(value) }
-            }
-        }
 
         val blocks =
             sharedPrefs.getStringSet("pref_block_list_values", null)

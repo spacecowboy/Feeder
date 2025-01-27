@@ -12,7 +12,9 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.time.Instant
 
-class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
+class MainActivityViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val context: Application by instance()
 

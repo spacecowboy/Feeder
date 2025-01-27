@@ -51,7 +51,9 @@ import java.time.Instant
 import java.time.ZonedDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class Repository(override val di: DI) : DIAware {
+class Repository(
+    override val di: DI,
+) : DIAware {
     private val settingsStore: SettingsStore by instance()
     private val sessionStore: SessionStore by instance()
     private val feedItemStore: FeedItemStore by instance()
@@ -177,7 +179,8 @@ class Repository(override val di: DI) : DIAware {
     suspend fun getCurrentArticle() = feedItemStore.getArticle(currentArticleId.value)
 
     fun getArticleFlow(itemId: Long): Flow<Article?> =
-        feedItemStore.getFeedItem(itemId)
+        feedItemStore
+            .getFeedItem(itemId)
             .map { Article(it) }
 
     val currentTheme: StateFlow<ThemeOptions> = settingsStore.currentTheme
@@ -286,7 +289,7 @@ class Repository(override val di: DI) : DIAware {
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)
 
-    val isOpenDrawerOnFab = settingsStore.isOpenDrawerOnFab
+    val isOpenDrawerOnFab = settingsStore.openDrawerOnFab
 
     fun setOpenDrawerOnFab(value: Boolean) = settingsStore.setOpenDrawerOnFab(value)
 
@@ -295,11 +298,11 @@ class Repository(override val di: DI) : DIAware {
      */
     val currentlySyncing: Flow<Boolean>
         get() =
-            feedStore.getCurrentlySyncingLatestTimestamp()
+            feedStore
+                .getCurrentlySyncingLatestTimestamp()
                 .mapLatest { value ->
                     (value ?: Instant.EPOCH).isAfter(Instant.now().minusSeconds(10))
-                }
-                .distinctUntilChanged()
+                }.distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> =
@@ -363,8 +366,7 @@ class Repository(override val di: DI) : DIAware {
         currentArticleId
             .flatMapLatest { itemId ->
                 feedItemStore.getFeedItem(itemId)
-            }
-            .mapLatest { item ->
+            }.mapLatest { item ->
                 Article(item = item)
             }
 
@@ -555,9 +557,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun markAsFullTextDownloaded(feedItemId: Long) = feedItemStore.markAsFullTextDownloaded(feedItemId)
 
-    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
-        return feedItemStore.getFeedItemsNeedingNotifying()
-    }
+    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> = feedItemStore.getFeedItemsNeedingNotifying()
 
     suspend fun remoteMarkAsRead(
         feedUrl: URL,
@@ -572,13 +572,9 @@ class Repository(override val di: DI) : DIAware {
         }
     }
 
-    fun getSyncRemoteFlow(): Flow<SyncRemote?> {
-        return syncRemoteStore.getSyncRemoteFlow()
-    }
+    fun getSyncRemoteFlow(): Flow<SyncRemote?> = syncRemoteStore.getSyncRemoteFlow()
 
-    suspend fun getSyncRemote(): SyncRemote {
-        return syncRemoteStore.getSyncRemote()
-    }
+    suspend fun getSyncRemote(): SyncRemote = syncRemoteStore.getSyncRemote()
 
     suspend fun updateSyncRemote(syncRemote: SyncRemote) {
         syncRemoteStore.updateSyncRemote(syncRemote)
@@ -588,9 +584,7 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.updateSyncRemoteMessageTimestamp(timestamp)
     }
 
-    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> {
-        return syncRemoteStore.getFeedItemsWithoutSyncedReadMark()
-    }
+    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> = syncRemoteStore.getFeedItemsWithoutSyncedReadMark()
 
     suspend fun setSynced(feedItemId: Long) {
         syncRemoteStore.setSynced(feedItemId)
@@ -639,21 +633,15 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.replaceWithDefaultSyncRemote()
     }
 
-    fun getDevices(): Flow<List<SyncDevice>> {
-        return syncRemoteStore.getDevices()
-    }
+    fun getDevices(): Flow<List<SyncDevice>> = syncRemoteStore.getDevices()
 
     suspend fun replaceDevices(devices: List<SyncDevice>) {
         syncRemoteStore.replaceDevices(devices)
     }
 
-    suspend fun getFeedsOrderedByUrl(): List<Feed> {
-        return feedStore.getFeedsOrderedByUrl()
-    }
+    suspend fun getFeedsOrderedByUrl(): List<Feed> = feedStore.getFeedsOrderedByUrl()
 
-    suspend fun getRemotelySeenFeeds(): List<URL> {
-        return syncRemoteStore.getRemotelySeenFeeds()
-    }
+    suspend fun getRemotelySeenFeeds(): List<URL> = syncRemoteStore.getRemotelySeenFeeds()
 
     suspend fun deleteFeed(url: URL) {
         feedStore.deleteFeed(url)
@@ -663,43 +651,42 @@ class Repository(override val di: DI) : DIAware {
         syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
     }
 
-    suspend fun updateDeviceList(): Either<ErrorResponse, DeviceListResponse> {
-        return syncClient.getDevices()
-    }
+    suspend fun updateDeviceList(): Either<ErrorResponse, DeviceListResponse> = syncClient.getDevices()
 
     suspend fun joinSyncChain(
         syncCode: String,
         secretKey: String,
-    ): Either<ErrorResponse, String> {
-        return syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
+    ): Either<ErrorResponse, String> =
+        syncClient
+            .join(syncCode = syncCode, remoteSecretKey = secretKey)
             .onRight {
                 syncClient.getDevices()
             }
-    }
 
     suspend fun leaveSyncChain() {
-        syncClient.leave()
+        syncClient
+            .leave()
             .onLeft {
                 Log.e(LOG_TAG, "leaveSyncChain: ${it.code}, ${it.body}", it.throwable)
             }
     }
 
     suspend fun removeDevice(deviceId: Long) {
-        syncClient.removeDevice(deviceId = deviceId)
+        syncClient
+            .removeDevice(deviceId = deviceId)
             .onLeft {
                 Log.e(LOG_TAG, "removeDevice: ${it.code}, ${it.body}", it.throwable)
             }
     }
 
-    suspend fun startNewSyncChain(): Either<ErrorResponse, Pair<String, String>> {
-        return syncClient.create()
+    suspend fun startNewSyncChain(): Either<ErrorResponse, Pair<String, String>> =
+        syncClient
+            .create()
             .onRight {
                 updateDeviceList()
-            }
-            .map { syncCode ->
+            }.map { syncCode ->
                 syncCode to getSyncRemote().secretKey
             }
-    }
 
     suspend fun syncLoadFeedIfStale(
         feedId: Long,
@@ -759,9 +746,7 @@ class Repository(override val di: DI) : DIAware {
         id: Long,
         title: String,
         link: String?,
-    ): Boolean {
-        return feedItemStore.duplicateStoryExists(id = id, title = title, link = link)
-    }
+    ): Boolean = feedItemStore.duplicateStoryExists(id = id, title = title, link = link)
 
     val syncWorkerRunning: StateFlow<Boolean> = sessionStore.syncWorkerRunning
 

@@ -7,7 +7,9 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class OpenLinkInDefaultActivityViewModel(di: DI) : DIAwareViewModel(di) {
+class OpenLinkInDefaultActivityViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
 
     fun markAsNotifiedInBackground(itemIds: List<Long>) {

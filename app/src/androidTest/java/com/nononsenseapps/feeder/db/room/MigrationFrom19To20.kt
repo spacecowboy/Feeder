@@ -36,15 +36,16 @@ class MigrationFrom19To20 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 20, true, MIGRATION_19_20)
 
-        db.query(
-            """
-            SELECT device_id, device_name FROM sync_remote WHERE id IS 1
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            Assert.assertEquals(ID_UNSET, it.getLong(0))
-            Assert.assertEquals("", it.getString(1))
-        }
+        db
+            .query(
+                """
+                SELECT device_id, device_name FROM sync_remote WHERE id IS 1
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                Assert.assertEquals(ID_UNSET, it.getLong(0))
+                Assert.assertEquals("", it.getString(1))
+            }
     }
 }

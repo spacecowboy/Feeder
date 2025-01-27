@@ -202,7 +202,6 @@ private val ArrowHeight = 5.dp
 private val Elevation = 6.dp
 
 @Composable
-@Suppress("ktlint:compose:modifier-composable-check")
 fun Modifier.pullRefreshIndicatorTransform(
     state: PullRefreshState,
     scale: Boolean = false,

@@ -51,37 +51,42 @@ private const val ATTR_OPEN_ARTICLES_WITH = "openArticlesWith"
 private const val TAG_BLOCKED = "blocked"
 
 @Suppress("NAME_SHADOWING")
-class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
+class OpmlPullParser(
+    private val opmlToDb: OPMLParserHandler,
+) {
     private val feeds: MutableList<Feed> = mutableListOf()
     private val settings: MutableMap<String, String> = mutableMapOf()
     private val blockList: MutableSet<String> = mutableSetOf()
     private val parser: XmlPullParser = Xml.newPullParser()
 
-    suspend fun parseInputStreamWithFallback(inputStream: InputStream): Either<OpmlError, Unit> {
-        return Either.catching(
-            onCatch = {
-                OpmlUnknownError(it)
-            },
-        ) {
-            inputStream.use {
-                it.readTheBytes()
-            }
-        }.flatMap { bytes ->
-            val parseResult = parseInputStream(bytes.inputStream())
+    suspend fun parseInputStreamWithFallback(inputStream: InputStream): Either<OpmlError, Unit> =
+        Either
+            .catching(
+                onCatch = {
+                    OpmlUnknownError(it)
+                },
+            ) {
+                inputStream.use {
+                    it.readTheBytes()
+                }
+            }.flatMap { bytes ->
+                val parseResult = parseInputStream(bytes.inputStream())
 
-            if (parseResult.isRight()) {
-                parseResult
-            } else {
-                bytes.toByteString().utf8()
-                    .replace(
-                        "<outline.*?xmlUrl=\"([^\"]+)\".*?/>".toRegex(),
-                        "<outline xmlUrl=\"$1\" type=\"rss\" />",
-                    ).byteInputStream().let {
-                        parseInputStream(it)
-                    }
+                if (parseResult.isRight()) {
+                    parseResult
+                } else {
+                    bytes
+                        .toByteString()
+                        .utf8()
+                        .replace(
+                            "<outline.*?xmlUrl=\"([^\"]+)\".*?/>".toRegex(),
+                            "<outline xmlUrl=\"$1\" type=\"rss\" />",
+                        ).byteInputStream()
+                        .let {
+                            parseInputStream(it)
+                        }
+                }
             }
-        }
-    }
 
     private suspend fun parseInputStream(inputStream: InputStream): Either<OpmlError, Unit> =
         Either.catching(
@@ -262,7 +267,8 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                     // Copy so default values can be referenced
                     feed.copy(
                         notify =
-                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_NOTIFY)
                                 ?.toBoolean()
                                 ?: feed.notify,
                         fullTextByDefault =
@@ -270,18 +276,20 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                                 false
                             } else {
                                 (
-                                    parser.getAttributeValue(
-                                        OPML_FEEDER_NAMESPACE,
-                                        ATTR_FULL_TEXT_BY_DEFAULT,
-                                    )
-                                        ?.toBoolean()
+                                    parser
+                                        .getAttributeValue(
+                                            OPML_FEEDER_NAMESPACE,
+                                            ATTR_FULL_TEXT_BY_DEFAULT,
+                                        )?.toBoolean()
                                         // Support Flym's value for this
-                                        ?: parser.getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+                                        ?: parser
+                                            .getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
                                             ?.toBoolean()
                                 ) ?: feed.fullTextByDefault
                             },
                         alternateId =
-                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)
                                 ?.toBoolean()
                                 ?: feed.alternateId,
                         openArticlesWith =
@@ -290,7 +298,8 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
                                 ATTR_OPEN_ARTICLES_WITH,
                             ) ?: feed.openArticlesWith,
                         imageUrl =
-                            parser.getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)
                                 ?.let { imageUrl ->
                                     try {
                                         URL(imageUrl)
@@ -339,9 +348,7 @@ class OpmlPullParser(private val opmlToDb: OPMLParserHandler) {
     operator fun getValue(
         thisRef: Nothing?,
         property: KProperty<*>,
-    ): String? {
-        return parser.getAttributeValue(null, property.name)
-    }
+    ): String? = parser.getAttributeValue(null, property.name)
 }
 
 private const val LOG_TAG = "FEEDER_OPMLPULL"
@@ -350,9 +357,13 @@ sealed class OpmlError {
     abstract val throwable: Throwable?
 }
 
-data class OpmlUnknownError(override val throwable: Throwable?) : OpmlError()
+data class OpmlUnknownError(
+    override val throwable: Throwable?,
+) : OpmlError()
 
-data class OpmlParsingError(override val throwable: Throwable) : OpmlError()
+data class OpmlParsingError(
+    override val throwable: Throwable,
+) : OpmlError()
 
 fun InputStream.readTheBytes(): ByteArray {
     val len = Int.MAX_VALUE

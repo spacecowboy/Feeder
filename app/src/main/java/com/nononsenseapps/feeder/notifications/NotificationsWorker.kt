@@ -20,7 +20,9 @@ import org.kodein.di.instance
 /**
  * Handles notifying and removing notifications
  */
-class NotificationsWorker(override val di: DI) : DIAware {
+class NotificationsWorker(
+    override val di: DI,
+) : DIAware {
     private val context: Application by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val repository: Repository by instance()
@@ -30,7 +32,8 @@ class NotificationsWorker(override val di: DI) : DIAware {
         job?.cancel("runForever")
         job =
             applicationCoroutineScope.launch {
-                repository.getFeedItemsNeedingNotifying()
+                repository
+                    .getFeedItemsNeedingNotifying()
                     .runningReduce { prev, current ->
                         try {
                             unNotifyForMissingItems(prev, current)
@@ -39,8 +42,7 @@ class NotificationsWorker(override val di: DI) : DIAware {
                         }
                         // Always pass current on
                         current
-                    }
-                    .collectLatest { items ->
+                    }.collectLatest { items ->
                         delay(100)
                         // Individual notifications are triggered during sync, not here
                         // but the summary notification still needs updating
@@ -62,11 +64,12 @@ class NotificationsWorker(override val di: DI) : DIAware {
         if (current.isEmpty()) {
             cancelNotification(SUMMARY_NOTIFICATION_ID.toLong())
         }
-        prev.filter {
-            it !in current
-        }.forEach {
-            cancelNotification(it)
-        }
+        prev
+            .filter {
+                it !in current
+            }.forEach {
+                cancelNotification(it)
+            }
     }
 
     // Silly wrapper method to make it testable

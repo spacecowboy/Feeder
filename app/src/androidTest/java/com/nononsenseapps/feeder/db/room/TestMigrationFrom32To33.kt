@@ -51,15 +51,16 @@ class TestMigrationFrom32To33 : DIAware {
                 MigrationFrom32To33(di),
             )
 
-        db.query(
-            """
-            select skip_duplicates from feeds
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                select skip_duplicates from feeds
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getInt(0))
+            }
     }
 
     companion object {

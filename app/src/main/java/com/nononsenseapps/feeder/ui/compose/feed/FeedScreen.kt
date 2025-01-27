@@ -1031,12 +1031,12 @@ fun FeedScreen(
                 onStop = ttsOnStop,
                 onSkipNext = ttsOnSkipNext,
                 languages = ImmutableHolder(viewState.ttsLanguages),
+                onSelectLanguage = ttsOnSelectLanguage,
                 floatingActionButton =
                     when (viewState.showFab) {
                         true -> floatingActionButton
                         false -> null
                     },
-                onSelectLanguage = ttsOnSelectLanguage,
             )
         },
         floatingActionButton = {
@@ -1161,7 +1161,9 @@ fun FeedListContent(
         ) {
             val screenHeightPx =
                 with(LocalDensity.current) {
-                    LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
+                    LocalConfiguration.current.screenHeightDp.dp
+                        .toPx()
+                        .toInt()
                 }
             LazyColumn(
                 state = listState,
@@ -1171,17 +1173,17 @@ fun FeedListContent(
                     if (viewState.isBottomBarVisible) {
                         PaddingValues(0.dp)
                     } else {
-                        WindowInsets.navigationBars.only(
-                            WindowInsetsSides.Bottom,
-                        ).run {
-                            when (viewState.feedItemStyle) {
-                                FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                                FeedItemStyle.COMPACT_CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                                // No margin since dividers
-                                FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> this
-                            }
-                        }
-                            .asPaddingValues()
+                        WindowInsets.navigationBars
+                            .only(
+                                WindowInsetsSides.Bottom,
+                            ).run {
+                                when (viewState.feedItemStyle) {
+                                    FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
+                                    FeedItemStyle.COMPACT_CARD -> addMargin(horizontal = LocalDimens.current.margin)
+                                    // No margin since dividers
+                                    FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> this
+                                }
+                            }.asPaddingValues()
                     },
                 modifier =
                     Modifier
@@ -1270,6 +1272,9 @@ fun FeedListContent(
                                 intent = intent,
                             )
                         },
+                        {
+                            onItemClick(previewItem.id)
+                        },
                         modifier =
                             Modifier
                                 .safeSemantics {
@@ -1281,9 +1286,7 @@ fun FeedListContent(
                                             columnSpan = 1,
                                         )
                                 },
-                    ) {
-                        onItemClick(previewItem.id)
-                    }
+                    )
 
                     if (viewState.feedItemStyle != FeedItemStyle.CARD &&
                         viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD
@@ -1340,7 +1343,9 @@ fun FeedGridContent(
 
     val screenHeightPx =
         with(LocalDensity.current) {
-            LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
+            LocalConfiguration.current.screenHeightDp.dp
+                .toPx()
+                .toInt()
         }
 
     Box(modifier = modifier) {
@@ -1384,9 +1389,10 @@ fun FeedGridContent(
                     if (viewState.isBottomBarVisible) {
                         PaddingValues(0.dp)
                     } else {
-                        WindowInsets.navigationBars.only(
-                            WindowInsetsSides.Bottom,
-                        ).addMargin(LocalDimens.current.margin)
+                        WindowInsets.navigationBars
+                            .only(
+                                WindowInsetsSides.Bottom,
+                            ).addMargin(LocalDimens.current.margin)
                             .asPaddingValues()
                     },
                 verticalItemSpacing = LocalDimens.current.gutter,
@@ -1464,9 +1470,10 @@ fun FeedGridContent(
                                 intent = intent,
                             )
                         },
-                    ) {
-                        onItemClick(previewItem.id)
-                    }
+                        {
+                            onItemClick(previewItem.id)
+                        },
+                    )
                 }
             }
         }
@@ -1504,7 +1511,9 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
         // Return a different LazyListState instance.
         0 -> remember(this) { LazyListState(0, 0) }
         // Return rememberLazyListState (normal case).
-        else -> androidx.compose.foundation.lazy.rememberLazyListState()
+        else ->
+            androidx.compose.foundation.lazy
+                .rememberLazyListState()
     }
 }
 

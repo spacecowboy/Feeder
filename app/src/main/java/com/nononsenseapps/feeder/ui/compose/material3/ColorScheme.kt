@@ -12,8 +12,8 @@ import com.nononsenseapps.feeder.ui.compose.material3.tokens.ColorSchemeKeyToken
  * tokens:
  * ``MaterialTheme.colorScheme.fromToken(ExtendedFabBranded.BrandedContainerColor)``
  */
-internal fun ColorScheme.fromToken(value: ColorSchemeKeyTokens): Color {
-    return when (value) {
+internal fun ColorScheme.fromToken(value: ColorSchemeKeyTokens): Color =
+    when (value) {
         ColorSchemeKeyTokens.Background -> background
         ColorSchemeKeyTokens.Error -> error
         ColorSchemeKeyTokens.ErrorContainer -> errorContainer
@@ -44,11 +44,8 @@ internal fun ColorScheme.fromToken(value: ColorSchemeKeyTokens): Color {
         ColorSchemeKeyTokens.Tertiary -> tertiary
         ColorSchemeKeyTokens.TertiaryContainer -> tertiaryContainer
     }
-}
 
 /** Converts a color token key to the local color scheme provided by the theme */
 @ReadOnlyComposable
 @Composable
-internal fun ColorSchemeKeyTokens.toColor(): Color {
-    return MaterialTheme.colorScheme.fromToken(this)
-}
+internal fun ColorSchemeKeyTokens.toColor(): Color = MaterialTheme.colorScheme.fromToken(this)

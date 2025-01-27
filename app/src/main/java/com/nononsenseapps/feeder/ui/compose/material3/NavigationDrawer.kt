@@ -240,11 +240,10 @@ class DrawerState(
 fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true },
-): DrawerState {
-    return rememberSaveable(saver = DrawerState.saver(confirmStateChange)) {
+): DrawerState =
+    rememberSaveable(saver = DrawerState.saver(confirmStateChange)) {
         DrawerState(initialValue, confirmStateChange)
     }
-}
 
 /**
  * <a href="https://m3.material.io/components/navigation-drawer/overview" class="external" target="_blank">Material Design navigation drawer</a>.
@@ -590,8 +589,7 @@ private fun DrawerSheet(
                 .sizeIn(
                     minWidth = MinimumDrawerWidth,
                     maxWidth = DrawerDefaults.getMaximumDrawerWidth(),
-                )
-                .fillMaxHeight(),
+                ).fillMaxHeight(),
         shape = drawerShape,
         color = drawerContainerColor,
         contentColor = drawerContentColor,
@@ -602,8 +600,7 @@ private fun DrawerSheet(
                 .sizeIn(
                     minWidth = MinimumDrawerWidth,
                     maxWidth = DrawerDefaults.getMaximumDrawerWidth(),
-                )
-                .windowInsetsPadding(windowInsets),
+                ).windowInsetsPadding(windowInsets),
             content = content,
         )
     }
@@ -819,28 +816,22 @@ private class DefaultDrawerItemsColor(
     val unselectedBadgeColor: Color,
 ) : NavigationDrawerItemColors {
     @Composable
-    override fun iconColor(selected: Boolean): State<Color> {
-        return rememberUpdatedState(if (selected) selectedIconColor else unselectedIconColor)
-    }
+    override fun iconColor(selected: Boolean): State<Color> = rememberUpdatedState(if (selected) selectedIconColor else unselectedIconColor)
 
     @Composable
-    override fun textColor(selected: Boolean): State<Color> {
-        return rememberUpdatedState(if (selected) selectedTextColor else unselectedTextColor)
-    }
+    override fun textColor(selected: Boolean): State<Color> = rememberUpdatedState(if (selected) selectedTextColor else unselectedTextColor)
 
     @Composable
-    override fun containerColor(selected: Boolean): State<Color> {
-        return rememberUpdatedState(
+    override fun containerColor(selected: Boolean): State<Color> =
+        rememberUpdatedState(
             if (selected) selectedContainerColor else unselectedContainerColor,
         )
-    }
 
     @Composable
-    override fun badgeColor(selected: Boolean): State<Color> {
-        return rememberUpdatedState(
+    override fun badgeColor(selected: Boolean): State<Color> =
+        rememberUpdatedState(
             if (selected) selectedBadgeColor else unselectedBadgeColor,
         )
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -918,7 +909,9 @@ private val AnimationSpec = TweenSpec<Float>(durationMillis = 256)
 
 @Immutable
 @kotlin.jvm.JvmInline
-internal value class Strings private constructor(private val value: Int) {
+internal value class Strings private constructor(
+    private val value: Int,
+) {
     companion object {
         val NavigationMenu = Strings(0)
         val CloseDrawer = Strings(1)

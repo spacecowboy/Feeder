@@ -45,27 +45,29 @@ class MigrationFrom20To21 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 21, true, MIGRATION_20_21)
 
-        db.query(
-            """
-            SELECT secret_key, last_feeds_remote_hash  FROM sync_remote WHERE id IS 1
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertTrue {
-                it.getString(0).isNotBlank()
+        db
+            .query(
+                """
+                SELECT secret_key, last_feeds_remote_hash  FROM sync_remote WHERE id IS 1
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertTrue {
+                    it.getString(0).isNotBlank()
+                }
+                assertEquals(0, it.getLong(1))
             }
-            assertEquals(0, it.getLong(1))
-        }
 
-        db.query(
-            """
-            SELECT when_modified FROM feeds LIMIT 1
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT when_modified FROM feeds LIMIT 1
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getLong(0))
+            }
     }
 }

@@ -63,14 +63,16 @@ sealed class NavigationDestination(
         val completePath =
             (
                 listOf(path) +
-                    navArguments.asSequence()
+                    navArguments
+                        .asSequence()
                         .filterIsInstance<PathParamArgument>()
                         .map { "{${it.name}}" }
                         .toList()
             ).joinToString(separator = "/")
 
         val queryParams =
-            navArguments.asSequence()
+            navArguments
+                .asSequence()
                 .filterIsInstance<QueryParamArgument>()
                 .map { "${it.name}={${it.name}}" }
                 .joinToString(prefix = "?", separator = "&")
@@ -167,15 +169,16 @@ data object SearchFeedDestination : NavigationDestination(
                 navController.popBackStack()
             },
             searchFeedViewModel = backStackEntry.diAwareViewModel(),
+            {
+                AddFeedDestination.navigate(
+                    navController,
+                    feedUrl = it.url,
+                    feedTitle = it.title,
+                    feedImage = it.feedImage,
+                )
+            },
             initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-        ) {
-            AddFeedDestination.navigate(
-                navController,
-                feedUrl = it.url,
-                feedTitle = it.title,
-                feedImage = it.feedImage,
-            )
-        }
+        )
     }
 }
 
@@ -503,9 +506,7 @@ data object SyncScreenDestination : NavigationDestination(
     }
 }
 
-fun queryParams(block: QueryParamsBuilder.() -> Unit): String {
-    return QueryParamsBuilder().apply { block() }.toString()
-}
+fun queryParams(block: QueryParamsBuilder.() -> Unit): String = QueryParamsBuilder().apply { block() }.toString()
 
 class QueryParamsBuilder {
     private val sb = StringBuilder()

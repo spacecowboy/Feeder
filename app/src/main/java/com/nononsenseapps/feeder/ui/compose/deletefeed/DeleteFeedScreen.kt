@@ -197,8 +197,7 @@ fun DeleteFeedDialog(
                                 .requiredHeightIn(min = minimumTouchSize)
                                 .clickable {
                                     onToggleFeed(feed.id, !isChecked(feed.id))
-                                }
-                                .safeSemantics(mergeDescendants = true) {
+                                }.safeSemantics(mergeDescendants = true) {
                                     stateDescription = stateLabel
                                 },
                     ) {

@@ -44,14 +44,15 @@ class MigrationFrom22To23 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 23, true, MIGRATION_22_23)
 
-        db.query(
-            """
-            SELECT bookmarked FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                SELECT bookmarked FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getInt(0))
+            }
     }
 }

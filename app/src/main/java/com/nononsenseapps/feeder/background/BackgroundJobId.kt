@@ -2,7 +2,9 @@ package com.nononsenseapps.feeder.background
 
 import android.app.job.JobParameters
 
-enum class BackgroundJobId(val jobId: Int) {
+enum class BackgroundJobId(
+    val jobId: Int,
+) {
     RSS_SYNC(1),
     RSS_SYNC_PERIODIC(2),
     FULL_TEXT_SYNC(3),

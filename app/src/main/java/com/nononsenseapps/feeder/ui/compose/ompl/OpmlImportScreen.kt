@@ -68,8 +68,8 @@ fun OpmlImportScreen(
     onNavigateUp: () -> Unit,
     uri: Uri?,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
     onOk: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val di = LocalDI.current
     var viewState: ViewState by remember {
@@ -173,7 +173,6 @@ fun OpmlImportScreen(
     ) { padding ->
         OpmlImportView(
             viewState = viewState,
-            modifier = Modifier.padding(padding),
             onDismiss = onDismiss,
             onOk = {
                 if (uri != null) {
@@ -184,6 +183,7 @@ fun OpmlImportScreen(
                 }
                 onOk()
             },
+            modifier = Modifier.padding(padding),
         )
     }
 //        }
@@ -195,8 +195,8 @@ fun OpmlImportScreen(
 fun OpmlImportView(
     viewState: ViewState,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
     onOk: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     OkCancelWithNonScrollableContent(
         onOk = onOk,
@@ -290,7 +290,12 @@ data class ViewState(
 ) {
     val okEnabled: Boolean = feeds.isNotEmpty()
     val feedCount: Int = feeds.size
-    val tagCount: Int = feeds.values.asSequence().map { it.tag }.filterNot { it.isBlank() }.count()
+    val tagCount: Int =
+        feeds.values
+            .asSequence()
+            .map { it.tag }
+            .filterNot { it.isBlank() }
+            .count()
 }
 
 @PreviewThemes

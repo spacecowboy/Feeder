@@ -81,8 +81,7 @@ fun EditFeedDialog(
                                 .clickable {
                                     onEdit(feed.id)
                                     onDismiss()
-                                }
-                                .semantics(mergeDescendants = true) {},
+                                }.semantics(mergeDescendants = true) {},
                     ) {
                         RadioButton(
                             selected = false,

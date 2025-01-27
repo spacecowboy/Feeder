@@ -14,13 +14,15 @@ class FeedScreenRobot(
     private val testRule: ComposeTestRule,
 ) : AndroidRobot() {
     fun assertAppBarTitleIs(title: String) {
-        testRule.onNodeWithTag("appBarTitle")
+        testRule
+            .onNodeWithTag("appBarTitle")
             .assertIsDisplayed()
             .assert(hasText(title))
     }
 
     infix fun openOverflowMenu(block: FeedScreenMenuRobot.() -> Unit): FeedScreenMenuRobot {
-        testRule.onNodeWithTag("menuButton")
+        testRule
+            .onNodeWithTag("menuButton")
             .assertIsDisplayed()
             .performClick()
 

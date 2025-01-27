@@ -23,7 +23,9 @@ fun rememberApiPermissionState(
     }
 
 @OptIn(ExperimentalPermissionsApi::class)
-class GrantedByDefaultPermission(override val permission: String) : PermissionState {
+class GrantedByDefaultPermission(
+    override val permission: String,
+) : PermissionState {
     override val status: PermissionStatus = PermissionStatus.Granted
 
     override fun launchPermissionRequest() {

@@ -47,14 +47,15 @@ class MigrationFrom12To13 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 13, true, MIGRATION_12_13)
 
-        db.query(
-            """
-            SELECT fulltext_by_default FROM feeds
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0L, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT fulltext_by_default FROM feeds
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0L, it.getLong(0))
+            }
     }
 }

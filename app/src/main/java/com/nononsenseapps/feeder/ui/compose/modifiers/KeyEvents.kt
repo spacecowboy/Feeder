@@ -29,8 +29,8 @@ import androidx.compose.ui.input.key.type
 fun Modifier.interceptKey(
     key: Key,
     onKeyEvent: () -> Unit,
-): Modifier {
-    return this.onPreviewKeyEvent {
+): Modifier =
+    this.onPreviewKeyEvent {
         if (it.key == key && it.type == KeyUp) { // fire onKeyEvent on KeyUp to prevent duplicates
             onKeyEvent()
             true
@@ -38,4 +38,3 @@ fun Modifier.interceptKey(
             it.key == key // only pass the key event to children if it's not the chosen key
         }
     }
-}

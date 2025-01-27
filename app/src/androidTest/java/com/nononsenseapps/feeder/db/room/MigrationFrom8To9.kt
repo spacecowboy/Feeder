@@ -40,16 +40,17 @@ class MigrationFrom8To9 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 9, true, MIGRATION_8_9)
 
-        db.query(
-            """
-            SELECT title, url, response_hash FROM feeds
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals("feed", it.getString(0))
-            assertEquals("http://url", it.getString(1))
-            assertEquals(0L, it.getLong(2))
-        }
+        db
+            .query(
+                """
+                SELECT title, url, response_hash FROM feeds
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals("feed", it.getString(0))
+                assertEquals("http://url", it.getString(1))
+                assertEquals(0L, it.getLong(2))
+            }
     }
 }

@@ -24,7 +24,9 @@ interface OpenAIClient {
     ): ChatCompletion
 }
 
-class OpenAIClientDefault(settings: OpenAISettings) : OpenAIClient {
+class OpenAIClientDefault(
+    settings: OpenAISettings,
+) : OpenAIClient {
     private val client = OpenAI(config = settings.toOpenAIConfig())
 
     override suspend fun models(requestOptions: RequestOptions?): List<Model> = client.models(requestOptions)

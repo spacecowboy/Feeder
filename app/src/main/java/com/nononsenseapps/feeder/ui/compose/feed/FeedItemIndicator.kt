@@ -82,14 +82,14 @@ fun FeedItemImageIndicator(
     ) {
         AsyncImage(
             model =
-                ImageRequest.Builder(LocalContext.current)
+                ImageRequest
+                    .Builder(LocalContext.current)
                     .data(imageUrl)
                     .listener(
                         onError = { a, b ->
                             Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
                         },
-                    )
-                    .scale(Scale.FIT)
+                    ).scale(Scale.FIT)
                     .size(pixels)
                     .precision(Precision.INEXACT)
                     .build(),
@@ -122,14 +122,14 @@ fun FeedItemFeedIconIndicator(
     ) {
         AsyncImage(
             model =
-                ImageRequest.Builder(LocalContext.current)
+                ImageRequest
+                    .Builder(LocalContext.current)
                     .data(feedImageUrl)
                     .listener(
                         onError = { a, b ->
                             Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
                         },
-                    )
-                    .scale(Scale.FIT)
+                    ).scale(Scale.FIT)
                     .size(pixels)
                     .precision(Precision.INEXACT)
                     .build(),

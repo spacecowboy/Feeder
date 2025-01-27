@@ -104,9 +104,9 @@ private const val LOG_TAG = "FEEDER_SEARCH"
 fun SearchFeedScreen(
     onNavigateUp: () -> Unit,
     searchFeedViewModel: SearchFeedViewModel,
+    onClick: (SearchResult) -> Unit,
     modifier: Modifier = Modifier,
     initialFeedUrl: String? = null,
-    onClick: (SearchResult) -> Unit,
 ) {
     val windowSize = LocalWindowSizeMetrics.current
     val screenType by remember(windowSize) {
@@ -141,9 +141,9 @@ fun SearchFeedScreen(
         SearchFeedView(
             screenType = screenType,
             searchFeedViewModel = searchFeedViewModel,
+            onClick = onClick,
             modifier = Modifier.padding(padding),
             initialFeedUrl = initialFeedUrl ?: "",
-            onClick = onClick,
         )
     }
 }
@@ -152,9 +152,9 @@ fun SearchFeedScreen(
 fun SearchFeedView(
     screenType: ScreenType,
     searchFeedViewModel: SearchFeedViewModel,
+    onClick: (SearchResult) -> Unit,
     modifier: Modifier = Modifier,
     initialFeedUrl: String = "",
-    onClick: (SearchResult) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -183,25 +183,26 @@ fun SearchFeedView(
             errors = emptyList()
             currentlySearching = true
             coroutineScope.launch {
-                searchFeedViewModel.searchForFeeds(url)
+                searchFeedViewModel
+                    .searchForFeeds(url)
                     .onCompletion {
                         currentlySearching = false
-                    }
-                    .collect {
-                        it.onLeft { e ->
-                            errors = errors + e
-                        }.onRight { r ->
-                            results = results + r
-                        }
+                    }.collect {
+                        it
+                            .onLeft { e ->
+                                errors = errors + e
+                            }.onRight { r ->
+                                results = results + r
+                            }
                     }
             }
         },
         results = StableHolder(results),
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
         currentlySearching = currentlySearching,
+        onClick = onClick,
         modifier = modifier,
         feedUrl = feedUrl,
-        onClick = onClick,
     )
 }
 
@@ -213,9 +214,9 @@ fun SearchFeedView(
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
+    onClick: (SearchResult) -> Unit,
     modifier: Modifier = Modifier,
     feedUrl: String = "",
-    onClick: (SearchResult) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val dimens = LocalDimens.current
@@ -225,7 +226,9 @@ fun SearchFeedView(
 
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
-        if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() &&
+        if (results.item.isEmpty() &&
+            errors.item.isEmpty() &&
+            feedUrl.isNotBlank() &&
             (isValidUrl(feedUrl))
         ) {
             onSearchCallback(
@@ -378,8 +381,7 @@ fun ColumnScope.leftContent(
                         )
                         keyboardController?.hide()
                     }
-                }
-                .interceptKey(Key.Escape, clearFocus)
+                }.interceptKey(Key.Escape, clearFocus)
                 .safeSemantics {
                     testTag = "urlField"
                 },
@@ -433,16 +435,17 @@ fun ColumnScope.rightContent(
                 title = title,
                 description = error.description,
                 url = error.url,
-            ) {
-                onClick(
-                    SearchResult(
-                        title = error.url,
-                        url = error.url,
-                        description = "",
-                        feedImage = "",
-                    ),
-                )
-            }
+                {
+                    onClick(
+                        SearchResult(
+                            title = error.url,
+                            url = error.url,
+                            description = "",
+                            feedImage = "",
+                        ),
+                    )
+                },
+            )
         }
     }
     for (result in results.item) {
@@ -450,9 +453,10 @@ fun ColumnScope.rightContent(
             title = result.title,
             url = result.url,
             description = result.description,
-        ) {
-            onClick(result)
-        }
+            {
+                onClick(result)
+            },
+        )
     }
     AnimatedVisibility(visible = currentlySearching) {
         SearchingIndicator()
@@ -480,8 +484,8 @@ fun SearchResultView(
     title: String,
     url: String,
     description: String,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     Card(
@@ -521,8 +525,8 @@ fun ErrorResultView(
     title: String,
     description: String,
     url: String,
-    modifier: Modifier = Modifier,
     onAddAnyway: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
 
@@ -593,9 +597,10 @@ private fun SearchPreview() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
+                {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
-            ) {}
+            )
         }
     }
 }
@@ -623,9 +628,10 @@ private fun ErrorPreview() {
                         ),
                     ),
                 currentlySearching = false,
+                {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
-            ) {}
+            )
         }
     }
 }
@@ -667,9 +673,10 @@ private fun SearchPreviewLarge() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
+                {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
-            ) {}
+            )
         }
     }
 }

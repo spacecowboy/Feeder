@@ -610,24 +610,27 @@ class OPMLTest : DIAware {
         runBlocking {
             val fileUri = context.cacheDir.resolve("exporttest.opml").toUri()
             val feedIds = mutableSetOf<Long>()
-            feedStore.saveFeed(
-                Feed(
-                    title = "Ampersands are & the worst",
-                    url = URL("https://example.com/ampersands"),
-                ),
-            ).also { feedIds.add(it) }
-            feedStore.saveFeed(
-                Feed(
-                    title = "So are > brackets",
-                    url = URL("https://example.com/lt"),
-                ),
-            ).also { feedIds.add(it) }
-            feedStore.saveFeed(
-                Feed(
-                    title = "So are < brackets",
-                    url = URL("https://example.com/gt"),
-                ),
-            ).also { feedIds.add(it) }
+            feedStore
+                .saveFeed(
+                    Feed(
+                        title = "Ampersands are & the worst",
+                        url = URL("https://example.com/ampersands"),
+                    ),
+                ).also { feedIds.add(it) }
+            feedStore
+                .saveFeed(
+                    Feed(
+                        title = "So are > brackets",
+                        url = URL("https://example.com/lt"),
+                    ),
+                ).also { feedIds.add(it) }
+            feedStore
+                .saveFeed(
+                    Feed(
+                        title = "So are < brackets",
+                        url = URL("https://example.com/gt"),
+                    ),
+                ).also { feedIds.add(it) }
 
             assertEquals(3, feedIds.size)
 
@@ -761,15 +764,14 @@ class OPMLTest : DIAware {
     }
 }
 
-suspend fun OpmlPullParser.parseFile(path: String): Either<OpmlError, Unit> {
-    return try {
+suspend fun OpmlPullParser.parseFile(path: String): Either<OpmlError, Unit> =
+    try {
         File(path).inputStream().use {
             parseInputStreamWithFallback(it)
         }
     } catch (t: Throwable) {
         Either.Left(OpmlUnknownError(t))
     }
-}
 
 private val sampleFile: List<String> =
     """

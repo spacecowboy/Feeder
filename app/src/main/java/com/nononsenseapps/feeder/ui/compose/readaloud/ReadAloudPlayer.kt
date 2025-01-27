@@ -58,9 +58,9 @@ fun HideableTTSPlayer(
     onStop: () -> Unit,
     onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
+    onSelectLanguage: (LocaleOverride) -> Unit,
     modifier: Modifier = Modifier,
     floatingActionButton: @Composable (() -> Unit)? = null,
-    onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
     AnimatedVisibility(
         modifier = modifier,
@@ -75,8 +75,8 @@ fun HideableTTSPlayer(
             onStop = onStop,
             onSkipNext = onSkipNext,
             languages = languages,
-            floatingActionButton = floatingActionButton,
             onSelectLanguage = onSelectLanguage,
+            floatingActionButton = floatingActionButton,
         )
     }
 }
@@ -90,9 +90,9 @@ fun TTSPlayer(
     onStop: () -> Unit,
     onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
+    onSelectLanguage: (LocaleOverride) -> Unit,
     modifier: Modifier = Modifier,
     floatingActionButton: @Composable (() -> Unit)? = null,
-    onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
     var showMenu by remember {
         mutableStateOf(false)
@@ -232,7 +232,8 @@ private fun PlayerPreview() {
             onStop = {},
             onSkipNext = {},
             languages = ImmutableHolder(emptyList()),
-        ) {}
+            {},
+        )
     }
 }
 
@@ -247,6 +248,7 @@ private fun PlayerPreviewWithFab() {
             onStop = {},
             onSkipNext = {},
             languages = ImmutableHolder(emptyList()),
+            {},
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {},
@@ -257,6 +259,6 @@ private fun PlayerPreviewWithFab() {
                     )
                 }
             },
-        ) {}
+        )
     }
 }

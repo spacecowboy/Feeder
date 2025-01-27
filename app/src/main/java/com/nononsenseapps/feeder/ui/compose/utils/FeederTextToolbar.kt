@@ -34,7 +34,10 @@ fun WithFeederTextToolbar(content: @Composable () -> Unit) {
     }
 }
 
-class FeederTextToolbar(private val view: View, activityLauncher: ActivityLauncher) : TextToolbar {
+class FeederTextToolbar(
+    private val view: View,
+    activityLauncher: ActivityLauncher,
+) : TextToolbar {
     private var actionMode: ActionMode? = null
     private val textActionModeCallback: FeederTextActionModeCallback =
         FeederTextActionModeCallback(
@@ -197,14 +200,14 @@ class FeederTextActionModeCallback(
         } else {
             @Suppress("DEPRECATION")
             packageManager.queryIntentActivities(intent, 0)
-        }
-            .sortedWith(displayNameComparator)
+        }.sortedWith(displayNameComparator)
             .forEachIndexed { index, info ->
                 val label = info.loadLabel(packageManager)
                 val id = 100 + index
                 if (menu.findItem(id) == null) {
                     // groupId, itemId, order, title
-                    menu.add(1, id, id, label)
+                    menu
+                        .add(1, id, id, label)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
                 }
 
@@ -232,7 +235,8 @@ class FeederTextActionModeCallback(
         menu: Menu,
         item: MenuItemOption,
     ) {
-        menu.add(0, item.id, item.order, item.titleResource)
+        menu
+            .add(0, item.id, item.order, item.titleResource)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
     }
 
@@ -248,7 +252,9 @@ class FeederTextActionModeCallback(
     }
 }
 
-internal enum class MenuItemOption(val id: Int) {
+internal enum class MenuItemOption(
+    val id: Int,
+) {
     Copy(0),
     Paste(1),
     Cut(2),
@@ -276,23 +282,17 @@ internal class FloatingTextActionModeCallback(
     override fun onActionItemClicked(
         mode: ActionMode?,
         item: MenuItem?,
-    ): Boolean {
-        return callback.onActionItemClicked(mode, item)
-    }
+    ): Boolean = callback.onActionItemClicked(mode, item)
 
     override fun onCreateActionMode(
         mode: ActionMode?,
         menu: Menu?,
-    ): Boolean {
-        return callback.onCreateActionMode(mode, menu)
-    }
+    ): Boolean = callback.onCreateActionMode(mode, menu)
 
     override fun onPrepareActionMode(
         mode: ActionMode?,
         menu: Menu?,
-    ): Boolean {
-        return callback.onPrepareActionMode(mode, menu)
-    }
+    ): Boolean = callback.onPrepareActionMode(mode, menu)
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         callback.onDestroyActionMode(mode)

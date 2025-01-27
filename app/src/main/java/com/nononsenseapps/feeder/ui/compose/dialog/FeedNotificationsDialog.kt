@@ -94,7 +94,7 @@ fun FeedNotificationsDialog(
                         val dimens = LocalDimens.current
                         Row(
                             modifier =
-                                modifier
+                                Modifier
                                     .width(dimens.maxContentWidth)
                                     .heightIn(min = 64.dp)
                                     .clickable(
@@ -105,8 +105,7 @@ fun FeedNotificationsDialog(
                                                 !item.notify,
                                             )
                                         },
-                                    )
-                                    .safeSemantics(mergeDescendants = true) {
+                                    ).safeSemantics(mergeDescendants = true) {
                                         stateDescription = stateLabel
                                         role = Role.Switch
                                     },

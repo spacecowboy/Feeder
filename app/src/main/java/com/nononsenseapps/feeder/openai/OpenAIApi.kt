@@ -20,7 +20,10 @@ class OpenAIApi(
     private val openAIClientFactory: (OpenAISettings) -> OpenAIClient,
 ) {
     @Serializable
-    data class SummaryResponse(val lang: String, val content: String)
+    data class SummaryResponse(
+        val lang: String,
+        val content: String,
+    )
 
     sealed interface SummaryResult {
         val content: String
@@ -36,7 +39,9 @@ class OpenAIApi(
             val detectedLanguage: String,
         ) : SummaryResult
 
-        data class Error(override val content: String) : SummaryResult
+        data class Error(
+            override val content: String,
+        ) : SummaryResult
     }
 
     sealed interface ModelsResult {
@@ -46,9 +51,13 @@ class OpenAIApi(
 
         data object AzureDeploymentIdRequired : ModelsResult
 
-        data class Success(val ids: List<String>) : ModelsResult
+        data class Success(
+            val ids: List<String>,
+        ) : ModelsResult
 
-        data class Error(val message: String?) : ModelsResult
+        data class Error(
+            val message: String?,
+        ) : ModelsResult
     }
 
     companion object {
@@ -77,9 +86,11 @@ class OpenAIApi(
             }
         }
         return try {
-            openAIClientFactory(settings).models()
+            openAIClientFactory(settings)
+                .models()
                 .sortedByDescending { it.created }
-                .map { it.id.id }.let { ModelsResult.Success(ids = it) }
+                .map { it.id.id }
+                .let { ModelsResult.Success(ids = it) }
         } catch (e: Exception) {
             ModelsResult.Error(message = e.message ?: e.cause?.message)
         }
@@ -94,7 +105,10 @@ class OpenAIApi(
                 )
             val summaryResponse: SummaryResponse =
                 parseSummaryResponse(
-                    response.choices.firstOrNull()?.message?.content ?: throw IllegalStateException("Response content is null"),
+                    response.choices
+                        .firstOrNull()
+                        ?.message
+                        ?.content ?: throw IllegalStateException("Response content is null"),
                 )
             return SummaryResult.Success(
                 id = response.id,
@@ -120,8 +134,8 @@ class OpenAIApi(
         )
     }
 
-    private fun summaryRequest(content: String): ChatCompletionRequest {
-        return ChatCompletionRequest(
+    private fun summaryRequest(content: String): ChatCompletionRequest =
+        ChatCompletionRequest(
             model = ModelId(id = openAISettings.modelId),
             messages =
                 listOf(
@@ -148,7 +162,6 @@ class OpenAIApi(
                 ),
             responseFormat = ChatResponseFormat.Text,
         )
-    }
 }
 
 val OpenAISettings.isAzure: Boolean
@@ -171,7 +184,8 @@ fun OpenAISettings.toOpenAIHost(withAzureDeploymentId: Boolean): OpenAIHost =
             OpenAIHost(
                 baseUrl =
                     URLBuilder()
-                        .takeFrom(baseUrl).also {
+                        .takeFrom(baseUrl)
+                        .also {
                             it.appendPathSegments("openai")
                             if (withAzureDeploymentId && azureDeploymentId.isNotBlank()) {
                                 it.appendPathSegments("deployments", azureDeploymentId)
@@ -187,6 +201,7 @@ fun OpenAISettings.toOpenAIHost(withAzureDeploymentId: Boolean): OpenAIHost =
 
 fun OpenAIHost.toUrl(): URLBuilder =
     URLBuilder()
-        .takeFrom(baseUrl).also {
+        .takeFrom(baseUrl)
+        .also {
             queryParams.forEach { (k, v) -> it.parameters.append(k, v) }
         }

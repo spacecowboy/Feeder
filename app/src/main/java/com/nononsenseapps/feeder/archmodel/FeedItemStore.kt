@@ -37,7 +37,9 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-class FeedItemStore(override val di: DI) : DIAware {
+class FeedItemStore(
+    override val di: DI,
+) : DIAware {
     private val dao: FeedItemDao by instance()
     private val blocklistDao: BlocklistDao by instance()
     private val appDatabase: AppDatabase by instance()
@@ -102,8 +104,8 @@ class FeedItemStore(override val di: DI) : DIAware {
             }
 
             dao.pagingPreviews(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
-        }
-            .flow.map { pagingData ->
+        }.flow
+            .map { pagingData ->
                 pagingData
                     .map { it.toFeedListItem() }
             }
@@ -253,28 +255,18 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.setBookmarked(itemId, bookmarked)
     }
 
-    suspend fun getFullTextByDefault(itemId: Long): Boolean {
-        return dao.getFullTextByDefault(itemId) ?: false
-    }
+    suspend fun getFullTextByDefault(itemId: Long): Boolean = dao.getFullTextByDefault(itemId) ?: false
 
-    fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> {
-        return dao.getFeedItemFlow(itemId)
-    }
+    fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> = dao.getFeedItemFlow(itemId)
 
     suspend fun getFeedItemId(
         feedUrl: URL,
         articleGuid: String,
-    ): Long? {
-        return dao.getItemWith(feedUrl = feedUrl, articleGuid = articleGuid)
-    }
+    ): Long? = dao.getItemWith(feedUrl = feedUrl, articleGuid = articleGuid)
 
-    suspend fun getLink(itemId: Long): String? {
-        return dao.getLink(itemId)
-    }
+    suspend fun getLink(itemId: Long): String? = dao.getLink(itemId)
 
-    suspend fun getArticleOpener(itemId: Long): String? {
-        return dao.getOpenArticleWith(itemId)
-    }
+    suspend fun getArticleOpener(itemId: Long): String? = dao.getOpenArticleWith(itemId)
 
     suspend fun markAllAsReadInFeed(feedId: Long) {
         dao.markAllAsRead(feedId)
@@ -292,9 +284,7 @@ class FeedItemStore(override val di: DI) : DIAware {
 
     suspend fun markAsFullTextDownloaded(feedItemId: Long) = dao.markAsFullTextDownloaded(feedItemId)
 
-    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
-        return dao.getFeedItemsNeedingNotifying()
-    }
+    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> = dao.getFeedItemsNeedingNotifying()
 
     suspend fun loadFeedItem(
         guid: String,
@@ -328,17 +318,14 @@ class FeedItemStore(override val di: DI) : DIAware {
         id: Long,
         title: String,
         link: String?,
-    ): Boolean {
-        return dao.duplicationExists(
+    ): Boolean =
+        dao.duplicationExists(
             id = id,
             plainTitle = title,
             link = link,
         )
-    }
 
-    suspend fun getArticle(id: Long): FeedItemWithFeed? {
-        return dao.getFeedItem(id)
-    }
+    suspend fun getArticle(id: Long): FeedItemWithFeed? = dao.getFeedItem(id)
 }
 
 val mediumDateTimeFormat: DateTimeFormatter =

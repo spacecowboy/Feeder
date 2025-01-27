@@ -47,14 +47,15 @@ class MigrationFrom10To11 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 11, true, MIGRATION_10_11)
 
-        db.query(
-            """
-            SELECT first_synced_time FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0L, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT first_synced_time FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0L, it.getLong(0))
+            }
     }
 }

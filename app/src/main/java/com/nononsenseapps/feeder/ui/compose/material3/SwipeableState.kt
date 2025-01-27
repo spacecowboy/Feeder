@@ -177,7 +177,8 @@ internal open class SwipeableState<T>(
                     val actualOldValue = oldAnchors[offset.value]
                     val value = if (actualOldValue == currentValue) currentValue else actualOldValue
                     newAnchors.getOffset(value) ?: newAnchors
-                        .keys.minByOrNull { abs(it - offset.value) }!!
+                        .keys
+                        .minByOrNull { abs(it - offset.value) }!!
                 }
             try {
                 animateInternalToOffset(targetOffset, animationSpec)
@@ -349,7 +350,8 @@ internal open class SwipeableState<T>(
                     anchors
                         // fighting rounding error once again, anchor should be as close as 0.5 pixels
                         .filterKeys { anchorOffset -> abs(anchorOffset - endOffset) < 0.5f }
-                        .values.firstOrNull() ?: currentValue
+                        .values
+                        .firstOrNull() ?: currentValue
                 currentValue = endValue
             }
         }
@@ -466,9 +468,7 @@ internal class SwipeProgress<T>(
         return result
     }
 
-    override fun toString(): String {
-        return "SwipeProgress(from=$from, to=$to, fraction=$fraction)"
-    }
+    override fun toString(): String = "SwipeProgress(from=$from, to=$to, fraction=$fraction)"
 }
 
 /**
@@ -484,8 +484,8 @@ internal fun <T : Any> rememberSwipeableState(
     initialValue: T,
     animationSpec: AnimationSpec<Float> = AnimationSpec,
     confirmStateChange: (newValue: T) -> Boolean = { true },
-): SwipeableState<T> {
-    return rememberSaveable(
+): SwipeableState<T> =
+    rememberSaveable(
         saver =
             SwipeableState.saver(
                 animationSpec = animationSpec,
@@ -498,7 +498,6 @@ internal fun <T : Any> rememberSwipeableState(
             confirmStateChange = confirmStateChange,
         )
     }
-}
 
 /**
  * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e.:
@@ -575,7 +574,7 @@ internal fun <T : Any> rememberSwipeableStateFor(
  */
 @ExperimentalMaterial3Api
 @Composable
-@Suppress("ktlint:compose:modifier-composable-check")
+// @Suppress("ktlint:compose:modifier-composable-check")
 internal fun <T> Modifier.swipeable(
     state: SwipeableState<T>,
     anchors: Map<Float, T>,
@@ -648,13 +647,13 @@ internal interface ThresholdConfig {
  */
 @Immutable
 @ExperimentalMaterial3Api
-internal data class FixedThreshold(private val offset: Dp) : ThresholdConfig {
+internal data class FixedThreshold(
+    private val offset: Dp,
+) : ThresholdConfig {
     override fun Density.computeThreshold(
         fromValue: Float,
         toValue: Float,
-    ): Float {
-        return fromValue + offset.toPx() * sign(toValue - fromValue)
-    }
+    ): Float = fromValue + offset.toPx() * sign(toValue - fromValue)
 }
 
 /**
@@ -671,9 +670,7 @@ internal data class FractionalThreshold(
     override fun Density.computeThreshold(
         fromValue: Float,
         toValue: Float,
-    ): Float {
-        return lerp(fromValue, toValue, fraction)
-    }
+    ): Float = lerp(fromValue, toValue, fraction)
 }
 
 /**
@@ -732,9 +729,7 @@ internal class ResistanceConfig(
         return result
     }
 
-    override fun toString(): String {
-        return "ResistanceConfig(basis=$basis, factorAtMin=$factorAtMin, factorAtMax=$factorAtMax)"
-    }
+    override fun toString(): String = "ResistanceConfig(basis=$basis, factorAtMin=$factorAtMin, factorAtMax=$factorAtMax)"
 }
 
 /**
@@ -811,9 +806,7 @@ private fun computeTarget(
     }
 }
 
-private fun <T> Map<Float, T>.getOffset(state: T): Float? {
-    return entries.firstOrNull { it.value == state }?.key
-}
+private fun <T> Map<Float, T>.getOffset(state: T): Float? = entries.firstOrNull { it.value == state }?.key
 
 /**
  * Contains useful defaults for [swipeable] and [SwipeableState].
@@ -849,14 +842,13 @@ internal object SwipeableDefaults {
         anchors: Set<Float>,
         factorAtMin: Float = STANDARD_RESISTANCE_FACTOR,
         factorAtMax: Float = STANDARD_RESISTANCE_FACTOR,
-    ): ResistanceConfig? {
-        return if (anchors.size <= 1) {
+    ): ResistanceConfig? =
+        if (anchors.size <= 1) {
             null
         } else {
             val basis = anchors.maxOrNull()!! - anchors.minOrNull()!!
             ResistanceConfig(basis, factorAtMin, factorAtMax)
         }
-    }
 }
 
 // temp default nested scroll connection for swipeables which desire as an opt in
@@ -881,13 +873,12 @@ internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedSc
                 consumed: Offset,
                 available: Offset,
                 source: NestedScrollSource,
-            ): Offset {
-                return if (source == NestedScrollSource.Drag) {
+            ): Offset =
+                if (source == NestedScrollSource.Drag) {
                     performDrag(available.toFloat()).toOffset()
                 } else {
                     Offset.Zero
                 }
-            }
 
             override suspend fun onPreFling(available: Velocity): Velocity {
                 val toFling = Offset(available.x, available.y).toFloat()

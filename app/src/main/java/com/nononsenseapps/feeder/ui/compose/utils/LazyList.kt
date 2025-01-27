@@ -23,8 +23,7 @@ fun LazyListState.rememberIsItemVisible(key: Any): State<Boolean> {
     LaunchedEffect(this, key) {
         snapshotFlow {
             layoutInfo.visibleItemsInfo.any { it.key == key }
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
             .collect {
                 isVisible.value = it
             }
@@ -47,8 +46,7 @@ fun LazyStaggeredGridState.rememberIsItemVisible(key: Any): State<Boolean> {
     LaunchedEffect(this, key) {
         snapshotFlow {
             layoutInfo.visibleItemsInfo.any { it.key == key }
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
             .collect {
                 isVisible.value = it
             }
@@ -101,8 +99,7 @@ fun LazyListState.rememberIsItemMostlyVisible(
 
             // true when over limit
             visibleHeightPercentage >= 80
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
             .collect {
                 result.value = it
             }
@@ -143,8 +140,7 @@ fun LazyStaggeredGridState.rememberIsItemMostlyVisible(
 
             // true when over limit
             visibleHeightPercentage >= 80
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
             .collect {
                 result.value = it
             }

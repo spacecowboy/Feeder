@@ -5,6 +5,4 @@ fun lerp(
     startValue: Float,
     endValue: Float,
     fraction: Float,
-): Float {
-    return startValue + fraction * (endValue - startValue)
-}
+): Float = startValue + fraction * (endValue - startValue)

@@ -70,10 +70,11 @@ class IcoDecoder(
                     "memory) as it's not encoded as a valid image format.",
             )
             return DecodeResult(
-                resources.getDrawable(
-                    R.drawable.blank_pixel,
-                    resources.newTheme(),
-                ).asImage(),
+                resources
+                    .getDrawable(
+                        R.drawable.blank_pixel,
+                        resources.newTheme(),
+                    ).asImage(),
                 false,
             )
         }
@@ -130,7 +131,9 @@ class IcoDecoder(
         private const val ICO_ENTRY_SIZE = 16
     }
 
-    class Factory(private val application: FeederApplication) : Decoder.Factory {
+    class Factory(
+        private val application: FeederApplication,
+    ) : Decoder.Factory {
         override fun create(
             result: SourceFetchResult,
             options: Options,

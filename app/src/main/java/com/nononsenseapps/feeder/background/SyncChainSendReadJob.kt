@@ -19,7 +19,8 @@ import java.time.Duration
 class SyncChainSendReadJob(
     context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
 
     private val syncClient: SyncRestClient by di.instance()
@@ -29,7 +30,8 @@ class SyncChainSendReadJob(
     override suspend fun doWork() {
         try {
             Log.d(LOG_TAG, "Doing work")
-            syncClient.markAsRead()
+            syncClient
+                .markAsRead()
                 .onLeft {
                     Log.e(
                         LOG_TAG,
@@ -65,7 +67,8 @@ fun runOnceSyncChainSendRead(di: DI) {
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val jobInfo =
-        JobInfo.Builder(BackgroundJobId.SYNC_CHAIN_SEND_READ.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.SYNC_CHAIN_SEND_READ.jobId, componentName)
             .setRequiresCharging(repository.syncOnlyWhenCharging.value)
             .setRequiredNetworkType(
                 if (repository.syncOnlyOnWifi.value) {

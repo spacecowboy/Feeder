@@ -23,14 +23,17 @@ import java.lang.reflect.InvocationTargetException
  * A view model which is also kodein aware. Construct any deriving class by using the getViewModel()
  * extension function.
  */
-abstract class DIAwareViewModel(override val di: DI) :
-    AndroidViewModel(di.direct.instance()), DIAware
+abstract class DIAwareViewModel(
+    override val di: DI,
+) : AndroidViewModel(di.direct.instance()),
+    DIAware
 
 class DIAwareViewModelFactory(
     override val di: DI,
-) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
+) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()),
+    DIAware {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
                 modelClass.getConstructor(DI::class.java).newInstance(di)
             } catch (e: NoSuchMethodException) {
@@ -45,7 +48,6 @@ class DIAwareViewModelFactory(
         } else {
             super.create(modelClass)
         }
-    }
 }
 
 inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithActivityViewModelScope() {
@@ -70,15 +72,17 @@ class DIAwareSavedStateViewModelFactory(
     override val di: DI,
     val owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null,
-) : AbstractSavedStateViewModelFactory(owner, defaultArgs), DIAware {
+) : AbstractSavedStateViewModelFactory(owner, defaultArgs),
+    DIAware {
     override fun <T : ViewModel> create(
         key: String,
         modelClass: Class<T>,
         handle: SavedStateHandle,
-    ): T {
-        return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
+    ): T =
+        if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
-                modelClass.getConstructor(DI::class.java, SavedStateHandle::class.java)
+                modelClass
+                    .getConstructor(DI::class.java, SavedStateHandle::class.java)
                     .newInstance(di, handle)
             } catch (orgError: Exception) {
                 try {
@@ -90,7 +94,6 @@ class DIAwareSavedStateViewModelFactory(
         } else {
             throw RuntimeException("Not a DIAwareViewModel! Please use by viewModel() instead")
         }
-    }
 }
 
 @Composable

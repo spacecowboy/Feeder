@@ -36,10 +36,10 @@ fun SliderWithLabel(
     value: Float,
     valueToLabel: (Float) -> String,
     valueRange: ClosedFloatingPointRange<Float>,
+    onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     steps: Int = 0,
     labelMinWidth: Dp = 28.dp,
-    onValueChange: (Float) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -81,9 +81,9 @@ fun SliderWithEndLabels(
     startLabel: @Composable (RowScope.() -> Unit),
     endLabel: @Composable (RowScope.() -> Unit),
     valueRange: ClosedFloatingPointRange<Float>,
+    onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     steps: Int = 0,
-    onValueChange: (Float) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -120,8 +120,7 @@ fun SliderLabel(
                 .background(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(10.dp),
-                )
-                .padding(4.dp)
+                ).padding(4.dp)
                 .size(minWidth),
     ) {
         Text(
@@ -164,9 +163,9 @@ private fun PreviewSliderWithLabel() {
             }
             SliderWithLabel(
                 value = value,
-                onValueChange = { value = it },
                 valueToLabel = { "%.1fx".format(value) },
                 valueRange = 1f..2f,
+                onValueChange = { value = it },
                 steps = 9,
             )
         }
@@ -212,8 +211,9 @@ private fun PreviewSliderWithEndLabels() {
                     )
                 },
                 valueRange = 1f..2f,
+                { value = it },
                 steps = 9,
-            ) { value = it }
+            )
         }
     }
 }

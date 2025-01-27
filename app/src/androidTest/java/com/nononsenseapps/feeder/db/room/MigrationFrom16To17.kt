@@ -30,12 +30,13 @@ class MigrationFrom16To17 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 17, true, MIGRATION_16_17)
 
-        db.query(
-            """
-            SELECT * FROM sync_remote
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 0)
-        }
+        db
+            .query(
+                """
+                SELECT * FROM sync_remote
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 0)
+            }
     }
 }

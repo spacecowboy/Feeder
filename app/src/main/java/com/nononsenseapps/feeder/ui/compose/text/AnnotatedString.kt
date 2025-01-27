@@ -112,9 +112,7 @@ class AnnotatedParagraphStringBuilder {
         }
     }
 
-    fun toAnnotatedString(): AnnotatedString {
-        return builder.toAnnotatedString()
-    }
+    fun toAnnotatedString(): AnnotatedString = builder.toAnnotatedString()
 }
 
 fun AnnotatedParagraphStringBuilder.isEmpty() = lastTwoChars.isEmpty()
@@ -135,9 +133,7 @@ private fun <T> MutableList<T>.pushMaxTwo(item: T) {
     }
 }
 
-private fun <T> List<T>.peekLatest(): T? {
-    return this.firstOrNull()
-}
+private fun <T> List<T>.peekLatest(): T? = this.firstOrNull()
 
 private fun <T> List<T>.peekSecondLatest(): T? {
     if (count() < 2) {

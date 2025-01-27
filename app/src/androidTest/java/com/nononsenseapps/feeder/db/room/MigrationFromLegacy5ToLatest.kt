@@ -85,13 +85,14 @@ class MigrationFromLegacy5ToLatest {
 
     private val roomDb: AppDatabase
         get() =
-            Room.databaseBuilder(
-                feederApplication,
-                AppDatabase::class.java,
-                testDbName,
-            )
-                .addMigrations(*getAllMigrations(di))
-                .build().also { testHelper.closeWhenFinished(it) }
+            Room
+                .databaseBuilder(
+                    feederApplication,
+                    AppDatabase::class.java,
+                    testDbName,
+                ).addMigrations(*getAllMigrations(di))
+                .build()
+                .also { testHelper.closeWhenFinished(it) }
 
     @Before
     fun setup() {

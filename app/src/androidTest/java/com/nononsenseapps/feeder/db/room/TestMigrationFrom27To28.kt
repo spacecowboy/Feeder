@@ -51,15 +51,16 @@ class TestMigrationFrom27To28 : DIAware {
                 MigrationFrom27To28(di),
             )
 
-        db.query(
-            """
-            SELECT site_fetched FROM feeds
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT site_fetched FROM feeds
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getLong(0))
+            }
     }
 
     companion object {

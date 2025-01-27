@@ -71,7 +71,8 @@ class ThumbnailsAreDisplayedTest : BaseComposeTest {
             5_000L,
         )
 
-        composeTestRule.onNodeWithTag("card_image", useUnmergedTree = true)
+        composeTestRule
+            .onNodeWithTag("card_image", useUnmergedTree = true)
             .assertIsDisplayed()
     }
 }

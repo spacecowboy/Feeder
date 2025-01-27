@@ -56,9 +56,9 @@ fun OpenAISection(
     modifier: Modifier = Modifier,
 ) {
     OpenAISectionItem(
-        modifier = modifier,
         settings = state.settings,
         onEvent = onEvent,
+        modifier = modifier,
     )
 
     if (state.isEditMode) {
@@ -85,7 +85,7 @@ fun OpenAISection(
             },
             text = {
                 OpenAISectionEdit(
-                    modifier = modifier,
+                    modifier = Modifier,
                     state = state,
                     current = current,
                     onEvent = {
@@ -104,8 +104,8 @@ fun OpenAISection(
 @Composable
 private fun OpenAISectionItem(
     settings: OpenAISettings,
-    modifier: Modifier = Modifier,
     onEvent: (OpenAISettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =

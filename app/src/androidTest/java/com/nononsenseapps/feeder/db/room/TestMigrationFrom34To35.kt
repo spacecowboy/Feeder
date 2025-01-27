@@ -51,15 +51,16 @@ class TestMigrationFrom34To35 : DIAware {
                 MigrationFrom34To35(di),
             )
 
-        db.query(
-            """
-            select feed_id from feeds_with_items_for_nav_drawer
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(1, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                select feed_id from feeds_with_items_for_nav_drawer
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(1, it.getLong(0))
+            }
     }
 
     companion object {

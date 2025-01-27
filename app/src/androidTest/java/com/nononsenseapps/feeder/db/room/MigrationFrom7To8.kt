@@ -40,16 +40,17 @@ class MigrationFrom7To8 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 8, true, MIGRATION_7_8)
 
-        db.query(
-            """
-            SELECT title, url, last_sync FROM feeds
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals("feed", it.getString(0))
-            assertEquals("http://url", it.getString(1))
-            assertEquals(0L, it.getLong(2))
-        }
+        db
+            .query(
+                """
+                SELECT title, url, last_sync FROM feeds
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals("feed", it.getString(0))
+                assertEquals("http://url", it.getString(1))
+                assertEquals(0L, it.getLong(2))
+            }
     }
 }

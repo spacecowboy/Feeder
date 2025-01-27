@@ -44,7 +44,8 @@ class SearchFeedScreenRobot(
     infix fun pressFirstResult(block: EditFeedScreenRobot.() -> Unit): EditFeedScreenRobot {
         testRule.waitUntil(5_000) {
             try {
-                testRule.onNodeWithTag("searchingIndicator")
+                testRule
+                    .onNodeWithTag("searchingIndicator")
                     .assertIsDisplayed()
                 false
             } catch (_: AssertionError) {
@@ -52,7 +53,8 @@ class SearchFeedScreenRobot(
             }
         }
 
-        testRule.onAllNodesWithTag("searchResult")[0]
+        testRule
+            .onAllNodesWithTag("searchResult")[0]
             .performClick()
 
         return EditFeedScreenRobot(testRule).apply { block() }

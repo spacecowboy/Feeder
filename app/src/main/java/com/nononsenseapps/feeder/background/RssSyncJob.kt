@@ -30,7 +30,8 @@ private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 class RssSyncJob(
     private val context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
 
     private val rssLocalSync: RssLocalSync by instance()
@@ -81,15 +82,15 @@ fun runOnceRssSync(
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val builder =
-        JobInfo.Builder(BackgroundJobId.RSS_SYNC.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.RSS_SYNC.jobId, componentName)
             .setRequiredNetworkType(
                 if (!forceNetwork && repository.syncOnlyOnWifi.value) {
                     JobInfo.NETWORK_TYPE_UNMETERED
                 } else {
                     JobInfo.NETWORK_TYPE_ANY
                 },
-            )
-            .setExtras(
+            ).setExtras(
                 PersistableBundle().apply {
                     putLong(ARG_FEED_ID, feedId)
                     putString(ARG_FEED_TAG, feedTag)
@@ -127,7 +128,8 @@ fun schedulePeriodicRssSync(
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val jobInfo =
-        JobInfo.Builder(BackgroundJobId.RSS_SYNC_PERIODIC.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.RSS_SYNC_PERIODIC.jobId, componentName)
             .setRequiresCharging(repository.syncOnlyWhenCharging.value)
             .setRequiredNetworkType(
                 if (repository.syncOnlyOnWifi.value) {
@@ -135,8 +137,7 @@ fun schedulePeriodicRssSync(
                 } else {
                     JobInfo.NETWORK_TYPE_ANY
                 },
-            )
-            .setPeriodic(frequency.toMillis())
+            ).setPeriodic(frequency.toMillis())
             .setPersisted(true)
             .build()
 
@@ -145,6 +146,4 @@ fun schedulePeriodicRssSync(
     }
 }
 
-fun JobScheduler.getMyPendingJob(jobId: Int): JobInfo? {
-    return allPendingJobs.firstOrNull { it.id == jobId }
-}
+fun JobScheduler.getMyPendingJob(jobId: Int): JobInfo? = allPendingJobs.firstOrNull { it.id == jobId }

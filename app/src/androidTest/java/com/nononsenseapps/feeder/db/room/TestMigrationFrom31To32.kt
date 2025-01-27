@@ -57,15 +57,16 @@ class TestMigrationFrom31To32 : DIAware {
                 MigrationFrom31To32(di),
             )
 
-        db.query(
-            """
-            select image_from_body from feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                select image_from_body from feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getInt(0))
+            }
     }
 
     companion object {

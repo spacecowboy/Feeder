@@ -14,7 +14,9 @@ fun findFirstImageInHtml(
                 Jsoup.parse(it, "UTF-8", baseUrl ?: "")
             }
 
-        doc.getElementsByTag("img").asSequence()
+        doc
+            .getElementsByTag("img")
+            .asSequence()
             .filterNot { it.attr("width") == "1" || it.attr("height") == "1" }
             .map {
                 // abs: will resolve relative urls against the baseurl
@@ -29,8 +31,7 @@ fun findFirstImageInHtml(
                     width = it.attr("width").toIntOrNull(),
                     height = it.attr("height").toIntOrNull(),
                 )
-            }
-            .firstOrNull {
+            }.firstOrNull {
                 it?.url?.isNotBlank() == true &&
                     !it.url.contains("twitter_icon", ignoreCase = true) &&
                     !it.url.contains("facebook_icon", ignoreCase = true)

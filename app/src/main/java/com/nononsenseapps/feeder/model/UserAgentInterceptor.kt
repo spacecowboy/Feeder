@@ -5,14 +5,14 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 object UserAgentInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        return chain.proceed(
-            chain.request()
+    override fun intercept(chain: Interceptor.Chain): Response =
+        chain.proceed(
+            chain
+                .request()
                 .newBuilder()
                 .header("User-Agent", USER_AGENT_STRING)
                 .build(),
         )
-    }
 }
 
 // See discussion on https://gitlab.com/spacecowboy/Feeder/-/issues/590
