@@ -20,7 +20,7 @@ jobs:
       uses: gradle/wrapper-validation-action@v3
 
     - name: setup JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -41,7 +41,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: setup JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
