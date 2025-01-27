@@ -180,21 +180,13 @@ android {
 
 composeCompiler {
     includeSourceInformation = true
+    // reportsDestination = layout.buildDirectory.dir("compose_metrics")
 }
 
 kotlin {
     jvmToolchain(17)
     compilerOptions {
         allWarningsAsErrors = false
-        // gw installDebug -Pmyapp.enableComposeCompilerReports=true --rerun-tasks
-        if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
-            freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.layout.buildDirectory.asFile.get().resolve("compose_metrics").canonicalPath}",
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.layout.buildDirectory.asFile.get().resolve("compose_metrics").canonicalPath}",
-            )
-        }
     }
 }
 
