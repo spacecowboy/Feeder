@@ -45,15 +45,16 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 onNavigateUpFromIntentActivities()
                             },
                             searchFeedViewModel = backStackEntry.diAwareViewModel(),
+                            {
+                                AddFeedDestination.navigate(
+                                    navController,
+                                    feedUrl = it.url,
+                                    feedTitle = it.title,
+                                    feedImage = it.feedImage,
+                                )
+                            },
                             initialFeedUrl = initialFeedUrl,
-                        ) {
-                            AddFeedDestination.navigate(
-                                navController,
-                                feedUrl = it.url,
-                                feedTitle = it.title,
-                                feedImage = it.feedImage,
-                            )
-                        }
+                        )
                     }
                     composable(
                         route = AddFeedDestination.route,

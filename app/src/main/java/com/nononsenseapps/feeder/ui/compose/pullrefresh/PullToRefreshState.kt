@@ -100,8 +100,8 @@ class PullRefreshState internal constructor(
      */
     val progress get() = adjustedDistancePulled / threshold
 
-    internal val refreshing get() = _refreshing
-    internal val position get() = _position
+    val refreshing get() = _refreshing
+    val position get() = _position
 
     private val adjustedDistancePulled by derivedStateOf { distancePulled * DRAG_MULTIPLIER }
 

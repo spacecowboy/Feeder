@@ -57,18 +57,19 @@ class TestMigrationFrom26To27 : DIAware {
         }
         val db = testHelper.runMigrationsAndValidate(dbName, 27, true, MigrationFrom26To27(di))
 
-        db.query(
-            """
-            SELECT read_time FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 2)
-            assert(it.moveToFirst())
-            assertTrue {
-                it.isNull(0)
+        db
+            .query(
+                """
+                SELECT read_time FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 2)
+                assert(it.moveToFirst())
+                assertTrue {
+                    it.isNull(0)
+                }
+                assert(it.moveToLast())
+                assertEquals(1690317917000, it.getLong(0))
             }
-            assert(it.moveToLast())
-            assertEquals(1690317917000, it.getLong(0))
-        }
     }
 }

@@ -61,7 +61,10 @@ import java.security.Security
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoilApi::class)
-class FeederApplication : Application(), DIAware, SingletonImageLoader.Factory {
+class FeederApplication :
+    Application(),
+    DIAware,
+    SingletonImageLoader.Factory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
 
@@ -148,37 +151,39 @@ class FeederApplication : Application(), DIAware, SingletonImageLoader.Factory {
                                     true -> chain.request()
                                     false -> {
                                         // Forces only cached responses to be used - if no cache then 504 is thrown
-                                        chain.request().newBuilder()
+                                        chain
+                                            .request()
+                                            .newBuilder()
                                             .cacheControl(
-                                                CacheControl.Builder()
+                                                CacheControl
+                                                    .Builder()
                                                     .onlyIfCached()
                                                     .maxStale(Int.MAX_VALUE, TimeUnit.SECONDS)
                                                     .maxAge(Int.MAX_VALUE, TimeUnit.SECONDS)
                                                     .build(),
-                                            )
-                                            .build()
+                                            ).build()
                                     }
                                 },
                             )
-                        }
-                        .build()
+                        }.build()
 
-                ImageLoader.Builder(instance())
+                ImageLoader
+                    .Builder(instance())
                     .crossfade(true)
                     .coroutineContext(applicationCoroutineScope.coroutineContext)
                     .maxBitmapSize(Size(2500, 2500))
                     .diskCache(
-                        DiskCache.Builder()
+                        DiskCache
+                            .Builder()
                             .directory(filePathProvider.imageCacheDir.toOkioPath())
                             .maxSizeBytes(250L * 1024 * 1024)
                             .build(),
-                    )
-                    .memoryCache {
-                        MemoryCache.Builder()
+                    ).memoryCache {
+                        MemoryCache
+                            .Builder()
                             .maxSizeBytes(50 * 1024 * 1024)
                             .build()
-                    }
-                    .components {
+                    }.components {
                         add(IcoDecoder.Factory(this@FeederApplication))
                         add(
                             OkHttpNetworkFetcherFactory(
@@ -190,8 +195,7 @@ class FeederApplication : Application(), DIAware, SingletonImageLoader.Factory {
                                 },
                             ),
                         )
-                    }
-                    .build()
+                    }.build()
             }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
@@ -222,9 +226,7 @@ class FeederApplication : Application(), DIAware, SingletonImageLoader.Factory {
         super.onTerminate()
     }
 
-    override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return di.direct.instance()
-    }
+    override fun newImageLoader(context: PlatformContext): ImageLoader = di.direct.instance()
 
     companion object {
         @Deprecated("Only used by an old database migration")

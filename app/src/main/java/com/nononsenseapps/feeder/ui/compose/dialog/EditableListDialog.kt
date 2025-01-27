@@ -94,8 +94,7 @@ fun EditableListDialog(
                             .interceptKey(Key.Enter) {
                                 onAddItem(newValue)
                                 newValue = ""
-                            }
-                            .interceptKey(Key.Escape) {
+                            }.interceptKey(Key.Escape) {
                                 onDismiss()
                             },
                 )

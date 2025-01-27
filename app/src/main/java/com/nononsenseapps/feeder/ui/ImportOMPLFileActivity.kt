@@ -48,23 +48,24 @@ class ImportOMPLFileActivity : DIAwareComponentActivity() {
                             onDismiss = {
                                 finish()
                             },
-                        ) {
-                            val deepLinkUri =
-                                "$DEEP_LINK_BASE_URI/feed?id=$ID_ALL_FEEDS"
+                            {
+                                val deepLinkUri =
+                                    "$DEEP_LINK_BASE_URI/feed?id=$ID_ALL_FEEDS"
 
-                            val intent =
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    deepLinkUri.toUri(),
-                                    this@ImportOMPLFileActivity,
-                                    MainActivity::class.java,
-                                ).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
+                                val intent =
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        deepLinkUri.toUri(),
+                                        this@ImportOMPLFileActivity,
+                                        MainActivity::class.java,
+                                    ).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
 
-                            startActivity(intent)
-                            finish()
-                        }
+                                startActivity(intent)
+                                finish()
+                            },
+                        )
                     }
                 }
             }

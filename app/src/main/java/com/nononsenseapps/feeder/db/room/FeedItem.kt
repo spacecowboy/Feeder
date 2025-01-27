@@ -119,7 +119,8 @@ data class FeedItem
         @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
         @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
         @ColumnInfo(name = COL_BLOCK_TIME) var blockTime: Instant? = null,
-    ) : FeedItemForFetching, FeedItemCursor {
+    ) : FeedItemForFetching,
+        FeedItemCursor {
         constructor() : this(id = ID_UNSET)
 
         val unread: Boolean

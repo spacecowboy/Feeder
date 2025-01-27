@@ -39,7 +39,8 @@ suspend fun exportSavedArticles(
                     val contentResolver: ContentResolver by di.instance()
                     val feedItemDao: FeedItemDao by di.instance()
                     contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { bw ->
-                        feedItemDao.getLinksOfBookmarks()
+                        feedItemDao
+                            .getLinksOfBookmarks()
                             .forEach { link ->
                                 if (link != null) {
                                     bw.write(link)
@@ -56,4 +57,6 @@ sealed class SavedArticlesExportError {
     abstract val throwable: Throwable?
 }
 
-data class SavedArticleExportUnknownError(override val throwable: Throwable) : SavedArticlesExportError()
+data class SavedArticleExportUnknownError(
+    override val throwable: Throwable,
+) : SavedArticlesExportError()

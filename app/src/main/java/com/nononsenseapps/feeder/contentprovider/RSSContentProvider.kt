@@ -13,7 +13,9 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
-class RSSContentProvider : ContentProvider(), DIAware {
+class RSSContentProvider :
+    ContentProvider(),
+    DIAware {
     override val di: DI by lazy {
         val application = context!!.applicationContext as FeederApplication
         application.di
@@ -37,17 +39,13 @@ class RSSContentProvider : ContentProvider(), DIAware {
             )
         }
 
-    override fun onCreate(): Boolean {
-        return true
-    }
+    override fun onCreate(): Boolean = true
 
     override fun delete(
         uri: Uri,
         selection: String?,
         selectionArgs: Array<out String>?,
-    ): Int {
-        throw UnsupportedOperationException("Not implemented")
-    }
+    ): Int = throw UnsupportedOperationException("Not implemented")
 
     override fun getType(uri: Uri): String? =
         when (uriMatcher.match(uri)) {
@@ -60,18 +58,14 @@ class RSSContentProvider : ContentProvider(), DIAware {
     override fun insert(
         uri: Uri,
         values: ContentValues?,
-    ): Uri? {
-        throw UnsupportedOperationException("Not implemented")
-    }
+    ): Uri? = throw UnsupportedOperationException("Not implemented")
 
     override fun update(
         uri: Uri,
         values: ContentValues?,
         selection: String?,
         selectionArgs: Array<out String>?,
-    ): Int {
-        throw UnsupportedOperationException("Not implemented")
-    }
+    ): Int = throw UnsupportedOperationException("Not implemented")
 
     override fun query(
         uri: Uri,
@@ -79,14 +73,13 @@ class RSSContentProvider : ContentProvider(), DIAware {
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?,
-    ): Cursor? {
-        return when (uriMatcher.match(uri)) {
+    ): Cursor? =
+        when (uriMatcher.match(uri)) {
             URI_FEED_LIST -> feedDao.loadFeedsForContentProvider()
             URI_ARTICLE_LIST -> feedItemDao.loadFeedItemsForContentProvider()
             URI_ARTICLE_IN_FEED_LIST -> feedItemDao.loadFeedItemsInFeedForContentProvider(uri.lastPathSegment!!.toLong())
             else -> null
         }
-    }
 
     companion object {
         private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.rssprovider"

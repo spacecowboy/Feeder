@@ -60,7 +60,8 @@ class IcoDecoderTest {
         private val gitlabIco: SourceFetchResult
             get() {
                 val buf =
-                    Companion::class.java.getResourceAsStream("gitlab.ico")!!
+                    Companion::class.java
+                        .getResourceAsStream("gitlab.ico")!!
                         .source()
                         .buffer()
 
@@ -80,7 +81,8 @@ class IcoDecoderTest {
         private val pngIco: SourceFetchResult
             get() {
                 val buf =
-                    Companion::class.java.getResourceAsStream("png.ico")!!
+                    Companion::class.java
+                        .getResourceAsStream("png.ico")!!
                         .source()
                         .buffer()
 

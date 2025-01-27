@@ -47,14 +47,15 @@ class MigrationFrom11To12 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 12, true, MIGRATION_11_12)
 
-        db.query(
-            """
-            SELECT primary_sort_time FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0L, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT primary_sort_time FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0L, it.getLong(0))
+            }
     }
 }

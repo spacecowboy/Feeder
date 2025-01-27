@@ -9,7 +9,8 @@ import java.net.URL
 import java.time.Instant
 
 fun getMoshi(): Moshi =
-    Moshi.Builder()
+    Moshi
+        .Builder()
         .add(InstantAdapter())
         .add(URLAdapter())
         .addLast(KotlinJsonAdapterFactory())

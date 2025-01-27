@@ -21,7 +21,9 @@ import java.net.URL
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-class SyncRemoteStore(override val di: DI) : DIAware {
+class SyncRemoteStore(
+    override val di: DI,
+) : DIAware {
     private val dao: SyncRemoteDao by instance()
     private val readStatusDao: ReadStatusSyncedDao by instance()
     private val remoteReadMarkDao: RemoteReadMarkDao by instance()
@@ -36,9 +38,7 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         return createDefaultSyncRemote()
     }
 
-    fun getSyncRemoteFlow(): Flow<SyncRemote?> {
-        return dao.getSyncRemoteFlow()
-    }
+    fun getSyncRemoteFlow(): Flow<SyncRemote?> = dao.getSyncRemoteFlow()
 
     suspend fun updateSyncRemote(syncRemote: SyncRemote) {
         dao.update(syncRemote)
@@ -56,17 +56,11 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         readStatusDao.deleteReadStatusSyncs(ids)
     }
 
-    fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?> {
-        return readStatusDao.getNextFeedItemWithoutSyncedReadMark()
-    }
+    fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?> = readStatusDao.getNextFeedItemWithoutSyncedReadMark()
 
-    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
-        return readStatusDao.getFlowOfFeedItemsWithoutSyncedReadMark()
-    }
+    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> = readStatusDao.getFlowOfFeedItemsWithoutSyncedReadMark()
 
-    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> {
-        return readStatusDao.getFeedItemsWithoutSyncedReadMark()
-    }
+    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> = readStatusDao.getFeedItemsWithoutSyncedReadMark()
 
     suspend fun setSynced(feedItemId: Long) {
         // Ignores duplicates
@@ -122,17 +116,13 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         return remote
     }
 
-    fun getDevices(): Flow<List<SyncDevice>> {
-        return syncDeviceDao.getDevices()
-    }
+    fun getDevices(): Flow<List<SyncDevice>> = syncDeviceDao.getDevices()
 
     suspend fun replaceDevices(devices: List<SyncDevice>) {
         syncDeviceDao.replaceDevices(devices)
     }
 
-    suspend fun getRemotelySeenFeeds(): List<URL> {
-        return remoteFeedDao.getRemotelySeenFeeds()
-    }
+    suspend fun getRemotelySeenFeeds(): List<URL> = remoteFeedDao.getRemotelySeenFeeds()
 
     suspend fun replaceRemoteFeedsWith(remoteFeeds: List<RemoteFeed>) {
         remoteFeedDao.replaceRemoteFeedsWith(remoteFeeds)

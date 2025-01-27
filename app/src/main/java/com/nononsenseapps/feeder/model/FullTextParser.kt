@@ -24,7 +24,9 @@ import org.kodein.di.instance
 import java.net.URL
 import java.nio.charset.Charset
 
-class FullTextParser(override val di: DI) : DIAware {
+class FullTextParser(
+    override val di: DI,
+) : DIAware {
     private val repository: Repository by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val filePathProvider: FilePathProvider by instance()
@@ -32,7 +34,8 @@ class FullTextParser(override val di: DI) : DIAware {
     suspend fun parseFullArticlesForMissing(): Boolean {
         logDebug(LOG_TAG, "Parsing full texts for missing")
         val itemsToSync: List<FeedItemForFetching> =
-            repository.getFeedsItemsWithDefaultFullTextNeedingDownload()
+            repository
+                .getFeedsItemsWithDefaultFullTextNeedingDownload()
                 .firstOrNull()
                 ?: emptyList()
 
@@ -41,8 +44,7 @@ class FullTextParser(override val di: DI) : DIAware {
                 parseFullArticleIfMissing(
                     feedItem = feedItem,
                 ).isRight()
-            }
-            .fold(true) { acc, value ->
+            }.fold(true) { acc, value ->
                 acc && value
             }
     }
@@ -71,61 +73,63 @@ class FullTextParser(override val di: DI) : DIAware {
             logDebug(LOG_TAG, "Fetching full page ${feedItem.link}, ${feedItem.id}")
             val url = feedItem.link ?: return@withContext Either.Left(NoUrl())
 
-            okHttpClient.curlAndOnResponse(URL(url)) { response ->
-                Either.catching(
-                    onCatch = { t ->
-                        FullTextDecodingFailure(url, t)
-                    },
-                ) {
-                    val body = response.body ?: return@catching NoBody(url = url).left()
+            okHttpClient
+                .curlAndOnResponse(URL(url)) { response ->
+                    Either.catching(
+                        onCatch = { t ->
+                            FullTextDecodingFailure(url, t)
+                        },
+                    ) {
+                        val body = response.body ?: return@catching NoBody(url = url).left()
 
-                    val bytes =
-                        body.use {
-                            it.bytes()
-                        }
+                        val bytes =
+                            body.use {
+                                it.bytes()
+                            }
 
-                    val contentType =
-                        body.contentType()
-                            ?: return@catching UnsupportedContentType(
+                        val contentType =
+                            body.contentType()
+                                ?: return@catching UnsupportedContentType(
+                                    url = url,
+                                    mimeType = "null",
+                                ).left()
+
+                        if (contentType.type != "text" || contentType.subtype != "html") {
+                            return@catching UnsupportedContentType(
                                 url = url,
-                                mimeType = "null",
+                                mimeType = contentType.toString(),
                             ).left()
-
-                    if (contentType.type != "text" || contentType.subtype != "html") {
-                        return@catching UnsupportedContentType(
-                            url = url,
-                            mimeType = contentType.toString(),
-                        ).left()
-                    }
-
-                    val charset = contentType.charset() ?: findMetaCharset(bytes)
-
-                    logDebug(LOG_TAG, "Full article charset: $charset")
-
-                    val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
-                    logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
-                    val article = parseFullArticle(url, html)
-                    logDebug(LOG_TAG, "Writing article ${feedItem.link}")
-                    withContext(Dispatchers.IO) {
-                        article?.let { articleContent ->
-                            filePathProvider.fullArticleDir.mkdirs()
-                            blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
-                                .bufferedWriter().use { writer ->
-                                    writer.write(articleContent)
-                                }
-
-                            // Update word count on item
-                            val converter = HtmlToPlainTextConverter()
-                            val plainText = converter.convert(articleContent)
-                            val wordCount = estimateWordCount(plainText)
-
-                            repository.updateWordCountFull(feedItem.id, wordCount)
                         }
-                    }
 
-                    Either.Right(Unit)
-                }
-            }.flatten()
+                        val charset = contentType.charset() ?: findMetaCharset(bytes)
+
+                        logDebug(LOG_TAG, "Full article charset: $charset")
+
+                        val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
+                        logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
+                        val article = parseFullArticle(url, html)
+                        logDebug(LOG_TAG, "Writing article ${feedItem.link}")
+                        withContext(Dispatchers.IO) {
+                            article?.let { articleContent ->
+                                filePathProvider.fullArticleDir.mkdirs()
+                                blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                                    .bufferedWriter()
+                                    .use { writer ->
+                                        writer.write(articleContent)
+                                    }
+
+                                // Update word count on item
+                                val converter = HtmlToPlainTextConverter()
+                                val plainText = converter.convert(articleContent)
+                                val wordCount = estimateWordCount(plainText)
+
+                                repository.updateWordCountFull(feedItem.id, wordCount)
+                            }
+                        }
+
+                        Either.Right(Unit)
+                    }
+                }.flatten()
         }
 
     fun parseFullArticle(

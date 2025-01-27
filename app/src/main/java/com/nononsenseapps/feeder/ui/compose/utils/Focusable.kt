@@ -12,9 +12,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalInputModeManager
 
 @Composable
-@Suppress("ktlint:compose:modifier-composable-check")
-fun Modifier.onKeyEventLikeEscape(action: () -> Unit): Modifier {
-    return this.then(
+fun Modifier.onKeyEventLikeEscape(action: () -> Unit): Modifier =
+    this.then(
         Modifier.onKeyEvent {
             when (it.key) {
                 Key.Escape, Key.Back, Key.NavigateOut -> {
@@ -26,10 +25,8 @@ fun Modifier.onKeyEventLikeEscape(action: () -> Unit): Modifier {
             }
         },
     )
-}
 
 @Composable
-@Suppress("ktlint:compose:modifier-composable-check")
 fun Modifier.focusableInNonTouchMode(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,

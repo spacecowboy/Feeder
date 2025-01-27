@@ -7,7 +7,9 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class NavigationDeepLinkViewModel(di: DI) : DIAwareViewModel(di) {
+class NavigationDeepLinkViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
 
     fun setCurrentFeedAndTag(

@@ -116,14 +116,14 @@ fun FeedItemCard(
                                 }
                             AsyncImage(
                                 model =
-                                    ImageRequest.Builder(LocalContext.current)
+                                    ImageRequest
+                                        .Builder(LocalContext.current)
                                         .data(image.url)
                                         .listener(
                                             onError = { a, b ->
                                                 Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
                                             },
-                                        )
-                                        .scale(Scale.FIT)
+                                        ).scale(Scale.FIT)
                                         .size(pixels)
                                         .precision(Precision.INEXACT)
                                         .build(),

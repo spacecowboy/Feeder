@@ -26,7 +26,9 @@ import org.kodein.di.instance
 import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SettingsStore(override val di: DI) : DIAware {
+class SettingsStore(
+    override val di: DI,
+) : DIAware {
     private val sp: SharedPreferences by instance()
     private val blocklistDao: BlocklistDao by instance()
 
@@ -73,14 +75,14 @@ class SettingsStore(override val di: DI) : DIAware {
             false
         }
 
-    private val _currentArticle =
+    private val _currentArticleId =
         MutableStateFlow(
             sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET),
         )
-    val currentArticleId = _currentArticle.asStateFlow()
+    val currentArticleId = _currentArticleId.asStateFlow()
 
     fun setCurrentArticle(articleId: Long) {
-        _currentArticle.value = articleId
+        _currentArticleId.value = articleId
         sp.edit().putLong(PREF_LAST_ARTICLE_ID, articleId).apply()
     }
 
@@ -308,14 +310,16 @@ class SettingsStore(override val di: DI) : DIAware {
 
     fun setItemOpener(value: ItemOpener) {
         _itemOpener.value = value
-        sp.edit().putString(
-            PREF_DEFAULT_OPEN_ITEM_WITH,
-            when (value) {
-                ItemOpener.READER -> PREF_VAL_OPEN_WITH_READER
-                ItemOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                ItemOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
-            },
-        ).apply()
+        sp
+            .edit()
+            .putString(
+                PREF_DEFAULT_OPEN_ITEM_WITH,
+                when (value) {
+                    ItemOpener.READER -> PREF_VAL_OPEN_WITH_READER
+                    ItemOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                    ItemOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
+                },
+            ).apply()
     }
 
     private val _linkOpener =
@@ -328,13 +332,15 @@ class SettingsStore(override val di: DI) : DIAware {
 
     fun setLinkOpener(value: LinkOpener) {
         _linkOpener.value = value
-        sp.edit().putString(
-            PREF_OPEN_LINKS_WITH,
-            when (value) {
-                LinkOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                LinkOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
-            },
-        ).apply()
+        sp
+            .edit()
+            .putString(
+                PREF_OPEN_LINKS_WITH,
+                when (value) {
+                    LinkOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                    LinkOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
+                },
+            ).apply()
     }
 
     private val _openAdjacent = MutableStateFlow(sp.getBoolean(PREF_OPEN_ADJACENT, true))
@@ -361,10 +367,12 @@ class SettingsStore(override val di: DI) : DIAware {
 
     fun setFeedItemStyle(value: FeedItemStyle) {
         _feedItemStyle.value = value
-        sp.edit().putString(
-            PREF_FEED_ITEM_STYLE,
-            value.name,
-        ).apply()
+        sp
+            .edit()
+            .putString(
+                PREF_FEED_ITEM_STYLE,
+                value.name,
+            ).apply()
     }
 
     private val _swipeAsRead =
@@ -377,15 +385,18 @@ class SettingsStore(override val di: DI) : DIAware {
 
     fun setSwipeAsRead(value: SwipeAsRead) {
         _swipeAsRead.value = value
-        sp.edit().putString(
-            PREF_SWIPE_AS_READ,
-            value.name,
-        ).apply()
+        sp
+            .edit()
+            .putString(
+                PREF_SWIPE_AS_READ,
+                value.name,
+            ).apply()
     }
 
     val blockListPreference: Flow<List<String>>
         get() =
-            blocklistDao.getGlobPatterns()
+            blocklistDao
+                .getGlobPatterns()
                 .mapLatest { patterns ->
                     patterns.map { pattern ->
                         // Remove start and ending *
@@ -435,7 +446,8 @@ class SettingsStore(override val di: DI) : DIAware {
 
     fun setOpenAiSettings(value: OpenAISettings) {
         _openAiSettings.value = value
-        sp.edit()
+        sp
+            .edit()
             .putString(PREF_OPENAI_KEY, value.key)
             .putString(PREF_OPENAI_MODEL_ID, value.modelId)
             .putString(PREF_OPENAI_URL, value.baseUrl)
@@ -453,7 +465,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _openDrawerOnFab = MutableStateFlow(sp.getBoolean(PREF_OPEN_DRAWER_ON_FAB, false))
-    val isOpenDrawerOnFab = _openDrawerOnFab.asStateFlow()
+    val openDrawerOnFab = _openDrawerOnFab.asStateFlow()
 
     fun setOpenDrawerOnFab(value: Boolean) {
         _openDrawerOnFab.value = value
@@ -465,7 +477,8 @@ class SettingsStore(override val di: DI) : DIAware {
 
         val userPrefs = UserSettings.values().mapTo(mutableSetOf()) { it.key }
 
-        return all.filterKeys { it in userPrefs }
+        return all
+            .filterKeys { it in userPrefs }
             .mapValues { (_, value) -> value.toString() }
     }
 
@@ -576,7 +589,9 @@ const val PREF_SHOW_TITLE_UNREAD_COUNT = "pref_show_title_unread_count"
 /**
  * Used for OPML Import/Export. Please add new (only) user configurable settings here
  */
-enum class UserSettings(val key: String) {
+enum class UserSettings(
+    val key: String,
+) {
     SETTING_ADDED_FEEDER_NEWS(key = PREF_ADDED_FEEDER_NEWS),
     SETTING_THEME(key = PREF_THEME),
     SETTING_DARK_THEME(key = PREF_DARK_THEME),
@@ -609,9 +624,7 @@ enum class UserSettings(val key: String) {
     ;
 
     companion object {
-        fun fromKey(key: String): UserSettings? {
-            return values().firstOrNull { it.key.equals(key, ignoreCase = true) }
-        }
+        fun fromKey(key: String): UserSettings? = values().firstOrNull { it.key.equals(key, ignoreCase = true) }
     }
 }
 
@@ -756,7 +769,8 @@ fun feedItemStyleFromString(value: String) =
     }
 
 fun syncFrequencyFromString(value: String) =
-    SyncFrequency.values()
+    SyncFrequency
+        .values()
         .firstOrNull {
             it.minutes == value.toLongOrNull()
         }

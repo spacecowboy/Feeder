@@ -47,7 +47,8 @@ fun getNotification(
 
     val syncingText = context.getString(R.string.syncing)
 
-    return NotificationCompat.Builder(context.applicationContext, SYNC_CHANNEL_ID)
+    return NotificationCompat
+        .Builder(context.applicationContext, SYNC_CHANNEL_ID)
         .setContentTitle(syncingText)
         .setTicker(syncingText)
         .setGroup(SYNC_NOTIFICATION_GROUP)

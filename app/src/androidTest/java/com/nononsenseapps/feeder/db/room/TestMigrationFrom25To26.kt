@@ -50,14 +50,15 @@ class TestMigrationFrom25To26 : DIAware {
         }
         val db = testHelper.runMigrationsAndValidate(dbName, 26, true, MigrationFrom25To26(di))
 
-        db.query(
-            """
-            SELECT bookmarked FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(1, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                SELECT bookmarked FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(1, it.getInt(0))
+            }
     }
 }

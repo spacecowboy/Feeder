@@ -16,7 +16,8 @@ fun htmlToAnnotatedString(
     inputStream: InputStream,
     baseUrl: String,
 ): List<AnnotatedString> =
-    Jsoup.parse(inputStream, null, baseUrl)
+    Jsoup
+        .parse(inputStream, null, baseUrl)
         ?.body()
         ?.let { body ->
             formatBody(
@@ -256,7 +257,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     }
 
                     "ul" -> {
-                        element.children()
+                        element
+                            .children()
                             .filter { it.tagName() == "li" }
                             .forEach { listItem ->
                                 withParagraph {
@@ -271,7 +273,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     }
 
                     "ol" -> {
-                        element.children()
+                        element
+                            .children()
                             .filter { it.tagName() == "li" }
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
@@ -296,7 +299,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
                             or one or more tr elements,
                             followed optionally by a tfoot element
                              */
-                            element.children()
+                            element
+                                .children()
                                 .filter { it.tagName() == "caption" }
                                 .forEach {
                                     appendTextChildren(
@@ -307,7 +311,8 @@ private fun AnnotatedStringComposer.appendTextChildren(
                                 }
 
                             element.children()
-                            element.children()
+                            element
+                                .children()
                                 .filter {
                                     it.tagName() in
                                         setOf(
@@ -315,20 +320,18 @@ private fun AnnotatedStringComposer.appendTextChildren(
                                             "tbody",
                                             "tfoot",
                                         )
-                                }
-                                .sortedBy {
+                                }.sortedBy {
                                     when (it.tagName()) {
                                         "thead" -> 0
                                         "tbody" -> 1
                                         "tfoot" -> 10
                                         else -> 2
                                     }
-                                }
-                                .flatMap {
-                                    it.children()
+                                }.flatMap {
+                                    it
+                                        .children()
                                         .filter { child -> child.tagName() == "tr" }
-                                }
-                                .forEach { row ->
+                                }.forEach { row ->
                                     appendTextChildren(
                                         row.childNodes(),
                                         baseUrl = baseUrl,

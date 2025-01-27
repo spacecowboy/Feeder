@@ -25,7 +25,8 @@ import java.time.Instant
 class EditFeedScreenViewModel(
     di: DI,
     private val state: SavedStateHandle,
-) : DIAwareViewModel(di), EditFeedScreenState {
+) : DIAwareViewModel(di),
+    EditFeedScreenState {
     private val repository: Repository by instance()
 
     val feedId: Long =
@@ -155,8 +156,8 @@ class EditFeedScreenViewModel(
         }
 }
 
-internal fun isValidUrlOrUri(value: String): Boolean {
-    return try {
+internal fun isValidUrlOrUri(value: String): Boolean =
+    try {
         if (value.isNostrUri()) {
             true
         } else {
@@ -166,4 +167,3 @@ internal fun isValidUrlOrUri(value: String): Boolean {
     } catch (e: Exception) {
         false
     }
-}

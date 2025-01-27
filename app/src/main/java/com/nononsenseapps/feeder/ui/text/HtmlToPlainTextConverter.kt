@@ -118,7 +118,8 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("a", ignoreCase = true) -> startA(builder, attributes)
             tag.length == 2 &&
                 Character.toLowerCase(tag[0]) == 'h' &&
-                tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+                tag[1] >= '1' &&
+                tag[1] <= '6' -> ensureSpace(builder)
             tag.equals("ul", ignoreCase = true) -> startUl(builder)
             tag.equals("ol", ignoreCase = true) -> startOl(builder)
             tag.equals("li", ignoreCase = true) -> startLi(builder)
@@ -217,7 +218,8 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("a", ignoreCase = true) -> endA(builder)
             tag.length == 2 &&
                 Character.toLowerCase(tag[0]) == 'h' &&
-                tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+                tag[1] >= '1' &&
+                tag[1] <= '6' -> ensureSpace(builder)
             tag.equals("ul", ignoreCase = true) -> endUl(builder)
             tag.equals("ol", ignoreCase = true) -> endOl(builder)
             tag.equals("li", ignoreCase = true) -> endLi(builder)
@@ -327,7 +329,9 @@ class HtmlToPlainTextConverter : ContentHandler {
 
     private class Sub
 
-    class Listing(var ordered: Boolean) {
+    class Listing(
+        var ordered: Boolean,
+    ) {
         var number: Int = 0
 
         init {
@@ -343,11 +347,18 @@ class HtmlToPlainTextConverter : ContentHandler {
 
     private class Code
 
-    private class Font(var mColor: String, var mFace: String?)
+    private class Font(
+        var mColor: String,
+        var mFace: String?,
+    )
 
-    private class Href(var mHref: String?)
+    private class Href(
+        var mHref: String?,
+    )
 
-    private class Header(var mLevel: Int)
+    private class Header(
+        var mLevel: Int,
+    )
 }
 
 fun repeated(

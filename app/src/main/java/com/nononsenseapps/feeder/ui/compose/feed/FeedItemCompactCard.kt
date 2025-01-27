@@ -196,14 +196,14 @@ private fun FeedItemThumbnail(
     if (imageUrl != null) {
         AsyncImage(
             model =
-                ImageRequest.Builder(LocalContext.current)
+                ImageRequest
+                    .Builder(LocalContext.current)
                     .data(imageUrl)
                     .listener(
                         onError = { a, b ->
                             Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
                         },
-                    )
-                    .scale(Scale.FILL)
+                    ).scale(Scale.FILL)
                     .size(sizePx)
                     .precision(Precision.INEXACT)
                     .build(),

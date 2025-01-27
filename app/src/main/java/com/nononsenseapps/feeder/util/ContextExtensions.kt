@@ -53,7 +53,8 @@ fun Context.addDynamicShortcutToFeed(
 
             // Update shortcuts
             val shortcut: ShortcutInfo =
-                ShortcutInfo.Builder(this, "$id")
+                ShortcutInfo
+                    .Builder(this, "$id")
                     .setShortLabel(label)
                     .setLongLabel(label)
                     .setIcon(
@@ -65,8 +66,7 @@ fun Context.addDynamicShortcutToFeed(
                                     radius = shortcutManager.iconMaxHeight,
                                 ),
                             ),
-                    )
-                    .setIntent(intent)
+                    ).setIntent(intent)
                     .setDisabledMessage("Feed deleted")
                     .setRank(0)
                     .build()

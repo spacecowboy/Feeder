@@ -27,32 +27,32 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.URL
 
-class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
+class SyncScreenViewModel(
+    di: DI,
+    private val state: SavedStateHandle,
+) : DIAwareViewModel(di) {
     private val context: Application by instance()
     private val repository: Repository by instance()
 
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
-    @Suppress("ktlint:standard:property-naming")
-    private val _syncCode: MutableStateFlow<String> =
+    private val syncCode: MutableStateFlow<String> =
         MutableStateFlow(
             state["syncCode"] ?: "",
         )
 
-    @Suppress("ktlint:standard:property-naming")
-    private val _secretKey: MutableStateFlow<String> =
+    private val secretKey: MutableStateFlow<String> =
         MutableStateFlow(
             state["secretKey"] ?: "",
         )
 
-    @Suppress("ktlint:standard:property-naming")
-    private val _screenToShow: MutableStateFlow<SyncScreenToShow> =
+    private val screenToShow: MutableStateFlow<SyncScreenToShow> =
         MutableStateFlow(
             state["syncScreen"] ?: SyncScreenToShow.SETUP,
         )
 
     init {
-        if (_syncCode.value.isNotBlank() || _secretKey.value.isNotBlank()) {
+        if (syncCode.value.isNotBlank() || secretKey.value.isNotBlank()) {
             if (!state.contains("syncScreen")) {
                 setScreen(SyncScreenToShow.JOIN)
             }
@@ -70,25 +70,26 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
             }
 
         state["syncCode"] = syncCode
-        _syncCode.update { syncCode }
+        syncCode.update { syncCode }
     }
 
     fun setSecretKey(value: String) {
         val secretKey = value.secretKeyQueryParam
 
         state["secretKey"] = secretKey
-        _secretKey.update { secretKey }
+        secretKey.update { secretKey }
     }
 
     fun setScreen(value: SyncScreenToShow) {
         state["syncScreen"] = value
-        _screenToShow.update { value }
+        screenToShow.update { value }
     }
 
     fun updateDeviceList() {
         applicationCoroutineScope.launch {
             logDebug(tag = LOG_TAG, "Update Devices")
-            repository.updateDeviceList()
+            repository
+                .updateDeviceList()
                 .onLeft {
                     Log.e(LOG_TAG, "updateDeviceList: ${it.code}: ${it.body}", it.throwable)
                 }
@@ -102,17 +103,17 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         logDebug(tag = LOG_TAG, "Joining sync chain")
         viewModelScope.launch {
             try {
-                applicationCoroutineScope.async {
-                    repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
-                }.await()
+                applicationCoroutineScope
+                    .async {
+                        repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
+                    }.await()
                     .onRight {
                         runOnceRssSync(
                             di = di,
                             triggeredByUser = false,
                         )
                         joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
-                    }
-                    .onLeft {
+                    }.onLeft {
                         Log.e(LOG_TAG, "joinSyncChain: ${it.code}, ${it.body}", it.throwable)
                     }
             } catch (e: Exception) {
@@ -152,11 +153,11 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     fun startNewSyncChain() {
         applicationCoroutineScope.launch {
             try {
-                repository.startNewSyncChain()
+                repository
+                    .startNewSyncChain()
                     .onRight { (syncCode, secretKey) ->
                         joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
-                    }
-                    .onLeft {
+                    }.onLeft {
                         Log.e(LOG_TAG, "startNewChain: ${it.body}", it.throwable)
                     }
             } catch (e: Exception) {
@@ -182,11 +183,11 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
             }
 
             combine(
-                _syncCode,
+                syncCode,
                 repository.getSyncRemoteFlow(),
-                _screenToShow,
+                screenToShow,
                 repository.getDevices(),
-                _secretKey,
+                secretKey,
             ) { params ->
                 val syncCode = params[0] as String
                 val syncRemote = params[1] as SyncRemote?

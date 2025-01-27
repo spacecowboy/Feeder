@@ -78,11 +78,12 @@ suspend fun notify(
     try {
         if (feedItems.isNotEmpty()) {
             if (!updateSummaryOnly) {
-                feedItems.map {
-                    it.id.toInt() to singleNotification(appContext, it)
-                }.forEach { (id, notification) ->
-                    nm.notify(id, notification)
-                }
+                feedItems
+                    .map {
+                        it.id.toInt() to singleNotification(appContext, it)
+                    }.forEach { (id, notification) ->
+                        nm.notify(id, notification)
+                    }
             }
             // Shown on API Level < 24
             nm.notify(SUMMARY_NOTIFICATION_ID, inboxNotification(appContext, feedItems))
@@ -173,7 +174,8 @@ private suspend fun singleNotification(
 
     val builder = notificationBuilder(context)
 
-    builder.setContentText(text)
+    builder
+        .setContentText(text)
         .setContentTitle(title)
         .setGroup(ARTICLE_NOTIFICATION_GROUP)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
@@ -249,11 +251,14 @@ internal fun getOpenInDefaultActivityIntent(
     Intent(
         Intent.ACTION_VIEW,
         // Important to keep the URI different so PendingIntents don't collide
-        URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").also {
-            if (link != null) {
-                it.appendQueryParameter(COL_LINK, link)
-            }
-        }.build(),
+        URI_FEEDITEMS
+            .buildUpon()
+            .appendPath("$feedItemId")
+            .also {
+                if (link != null) {
+                    it.appendQueryParameter(COL_LINK, link)
+                }
+            }.build(),
         context,
         OpenLinkInDefaultActivity::class.java,
     )
@@ -338,7 +343,8 @@ private fun inboxNotification(
 
     val builder = notificationBuilder(context)
 
-    builder.setContentText(text)
+    builder
+        .setContentText(text)
         .setContentTitle(title)
         .setContentIntent(pendingIntent)
         .setGroup(ARTICLE_NOTIFICATION_GROUP)
@@ -396,7 +402,8 @@ private fun getPendingDeleteIntent(
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
-    return NotificationCompat.Builder(context, CHANNEL_ID)
+    return NotificationCompat
+        .Builder(context, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_stat_f)
         .setLargeIcon(bm)
         .setAutoCancel(true)

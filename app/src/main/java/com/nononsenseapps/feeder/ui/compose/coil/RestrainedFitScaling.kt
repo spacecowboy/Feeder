@@ -14,7 +14,9 @@ import kotlin.math.min
  * However, the scaling will never exceed the designated pixel density, which is at least 1.
  */
 @Stable
-class RestrainedFitScaling(private val pixelDensity: Float) : ContentScale {
+class RestrainedFitScaling(
+    private val pixelDensity: Float,
+) : ContentScale {
     override fun computeScaleFactor(
         srcSize: Size,
         dstSize: Size,
@@ -32,7 +34,9 @@ class RestrainedFitScaling(private val pixelDensity: Float) : ContentScale {
  * However, the scaling will never exceed the designated pixel density, which is at least 1.
  */
 @Stable
-class RestrainedCropScaling(private val pixelDensity: Float) : ContentScale {
+class RestrainedCropScaling(
+    private val pixelDensity: Float,
+) : ContentScale {
     override fun computeScaleFactor(
         srcSize: Size,
         dstSize: Size,
@@ -49,7 +53,9 @@ class RestrainedCropScaling(private val pixelDensity: Float) : ContentScale {
  * However, the scaling will never exceed the designated pixel density, which is at least 1.
  */
 @Stable
-class RestrainedFillWidthScaling(private val pixelDensity: Float) : ContentScale {
+class RestrainedFillWidthScaling(
+    private val pixelDensity: Float,
+) : ContentScale {
     override fun computeScaleFactor(
         srcSize: Size,
         dstSize: Size,

@@ -58,15 +58,16 @@ class TestMigrationFrom28To29 : DIAware {
                 MigrationFrom28To29(di),
             )
 
-        db.query(
-            """
-            SELECT enclosure_type FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertNull(it.getStringOrNull(0))
-        }
+        db
+            .query(
+                """
+                SELECT enclosure_type FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertNull(it.getStringOrNull(0))
+            }
     }
 
     companion object {

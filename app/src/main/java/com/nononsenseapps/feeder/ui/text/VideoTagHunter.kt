@@ -7,8 +7,8 @@ package com.nononsenseapps.feeder.ui.text
 // www.youtube.com/embed/cjxnVO9RpaQ/crap?feature=oembed
 internal val YoutubeIdPattern = "youtube.com/embed/([^?/]*)".toRegex()
 
-fun getVideo(src: String?): Video? {
-    return src?.let {
+fun getVideo(src: String?): Video? =
+    src?.let {
         YoutubeIdPattern.find(src)?.let { match ->
             val videoId = match.groupValues[1]
             Video(
@@ -18,7 +18,6 @@ fun getVideo(src: String?): Video? {
             )
         }
     }
-}
 
 data class Video(
     val src: String,

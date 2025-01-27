@@ -23,7 +23,8 @@ import java.time.Instant
 class BlocklistUpdateJob(
     context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
 
     private val blocklistDao: BlocklistDao by instance()
@@ -62,7 +63,8 @@ fun runOnceBlocklistUpdate(di: DI) {
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val jobInfo =
-        JobInfo.Builder(BackgroundJobId.BLOCKLIST_UPDATE.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.BLOCKLIST_UPDATE.jobId, componentName)
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE)
             // Older versions of Android enforce a constraint to be present. Hence the small delay
             .setMinimumLatency(1)

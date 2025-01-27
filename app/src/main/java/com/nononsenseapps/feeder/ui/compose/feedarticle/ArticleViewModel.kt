@@ -72,7 +72,8 @@ class ArticleViewModel(
             ?: throw IllegalArgumentException("Missing itemId in savedState")
 
     private val articleFlow =
-        repository.getArticleFlow(itemId)
+        repository
+            .getArticleFlow(itemId)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -90,12 +91,10 @@ class ArticleViewModel(
             article?.let {
                 it to (fullTextOverride ?: it.fullTextByDefault)
             }
-        }
-            .filterNotNull()
+        }.filterNotNull()
             .map { (article, displayFullText) ->
                 parseArticleContent(article, displayFullText)
-            }
-            .stateIn(
+            }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
                 initialValue = LinearArticle(emptyList()),
@@ -171,12 +170,11 @@ class ArticleViewModel(
                 openAiSummary = openAiSummary,
                 articleContent = articleContent,
             )
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = ArticleState(),
-            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = ArticleState(),
+        )
 
     private suspend fun parseArticleContent(
         article: Article,
@@ -190,14 +188,15 @@ class ArticleViewModel(
                     false -> {
                         if (blobFile(article.id, filePathProvider.articleDir).isFile) {
                             try {
-                                blobInputStream(article.id, filePathProvider.articleDir).use {
-                                    htmlLinearizer.linearize(
-                                        inputStream = it,
-                                        baseUrl = article.feedUrl ?: "",
-                                    )
-                                }.also {
-                                    textToDisplay.update { TextToDisplay.CONTENT }
-                                }
+                                blobInputStream(article.id, filePathProvider.articleDir)
+                                    .use {
+                                        htmlLinearizer.linearize(
+                                            inputStream = it,
+                                            baseUrl = article.feedUrl ?: "",
+                                        )
+                                    }.also {
+                                        textToDisplay.update { TextToDisplay.CONTENT }
+                                    }
                             } catch (e: Exception) {
                                 // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
@@ -237,14 +236,15 @@ class ArticleViewModel(
                         }
                         if (blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
                             try {
-                                blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
-                                    htmlLinearizer.linearize(
-                                        inputStream = it,
-                                        baseUrl = article.feedUrl ?: "",
-                                    )
-                                }.also {
-                                    textToDisplay.update { TextToDisplay.CONTENT }
-                                }
+                                blobFullInputStream(article.id, filePathProvider.fullArticleDir)
+                                    .use {
+                                        htmlLinearizer.linearize(
+                                            inputStream = it,
+                                            baseUrl = article.feedUrl ?: "",
+                                        )
+                                    }.also {
+                                        textToDisplay.update { TextToDisplay.CONTENT }
+                                    }
                             } catch (e: Exception) {
                                 // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
@@ -395,19 +395,20 @@ class ArticleViewModel(
             if (blobFile.isFile) {
                 blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir)
             } else {
-                fullTextParser.parseFullArticleIfMissing(
-                    object : FeedItemForFetching {
-                        override val id = viewState.articleId
-                        override val link = viewState.articleLink
-                    },
-                ).let {
-                    val error = it.leftOrNull()
-                    if (error == null) {
-                        blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir)
-                    } else {
-                        throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
+                fullTextParser
+                    .parseFullArticleIfMissing(
+                        object : FeedItemForFetching {
+                            override val id = viewState.articleId
+                            override val link = viewState.articleLink
+                        },
+                    ).let {
+                        val error = it.leftOrNull()
+                        if (error == null) {
+                            blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir)
+                        } else {
+                            throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
+                        }
                     }
-                }
             }
 
         val content =
@@ -479,7 +480,9 @@ sealed interface OpenAISummaryState {
 
     data object Loading : OpenAISummaryState
 
-    data class Result(val value: OpenAIApi.SummaryResult) : OpenAISummaryState
+    data class Result(
+        val value: OpenAIApi.SummaryResult,
+    ) : OpenAISummaryState
 }
 
 interface ArticleItemKeyHolder {
@@ -489,9 +492,7 @@ interface ArticleItemKeyHolder {
 object RotatingArticleItemKeyHolder : ArticleItemKeyHolder {
     private var key: Long = 0L
 
-    override fun getAndIncrementKey(): Long {
-        return key++
-    }
+    override fun getAndIncrementKey(): Long = key++
 }
 
 sealed class TSSError

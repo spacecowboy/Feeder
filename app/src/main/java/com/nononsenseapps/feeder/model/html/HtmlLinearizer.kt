@@ -26,11 +26,12 @@ class HtmlLinearizer {
     fun linearize(
         inputStream: InputStream,
         baseUrl: String,
-    ): LinearArticle {
-        return LinearArticle(
+    ): LinearArticle =
+        LinearArticle(
             elements =
                 try {
-                    Jsoup.parse(inputStream, null, baseUrl)
+                    Jsoup
+                        .parse(inputStream, null, baseUrl)
                         ?.body()
                         ?.let { body ->
                             linearizeBody(body, baseUrl)
@@ -41,13 +42,12 @@ class HtmlLinearizer {
                     emptyList()
                 },
         )
-    }
 
     private fun linearizeBody(
         body: Element,
         baseUrl: String,
-    ): List<LinearElement> {
-        return ListBuilderScope {
+    ): List<LinearElement> =
+        ListBuilderScope {
             asElement(blockStyle = LinearTextBlockStyle.TEXT) {
                 linearizeChildren(
                     body.childNodes(),
@@ -56,7 +56,6 @@ class HtmlLinearizer {
                 )
             }
         }.items
-    }
 
     private fun ListBuilderScope<LinearElement>.linearizeChildren(
         nodes: List<Node>,
@@ -190,12 +189,12 @@ class HtmlLinearizer {
 
                         "span" -> {
                             val style =
-                                element.attr("style")
+                                element
+                                    .attr("style")
                                     .splitToSequence(";")
                                     .map {
                                         it.split(":", limit = 2)
-                                    }
-                                    .filter { it.size == 2 }
+                                    }.filter { it.size == 2 }
                                     .associate {
                                         it[0].trim() to it[1].trim()
                                     }
@@ -361,8 +360,7 @@ class HtmlLinearizer {
                                         )
                                         mutableListOf()
                                     }
-                                }
-                                .let {
+                                }.let {
                                     if (it.isNotEmpty()) {
                                         add(
                                             LinearBlockQuote(
@@ -472,7 +470,8 @@ class HtmlLinearizer {
 
                             val list =
                                 LinearList.build(ordered = element.tagName() == "ol") {
-                                    element.children()
+                                    element
+                                        .children()
                                         .filter { it.tagName() == "li" }
                                         .forEach { listItem ->
                                             val item =
@@ -516,12 +515,12 @@ class HtmlLinearizer {
 
                             val rowSequence =
                                 sequence<Element> {
-                                    element.children()
+                                    element
+                                        .children()
                                         .asSequence()
                                         .filter { child ->
                                             child.tagName() in setOf("thead", "tbody", "tfoot", "tr")
-                                        }
-                                        .sortedBy { child ->
+                                        }.sortedBy { child ->
                                             when (child.tagName()) {
                                                 "thead" -> 0
                                                 "tbody" -> 1
@@ -529,8 +528,7 @@ class HtmlLinearizer {
                                                 "tfoot" -> 3
                                                 else -> 99
                                             }
-                                        }
-                                        .forEach { child ->
+                                        }.forEach { child ->
                                             if (child.tagName() == "tr") {
                                                 yield(child)
                                             } else {
@@ -543,8 +541,7 @@ class HtmlLinearizer {
                                 rowSequence
                                     .map { row ->
                                         row.children().count { it.tagName() == "td" || it.tagName() == "th" }
-                                    }
-                                    .maxOrNull()
+                                    }.maxOrNull()
                                     ?: 0
 
                             // If there is only a single row, or a single column, then don't bother with a table
@@ -561,7 +558,8 @@ class HtmlLinearizer {
                                             .forEach { row ->
                                                 newRow()
 
-                                                row.children()
+                                                row
+                                                    .children()
                                                     .filter { it.tagName() == "td" || it.tagName() == "th" }
                                                     .forEach { cell ->
                                                         add(
@@ -597,7 +595,9 @@ class HtmlLinearizer {
 
                         "audio" -> {
                             val sources =
-                                element.getElementsByTag("source").asSequence()
+                                element
+                                    .getElementsByTag("source")
+                                    .asSequence()
                                     .mapNotNull { source ->
                                         source.attr("abs:src").takeIf { it.isNotBlank() }?.let { src ->
                                             LinearAudioSource(
@@ -622,7 +622,9 @@ class HtmlLinearizer {
                             val width = element.attr("width").toIntOrNull()
                             val height = element.attr("height").toIntOrNull()
                             val sources =
-                                element.getElementsByTag("source").asSequence()
+                                element
+                                    .getElementsByTag("source")
+                                    .asSequence()
                                     .mapNotNull { source ->
                                         source.attr("abs:src").takeIf { it.isNotBlank() }?.let { src ->
                                             LinearVideoSource(
@@ -736,7 +738,8 @@ class HtmlLinearizer {
         val srcSet: String = element.attr("srcset").ifBlank { element.attr("data-responsive") }
         // Can be set on divs - see ArsTechnica
         val backgroundImage =
-            element.attr("style")
+            element
+                .attr("style")
                 .ifBlank { null }
                 ?.splitToSequence(";")
                 ?.map { it.trim() }
@@ -752,14 +755,14 @@ class HtmlLinearizer {
                             null
                         }
                     }
-                }
-                ?.firstOrNull()
+                }?.firstOrNull()
                 ?: ""
 
         val result = mutableListOf<LinearImageSource>()
 
         try {
-            srcSet.splitToSequence(", ")
+            srcSet
+                .splitToSequence(", ")
                 .map { it.trim() }
                 .map { it.split(spaceRegex).take(2).map { x -> x.trim() } }
                 .forEach { candidate ->
@@ -893,8 +896,7 @@ class HtmlLinearizer {
         return sequence {
             yieldAll(getElementsByTag("img"))
             yieldAll(getElementsByClass("image"))
-        }
-            .flatMap { getImageSource(baseUrl, it) }
+        }.flatMap { getImageSource(baseUrl, it) }
             .distinctBy { it.imgUri }
             .toList()
             .takeIf { it.isNotEmpty() }
@@ -904,8 +906,7 @@ class HtmlLinearizer {
         // Arstechnica is weird and places image details in list items which themselves contain the figure
         return ancestors {
             it.hasAttr("data-src") || it.hasAttr("data-responsive")
-        }
-            .flatMap { getImageSource(baseUrl, it) }
+        }.flatMap { getImageSource(baseUrl, it) }
             .distinctBy { it.imgUri }
             .toList()
             .takeIf { it.isNotEmpty() }
@@ -922,11 +923,11 @@ class HtmlLinearizer {
  * such as ZWNJ which are crucial for several languages.
  */
 fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
-    wholeText.asUTF8Sequence()
+    wholeText
+        .asUTF8Sequence()
         .dropWhile {
             builder.endsWithWhitespace && isCollapsableWhiteSpace(it)
-        }
-        .fold(false) { lastWasWhite, char ->
+        }.fold(false) { lastWasWhite, char ->
             if (isCollapsableWhiteSpace(char)) {
                 if (!lastWasWhite) {
                     builder.append(' ')
@@ -951,7 +952,9 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(builder: LinearTextBu
     }
 }
 
-class ListBuilderScope<T>(block: ListBuilderScope<T>.() -> Unit) {
+class ListBuilderScope<T>(
+    block: ListBuilderScope<T>.() -> Unit,
+) {
     val items = mutableListOf<T>()
 
     init {

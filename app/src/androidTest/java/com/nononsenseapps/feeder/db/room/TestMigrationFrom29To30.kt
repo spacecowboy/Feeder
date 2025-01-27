@@ -57,15 +57,16 @@ class TestMigrationFrom29To30 : DIAware {
                 MigrationFrom29To30(di),
             )
 
-        db.query(
-            """
-            SELECT word_count FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                SELECT word_count FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getInt(0))
+            }
     }
 
     companion object {

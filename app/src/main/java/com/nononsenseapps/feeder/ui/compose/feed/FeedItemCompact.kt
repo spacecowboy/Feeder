@@ -119,14 +119,14 @@ fun FeedItemCompact(
                             }
                         AsyncImage(
                             model =
-                                ImageRequest.Builder(LocalContext.current)
+                                ImageRequest
+                                    .Builder(LocalContext.current)
                                     .data(imageUrl)
                                     .listener(
                                         onError = { a, b ->
                                             Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
                                         },
-                                    )
-                                    .scale(Scale.FILL)
+                                    ).scale(Scale.FILL)
                                     .size(pixels)
                                     .precision(Precision.INEXACT)
                                     .build(),

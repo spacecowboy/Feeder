@@ -487,32 +487,36 @@ fun ColumnScope.RightContent(
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
-        enabled = !viewState.feedUrl.isNostrUri(),
-        icon = null,
+        { viewState.fullTextByDefault = it },
         modifier =
             Modifier
                 .focusRequester(rightFocusRequester)
                 .focusProperties {
                     previous = leftFocusRequester
                 },
-    ) { viewState.fullTextByDefault = it }
+        icon = null,
+        enabled = !viewState.feedUrl.isNostrUri(),
+    )
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
         checked = viewState.notify,
+        { viewState.notify = it },
         icon = null,
-    ) { viewState.notify = it }
+    )
     SwitchSetting(
         title = stringResource(id = R.string.skip_duplicate_articles),
-        description = stringResource(id = R.string.skip_duplicate_articles_desc),
         checked = viewState.skipDuplicates,
+        { viewState.skipDuplicates = it },
+        description = stringResource(id = R.string.skip_duplicate_articles_desc),
         icon = null,
-    ) { viewState.skipDuplicates = it }
+    )
     SwitchSetting(
         title = stringResource(id = R.string.generate_extra_unique_ids),
         checked = viewState.alternateId,
+        { viewState.alternateId = it },
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         icon = null,
-    ) { viewState.alternateId = it }
+    )
     HorizontalDivider(modifier = Modifier.fillMaxWidth())
     GroupTitle(
         startingSpace = false,
@@ -523,38 +527,38 @@ fun ColumnScope.RightContent(
     RadioButtonSetting(
         title = stringResource(id = R.string.use_app_default),
         selected = viewState.isOpenItemWithAppDefault,
-        minHeight = 48.dp,
-        icon = null,
         onClick = {
             viewState.articleOpener = ""
         },
+        icon = null,
+        minHeight = 48.dp,
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_reader),
         selected = viewState.isOpenItemWithReader,
-        minHeight = 48.dp,
-        icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_READER
         },
+        icon = null,
+        minHeight = 48.dp,
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_custom_tab),
         selected = viewState.isOpenItemWithCustomTab,
-        minHeight = 48.dp,
-        icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_CUSTOM_TAB
         },
+        icon = null,
+        minHeight = 48.dp,
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_default_browser),
         selected = viewState.isOpenItemWithBrowser,
-        minHeight = 48.dp,
-        icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_BROWSER
         },
+        icon = null,
+        minHeight = 48.dp,
     )
 }
 

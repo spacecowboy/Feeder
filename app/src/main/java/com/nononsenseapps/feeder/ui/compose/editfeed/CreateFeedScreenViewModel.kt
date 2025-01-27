@@ -26,7 +26,8 @@ import java.time.Instant
 class CreateFeedScreenViewModel(
     di: DI,
     state: SavedStateHandle,
-) : DIAwareViewModel(di), EditFeedScreenState {
+) : DIAwareViewModel(di),
+    EditFeedScreenState {
     private val repository: Repository by instance()
 
     // These three are updated as a result of url/uri updating

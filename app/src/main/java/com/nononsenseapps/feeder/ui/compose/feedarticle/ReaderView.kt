@@ -80,7 +80,8 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 val dateTimeFormat: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
+    DateTimeFormatter
+        .ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
 
 @Composable
@@ -189,8 +190,7 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clearAndSetSemantics {
                                                 contentDescription = feedTitle
-                                            }
-                                            .clickable {
+                                            }.clickable {
                                                 onFeedTitleClick()
                                             },
                                 )
@@ -230,10 +230,9 @@ fun ReaderView(
                                             pluralStringResource(
                                                 id = R.plurals.n_minutes,
                                                 count = readTimeSecs / 60,
+                                            ).format(
+                                                "${readTimeSecs / 60}:$seconds",
                                             )
-                                                .format(
-                                                    "${readTimeSecs / 60}:$seconds",
-                                                )
                                         WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
                                             val interactionSource =
                                                 remember { MutableInteractionSource() }
@@ -245,8 +244,7 @@ fun ReaderView(
                                                         .indication(
                                                             interactionSource,
                                                             LocalIndication.current,
-                                                        )
-                                                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                                                        ).focusableInNonTouchMode(interactionSource = interactionSource),
                                             )
                                         }
                                     }
@@ -279,8 +277,7 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clickable {
                                                 onEnclosureClick()
-                                            }
-                                            .clearAndSetSemantics {
+                                            }.clearAndSetSemantics {
                                                 try {
                                                     customActions =
                                                         listOf(
@@ -336,7 +333,8 @@ fun ReaderView(
                                         }
                                     AsyncImage(
                                         model =
-                                            ImageRequest.Builder(LocalContext.current)
+                                            ImageRequest
+                                                .Builder(LocalContext.current)
                                                 .data(image.url)
                                                 .scale(Scale.FIT)
                                                 .size(imageWidth.coerceAtMost(maxImageWidth))
@@ -397,8 +395,6 @@ private fun ReaderPreview() {
     }
 }
 
-fun wordsToReadTimeSecs(words: Int): Int {
-    return (words * 60 / 220.0).roundToInt()
-}
+fun wordsToReadTimeSecs(words: Int): Int = (words * 60 / 220.0).roundToInt()
 
 private const val LOG_TAG = "FEEDER_READER"

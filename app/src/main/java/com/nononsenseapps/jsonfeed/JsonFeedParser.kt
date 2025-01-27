@@ -41,7 +41,12 @@ fun cachingHttpClient(
     return builder.build()
 }
 
-fun feedAdapter(): JsonAdapter<Feed> = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build().adapter(Feed::class.java)
+fun feedAdapter(): JsonAdapter<Feed> =
+    Moshi
+        .Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build()
+        .adapter(Feed::class.java)
 
 /**
  * A parser for JSONFeeds. CacheDirectory and CacheSize are only relevant if feeds are downloaded. They are not used
@@ -75,7 +80,8 @@ class JsonFeedParser(
         val request: Request
         try {
             request =
-                Request.Builder()
+                Request
+                    .Builder()
                     .url(url)
                     .build()
         } catch (error: Throwable) {

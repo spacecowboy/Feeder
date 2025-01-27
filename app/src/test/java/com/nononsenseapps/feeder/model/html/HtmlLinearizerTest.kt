@@ -948,14 +948,16 @@ class HtmlLinearizerTest {
                 add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Sad", LinearTextBlockStyle.TEXT))))
             }
         val firstDiffIndex =
-            expected.cells.map { (key, linearTableCellItem) ->
-                val other = (result[0] as LinearTable).cells[key]
-                if (linearTableCellItem != other) {
-                    key
-                } else {
-                    null
-                }
-            }.filterNotNull().firstOrNull()
+            expected.cells
+                .map { (key, linearTableCellItem) ->
+                    val other = (result[0] as LinearTable).cells[key]
+                    if (linearTableCellItem != other) {
+                        key
+                    } else {
+                        null
+                    }
+                }.filterNotNull()
+                .firstOrNull()
         val firstDiff: String? =
             firstDiffIndex?.let { index ->
                 "First differing cell at index $index: ${expected.cells[index]} vs ${(result[0] as LinearTable).cells[index]}"

@@ -102,18 +102,19 @@ fun ScreenWithNavDrawer(
         drawerContent = {
             DismissibleDrawerSheet {
                 ListOfFeedsAndTags(
+                    feedsAndTags = feedsAndTags,
+                    onToggleTagExpansion = onToggleTagExpansion,
                     state = navDrawerListState,
+                    { item ->
+                        coroutineScope.launch {
+                            onDrawerItemSelect(item.id, item.tag)
+                            drawerState.close()
+                        }
+                    },
                     modifier =
                         Modifier
                             .focusRequester(focusRequester),
-                    feedsAndTags = feedsAndTags,
-                    onToggleTagExpansion = onToggleTagExpansion,
-                ) { item ->
-                    coroutineScope.launch {
-                        onDrawerItemSelect(item.id, item.tag)
-                        drawerState.close()
-                    }
-                }
+                )
             }
         },
         content = content,
@@ -126,8 +127,8 @@ fun ListOfFeedsAndTags(
     feedsAndTags: LazyPagingItems<FeedUnreadCount>,
     onToggleTagExpansion: (String) -> Unit,
     state: LazyListState,
-    modifier: Modifier = Modifier,
     onItemClick: (FeedIdTag) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         state = state,
@@ -419,8 +420,7 @@ private fun AllFeeds(
                     end = 16.dp,
                     top = 2.dp,
                     bottom = 2.dp,
-                )
-                .fillMaxWidth()
+                ).fillMaxWidth()
                 .height(48.dp),
     ) {
         Box(
@@ -475,8 +475,7 @@ private fun Feed(
                     end = 16.dp,
                     top = 2.dp,
                     bottom = 2.dp,
-                )
-                .fillMaxWidth()
+                ).fillMaxWidth()
                 .height(48.dp),
     ) {
         Box(
@@ -544,13 +543,14 @@ private fun Feed(
                         }
                     AsyncImage(
                         model =
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(imageUrl.toString()).listener(
+                            ImageRequest
+                                .Builder(LocalContext.current)
+                                .data(imageUrl.toString())
+                                .listener(
                                     onError = { a, b ->
                                         Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
                                     },
-                                )
-                                .scale(Scale.FIT)
+                                ).scale(Scale.FIT)
                                 .size(pixels)
                                 .precision(Precision.INEXACT)
                                 .build(),

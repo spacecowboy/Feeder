@@ -13,7 +13,8 @@ import java.net.URL
 sealed class DrawerItemWithUnreadCount(
     open val title: @Composable () -> String,
     open val unreadCount: Int,
-) : Comparable<DrawerItemWithUnreadCount>, FeedIdTag {
+) : Comparable<DrawerItemWithUnreadCount>,
+    FeedIdTag {
     abstract val uiId: Long
 
     override fun compareTo(other: DrawerItemWithUnreadCount): Int =

@@ -70,9 +70,7 @@ object AesCbcWithIntegrity {
      * @param keys The combined aes and hmac keys
      * @return a base 64 encoded AES string and hmac key as base64(aesKey) : base64(hmacKey)
      */
-    fun encodeKey(keys: SecretKeys): String {
-        return keys.toString()
-    }
+    fun encodeKey(keys: SecretKeys): String = keys.toString()
 
     /**
      * An aes key derived from a base64 encoded key. This does not generate the
@@ -102,14 +100,13 @@ object AesCbcWithIntegrity {
         }
     }
 
-    fun isKeyDecodable(keysStr: String): Boolean {
-        return try {
+    fun isKeyDecodable(keysStr: String): Boolean =
+        try {
             decodeKey(keysStr)
             true
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * A function that generates random AES and HMAC keys and prints out exceptions but
@@ -189,18 +186,14 @@ object AesCbcWithIntegrity {
     fun generateKeyFromPassword(
         password: String,
         salt: String,
-    ): SecretKeys {
-        return generateKeyFromPassword(password, Base64.decode(salt, BASE64_FLAGS))
-    }
+    ): SecretKeys = generateKeyFromPassword(password, Base64.decode(salt, BASE64_FLAGS))
 
     /**
      * Generates a random salt.
      * @return The random salt suitable for generateKeyFromPassword.
      */
     @Throws(GeneralSecurityException::class)
-    fun generateSalt(): ByteArray {
-        return randomBytes(PBE_SALT_LENGTH_BITS)
-    }
+    fun generateSalt(): ByteArray = randomBytes(PBE_SALT_LENGTH_BITS)
 
     /**
      * Converts the given salt into a base64 encoded string suitable for
@@ -209,9 +202,7 @@ object AesCbcWithIntegrity {
      * @param salt
      * @return a base 64 encoded salt string suitable to pass into generateKeyFromPassword.
      */
-    fun saltString(salt: ByteArray): String {
-        return Base64.encodeToString(salt, BASE64_FLAGS)
-    }
+    fun saltString(salt: ByteArray): String = Base64.encodeToString(salt, BASE64_FLAGS)
 
     /**
      * Creates a random Initialization Vector (IV) of IV_LENGTH_BYTES.
@@ -220,9 +211,7 @@ object AesCbcWithIntegrity {
      * @throws GeneralSecurityException if a suitable RNG is not available
      */
     @Throws(GeneralSecurityException::class)
-    fun generateIv(): ByteArray {
-        return randomBytes(IV_LENGTH_BYTES)
-    }
+    fun generateIv(): ByteArray = randomBytes(IV_LENGTH_BYTES)
 
     @Throws(GeneralSecurityException::class)
     private fun randomBytes(length: Int): ByteArray {
@@ -279,9 +268,7 @@ object AesCbcWithIntegrity {
         plaintext: String,
         secretKeys: SecretKeys,
         encoding: Charset = Charsets.UTF_8,
-    ): CipherTextIvMac {
-        return encrypt(plaintext.toByteArray(encoding), secretKeys)
-    }
+    ): CipherTextIvMac = encrypt(plaintext.toByteArray(encoding), secretKeys)
 
     /**
      * Generates a random IV and encrypts this plain text with the given key. Then attaches
@@ -337,9 +324,7 @@ object AesCbcWithIntegrity {
         civ: String,
         secretKeys: SecretKeys,
         encoding: Charset = Charsets.UTF_8,
-    ): String {
-        return String(decrypt(CipherTextIvMac(civ), secretKeys), encoding)
-    }
+    ): String = String(decrypt(CipherTextIvMac(civ), secretKeys), encoding)
 
     /**
      * AES CBC decrypt.
@@ -356,9 +341,7 @@ object AesCbcWithIntegrity {
         civ: CipherTextIvMac,
         secretKeys: SecretKeys,
         encoding: Charset = Charsets.UTF_8,
-    ): String {
-        return String(decrypt(civ, secretKeys), encoding)
-    }
+    ): String = String(decrypt(civ, secretKeys), encoding)
 
     /**
      * AES CBC decrypt.

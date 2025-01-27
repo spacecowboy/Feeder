@@ -102,4 +102,6 @@ sealed class OpmlExportError {
     abstract val throwable: Throwable?
 }
 
-data class OpmlExportUnknownError(override val throwable: Throwable) : OpmlExportError()
+data class OpmlExportUnknownError(
+    override val throwable: Throwable,
+) : OpmlExportError()

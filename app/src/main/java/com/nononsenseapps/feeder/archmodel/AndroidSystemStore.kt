@@ -13,7 +13,9 @@ import org.kodein.di.instance
  *
  * Useful because otherwise repository needs to run instrumented tests.
  */
-class AndroidSystemStore(override val di: DI) : DIAware {
+class AndroidSystemStore(
+    override val di: DI,
+) : DIAware {
     private val application: Application by instance()
 
     fun removeDynamicShortcuts(feedIds: List<Long>) {

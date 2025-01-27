@@ -135,12 +135,11 @@ class RssLocalSyncKtTest : DIAware {
 
         server.dispatcher =
             object : Dispatcher() {
-                override fun dispatch(request: RecordedRequest): MockResponse {
-                    return responses.getOrDefault(
+                override fun dispatch(request: RecordedRequest): MockResponse =
+                    responses.getOrDefault(
                         request.requestUrl?.toUrl(),
                         MockResponse().setResponseCode(404),
                     )
-                }
             }
 
         responses[url] =
@@ -178,7 +177,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Unexpected number of items in feed",
                 10,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .size,
             )
         }
 
@@ -202,7 +204,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Unexpected number of items in feed",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
             )
         }
 
@@ -227,7 +232,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Expected duplicate guids to be mitigated by alternate id",
                 13,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(duplicateIdRss).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(duplicateIdRss)
+                    .size,
             )
         }
 
@@ -257,13 +265,19 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Unexpected number of items in feed",
                 10,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .size,
             )
 
             assertEquals(
                 "Unexpected number of items in feed",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
             )
         }
 
@@ -293,7 +307,11 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Cached response should still have updated feed last sync",
                 999L,
-                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync.toEpochMilli(),
+                testDb.db
+                    .feedDao()
+                    .getFeed(cowboyJsonId)!!
+                    .lastSync
+                    .toEpochMilli(),
             )
         }
 
@@ -332,7 +350,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Last sync should not have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync,
+                testDb.db
+                    .feedDao()
+                    .getFeed(cowboyJsonId)!!
+                    .lastSync,
             )
         }
 
@@ -416,7 +437,10 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have changed",
                 fourteenMinsAgo,
-                testDb.db.feedDao().getFeed(cowboyJsonId)!!.lastSync,
+                testDb.db
+                    .feedDao()
+                    .getFeed(cowboyJsonId)!!
+                    .lastSync,
             )
         }
 
@@ -447,7 +471,10 @@ class RssLocalSyncKtTest : DIAware {
             assertNotEquals(
                 "Last sync should have been updated",
                 Instant.EPOCH,
-                testDb.db.feedDao().getFeed(failingJsonId)!!.lastSync,
+                testDb.db
+                    .feedDao()
+                    .getFeed(failingJsonId)!!
+                    .lastSync,
             )
 
             // Assert the feed was retrieved
@@ -610,7 +637,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Feed should have been parsed from slow response",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
             )
         }
 
@@ -627,7 +657,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "Feed should not have been parsed from extremely slow response",
                 0,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
             )
         }
 
@@ -644,7 +677,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "All items from first feed should be present",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
             )
 
             val jsonUrl = server.url("/feed.json").toUrl()
@@ -657,7 +693,10 @@ class RssLocalSyncKtTest : DIAware {
             assertEquals(
                 "All items should have been filtered out due to duplicate checking",
                 0,
-                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .size,
             )
         }
 

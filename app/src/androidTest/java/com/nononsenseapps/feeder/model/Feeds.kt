@@ -11,7 +11,8 @@ class Feeds {
         val cowboyJson: String
             get() =
                 String(
-                    Companion::class.java.getResourceAsStream("cowboyprogrammer_feed.json")!!
+                    Companion::class.java
+                        .getResourceAsStream("cowboyprogrammer_feed.json")!!
                         .use { it.readBytes() },
                 )
 

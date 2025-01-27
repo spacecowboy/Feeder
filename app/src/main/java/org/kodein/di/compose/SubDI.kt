@@ -25,9 +25,7 @@ fun SubDI(
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
     diBuilder: DI.MainBuilder.() -> Unit,
-    content:
-        @Composable()
-        () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val di = org.kodein.di.subDI(parentDI, allowSilentOverride, copy) { diBuilder() }
     CompositionLocalProvider(LocalDI provides di) { content() }
@@ -49,7 +47,5 @@ fun SubDI(
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
     diBuilder: DI.MainBuilder.() -> Unit,
-    content:
-        @Composable()
-        () -> Unit,
+    content: @Composable () -> Unit,
 ) = SubDI(LocalDI.current, allowSilentOverride, copy, diBuilder, content)

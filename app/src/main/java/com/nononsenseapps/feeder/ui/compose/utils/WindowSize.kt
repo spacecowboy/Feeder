@@ -38,7 +38,13 @@ fun Activity.withWindowMetrics(content: @Composable () -> Unit) {
     LocalConfiguration.current
     val density = LocalDensity.current
     val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
-    val size = with(density) { metrics.bounds.toComposeRect().size.toDpSize() }
+    val size =
+        with(density) {
+            metrics.bounds
+                .toComposeRect()
+                .size
+                .toDpSize()
+        }
     CompositionLocalProvider(LocalWindowSize provides size) {
         content()
     }
@@ -55,10 +61,9 @@ fun WithPreviewWindowSize(
 }
 
 @Composable
-fun isCompactLandscape(): Boolean {
-    return LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE &&
+fun isCompactLandscape(): Boolean =
+    LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE &&
         LocalWindowSizeMetrics.current.heightSizeClass == WindowHeightSizeClass.Compact
-}
 
 @Composable
 fun isCompactDevice(): Boolean {

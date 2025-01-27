@@ -17,7 +17,9 @@ import org.kodein.di.instance
 import java.net.URL
 import java.time.Instant
 
-class FeedStore(override val di: DI) : DIAware {
+class FeedStore(
+    override val di: DI,
+) : DIAware {
     private val feedDao: FeedDao by instance()
 
     // Need only be internally consistent within the composition
@@ -27,24 +29,22 @@ class FeedStore(override val di: DI) : DIAware {
     // But IDs need to be consistent even if tags come and go
     private val tagUiIds = mutableMapOf<String, Long>()
 
-    private fun getTagUiId(tag: String): Long {
-        return tagUiIds.getOrPut(tag) {
+    private fun getTagUiId(tag: String): Long =
+        tagUiIds.getOrPut(tag) {
             --nextTagUiId
         }
-    }
 
     suspend fun getFeed(feedId: Long): Feed? = feedDao.getFeed(feedId = feedId)
 
     suspend fun getFeed(url: URL): Feed? = feedDao.loadFeedWithUrl(url)
 
-    suspend fun saveFeed(feed: Feed): Long {
-        return if (feed.id > ID_UNSET) {
+    suspend fun saveFeed(feed: Feed): Long =
+        if (feed.id > ID_UNSET) {
             feedDao.updateFeed(feed)
             feed.id
         } else {
             feedDao.insertFeed(feed)
         }
-    }
 
     suspend fun toggleNotifications(
         feedId: Long,
@@ -72,8 +72,7 @@ class FeedStore(override val di: DI) : DIAware {
                 ),
         ) {
             feedDao.getPagedNavDrawerItems(expandedTags)
-        }
-            .flow
+        }.flow
 
     fun getFeedTitles(
         feedId: Long,
@@ -99,8 +98,8 @@ class FeedStore(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun upsertFeed(feedSql: Feed): Long {
-        return try {
+    suspend fun upsertFeed(feedSql: Feed): Long =
+        try {
             feedDao.upsert(feed = feedSql)
         } catch (e: SQLiteConstraintException) {
             // upsert only works if ID is defined - need to catch constraint errors still
@@ -116,11 +115,8 @@ class FeedStore(override val di: DI) : DIAware {
                 throw e
             }
         }
-    }
 
-    suspend fun getFeedsOrderedByUrl(): List<Feed> {
-        return feedDao.getFeedsOrderedByUrl()
-    }
+    suspend fun getFeedsOrderedByUrl(): List<Feed> = feedDao.getFeedsOrderedByUrl()
 
     suspend fun deleteFeed(url: URL) {
         feedDao.deleteFeedWithUrl(url)

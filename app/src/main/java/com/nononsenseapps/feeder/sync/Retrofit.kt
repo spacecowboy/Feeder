@@ -16,21 +16,23 @@ fun getFeederSyncClient(
     val moshi = getMoshi()
 
     val retrofit =
-        Retrofit.Builder()
+        Retrofit
+            .Builder()
             .client(
-                okHttpClient.newBuilder()
+                okHttpClient
+                    .newBuilder()
                     // Auth only used to prevent automatic scanning of the API
                     .addInterceptor { chain ->
                         chain.proceed(
-                            chain.request().newBuilder()
+                            chain
+                                .request()
+                                .newBuilder()
                                 .header(
                                     "Authorization",
                                     Credentials.basic(HARDCODED_USER, HARDCODED_PASSWORD),
-                                )
-                                .build(),
+                                ).build(),
                         )
-                    }
-                    .addInterceptor { chain ->
+                    }.addInterceptor { chain ->
                         val response = chain.proceed(chain.request())
                         val isCachedResponse =
                             response.cacheResponse != null && (response.networkResponse == null || response.networkResponse?.code == 304)
@@ -39,10 +41,8 @@ fun getFeederSyncClient(
                             "Response cached: $isCachedResponse, ${response.networkResponse?.code}, cache-Control: ${response.cacheControl}",
                         )
                         response
-                    }
-                    .build(),
-            )
-            .baseUrl(URL(syncRemote.url, "/api/v1/"))
+                    }.build(),
+            ).baseUrl(URL(syncRemote.url, "/api/v1/"))
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
 

@@ -129,8 +129,8 @@ fun LazyListScope.linearArticleContent(
             ) {
                 LinearElementContent(
                     linearElement = articleContent.elements[index],
-                    onLinkClick = onLinkClick,
                     allowHorizontalScroll = true,
+                    onLinkClick = onLinkClick,
                     modifier =
                         Modifier
                             .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
@@ -145,15 +145,15 @@ fun LazyListScope.linearArticleContent(
 fun LinearElementContent(
     linearElement: LinearElement,
     allowHorizontalScroll: Boolean,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (linearElement) {
         is LinearList ->
             LinearListContent(
                 linearList = linearElement,
-                onLinkClick = onLinkClick,
                 allowHorizontalScroll = allowHorizontalScroll,
+                onLinkClick = onLinkClick,
                 modifier = modifier,
             )
 
@@ -167,8 +167,8 @@ fun LinearElementContent(
         is LinearBlockQuote -> {
             LinearBlockQuoteContent(
                 blockQuote = linearElement,
-                modifier = modifier,
                 onLinkClick = onLinkClick,
+                modifier = modifier,
             )
         }
 
@@ -186,8 +186,8 @@ fun LinearElementContent(
 //                    PreFormattedBlock(
                     CodeBlock(
                         linearText = linearElement,
-                        onLinkClick = onLinkClick,
                         allowHorizontalScroll = allowHorizontalScroll,
+                        onLinkClick = onLinkClick,
                         modifier = modifier,
                     )
                 }
@@ -195,8 +195,8 @@ fun LinearElementContent(
                 LinearTextBlockStyle.CODE_BLOCK -> {
                     CodeBlock(
                         linearText = linearElement,
-                        onLinkClick = onLinkClick,
                         allowHorizontalScroll = allowHorizontalScroll,
+                        onLinkClick = onLinkClick,
                         modifier = modifier,
                     )
                 }
@@ -205,8 +205,8 @@ fun LinearElementContent(
         is LinearTable ->
             LinearTableContent(
                 linearTable = linearElement,
-                onLinkClick = onLinkClick,
                 allowHorizontalScroll = allowHorizontalScroll,
+                onLinkClick = onLinkClick,
                 modifier = modifier,
             )
 
@@ -229,8 +229,8 @@ fun LinearElementContent(
 @Composable
 fun LinearAudioContent(
     linearAudio: LinearAudio,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -259,8 +259,8 @@ fun LinearAudioContent(
 @Composable
 fun LinearVideoContent(
     linearVideo: LinearVideo,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -276,8 +276,7 @@ fun LinearVideoContent(
                             .clip(RectangleShape)
                             .clickable {
                                 linearVideo.firstSource.link.let(onLinkClick)
-                            }
-                            .fillMaxWidth(),
+                            }.fillMaxWidth(),
                 ) {
                     val maxImageWidth by rememberMaxImageWidth()
                     val pixelDensity = LocalDensity.current.density
@@ -309,7 +308,8 @@ fun LinearVideoContent(
 
                     AsyncImage(
                         model =
-                            ImageRequest.Builder(LocalContext.current)
+                            ImageRequest
+                                .Builder(LocalContext.current)
                                 .data(linearVideo.imageThumbnail)
                                 .scale(Scale.FIT)
                                 // DO NOT use the actualSize parameter here
@@ -356,8 +356,8 @@ fun LinearVideoContent(
 fun LinearListContent(
     linearList: LinearList,
     allowHorizontalScroll: Boolean,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -384,8 +384,8 @@ fun LinearListContent(
                     item.content.forEach { element ->
                         LinearElementContent(
                             linearElement = element,
-                            onLinkClick = onLinkClick,
                             allowHorizontalScroll = allowHorizontalScroll,
+                            onLinkClick = onLinkClick,
                         )
                     }
                 }
@@ -397,8 +397,8 @@ fun LinearListContent(
 @Composable
 fun LinearImageContent(
     linearImage: LinearImage,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (linearImage.sources.isEmpty()) {
         return
@@ -420,8 +420,7 @@ fun LinearImageContent(
                             enabled = linearImage.link != null,
                         ) {
                             linearImage.link?.let(onLinkClick)
-                        }
-                        .fillMaxWidth(),
+                        }.fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
                 val pixelDensity = LocalDensity.current.density
@@ -462,7 +461,8 @@ fun LinearImageContent(
 
                     AsyncImage(
                         model =
-                            ImageRequest.Builder(LocalContext.current)
+                            ImageRequest
+                                .Builder(LocalContext.current)
                                 .data(bestImage.imgUri)
                                 .scale(Scale.FIT)
                                 // DO NOT use the actualSize parameter here
@@ -525,9 +525,9 @@ private fun LinearImage.getBestImageForMaxSize(
 @Composable
 fun LinearTextContent(
     linearText: LinearText,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     softWrap: Boolean = true,
-    onLinkClick: (String) -> Unit,
 ) {
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
@@ -547,7 +547,8 @@ fun LinearTextContent(
                             .indication(interactionSource, LocalIndication.current)
                             .focusableInNonTouchMode(interactionSource = interactionSource),
                 ) { offset ->
-                    annotatedString.getStringAnnotations("URL", offset, offset)
+                    annotatedString
+                        .getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
                         ?.let {
                             onLinkClick(it.item)
@@ -570,8 +571,8 @@ fun LinearTextContent(
 @Composable
 fun LinearBlockQuoteContent(
     blockQuote: LinearBlockQuote,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -670,8 +671,8 @@ fun LinearBlockQuoteContent(
 fun CodeBlock(
     linearText: LinearText,
     allowHorizontalScroll: Boolean,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val interactionSource =
@@ -691,12 +692,10 @@ fun CodeBlock(
                         } else {
                             this
                         }
-                    }
-                    .indication(
+                    }.indication(
                         interactionSource,
                         LocalIndication.current,
-                    )
-                    .focusableInNonTouchMode(interactionSource = interactionSource),
+                    ).focusableInNonTouchMode(interactionSource = interactionSource),
         ) {
             Box(
                 contentAlignment = Alignment.TopStart,
@@ -722,8 +721,8 @@ fun CodeBlock(
 fun LinearTableContent(
     linearTable: LinearTable,
     allowHorizontalScroll: Boolean,
-    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val borderColor = MaterialTheme.colorScheme.outlineVariant
     Table(
@@ -764,8 +763,7 @@ fun LinearTableContent(
                                     end = Offset(size.width, size.height),
                                 )
                             }
-                        }
-                        .padding(4.dp),
+                        }.padding(4.dp),
             ) {
                 val cellItem = linearTable.cellAt(row = row, col = column)
                 cellItem?.let {
@@ -799,9 +797,9 @@ fun LinearTableContent(
                         for (element in it.content) {
                             LinearElementContent(
                                 linearElement = element,
+                                allowHorizontalScroll = false,
                                 onLinkClick = onLinkClick,
                                 modifier = Modifier.fillMaxWidth(),
-                                allowHorizontalScroll = false,
                             )
                         }
                     }
@@ -946,8 +944,8 @@ private fun PreviewContent(element: LinearElement) {
             ) {
                 LinearElementContent(
                     linearElement = element,
-                    onLinkClick = {},
                     allowHorizontalScroll = true,
+                    onLinkClick = {},
                 )
             }
         }
@@ -1389,8 +1387,8 @@ private fun PreviewColSpanningTable() {
     PreviewContent(linearTable)
 }
 
-fun LinearTable.toTableData(): TableData {
-    return TableData.fromCells(
+fun LinearTable.toTableData(): TableData =
+    TableData.fromCells(
         cells =
             cells
                 .asSequence()
@@ -1412,7 +1410,5 @@ fun LinearTable.toTableData(): TableData {
                                 cell.rowSpan
                             },
                     )
-                }
-                .toList(),
+                }.toList(),
     )
-}

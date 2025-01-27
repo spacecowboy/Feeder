@@ -87,15 +87,15 @@ abstract class AppDatabase : RoomDatabase() {
             instance = db
         }
 
-        fun getInstance(context: Context): AppDatabase {
-            return instance ?: synchronized(this) {
+        fun getInstance(context: Context): AppDatabase =
+            instance ?: synchronized(this) {
                 instance ?: buildDatabase(context).also { instance = it }
             }
-        }
 
         private fun buildDatabase(context: Context): AppDatabase {
             val di: DI by closestDI(context)
-            return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
+            return Room
+                .databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                 .addMigrations(*getAllMigrations(di))
                 .build()
         }
@@ -142,7 +142,10 @@ fun getAllMigrations(di: DI) =
  * 6 represents legacy database
  * 7 represents new Room database
  */
-class MigrationFrom35To36(override val di: DI) : Migration(35, 36), DIAware {
+class MigrationFrom35To36(
+    override val di: DI,
+) : Migration(35, 36),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         // TODO add column retry_after to feeds, default epoch, not null
         database.execSQL(
@@ -153,7 +156,10 @@ class MigrationFrom35To36(override val di: DI) : Migration(35, 36), DIAware {
     }
 }
 
-class MigrationFrom34To35(override val di: DI) : Migration(34, 35), DIAware {
+class MigrationFrom34To35(
+    override val di: DI,
+) : Migration(34, 35),
+    DIAware {
     private val repository: Repository by instance()
 
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -171,7 +177,10 @@ class MigrationFrom34To35(override val di: DI) : Migration(34, 35), DIAware {
     }
 }
 
-class MigrationFrom33To34(override val di: DI) : Migration(33, 34), DIAware {
+class MigrationFrom33To34(
+    override val di: DI,
+) : Migration(33, 34),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         // Room schema is anal about whitespace
         @Suppress("ktlint:standard:max-line-length")
@@ -180,7 +189,10 @@ class MigrationFrom33To34(override val di: DI) : Migration(33, 34), DIAware {
     }
 }
 
-class MigrationFrom32To33(override val di: DI) : Migration(32, 33), DIAware {
+class MigrationFrom32To33(
+    override val di: DI,
+) : Migration(32, 33),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -190,7 +202,10 @@ class MigrationFrom32To33(override val di: DI) : Migration(32, 33), DIAware {
     }
 }
 
-class MigrationFrom31To32(override val di: DI) : Migration(31, 32), DIAware {
+class MigrationFrom31To32(
+    override val di: DI,
+) : Migration(31, 32),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -200,7 +215,10 @@ class MigrationFrom31To32(override val di: DI) : Migration(31, 32), DIAware {
     }
 }
 
-class MigrationFrom30To31(override val di: DI) : Migration(30, 31), DIAware {
+class MigrationFrom30To31(
+    override val di: DI,
+) : Migration(30, 31),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -210,7 +228,10 @@ class MigrationFrom30To31(override val di: DI) : Migration(30, 31), DIAware {
     }
 }
 
-class MigrationFrom29To30(override val di: DI) : Migration(29, 30), DIAware {
+class MigrationFrom29To30(
+    override val di: DI,
+) : Migration(29, 30),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -220,7 +241,10 @@ class MigrationFrom29To30(override val di: DI) : Migration(29, 30), DIAware {
     }
 }
 
-class MigrationFrom28To29(override val di: DI) : Migration(28, 29), DIAware {
+class MigrationFrom28To29(
+    override val di: DI,
+) : Migration(28, 29),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -230,7 +254,10 @@ class MigrationFrom28To29(override val di: DI) : Migration(28, 29), DIAware {
     }
 }
 
-class MigrationFrom27To28(override val di: DI) : Migration(27, 28), DIAware {
+class MigrationFrom27To28(
+    override val di: DI,
+) : Migration(27, 28),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -240,7 +267,10 @@ class MigrationFrom27To28(override val di: DI) : Migration(27, 28), DIAware {
     }
 }
 
-class MigrationFrom26To27(override val di: DI) : Migration(26, 27), DIAware {
+class MigrationFrom26To27(
+    override val di: DI,
+) : Migration(26, 27),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -258,7 +288,10 @@ class MigrationFrom26To27(override val di: DI) : Migration(26, 27), DIAware {
     }
 }
 
-class MigrationFrom25To26(override val di: DI) : Migration(25, 26), DIAware {
+class MigrationFrom25To26(
+    override val di: DI,
+) : Migration(25, 26),
+    DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
@@ -277,7 +310,10 @@ class MigrationFrom25To26(override val di: DI) : Migration(25, 26), DIAware {
     }
 }
 
-class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
+class MigrationFrom24To25(
+    override val di: DI,
+) : Migration(24, 25),
+    DIAware {
     private val filePathProvider: FilePathProvider by instance()
 
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -288,37 +324,42 @@ class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
         )
 
         // Delete all existing full text
-        filePathProvider.filesDir.list { _, name ->
-            name.endsWith(".full.html.gz")
-        }?.forEach { name ->
-            try {
-                filePathProvider.filesDir.resolve(name).delete()
-            } catch (t: Throwable) {
-                Log.e(LOG_TAG, "Failed to delete: $name")
+        filePathProvider.filesDir
+            .list { _, name ->
+                name.endsWith(".full.html.gz")
+            }?.forEach { name ->
+                try {
+                    filePathProvider.filesDir.resolve(name).delete()
+                } catch (t: Throwable) {
+                    Log.e(LOG_TAG, "Failed to delete: $name")
+                }
             }
-        }
 
         // Move all article texts to new location
-        filePathProvider.filesDir.list { _, name ->
-            name.endsWith(".txt.gz")
-        }?.forEach { name ->
-            try {
-                val src = filePathProvider.filesDir.resolve(name)
-                val dst = filePathProvider.articleDir.resolve(name)
+        filePathProvider.filesDir
+            .list { _, name ->
+                name.endsWith(".txt.gz")
+            }?.forEach { name ->
+                try {
+                    val src = filePathProvider.filesDir.resolve(name)
+                    val dst = filePathProvider.articleDir.resolve(name)
 
-                if (!filePathProvider.articleDir.isDirectory) {
-                    filePathProvider.articleDir.mkdirs()
+                    if (!filePathProvider.articleDir.isDirectory) {
+                        filePathProvider.articleDir.mkdirs()
+                    }
+
+                    src.renameTo(dst)
+                } catch (t: Throwable) {
+                    Log.e(LOG_TAG, "Failed to delete: $name")
                 }
-
-                src.renameTo(dst)
-            } catch (t: Throwable) {
-                Log.e(LOG_TAG, "Failed to delete: $name")
             }
-        }
     }
 }
 
-class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
+class MigrationFrom23To24(
+    override val di: DI,
+) : Migration(23, 24),
+    DIAware {
     private val sharedPrefs: SharedPreferences by instance()
 
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -356,7 +397,8 @@ class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
                 Log.e("FEEDER_DB", "Failed to migrate blocklist", e)
             }
 
-            sharedPrefs.edit()
+            sharedPrefs
+                .edit()
                 .remove("pref_block_list_values")
                 .apply()
         }
@@ -623,22 +665,24 @@ object MIGRATION_9_10 : Migration(9, 10) {
 
         // Iterate over all items using the minimum query. Also restrict the text field to
         // 1 MB which should be safe enough considering the window size is 2MB large.
-        database.query(
-            """
-            SELECT id, substr(description,0,1000000) FROM feed_items
-            """.trimIndent(),
-        ).use { cursor ->
-            cursor.forEach {
-                val feedItemId = cursor.getLong(0)
-                val description = cursor.getString(1)
+        database
+            .query(
+                """
+                SELECT id, substr(description,0,1000000) FROM feed_items
+                """.trimIndent(),
+            ).use { cursor ->
+                cursor.forEach {
+                    val feedItemId = cursor.getLong(0)
+                    val description = cursor.getString(1)
 
-                @Suppress("DEPRECATION")
-                blobOutputStream(feedItemId, FeederApplication.staticFilesDir).bufferedWriter()
-                    .use {
-                        it.write(description)
-                    }
+                    @Suppress("DEPRECATION")
+                    blobOutputStream(feedItemId, FeederApplication.staticFilesDir)
+                        .bufferedWriter()
+                        .use {
+                            it.write(description)
+                        }
+                }
             }
-        }
 
         database.execSQL(
             """
@@ -750,65 +794,67 @@ private fun legacyMigration(
     )
 
     // Migrate to new tables
-    database.query(
-        """
-        SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
-        FROM Feed
-        """.trimIndent(),
-    ).use { cursor ->
-        cursor.forEach { _ ->
-            val oldFeedId = cursor.getLong(0)
+    database
+        .query(
+            """
+            SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
+            FROM Feed
+            """.trimIndent(),
+        ).use { cursor ->
+            cursor.forEach { _ ->
+                val oldFeedId = cursor.getLong(0)
 
-            val newFeedId =
-                database.insert(
-                    "feeds",
-                    SQLiteDatabase.CONFLICT_FAIL,
-                    contentValues {
-                        setString("title" to cursor.getString(1))
-                        setString("custom_title" to cursor.getString(4))
-                        setString("url" to cursor.getString(2))
-                        setString("tag" to cursor.getString(3))
-                        setInt("notify" to cursor.getInt(5))
-                        if (version == 6) {
-                            setString("image_url" to cursor.getString(6))
+                val newFeedId =
+                    database.insert(
+                        "feeds",
+                        SQLiteDatabase.CONFLICT_FAIL,
+                        contentValues {
+                            setString("title" to cursor.getString(1))
+                            setString("custom_title" to cursor.getString(4))
+                            setString("url" to cursor.getString(2))
+                            setString("tag" to cursor.getString(3))
+                            setInt("notify" to cursor.getInt(5))
+                            if (version == 6) {
+                                setString("image_url" to cursor.getString(6))
+                            }
+                        },
+                    )
+
+                database
+                    .query(
+                        """
+                        SELECT title, description, plainTitle, plainSnippet, imageUrl, link, author,
+                               pubdate, unread, feed, enclosureLink, notified, guid
+                        FROM FeedItem
+                        WHERE feed = $oldFeedId
+                        """.trimIndent(),
+                    ).use { cursor ->
+                        database.inTransaction {
+                            cursor.forEach { _ ->
+                                database.insert(
+                                    "feed_items",
+                                    SQLiteDatabase.CONFLICT_FAIL,
+                                    contentValues {
+                                        setString("guid" to cursor.getString(12))
+                                        setString("title" to cursor.getString(0))
+                                        setString("description" to cursor.getString(1))
+                                        setString("plain_title" to cursor.getString(2))
+                                        setString("plain_snippet" to cursor.getString(3))
+                                        setString("image_url" to cursor.getString(4))
+                                        setString("enclosure_link" to cursor.getString(10))
+                                        setString("author" to cursor.getString(6))
+                                        setString("pub_date" to cursor.getString(7))
+                                        setString("link" to cursor.getString(5))
+                                        setInt("unread" to cursor.getInt(8))
+                                        setInt("notified" to cursor.getInt(11))
+                                        setLong("feed_id" to newFeedId)
+                                    },
+                                )
+                            }
                         }
-                    },
-                )
-
-            database.query(
-                """
-                SELECT title, description, plainTitle, plainSnippet, imageUrl, link, author,
-                       pubdate, unread, feed, enclosureLink, notified, guid
-                FROM FeedItem
-                WHERE feed = $oldFeedId
-                """.trimIndent(),
-            ).use { cursor ->
-                database.inTransaction {
-                    cursor.forEach { _ ->
-                        database.insert(
-                            "feed_items",
-                            SQLiteDatabase.CONFLICT_FAIL,
-                            contentValues {
-                                setString("guid" to cursor.getString(12))
-                                setString("title" to cursor.getString(0))
-                                setString("description" to cursor.getString(1))
-                                setString("plain_title" to cursor.getString(2))
-                                setString("plain_snippet" to cursor.getString(3))
-                                setString("image_url" to cursor.getString(4))
-                                setString("enclosure_link" to cursor.getString(10))
-                                setString("author" to cursor.getString(6))
-                                setString("pub_date" to cursor.getString(7))
-                                setString("link" to cursor.getString(5))
-                                setInt("unread" to cursor.getInt(8))
-                                setInt("notified" to cursor.getInt(11))
-                                setLong("feed_id" to newFeedId)
-                            },
-                        )
                     }
-                }
             }
         }
-    }
 
     // Remove all legacy content
     database.execSQL("DROP TRIGGER IF EXISTS trigger_tag_updater")

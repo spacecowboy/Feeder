@@ -368,6 +368,7 @@ fun SettingsList(
                 .verticalScroll(scrollState),
     ) {
         MenuSetting(
+            title = stringResource(id = R.string.theme),
             currentValue = currentThemeValue,
             values =
                 immutableListHolderOf(
@@ -376,13 +377,13 @@ fun SettingsList(
                     ThemeOptions.NIGHT.asThemeOption(),
                     ThemeOptions.E_INK.asThemeOption(),
                 ),
-            title = stringResource(id = R.string.theme),
             onSelection = onThemeChange,
         )
 
         SwitchSetting(
             title = stringResource(id = R.string.dynamic_theme_use),
             checked = useDynamicTheme,
+            onCheckedChange = onUseDynamicTheme,
             description =
                 when {
                     isAndroidSAndAbove -> {
@@ -397,7 +398,6 @@ fun SettingsList(
                     }
                 },
             enabled = isAndroidSAndAbove,
-            onCheckedChange = onUseDynamicTheme,
         )
 
         MenuSetting(
@@ -460,6 +460,7 @@ fun SettingsList(
             title = R.string.synchronization,
         ) {
             MenuSetting(
+                title = stringResource(id = R.string.check_for_updates),
                 currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
                 values =
                     ImmutableHolder(
@@ -467,7 +468,6 @@ fun SettingsList(
                             it.asSyncFreqOption()
                         },
                     ),
-                title = stringResource(id = R.string.check_for_updates),
                 onSelection = {
                     onSyncFrequencyChange(it.syncFrequency)
                 },
@@ -492,6 +492,7 @@ fun SettingsList(
             )
 
             MenuSetting(
+                title = stringResource(id = R.string.max_feed_items),
                 currentValue = maxItemsPerFeedValue,
                 values =
                     immutableListHolderOf(
@@ -501,7 +502,6 @@ fun SettingsList(
                         500,
                         1000,
                     ),
-                title = stringResource(id = R.string.max_feed_items),
                 onSelection = onMaxItemsPerFeedChange,
             )
 
@@ -512,16 +512,18 @@ fun SettingsList(
                         false -> stringResource(id = R.string.battery_optimization_enabled)
                     },
                 title = stringResource(id = R.string.battery_optimization),
-            ) {
-                onStartActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-            }
+                {
+                    onStartActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+                },
+            )
 
             ExternalSetting(
                 currentValue = "",
                 title = stringResource(id = R.string.device_sync),
-            ) {
-                onOpenSyncSettings()
-            }
+                {
+                    onOpenSyncSettings()
+                },
+            )
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -530,13 +532,13 @@ fun SettingsList(
             title = R.string.article_list_settings,
         ) {
             MenuSetting(
+                title = stringResource(id = R.string.sort),
                 currentValue = currentSortingValue,
                 values =
                     immutableListHolderOf(
                         SortingOptions.NEWEST_FIRST.asSortOption(),
                         SortingOptions.OLDEST_FIRST.asSortOption(),
                     ),
-                title = stringResource(id = R.string.sort),
                 onSelection = onSortingChange,
             )
 
@@ -614,6 +616,7 @@ fun SettingsList(
             title = R.string.reader_settings,
         ) {
             MenuSetting(
+                title = stringResource(id = R.string.open_item_by_default_with),
                 currentValue = currentItemOpenerValue.asItemOpenerOption(),
                 values =
                     immutableListHolderOf(
@@ -621,20 +624,19 @@ fun SettingsList(
                         ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
                         ItemOpener.DEFAULT_BROWSER.asItemOpenerOption(),
                     ),
-                title = stringResource(id = R.string.open_item_by_default_with),
                 onSelection = {
                     onItemOpenerChange(it.itemOpener)
                 },
             )
 
             MenuSetting(
+                title = stringResource(id = R.string.open_links_with),
                 currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
                 values =
                     immutableListHolderOf(
                         LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
                         LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
                     ),
-                title = stringResource(id = R.string.open_links_with),
                 onSelection = {
                     onLinkOpenerChange(it.linkOpener)
                 },
@@ -671,6 +673,7 @@ fun SettingsList(
             SwitchSetting(
                 title = stringResource(id = R.string.use_detect_language),
                 checked = useDetectLanguage,
+                onCheckedChange = onUseDetectLanguageChange,
                 description =
                     when {
                         isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
@@ -681,7 +684,6 @@ fun SettingsList(
                             )
                     },
                 enabled = isAndroidQAndAbove,
-                onCheckedChange = onUseDetectLanguageChange,
             )
         }
 
@@ -764,9 +766,9 @@ fun GroupTitle(
 fun ExternalSetting(
     currentValue: String,
     title: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onClick: () -> Unit,
 ) {
     val dimens = LocalDimens.current
     Row(
@@ -804,9 +806,9 @@ fun <T> MenuSetting(
     title: String,
     currentValue: T,
     values: ImmutableHolder<List<T>>,
+    onSelection: (T) -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onSelection: (T) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -896,9 +898,9 @@ fun ListDialogSetting(
     dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
     onAddItem: (String) -> Unit,
+    onRemoveItem: (String) -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
-    onRemoveItem: (String) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -999,8 +1001,7 @@ fun NotificationsSetting(
 
                         PermissionStatus.Granted -> expanded = true
                     }
-                }
-                .semantics {
+                }.semantics {
                     role = Role.Button
                 },
         verticalAlignment = Alignment.CenterVertically,
@@ -1024,7 +1025,8 @@ fun NotificationsSetting(
                         when (permissionDenied) {
                             true -> stringResource(id = R.string.explanation_permission_notifications)
                             false -> {
-                                items.item.asSequence()
+                                items.item
+                                    .asSequence()
                                     .filter { it.notify }
                                     .map { it.title }
                                     .take(4)
@@ -1068,10 +1070,10 @@ fun NotificationsSetting(
 fun RadioButtonSetting(
     title: String,
     selected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = {},
     minHeight: Dp = 64.dp,
-    onClick: () -> Unit,
 ) {
     val stateLabel =
         if (selected) {
@@ -1123,11 +1125,11 @@ fun RadioButtonSetting(
 fun SwitchSetting(
     title: String,
     checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     description: String? = null,
     icon: @Composable (() -> Unit)? = {},
     enabled: Boolean = true,
-    onCheckedChange: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val dimens = LocalDimens.current
@@ -1139,8 +1141,7 @@ fun SwitchSetting(
                 .clickable(
                     enabled = enabled,
                     onClick = { onCheckedChange(!checked) },
-                )
-                .safeSemantics(mergeDescendants = true) {
+                ).safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
                             true -> context.getString(R.string.on)
@@ -1254,8 +1255,8 @@ fun ScaleSetting(
                 )
             },
             valueRange = valueRange,
-            steps = steps,
             onValueChange = onValueChange,
+            steps = steps,
         )
     }
 }

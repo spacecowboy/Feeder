@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -28,12 +29,10 @@ fun Element.attrInHierarchy(attr: String): String {
     return ""
 }
 
-fun Element.ancestors(predicate: (Element) -> Boolean): Sequence<Element> {
-    return ancestors().filter(predicate)
-}
+fun Element.ancestors(predicate: (Element) -> Boolean): Sequence<Element> = ancestors().filter(predicate)
 
-private fun Element.ancestors(): Sequence<Element> {
-    return sequence {
+private fun Element.ancestors(): Sequence<Element> =
+    sequence {
         var current: Element? = this@ancestors.parent()
 
         while (current != null) {
@@ -41,7 +40,6 @@ private fun Element.ancestors(): Sequence<Element> {
             current = current.parent()
         }
     }
-}
 
 fun String.asFontFamily(): FontFamily? =
     when (this.lowercase()) {
@@ -69,11 +67,11 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
     builder: HtmlParser,
     stripLeading: Boolean,
 ) {
-    wholeText.asUTF8Sequence()
+    wholeText
+        .asUTF8Sequence()
         .dropWhile {
             stripLeading && isCollapsableWhiteSpace(it)
-        }
-        .fold(false) { lastWasWhite, char ->
+        }.fold(false) { lastWasWhite, char ->
             if (isCollapsableWhiteSpace(char)) {
                 if (!lastWasWhite) {
                     builder.append(' ')
@@ -150,6 +148,7 @@ fun WithTooltipIfNotBlank(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val content = remember { movableContentOf { content() } }
     if (tooltip.isNotBlank()) {
         PlainTooltipBox(modifier = modifier, tooltip = { Text(tooltip) }) {
             content()

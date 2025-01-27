@@ -42,9 +42,7 @@ class ImageFromHTML(
         return result
     }
 
-    override fun toString(): String {
-        return "ImageFromHTML(url='$url', width=$width, height=$height, fromBody=$fromBody)"
-    }
+    override fun toString(): String = "ImageFromHTML(url='$url', width=$width, height=$height, fromBody=$fromBody)"
 }
 
 @Serializable
@@ -82,9 +80,7 @@ class EnclosureImage(
         return result
     }
 
-    override fun toString(): String {
-        return "EnclosureImage(url='$url', width=$width, height=$height, fromBody=$fromBody)"
-    }
+    override fun toString(): String = "EnclosureImage(url='$url', width=$width, height=$height, fromBody=$fromBody)"
 }
 
 @Serializable
@@ -115,7 +111,5 @@ class MediaImage(
         return result
     }
 
-    override fun toString(): String {
-        return "MediaImage(url='$url', width=$width, height=$height, fromBody=$fromBody)"
-    }
+    override fun toString(): String = "MediaImage(url='$url', width=$width, height=$height, fromBody=$fromBody)"
 }

@@ -14,10 +14,10 @@ import androidx.compose.runtime.Stable
  * See https://chris.banes.dev/composable-metrics/
  */
 @Stable
-data class StableHolder<T>(val item: T) {
-    override fun toString(): String {
-        return item.toString()
-    }
+data class StableHolder<T>(
+    val item: T,
+) {
+    override fun toString(): String = item.toString()
 }
 
 /**
@@ -31,10 +31,10 @@ data class StableHolder<T>(val item: T) {
  * See https://chris.banes.dev/composable-metrics/
  */
 @Immutable
-data class ImmutableHolder<T>(val item: T) {
-    override fun toString(): String {
-        return item.toString()
-    }
+data class ImmutableHolder<T>(
+    val item: T,
+) {
+    override fun toString(): String = item.toString()
 }
 
 fun <T> immutableListHolderOf(vararg elements: T): ImmutableHolder<List<T>> =

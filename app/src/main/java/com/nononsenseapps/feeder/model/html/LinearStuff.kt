@@ -18,33 +18,27 @@ data class LinearList(
     val ordered: Boolean,
     val items: List<LinearListItem>,
 ) : LinearElement {
-    fun isEmpty(): Boolean {
-        return items.isEmpty()
-    }
+    fun isEmpty(): Boolean = items.isEmpty()
 
-    fun isNotEmpty(): Boolean {
-        return items.isNotEmpty()
-    }
+    fun isNotEmpty(): Boolean = items.isNotEmpty()
 
-    class Builder(private val ordered: Boolean) {
+    class Builder(
+        private val ordered: Boolean,
+    ) {
         private val items: MutableList<LinearListItem> = mutableListOf()
 
         fun add(item: LinearListItem) {
             items.add(item)
         }
 
-        fun build(): LinearList {
-            return LinearList(ordered, items)
-        }
+        fun build(): LinearList = LinearList(ordered, items)
     }
 
     companion object {
         fun build(
             ordered: Boolean,
             block: Builder.() -> Unit,
-        ): LinearList {
-            return Builder(ordered).apply(block).build()
-        }
+        ): LinearList = Builder(ordered).apply(block).build()
     }
 }
 
@@ -58,13 +52,9 @@ data class LinearListItem(
 
     constructor(vararg elements: LinearElement) : this(content = elements.toList())
 
-    fun isEmpty(): Boolean {
-        return content.isEmpty()
-    }
+    fun isEmpty(): Boolean = content.isEmpty()
 
-    fun isNotEmpty(): Boolean {
-        return content.isNotEmpty()
-    }
+    fun isNotEmpty(): Boolean = content.isNotEmpty()
 
     class Builder {
         private val content: MutableList<LinearElement> = mutableListOf()
@@ -73,15 +63,11 @@ data class LinearListItem(
             content.add(element)
         }
 
-        fun build(): LinearListItem {
-            return LinearListItem(content)
-        }
+        fun build(): LinearListItem = LinearListItem(content)
     }
 
     companion object {
-        fun build(block: Builder.() -> Unit): LinearListItem {
-            return Builder().apply(block).build()
-        }
+        fun build(block: Builder.() -> Unit): LinearListItem = Builder().apply(block).build()
     }
 }
 
@@ -125,11 +111,11 @@ data class LinearTable(
     fun cellAt(
         row: Int,
         col: Int,
-    ): LinearTableCellItem? {
-        return cells[Coordinate(row = row, col = col)]
-    }
+    ): LinearTableCellItem? = cells[Coordinate(row = row, col = col)]
 
-    class Builder(val leftToRight: Boolean) {
+    class Builder(
+        val leftToRight: Boolean,
+    ) {
         private val cells: ArrayMap<Coordinate, LinearTableCellItem> = ArrayMap()
         private var rowCount: Int = 0
         private var colCount: Int = 0
@@ -176,8 +162,8 @@ data class LinearTable(
             currentRowColCount = 0
         }
 
-        fun build(): LinearTable {
-            return LinearTable(
+        fun build(): LinearTable =
+            LinearTable(
                 rowCount = rowCount,
                 colCount = colCount,
                 cellsReal =
@@ -197,16 +183,13 @@ data class LinearTable(
                         }
                     },
             )
-        }
     }
 
     companion object {
         fun build(
             leftToRight: Boolean,
             block: Builder.() -> Unit,
-        ): LinearTable {
-            return Builder(leftToRight = leftToRight).apply(block).build()
-        }
+        ): LinearTable = Builder(leftToRight = leftToRight).apply(block).build()
     }
 }
 
@@ -245,9 +228,7 @@ data class LinearTableCellItem(
             content.add(element)
         }
 
-        fun build(): LinearTableCellItem {
-            return LinearTableCellItem(colSpan = colSpan, rowSpan = rowSpan, type = type, content = content)
-        }
+        fun build(): LinearTableCellItem = LinearTableCellItem(colSpan = colSpan, rowSpan = rowSpan, type = type, content = content)
     }
 
     companion object {
@@ -256,9 +237,7 @@ data class LinearTableCellItem(
             rowSpan: Int,
             type: LinearTableCellItemType,
             block: Builder.() -> Unit,
-        ): LinearTableCellItem {
-            return Builder(colSpan = colSpan, rowSpan = rowSpan, type = type).apply(block).build()
-        }
+        ): LinearTableCellItem = Builder(colSpan = colSpan, rowSpan = rowSpan, type = type).apply(block).build()
 
         val filler =
             LinearTableCellItem(

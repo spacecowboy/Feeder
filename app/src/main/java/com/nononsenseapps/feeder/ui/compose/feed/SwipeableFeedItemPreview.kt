@@ -87,8 +87,8 @@ fun SwipeableFeedItemPreview(
     onMarkBelowAsRead: () -> Unit,
     onToggleBookmark: () -> Unit,
     onShareItem: () -> Unit,
-    modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -161,8 +161,7 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = true
                     },
                     onClick = onItemClick,
-                )
-                .safeSemantics {
+                ).safeSemantics {
                     stateDescription = readStatusLabel
                     customActions =
                         listOf(
@@ -373,8 +372,7 @@ fun SwipeableFeedItemPreview(
                                             .matchParentSize()
                                     }
                                 }
-                            }
-                            .swipeable(
+                            }.swipeable(
                                 state = swipeableState,
                                 anchors = anchors,
                                 orientation = Orientation.Horizontal,

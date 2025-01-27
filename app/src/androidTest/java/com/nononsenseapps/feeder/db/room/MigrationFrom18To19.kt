@@ -30,12 +30,13 @@ class MigrationFrom18To19 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 19, true, MIGRATION_18_19)
 
-        db.query(
-            """
-            SELECT * FROM remote_read_mark
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 0)
-        }
+        db
+            .query(
+                """
+                SELECT * FROM remote_read_mark
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 0)
+            }
     }
 }

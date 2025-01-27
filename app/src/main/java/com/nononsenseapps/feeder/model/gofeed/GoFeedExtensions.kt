@@ -305,8 +305,8 @@ private fun linkToHtml(
 //    }
 // }
 //
-private fun pointsToImage(url: String): Boolean {
-    return try {
+private fun pointsToImage(url: String): Boolean =
+    try {
         val u = URL(url)
 
         u.path.endsWith(".jpg", ignoreCase = true) ||
@@ -317,7 +317,6 @@ private fun pointsToImage(url: String): Boolean {
     } catch (_: Exception) {
         false
     }
-}
 
 fun makeGoItem(
     guid: String? = null,

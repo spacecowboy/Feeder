@@ -18,8 +18,8 @@ private fun currentlyMetered(context: Context): Boolean {
 
 fun currentlyUnmetered(context: Context): Boolean = !currentlyMetered(context)
 
-fun currentlyCharging(context: Context): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+fun currentlyCharging(context: Context): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager?
         batteryManager?.isCharging ?: false
     } else {
@@ -29,7 +29,6 @@ fun currentlyCharging(context: Context): Boolean {
         val status = batteryStatus!!.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
         status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
     }
-}
 
 fun currentlyConnected(context: Context): Boolean {
     val connManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
@@ -44,13 +43,17 @@ fun currentlyConnected(context: Context): Boolean {
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         @Suppress("DEPRECATION")
-        return connManager?.allNetworks?.map { connManager.getNetworkInfo(it)?.isConnected }
+        return connManager
+            ?.allNetworks
+            ?.map { connManager.getNetworkInfo(it)?.isConnected }
             ?.fold(false) { result, connected ->
                 result || (connected ?: false)
             } ?: false
     }
     @Suppress("DEPRECATION")
-    return connManager?.allNetworkInfo?.map { it?.isConnected }
+    return connManager
+        ?.allNetworkInfo
+        ?.map { it?.isConnected }
         ?.fold(false) { result, connected ->
             result || (connected ?: false)
         } ?: false

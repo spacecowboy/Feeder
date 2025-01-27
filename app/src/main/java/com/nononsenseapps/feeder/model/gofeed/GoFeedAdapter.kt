@@ -7,16 +7,15 @@ import java.io.IOException
 
 class GoFeedAdapter {
     private val moshi =
-        Moshi.Builder()
+        Moshi
+            .Builder()
             .addLast(KotlinJsonAdapterFactory())
             .build()
 
     private val goFeedAdapter = moshi.adapter<GoFeed>()
 
     @Throws(IOException::class)
-    private fun fromJson(json: ByteArray): GoFeed? {
-        return goFeedAdapter.fromJson(json.decodeToString())
-    }
+    private fun fromJson(json: ByteArray): GoFeed? = goFeedAdapter.fromJson(json.decodeToString())
 
     @Throws(IOException::class)
     fun parseBody(body: String): GoFeed? {

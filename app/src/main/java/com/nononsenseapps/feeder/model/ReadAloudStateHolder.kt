@@ -87,8 +87,8 @@ class TTSStateHolder(
     val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
 
     @Suppress("ktlint:standard:property-naming")
-    private val _lang = MutableStateFlow<LocaleOverride>(AppSetting)
-    val language: StateFlow<LocaleOverride> = _lang.asStateFlow()
+    private val _language = MutableStateFlow<LocaleOverride>(AppSetting)
+    val language: StateFlow<LocaleOverride> = _language.asStateFlow()
 
     private val _availableLanguages = MutableStateFlow<List<Locale>>(emptyList())
     val availableLanguages: StateFlow<List<Locale>> = _availableLanguages.asStateFlow()
@@ -97,11 +97,12 @@ class TTSStateHolder(
 
     private fun speakNext() {
         textToSpeechQueue.firstOrNull()?.let { text ->
-            val lang = _lang.value
+            val lang = _language.value
             val localesToUse: Sequence<Locale> =
                 when {
                     lang is ForcedAuto && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                        context.detectLocaleFromText(text)
+                        context
+                            .detectLocaleFromText(text)
                             .sortedByDescending { it.confidence }
                             .map { it.locale }
                             .plus(_availableLanguages.value)
@@ -114,13 +115,15 @@ class TTSStateHolder(
                     else -> {
                         // Use app setting
                         if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            context.detectLocaleFromText(text)
+                            context
+                                .detectLocaleFromText(text)
                                 .sortedByDescending { it.confidence }
                                 .map { it.locale }
                                 .plus(_availableLanguages.value)
                         } else {
                             // User has requested un-dynamic so for context locales first
-                            context.getLocales()
+                            context
+                                .getLocales()
                                 .plus(_availableLanguages.value)
                         }
                     }
@@ -183,12 +186,12 @@ class TTSStateHolder(
                     }
                     if (initializedState != TextToSpeech.SUCCESS) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                R.string.failed_to_load_text_to_speech,
-                                Toast.LENGTH_SHORT,
-                            )
-                                .show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    R.string.failed_to_load_text_to_speech,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                         return@launch
                     }
@@ -239,7 +242,7 @@ class TTSStateHolder(
             startJob?.cancel()
             textToSpeech?.stop()
             startJob?.join()
-            _lang.update { lang }
+            _language.update { lang }
             play()
         }
     }
@@ -257,29 +260,31 @@ class TTSStateHolder(
 
         val sortedLanguages =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                context.detectLocaleFromText(
-                    textToSpeechQueue.joinToString("\n\n"),
-                    minConfidence = 0f,
-                )
-                    .sortedByDescending { it.confidence }
+                context
+                    .detectLocaleFromText(
+                        textToSpeechQueue.joinToString("\n\n"),
+                        minConfidence = 0f,
+                    ).sortedByDescending { it.confidence }
                     .map { it.locale }
                     .plus(
-                        context.getLocales()
+                        context
+                            .getLocales()
                             .sortedBy { it.getDisplayName(it).lowercase(it) },
-                    )
-                    .plus(
-                        allAvailableLanguages.asSequence()
+                    ).plus(
+                        allAvailableLanguages
+                            .asSequence()
                             .sortedBy { it.getDisplayName(it).lowercase(it) },
                     )
             } else {
-                context.getLocales()
+                context
+                    .getLocales()
                     .sortedBy { it.displayName }
                     .plus(
-                        allAvailableLanguages.asSequence()
+                        allAvailableLanguages
+                            .asSequence()
                             .sortedBy { it.getDisplayName(it).lowercase(it) },
                     )
-            }
-                .distinctBy { it.toLanguageTag() }
+            }.distinctBy { it.toLanguageTag() }
                 .toList()
 
         _availableLanguages.update {
@@ -441,4 +446,6 @@ object AppSetting : LocaleOverride()
 object ForcedAuto : LocaleOverride()
 
 @Immutable
-data class ForcedLocale(val locale: Locale) : LocaleOverride()
+data class ForcedLocale(
+    val locale: Locale,
+) : LocaleOverride()

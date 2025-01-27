@@ -32,7 +32,9 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
+class SettingsViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val context: Application by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -190,10 +192,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
             }
 
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> =
-        repository.resumeTime.map {
-            val powerManager: PowerManager? = context.getSystemService()
-            powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
-        }.buffer(1)
+        repository.resumeTime
+            .map {
+                val powerManager: PowerManager? = context.getSystemService()
+                powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
+            }.buffer(1)
 
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState>
@@ -348,17 +351,29 @@ sealed interface OpenAIModelsState {
 
     data object Loading : OpenAIModelsState
 
-    data class Success(val ids: List<String>) : OpenAIModelsState
+    data class Success(
+        val ids: List<String>,
+    ) : OpenAIModelsState
 
-    data class Error(val message: String) : OpenAIModelsState
+    data class Error(
+        val message: String,
+    ) : OpenAIModelsState
 }
 
 sealed interface OpenAISettingsEvent {
-    data class UpdateSettings(val settings: OpenAISettings) : OpenAISettingsEvent
+    data class UpdateSettings(
+        val settings: OpenAISettings,
+    ) : OpenAISettingsEvent
 
-    data class LoadModels(val settings: OpenAISettings) : OpenAISettingsEvent
+    data class LoadModels(
+        val settings: OpenAISettings,
+    ) : OpenAISettingsEvent
 
-    data class SwitchEditMode(val enabled: Boolean) : OpenAISettingsEvent
+    data class SwitchEditMode(
+        val enabled: Boolean,
+    ) : OpenAISettingsEvent
 
-    data class ShowModelsError(val show: Boolean) : OpenAISettingsEvent
+    data class ShowModelsError(
+        val show: Boolean,
+    ) : OpenAISettingsEvent
 }

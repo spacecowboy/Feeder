@@ -75,15 +75,16 @@ class TestMigrationFrom24To25 : DIAware {
 
         val db = testHelper.runMigrationsAndValidate(dbName, 25, true, MigrationFrom24To25(di))
 
-        db.query(
-            """
-            SELECT fulltext_downloaded FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0, it.getInt(0))
-        }
+        db
+            .query(
+                """
+                SELECT fulltext_downloaded FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0, it.getInt(0))
+            }
 
         assertFalse {
             feederApplication.cacheDir.resolve("full_articles/$fullName1").exists()

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class CommonActivityViewModel(di: DI) : DIAwareViewModel(di) {
+class CommonActivityViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
 
     val currentTheme: StateFlow<ThemeOptions> =

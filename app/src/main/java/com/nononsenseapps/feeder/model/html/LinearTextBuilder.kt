@@ -194,6 +194,4 @@ private fun <T> MutableList<T>.pushMaxTwo(item: T) {
     }
 }
 
-private fun <T> List<T>.peekLatest(): T? {
-    return this.firstOrNull()
-}
+private fun <T> List<T>.peekLatest(): T? = this.firstOrNull()

@@ -12,7 +12,9 @@ import org.kodein.di.instance
 import org.kodein.di.provider
 import org.kodein.di.singleton
 
-abstract class DIAwareComponentActivity : ComponentActivity(), DIAware {
+abstract class DIAwareComponentActivity :
+    ComponentActivity(),
+    DIAware {
     private val parentDI: DI by closestDI()
     override val di: DI by DI.lazy {
         extend(parentDI)

@@ -61,7 +61,9 @@ import rust.nostr.sdk.Client as NostrClient
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
-class FeedParser(override val di: DI) : DIAware {
+class FeedParser(
+    override val di: DI,
+) : DIAware {
     private val client: OkHttpClient by instance()
     private val goFeedAdapter = GoFeedAdapter()
 
@@ -79,12 +81,11 @@ class FeedParser(override val di: DI) : DIAware {
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
      */
-    suspend fun getSiteMetaData(url: URL): Either<FeedParserError, SiteMetaData> {
-        return curl(url)
+    suspend fun getSiteMetaData(url: URL): Either<FeedParserError, SiteMetaData> =
+        curl(url)
             .flatMap { html ->
                 getSiteMetaDataInHtml(url, html)
             }
-    }
 
     @VisibleForTesting
     internal fun getSiteMetaDataInHtml(
@@ -125,8 +126,7 @@ class FeedParser(override val di: DI) : DIAware {
             doc.getElementsByAttributeValue("rel", "apple-touch-icon") +
                 doc.getElementsByAttributeValue("rel", "icon") +
                 doc.getElementsByAttributeValue("rel", "shortcut icon")
-        )
-            .filter { it.hasAttr("href") }
+        ).filter { it.hasAttr("href") }
             .firstNotNullOfOrNull { e ->
                 when {
                     baseUrl != null ->
@@ -153,7 +153,8 @@ class FeedParser(override val di: DI) : DIAware {
             }
 
         val feeds =
-            doc.getElementsByAttributeValue("rel", "alternate")
+            doc
+                .getElementsByAttributeValue("rel", "alternate")
                 ?.filter { it.hasAttr("href") && it.hasAttr("type") }
                 ?.filter {
                     val t = it.attr("type").lowercase(Locale.getDefault())
@@ -164,8 +165,7 @@ class FeedParser(override val di: DI) : DIAware {
                         t == "application/json" -> true
                         else -> false
                     }
-                }
-                ?.filter {
+                }?.filter {
                     val l = it.attr("href").lowercase(Locale.getDefault())
                     try {
                         if (baseUrl != null) {
@@ -177,8 +177,7 @@ class FeedParser(override val di: DI) : DIAware {
                     } catch (_: MalformedURLException) {
                         false
                     }
-                }
-                ?.mapNotNull { e ->
+                }?.mapNotNull { e ->
                     when {
                         baseUrl != null -> {
                             try {
@@ -218,7 +217,9 @@ class FeedParser(override val di: DI) : DIAware {
 
     private fun findFeedLinksForYoutube(doc: Document): List<AlternateLink> {
         val channelId: String? =
-            doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
+            doc
+                .body()
+                ?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
                 ?.firstOrNull()
                 ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
 
@@ -256,14 +257,15 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, AuthorNostrData> {
-        return Either.catching(
+    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, AuthorNostrData> =
+        Either.catching(
             onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) },
         ) {
             val possibleNostrProfile = parseNostrUri(nostrUri.toString())
             val publicKey = possibleNostrProfile.publicKey()
             val relayList =
-                possibleNostrProfile.relays()
+                possibleNostrProfile
+                    .relays()
                     .takeIf {
                         it.size < 4
                     }.orEmpty()
@@ -301,7 +303,6 @@ class FeedParser(override val di: DI) : DIAware {
                 relayList = nostrClient.relays().map { relayEntry -> relayEntry.key },
             )
         }
-    }
 
     private suspend fun getUserPublishRelays(userPubkey: PublicKey): List<String> {
         val userRelaysFilter =
@@ -347,61 +348,59 @@ class FeedParser(override val di: DI) : DIAware {
 
         nostrClient.removeAllRelays()
         val relaysToUse =
-            relays.take(3).plus(defaultArticleFetchRelays.random())
+            relays
+                .take(3)
+                .plus(defaultArticleFetchRelays.random())
                 .ifEmpty { defaultFetchRelays }
         relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
         nostrClient.connect()
         logDebug(LOG_TAG, "FETCHING ARTICLES")
         val articleEventSet =
-            nostrClient.fetchEventsFrom(
-                urls = relaysToUse,
-                filters =
-                    listOf(
-                        articlesByAuthorFilter,
-                    ),
-                timeout = Duration.ofSeconds(10L),
-            ).toVec()
+            nostrClient
+                .fetchEventsFrom(
+                    urls = relaysToUse,
+                    filters =
+                        listOf(
+                            articlesByAuthorFilter,
+                        ),
+                    timeout = Duration.ofSeconds(10L),
+                ).toVec()
         val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
         nostrClient.removeAllRelays() // This is necessary to avoid piling relays to fetch from(on each fetch).
         return articleEvents
     }
 
-    suspend fun findNostrFeed(authorNostrData: AuthorNostrData): Either<FeedParserError, ParsedFeed> {
-        return Either.catching(
+    suspend fun findNostrFeed(authorNostrData: AuthorNostrData): Either<FeedParserError, ParsedFeed> =
+        Either.catching(
             onCatch = { t -> FetchError(url = authorNostrData.uri, throwable = t) },
         ) {
             val fetchedArticles = fetchArticlesForAuthor(authorNostrData.publicKey, authorNostrData.relayList)
             fetchedArticles.mapToFeed(authorNostrData.uri, authorNostrData.name, authorNostrData.imageUrl)
         }
-    }
 
-    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> {
-        return client.curlAndOnResponse(url) {
-            parseFeedResponse(it)
-        }
-            .map {
+    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> =
+        client
+            .curlAndOnResponse(url) {
+                parseFeedResponse(it)
+            }.map {
                 // Preserve original URL to maintain authentication data and/or tokens in query params
                 // but this is also done inside parse from the request URL
                 it.copy(feed_url = url.toString())
             }
-    }
 
-    internal fun parseFeedResponse(response: Response): Either<FeedParserError, ParsedFeed> {
-        return response.body?.use {
+    internal fun parseFeedResponse(response: Response): Either<FeedParserError, ParsedFeed> =
+        response.body?.use {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
                 response.request.url.toUrl(),
                 it,
             )
         } ?: Either.Left(NoBody(url = response.request.url.toString()))
-    }
 
     private fun parseFeedBytes(
         url: URL,
         body: ByteArray,
-    ): ParsedFeed? {
-        return goFeedAdapter.parseBody(body)?.asFeed(url)
-    }
+    ): ParsedFeed? = goFeedAdapter.parseBody(body)?.asFeed(url)
 
     /**
      * Takes body as bytes to handle encoding correctly
@@ -441,8 +440,8 @@ class FeedParser(override val di: DI) : DIAware {
     internal fun parseFeedResponse(
         url: URL,
         body: String,
-    ): Either<FeedParserError, ParsedFeed> {
-        return Either.catching(
+    ): Either<FeedParserError, ParsedFeed> =
+        Either.catching(
             onCatch = { t ->
                 RSSParseError(url = url.toString(), throwable = t)
             },
@@ -450,7 +449,6 @@ class FeedParser(override val di: DI) : DIAware {
             parseFeedBytes(url, body.toByteArray())
                 ?: throw NullPointerException("Parsed feed is null")
         }
-    }
 
     companion object {
         private const val LOG_TAG = "FEEDER_FEEDPARSER"
@@ -470,11 +468,16 @@ private fun List<Event>.mapToFeed(
             avatar = imageUrl,
         )
     val articles =
-        this.sortedByDescending {
-            it.tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: 0L
-        }.map { event: Event ->
-            event.asArticle(authorName, imageUrl)
-        }
+        this
+            .sortedByDescending {
+                it
+                    .tags()
+                    .find(TagKind.PublishedAt)
+                    ?.content()
+                    ?.toLong() ?: 0L
+            }.map { event: Event ->
+                event.asArticle(authorName, imageUrl)
+            }
 
     return ParsedFeed(
         title = authorName,
@@ -501,11 +504,13 @@ fun Event.asArticle(
         Coordinate(
             Kind.fromEnum(KindEnum.LongFormTextNote),
             author(),
-            tags().find(
-                TagKind.SingleLetter(
-                    SingleLetterTag.lowercase(Alphabet.D),
-                ),
-            )?.content().toString(),
+            tags()
+                .find(
+                    TagKind.SingleLetter(
+                        SingleLetterTag.lowercase(Alphabet.D),
+                    ),
+                )?.content()
+                .toString(),
         ).toBech32()
     // Highlighter is a service for reading Nostr articles on the web.
     val externalLink = "https://highlighter.com/a/$articleNostrAddress"
@@ -517,9 +522,11 @@ fun Event.asArticle(
         )
     val articleTitle = tags().find(TagKind.Title)?.content()
     val publishDate =
-        Instant.ofEpochSecond(
-            tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond,
-        ).atZone(ZoneId.systemDefault()).withFixedOffsetZone()
+        Instant
+            .ofEpochSecond(
+                tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond,
+            ).atZone(ZoneId.systemDefault())
+            .withFixedOffsetZone()
     val articleTags = tags().hashtags()
     val articleImage = tags().find(TagKind.Image)?.content()
     val articleSummary = tags().find(TagKind.Summary)?.content()
@@ -598,7 +605,8 @@ suspend fun OkHttpClient.getResponse(
     forceNetwork: Boolean = false,
 ): Response {
     val request =
-        Request.Builder()
+        Request
+            .Builder()
             .url(url)
             .run {
                 if (forceNetwork) {
@@ -609,8 +617,7 @@ suspend fun OkHttpClient.getResponse(
                 } else {
                     this
                 }
-            }
-            .build()
+            }.build()
 
     @Suppress("BlockingMethodInNonBlockingContext")
     val clientToUse =
@@ -634,26 +641,26 @@ suspend fun OkHttpClient.getResponse(
                         }
 
                         else -> {
-                            response.request.newBuilder()
+                            response.request
+                                .newBuilder()
                                 .header("Authorization", credentials)
                                 .build()
                         }
                     }
-                }
-                .proxyAuthenticator { _, response ->
+                }.proxyAuthenticator { _, response ->
                     when {
                         response.request.header("Proxy-Authorization") != null -> {
                             null
                         }
 
                         else -> {
-                            response.request.newBuilder()
+                            response.request
+                                .newBuilder()
                                 .header("Proxy-Authorization", credentials)
                                 .build()
                         }
                     }
-                }
-                .build()
+                }.build()
         } else {
             this
         }
@@ -663,8 +670,8 @@ suspend fun OkHttpClient.getResponse(
     }
 }
 
-suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
-    return curlAndOnResponse(url) {
+suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
+    curlAndOnResponse(url) {
         val contentType = it.body?.contentType()
         when (contentType?.type) {
             "text" -> {
@@ -707,35 +714,34 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> {
                 )
         }
     }
-}
 
 suspend fun <T> OkHttpClient.curlAndOnResponse(
     url: URL,
     block: (suspend (Response) -> Either<FeedParserError, T>),
-): Either<FeedParserError, T> {
-    return Either.catching(
-        onCatch = { t ->
-            FetchError(url = url.toString(), throwable = t)
-        },
-    ) {
-        getResponse(url)
-    }.flatMap { response ->
-        if (response.isSuccessful) {
-            response.use {
-                block(it)
+): Either<FeedParserError, T> =
+    Either
+        .catching(
+            onCatch = { t ->
+                FetchError(url = url.toString(), throwable = t)
+            },
+        ) {
+            getResponse(url)
+        }.flatMap { response ->
+            if (response.isSuccessful) {
+                response.use {
+                    block(it)
+                }
+            } else {
+                Either.Left(
+                    HttpError(
+                        url = url.toString(),
+                        code = response.code,
+                        retryAfterSeconds = response.retryAfterSeconds,
+                        message = response.message,
+                    ),
+                )
             }
-        } else {
-            Either.Left(
-                HttpError(
-                    url = url.toString(),
-                    code = response.code,
-                    retryAfterSeconds = response.retryAfterSeconds,
-                    message = response.message,
-                ),
-            )
         }
-    }
-}
 
 private val markDownParser = MarkdownParser(CommonMarkFlavourDescriptor())
 
@@ -747,11 +753,17 @@ class AuthorNostrData(
     val relayList: List<String>,
 )
 
-sealed class NostrException(message: String) : Exception(message)
+sealed class NostrException(
+    message: String,
+) : Exception(message)
 
-class NostrUriParserException(override val message: String) : NostrException(message)
+class NostrUriParserException(
+    override val message: String,
+) : NostrException(message)
 
-class NostrMetadataException(override val message: String) : NostrException(message)
+class NostrMetadataException(
+    override val message: String,
+) : NostrException(message)
 
 @Parcelize
 sealed class FeedParserError : Parcelable {

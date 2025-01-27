@@ -50,26 +50,28 @@ class MigrationFrom9To10 {
 
         db = testHelper.runMigrationsAndValidate(dbName, 10, true, MIGRATION_9_10)
 
-        db.query(
-            """
-            SELECT response_hash FROM feeds WHERE id IS 1
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(0L, it.getLong(0))
-        }
+        db
+            .query(
+                """
+                SELECT response_hash FROM feeds WHERE id IS 1
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(0L, it.getLong(0))
+            }
 
-        db.query(
-            """
-            SELECT id, title FROM feed_items
-            """.trimIndent(),
-        ).use {
-            assert(it.count == 1)
-            assert(it.moveToFirst())
-            assertEquals(8L, it.getLong(0))
-            assertEquals("title", it.getString(1))
-        }
+        db
+            .query(
+                """
+                SELECT id, title FROM feed_items
+                """.trimIndent(),
+            ).use {
+                assert(it.count == 1)
+                assert(it.moveToFirst())
+                assertEquals(8L, it.getLong(0))
+                assertEquals("title", it.getString(1))
+            }
 
         blobInputStream(
             itemId = 8,

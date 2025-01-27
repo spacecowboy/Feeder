@@ -342,9 +342,9 @@ fun SyncScreen(
             onJoinSyncChain = onJoinSyncChain,
             syncCode = viewState.syncCode,
             onSetSyncCode = onSetSyncCode,
-            onLeaveSyncChain = onLeaveSyncChain,
             secretKey = viewState.secretKey,
             onSetSecretKey = onSetSecretKey,
+            onLeaveSyncChain = onLeaveSyncChain,
         )
     }
 
@@ -385,9 +385,9 @@ fun SyncScreen(
             onJoinSyncChain = onJoinSyncChain,
             syncCode = viewState.syncCode,
             onSetSyncCode = onSetSyncCode,
-            onLeaveSyncChain = onLeaveSyncChain,
             secretKey = viewState.secretKey,
             onSetSecretKey = onSetSecretKey,
+            onLeaveSyncChain = onLeaveSyncChain,
         )
     }
 
@@ -466,8 +466,8 @@ fun DualSyncScreen(
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
     onSetSecretKey: (String) -> Unit,
-    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
 
@@ -493,10 +493,10 @@ fun DualSyncScreen(
                 LeftScreenToShow.SETUP -> {
                     SyncSetupContent(
                         onScanSyncCode = onScanSyncCode,
+                        onStartNewSyncChain = onStartNewSyncChain,
                         modifier =
                             Modifier
                                 .weight(1f, fill = true),
-                        onStartNewSyncChain = onStartNewSyncChain,
                     )
                 }
 
@@ -530,10 +530,10 @@ fun DualSyncScreen(
                         syncCode = syncCode,
                         onSetSyncCode = onSetSyncCode,
                         secretKey = secretKey,
+                        onSetSecretKey = onSetSecretKey,
                         modifier =
                             Modifier
                                 .weight(1f, fill = true),
-                        onSetSecretKey = onSetSecretKey,
                     )
                 }
             }
@@ -546,8 +546,8 @@ fun SyncSetupScreen(
     onNavigateUp: () -> Unit,
     onScanSyncCode: () -> Unit,
     onStartNewSyncChain: () -> Unit,
-    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
     val scrollState = rememberScrollState()
@@ -561,8 +561,8 @@ fun SyncSetupScreen(
     ) { innerModifier ->
         SyncSetupContent(
             onScanSyncCode = onScanSyncCode,
-            modifier = innerModifier.verticalScroll(scrollState),
             onStartNewSyncChain = onStartNewSyncChain,
+            modifier = innerModifier.verticalScroll(scrollState),
         )
     }
 }
@@ -570,8 +570,8 @@ fun SyncSetupScreen(
 @Composable
 fun SyncSetupContent(
     onScanSyncCode: () -> Unit,
-    modifier: Modifier = Modifier,
     onStartNewSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
@@ -672,8 +672,8 @@ fun SyncJoinScreen(
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
     onSetSecretKey: (String) -> Unit,
-    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
     val scrollState = rememberScrollState()
@@ -690,8 +690,8 @@ fun SyncJoinScreen(
             syncCode = syncCode,
             onSetSyncCode = onSetSyncCode,
             secretKey = secretKey,
-            modifier = innerModifier.verticalScroll(scrollState),
             onSetSecretKey = onSetSecretKey,
+            modifier = innerModifier.verticalScroll(scrollState),
         )
     }
 }
@@ -702,8 +702,8 @@ fun SyncJoinContent(
     syncCode: String,
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
-    modifier: Modifier = Modifier,
     onSetSecretKey: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
 
@@ -761,8 +761,8 @@ fun SyncDeviceListScreen(
     devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
-    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
     val scrollState = rememberScrollState()
@@ -879,8 +879,8 @@ fun SyncDeviceListContent(
 fun DeviceEntry(
     currentDeviceId: Long,
     device: SyncDevice,
-    modifier: Modifier = Modifier,
     onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -965,8 +965,8 @@ fun DeleteDeviceDialog(
 fun SyncAddNewDeviceScreen(
     onNavigateUp: () -> Unit,
     syncUrl: ImmutableHolder<URL>,
-    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
     val scrollState = rememberScrollState()
@@ -994,12 +994,12 @@ fun SyncAddNewDeviceContent(
 
     val qrCode by remember(syncUrl) {
         derivedStateOf {
-            QRCode.from(
-                Url().also {
-                    it.url = "${syncUrl.item}"
-                },
-            )
-                .withSize(1000, 1000)
+            QRCode
+                .from(
+                    Url().also {
+                        it.url = "${syncUrl.item}"
+                    },
+                ).withSize(1000, 1000)
                 .bitmap()
                 .asImageBitmap()
         }
@@ -1079,7 +1079,6 @@ private fun PreviewDualSyncScreenDeviceList() {
             onStartNewSyncChain = { },
             onAddNewDevice = { },
             onDeleteDevice = {},
-            onLeaveSyncChain = {},
             currentDeviceId = 5L,
             devices =
                 ImmutableHolder(
@@ -1095,6 +1094,7 @@ private fun PreviewDualSyncScreenDeviceList() {
             onSetSyncCode = {},
             secretKey = "",
             onSetSecretKey = {},
+            onLeaveSyncChain = {},
         )
     }
 }
@@ -1112,7 +1112,6 @@ private fun PreviewDualSyncScreenSetup() {
             onStartNewSyncChain = { },
             onAddNewDevice = { },
             onDeleteDevice = {},
-            onLeaveSyncChain = {},
             currentDeviceId = 5L,
             devices =
                 ImmutableHolder(
@@ -1128,6 +1127,7 @@ private fun PreviewDualSyncScreenSetup() {
             onSetSyncCode = {},
             secretKey = "",
             onSetSecretKey = {},
+            onLeaveSyncChain = {},
         )
     }
 }
@@ -1142,9 +1142,9 @@ private fun PreviewJoin() {
             onJoinSyncChain = { _, _ -> },
             syncCode = "",
             onSetSyncCode = {},
-            onLeaveSyncChain = {},
             secretKey = "",
             onSetSecretKey = {},
+            onLeaveSyncChain = {},
         )
     }
 }
@@ -1193,8 +1193,8 @@ private fun PreviewAddNewDeviceContent() {
     PreviewTheme {
         SyncAddNewDeviceScreen(
             onNavigateUp = {},
-            onLeaveSyncChain = {},
             syncUrl = ImmutableHolder(URL("https://feeder-sync.nononsenseapps.com/join?sync_code=1234abc572335asdbc&key=123ABF")),
+            onLeaveSyncChain = {},
         )
     }
 }

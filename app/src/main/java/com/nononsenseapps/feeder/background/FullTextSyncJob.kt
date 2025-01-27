@@ -19,7 +19,8 @@ import org.kodein.di.instance
 class FullTextSyncJob(
     context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
     private val fullTextParser: FullTextParser by instance()
 
@@ -51,7 +52,8 @@ fun runOnceFullTextSync(
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val builder =
-        JobInfo.Builder(BackgroundJobId.FULL_TEXT_SYNC.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.FULL_TEXT_SYNC.jobId, componentName)
             .apply {
                 if (!triggeredByUser) {
                     setRequiresCharging(repository.syncOnlyWhenCharging.value)

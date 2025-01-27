@@ -47,7 +47,8 @@ import java.util.Locale
 class FeedViewModel(
     di: DI,
     private val state: SavedStateHandle,
-) : DIAwareViewModel(di), FeedListFilterCallback {
+) : DIAwareViewModel(di),
+    FeedListFilterCallback {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
     private val filePathProvider: FilePathProvider by instance()
@@ -56,15 +57,18 @@ class FeedViewModel(
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
-        repository.getCurrentFeedListItems()
+        repository
+            .getCurrentFeedListItems()
             .cachedIn(viewModelScope)
 
     val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
-        repository.getPagedNavDrawerItems()
+        repository
+            .getPagedNavDrawerItems()
             .cachedIn(viewModelScope)
 
     private val visibleFeedItemCount: StateFlow<Int> =
-        repository.getCurrentFeedListVisibleItemCount()
+        repository
+            .getCurrentFeedListVisibleItemCount()
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -73,7 +77,8 @@ class FeedViewModel(
             )
 
     private val screenTitleForCurrentFeedOrTag: StateFlow<ScreenTitle> =
-        repository.getScreenTitleForCurrentFeedOrTag()
+        repository
+            .getScreenTitleForCurrentFeedOrTag()
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -81,7 +86,8 @@ class FeedViewModel(
             )
 
     private val visibleFeeds: StateFlow<List<FeedTitle>> =
-        repository.getCurrentlyVisibleFeedTitles()
+        repository
+            .getCurrentlyVisibleFeedTitles()
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -292,12 +298,11 @@ class FeedViewModel(
                 showTitleUnreadCount = params[23] as Boolean,
                 isOpenDrawerOnFab = params[25] as Boolean,
             )
-        }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                FeedState(),
-            )
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            FeedState(),
+        )
 
     fun ttsStop() {
         ttsStateHolder.stop()

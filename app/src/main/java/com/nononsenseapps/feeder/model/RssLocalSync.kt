@@ -46,7 +46,9 @@ val syncMutex = Mutex()
 /**
  * WARNING. DO NOT CHANGE THE DISPATCHER WITHIN THE LOGIC!
  */
-class RssLocalSync(override val di: DI) : DIAware {
+class RssLocalSync(
+    override val di: DI,
+) : DIAware {
     private val repository: Repository by instance()
     private val syncClient: SyncRestClient by instance()
     private val feedParser: FeedParser by instance()
@@ -100,7 +102,9 @@ class RssLocalSync(override val di: DI) : DIAware {
                                 // Under no circumstances should we spam servers more than once per minute intentionally
                                 Instant.now().minus(1, ChronoUnit.MINUTES).toEpochMilli()
                             } else {
-                                Instant.now().minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
+                                Instant
+                                    .now()
+                                    .minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
                                     .toEpochMilli()
                             }
                         // Fetch sync stuff first - this is fast
@@ -129,11 +133,11 @@ class RssLocalSync(override val di: DI) : DIAware {
                             (0 until concurrentJobs)
                                 .map { jobIndex ->
                                     launch {
-                                        feedsToFetch.asSequence()
+                                        feedsToFetch
+                                            .asSequence()
                                             .filterIndexed { index, _ ->
                                                 index % concurrentJobs == jobIndex
-                                            }
-                                            .forEach { feed ->
+                                            }.forEach { feed ->
                                                 handleFeed(
                                                     feed = feed,
                                                     maxFeedItemCount = maxFeedItemCount,
@@ -249,45 +253,48 @@ class RssLocalSync(override val di: DI) : DIAware {
         // Alternate based on Nostr feed
 
         return if (url.isAdaptedUrlFromNostrUri()) {
-            Either.catching(
-                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
-            ) {
-                feedParser.getProfileMetadata(url).getOrNull() ?: throw NostrMetadataException("Could not find metadata for $url")
-            }.flatMap { profile ->
-                feedParser.findNostrFeed(profile)
-                    .map {
-                        it.copy(description = application.applicationContext.getString(R.string.nostr_feed_description, profile.name))
-                    }
-            }
-        } else {
-            Either.catching(
-                onCatch = { t ->
-                    FetchError(url = url.toString(), throwable = t)
-                },
-            ) {
-                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
-            }.flatMap { response ->
-                response.use {
-                    if (response.isSuccessful) {
-                        response.body?.let { responseBody ->
-                            feedParser.parseFeedResponse(
-                                response.request.url.toUrl(),
-                                responseBody,
-                            )
-                        } ?: NoBody(url = url.toString()).left()
-                    } else {
-                        response.retryAfterSeconds?.let { retryAfterSeconds ->
-                            logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+            Either
+                .catching(
+                    onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+                ) {
+                    feedParser.getProfileMetadata(url).getOrNull() ?: throw NostrMetadataException("Could not find metadata for $url")
+                }.flatMap { profile ->
+                    feedParser
+                        .findNostrFeed(profile)
+                        .map {
+                            it.copy(description = application.applicationContext.getString(R.string.nostr_feed_description, profile.name))
                         }
-                        HttpError(
-                            url = url.toString(),
-                            code = response.code,
-                            retryAfterSeconds = response.retryAfterSeconds,
-                            message = response.message,
-                        ).left()
+                }
+        } else {
+            Either
+                .catching(
+                    onCatch = { t ->
+                        FetchError(url = url.toString(), throwable = t)
+                    },
+                ) {
+                    okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
+                }.flatMap { response ->
+                    response.use {
+                        if (response.isSuccessful) {
+                            response.body?.let { responseBody ->
+                                feedParser.parseFeedResponse(
+                                    response.request.url.toUrl(),
+                                    responseBody,
+                                )
+                            } ?: NoBody(url = url.toString()).left()
+                        } else {
+                            response.retryAfterSeconds?.let { retryAfterSeconds ->
+                                logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+                            }
+                            HttpError(
+                                url = url.toString(),
+                                code = response.code,
+                                retryAfterSeconds = response.retryAfterSeconds,
+                                message = response.message,
+                            ).left()
+                        }
                     }
                 }
-            }
         }.map {
             // Double check that icon is not base64
             when {
@@ -319,8 +326,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                                 }
 
                             it to guid
-                        }
-                        ?.reversed()
+                        }?.reversed()
                         ?.mapNotNull { (item, guid) ->
                             // Always attempt to load existing items using both id schemes
                             // Id is rewritten to preferred on update
@@ -353,7 +359,8 @@ class RssLocalSync(override val di: DI) : DIAware {
 
                 repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
                     filePathProvider.articleDir.mkdirs()
-                    blobOutputStream(feedItem.id, filePathProvider.articleDir).bufferedWriter()
+                    blobOutputStream(feedItem.id, filePathProvider.articleDir)
+                        .bufferedWriter()
                         .use {
                             it.write(text)
                         }
@@ -369,7 +376,8 @@ class RssLocalSync(override val di: DI) : DIAware {
                         }
                     if (siteUrl != null) {
                         feedSql.siteFetched = Instant.now()
-                        feedParser.getSiteMetaData(siteUrl)
+                        feedParser
+                            .getSiteMetaData(siteUrl)
                             .onRight { metadata ->
                                 try {
                                     feedSql.imageUrl = URL(metadata.feedImage)
@@ -441,8 +449,8 @@ class RssLocalSync(override val di: DI) : DIAware {
         feedId: Long,
         tag: String,
         staleTime: Long = -1L,
-    ): List<Feed> {
-        return when {
+    ): List<Feed> =
+        when {
             feedId > 0 -> {
                 val feed =
                     if (staleTime > 0) {
@@ -475,7 +483,6 @@ class RssLocalSync(override val di: DI) : DIAware {
 
             else -> if (staleTime > 0) repository.syncLoadFeedsIfStale(staleTime, retryAfter = Instant.now()) else repository.syncLoadFeeds(retryAfter = Instant.now())
         }
-    }
 
     companion object {
         private const val LOG_TAG = "FEEDER_RssLocalSync"

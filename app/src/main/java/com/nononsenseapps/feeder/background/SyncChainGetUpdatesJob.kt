@@ -19,7 +19,8 @@ import org.kodein.di.instance
 class SyncChainGetUpdatesJob(
     context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
 
     private val syncClient: SyncRestClient by instance()
@@ -61,7 +62,8 @@ fun runOnceSyncChainGetUpdates(di: DI) {
 
     val componentName = ComponentName(context, FeederJobService::class.java)
     val jobInfo =
-        JobInfo.Builder(BackgroundJobId.SYNC_CHAIN_GET_UPDATES.jobId, componentName)
+        JobInfo
+            .Builder(BackgroundJobId.SYNC_CHAIN_GET_UPDATES.jobId, componentName)
             .setRequiresCharging(repository.syncOnlyWhenCharging.value)
             .setRequiredNetworkType(
                 if (repository.syncOnlyOnWifi.value) {
@@ -69,8 +71,7 @@ fun runOnceSyncChainGetUpdates(di: DI) {
                 } else {
                     JobInfo.NETWORK_TYPE_ANY
                 },
-            )
-            .build()
+            ).build()
 
     jobScheduler.schedule(jobInfo)
 }

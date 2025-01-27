@@ -51,7 +51,11 @@ class FeedParserTest : DIAware {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
             val feeds =
-                feedParser.getSiteMetaData(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A")).getOrNull()!!.alternateFeedLinks.first()
+                feedParser
+                    .getSiteMetaData(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
+                    .getOrNull()!!
+                    .alternateFeedLinks
+                    .first()
             assertEquals(
                 AlternateLink(
                     URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw"),
@@ -372,7 +376,15 @@ class FeedParserTest : DIAware {
         runBlocking {
             val feed = golemDe.use { feedParser.parseFeedResponse(it) }
 
-            assertEquals(true, feed.getOrNull()?.items?.get(0)?.content_text?.contains("größte"))
+            assertEquals(
+                true,
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.content_text
+                    ?.contains("größte"),
+            )
         }
 
     // Bug in Rome which I am working around, this will crash if not worked around
@@ -385,8 +397,17 @@ class FeedParserTest : DIAware {
             assertEquals(1, feed.getOrNull()?.items?.size)
             assertEquals(
                 true,
-                feed.getOrNull()?.items?.get(0)?.content_text?.contains("größte"),
-                feed.getOrNull()?.items?.get(0)?.content_text!!,
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.content_text
+                    ?.contains("größte"),
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.content_text!!,
             )
         }
 
@@ -398,7 +419,11 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
-                feed.getOrNull()?.items?.first()?.url,
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.first()
+                    ?.url,
             )
         }
 
@@ -440,11 +465,30 @@ class FeedParserTest : DIAware {
             assertEquals("https://lineageos.org/", feed.getOrNull()!!.home_page_url)
             assertEquals("https://lineageos.org/feed.xml", feed.getOrNull()!!.feed_url)
 
-            assertEquals("https://lineageos.org/Changelog-16", feed.getOrNull()?.items?.get(0)?.id)
-            assertEquals("https://lineageos.org/Changelog-16/", feed.getOrNull()?.items?.get(0)?.url)
+            assertEquals(
+                "https://lineageos.org/Changelog-16",
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.id,
+            )
+            assertEquals(
+                "https://lineageos.org/Changelog-16/",
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.url,
+            )
             assertEquals(
                 "https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png",
-                feed.getOrNull()?.items?.get(0)?.image?.url,
+                feed
+                    .getOrNull()
+                    ?.items
+                    ?.get(0)
+                    ?.image
+                    ?.url,
             )
         }
 
@@ -968,7 +1012,8 @@ class FeedParserTest : DIAware {
     fun timestampsAreParsedWithCorrectTimezone() {
         runBlocking {
             val feed =
-                feedParser.parseFeedResponse(URL("https://www.bleepingcomputer.com/feed/"), rssBleepingComputer)
+                feedParser
+                    .parseFeedResponse(URL("https://www.bleepingcomputer.com/feed/"), rssBleepingComputer)
                     .getOrElse { throw it.throwable!! }
 
             // Thu, 14 Mar 2024 14:08:43 -0400"
@@ -996,7 +1041,8 @@ class FeedParserTest : DIAware {
         block: suspend (String) -> T,
     ): T {
         val body =
-            javaClass.getResourceAsStream(asdf)!!
+            javaClass
+                .getResourceAsStream(asdf)!!
                 .bufferedReader()
                 .use(BufferedReader::readText)
 
@@ -1006,7 +1052,8 @@ class FeedParserTest : DIAware {
     }
 
     private fun getCowboyHtml(): String =
-        javaClass.getResourceAsStream("cowboyprogrammer.html")!!
+        javaClass
+            .getResourceAsStream("cowboyprogrammer.html")!!
             .bufferedReader()
             .use {
                 it.readText()
@@ -1133,21 +1180,23 @@ class FeedParserTest : DIAware {
         contentType: String? = "application/xml",
     ): Response {
         val responseBody: ResponseBody =
-            javaClass.getResourceAsStream(resourceName)!!
+            javaClass
+                .getResourceAsStream(resourceName)!!
                 .use { it.readBytes() }
                 .toResponseBody(contentType?.toMediaTypeOrNull())
 
-        return Response.Builder()
+        return Response
+            .Builder()
             .body(responseBody)
             .protocol(Protocol.HTTP_2)
             .code(200)
             .message("Test")
             .request(
-                Request.Builder()
+                Request
+                    .Builder()
                     .url(url)
                     .build(),
-            )
-            .build()
+            ).build()
     }
 }
 

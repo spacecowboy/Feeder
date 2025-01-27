@@ -69,7 +69,13 @@ class FeedParserClientTest : DIAware {
             },
         )
 
-        val url = server.url("/foo").newBuilder().username("user").build().toUrl()
+        val url =
+            server
+                .url("/foo")
+                .newBuilder()
+                .username("user")
+                .build()
+                .toUrl()
 
         assertTrue {
             url.userInfo == "user"
@@ -168,6 +174,14 @@ class FeedParserClientTest : DIAware {
             val url = server.url("/foo").toUrl()
             // This should not crash
             val result = feedParser.parseFeedUrl(url)
-            assertEquals("http://www.questionablecontent.net/comics/4776.png", result.getOrNull()?.items?.first()?.image?.url)
+            assertEquals(
+                "http://www.questionablecontent.net/comics/4776.png",
+                result
+                    .getOrNull()
+                    ?.items
+                    ?.first()
+                    ?.image
+                    ?.url,
+            )
         }
 }
