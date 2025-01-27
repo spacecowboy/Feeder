@@ -62,22 +62,22 @@ class SyncScreenViewModel(
     fun setSyncCode(value: String) {
         val possibleUrlCode = value.syncCodeQueryParam
 
-        val syncCode =
+        val code =
             if (possibleUrlCode.length == 64) {
                 possibleUrlCode
             } else {
                 value
             }
 
-        state["syncCode"] = syncCode
-        syncCode.update { syncCode }
+        state["syncCode"] = code
+        syncCode.update { code }
     }
 
     fun setSecretKey(value: String) {
-        val secretKey = value.secretKeyQueryParam
+        val key = value.secretKeyQueryParam
 
-        state["secretKey"] = secretKey
-        secretKey.update { secretKey }
+        state["secretKey"] = key
+        secretKey.update { key }
     }
 
     fun setScreen(value: SyncScreenToShow) {
