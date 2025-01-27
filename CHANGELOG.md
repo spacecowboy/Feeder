@@ -1,4 +1,13 @@
-# 2.8.1
+# Changelog
+
+## [2.8.2](https://github.com/spacecowboy/feeder/compare/2.8.1...2.8.2) (2025-01-27)
+
+
+### Bug Fixes
+
+* removed use of jsoup stringutil ([16f56e5](https://github.com/spacecowboy/feeder/commit/16f56e577d4938f1fb008d0108c0d1f13c89134a))
+
+## 2.8.1
 ERYpTION (1):
   * [82a2b196] Updated Danish translation using Weblate
 
@@ -38,7 +47,7 @@ zmni (1):
   * [4787d55b] Updated Chinese (Simplified Han script) translation using
          Weblate
 
-# 2.8.0
+## 2.8.0
 Agnieszka C (1):
   * [6dbedc6c] Updated Polish translation using Weblate
 
@@ -64,19 +73,19 @@ trunars (1):
 தமிழ்நேரம் (1):
   * [49a559dc] Translated using Weblate (Tamil)
 
-# 2.7.4
+## 2.7.4
 Jonas Kalderstam (2):
   * [49f3008c] fixed tablet being hardcoded to card article style
   * [cc8c9f7c] switched to JobScheduler to fix crash on older versions of
          Android (#465)
 
-# 2.7.3
+## 2.7.3
 Jonas Kalderstam (3):
   * [235228e4] removed foreground permission since it wasn't used
   * [32cb38f4] fixed missing spaces inside some tags
   * [1e7f9f68] fixed crash when a table was empty
 
-# 2.7.2
+## 2.7.2
 Agnieszka C (1):
   * [fc652d0a] Updated Polish translation using Weblate
 
@@ -136,7 +145,7 @@ zmni (1):
   * [b7e60ecf] Updated Chinese (Simplified Han script) translation using
          Weblate
 
-# 2.7.1
+## 2.7.1
 Agnieszka C (2):
   * [93f7ff7b] Updated Polish translation using Weblate
   * [55f6499b] Updated Polish translation using Weblate
@@ -181,7 +190,7 @@ trunars (2):
   * [820af2d3] Updated Chinese (Simplified Han script) translation using
          Weblate
 
-# 2.7.0
+## 2.7.0
 Alex Gavrishev (1):
   * [ca13fd47] added article summary with OpenAI integration (#399)
 
@@ -235,7 +244,7 @@ trunars (4):
 Λευτέρης Τ (1):
   * [10417ac9] Updated Greek translation using Weblate
 
-# 2.6.33
+## 2.6.33
 AlekseySaenko (1):
   * [0fc8893a] Updated Russian translation using Weblate
 
@@ -253,7 +262,7 @@ summoner001 (1):
 trunars (1):
   * [cb0dcf4a] Updated Bulgarian translation using Weblate
 
-# 2.6.32
+## 2.6.32
 Jonas Kalderstam (3):
   * [24022416] Bumped targetSDK
   * [050f3cff] Fixed runtime issue in Kotlin code
@@ -262,7 +271,7 @@ Jonas Kalderstam (3):
 fincent (1):
   * [c8440a92] Translated using Weblate (Dutch)
 
-# 2.6.31
+## 2.6.31
 George Bogdanoff (1):
   * [05df6c71] Updated Russian translation using Weblate
 
@@ -275,7 +284,7 @@ XblateX (1):
 sprin (1):
   * [7e094471] Updated Catalan translation using Weblate
 
-# 2.6.30
+## 2.6.30
 439JBYL80IGQTF25UXNR0X1BG (1):
   * [e07fe830] Updated Russian translation using Weblate
 
@@ -303,7 +312,7 @@ trunars (1):
 zmni (1):
   * [13b2fd65] Updated Indonesian translation using Weblate
 
-# 2.6.29
+## 2.6.29
 Mattia Passeri (1):
   * [2e709205e] Translated using Weblate (Italian)
 
@@ -319,7 +328,7 @@ noSé (1):
 Λευτέρης Τ (1):
   * [6ce06cd04] Updated Greek translation using Weblate
 
-# 2.6.28
+## 2.6.28
 Agnieszka C (1):
   * [9fbe413d7] Updated Polish translation using Weblate
 
@@ -368,7 +377,7 @@ trunars (1):
 大王叫我来巡山 (1):
   * [e8ddc8ea7] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.27
+## 2.6.27
 Jonas Kalderstam (3):
   * [f23390ed0] Fixed nested content inside blockquotes
   * [5bdd17043] Fixed crash for some images
@@ -380,7 +389,7 @@ Sven Jacobs (1):
 ngocanhtve (1):
   * [1e0fc0fae] Updated Vietnamese translation using Weblate
 
-# 2.6.26
+## 2.6.26
 Agnieszka C (1):
   * [7fd77f475] Updated Polish translation using Weblate
 
@@ -417,7 +426,7 @@ pchelium (1):
 大王叫我来巡山 (1):
   * [85001e889] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.25
+## 2.6.25
 Jonas Kalderstam (6):
   * [dea0a7092] Updated release pipeline to always publish APKs even if Play
          store is dumb
@@ -445,11 +454,11 @@ v1s7 (1):
 Λευτέρης Τ (1):
   * [817acf02f] Updated Greek translation using Weblate
 
-# 2.6.24
+## 2.6.24
 Jonas Kalderstam (1):
   * [8a86acbd] Fixed performance when many entries in blocklist
 
-# 2.6.23
+## 2.6.23
 Aitor Salaberria (1):
   * [d719ced2] Translated using Weblate (Basque)
 
@@ -479,7 +488,7 @@ ngocanhtve (1):
 zmni (1):
   * [b56e987b] Updated Indonesian translation using Weblate
 
-# 2.6.22
+## 2.6.22
 Jonas Kalderstam (4):
   * [166390e5] Fixed so sync will never run when no network available
   * [eac1b124] Fixed performance of NavDrawer. If you have many feeds you
@@ -497,7 +506,7 @@ atilluF (1):
 lucasmz (1):
   * [b62bf581] Updated Portuguese (Brazil) translation using Weblate
 
-# 2.6.21
+## 2.6.21
 Jonas Kalderstam (2):
   * [0d564b74] Fixed Settings preview
   * [1090fcba] Tweaked Cache-Control headers to respect site headers even
@@ -524,7 +533,7 @@ trunars (1):
 Сергій (1):
   * [f8961a42] Updated Ukrainian translation using Weblate
 
-# 2.6.20
+## 2.6.20
 Agnieszka C (1):
   * [f13c3c3f] Updated Polish translation using Weblate
 
@@ -576,7 +585,7 @@ pchelium (1):
 大王叫我来巡山 (1):
   * [8dd7ee20] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.19
+## 2.6.19
 Eduardo (1):
   * [b128dfdc] Translated using Weblate (Portuguese (Brazil))
 
@@ -598,7 +607,7 @@ trunars (1):
 Сергій (1):
   * [c3ac47bd] Updated Ukrainian translation using Weblate
 
-# 2.6.18
+## 2.6.18
 Agnieszka C (1):
   * [2a4acaef] Updated Polish translation using Weblate
 
@@ -636,7 +645,7 @@ v1s7 (1):
 大王叫我来巡山 (1):
   * [dc9417bb] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.17
+## 2.6.17
 Agnieszka C (1):
   * [735920e6] Translated using Weblate (Polish)
 
@@ -684,7 +693,7 @@ v1s7 (1):
 Сергій (1):
   * [d7392440] Translated using Weblate (Ukrainian)
 
-# 2.6.16
+## 2.6.16
 Jonas Kalderstam (1):
   * [78919404] Added ability to export saved articles
 
@@ -730,7 +739,7 @@ v1s7 (1):
 大王叫我来巡山 (1):
   * [01ccc9d2] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.15
+## 2.6.15
 Agnieszka C (1):
   * [d8d3b6e0] Updated Polish translation using Weblate
 
@@ -776,7 +785,7 @@ zmni (1):
 大王叫我来巡山 (1):
   * [2fa7266b] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.14
+## 2.6.14
 Jonas Kalderstam (1):
   * [ff495c38] Fixed mark as read on scroll also marking items when opening
          items
@@ -784,7 +793,7 @@ Jonas Kalderstam (1):
 trunars (1):
   * [958df8ca] Updated Bulgarian translation using Weblate
 
-# 2.6.13
+## 2.6.13
 Dritan Taulla (1):
   * [39b9434c] Updated Albanian translation using Weblate
 
@@ -809,7 +818,7 @@ bowornsin (1):
 Сергій (1):
   * [b1c004f7] Updated Ukrainian translation using Weblate
 
-# 2.6.12
+## 2.6.12
 Jonas Kalderstam (9):
   * [0044d6b1] Fixed small images being rendered too large and flickering on
          scroll
@@ -856,7 +865,7 @@ zmni (1):
 Сергій (1):
   * [f7c2c9f7] Updated Ukrainian translation using Weblate
 
-# 2.6.11
+## 2.6.11
 Aitor Salaberria (1):
   * [a8431296] Translated using Weblate (Basque)
 
@@ -879,7 +888,7 @@ Vitor Henrique (1):
 bittin1ddc447d824349b2 (1):
   * [0658b474] Updated Swedish translation using Weblate
 
-# 2.6.10
+## 2.6.10
 Agnieszka C (1):
   * [1bedec87] Updated Polish translation using Weblate
 
@@ -929,7 +938,7 @@ berhat gergin (1):
 gallegonovato (1):
   * [c7a535c6] Updated Spanish translation using Weblate
 
-# 2.6.9
+## 2.6.9
 Jonas Kalderstam (11):
   * [2bdade90] Fixed crash when table had no columns
   * [03924c15] Fixed crash when trying to TTS play a missing file
@@ -950,7 +959,7 @@ Kazushi Hayama (1):
 Vitor Henrique (1):
   * [28063c3d] Translated using Weblate (Portuguese)
 
-# 2.6.8
+## 2.6.8
 Agnieszka C (1):
   * [2ffda1a6] Updated Polish translation using Weblate
 
@@ -987,7 +996,7 @@ ngocanhtve (1):
 zmni (1):
   * [6bdfaad2] Updated Indonesian translation using Weblate
 
-# 2.6.7-1
+## 2.6.7-1
 Harsha0431 (1):
   * [b23fd0b6] Updated Telugu translation using Weblate
 
@@ -1010,7 +1019,7 @@ ngocanhtve (1):
 trunars (1):
   * [010a2f96] Translated using Weblate (Bulgarian)
 
-# 2.6.7
+## 2.6.7
 Cleydison Nascimento (1):
   * [e736f383] Updated Portuguese (Brazil) translation using Weblate
 
@@ -1036,11 +1045,11 @@ ngocanhtve (1):
 trunars (1):
   * [010a2f96] Translated using Weblate (Bulgarian)
 
-# 2.6.6
+## 2.6.6
 bowornsin (1):
   * [cac00ff3] Updated Thai translation using Weblate
 
-# 2.6.5
+## 2.6.5
 Agnieszka C (1):
   * [5fa3ac9e] Updated Polish translation using Weblate
 
@@ -1068,7 +1077,7 @@ Retrial (1):
 eevan78 (1):
   * [1c5976d4] Updated Serbian translation using Weblate
 
-# 2.6.4
+## 2.6.4
 Jonas Kalderstam (7):
   * [ef1a65b0] Improved OPML import when files are incorrect
   * [2f564e62] Some gradle housekeeping
@@ -1086,7 +1095,7 @@ Belmar Begić (1):
 zmni (1):
   * [b70c5274] Updated Indonesian translation using Weblate
 
-# 2.6.3
+## 2.6.3
 Jonas Kalderstam (2):
   * [77ec797b] Changed so sync will try to fetch the favicon of a site if no
          feed image (one time only)
@@ -1095,7 +1104,7 @@ Jonas Kalderstam (2):
 YGXB_net (1):
   * [278355d1] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.2
+## 2.6.2
 Axus Wizix (1):
   * [ec5281aa] Updated Russian translation using Weblate
 
@@ -1110,7 +1119,7 @@ Jonas Kalderstam (6):
 YGXB_net (1):
   * [1824a3cf] Updated Chinese (Simplified) translation using Weblate
 
-# 2.6.1
+## 2.6.1
 Jonas Kalderstam (6):
   * [08295427] Fixed a crash if device was removed from sync chain
   * [7f4ec4f6] Implemented Either from Arrow
@@ -1199,7 +1208,7 @@ zmni (1):
 عمار (1):
   * [8def65df] Updated Arabic translation using Weblate
 
-# 2.6.0
+## 2.6.0
 Agnieszka C (1):
   * [3ae0d2ab] Updated Polish translation using Weblate
 
@@ -1243,7 +1252,7 @@ Matth78 (1):
 Weblate (bot) (1):
   * [6fb87310] Updated Czech translation using Weblate (#80)
 
-# 2.5.0
+## 2.5.0
 Agnieszka C (1):
   * [0818b4a7] Updated Polish translation using Weblate
 
@@ -1341,7 +1350,7 @@ mm4c (1):
 ssantos (1):
   * [f8e72164] Updated Portuguese (Portugal) translation using Weblate
 
-# 2.4.20
+## 2.4.20
 J. Lavoie (1):
   * [7c9ea4d7] Updated Italian translation using Weblate
 
@@ -1362,7 +1371,7 @@ Vitor Henrique (1):
 zmni (1):
   * [30e88bc1] Updated Indonesian translation using Weblate
 
-# 2.4.19
+## 2.4.19
 Alexthegib (1):
   * [9a6ec389] Updated Portuguese (Portugal) translation using Weblate
 
@@ -1389,7 +1398,7 @@ bowornsin (1):
 pchelium (1):
   * [491e0545] Updated Czech translation using Weblate
 
-# 2.4.18
+## 2.4.18
 Agnieszka C (1):
   * [565de63c] Updated Polish translation using Weblate
 
@@ -1425,7 +1434,7 @@ WB (1):
 Wolfgang (1):
   * [4fcf1af2] Updated German translation using Weblate
 
-# 2.4.17
+## 2.4.17
 Jonas Kalderstam (10):
   * [71835f81] Fixed possible crash during article parsing
   * [36f08f92] Fixed charset detection for sites not using UTF-8
@@ -1448,7 +1457,7 @@ S3aBreeze (1):
 mm4c (1):
   * [16ce2cb1] Updated Dutch translation using Weblate
 
-# 2.4.16
+## 2.4.16
 Jonas Kalderstam (11):
   * [3493e09b] Added global notifications setting as an alternative way to
          toggle feed notifications
@@ -1521,7 +1530,7 @@ zmni (2):
   * [936ee470] Updated Indonesian translation using Weblate
   * [647040b6] Updated Indonesian translation using Weblate
 
-# 2.4.15
+## 2.4.15
 Jonas Kalderstam (15):
   * [6838e46a] Updated versions
   * [8cd2453a] Changed to official upsert
@@ -1544,7 +1553,7 @@ Jonas Kalderstam (15):
   * [e23ecb47] Improved reader screen performance
   * [6bf00a09] Fixed display of nested figures in reader
 
-# 2.4.14
+## 2.4.14
 Jonas Kalderstam (4):
   * [9251378d] Added TW title
   * [f6bd778e] Updated UserAgent to explain what the app is for server
@@ -1558,7 +1567,7 @@ Subham Jena (1):
 yangyangdaji (1):
   * [f86db9ca] Translated using Weblate (Chinese (Traditional))
 
-# 2.4.13
+## 2.4.13
 Hotarun (1):
   * [a25e1cbb] Updated Russian translation using Weblate
 
@@ -1575,7 +1584,7 @@ Jonas Kalderstam (9):
   * [cf81e5e5] Fixed so release script can generate config locales
   * [2854679f] Tweaked release script
 
-# 2.4.12
+## 2.4.12
 Belmar Begić (1):
   * [9157af8f] Updated Bosnian translation using Weblate
 
@@ -1593,7 +1602,7 @@ Zayed Al-Saidi (1):
 fincent (1):
   * [b502d1ff] Updated Dutch translation using Weblate
 
-# 2.4.11
+## 2.4.11
 Juraj Liso (1):
   * [61a263f3] Added Slovak translation using Weblate
 
@@ -1603,7 +1612,7 @@ Parsa (1):
 Zayed Al-Saidi (1):
   * [3b48b9b8] Translated using Weblate (Arabic)
 
-# 2.4.10
+## 2.4.10
 Jonas Kalderstam (3):
   * [c2010a4f] Disabled emulator tests on github
   * [24a024f5] Upgraded kotlin, compose compiler and compose BOM
@@ -1611,7 +1620,7 @@ Jonas Kalderstam (3):
 S-H-Y-A (1):
   * [6a786c1f] Translated using Weblate (Japanese)
 
-# 2.4.9
+## 2.4.9
 Aitor Salaberria (1):
   * [3d295d48] Updated Basque translation using Weblate
 
@@ -1627,7 +1636,7 @@ jc (1):
 zmni (1):
   * [6a822bb8] Updated Indonesian translation using Weblate
 
-# 2.4.8
+## 2.4.8
 Carles Muñoz Gorriz (1):
   * [be63937d] Updated Catalan translation using Weblate
 
@@ -1651,7 +1660,7 @@ gallegonovato (1):
 mm4c (1):
   * [c45efb88] Updated Dutch translation using Weblate
 
-# 2.4.7
+## 2.4.7
 Agnieszka C (1):
   * [173a35ca] Updated Polish translation using Weblate
 
@@ -1721,7 +1730,7 @@ gallegonovato (1):
 zmni (1):
   * [163f27ae] Updated Indonesian translation using Weblate
 
-# 2.4.6
+## 2.4.6
 Aitor (2):
   * [69989627] Translated using Weblate (Basque)
   * [21629a41] Updated Basque translation using Weblate
@@ -1741,7 +1750,7 @@ Skrripy (1):
   * [05f2f077] Translated using Weblate
   
 
-# 2.4.6
+## 2.4.6
 Aitor (2):
   * [69989627] Translated using Weblate (Basque)
   * [21629a41] Updated Basque translation using Weblate
@@ -1760,7 +1769,7 @@ Retrial (1):
 Skrripy (1):
   * [05f2f077] Translated using Weblate (Ukrainian)
 
-# 2.4.6
+## 2.4.6
 Aitor (2):
   * [69989627] Translated using Weblate (Basque)
   * [21629a41] Updated Basque translation using Weblate
@@ -1793,7 +1802,7 @@ wackbyte (1):
 Ícar N. S (1):
   * [dabcdbd2] Updated Catalan translation using Weblate
 
-# 2.4.5
+## 2.4.5
 Jonas Kalderstam (3):
   * [7a26e00d] Fixed crash when sharing link to Feeder
   * [1ce1f6b0] Upgraded some versions
@@ -1806,7 +1815,7 @@ José Cabeda (1):
 bowornsin (1):
   * [d9b58d61] Updated Thai translation using Weblate
 
-# 2.4.4
+## 2.4.4
 Jonas Kalderstam (5):
   * [22996d2b] Removed all static functions with DI in them
   * [3dbb26b5] Fixed crash on startup if "Sync upon app start" was enabled
@@ -1817,7 +1826,7 @@ Jonas Kalderstam (5):
 Retrial (1):
   * [9518e7e8] Translated using Weblate (Greek)
 
-# 2.4.3
+## 2.4.3
 Belmar Begić (1):
   * [b230216a] Updated Bosnian translation using Weblate
 
@@ -1833,7 +1842,7 @@ bowornsin (1):
 mm4c (1):
   * [591c92cf] Translated using Weblate (Dutch)
 
-# 2.4.2
+## 2.4.2
 Agnieszka C (1):
   * [f4bb4abf] Updated Polish translation using Weblate
 
@@ -1874,7 +1883,7 @@ haidarah esmander (1):
 zmni (1):
   * [9c13bc84] Updated Indonesian translation using Weblate
 
-# 2.4.1
+## 2.4.1
 Agnieszka C (1):
   * [86b33eb1] Updated Polish translation using Weblate
 
@@ -1916,7 +1925,7 @@ VfBFan (1):
 zmni (1):
   * [4aaaa296] Updated Indonesian translation using Weblate
 
-# 2.4.0
+## 2.4.0
 Dritan Taulla (1):
   * [fa0a128e] Updated Albanian translation using Weblate
 
@@ -1940,7 +1949,7 @@ WB (1):
 bowornsin (1):
   * [b027d0c8] Updated Thai translation using Weblate
 
-# 2.3.9
+## 2.3.9
 Aitor Salaberria (1):
   * [c7c6c271] Updated Basque translation using Weblate
 
@@ -1964,7 +1973,7 @@ bowornsin (1):
 ssantos (1):
   * [cfedc4d4] Updated Portuguese (Portugal) translation using Weblate
 
-# 2.3.8
+## 2.3.8
 ERYpTION (1):
   * [9e04ef88] Updated Danish translation using Weblate
 
@@ -1991,7 +2000,7 @@ Simona Iacob (1):
 bowornsin (1):
   * [8aa363b7] Translated using Weblate (Thai)
 
-# 2.3.7
+## 2.3.7
 Ady (1):
   * [30fab5dd] Updated French translation using Weblate
 
@@ -2051,7 +2060,7 @@ bruh (1):
 zmni (1):
   * [1dc28299] Updated Indonesian translation using Weblate
 
-# 2.3.6
+## 2.3.6
 Belmar Begić (1):
   * [9b6b5a66] Updated Bosnian translation using Weblate
 
@@ -2064,7 +2073,7 @@ Miraficus (1):
 Simona Iacob (1):
   * [db9b825d] Updated Romanian translation using Weblate
 
-# 2.3.5
+## 2.3.5
 Ady (1):
   * [4cdc88ba] Translated using Weblate (French)
 
@@ -2081,13 +2090,13 @@ liimee (1):
 zmni (1):
   * [9c1acc5b] Translated using Weblate (Indonesian)
 
-# 2.3.4
+## 2.3.4
 Jonas Kalderstam (5):
   * [7036d422] Fixed parsing of additional types of thumbnails
   * [a22aa525] Further improved thumbnail parsing
   * [943695c5] Fixed decoding where smileys would not get rendered correctly
 
-# 2.3.3
+## 2.3.3
 Agnieszka C (1):
   * [6145fb2a] Updated Polish translation using Weblate
 
@@ -2120,7 +2129,7 @@ atilluF (1):
 zmni (1):
   * [1a9efa68] Updated Indonesian translation using Weblate
 
-# 2.3.2
+## 2.3.2
 Allan Nordhøy (1):
   * [9c947b4c] Updated Norwegian Bokmål translation using Weblate
 
@@ -2164,7 +2173,7 @@ kak mi (1):
 Егор Ермаков (1):
   * [11505e3b] Updated Russian translation using Weblate
 
-# 2.3.1
+## 2.3.1
 Ady (1):
   * [65b669ec] Updated French translation using Weblate
 
@@ -2181,7 +2190,7 @@ linsui (1):
 zmni (1):
   * [e37aba0c] Updated Indonesian translation using Weblate
 
-# 2.3.0
+## 2.3.0
 
 * Upgraded to follow Material3 guidelines including dynamic colors
 * Big improvements to TTS with the help of Kevin Jiang
@@ -2321,7 +2330,7 @@ Jonas Kalderstam (74):
   * [af05221c] Fixed pipeline deps
   * [38401846] Moved Mark All As Read to top of the menu
 
-# 2.2.7
+## 2.2.7
 Jonas Kalderstam (1):
   * [c333c453] Fixed mark above/below as read with pinned items
 
@@ -2337,7 +2346,7 @@ Simona Iacob (1):
 мачко (1):
   * [317bdcd5] Added Bulgarian translation using Weblate
 
-# 2.2.6
+## 2.2.6
 D221 (1):
   * [f6445c30] Updated Lithuanian translation using Weblate
 
@@ -2356,7 +2365,7 @@ WB (1):
 zmni (1):
   * [b9c15802] Updated Indonesian translation using Weblate
 
-# 2.2.5
+## 2.2.5
 Agnieszka C (1):
   * [59c9f5d9] Updated Polish translation using Weblate
 
@@ -2393,11 +2402,11 @@ mm4c (1):
 Егор Ермаков (1):
   * [7dbee822] Translated using Weblate (Russian)
 
-# 2.2.4-1
+## 2.2.4-1
 Jonas Kalderstam (2):
   * [b8f4f64e] Fixed content provider preventing installs
 
-# 2.2.4
+## 2.2.4
 Artem (1):
   * [3f1e94b0] Translated using Weblate (Ukrainian)
 
@@ -2409,7 +2418,7 @@ Jonas Kalderstam (1):
   * [dea765b9] Implemented content provider so other apps can access data
          with permission
 
-# 2.2.3
+## 2.2.3
 Athanasios Plastiras (1):
   * [d3ea05e1] Updated Greek translation using Weblate
 
@@ -2430,7 +2439,7 @@ WB (1):
 Weblate (1):
   * [6c49bc96] Added Portuguese translation using Weblate
 
-# 2.2.3
+## 2.2.3
 Athanasios Plastiras (1):
   * [d3ea05e1] Updated Greek translation using Weblate
 
@@ -2443,7 +2452,7 @@ WB (1):
 Weblate (1):
   * [6c49bc96] Added Portuguese translation using Weblate
 
-# 2.2.2
+## 2.2.2
 Andrij Mizyk (1):
   * [5f9dfafd] Updated Ukrainian translation using Weblate
 
@@ -2459,7 +2468,7 @@ VfBFan (1):
 zmni (1):
   * [40ec8315] Updated Indonesian translation using Weblate
 
-# 2.2.1
+## 2.2.1
 Ady (1):
   * [41c33ece] Updated French translation using Weblate
 
@@ -2493,7 +2502,7 @@ Vitor Henrique (1):
 mm4c (1):
   * [7980253d] Updated Dutch translation using Weblate
 
-# 2.2.0
+## 2.2.0
 Ady (6):
   * [6f4bcab2] Update schema to add bookmarked status
   * [0ab5b1bb] Toggle bookmarks
@@ -2515,7 +2524,7 @@ Simone Dotto (1):
 antonpaidoslalin (1):
   * [356d1c26] Translated using Weblate (Galician)
 
-# 2.1.8
+## 2.1.8
 Ben Beaver (2):
   * [e0d24b91] Added Toki Pona translation using Weblate
   * [5be9e915] Translated using Weblate (Toki Pona)
@@ -2530,7 +2539,7 @@ Jonas Kalderstam (2):
 Vitor Henrique (1):
   * [bef7d13c] Updated Portuguese (Brazil) translation using Weblate
 
-# 2.1.7
+## 2.1.7
 Alan (1):
   * [93606b38] Updated Portuguese (Brazil) translation using Weblate
 
@@ -2552,7 +2561,7 @@ bruh (1):
 zmni (1):
   * [3ff53b65] Updated Indonesian translation using Weblate
 
-# 2.1.6
+## 2.1.6
 Agnieszka C (1):
   * [0864c9f5] Updated Polish translation using Weblate
 
@@ -2596,7 +2605,7 @@ mm4c (1):
 zmni (1):
   * [ce5d1a0d] Updated Indonesian translation using Weblate
 
-# 2.1.5
+## 2.1.5
 Andrij Mizyk (1):
   * [a3a24eb2] Updated Ukrainian translation using Weblate
 
@@ -2623,7 +2632,7 @@ Oğuz Ersen (1):
 mm4c (1):
   * [99518473] Updated Dutch translation using Weblate
 
-# 2.1.4
+## 2.1.4
 Agnieszka C (1):
   * [066ab713] Updated Polish translation using Weblate
 
@@ -2637,7 +2646,7 @@ Jonas Kalderstam (2):
   * [ce2f7648] Ktlint format
   * [b218326e] Fixed a crash introduced in 2.1.3
 
-# 2.1.3
+## 2.1.3
 Andrij Mizyk (1):
   * [059041bc] Updated Ukrainian translation using Weblate
 
@@ -2653,14 +2662,14 @@ Julian Chu (1):
 mm4c (1):
   * [9a91d313] Updated Dutch translation using Weblate
 
-# 2.1.2
+## 2.1.2
 Jonas Kalderstam (1):
   * [d06407a5] Fixed broken test
 
 mm4c (1):
   * [c7a09365] Updated Dutch translation using Weblate
 
-# 2.1.1
+## 2.1.1
 Julian Chu (1):
   * [95ea703a] Updated Chinese (Traditional) translation using Weblate
 
@@ -2679,7 +2688,7 @@ bruh (1):
 mm4c (1):
   * [6fe26dc0] Updated Dutch translation using Weblate
 
-# 2.1.0-1
+## 2.1.0-1
 Jonas Kalderstam (19):
   * [24c0c8fd] Implemented multi device sync
   * [211b1281] Fixed spaces getting replaced by + in feed titles
@@ -2751,7 +2760,7 @@ zmni (1):
 Éfrit (1):
   * [5959c512] Updated French translation using Weblate
 
-# 2.1.0
+## 2.1.0
 Agnieszka C (3):
   * [c68321b8] Updated Polish translation using Weblate
 
@@ -2823,11 +2832,11 @@ zmni (1):
 Éfrit (1):
   * [5959c512] Updated French translation using Weblate
 
-# 2.0.14
+## 2.0.14
 Jonas Kalderstam (1):
   * [90e8048c] Fixed spaces getting replaced by + in feed titles
 
-# 2.0.13
+## 2.0.13
 Anne Onyme 017 (1):
   * [896b575f] Updated French translation using Weblate
 
@@ -2856,7 +2865,7 @@ bruh (1):
 mm4c (1):
   * [9c1befbd] Updated Dutch translation using Weblate
 
-# 2.0.12
+## 2.0.12
 Agnieszka C (1):
   * [7daeddf9] Updated Polish translation using Weblate
 
@@ -2896,7 +2905,7 @@ Vitor Henrique (1):
 mm4c (1):
   * [71228fb7] Updated Dutch translation using Weblate
 
-# 2.0.11
+## 2.0.11
 Jonas Kalderstam (5):
   * [1e4ecf09] Fixed crash when opening app
   * [64b0c705] Fixed a reported crash (rare edge case)
@@ -2916,7 +2925,7 @@ gutierri (1):
 mm4c (1):
   * [2f4ed127] Updated Dutch translation using Weblate
 
-# 2.0.10
+## 2.0.10
 Jonas Kalderstam (2):
   * [6bbabe68] Fixed open in browser opening wrong link
   * [696203ea] Renamed folder to match Play store restrictions
@@ -2927,7 +2936,7 @@ Simona Iacob (1):
 mm4c (1):
   * [1ac2b331] Translated using Weblate (Dutch)
 
-# 2.0.9
+## 2.0.9
 Jonas Kalderstam (2):
   * [5c9259cc] Fixed app not respecting what to open articles with
   * [28618bc9] Fixed notifications not dismissing when reading articles
@@ -2938,7 +2947,7 @@ mm4c (1):
 zmni (1):
   * [1600cb79] Updated Indonesian translation using Weblate
 
-# 2.0.8
+## 2.0.8
 Agnieszka C (2):
   * [b8857312] Updated Polish translation using Weblate
 
@@ -2985,7 +2994,7 @@ bruh (2):
 g (1):
   * [faf4d7d3] Updated Lithuanian translation using Weblate
 
-# 2.0.7
+## 2.0.7
 Agnieszka C (1):
   * [eccc086f] Updated Polish translation using Weblate
 
@@ -3019,7 +3028,7 @@ g (1):
 zmni (1):
   * [9eb6273d] Updated Indonesian translation using Weblate
 
-# 2.0.6
+## 2.0.6
 I. Musthafa (1):
   * [f4801944] Translated using Weblate (Indonesian)
 
@@ -3043,7 +3052,7 @@ Simona Iacob (1):
 VfBFan (1):
   * [5b073871] Updated German translation using Weblate
 
-# 2.0.5
+## 2.0.5
 Agnieszka C (1):
   * [7bc1efe6] Updated Polish translation using Weblate
 
@@ -3081,7 +3090,7 @@ g (1):
 zmni (1):
   * [12554068] Updated Indonesian translation using Weblate
 
-# 2.0.4
+## 2.0.4
 Agnieszka C (1):
   * [625596b8] Updated Polish translation using Weblate
 
@@ -3109,7 +3118,7 @@ Oğuz Ersen (1):
 VfBFan (1):
   * [481dbcd5] Updated German translation using Weblate
 
-# 2.0.3
+## 2.0.3
 Allan Nordhøy (4):
   * [6f5418e3] Crowdin integration removed
   * [826a18df] Correct locale for Norwegian Bokmål
@@ -3128,7 +3137,7 @@ THANOS SIOURDAKIS (1):
 harisai (1):
   * [28fcb903] Added Telugu translation using Weblate
 
-# 2.0.2
+## 2.0.2
 Agnieszka C (1):
   * [2530f074] Updated Polish translation using Weblate
 
@@ -3173,7 +3182,7 @@ bruh (1):
 zmni (1):
   * [83b12cb6] Updated Indonesian translation using Weblate
 
-# 2.0.1
+## 2.0.1
 Felipe Alvarez (7):
   * [656a276a] Added new dark theme
 
@@ -3199,7 +3208,7 @@ VfBFan (1):
 zmni (1):
   * [18fcb357] Updated Indonesian translation using Weblate
 
-# 2.0.0
+## 2.0.0
 
 * UI layer of Feeder has been rewritten in Jetpack Compose
 * Improved accessibility
@@ -3207,7 +3216,7 @@ zmni (1):
 * Added a playback interface for TextToSpeech
 * Translation updates by the community
 
-# 2.0.0-rc.4
+## 2.0.0-rc.4
 Agnieszka C (1):
   * [89ba5aef] Updated Polish translation using Weblate
 
@@ -3256,7 +3265,7 @@ bruh (1):
 Éfrit (1):
   * [8780fab4] Translated using Weblate (French)
 
-# 2.0.0-rc.3
+## 2.0.0-rc.3
 Andrij Mizyk (2):
   * [4615622f] Updated Ukrainian translation using Weblate
 
@@ -3281,7 +3290,7 @@ Simona Iacob (1):
 VfBFan (1):
   * [575e1dc0] Updated German translation using Weblate
 
-# 2.0.0-rc.2
+## 2.0.0-rc.2
 Agnieszka C (1):
   * [b36db45a] Updated Polish translation using Weblate
 
@@ -3313,14 +3322,14 @@ Oğuz Ersen (1):
 bruh (1):
   * [5d3998ec] Updated Vietnamese translation using Weblate
 
-# 2.0.0-rc.1
+## 2.0.0-rc.1
 Jonas Kalderstam (10):
   * [f0e87b8a] Fixed accessibility descriptions
   * [fa632512] Changed to Readability4JExtended for full text parsing
   * [908efc98] Made Feeder very TalkBack compatible
   * [3fda9092] Fixed so Feeder handles rotation gracefully
 
-# 2.0.0-beta.6
+## 2.0.0-beta.6
 Jonas Kalderstam (5):
   * [08760e63] Fixed sync indicator being rendered behind top app bar
   * [92e802b0] Added ability to toggle between full text and included
@@ -3329,7 +3338,7 @@ Jonas Kalderstam (5):
   * [47c40796] Adding some fade in/out animations to empty screen
   * [d1275492] Tweaked some padding in list
 
-# 2.0.0-beta.5
+## 2.0.0-beta.5
 Jonas Kalderstam (6):
   * [0ad40b9e] Fixed incorrect decoding during parsing for some feeds
   * [d0b6ca47] Fixed color of icon in floating action bar to be white
@@ -3340,7 +3349,7 @@ Jonas Kalderstam (6):
   * [1e2fe647] Added dialog for editing feed when viewing a tag (like for
          delete)
 
-# 2.0.0-beta.4
+## 2.0.0-beta.4
 Jonas Kalderstam (10):
   * [fdb700fa] Reversed expansion icons in navigation drawer to match
          material design
@@ -3350,12 +3359,12 @@ Jonas Kalderstam (10):
   * [f5ecd777] Fixed color of status bar and navigation bar
   * [f975fda2] Fixed toolbar color in custom tab
 
-# 2.0.0-beta.3
+## 2.0.0-beta.3
 Jonas Kalderstam (2):
   * [a97a0257] Fixed some notifications not being cleared when opened
   * [3f8240f3] Fixed feeds not being possible to add after enabling R8
 
-# 2.0.0-beta.2
+## 2.0.0-beta.2
 Jonas Kalderstam (5):
   * [60694836] Renamed Norwegian play store metadata
   * [9c8f5e07] Validate fastlane deployment on 2.0.0 branch
@@ -3363,13 +3372,13 @@ Jonas Kalderstam (5):
   * [3d2aa645] Fixed mapping directive in Fastlane
   * [93b8f4c8] Added beta support to fastlane
 
-# 2.0.0-beta.1
+## 2.0.0-beta.1
 
 Complete rewrite of the UI in Jetpack Compose
 
 Expect bugs, but all features should be present.
 
-# 1.13.5
+## 1.13.5
 Jonas Kalderstam (2):
   * [b9c97797] Changed so Feeder no longer changes the URL of feeds to
          canonical selflink
@@ -3378,7 +3387,7 @@ Jonas Kalderstam (2):
 Luna Jernberg (1):
   * [850f411d] Updated Swedish translation using Weblate
 
-# 1.13.4
+## 1.13.4
 Agnieszka C (2):
   * [098172c1] Updated Polish translation using Weblate
   * [d8455440] Updated Polish translation using Weblate
@@ -3406,7 +3415,7 @@ daywalk3r666 (2):
   * [7a22bd67] Updated German translation using Weblate
   * [1ba9b59f] Updated German translation using Weblate
 
-# 1.13.3
+## 1.13.3
 Agnieszka C (1):
   * [029f7af4] Updated Polish translation using Weblate
 
@@ -3419,7 +3428,7 @@ Naveen (1):
 Nikhil Kadiyan (1):
   * [7bed6c84] Translated using Weblate (Hindi)
 
-# 1.13.2
+## 1.13.2
 Drhaal (1):
   * [c4545c2b] Use different colors when swiping to mark article as
          read/unread
@@ -3439,7 +3448,7 @@ Naveen (1):
 gutierri (1):
   * [7426f9d0] Updated Portuguese (Brazil) translation using Weblate
 
-# 1.13.1
+## 1.13.1
 Axus Wizix (1):
   * [2f4d770f] Updated Russian translation using Weblate
 
@@ -3461,7 +3470,7 @@ bruh (1):
 zmni (1):
   * [2b3e17bb] Updated Indonesian translation using Weblate
 
-# 1.13.0
+## 1.13.0
 Drhaal (1):
   * [64512d3a] Added option to set article reader on a per feed basis
 
@@ -3495,7 +3504,7 @@ ssantos (1):
 zmni (1):
   * [b351658f] Updated Indonesian translation using Weblate
 
-# 1.12.1
+## 1.12.1
 Belmar Begić (1):
   * [666f0e3c] Updated Bosnian translation using Weblate
 
@@ -3514,7 +3523,7 @@ VfBFan (1):
 cld4h (1):
   * [95e8f6df] Translated using Weblate (Chinese (Simplified))
 
-# 1.12.0
+## 1.12.0
 El Pirujo (1):
   * [ddf06c3a] Updated Spanish translation using Weblate
 
@@ -3559,7 +3568,7 @@ vachan-maker (1):
 zmni (1):
   * [ddf53f41] Updated Indonesian translation using Weblate
 
-# 1.11.3
+## 1.11.3
 Eric (1):
   * [b5a50dfb] Updated Chinese (Simplified) translation using Weblate
 
@@ -3573,7 +3582,7 @@ Jonas Kalderstam (9):
 Nikita Epifanov (1):
   * [d09adafe] Updated Russian translation using Weblate
 
-# 1.11.2
+## 1.11.2
 Eric (1):
   * [b5a50dfb] Updated Chinese (Simplified) translation using Weblate
 
@@ -3585,7 +3594,7 @@ Jonas Kalderstam (5):
 Nikita Epifanov (1):
   * [d09adafe] Updated Russian translation using Weblate
 
-# 1.11.1
+## 1.11.1
 Jonas Kalderstam (2):
   * [130137d3] Fixed database test
   * [aa9ebbd3] Maybe fixed a nullpointer error
@@ -3593,7 +3602,7 @@ Jonas Kalderstam (2):
 Nikita Epifanov (1):
   * [d09adafe] Updated Russian translation using Weblate
 
-# 1.11.0
+## 1.11.0
 Allan Nordhøy (2):
   * [4e05cb55] Updated Norwegian Bokmål translation using Weblate
 
@@ -3634,7 +3643,7 @@ zmni (1):
 Ícar N. S (1):
   * [d36e6d67] Updated Catalan translation using Weblate
 
-# 1.10.14
+## 1.10.14
 Jonas Kalderstam (2):
   * [3777ebfd] Added error reporting when trying to add a feed fails
 
@@ -3647,7 +3656,7 @@ kak mi (1):
 vachan-maker (1):
   * [1221c6f3] Updated Malayalam translation using Weblate
 
-# 1.10.13
+## 1.10.13
 Eduardo Rodrigues (1):
   * [7d01b89f] Translated using Weblate (Portuguese (Brazil))
 
@@ -3674,7 +3683,7 @@ zmni (1):
 Ícar N. S (1):
   * [c67896b7] Updated Catalan translation using Weblate
 
-# 1.10.12
+## 1.10.12
 Belmar Begić (1):
   * [07443bf7] Updated Bosnian translation using Weblate
 
@@ -3687,7 +3696,7 @@ Jonas Kalderstam (9):
 Reza Almanda (1):
   * [b088b923] Updated Indonesian translation using Weblate
 
-# 1.10.11
+## 1.10.11
 Allan Nordhøy (2):
   * [c64b4a57] Updated Norwegian Bokmål translation using Weblate
   * [853b7f0a] Translated using Weblate (Norwegian Bokmål)
@@ -3730,11 +3739,11 @@ vachan-maker (1):
 Ícar N. S (1):
   * [65b7bc99] Translated using Weblate (Catalan)
 
-# 1.10.10
+## 1.10.10
 Space Cowboy (3):
   * [b316df06] New translations from Crowdin
 
-# 1.10.9
+## 1.10.9
 Jonas Kalderstam (3):
   * [5ac2bc2c] Disabled minification due to crash on old Android
   * [0add4d20] Added comments to some strings
@@ -3742,11 +3751,11 @@ Jonas Kalderstam (3):
 Space Cowboy (5):
   * [7a715fa4] Updated translations from Crowdin
 
-# 1.10.8
+## 1.10.8
 Jonas Kalderstam (2):
   * [472dc314] Fixed reader going blank after opening a web view
 
-# 1.10.7
+## 1.10.7
 Jonas Kalderstam (22):
   * [27cd9114] Updated translations
   * [5fa9116f] Enabled minification for play and release builds
@@ -3761,13 +3770,13 @@ mezysinc (4):
   * [4044ee48] Delete .gitkeep
   * [589ac044] updated strings ptbr
 
-# 1.10.6
+## 1.10.6
 Jonas Kalderstam (5):
   * [06f7fb81] Added a scrollbar to the Reader
   * [05078389] Fixed atom feed html content being unescaped twice
   * [e8c5470d] Fixed some additional html escaping cases
 
-# 1.10.5
+## 1.10.5
 Armand Lynch (2):
   * [08b6aa7f] Adds 'mark above as read' option
   * [14c07701] Remove code duplication
@@ -3783,22 +3792,22 @@ Khar Khamal (1):
   * [6663bdf2] Update Spanish strings.xml to add one new string and correct
          other string
 
-# 1.10.4
+## 1.10.4
 Jonas Kalderstam (1):
   * [51ef23e6] App is now compiled against Android 11 (SDK-30, R)
 
-# 1.10.3
+## 1.10.3
 Jonas Kalderstam (1):
   * [4827e41c] Fixed crash when base64 encoded images were present in feeds
 
-# 1.10.2
+## 1.10.2
 Fëdor T (1):
   * [e9787dee] Updated Russian translation
 
 Muha Aliss (1):
   * [2885b218] Turkish translations added
 
-# 1.10.1
+## 1.10.1
 Jonas Kalderstam (2):
   * [b9b3bd76] Reworded tooltip to reduce confusion
   * [a4d8dd3b] Increased synchronization speed
@@ -3813,7 +3822,7 @@ aevw (1):
 linsui (1):
   * [19b64a13] Update Simplified Chinese translation
 
-# 1.10.0
+## 1.10.0
 Jonas Kalderstam (5):
   * [3a3d3689] Added preference for battery optimization
   * [0d17d374] Fixed custom tab not showing as default option for opening
@@ -3840,7 +3849,7 @@ zmni (2):
   * [8be9508a] Update Indonesian translation
   * [8bc4f4e6] Update Indonesian translation
 
-# 1.9.9
+## 1.9.9
 Jonas Kalderstam (4):
   * [b4827aaa] Fixed text formatting not updating with System night mode
 
@@ -3853,7 +3862,7 @@ Tomáš Tihlařík (1):
 aevw (1):
   * [a2ac9334] Added Portuguese (Brazil) translation
 
-# 1.9.8
+## 1.9.8
 Jonas Kalderstam (2):
   * [e3245b9c] Added 'mark as unread' to the webview menu
 
@@ -3866,7 +3875,7 @@ Michael Hynes (1):
 Sam Clie (1):
   * [bdedadd5] Fixed typo in Chinese translation
 
-# 1.9.7
+## 1.9.7
 Tomáš Tihlařík (2):
   * [251ffe8d] Updated Czech translation
   * [8d92b9ac] Updated Czech translation
@@ -3874,7 +3883,7 @@ Tomáš Tihlařík (2):
 linsui (1):
   * [a7b65165] Updated Simplified Chinese Translation
 
-# 1.9.6
+## 1.9.6
 Jonas Kalderstam (2):
   * [47bc0a5c] Fixed possible crash in case you pressed two feed items at
          once
@@ -3899,21 +3908,21 @@ linsui (1):
 zmni (1):
   * [4b67ce48] Updated Indonesian translation
 
-# 1.9.5
+## 1.9.5
 Philipp Hutterer (1):
   * [9222bf71] Bugfix: decode encoded credentials before request
 
 zmni (1):
   * [60007125] Update Indonesian translation
 
-# 1.9.4
+## 1.9.4
 Jonas Kalderstam (9):
   * [6003e84c] Fixed monospacing of pre-tags
   * [fd87f04b] Removed html formatting from titles
   * [6f6ed5ca] Added share option for feeds
   * [bfa1a293] Fixed parsing some feeds with bad server responses
 
-# 1.9.3
+## 1.9.3
 Jonas Kalderstam (4):
   * [614597d] Fixed sort order to be the minimum of syncing time and publish date
   * [5596669] Updated share menu to use modern chooser
@@ -3922,7 +3931,7 @@ Jonas Kalderstam (4):
 Tomáš Tihlařík (1):
   * [ada5da8] Updated Czech translation
 
-# 1.9.2
+## 1.9.2
 Jonas Kalderstam (2):
   * [d7eeb89] Fixed incorrect titles shown in delete dialog
 
@@ -3935,10 +3944,10 @@ Khar Khamal (1):
 Vadik Sirekanyan (1):
   * [85fc6d1] Added option for hiding thumbnails
 
-# 1.9.1
+## 1.9.1
   * [72f6d12] Disabled R9 minification to avoid crash on Android Kitkat
 
-# 1.9.0
+## 1.9.0
 Jonas Kalderstam (3):
   * [ae1338e] Added additional accessibility strings
   * [25e9602] Added dialog for deleting multiple feeds
@@ -3947,7 +3956,7 @@ Jonas Kalderstam (3):
 Khar Khamal (1):
   * [ff491f1] Updated Spanish translations
 
-# 1.8.30
+## 1.8.30
   * [49e7f76] Replaced day-night theme with manual control over themes
   * [d54ccbc] Fixed scrollbar ghosting
   * [3614f8a] Added another theme which follows system night mode
@@ -3956,91 +3965,91 @@ Khar Khamal (1):
   * [7df3dc2] Removed conscrypt
   * [e9a6dc3] Updated versions of libraries used
 
-# 1.8.29
+## 1.8.29
 *   Added a UserAgent to fix sites blocking requests
     See !214 #248
 
-# 1.8.28
+## 1.8.28
 
 * Fixed a crash when clicking on notification
 
-# 1.8.27
+## 1.8.27
 
 Minor bug fixes and tweaks.
 
-# 1.8.26
+## 1.8.26
 *   Stores feed content primarily in files instead of database
     See !209 #227
 *   More feeds should now have thumbnails displayed
     See !210 #231
 
-# 1.8.24
+## 1.8.24
 *   Fixed alignment issue in RTL layout
     See !208 #224
 *   Update Italian (it) translation
     Thanks to Emanuele Petriglia
     See !207
 
-# 1.8.23
+## 1.8.23
 *   List should once again remember where you were when you come back
     See !206 #219
 *   Spanish translation
     Thanks to Khar Khamal
     See !205
 
-# 1.8.22
+## 1.8.22
 *   Update Spanish translations
     Thanks to Khar Khamal
     See !203
 
-# 1.8.21
+## 1.8.21
 *   Long press items to open a context menu with various actions
     See !202
 *   List will now auto scroll to top when new items are downloaded if list is already at the top
     See !202
 
-# 1.8.20
+## 1.8.20
 *   Changed 'Report bug' to open the Gitlab issues page instead of an email
     See !201
 *   Updated Czech translation
     Thanks to Tomáš Tihlařík
     See !200 !199
 
-# 1.8.19
+## 1.8.19
 *   Added czech translation
     Thanks to Tomas
     See !198
 *   Added option to toggle Javascript in Webview
     See !197
 
-# 1.8.18
+## 1.8.18
 *   Indonesian translation
     Thanks to zmni
     See !196
 *   Fixed back button handling in web view
     See !195
 
-# 1.8.17
+## 1.8.17
 *   Made feed title clickable in Reader
     See !194 #205
 *   Fixed crash when notification contained items to be marked as read
     See !193 #204
 
-# 1.8.16
+## 1.8.16
 *   Fixed a null pointer crash if bare <li> tag was encountered
     See !192
 
-# 1.8.15
+## 1.8.15
 *   Improved webview: cookie dialogs should no longer be off screen
     See !190
 
-# 1.8.14
+## 1.8.14
 *   Fixed crash on tablets
     See !189 #191
 *   Fixed handling of URLs with only user (such as http://user@...)
     See !188
 
-# 1.8.13
+## 1.8.13
 *   Fixed edit dialog starting with the wrong theme
     See !187
 *   Fixed spelling error in Spanish
@@ -4052,32 +4061,32 @@ Minor bug fixes and tweaks.
 *   Fixed thumbnails not showing in Engadget feed
     See !183 #186
 
-# 1.8.12
+## 1.8.12
 *   Fixed webview being obscured by the action bar
     See !182 #179 #173
 *   Added Spanish translation
     Thanks to Khar Khamal
     See !180
 
-# 1.8.11
+## 1.8.11
 
 Removed "mark as read when scrolling". It had a bug when toggling display of read items, and it was very "surprising" to some users.
 
 Will be back when bug free and off by default.
 
-# 1.8.10
+## 1.8.10
 *   Update Simplified Chinese Translation
     Thanks to linsui
     See !179
 *   Added option to mark items as read as you scroll (defaults to true)
 
-# 1.8.9
+## 1.8.9
 *   Increased http timeouts to 30 seconds from 5 seconds
     See !175
 *   Changed so time of publication (and not just date) is shown in Article
     See !174 #61
 
-# 1.8.8
+## 1.8.8
 *   Changed plaintext conversion to stop formatting as markdown
     See !172
 *   Fixed not being able to parse dates in certain feeds
@@ -4085,7 +4094,7 @@ Will be back when bug free and off by default.
 *   Fixed so feeds without publication dates gets some when synced
     See !169 #178
 
-# 1.8.7
+## 1.8.7
 *   Added support for RTL
     Some devices might still not render perfectly though
     See !165 #176
@@ -4096,11 +4105,11 @@ Will be back when bug free and off by default.
 *   Changed so that notification actions do not open the app after pressing Back
     See !166
 
-# 1.8.6
+## 1.8.6
 *   Fixed notification "Open in"-actions not working
     See !164
 
-# 1.8.5
+## 1.8.5
 *   Fixed parsing of feeds without unique guids or links (NixOS)
     See !162
 *   Changed so feed search finds alternate links in body of documents
@@ -4125,7 +4134,7 @@ Will be back when bug free and off by default.
 *   Fixed some parsing errors on feeds with slash-comments
     See #166
 
-# 1.8.4
+## 1.8.4
 *   Fixed long blog title overlapping date
     See !149 #164
 *   Fixed crash when loading certain videos
@@ -4133,7 +4142,7 @@ Will be back when bug free and off by default.
 *   Fixed opening in browser from notification not marking as read or dismissing
     See !146 #155
 
-# 1.8.3
+## 1.8.3
 *   Tweaked colors in themes
     See !144 #159
 *   Fixed crash when loading bad images
@@ -4144,13 +4153,13 @@ Will be back when bug free and off by default.
 *   Fixed theme-specific place holder image for articles
     See !139
 
-# 1.8.2
+## 1.8.2
 *   Fixed crash when image could not be loaded on pre Lollipop
     See !138 #156
 *   Added menu item for sending a bug report via email
     See !137
 
-# 1.8.1
+## 1.8.1
 *   Fixed crash when clearing notifications
     See !136 #153
 *   Update Simplified Chinese
@@ -4160,7 +4169,7 @@ Will be back when bug free and off by default.
     Thanks to DJCrashdummy
     See !135
 
-# 1.8.0
+## 1.8.0
 *   Removed option to sync on Hotspots
     Fixed automatic synchronization never running on mobile data
     Added option to sync when app is opened
@@ -4173,13 +4182,13 @@ Will be back when bug free and off by default.
     Thanks to linsui
     See !128
 
-# 1.7.1
+## 1.7.1
 *   Fixed possible crash when marking all items as read
     See !127 #145
 *   Fixed text for show unread toggle
     See !125
 
-# 1.7.0
+## 1.7.0
 *   Moved notification toggle to options menu
     See !123 #125 #66
 *   Added a light theme
@@ -4194,14 +4203,14 @@ Will be back when bug free and off by default.
 *   Added menu option in reader to mark item as unread
     See !111 #134
 
-# 1.6.8
+## 1.6.8
 *   Fixed crash when supplying bad URL to add feed dialog
     See !110 #137
 *   Fix typo in German translation
     Thanks to Swen Krüger
     See !109
 
-# 1.6.7
+## 1.6.7
 *   Fixed crash on older Android versions when opening a web view
     See !108
 *   Fixed update of views when pressing 'mark all as read' button
@@ -4212,11 +4221,11 @@ Will be back when bug free and off by default.
     Thanks to Chris
     See !106
 
-# 1.6.6
+## 1.6.6
 
 - Fixed a crash in Reader
 
-# 1.6.5
+## 1.6.5
 *   Added support for username/password in URLs
     See !100 #128
 *   Fixed https compatibility on older versions of Android
@@ -4224,34 +4233,34 @@ Will be back when bug free and off by default.
 *   Fixed crash for HorribleSubs.info
     See !103 #131
 
-# 1.6.4
+## 1.6.4
 *   Added paging to lists
     See !99
 *   Added option for maximum number of items per feed
     See !98 #126
 
-# 1.6.3
+## 1.6.3
 *   Now all links are explicitly opened in new browser tabs
     See !97 #117
 *   Fixed buggy back stack
     See !96
 
-# 1.6.2
+## 1.6.2
 *   Block cookies from webview  
     See !95
 
-# 1.6.1
+## 1.6.1
 *   Fixed parsing of some OPML formats  
     See !94 #111
 
-# 1.6.0
+## 1.6.0
 *   Added option of how to open articles.
     One of Reader, WebView or Browser.
     See !93 #39 #102
 *   Fixed resolution of relative links
     See !92 #101
 
-# 1.5.0
+## 1.5.0
 *   Fixed notifications  
     See !91 #10 #88
 *   Changed to allow installation on internal storage  
@@ -4267,7 +4276,7 @@ Will be back when bug free and off by default.
     See !88 #96
 *   Fixed various crashes
 
-# 1.4.3
+## 1.4.3
 *   Fixed crash for missing video urls  
     See !84 #90
 *   Improved UI responsiveness but throttling database loaders
@@ -4281,11 +4290,11 @@ Will be back when bug free and off by default.
 *   Handle ENTER press in add feed dialog  
     See !77
 
-# 1.4.2
+## 1.4.2
 *   Stopped rendering script tags
     See !75 #85
 
-# 1.4.1
+## 1.4.1
 *   Fixed some translation issues which could cause crashes  
     See !74
 *   Added French translation  
@@ -4295,7 +4304,7 @@ Will be back when bug free and off by default.
     Thanks to Grzegorz Szymaszek  
     See !72
 
-# 1.4.0
+## 1.4.0
 
 This version changes the database tables slighly which means your
 read-status will be gone. Apologies for the inconvenience.
@@ -4325,15 +4334,15 @@ read-status will be gone. Apologies for the inconvenience.
 *   Added support for JSONFeed  
     See !41
 
-# 1.3.15
+## 1.3.15
 *   Fixed an installation crash on Android 5  
     See !62 #69
 
-# 1.3.14
+## 1.3.14
 *   Fixed loss of scroll position on redraw in left drawer menu  
     See !61 #57
 
-# 1.3.13
+## 1.3.13
 
 *   Add new feed now finds feed links in web pages
 
@@ -4361,39 +4370,39 @@ read-status will be gone. Apologies for the inconvenience.
 *   Target Android 26  
     See !60
 
-# 1.3.12
+## 1.3.12
 *   Changed so that an empty feed can be dragged to be refreshed  
     See !57 #40
 
-# 1.3.11
+## 1.3.11
 *   Added Italian translation  
     Thanks to Marco  
     See !56
 
-# 1.3.10
+## 1.3.10
 *   Fixed crash when toggling 'Notify for new items' on All Feeds  
     See !55 #56
 
-# 1.3.9
+## 1.3.9
 *   Fixed visibility of notify icon on certain devices  
     See !53 #55
 
-# 1.3.8
+## 1.3.8
 *   Fixed crash on older versions of Android  
     See !51 #53
 
-# 1.3.7
+## 1.3.7
 *   Added a show all option in the sidebar  
     See !50 #50
 
-# 1.3.6
+## 1.3.6
 *   Fixed crash when importing/exporting OPML on Android18  
     See !49 #51
 *   Updated russian translation  
     Thanks to Anton Shestakov  
     See !48
 
-# 1.3.5
+## 1.3.5
 *   Add tests for contributed OMPL files  
     See !47 #36
 *   Move OMPL test to correct package  
@@ -4415,7 +4424,7 @@ read-status will be gone. Apologies for the inconvenience.
 *   New german translations courtesy of @dehnhard  
     See !45
 
-# 1.3.4
+## 1.3.4
 *   Removed translations of dummy strings  
     See !43 #44
 *   Added russian translation  
@@ -4424,7 +4433,7 @@ read-status will be gone. Apologies for the inconvenience.
 *   Fixed sorting of feeds to be alphabetical  
     See !38 #41
 
-# 1.3.3
+## 1.3.3
 *   Update feed items if they exist instead of effectively ignoring them  
     See !36 #33
 *   Fallback to feed author if entry author is empty  
@@ -4442,13 +4451,13 @@ read-status will be gone. Apologies for the inconvenience.
 *   Don't render markdown links in plaintext snippets  
     See !32 #30
 
-# 1.3.2
+## 1.3.2
 *   Fix OPML export  
     See !27
 *   Add missing permission for SDK23 and below  
     See !30 #28
 *   Make read story title even more readable
 
-# 1.3.1
+## 1.3.1
 *   Make read story title even more readable  
     See !28
