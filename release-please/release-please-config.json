@@ -2,6 +2,7 @@
     "bootstrap-sha": "3b1886d7f3fbb8e2b2a1d2595fb444fd99456c72",
     "release-type": "simple",
     "include-component-in-tag": false,
+    "include-v-in-tag": false,
     "packages": {
       ".": {
         "package-name": "Feeder",
