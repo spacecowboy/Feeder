@@ -1,5 +1,14 @@
 {
+    "bootstrap-sha": "3b1886d7f3fbb8e2b2a1d2595fb444fd99456c72",
     "packages": {
-      ".": {}
+      ".": {
+        "package-name": "Feeder",
+        "exclude-paths": [
+            ".github/",
+            ".circleci/",
+            "scripts/",
+            "release-please/"
+        ]
+      }
     }
   }
