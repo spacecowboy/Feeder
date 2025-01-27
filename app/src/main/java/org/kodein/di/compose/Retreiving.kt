@@ -2,7 +2,7 @@ package org.kodein.di.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import org.kodein.di.DIProperty
+import org.kodein.di.LazyDelegate
 import org.kodein.di.factory
 import org.kodein.di.instance
 import org.kodein.di.provider
@@ -19,7 +19,7 @@ import org.kodein.di.provider
  * @throws DI.DependencyLoopException If the instance construction triggered a dependency loop.
  */
 @Composable
-inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> =
+inline fun <reified T : Any> instance(tag: Any? = null): LazyDelegate<T> =
     with(LocalDI.current) {
         remember { instance(tag = tag) }
     }
@@ -41,7 +41,7 @@ inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> =
 inline fun <reified A : Any, reified T : Any> instance(
     arg: A,
     tag: Any? = null,
-): DIProperty<T> =
+): LazyDelegate<T> =
     with(LocalDI.current) {
         remember { instance(tag = tag, arg = arg) }
     }
@@ -59,7 +59,7 @@ inline fun <reified A : Any, reified T : Any> instance(
  * @throws DI.DependencyLoopException When calling the factory function, if the instance construction triggered a dependency loop.
  */
 @Composable
-inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIProperty<(A) -> T> =
+inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): LazyDelegate<(A) -> T> =
     with(LocalDI.current) {
         remember { factory(tag = tag) }
     }
@@ -76,7 +76,7 @@ inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIPrope
  * @throws DI.DependencyLoopException When calling the provider function, if the instance construction triggered a dependency loop.
  */
 @Composable
-inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProperty<() -> T> =
+inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): LazyDelegate<() -> T> =
     with(LocalDI.current) {
         remember { provider(tag = tag) }
     }
@@ -98,7 +98,7 @@ inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProp
 inline fun <reified A : Any, reified T : Any> provider(
     arg: A,
     tag: Any? = null,
-): DIProperty<() -> T> =
+): LazyDelegate<() -> T> =
     with(LocalDI.current) {
         remember { provider(tag = tag, arg = arg) }
     }
@@ -120,7 +120,7 @@ inline fun <reified A : Any, reified T : Any> provider(
 inline fun <reified A : Any, reified T : Any> provider(
     noinline fArg: () -> A,
     tag: Any? = null,
-): DIProperty<() -> T> =
+): LazyDelegate<() -> T> =
     with(LocalDI.current) {
         remember { provider(tag = tag, arg = fArg) }
     }
