@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -41,13 +40,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -532,38 +535,16 @@ fun LinearTextContent(
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
+            val annotatedString = linearText.toAnnotatedString(onLinkClick = onLinkClick)
 
-            val annotatedString = linearText.toAnnotatedString()
-
-            // ClickableText prevents taps from deselecting selected text
-            // So use regular Text if possible
-            if (linearText.annotations.any { it.data is LinearTextAnnotationLink }) {
-                ClickableText(
-                    text = annotatedString,
-                    softWrap = softWrap,
-                    style = LocalTextStyle.current,
-                    modifier =
-                        modifier
-                            .indication(interactionSource, LocalIndication.current)
-                            .focusableInNonTouchMode(interactionSource = interactionSource),
-                ) { offset ->
-                    annotatedString
-                        .getStringAnnotations("URL", offset, offset)
-                        .firstOrNull()
-                        ?.let {
-                            onLinkClick(it.item)
-                        }
-                }
-            } else {
-                Text(
-                    text = annotatedString,
-                    softWrap = softWrap,
-                    modifier =
-                        modifier
-                            .indication(interactionSource, LocalIndication.current)
-                            .focusableInNonTouchMode(interactionSource = interactionSource),
-                )
-            }
+            Text(
+                text = annotatedString,
+                softWrap = softWrap,
+                modifier =
+                    modifier
+                        .indication(interactionSource, LocalIndication.current)
+                        .focusableInNonTouchMode(interactionSource = interactionSource),
+            )
         }
     }
 }
@@ -605,19 +586,32 @@ fun LinearBlockQuoteContent(
                 }
 
             blockQuote.cite?.let { cite ->
-                ClickableText(
-                    text = AnnotatedString(cite),
-                    modifier = Modifier.align(Alignment.End),
-                    style =
-                        MaterialTheme.typography.bodySmall.merge(
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                fontStyle = FontStyle.Italic,
+                val annotatedText =
+                    buildAnnotatedString {
+                        withLink(
+                            LinkAnnotation.Clickable(
+                                tag = cite,
+                                styles =
+                                    TextLinkStyles(
+                                        style =
+                                            MaterialTheme.typography.bodySmall.toSpanStyle().merge(
+                                                SpanStyle(
+                                                    color = MaterialTheme.colorScheme.tertiary,
+                                                    fontStyle = FontStyle.Italic,
+                                                ),
+                                            ),
+                                    ),
+                                linkInteractionListener = { onLinkClick(cite) },
                             ),
-                        ),
-                ) {
-                    onLinkClick(cite)
-                }
+                        ) {
+                            append(cite)
+                        }
+                    }
+
+                Text(
+                    text = annotatedText,
+                    modifier = Modifier.align(Alignment.End),
+                )
             }
         }
     }
@@ -822,7 +816,7 @@ val LinearElement.lazyListContentType: String
         }
 
 @Composable
-fun LinearText.toAnnotatedString(): AnnotatedString {
+fun LinearText.toAnnotatedString(onLinkClick: (String) -> Unit): AnnotatedString {
     val builder = AnnotatedString.Builder()
     builder.append(text)
     annotations.forEach { annotation ->
@@ -866,16 +860,18 @@ fun LinearText.toAnnotatedString(): AnnotatedString {
             }
 
             is LinearTextAnnotationLink -> {
-                builder.addStringAnnotation(
-                    tag = "URL",
+                builder.addLink(
+                    clickable =
+                        LinkAnnotation.Clickable(
+                            tag = data.href,
+                            styles =
+                                TextLinkStyles(
+                                    style = LinkTextStyle().toSpanStyle(),
+                                ),
+                            linkInteractionListener = { onLinkClick(data.href) },
+                        ),
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    annotation = data.href,
-                )
-                builder.addStyle(
-                    start = annotation.start,
-                    end = annotation.endExclusive,
-                    style = LinkTextStyle().toSpanStyle(),
                 )
             }
 
