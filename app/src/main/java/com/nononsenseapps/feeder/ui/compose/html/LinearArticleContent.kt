@@ -537,7 +537,7 @@ fun LinearTextContent(
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
-            val annotatedString = linearText.toAnnotatedString()
+            val annotatedString = linearText.toAnnotatedString(onLinkClick = onLinkClick)
 
             Text(
                 text = annotatedString,
@@ -821,7 +821,7 @@ val LinearElement.lazyListContentType: String
         }
 
 @Composable
-fun LinearText.toAnnotatedString(): AnnotatedString {
+fun LinearText.toAnnotatedString(onLinkClick: (String) -> Unit): AnnotatedString {
     val builder = AnnotatedString.Builder()
     builder.append(text)
     annotations.forEach { annotation ->
@@ -866,28 +866,18 @@ fun LinearText.toAnnotatedString(): AnnotatedString {
 
             is LinearTextAnnotationLink -> {
                 builder.addLink(
-                    url =
-                        LinkAnnotation.Url(
-                            url = data.href,
+                    clickable =
+                        LinkAnnotation.Clickable(
+                            tag = data.href,
                             styles =
                                 TextLinkStyles(
                                     style = LinkTextStyle().toSpanStyle(),
                                 ),
+                            linkInteractionListener = { onLinkClick(data.href) },
                         ),
                     start = annotation.start,
                     end = annotation.endExclusive,
                 )
-//                builder.addStringAnnotation(
-//                    tag = "URL",
-//                    start = annotation.start,
-//                    end = annotation.endExclusive,
-//                    annotation = data.href,
-//                )
-//                builder.addStyle(
-//                    start = annotation.start,
-//                    end = annotation.endExclusive,
-//                    style = LinkTextStyle().toSpanStyle(),
-//                )
             }
 
             LinearTextAnnotationMonospace -> {
