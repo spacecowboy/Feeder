@@ -69,7 +69,6 @@ import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
-import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.unicodeWrap
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
@@ -392,8 +391,6 @@ fun ArticleContent(
     articleListState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
-    val filePathProvider by LocalDI.current.instance<FilePathProvider>()
-
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val context = LocalContext.current

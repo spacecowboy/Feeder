@@ -148,7 +148,7 @@ fun WithTooltipIfNotBlank(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val content = remember { movableContentOf { content() } }
+    val content = remember(tooltip) { movableContentOf { content() } }
     if (tooltip.isNotBlank()) {
         PlainTooltipBox(modifier = modifier, tooltip = { Text(tooltip) }) {
             content()
