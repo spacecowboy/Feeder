@@ -279,8 +279,7 @@ fun LinearVideoContent(
                             .clip(RectangleShape)
                             .clickable {
                                 linearVideo.firstSource.link.let(onLinkClick)
-                            }
-                            .fillMaxWidth(),
+                            }.fillMaxWidth(),
                 ) {
                     val maxImageWidth by rememberMaxImageWidth()
                     val pixelDensity = LocalDensity.current.density
@@ -424,8 +423,7 @@ fun LinearImageContent(
                             enabled = linearImage.link != null,
                         ) {
                             linearImage.link?.let(onLinkClick)
-                        }
-                        .fillMaxWidth(),
+                        }.fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
                 val pixelDensity = LocalDensity.current.density
@@ -688,12 +686,10 @@ fun CodeBlock(
                         } else {
                             this
                         }
-                    }
-                    .indication(
+                    }.indication(
                         interactionSource,
                         LocalIndication.current,
-                    )
-                    .focusableInNonTouchMode(interactionSource = interactionSource),
+                    ).focusableInNonTouchMode(interactionSource = interactionSource),
         ) {
             Box(
                 contentAlignment = Alignment.TopStart,
@@ -761,8 +757,7 @@ fun LinearTableContent(
                                     end = Offset(size.width, size.height),
                                 )
                             }
-                        }
-                        .padding(4.dp),
+                        }.padding(4.dp),
             ) {
                 val cellItem = linearTable.cellAt(row = row, col = column)
                 cellItem?.let {
