@@ -158,7 +158,7 @@ class ArticleViewModel(
                 articleTitle = article?.title ?: "",
                 showToolbarMenu = toolbarVisible,
                 feedDisplayTitle = article?.feedDisplayTitle ?: "",
-                isBookmarked = article?.bookmarked ?: false,
+                isBookmarked = article?.bookmarked == true,
                 wordCount =
                     if (isFullText) {
                         article?.wordCountFull ?: 0

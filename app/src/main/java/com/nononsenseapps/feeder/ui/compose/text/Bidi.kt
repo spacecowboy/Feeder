@@ -18,7 +18,7 @@ inline fun WithBidiDeterminedLayoutDirection(
             Bidi(paragraph, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
         }
 
-    val content = remember { movableContentOf { content() } }
+    val content = remember(paragraph) { movableContentOf { content() } }
 
     if (bidi.baseIsLeftToRight()) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
