@@ -1,10 +1,26 @@
 package com.nononsenseapps.feeder.model.html
 
 import androidx.collection.ArrayMap
+import com.nononsenseapps.feeder.util.logDebug
+
+private const val LOG_TAG = "FEEDER_LINEAR"
 
 data class LinearArticle(
     val elements: List<LinearElement>,
-)
+) {
+    val idToIndex: Map<String, Int> =
+        elements
+            .asSequence()
+            .mapIndexedNotNull { index, element ->
+                if (element is LinearText && element.ids.isNotEmpty()) {
+                    logDebug(LOG_TAG, "mapping ${element.ids} to $index")
+                    element.ids.map { it to index }
+                } else {
+                    null
+                }
+            }.flatten()
+            .toMap()
+}
 
 /**
  * A linear element can contain other linear elements
@@ -272,11 +288,17 @@ sealed interface LinearPrimitive : LinearElement
  * Represents a text element. For example a paragraph, or a header.
  */
 data class LinearText(
+    val ids: Set<String>,
     val text: String,
     val annotations: List<LinearTextAnnotation>,
     val blockStyle: LinearTextBlockStyle,
 ) : LinearPrimitive {
-    constructor(text: String, blockStyle: LinearTextBlockStyle, vararg annotations: LinearTextAnnotation) : this(text = text, blockStyle = blockStyle, annotations = annotations.toList())
+    constructor(
+        ids: Set<String>,
+        text: String,
+        blockStyle: LinearTextBlockStyle,
+        vararg annotations: LinearTextAnnotation,
+    ) : this(ids = ids, text = text, blockStyle = blockStyle, annotations = annotations.toList())
 }
 
 enum class LinearTextBlockStyle {

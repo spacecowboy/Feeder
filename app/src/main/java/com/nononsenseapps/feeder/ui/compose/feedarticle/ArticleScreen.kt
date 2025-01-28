@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -70,6 +71,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.unicodeWrap
+import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 import java.time.ZoneId
@@ -395,6 +397,7 @@ fun ArticleContent(
 
     val context = LocalContext.current
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
+    val coroutineScope = rememberCoroutineScope()
 
     ReaderView(
         screenType = screenType,
@@ -431,8 +434,11 @@ fun ArticleContent(
         isFeedText = viewState.textToDisplay == TextToDisplay.CONTENT,
         modifier = modifier,
         articleListState = articleListState,
-    ) {
+    ) { indexOffset ->
+        var offsetCounter = indexOffset
+
         if (viewState.openAiSummary !is OpenAISummaryState.Empty) {
+            offsetCounter++
             item {
                 SummarySection(viewState.openAiSummary)
             }
@@ -443,11 +449,17 @@ fun ArticleContent(
                 TextToDisplay.CONTENT -> {
                     linearArticleContent(
                         articleContent = viewState.articleContent,
-                        onLinkClick = { link ->
-                            activityLauncher.openLink(
-                                link = link,
-                                toolbarColor = toolbarColor,
-                            )
+                        onLinkClick = { link, index ->
+                            if (index != null) {
+                                coroutineScope.launch {
+                                    articleListState.animateScrollToItem(offsetCounter + index)
+                                }
+                            } else {
+                                activityLauncher.openLink(
+                                    link = link,
+                                    toolbarColor = toolbarColor,
+                                )
+                            }
                         },
                     )
                 }

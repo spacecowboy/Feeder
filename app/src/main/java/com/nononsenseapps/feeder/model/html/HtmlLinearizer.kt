@@ -32,11 +32,10 @@ class HtmlLinearizer {
                 try {
                     Jsoup
                         .parse(inputStream, null, baseUrl)
-                        ?.body()
-                        ?.let { body ->
+                        .body()
+                        .let { body ->
                             linearizeBody(body, baseUrl)
                         }
-                        ?: emptyList()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "htmlFormattingFailed", e)
                     emptyList()
@@ -77,6 +76,8 @@ class HtmlLinearizer {
 
                 is Element -> {
                     val element = node
+                    // Id is used for in-page links
+                    pushId(element.id())
 
                     if (isHiddenByCSS(element)) {
                         // Element is not supposed to be shown because javascript and/or tracking
@@ -453,6 +454,7 @@ class HtmlLinearizer {
                                             caption =
                                                 captionText?.let {
                                                     LinearText(
+                                                        ids = linearTextBuilder.ids,
                                                         text = it,
                                                         annotations = emptyList(),
                                                         blockStyle = LinearTextBlockStyle.TEXT,
@@ -683,6 +685,10 @@ class HtmlLinearizer {
 
     private fun append(c: String) {
         linearTextBuilder.append(c)
+    }
+
+    private fun pushId(id: String) {
+        linearTextBuilder.pushId(id)
     }
 
     @Suppress("SameParameterValue")
