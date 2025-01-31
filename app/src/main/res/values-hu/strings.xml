@@ -142,7 +142,7 @@
     <string name="sync_code">Szinkronizálási kód</string>
     <string name="secret_key">Titkos kulcs</string>
     <string name="join_sync_chain">Csatlakozás szinkronizálási lánchoz</string>
-    <string name="disabled">Kikapcsolva</string>
+    <string name="disabled">Letiltva</string>
     <string name="only_from_end">Csak a végéről</string>
     <string name="from_anywhere">Bárhonnan</string>
     <string name="swipe_to_mark_as_read">Húzza félre az olvasottnak jelöléshez</string>
@@ -165,9 +165,9 @@
     <string name="touch_to_play_video">Érintse meg a videó indításhoz</string>
     <string name="open_feed">Hírfolyam megnyitása</string>
     <string name="mark_items_below_as_read">A lentebbiek megjelölése olvasottként</string>
-    <string name="battery_optimization_disabled">Ki</string>
+    <string name="battery_optimization_disabled">Kikapcsolva</string>
     <string name="battery_optimization">Akkumulátoroptimalizáció</string>
-    <string name="battery_optimization_enabled">Be</string>
+    <string name="battery_optimization_enabled">Bekapcsolva</string>
     <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_super_compact">Szuper kompakt</string>
     <string name="invalid_url">Érvénytelen webcím</string>
@@ -262,4 +262,6 @@
     <string name="show_message">Üzenet megjelenítése</string>
     <string name="open_drawer_on_fab">A hírfolyam megjelenítése miután az összes cikk meg lett jelölve olvasottként</string>
     <string name="nostr_feed_description">%1$s Nostr-cikkei</string>
+    <string name="off">Kikapcsolva</string>
+    <string name="on">Bekapcsolva</string>
 </resources>
