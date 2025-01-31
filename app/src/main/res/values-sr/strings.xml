@@ -262,4 +262,6 @@
     <string name="show_message">Прикажи поруку</string>
     <string name="open_drawer_on_fab">Када се све обележи као прочитано, прикажи изворе</string>
     <string name="nostr_feed_description">Nostr чланци по %1$s</string>
+    <string name="on">Укључено</string>
+    <string name="off">Искључено</string>
 </resources>
