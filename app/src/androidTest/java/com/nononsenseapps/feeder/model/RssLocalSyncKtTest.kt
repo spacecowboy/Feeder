@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.Feeds.Companion.RSS_WITH_DUPLICATE_GUIDS
 import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyAtom
+import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyDeletedMiddleAtom
 import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyJson
 import com.nononsenseapps.feeder.model.Feeds.Companion.nixosRss
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
@@ -103,6 +104,7 @@ class RssLocalSyncKtTest : DIAware {
     val responses = mutableMapOf<URL?, MockResponse>()
 
     private val rssLocalSync: RssLocalSync by instance()
+    private val settingsStore: SettingsStore by instance()
 
     @After
     fun stopServer() {
@@ -698,6 +700,59 @@ class RssLocalSyncKtTest : DIAware {
                     .loadFeedItemsInFeedDesc(cowboyJsonId)
                     .size,
             )
+        }
+
+    @Test
+    fun itemsAreNotDeletedIfStillInFeed(): Unit =
+        runBlocking {
+            settingsStore.setMaxCountPerFeed(1)
+
+            val atomUrl = server.url("/atom.xml").toUrl()
+            val cowboyAtomId = insertFeed("cowboyAtom", atomUrl, cowboyAtom, isJson = false, skipDuplicates = true)
+
+            rssLocalSync.syncFeeds(feedId = cowboyAtomId)
+
+            assertEquals(
+                "All items from first feed should be present",
+                15,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .size,
+            )
+
+            // Delete items
+            responses[atomUrl] =
+                MockResponse().apply {
+                    setResponseCode(200)
+                    setHeader("Content-Type", "application/xml")
+                    setBody(cowboyDeletedMiddleAtom)
+                }
+
+            rssLocalSync.syncFeeds(feedId = cowboyAtomId, forceNetwork = true)
+
+            val items =
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+
+            assertEquals(
+                "Items still in feed should be present",
+                2,
+                items.size,
+            )
+
+            val expectedGuids =
+                setOf(
+                    "https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/",
+                    "https://cowboyprogrammer.org/2014/04/advertising-thats-not-intrusive-orly/",
+                )
+
+            assertTrue("Expected the remaining items to be the ones in the feed") {
+                items.all {
+                    it.guid in expectedGuids
+                }
+            }
         }
 
     private fun fooRss(itemsCount: Int = 1): String {
