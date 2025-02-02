@@ -38,6 +38,16 @@ body:
         - Other
     validations:
       required: true
+  - type: dropdown
+    id: full_article
+    attributes:
+      label: Are you using the "Parse full article" feature?
+      multiple: false
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
   - type: input
     id: android_version
     attributes:
