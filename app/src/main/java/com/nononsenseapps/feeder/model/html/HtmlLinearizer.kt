@@ -15,8 +15,13 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
+typealias IdHolder = (String) -> Unit
+
 class HtmlLinearizer {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
+    private var idHolder: IdHolder = {
+        linearTextBuilder.pushId(it)
+    }
 
     fun linearize(
         html: String,
@@ -408,7 +413,7 @@ class HtmlLinearizer {
                                 // Wordpress likes nested figures to get images side by side
                                 val imageCandidates =
                                     element.descendantImageCandidates(baseUrl = baseUrl)
-                                        // Arstechnica has its own ideas about how to structure things
+                                    // Arstechnica has its own ideas about how to structure things
                                         ?: element.ancestorImageCandidates(baseUrl = baseUrl)
 
                                 if (imageCandidates != null) {
@@ -470,32 +475,32 @@ class HtmlLinearizer {
                         "ul", "ol" -> {
                             finalizeAndAddCurrentElement(blockStyle)
 
-                            val list =
-                                LinearList.build(ordered = element.tagName() == "ol") {
-                                    element
-                                        .children()
-                                        .filter { it.tagName() == "li" }
-                                        .forEach { listItem ->
-                                            val item =
-                                                LinearListItem {
-                                                    asElement(blockStyle) {
-                                                        linearizeChildren(
-                                                            listItem.childNodes(),
-                                                            blockStyle = it,
-                                                            baseUrl = baseUrl,
-                                                        )
-                                                    }
-                                                }
-
-                                            if (item.isNotEmpty()) {
-                                                add(item)
+                            val ordered = element.tagName() == "ol"
+                            element
+                                .children()
+                                .filter { it.tagName() == "li" }
+                                .forEachIndexed { index, listItem ->
+                                    val item =
+                                        LinearListItem(
+                                            orderedIndex = if (ordered) {
+                                                index + 1
+                                            } else {
+                                                null
+                                            },
+                                        ) {
+                                            asElement(blockStyle) {
+                                                linearizeChildren(
+                                                    listItem.childNodes(),
+                                                    blockStyle = it,
+                                                    baseUrl = baseUrl,
+                                                )
                                             }
                                         }
-                                }
 
-                            if (list.isNotEmpty()) {
-                                add(list)
-                            }
+                                    if (item.isNotEmpty()) {
+                                        add(item)
+                                    }
+                                }
                         }
 
                         "td", "th" -> {
@@ -688,7 +693,14 @@ class HtmlLinearizer {
     }
 
     private fun pushId(id: String) {
-        linearTextBuilder.pushId(id)
+        idHolder(id)
+    }
+
+    private fun withIdHolder(idHolder: IdHolder, block: () -> Unit) {
+        val oldHolder = this.idHolder
+        this.idHolder = idHolder
+        block()
+        this.idHolder = oldHolder
     }
 
     @Suppress("SameParameterValue")

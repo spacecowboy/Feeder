@@ -157,9 +157,17 @@ fun LinearElementContent(
     modifier: Modifier = Modifier,
 ) {
     when (linearElement) {
-        is LinearList ->
-            LinearListContent(
-                linearList = linearElement,
+//        is LinearList ->
+//            LinearListContent(
+//                linearList = linearElement,
+//                allowHorizontalScroll = allowHorizontalScroll,
+//                onLinkClick = onLinkClick,
+//                modifier = modifier,
+//                idToIndex = idToIndex,
+//            )
+        is LinearListItem ->
+            LinearListItemContent(
+                listItem = linearElement,
                 allowHorizontalScroll = allowHorizontalScroll,
                 onLinkClick = onLinkClick,
                 modifier = modifier,
@@ -384,11 +392,6 @@ fun LinearListContent(
         linearList.items.forEachIndexed { itemIndex, item ->
             LinearListItemContent(
                 listItem = item,
-                orderedIndex = if (linearList.ordered) {
-                    itemIndex + 1
-                } else {
-                    null
-                },
                 allowHorizontalScroll = allowHorizontalScroll,
                 idToIndex = idToIndex,
                 onLinkClick = onLinkClick,
@@ -400,7 +403,6 @@ fun LinearListContent(
 @Composable
 fun LinearListItemContent(
     listItem: LinearListItem,
-    orderedIndex: Int?,
     allowHorizontalScroll: Boolean,
     idToIndex: Map<String, Int>,
     onLinkClick: (url: String, index: Int?) -> Unit,
@@ -412,8 +414,8 @@ fun LinearListItemContent(
         modifier = modifier,
     ) {
         // List item indicator here
-        if (orderedIndex != null) {
-            Text("$orderedIndex.")
+        if (listItem.orderedIndex != null) {
+            Text("${listItem.orderedIndex}.")
         } else {
             Text("•")
         }
@@ -873,7 +875,8 @@ fun LinearTableContent(
 val LinearElement.lazyListContentType: String
     get() =
         when (this) {
-            is LinearList -> "LinearList"
+//            is LinearList -> "LinearList"
+            is LinearListItem -> "LinearListItem"
             is LinearImage -> "LinearImage"
             is LinearText -> "LinearText"
             is LinearTable -> "LinearTable"
@@ -1106,6 +1109,7 @@ private fun PreviewLinearOrderedListContent() {
             items =
                 listOf(
                     LinearListItem(
+                        orderedIndex = 1,
                         content =
                             listOf(
                                 LinearText(
@@ -1116,6 +1120,7 @@ private fun PreviewLinearOrderedListContent() {
                             ),
                     ),
                     LinearListItem(
+                        orderedIndex = 2,
                         content =
                             listOf(
                                 LinearText(
@@ -1140,6 +1145,7 @@ private fun PreviewLinearUnorderedListContent() {
             items =
                 listOf(
                     LinearListItem(
+                        orderedIndex = null,
                         content =
                             listOf(
                                 LinearText(
@@ -1150,6 +1156,7 @@ private fun PreviewLinearUnorderedListContent() {
                             ),
                     ),
                     LinearListItem(
+                        orderedIndex = null,
                         content =
                             listOf(
                                 LinearText(
@@ -1308,6 +1315,7 @@ private fun PreviewNestedTableContent() {
                                     items =
                                         listOf(
                                             LinearListItem(
+                                                orderedIndex = 1,
                                                 content =
                                                     listOf(
                                                         LinearText(
@@ -1318,6 +1326,7 @@ private fun PreviewNestedTableContent() {
                                                     ),
                                             ),
                                             LinearListItem(
+                                                orderedIndex = 2,
                                                 content =
                                                     listOf(
                                                         LinearText(
@@ -1328,6 +1337,7 @@ private fun PreviewNestedTableContent() {
                                                     ),
                                             ),
                                             LinearListItem(
+                                                orderedIndex = 3,
                                                 content =
                                                     listOf(
                                                         LinearText(
