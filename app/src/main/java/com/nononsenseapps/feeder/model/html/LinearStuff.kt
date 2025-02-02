@@ -1,15 +1,58 @@
 package com.nononsenseapps.feeder.model.html
 
 import androidx.collection.ArrayMap
+import com.nononsenseapps.feeder.util.logDebug
+
+private const val LOG_TAG = "FEEDER_LINEAR"
 
 data class LinearArticle(
     val elements: List<LinearElement>,
-)
+) {
+    val idToIndex: Map<String, Int> =
+        elements
+            .asSequence()
+            .mapIndexedNotNull { index, element ->
+                val itemIds = element.ids()
+
+                when {
+                    itemIds.isNotEmpty() -> {
+                        logDebug(LOG_TAG, "mapping $itemIds to $index")
+                        itemIds.map { it to index }
+                    }
+                    else -> null
+                }
+            }.flatten()
+            .toMap()
+}
 
 /**
  * A linear element can contain other linear elements
  */
 sealed interface LinearElement
+
+fun LinearElement.ids(): Set<String> {
+    return when(this) {
+        is LinearAudio -> emptySet() // TODO
+        is LinearBlockQuote -> idsSeq().toSet()
+        is LinearImage -> emptySet() // TODO
+        is LinearListItem -> idsSeq().toSet()
+        is LinearText -> ids
+        is LinearTable -> emptySet() // TODO
+        is LinearVideo -> emptySet() // TODO
+    }
+}
+
+fun LinearElement.idsSeq(): Sequence<String> {
+    return when (this) {
+        is LinearAudio -> emptySequence() // TODO
+        is LinearBlockQuote -> content.asSequence().flatMap { it.idsSeq() }
+        is LinearImage -> emptySequence() // TODO
+        is LinearListItem -> content.asSequence().flatMap { it.idsSeq() }
+        is LinearText -> ids.asSequence()
+        is LinearTable -> emptySequence() // TODO
+        is LinearVideo -> emptySequence() // TODO
+    }
+}
 
 /**
  * Represents a list of items, ordered or unordered
@@ -17,7 +60,7 @@ sealed interface LinearElement
 data class LinearList(
     val ordered: Boolean,
     val items: List<LinearListItem>,
-) : LinearElement {
+) {
     fun isEmpty(): Boolean = items.isEmpty()
 
     fun isNotEmpty(): Boolean = items.isNotEmpty()
@@ -46,24 +89,27 @@ data class LinearList(
  * Represents a single item in a list
  */
 data class LinearListItem(
+    // If non-null, this is part of a ordered list and this is the user-visible index
+    val orderedIndex: Int?,
     val content: List<LinearElement>,
-) {
-    constructor(block: ListBuilderScope<LinearElement>.() -> Unit) : this(content = ListBuilderScope(block).items)
+): LinearElement {
+    constructor(orderedIndex: Int?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(orderedIndex = orderedIndex, content = ListBuilderScope(block).items)
 
-    constructor(vararg elements: LinearElement) : this(content = elements.toList())
+    constructor(orderedIndex: Int?, vararg elements: LinearElement) : this(orderedIndex = orderedIndex, content = elements.toList())
 
     fun isEmpty(): Boolean = content.isEmpty()
 
     fun isNotEmpty(): Boolean = content.isNotEmpty()
 
     class Builder {
+        var orderedIndex: Int? = null
         private val content: MutableList<LinearElement> = mutableListOf()
 
         fun add(element: LinearElement) {
             content.add(element)
         }
 
-        fun build(): LinearListItem = LinearListItem(content)
+        fun build(): LinearListItem = LinearListItem(orderedIndex = orderedIndex, content = content)
     }
 
     companion object {
@@ -272,11 +318,17 @@ sealed interface LinearPrimitive : LinearElement
  * Represents a text element. For example a paragraph, or a header.
  */
 data class LinearText(
+    val ids: Set<String>,
     val text: String,
     val annotations: List<LinearTextAnnotation>,
     val blockStyle: LinearTextBlockStyle,
 ) : LinearPrimitive {
-    constructor(text: String, blockStyle: LinearTextBlockStyle, vararg annotations: LinearTextAnnotation) : this(text = text, blockStyle = blockStyle, annotations = annotations.toList())
+    constructor(
+        ids: Set<String>,
+        text: String,
+        blockStyle: LinearTextBlockStyle,
+        vararg annotations: LinearTextAnnotation,
+    ) : this(ids = ids, text = text, blockStyle = blockStyle, annotations = annotations.toList())
 }
 
 enum class LinearTextBlockStyle {

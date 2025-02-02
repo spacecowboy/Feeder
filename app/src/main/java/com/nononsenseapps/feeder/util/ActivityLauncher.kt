@@ -59,7 +59,7 @@ class ActivityLauncher(
         @ColorInt toolbarColor: Int,
         openAdjacentIfSuitable: Boolean = true,
     ): Boolean {
-        if (link.isBlank()) {
+        if (link.isBlank() || link.startsWith("#")) {
             return false
         }
         return if (link.startsWith("mailto:")) {

@@ -98,7 +98,7 @@ fun ReaderView(
     isFeedText: Boolean,
     modifier: Modifier = Modifier,
     articleListState: LazyListState = rememberLazyListState(),
-    articleBody: LazyListScope.() -> Unit,
+    articleBody: LazyListScope.(indexOffset: Int) -> Unit,
 ) {
     val dimens = LocalDimens.current
 
@@ -138,6 +138,7 @@ fun ReaderView(
                             testTag = "readerColumn"
                         },
             ) {
+                var offsetCounter = 1
                 item {
                     val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                     Column(
@@ -255,6 +256,7 @@ fun ReaderView(
                 }
 
                 if (enclosure.present) {
+                    offsetCounter++
                     item {
                         // Image will be shown in block below
                         if (!enclosure.isImage) {
@@ -316,6 +318,7 @@ fun ReaderView(
                         }
 
                     if (imageWidth > 0) {
+                        offsetCounter++
                         item {
                             BoxWithConstraints(
                                 contentAlignment = Alignment.Center,
@@ -363,7 +366,7 @@ fun ReaderView(
                     }
                 }
 
-                articleBody()
+                articleBody(offsetCounter)
 
                 // Using spacer instead of content padding because padding interferes with scrollbar
                 item {
