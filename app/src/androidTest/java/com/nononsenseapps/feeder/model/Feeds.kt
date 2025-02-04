@@ -22,6 +22,12 @@ class Feeds {
                     Companion::class.java.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() },
                 )
 
+        val cowboyDeletedMiddleAtom: String
+            get() =
+                String(
+                    Companion::class.java.getResourceAsStream("cowboyprogrammer_deleted_middle_atom.xml")!!.use { it.readBytes() },
+                )
+
         /**
          * Reported in https://gitlab.com/spacecowboy/Feeder/-/issues/410
          *

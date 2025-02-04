@@ -411,7 +411,16 @@ class RssLocalSync(
                         keepCount = max(maxFeedItemCount, items?.size ?: 0),
                     )
 
+                val presentIds =
+                    feedItemSqls
+                        .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
+
                 for (id in ids) {
+                    // Ensure we don't delete items that are still present in the feed
+                    if (id in presentIds) {
+                        continue
+                    }
+
                     blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
                         try {
                             if (file.isFile) {

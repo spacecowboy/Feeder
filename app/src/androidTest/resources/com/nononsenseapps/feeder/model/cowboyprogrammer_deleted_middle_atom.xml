@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <id>https://cowboyprogrammer.org/</id>
+  <title>Cowboy Programmer</title>
+  <updated>2018-03-05T23:00:00+02:00</updated>
+  <author>
+    <name>Space Cowboy</name>
+    <email>jonas@cowboyprogrammer.org</email>
+  </author>
+  <link rel="alternate" type="text/html" href="https://cowboyprogrammer.org/" />
+  <link rel="alternate" type="application/rss" href="https://cowboyprogrammer.org/index.xml" />
+  <link rel="alternate" type="application/json" href="https://cowboyprogrammer.org/feed.json" />
+  <generator>Hugo -- gohugo.io</generator>
+  <subtitle>Recent content in Cowboy Programmer on Cowboy Programmer</subtitle>
+  <icon>https://cowboyprogrammer.org/css/images/logo.png</icon>
+  <rights>Powered by [Hugo](//gohugo.io) and [Icarus Theme](http://themes.gohugo.io/theme/hugo-icarus/).</rights>
+
+  
+  <entry>
+    <id>https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/</id>
+    <link href="https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/" rel="alternate" />
+    <title>A comparison between fixed and variable interest rates</title>
+    <updated>2018-03-05T23:00:00+02:00</updated>
+    <author>
+      <name>Space Cowboy</name>
+      <email>jonas@cowboyprogrammer.org</email>
+    </author>
+    
+    <media:thumbnail url="https://cowboyprogrammer.org/images/2018/03/5y_avg_rates.en.png" />
+    
+    <summary type="html"><![CDATA[The data I am using is originally from SwedBank and all data and code is available at GitLab. The data contains interest rates at 5 years fixed term, 2 years fixed term, and 3 months fixed term (also called variable rate in Sweden) for those dates when any rate was changed. The first rates are from 1989-11-01 and the last are from 2018-02-12. Example of the data:
+  5y 2y 3m   Date        1989-11-22 13.]]></summary>
+    <content type="html"><![CDATA[<p>The data I am using is originally from <a href="http://hypotek.swedbank.se/rantor/historiska-rantor/">SwedBank</a> and all data and
+code is available at <a href="https://gitlab.com/spacecowboy/swedish-interest-rates">GitLab</a>. <a href="https://gitlab.com/spacecowboy/swedish-interest-rates/raw/master/swedish_interest_rates.csv">The data</a> contains interest
+rates at 5 years fixed term, 2 years fixed term, and 3 months fixed
+term (also called variable rate in Sweden) for those dates when any
+rate was changed. The first rates are from 1989-11-01 and the last are
+from 2018-02-12. Example of the data:</p>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>5y</th>
+      <th>2y</th>
+      <th>3m</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1989-11-22</th>
+      <td>13.50</td>
+      <td>13.50</td>
+      <td>12.75</td>
+    </tr>
+    <tr>
+      <th>1991-01-14</th>
+      <td>14.00</td>
+      <td>14.75</td>
+      <td>15.25</td>
+    </tr>
+    <tr>
+      <th>1993-01-13</th>
+      <td>12.75</td>
+      <td>13.00</td>
+      <td>13.75</td>
+    </tr>
+    <tr>
+      <th>1994-11-21</th>
+      <td>11.75</td>
+      <td>11.50</td>
+      <td>9.75</td>
+    </tr>
+    <tr>
+      <th>1996-03-12</th>
+      <td>9.85</td>
+      <td>8.95</td>
+      <td>9.10</td>
+    </tr>
+    <tr>
+      <th>2005-09-09</th>
+      <td>3.55</td>
+      <td>2.97</td>
+      <td>3.15</td>
+    </tr>
+    <tr>
+      <th>2005-10-03</th>
+      <td>3.69</td>
+      <td>3.09</td>
+      <td>3.15</td>
+    </tr>
+    <tr>
+      <th>2007-12-21</th>
+      <td>5.36</td>
+      <td>5.25</td>
+      <td>5.15</td>
+    </tr>
+    <tr>
+      <th>2008-01-24</th>
+      <td>5.13</td>
+      <td>4.94</td>
+      <td>5.15</td>
+    </tr>
+    <tr>
+      <th>2009-03-20</th>
+      <td>4.26</td>
+      <td>2.83</td>
+      <td>2.20</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>To make the calculations more convenient I assume that loans are only
+fixed the first day of the month. Example:</p>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>5y</th>
+      <th>2y</th>
+      <th>3m</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1990-06-01</th>
+      <td>14.50</td>
+      <td>14.50</td>
+      <td>13.95</td>
+    </tr>
+    <tr>
+      <th>1992-03-01</th>
+      <td>12.50</td>
+      <td>13.00</td>
+      <td>14.75</td>
+    </tr>
+    <tr>
+      <th>1993-06-01</th>
+      <td>10.75</td>
+      <td>10.50</td>
+      <td>11.50</td>
+    </tr>
+    <tr>
+      <th>1998-02-01</th>
+      <td>6.70</td>
+      <td>6.40</td>
+      <td>5.80</td>
+    </tr>
+    <tr>
+      <th>2001-09-01</th>
+      <td>6.55</td>
+      <td>5.95</td>
+      <td>5.90</td>
+    </tr>
+    <tr>
+      <th>2004-11-01</th>
+      <td>4.85</td>
+      <td>3.90</td>
+      <td>3.65</td>
+    </tr>
+    <tr>
+      <th>2009-05-01</th>
+      <td>4.15</td>
+      <td>2.73</td>
+      <td>1.97</td>
+    </tr>
+    <tr>
+      <th>2010-08-01</th>
+      <td>3.99</td>
+      <td>2.90</td>
+      <td>2.17</td>
+    </tr>
+    <tr>
+      <th>2011-05-01</th>
+      <td>5.29</td>
+      <td>4.39</td>
+      <td>3.88</td>
+    </tr>
+    <tr>
+      <th>2011-11-01</th>
+      <td>4.59</td>
+      <td>4.14</td>
+      <td>4.35</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If we graph the interest rates we get:</p>
+
+<p><img src="/images/2018/03/rates.en.png" alt="Interest rates over time" /></p>
+
+<p>You can see a clear peak in the variable rate when the riksbank set
+the repo rate at 500% (mortgages &ldquo;only&rdquo; reached 24%). You can also see
+that during the early nineties the variable rate was higher than the
+fixed rates during relatively long periods. But to compare the actual
+cost over the fixed term we have to compare average rates.</p>
+
+<p>For example, let us compare the actual average rates from the first of
+July 1991 during 5 years for variable rate (11.96%) and 5 years fixed
+term (12.25%). Even though with variable rate you&rsquo;d have had a rate of
+24% during a quarter you&rsquo;d still pay less in total over the 5 years.</p>
+
+<p>If the same calculation is made for every month you can see how much
+you would have earned/lost depending on when you started your fixed
+term. Since 5 years is not evenly divisible by 2 years, the 2 years
+fixed term refers to what the average rate would have been during the
+first 5 of the 6 years.</p>
+
+<p><img src="/images/2018/03/5y_avg_rates.en.png" alt="Average interest rate over 5 years" /></p>
+
+<p>It&rsquo;s quite clear that variable rate has nearly always been the most
+profitable alternative. At three seperate occasions it would have been
+more profitable to pick a 5 year fixed term: at the of 1989, the
+beginning of 1997, and in the middle of 2005. I won&rsquo;t comment on the 2
+years fixed term since it&rsquo;s not a fair comparison to only look at 5 out of
+6 years.</p>
+
+<p>If we compare 2 years fixed term with variable rate:</p>
+
+<p><img src="/images/2018/03/2y_avg_rates.en.png" alt="Average interest rate over 2 years" /></p>
+
+<p>Also here the most profitable choice is generally the variable rate
+however during times of rising interest rates getting a fixed 2 year
+term has been the better choice on several occasions. An important
+difference to the 5 years term is that you&rsquo;re not locked in for long
+when the rates finally go down again (and you&rsquo;re able to switch to
+variable rate).</p>
+
+<p>If we compare all terms during 10 years:</p>
+
+<p><img src="/images/2018/03/10y_avg_rates.en.png" alt="Average interest rate over 10 years" /></p>
+
+<p>Here it is clear that the variable rate is the most profitable.</p>
+
+<p>Even though it has been possible at certain occasions (29 years and
+only 3 short occasions!) to get a fixed term for 5 years and pay less
+overall than with variable rate, I think it&rsquo;s far too improbable that
+one is able to do it at the right time. You&rsquo;re almost guaranteed to be
+paying more in the end.</p>
+
+<p>Getting a fixed term for 2 years is more probable to be profitable,
+but even here it is more probable not to be.</p>
+]]></content>
+  </entry>
+
+  <entry>
+    <id>https://cowboyprogrammer.org/2014/04/advertising-thats-not-intrusive-orly/</id>
+    <link href="https://cowboyprogrammer.org/2014/04/advertising-thats-not-intrusive-orly/" rel="alternate" />
+    <title>Advertising, that&#39;s not intrusive. Orly?</title>
+    <updated>2014-04-07T00:00:00+00:00</updated>
+    <author>
+      <name>Space Cowboy</name>
+      <email>jonas@cowboyprogrammer.org</email>
+    </author>
+    
+    <summary type="html"><![CDATA[When you have apps in Google Play (and I imagine, other App stores as well), the amount of spam you receive instantly goes up by a factor of 10. Google&rsquo;s spam filters are pretty well trained but every now and again something gets through.
+Advertising opportunity Today&rsquo;s piece of bullshyt (I really meant to spell it like that) reads as follows (my emphasis):
+ Our premium advertisers are currently looking to buy android traffic at a very high price in apps like Nononsense Notes.]]></summary>
+    <content type="html"><![CDATA[
+
+<p>When you have apps in Google Play (and I imagine, other App stores as well), the amount of spam you receive instantly goes up by a factor of 10. Google&rsquo;s spam filters are pretty well trained but every now and again something gets through.</p>
+
+<h2 id="advertising-opportunity">Advertising opportunity</h2>
+
+<p>Today&rsquo;s piece of bullshyt (I really meant to spell it like that) reads as follows (my emphasis):</p>
+
+<blockquote>
+<p>Our premium advertisers are currently looking to buy android traffic at a very high price in apps like Nononsense Notes.</p>
+
+<p>We think you can generate up to $10 CPM with their <strong>full screen ads</strong>, which are <strong>very clean</strong>. Indeed, most of our advertisers are willing to pay, on average, between $1 and $3 per installation. You&rsquo;re free to display these ads whenever you want in your app so that it&rsquo;s <strong>not intrusive</strong>.</p>
+</blockquote>
+
+<p>Ads are by definition <em>intrusive</em>. That&rsquo;s how they nag you into buying their stupid stuff. And it doesn&rsquo;t matter how clean your ads are. Displaying them fullscreen is <em>beyond</em> intrusive. It is down right <strong>offensive</strong>.</p>
+
+<p>I uninstall anything that displays obnoxious ads, be they fullscreen or notifications, and promptly give the app a one star review. I sincerely hope others afford me the same &ldquo;courtesy&rdquo; for my apps.</p>
+]]></content>
+  </entry>
+  
+</feed>
