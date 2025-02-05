@@ -148,20 +148,13 @@ data class FeedItem
                         ?: plainText
                 ).take(MAX_SNIPPET_LENGTH)
 
-            // Make double sure no base64 images are used as thumbnails
-            val safeImage =
-                when {
-                    entry.image?.url?.startsWith("data") == true -> null
-                    else -> entry.image
-                }
-
             this.guid = entryGuid
             entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
             @Suppress("DEPRECATION")
             this.title = this.plainTitle
             this.plainSnippet = summary
 
-            this.thumbnailImage = safeImage
+            this.thumbnailImage = entry.image
             val firstEnclosure = entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()

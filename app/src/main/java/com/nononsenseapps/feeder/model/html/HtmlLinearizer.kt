@@ -849,7 +849,13 @@ class HtmlLinearizer {
             }
 
             absSrc.takeIf { it.isNotBlank() }?.let {
-                val url = resolve(baseUrl, it)
+                // inline data images can't be resolved, the result is an empty string
+                val url =
+                    if (it.startsWith("data:")) {
+                        it
+                    } else {
+                        resolve(baseUrl, it)
+                    }
                 if (width != null && height != null) {
                     result.add(
                         LinearImageSource(
