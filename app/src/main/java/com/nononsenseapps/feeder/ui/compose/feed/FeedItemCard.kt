@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +64,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
 import java.time.Instant
 
@@ -121,7 +121,7 @@ fun FeedItemCard(
                                         .data(image.url)
                                         .listener(
                                             onError = { a, b ->
-                                                Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
+                                                logDebug("FEEDER_CARD", "error ${a.data}", b.throwable)
                                             },
                                         ).scale(Scale.FIT)
                                         .size(pixels)
