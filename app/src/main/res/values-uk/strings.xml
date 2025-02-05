@@ -70,7 +70,7 @@
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Натисніть, щоб відтворити відео</string>
     <string name="no_email_client">Не можливо відкрити клієнт ел. пошти</string>
-    <string name="send_bug_report">Звіт про недолік</string>
+    <string name="send_bug_report">Надіслати звіт про помилку</string>
     <string name="sort">Сортування</string>
     <string name="sort_oldest_first">Спочатку старіші</string>
     <string name="sort_newest_first">Спочатку новіші</string>
@@ -250,4 +250,15 @@
     <string name="feed_item_style_compact_card">Компактна картка</string>
     <string name="touch_to_play_audio">Торкніться, щоб відтворити аудіо</string>
     <string name="show_title_unread_count">Показувати кількість непрочитаних статей у заголовку</string>
+    <string name="off">Вимкнути</string>
+    <string name="show_message">Відобразити повідомлення</string>
+    <string name="openai_settings">Інтеграція OpenAI</string>
+    <string name="api_key">Ключ API</string>
+    <string name="model_id">Ідентифікатор моделі</string>
+    <string name="azure_api_version">Версія Azure API</string>
+    <string name="unable_to_load_models">Не вдалося завантажити моделі.</string>
+    <string name="no_models_were_found">Моделей не знайдено</string>
+    <string name="azure_deployment_id">Ідентифікатор розгортання Azure</string>
+    <string name="list_of_available_models">Список доступних моделей</string>
+    <string name="open_drawer_on_fab">Показувати стрічки після позначення всіх прочитаними</string>
 </resources>

@@ -355,6 +355,36 @@ class HtmlLinearizerTest {
     }
 
     @Test
+    fun `simple image with inline data image`() {
+        val html =
+            "<html><body><img src=\"" +
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
+                "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==\" alt=\"Red dot\"></body></html>"
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(
+            LinearImage(
+                sources =
+                    listOf(
+                        LinearImageSource(
+                            imgUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
+                            widthPx = null,
+                            heightPx = null,
+                            pixelDensity = null,
+                            screenWidth = null,
+                        ),
+                    ),
+                caption = LinearText("Red dot", LinearTextBlockStyle.TEXT),
+                link = null,
+            ),
+            result[0],
+        )
+    }
+
+    @Test
     fun `simple figure image with figcaption`() {
         val html = "<html><body><figure><img src=\"https://example.com/image.jpg\"/><figcaption>Alt <b>t</b>ext</figcaption></figure></body></html>"
         val baseUrl = "https://example.com"

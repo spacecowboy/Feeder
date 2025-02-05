@@ -37,7 +37,7 @@ import rust.nostr.sdk.Coordinate
 import rust.nostr.sdk.Event
 import rust.nostr.sdk.Filter
 import rust.nostr.sdk.Kind
-import rust.nostr.sdk.KindEnum
+import rust.nostr.sdk.KindStandard
 import rust.nostr.sdk.Nip19Profile
 import rust.nostr.sdk.Nip21
 import rust.nostr.sdk.Nip21Enum
@@ -309,7 +309,7 @@ class FeedParser(
             Filter()
                 .author(userPubkey)
                 .kind(
-                    Kind.fromEnum(KindEnum.RelayList),
+                    Kind.fromStd(KindStandard.RELAY_LIST),
                 )
 
         nostrClient.removeAllRelays()
@@ -320,7 +320,7 @@ class FeedParser(
         val potentialUserRelays =
             nostrClient.fetchEventsFrom(
                 urls = defaultMetadataRelays,
-                filters = listOf(userRelaysFilter),
+                filter = userRelaysFilter,
                 timeout = Duration.ofSeconds(5),
             )
         val relayList = extractRelayList(potentialUserRelays.toVec().first())
@@ -343,7 +343,7 @@ class FeedParser(
         val articlesByAuthorFilter =
             Filter()
                 .author(author)
-                .kind(Kind.fromEnum(KindEnum.LongFormTextNote))
+                .kind(Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE))
         logDebug(LOG_TAG, "Relay List size: ${relays.size}")
 
         nostrClient.removeAllRelays()
@@ -359,10 +359,7 @@ class FeedParser(
             nostrClient
                 .fetchEventsFrom(
                     urls = relaysToUse,
-                    filters =
-                        listOf(
-                            articlesByAuthorFilter,
-                        ),
+                    filter = articlesByAuthorFilter,
                     timeout = Duration.ofSeconds(10L),
                 ).toVec()
         val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
@@ -502,7 +499,7 @@ fun Event.asArticle(
     val articleUri = id().toNostrUri()
     val articleNostrAddress =
         Coordinate(
-            Kind.fromEnum(KindEnum.LongFormTextNote),
+            Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE),
             author(),
             tags()
                 .find(
