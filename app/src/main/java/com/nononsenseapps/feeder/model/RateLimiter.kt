@@ -51,7 +51,8 @@ object RateLimiter {
             val now = System.currentTimeMillis()
             val diff = now - last
             if (diff < DELAY_MS) {
-                val sleepTime = DELAY_MS - diff
+                val remainingTime = DELAY_MS - diff
+                val sleepTime = Random.nextLong(remainingTime, remainingTime * 2)
                 logDebug(LOG_TAG, "Delaying for $sleepTime ms")
                 delay(sleepTime)
             } else {
