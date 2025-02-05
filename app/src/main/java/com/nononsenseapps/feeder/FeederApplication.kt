@@ -14,7 +14,6 @@ import coil3.SingletonImageLoader
 import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
-import coil3.network.cachecontrol.CacheControlCacheStrategy
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.request.maxBitmapSize
@@ -33,8 +32,12 @@ import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.model.AlwaysUseCacheIfPossibleRequestsInterceptor
 import com.nononsenseapps.feeder.model.ForceCacheOnSomeFailuresInterceptor
+import com.nononsenseapps.feeder.model.OneImageRequestPerHostInterceptor
+import com.nononsenseapps.feeder.model.RateLimitedInterceptor
 import com.nononsenseapps.feeder.model.TTSStateHolder
+import com.nononsenseapps.feeder.model.TooManyRequestsInterceptor
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -119,7 +122,9 @@ class FeederApplication :
                     cacheDirectory = (filePathProvider.httpCacheDir),
                 ) {
                     addNetworkInterceptor(UserAgentInterceptor)
+                    addNetworkInterceptor(RateLimitedInterceptor)
                     addNetworkInterceptor(ForceCacheOnSomeFailuresInterceptor)
+                    addNetworkInterceptor(TooManyRequestsInterceptor)
                     if (BuildConfig.DEBUG) {
                         addInterceptor { chain ->
                             val request = chain.request()
@@ -145,6 +150,7 @@ class FeederApplication :
                 val okHttpClient =
                     instance<OkHttpClient>()
                         .newBuilder()
+                        .addInterceptor(AlwaysUseCacheIfPossibleRequestsInterceptor)
                         .addInterceptor { chain ->
                             chain.proceed(
                                 when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
@@ -184,14 +190,12 @@ class FeederApplication :
                             .maxSizeBytes(50 * 1024 * 1024)
                             .build()
                     }.components {
+                        add(OneImageRequestPerHostInterceptor)
                         add(IcoDecoder.Factory(this@FeederApplication))
                         add(
                             OkHttpNetworkFetcherFactory(
                                 callFactory = {
                                     okHttpClient
-                                },
-                                cacheStrategy = {
-                                    CacheControlCacheStrategy()
                                 },
                             ),
                         )
