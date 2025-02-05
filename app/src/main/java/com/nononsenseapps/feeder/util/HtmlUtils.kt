@@ -20,19 +20,13 @@ fun findFirstImageInHtml(
             .filterNot { it.attr("width") == "1" || it.attr("height") == "1" }
             .map {
                 // abs: will resolve relative urls against the baseurl
-                val url =
-                    if (it.attr("abs:src").contains("data:image", ignoreCase = true)) {
-                        return@map null
-                    } else {
-                        it.attr("abs:src")
-                    }
                 ImageFromHTML(
-                    url = url,
+                    url = it.attr("abs:src"),
                     width = it.attr("width").toIntOrNull(),
                     height = it.attr("height").toIntOrNull(),
                 )
             }.firstOrNull {
-                it?.url?.isNotBlank() == true &&
+                it.url.isNotBlank() == true &&
                     !it.url.contains("twitter_icon", ignoreCase = true) &&
                     !it.url.contains("facebook_icon", ignoreCase = true)
             }
