@@ -413,7 +413,7 @@ class HtmlLinearizer {
                                 // Wordpress likes nested figures to get images side by side
                                 val imageCandidates =
                                     element.descendantImageCandidates(baseUrl = baseUrl)
-                                    // Arstechnica has its own ideas about how to structure things
+                                        // Arstechnica has its own ideas about how to structure things
                                         ?: element.ancestorImageCandidates(baseUrl = baseUrl)
 
                                 if (imageCandidates != null) {
@@ -482,11 +482,12 @@ class HtmlLinearizer {
                                 .forEachIndexed { index, listItem ->
                                     val item =
                                         LinearListItem(
-                                            orderedIndex = if (ordered) {
-                                                index + 1
-                                            } else {
-                                                null
-                                            },
+                                            orderedIndex =
+                                                if (ordered) {
+                                                    index + 1
+                                                } else {
+                                                    null
+                                                },
                                         ) {
                                             asElement(blockStyle) {
                                                 linearizeChildren(
@@ -696,7 +697,10 @@ class HtmlLinearizer {
         idHolder(id)
     }
 
-    private fun withIdHolder(idHolder: IdHolder, block: () -> Unit) {
+    private fun withIdHolder(
+        idHolder: IdHolder,
+        block: () -> Unit,
+    ) {
         val oldHolder = this.idHolder
         this.idHolder = idHolder
         block()

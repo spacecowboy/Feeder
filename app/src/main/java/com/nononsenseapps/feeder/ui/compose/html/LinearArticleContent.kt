@@ -299,8 +299,7 @@ fun LinearVideoContent(
                             .clip(RectangleShape)
                             .clickable {
                                 linearVideo.firstSource.link.let { onLinkClick(it, null) }
-                            }
-                            .fillMaxWidth(),
+                            }.fillMaxWidth(),
                 ) {
                     val maxImageWidth by rememberMaxImageWidth()
                     val pixelDensity = LocalDensity.current.density
@@ -472,8 +471,7 @@ fun LinearImageContent(
                                     }
                                 onLinkClick(it, index)
                             }
-                        }
-                        .fillMaxWidth(),
+                        }.fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
                 val pixelDensity = LocalDensity.current.density
@@ -749,12 +747,10 @@ fun CodeBlock(
                         } else {
                             this
                         }
-                    }
-                    .indication(
+                    }.indication(
                         interactionSource,
                         LocalIndication.current,
-                    )
-                    .focusableInNonTouchMode(interactionSource = interactionSource),
+                    ).focusableInNonTouchMode(interactionSource = interactionSource),
         ) {
             Box(
                 contentAlignment = Alignment.TopStart,
@@ -824,8 +820,7 @@ fun LinearTableContent(
                                     end = Offset(size.width, size.height),
                                 )
                             }
-                        }
-                        .padding(4.dp),
+                        }.padding(4.dp),
             ) {
                 val cellItem = linearTable.cellAt(row = row, col = column)
                 cellItem?.let {
@@ -916,7 +911,7 @@ fun LinearText.toAnnotatedString(
             LinearTextAnnotationH4,
             LinearTextAnnotationH5,
             LinearTextAnnotationH6,
-                -> {
+            -> {
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
@@ -1103,73 +1098,37 @@ private fun PreviewPreFormatted() {
 @PreviewLightDark
 @Composable
 private fun PreviewLinearOrderedListContent() {
-    val linearList =
-        LinearList(
-            ordered = true,
-            items =
+    PreviewContent(
+        LinearListItem(
+            orderedIndex = 1,
+            content =
                 listOf(
-                    LinearListItem(
-                        orderedIndex = 1,
-                        content =
-                            listOf(
-                                LinearText(
-                                    ids = emptySet(),
-                                    text = "List Item 1",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
-                    ),
-                    LinearListItem(
-                        orderedIndex = 2,
-                        content =
-                            listOf(
-                                LinearText(
-                                    ids = emptySet(),
-                                    text = "List Item 2",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
+                    LinearText(
+                        ids = emptySet(),
+                        text = "List Item 1",
+                        blockStyle = LinearTextBlockStyle.TEXT,
                     ),
                 ),
-        )
-
-    PreviewContent(linearList)
+        ),
+    )
 }
 
 @PreviewLightDark
 @Composable
 private fun PreviewLinearUnorderedListContent() {
-    val linearList =
-        LinearList(
-            ordered = false,
-            items =
+    PreviewContent(
+        LinearListItem(
+            orderedIndex = null,
+            content =
                 listOf(
-                    LinearListItem(
-                        orderedIndex = null,
-                        content =
-                            listOf(
-                                LinearText(
-                                    ids = emptySet(),
-                                    text = "List Item 1",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
-                    ),
-                    LinearListItem(
-                        orderedIndex = null,
-                        content =
-                            listOf(
-                                LinearText(
-                                    ids = emptySet(),
-                                    text = "List Item 2",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
+                    LinearText(
+                        ids = emptySet(),
+                        text = "List Item 1",
+                        blockStyle = LinearTextBlockStyle.TEXT,
                     ),
                 ),
-        )
-
-    PreviewContent(linearList)
+        ),
+    )
 }
 
 @PreviewLightDark
@@ -1310,42 +1269,36 @@ private fun PreviewNestedTableContent() {
                         type = LinearTableCellItemType.DATA,
                         content =
                             listOf(
-                                LinearList(
-                                    ordered = true,
-                                    items =
+                                LinearListItem(
+                                    orderedIndex = 1,
+                                    content =
                                         listOf(
-                                            LinearListItem(
-                                                orderedIndex = 1,
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            ids = emptySet(),
-                                                            text = "List Item 1",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 1",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                            LinearListItem(
-                                                orderedIndex = 2,
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            ids = emptySet(),
-                                                            text = "List Item 2",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                        ),
+                                ),
+                                LinearListItem(
+                                    orderedIndex = 2,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 2",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                            LinearListItem(
-                                                orderedIndex = 3,
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            ids = emptySet(),
-                                                            text = "List Item 3",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                        ),
+                                ),
+                                LinearListItem(
+                                    orderedIndex = 3,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 3",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
                                         ),
                                 ),
@@ -1450,47 +1403,47 @@ private fun PreviewColSpanningTable() {
                     putAll(
                         listOf(
                             Coordinate(row = 0, col = 0) to
-                                    LinearTableCellItem(
-                                        type = LinearTableCellItemType.HEADER,
-                                        colSpan = 2,
-                                        rowSpan = 1,
-                                        content =
-                                            listOf(
-                                                LinearText(
-                                                    ids = emptySet(),
-                                                    text = "Header 1 and 2",
-                                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                                ),
+                                LinearTableCellItem(
+                                    type = LinearTableCellItemType.HEADER,
+                                    colSpan = 2,
+                                    rowSpan = 1,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "Header 1 and 2",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                    ),
+                                        ),
+                                ),
                             Coordinate(row = 1, col = 0) to
-                                    LinearTableCellItem(
-                                        type = LinearTableCellItemType.DATA,
-                                        colSpan = 1,
-                                        rowSpan = 1,
-                                        content =
-                                            listOf(
-                                                LinearText(
-                                                    ids = emptySet(),
-                                                    text = "Cell 1",
-                                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                                ),
+                                LinearTableCellItem(
+                                    type = LinearTableCellItemType.DATA,
+                                    colSpan = 1,
+                                    rowSpan = 1,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "Cell 1",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                    ),
+                                        ),
+                                ),
                             Coordinate(row = 1, col = 1) to
-                                    LinearTableCellItem(
-                                        type = LinearTableCellItemType.DATA,
-                                        colSpan = 1,
-                                        rowSpan = 1,
-                                        content =
-                                            listOf(
-                                                LinearText(
-                                                    ids = emptySet(),
-                                                    text = "Cell 2",
-                                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                                ),
+                                LinearTableCellItem(
+                                    type = LinearTableCellItemType.DATA,
+                                    colSpan = 1,
+                                    rowSpan = 1,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "Cell 2",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                    ),
+                                        ),
+                                ),
                         ),
                     )
                 },

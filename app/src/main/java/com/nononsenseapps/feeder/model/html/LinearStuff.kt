@@ -30,8 +30,8 @@ data class LinearArticle(
  */
 sealed interface LinearElement
 
-fun LinearElement.ids(): Set<String> {
-    return when(this) {
+fun LinearElement.ids(): Set<String> =
+    when (this) {
         is LinearAudio -> emptySet() // TODO
         is LinearBlockQuote -> idsSeq().toSet()
         is LinearImage -> emptySet() // TODO
@@ -40,10 +40,9 @@ fun LinearElement.ids(): Set<String> {
         is LinearTable -> emptySet() // TODO
         is LinearVideo -> emptySet() // TODO
     }
-}
 
-fun LinearElement.idsSeq(): Sequence<String> {
-    return when (this) {
+fun LinearElement.idsSeq(): Sequence<String> =
+    when (this) {
         is LinearAudio -> emptySequence() // TODO
         is LinearBlockQuote -> content.asSequence().flatMap { it.idsSeq() }
         is LinearImage -> emptySequence() // TODO
@@ -52,7 +51,6 @@ fun LinearElement.idsSeq(): Sequence<String> {
         is LinearTable -> emptySequence() // TODO
         is LinearVideo -> emptySequence() // TODO
     }
-}
 
 /**
  * Represents a list of items, ordered or unordered
@@ -92,7 +90,7 @@ data class LinearListItem(
     // If non-null, this is part of a ordered list and this is the user-visible index
     val orderedIndex: Int?,
     val content: List<LinearElement>,
-): LinearElement {
+) : LinearElement {
     constructor(orderedIndex: Int?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(orderedIndex = orderedIndex, content = ListBuilderScope(block).items)
 
     constructor(orderedIndex: Int?, vararg elements: LinearElement) : this(orderedIndex = orderedIndex, content = elements.toList())
