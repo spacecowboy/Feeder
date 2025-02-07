@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -17,7 +16,6 @@ import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +39,7 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
+import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -124,7 +123,7 @@ fun FeedItemCompact(
                                     .data(imageUrl)
                                     .listener(
                                         onError = { a, b ->
-                                            Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
+                                            logDebug("FEEDER_COMPACT", "error ${a.data}", b.throwable)
                                         },
                                     ).scale(Scale.FILL)
                                     .size(pixels)
