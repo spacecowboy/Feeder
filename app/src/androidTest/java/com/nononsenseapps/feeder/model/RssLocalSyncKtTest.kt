@@ -729,7 +729,7 @@ class RssLocalSyncKtTest : DIAware {
                     setBody(cowboyDeletedMiddleAtom)
                 }
 
-            rssLocalSync.syncFeeds(feedId = cowboyAtomId, forceNetwork = true)
+            rssLocalSync.syncFeeds(feedId = cowboyAtomId, debugReallyForceNetwork = true)
 
             val items =
                 testDb.db
@@ -737,18 +737,21 @@ class RssLocalSyncKtTest : DIAware {
                     .loadFeedItemsInFeedDesc(cowboyAtomId)
 
             assertEquals(
-                "Items still in feed should be present",
-                2,
+                "Items should have been deleted, one is left over due to math",
+                3,
                 items.size,
             )
 
             val expectedGuids =
                 setOf(
+                    // First one is second, which is not deleted due to math
+                    "https://cowboyprogrammer.org/2016/10/reduce-colors-in-images/",
+                    // Next two are the ones that are still present in the feed and should absolutely not be deleted
                     "https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/",
                     "https://cowboyprogrammer.org/2014/04/advertising-thats-not-intrusive-orly/",
                 )
 
-            assertTrue("Expected the remaining items to be the ones in the feed") {
+            assertTrue("Expected the remaining items to be the ones in the feed: ${items.map { it.guid }}") {
                 items.all {
                     it.guid in expectedGuids
                 }

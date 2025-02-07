@@ -61,6 +61,8 @@ class RssLocalSync(
         feedTag: String = "",
         forceNetwork: Boolean = false,
         minFeedAgeMinutes: Int = 5,
+        // Used in tests to force network without having to wait
+        debugReallyForceNetwork: Boolean = false,
     ): Boolean {
         logDebug(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
         return syncMutex.withLock {
@@ -74,6 +76,7 @@ class RssLocalSync(
                         maxFeedItemCount = repository.maximumCountPerFeed.value,
                         forceNetwork = forceNetwork,
                         minFeedAgeMinutes = minFeedAgeMinutes,
+                        debugReallyForceNetwork = debugReallyForceNetwork,
                     )
                 } finally {
                     repository.setSyncWorkerRunning(false)
@@ -88,6 +91,8 @@ class RssLocalSync(
         maxFeedItemCount: Int = 100,
         forceNetwork: Boolean = false,
         minFeedAgeMinutes: Int = 5,
+        // Used in tests to force network without having to wait
+        debugReallyForceNetwork: Boolean = false,
     ): Boolean {
         var result = false
         var needFullTextSync = false
@@ -98,7 +103,9 @@ class RssLocalSync(
                 try {
                     supervisorScope {
                         val staleTime: Long =
-                            if (forceNetwork) {
+                            if (debugReallyForceNetwork) {
+                                Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
+                            } else if (forceNetwork) {
                                 // Under no circumstances should we spam servers more than once per minute intentionally
                                 Instant.now().minus(1, ChronoUnit.MINUTES).toEpochMilli()
                             } else {
@@ -399,22 +406,18 @@ class RssLocalSync(
                 repository.upsertFeed(feedSql)
 
                 // Finally, prune database of old items
-                val ids =
-                    repository.getItemsToBeCleanedFromFeed(
-                        feedId = feedSql.id,
-                        keepCount = max(maxFeedItemCount, items?.size ?: 0),
-                    )
-
+                // Ensure we don't delete items that are still present in the feed
                 val presentIds =
                     feedItemSqls
                         .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
 
-                for (id in ids) {
-                    // Ensure we don't delete items that are still present in the feed
-                    if (id in presentIds) {
-                        continue
-                    }
+                val articlesToDelete =
+                    repository.getItemsToBeCleanedFromFeed(
+                        feedId = feedSql.id,
+                        keepCount = max(maxFeedItemCount, items?.size ?: 0),
+                    ).filterNot { it in presentIds }
 
+                for (id in articlesToDelete) {
                     blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
                         try {
                             if (file.isFile) {
@@ -440,7 +443,7 @@ class RssLocalSync(
                     }
                 }
 
-                repository.deleteFeedItems(ids)
+                repository.deleteFeedItems(articlesToDelete)
                 repository.deleteStaleRemoteReadMarks()
 
                 logDebug(LOG_TAG, "Fetched ${feedSql.displayTitle}")
