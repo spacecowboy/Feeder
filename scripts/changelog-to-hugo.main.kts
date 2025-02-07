@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit
 
 val flavour = CommonMarkFlavourDescriptor()
 
+val versionPattern = Regex("""(\d+\.\d+\.\d+[\.\-_0-9a-zA-Z]*)""")
+
 data class ChangelogEntry(
     val version: String,
     val content: String,
@@ -56,6 +58,11 @@ fun recurseMarkdown(
         }
 
         MarkdownElementTypes.ATX_1 -> {
+            // Keep going directly
+            ignoreContent = true
+        }
+
+        MarkdownElementTypes.ATX_2 -> {
             // Header marks boundary between entries
             if (sb.isNotBlank()) {
                 entries.add(
@@ -67,7 +74,11 @@ fun recurseMarkdown(
                 sb.clear()
             }
             val textNode = node.children.last()
-            return src.slice(textNode.startOffset until textNode.endOffset).trim()
+            // [2.9.0] - 2025-02-07 released
+            val title = src.slice(textNode.startOffset until textNode.endOffset).trim()
+            // Extract version from title using regex
+            newVersion = versionPattern.find(title)?.groupValues?.get(1) ?: error("Failed to extract version from: $title")
+            return newVersion
         }
     }
 

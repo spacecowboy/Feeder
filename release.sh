@@ -4,16 +4,9 @@ TARGET="${1:-HEAD}"
 
 current_default="$(git describe --tags --abbrev=0 "${TARGET}")"
 
-echo >&2 -n "Current version [${current_default}]: "
-read -r current_in
+echo >&2 -n "Current version [${current_default}]"
 
-if [ -z "${current_in}" ]; then
-  CURRENT_VERSION="${current_default}"
-else
-  CURRENT_VERSION="${current_in}"
-fi
-
-next_default="$(grep "versionName" app/build.gradle.kts | sed "s|\s*versionName = \"\(.*\)\"|\\1|")"
+next_default="$(git cliff --bumped-version)"
 echo >&2 -n "Next version [${next_default}]: "
 read -r next_in
 
@@ -47,36 +40,10 @@ then
   git add app/src/main/res/xml/locales_config.xml
 fi
 
-CL="# ${NEXT_VERSION}
-$(git shortlog -w76,2,9 --max-parents=1 --format='* [%h] %s' "${CURRENT_VERSION}..HEAD")
-"
-
-tmpfile="$(mktemp)"
-
-echo "${CL}" > "${tmpfile}"
-
-sensible-editor "${tmpfile}"
+git cliff --tag "${NEXT_VERSION}" -o CHANGELOG.md
 
 echo >&2 "Changelog for [${NEXT_VERSION}]:"
-cat >&2 "${tmpfile}"
-
-read -r -p "Write changelog? [y/N] " response
-if [[ "$response" =~ ^[yY]$ ]]
-then
-  # Playstore has a limit
-  head --bytes=500 "${tmpfile}" >"fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
-
-  PREV=""
-  if [ -f CHANGELOG.md ]; then
-    PREV="$(cat CHANGELOG.md)"
-  fi
-
-  cat >CHANGELOG.md <<EOF
-$(cat "${tmpfile}")
-
-${PREV}
-EOF
-fi
+head -n 40 CHANGELOG.md >&2
 
 read -r -p "Update gradle versions? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
@@ -91,19 +58,19 @@ echo "Verifying build"
 read -r -p "Commit changes? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  git add "fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
   git add app/build.gradle.kts
   git add CHANGELOG.md
   git diff --staged
-  git commit -m "Releasing ${NEXT_VERSION}"
+  git commit -m "chore: releasing ${NEXT_VERSION}"
 fi
 
 read -r -p "Make tag? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  git tag -asm "$(cat "${tmpfile}")" "${NEXT_VERSION}"
+  git tag -asm "$(git cliff --tag "${NEXT_VERSION}" --unreleased)" "${NEXT_VERSION}"
 fi
 
+# Undo the changes to locales_config.xml
 git checkout app/src/main/res fastlane/metadata/android
 
 read -r -p "Post to feed? [y/N] " response
