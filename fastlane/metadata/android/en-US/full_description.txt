@@ -17,3 +17,5 @@
 <li>Handy access to enclosure links</li>
 <li>Material design</li>
 </ul>
+
+Full changelog is available <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
