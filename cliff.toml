@@ -34,15 +34,17 @@ body = """
             {% if commit.remote.username %} by @{{ commit.remote.username }}{%- endif -%}
             {% if commit.remote.pr_number %} in \
             [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }}) \
+            {% else %} in \
+            [commit]({{ self::remote_url() }}/commit/{{ commit.id }}) \
             {%- endif -%}
     {% endfor %}
 {% endfor %}
 
 {%- if github.contributors | filter(attribute="is_first_time", value=true) | length != 0 %}
-  ## New Contributors
+  ### ❤️  New Contributors
 {%- endif -%}
 
-{% for contributor in github.contributors | filter(attribute="is_first_time", value=true) %}
+{% for contributor in github.contributors | filter(attribute="is_first_time", value=true) | filter(attribute="username", ne="") %}
   * @{{ contributor.username }} made their first contribution
     {%- if contributor.pr_number %} in \
       [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
@@ -78,9 +80,9 @@ postprocessors = [
 # output file path
 # output = "test.md"
 
-#[remote.github]
-#owner = "spacecowboy"
-#repo = "feeder"
+[remote.github]
+owner = "spacecowboy"
+repo = "feeder"
 
 [git]
 # parse the commits based on https://www.conventionalcommits.org
@@ -107,7 +109,7 @@ commit_parsers = [
   { message = "^Bump", skip = true },
   { message = "^build", skip = true },
   { message = "^deps", skip = true },
-  { message = "^fix(deps)", skip = true },
+  { message = "^fix\\(deps\\)", skip = true },
   { message = "^Releasing", skip = true },
   { message = "^feat", group = "<!-- 0 -->🚀 Features" },
   { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes & Minor Changes" },
