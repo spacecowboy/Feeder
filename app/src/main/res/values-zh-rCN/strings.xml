@@ -262,4 +262,6 @@
     <string name="show_message">显示消息</string>
     <string name="open_drawer_on_fab">标记所有为已读后显示订阅源</string>
     <string name="nostr_feed_description">%1$s 提供的 Nostr 文章</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
 </resources>

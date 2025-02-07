@@ -262,4 +262,6 @@
     <string name="show_message">Montrer le message</string>
     <string name="open_drawer_on_fab">Montrer les flux après avoir marqué tout lu</string>
     <string name="nostr_feed_description">Articles Nostr par %1$s</string>
+    <string name="off">Inactif</string>
+    <string name="on">Actif</string>
 </resources>

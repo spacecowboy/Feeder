@@ -4,25 +4,30 @@ package com.nononsenseapps.feeder.util
 
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class HtmlUtilsKtTest {
     @Test
-    fun ignoresBase64InlineImages() {
+    fun findsBase64InlineImages() {
         val text = """<summary type="html">
 &lt;img src="data:image/png;base64,iVBORw0KGgoAAA
 ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4
 //8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU
 5ErkJggg==" alt="Red dot" /&gt;</summary>"""
-        assertNull(findFirstImageInHtml(text, null))
+        val image = assertNotNull(findFirstImageInHtml(text, null))
+
+        assertEquals("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==", image.url)
     }
 
     @Test
-    fun ignoresBase64InlineImagesSingleLine() {
+    fun findsBase64InlineImagesSingleLine() {
         val text =
             """<summary type="html">&lt;img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Red dot" /&gt;</summary>"""
                 .trimMargin()
-        assertNull(findFirstImageInHtml(text, null))
+        val image = assertNotNull(findFirstImageInHtml(text, null))
+
+        assertEquals("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==", image.url)
     }
 
     @Test

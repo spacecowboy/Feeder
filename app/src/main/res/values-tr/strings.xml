@@ -250,4 +250,7 @@
     <string name="feed_item_style_compact_card">Sıkı Kart</string>
     <string name="touch_to_play_audio">Sesi oynatmak için dokun</string>
     <string name="show_title_unread_count">Başlıkta okunmayan makale sayısını göster</string>
+    <string name="openai_settings">OpenAI entegrasyonu</string>
+    <string name="api_key">API Anahtarı</string>
+    <string name="summarize">Özetle</string>
 </resources>

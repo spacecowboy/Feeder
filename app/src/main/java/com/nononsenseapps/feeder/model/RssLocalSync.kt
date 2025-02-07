@@ -295,12 +295,6 @@ class RssLocalSync(
                         }
                     }
                 }
-        }.map {
-            // Double check that icon is not base64
-            when {
-                it.icon?.startsWith("data") == true -> it.copy(icon = null)
-                else -> it
-            }
         }.onLeft {
             // Nothing was parsed, nothing to do. lastSync time has already been updated
         }.flatMap { feed ->
