@@ -1596,4 +1596,18 @@ class HtmlLinearizerTest {
             result.all { it is LinearText }
         }
     }
+
+    @Test
+    fun `two divs enclosing a paragraph of text should return single LinearText with combined ids`() {
+        val html = "<html><body><div id=\"div1\"><div id=\"div2\"><p>Hello, world!</p></div></div></body></html>"
+        val baseUrl = "https://example.com"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearText)
+        val linearText = result[0] as LinearText
+        assertEquals("Hello, world!", linearText.text)
+        assertEquals(setOf("div1", "div2"), linearText.ids)
+    }
 }
