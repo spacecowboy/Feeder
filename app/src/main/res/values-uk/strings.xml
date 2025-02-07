@@ -250,7 +250,7 @@
     <string name="feed_item_style_compact_card">Компактна картка</string>
     <string name="touch_to_play_audio">Торкніться, щоб відтворити аудіо</string>
     <string name="show_title_unread_count">Показувати кількість непрочитаних статей у заголовку</string>
-    <string name="off">Вимкнути</string>
+    <string name="off">Вимк.</string>
     <string name="show_message">Відобразити повідомлення</string>
     <string name="openai_settings">Інтеграція OpenAI</string>
     <string name="api_key">Ключ API</string>
@@ -258,7 +258,10 @@
     <string name="azure_api_version">Версія Azure API</string>
     <string name="unable_to_load_models">Не вдалося завантажити моделі.</string>
     <string name="no_models_were_found">Моделей не знайдено</string>
-    <string name="azure_deployment_id">Ідентифікатор розгортання Azure</string>
+    <string name="azure_deployment_id">ІД розгортання Azure</string>
     <string name="list_of_available_models">Список доступних моделей</string>
     <string name="open_drawer_on_fab">Показувати стрічки після позначення всіх прочитаними</string>
+    <string name="nostr_feed_description">Статті Nostr від %1$s</string>
+    <string name="on">Увімк.</string>
+    <string name="summarize">Підсумки</string>
 </resources>
