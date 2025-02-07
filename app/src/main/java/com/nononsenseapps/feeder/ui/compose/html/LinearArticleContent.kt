@@ -111,11 +111,14 @@ import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
+import com.nononsenseapps.feeder.util.logDebug
 import kotlin.math.abs
+
+private const val LOG_TAG = "FEEDER_LINEARCON"
 
 fun LazyListScope.linearArticleContent(
     articleContent: LinearArticle,
-    onLinkClick: (String) -> Unit,
+    onLinkClick: (url: String, index: Int?) -> Unit,
 ) {
     items(
         count = articleContent.elements.size,
@@ -132,6 +135,7 @@ fun LazyListScope.linearArticleContent(
             ) {
                 LinearElementContent(
                     linearElement = articleContent.elements[index],
+                    idToIndex = articleContent.idToIndex,
                     allowHorizontalScroll = true,
                     onLinkClick = onLinkClick,
                     modifier =
@@ -148,16 +152,26 @@ fun LazyListScope.linearArticleContent(
 fun LinearElementContent(
     linearElement: LinearElement,
     allowHorizontalScroll: Boolean,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (linearElement) {
-        is LinearList ->
-            LinearListContent(
-                linearList = linearElement,
+//        is LinearList ->
+//            LinearListContent(
+//                linearList = linearElement,
+//                allowHorizontalScroll = allowHorizontalScroll,
+//                onLinkClick = onLinkClick,
+//                modifier = modifier,
+//                idToIndex = idToIndex,
+//            )
+        is LinearListItem ->
+            LinearListItemContent(
+                listItem = linearElement,
                 allowHorizontalScroll = allowHorizontalScroll,
                 onLinkClick = onLinkClick,
                 modifier = modifier,
+                idToIndex = idToIndex,
             )
 
         is LinearImage ->
@@ -165,6 +179,7 @@ fun LinearElementContent(
                 linearImage = linearElement,
                 onLinkClick = onLinkClick,
                 modifier = modifier,
+                idToIndex = idToIndex,
             )
 
         is LinearBlockQuote -> {
@@ -172,6 +187,7 @@ fun LinearElementContent(
                 blockQuote = linearElement,
                 onLinkClick = onLinkClick,
                 modifier = modifier,
+                idToIndex = idToIndex,
             )
         }
 
@@ -181,6 +197,7 @@ fun LinearElementContent(
                     LinearTextContent(
                         linearText = linearElement,
                         onLinkClick = onLinkClick,
+                        idToIndex = idToIndex,
                         modifier = modifier,
                     )
                 }
@@ -192,6 +209,7 @@ fun LinearElementContent(
                         allowHorizontalScroll = allowHorizontalScroll,
                         onLinkClick = onLinkClick,
                         modifier = modifier,
+                        idToIndex = idToIndex,
                     )
                 }
 
@@ -201,6 +219,7 @@ fun LinearElementContent(
                         allowHorizontalScroll = allowHorizontalScroll,
                         onLinkClick = onLinkClick,
                         modifier = modifier,
+                        idToIndex = idToIndex,
                     )
                 }
             }
@@ -211,6 +230,7 @@ fun LinearElementContent(
                 allowHorizontalScroll = allowHorizontalScroll,
                 onLinkClick = onLinkClick,
                 modifier = modifier,
+                idToIndex = idToIndex,
             )
 
         is LinearAudio ->
@@ -232,7 +252,7 @@ fun LinearElementContent(
 @Composable
 fun LinearAudioContent(
     linearAudio: LinearAudio,
-    onLinkClick: (String) -> Unit,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -251,7 +271,7 @@ fun LinearAudioContent(
                     text = stringResource(R.string.touch_to_play_audio),
                     modifier =
                         Modifier.clickable {
-                            onLinkClick(linearAudio.firstSource.uri)
+                            onLinkClick(linearAudio.firstSource.uri, null)
                         },
                 )
             }
@@ -262,7 +282,7 @@ fun LinearAudioContent(
 @Composable
 fun LinearVideoContent(
     linearVideo: LinearVideo,
-    onLinkClick: (String) -> Unit,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -278,7 +298,7 @@ fun LinearVideoContent(
                         Modifier
                             .clip(RectangleShape)
                             .clickable {
-                                linearVideo.firstSource.link.let(onLinkClick)
+                                linearVideo.firstSource.link.let { onLinkClick(it, null) }
                             }.fillMaxWidth(),
                 ) {
                     val maxImageWidth by rememberMaxImageWidth()
@@ -347,7 +367,7 @@ fun LinearVideoContent(
                     text = stringResource(R.string.touch_to_play_video),
                     modifier =
                         Modifier.clickable {
-                            onLinkClick(linearVideo.firstSource.link)
+                            onLinkClick(linearVideo.firstSource.link, null)
                         },
                 )
             }
@@ -359,7 +379,8 @@ fun LinearVideoContent(
 fun LinearListContent(
     linearList: LinearList,
     allowHorizontalScroll: Boolean,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -368,30 +389,48 @@ fun LinearListContent(
         horizontalAlignment = Alignment.Start,
     ) {
         linearList.items.forEachIndexed { itemIndex, item ->
-            Row(
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                // List item indicator here
-                if (linearList.ordered) {
-                    Text("${itemIndex + 1}.")
-                } else {
-                    Text("•")
-                }
+            LinearListItemContent(
+                listItem = item,
+                allowHorizontalScroll = allowHorizontalScroll,
+                idToIndex = idToIndex,
+                onLinkClick = onLinkClick,
+            )
+        }
+    }
+}
 
-                // Then the item content
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    item.content.forEach { element ->
-                        LinearElementContent(
-                            linearElement = element,
-                            allowHorizontalScroll = allowHorizontalScroll,
-                            onLinkClick = onLinkClick,
-                        )
-                    }
-                }
+@Composable
+fun LinearListItemContent(
+    listItem: LinearListItem,
+    allowHorizontalScroll: Boolean,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
+    ) {
+        // List item indicator here
+        if (listItem.orderedIndex != null) {
+            Text("${listItem.orderedIndex}.")
+        } else {
+            Text("•")
+        }
+
+        // Then the item content
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
+            listItem.content.forEach { element ->
+                LinearElementContent(
+                    linearElement = element,
+                    allowHorizontalScroll = allowHorizontalScroll,
+                    onLinkClick = onLinkClick,
+                    idToIndex = idToIndex,
+                )
             }
         }
     }
@@ -400,7 +439,8 @@ fun LinearListContent(
 @Composable
 fun LinearImageContent(
     linearImage: LinearImage,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (linearImage.sources.isEmpty()) {
@@ -422,7 +462,15 @@ fun LinearImageContent(
                         .clickable(
                             enabled = linearImage.link != null,
                         ) {
-                            linearImage.link?.let(onLinkClick)
+                            linearImage.link?.let {
+                                val hashSplit = it.split("#")
+                                val index =
+                                    when {
+                                        hashSplit.size > 1 -> idToIndex[hashSplit.last()]
+                                        else -> null
+                                    }
+                                onLinkClick(it, index)
+                            }
                         }.fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
@@ -501,6 +549,7 @@ fun LinearImageContent(
             ) {
                 LinearTextContent(
                     linearText = caption,
+                    idToIndex = idToIndex,
                     onLinkClick = onLinkClick,
                 )
             }
@@ -528,14 +577,15 @@ private fun LinearImage.getBestImageForMaxSize(
 @Composable
 fun LinearTextContent(
     linearText: LinearText,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
     softWrap: Boolean = true,
 ) {
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
-            val annotatedString = linearText.toAnnotatedString(onLinkClick = onLinkClick)
+            val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
 
             Text(
                 text = annotatedString,
@@ -552,7 +602,8 @@ fun LinearTextContent(
 @Composable
 fun LinearBlockQuoteContent(
     blockQuote: LinearBlockQuote,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -580,6 +631,7 @@ fun LinearBlockQuoteContent(
                     ) {
                         LinearTextContent(
                             linearText = element,
+                            idToIndex = idToIndex,
                             onLinkClick = onLinkClick,
                         )
                     }
@@ -601,7 +653,15 @@ fun LinearBlockQuoteContent(
                                                 ),
                                             ),
                                     ),
-                                linkInteractionListener = { onLinkClick(cite) },
+                                linkInteractionListener = {
+                                    val hashSplit = cite.split("#")
+                                    val index =
+                                        when {
+                                            hashSplit.size > 1 -> idToIndex[hashSplit.last()]
+                                            else -> null
+                                        }
+                                    onLinkClick(cite, index)
+                                },
                             ),
                         ) {
                             append(cite)
@@ -622,7 +682,7 @@ fun LinearBlockQuoteContent(
 //    linearText: LinearText,
 //    allowHorizontalScroll: Boolean,
 //    modifier: Modifier = Modifier,
-//    onLinkClick: (String) -> Unit,
+//    onLinkClick: (url: String, index: Int?) -> Unit,
 // ) {
 //    val scrollState = rememberScrollState()
 //    val interactionSource =
@@ -665,7 +725,8 @@ fun LinearBlockQuoteContent(
 fun CodeBlock(
     linearText: LinearText,
     allowHorizontalScroll: Boolean,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -702,6 +763,7 @@ fun CodeBlock(
                 ) {
                     LinearTextContent(
                         linearText = linearText,
+                        idToIndex = idToIndex,
                         onLinkClick = onLinkClick,
                         softWrap = false,
                     )
@@ -715,7 +777,8 @@ fun CodeBlock(
 fun LinearTableContent(
     linearTable: LinearTable,
     allowHorizontalScroll: Boolean,
-    onLinkClick: (String) -> Unit,
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val borderColor = MaterialTheme.colorScheme.outlineVariant
@@ -794,6 +857,7 @@ fun LinearTableContent(
                                 allowHorizontalScroll = false,
                                 onLinkClick = onLinkClick,
                                 modifier = Modifier.fillMaxWidth(),
+                                idToIndex = idToIndex,
                             )
                         }
                     }
@@ -806,7 +870,8 @@ fun LinearTableContent(
 val LinearElement.lazyListContentType: String
     get() =
         when (this) {
-            is LinearList -> "LinearList"
+//            is LinearList -> "LinearList"
+            is LinearListItem -> "LinearListItem"
             is LinearImage -> "LinearImage"
             is LinearText -> "LinearText"
             is LinearTable -> "LinearTable"
@@ -816,7 +881,10 @@ val LinearElement.lazyListContentType: String
         }
 
 @Composable
-fun LinearText.toAnnotatedString(onLinkClick: (String) -> Unit): AnnotatedString {
+fun LinearText.toAnnotatedString(
+    idToIndex: Map<String, Int>,
+    onLinkClick: (url: String, index: Int?) -> Unit,
+): AnnotatedString {
     val builder = AnnotatedString.Builder()
     builder.append(text)
     annotations.forEach { annotation ->
@@ -868,7 +936,17 @@ fun LinearText.toAnnotatedString(onLinkClick: (String) -> Unit): AnnotatedString
                                 TextLinkStyles(
                                     style = LinkTextStyle().toSpanStyle(),
                                 ),
-                            linkInteractionListener = { onLinkClick(data.href) },
+                            linkInteractionListener = {
+                                // Looks like data.href=http://www.example.com/feed#footnote-1
+                                val hashSplit = data.href.split("#")
+                                val index =
+                                    when {
+                                        hashSplit.size > 1 -> idToIndex[hashSplit.last()]
+                                        else -> null
+                                    }
+                                logDebug(LOG_TAG, "Link clicked: ${data.href}, index: $index")
+                                onLinkClick(data.href, index)
+                            },
                         ),
                     start = annotation.start,
                     end = annotation.endExclusive,
@@ -941,7 +1019,8 @@ private fun PreviewContent(element: LinearElement) {
                 LinearElementContent(
                     linearElement = element,
                     allowHorizontalScroll = true,
-                    onLinkClick = {},
+                    onLinkClick = { _, _ -> },
+                    idToIndex = emptyMap(),
                 )
             }
         }
@@ -953,6 +1032,7 @@ private fun PreviewContent(element: LinearElement) {
 private fun PreviewTextElement() {
     val linearText =
         LinearText(
+            ids = emptySet(),
             text = "Hello, world future!",
             blockStyle = LinearTextBlockStyle.TEXT,
             LinearTextAnnotation(
@@ -975,10 +1055,12 @@ private fun PreviewTextElement() {
 private fun PreviewBlockQuote() {
     val blockQuote =
         LinearBlockQuote(
+            ids = emptySet(),
             cite = "https://example.com",
             content =
                 listOf(
                     LinearText(
+                        ids = emptySet(),
                         text = "This is a block quote",
                         blockStyle = LinearTextBlockStyle.TEXT,
                     ),
@@ -993,6 +1075,7 @@ private fun PreviewBlockQuote() {
 private fun PreviewCodeBlock() {
     val codeBlock =
         LinearText(
+            ids = emptySet(),
             text = "fun main() {\n    println(\"Hello, world!\")\n}",
             blockStyle = LinearTextBlockStyle.CODE_BLOCK,
         )
@@ -1005,6 +1088,7 @@ private fun PreviewCodeBlock() {
 private fun PreviewPreFormatted() {
     val preFormatted =
         LinearText(
+            ids = emptySet(),
             text = "This is pre-formatted text\n    with some indentation",
             blockStyle = LinearTextBlockStyle.PRE_FORMATTED,
         )
@@ -1015,65 +1099,39 @@ private fun PreviewPreFormatted() {
 @PreviewLightDark
 @Composable
 private fun PreviewLinearOrderedListContent() {
-    val linearList =
-        LinearList(
-            ordered = true,
-            items =
+    PreviewContent(
+        LinearListItem(
+            ids = emptySet(),
+            orderedIndex = 1,
+            content =
                 listOf(
-                    LinearListItem(
-                        content =
-                            listOf(
-                                LinearText(
-                                    text = "List Item 1",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
-                    ),
-                    LinearListItem(
-                        content =
-                            listOf(
-                                LinearText(
-                                    text = "List Item 2",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
+                    LinearText(
+                        ids = emptySet(),
+                        text = "List Item 1",
+                        blockStyle = LinearTextBlockStyle.TEXT,
                     ),
                 ),
-        )
-
-    PreviewContent(linearList)
+        ),
+    )
 }
 
 @PreviewLightDark
 @Composable
 private fun PreviewLinearUnorderedListContent() {
-    val linearList =
-        LinearList(
-            ordered = false,
-            items =
+    PreviewContent(
+        LinearListItem(
+            ids = emptySet(),
+            orderedIndex = null,
+            content =
                 listOf(
-                    LinearListItem(
-                        content =
-                            listOf(
-                                LinearText(
-                                    text = "List Item 1",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
-                    ),
-                    LinearListItem(
-                        content =
-                            listOf(
-                                LinearText(
-                                    text = "List Item 2",
-                                    blockStyle = LinearTextBlockStyle.TEXT,
-                                ),
-                            ),
+                    LinearText(
+                        ids = emptySet(),
+                        text = "List Item 1",
+                        blockStyle = LinearTextBlockStyle.TEXT,
                     ),
                 ),
-        )
-
-    PreviewContent(linearList)
+        ),
+    )
 }
 
 @PreviewLightDark
@@ -1081,6 +1139,7 @@ private fun PreviewLinearUnorderedListContent() {
 private fun PreviewLinearImageContent() {
     val linearImage =
         LinearImage(
+            ids = emptySet(),
             sources =
                 listOf(
                     LinearImageSource(
@@ -1093,6 +1152,7 @@ private fun PreviewLinearImageContent() {
                 ),
             caption =
                 LinearText(
+                    ids = emptySet(),
                     text = "This is an image caption",
                     blockStyle = LinearTextBlockStyle.TEXT,
                 ),
@@ -1107,6 +1167,7 @@ private fun PreviewLinearImageContent() {
 private fun PreviewLinearTableContent() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             leftToRight = false,
@@ -1119,6 +1180,7 @@ private fun PreviewLinearTableContent() {
                         content =
                             listOf(
                                 LinearText(
+                                    ids = emptySet(),
                                     text = "Cell 1",
                                     blockStyle = LinearTextBlockStyle.TEXT,
                                 ),
@@ -1131,6 +1193,7 @@ private fun PreviewLinearTableContent() {
                         content =
                             listOf(
                                 LinearText(
+                                    ids = emptySet(),
                                     text = "Cell 2",
                                     blockStyle = LinearTextBlockStyle.TEXT,
                                 ),
@@ -1143,6 +1206,7 @@ private fun PreviewLinearTableContent() {
                         content =
                             listOf(
                                 LinearText(
+                                    ids = emptySet(),
                                     text = "Cell 3",
                                     blockStyle = LinearTextBlockStyle.TEXT,
                                 ),
@@ -1155,6 +1219,7 @@ private fun PreviewLinearTableContent() {
                         content =
                             listOf(
                                 LinearText(
+                                    ids = emptySet(),
                                     text = "Cell 4",
                                     blockStyle = LinearTextBlockStyle.TEXT,
                                 ),
@@ -1171,6 +1236,7 @@ private fun PreviewLinearTableContent() {
 private fun PreviewNestedTableContent() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             leftToRight = false,
@@ -1183,6 +1249,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearImage(
+                                    ids = emptySet(),
                                     sources =
                                         listOf(
                                             LinearImageSource(
@@ -1195,6 +1262,7 @@ private fun PreviewNestedTableContent() {
                                         ),
                                     caption =
                                         LinearText(
+                                            ids = emptySet(),
                                             text = "This is an image caption",
                                             blockStyle = LinearTextBlockStyle.TEXT,
                                         ),
@@ -1208,36 +1276,39 @@ private fun PreviewNestedTableContent() {
                         type = LinearTableCellItemType.DATA,
                         content =
                             listOf(
-                                LinearList(
-                                    ordered = true,
-                                    items =
+                                LinearListItem(
+                                    ids = emptySet(),
+                                    orderedIndex = 1,
+                                    content =
                                         listOf(
-                                            LinearListItem(
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            text = "List Item 1",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 1",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                            LinearListItem(
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            text = "List Item 2",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                        ),
+                                ),
+                                LinearListItem(
+                                    ids = emptySet(),
+                                    orderedIndex = 2,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 2",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
-                                            LinearListItem(
-                                                content =
-                                                    listOf(
-                                                        LinearText(
-                                                            text = "List Item 3",
-                                                            blockStyle = LinearTextBlockStyle.TEXT,
-                                                        ),
-                                                    ),
+                                        ),
+                                ),
+                                LinearListItem(
+                                    ids = emptySet(),
+                                    orderedIndex = 3,
+                                    content =
+                                        listOf(
+                                            LinearText(
+                                                ids = emptySet(),
+                                                text = "List Item 3",
+                                                blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
                                         ),
                                 ),
@@ -1250,6 +1321,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearText(
+                                    ids = emptySet(),
                                     text = "fun main() {\n    println(\"Hello, world!\")\n}",
                                     blockStyle = LinearTextBlockStyle.CODE_BLOCK,
                                 ),
@@ -1262,6 +1334,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearTable(
+                                    ids = emptySet(),
                                     rowCount = 2,
                                     colCount = 2,
                                     leftToRight = false,
@@ -1274,6 +1347,7 @@ private fun PreviewNestedTableContent() {
                                                 content =
                                                     listOf(
                                                         LinearText(
+                                                            ids = emptySet(),
                                                             text = "Cell 1",
                                                             blockStyle = LinearTextBlockStyle.TEXT,
                                                         ),
@@ -1286,6 +1360,7 @@ private fun PreviewNestedTableContent() {
                                                 content =
                                                     listOf(
                                                         LinearText(
+                                                            ids = emptySet(),
                                                             text = "Cell 2",
                                                             blockStyle = LinearTextBlockStyle.TEXT,
                                                         ),
@@ -1298,6 +1373,7 @@ private fun PreviewNestedTableContent() {
                                                 content =
                                                     listOf(
                                                         LinearText(
+                                                            ids = emptySet(),
                                                             text = "Cell 3",
                                                             blockStyle = LinearTextBlockStyle.TEXT,
                                                         ),
@@ -1310,6 +1386,7 @@ private fun PreviewNestedTableContent() {
                                                 content =
                                                     listOf(
                                                         LinearText(
+                                                            ids = emptySet(),
                                                             text = "Cell 4",
                                                             blockStyle = LinearTextBlockStyle.TEXT,
                                                         ),
@@ -1330,6 +1407,7 @@ private fun PreviewNestedTableContent() {
 private fun PreviewColSpanningTable() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             cellsReal =
@@ -1344,6 +1422,7 @@ private fun PreviewColSpanningTable() {
                                     content =
                                         listOf(
                                             LinearText(
+                                                ids = emptySet(),
                                                 text = "Header 1 and 2",
                                                 blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
@@ -1357,6 +1436,7 @@ private fun PreviewColSpanningTable() {
                                     content =
                                         listOf(
                                             LinearText(
+                                                ids = emptySet(),
                                                 text = "Cell 1",
                                                 blockStyle = LinearTextBlockStyle.TEXT,
                                             ),
@@ -1370,6 +1450,7 @@ private fun PreviewColSpanningTable() {
                                     content =
                                         listOf(
                                             LinearText(
+                                                ids = emptySet(),
                                                 text = "Cell 2",
                                                 blockStyle = LinearTextBlockStyle.TEXT,
                                             ),

@@ -8,6 +8,7 @@ import kotlin.test.assertTrue
 
 class HtmlLinearizerTest {
     private lateinit var linearizer: HtmlLinearizer
+    private val baseUrl = "https://example.com"
 
     @Before
     fun setUp() {
@@ -17,7 +18,6 @@ class HtmlLinearizerTest {
     @Test
     fun `should return empty list when input is empty`() {
         val html = "<html><body></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
@@ -27,12 +27,11 @@ class HtmlLinearizerTest {
     @Test
     fun `should return single LinearText when input is simple text`() {
         val html = "<html><body>Hello, world!</body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[0])
     }
 
     @Test
@@ -41,13 +40,12 @@ class HtmlLinearizerTest {
             """
             <html><body><h2><a href="http://example.com">Link</a> <small>small</small></h2></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
         assertEquals(
-            LinearText("Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
+            LinearText(ids = emptySet(), "Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
             result[0],
         )
     }
@@ -55,13 +53,13 @@ class HtmlLinearizerTest {
     @Test
     fun `should return annotations with bold, italic, and underline`() {
         val html = "<html><body><b><i><u>Hello, world!</u></i></b></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
         assertEquals(
             LinearText(
+                ids = emptySet(),
                 "Hello, world!",
                 LinearTextBlockStyle.TEXT,
                 LinearTextAnnotation(LinearTextAnnotationBold, 0, 12),
@@ -75,13 +73,13 @@ class HtmlLinearizerTest {
     @Test
     fun `should return annotations with bold, italic, and underline interleaving`() {
         val html = "<html><body><b><i><u>Hell</u>o</i>, wor</b>ld!</body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
         assertEquals(
             LinearText(
+                ids = emptySet(),
                 "Hello, world!",
                 LinearTextBlockStyle.TEXT,
                 LinearTextAnnotation(LinearTextAnnotationBold, 0, 9),
@@ -96,124 +94,113 @@ class HtmlLinearizerTest {
     fun `should return own item for header`() {
         // separate items for the paragraph and the H1
         val html = "<html><body><h1>Header 1</h1>Hello, world!</body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(2, result.size)
-        assertEquals(LinearText("Header 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH1, 0, 7)), result[0])
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[1])
+        assertEquals(LinearText(ids = emptySet(), "Header 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH1, 0, 7)), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[1])
     }
 
     @Test
     fun `should return single item for nested divs`() {
         val html = "<html><body><div><div>Hello, world!</div></div></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[0])
     }
 
     @Test
     fun `should return ordered LinearList for ol`() {
         val html = "<html><body><ol><li>Item 1</li><li>Item 2</li></ol></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(2, result.size, "Expected one item: $result")
         assertEquals(
-            LinearList(
-                ordered = true,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 2", LinearTextBlockStyle.TEXT),
-                        ),
-                    ),
+            listOf(
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = 1,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = 2,
+                    LinearText(ids = emptySet(), "Item 2", LinearTextBlockStyle.TEXT),
+                ),
             ),
-            result[0],
+            result,
         )
     }
 
     @Test
     fun `should return unordered LinearList for ul`() {
         val html = "<html><body><ul><li>Item 1</li><li>Item 2</li></ul></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(2, result.size, "Expected one item: $result")
         assertEquals(
-            LinearList(
-                ordered = false,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 2", LinearTextBlockStyle.TEXT),
-                        ),
-                    ),
+            listOf(
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 2", LinearTextBlockStyle.TEXT),
+                ),
             ),
-            result[0],
+            result,
         )
     }
 
     @Test
     fun `surrounding span is preserved with list in middle`() {
         val html = "<html><body><b>Before it<ul><li>Item 1</li><li>Item 22</li></ul>After</b></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(3, result.size, "Expected three items: $result")
+        assertEquals(4, result.size, "Expected three items: $result")
         assertEquals(
-            LinearText("Before it", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 0, 8)),
-            result[0],
-        )
-        assertEquals(
-            LinearList(
-                ordered = false,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 5)),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 22", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 6)),
-                        ),
-                    ),
+            listOf(
+                LinearText(ids = emptySet(), "Before it", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 0, 8)),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 5)),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 22", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 6)),
+                ),
+                LinearText(ids = emptySet(), "After", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 4)),
             ),
-            result[1],
-        )
-        assertEquals(
-            LinearText("After", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 4)),
-            result[2],
+            result,
         )
     }
 
     @Test
     fun `simple image with alt text should return single Image`() {
         val html = "<html><body><img src=\"https://example.com/image.jpg\" alt=\"Alt text\"/></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -223,18 +210,18 @@ class HtmlLinearizerTest {
     @Test
     fun `simple image with bold alt text should return no formatting`() {
         val html = "<html><body><img src=\"https://example.com/image.jpg\" alt=\"<b>Bold</b> text\"/></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Bold text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Bold text", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -244,18 +231,18 @@ class HtmlLinearizerTest {
     @Test
     fun `simple image inside a link`() {
         val html = "<html><body><a href=\"https://example.com/link\"><img src=\"https://example.com/image.jpg\" alt=\"Alt text\"/></a></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT),
                 link = "https://example.com/link",
             ),
             result[0],
@@ -265,13 +252,13 @@ class HtmlLinearizerTest {
     @Test
     fun `simple image with defined size`() {
         val html = "<html><body><img src=\"https://example.com/image.jpg\" width=\"100\" height=\"200\"/></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = 100, heightPx = 200, pixelDensity = null, screenWidth = null),
@@ -291,13 +278,13 @@ class HtmlLinearizerTest {
             <img srcset="https://example.com/image.jpg 1x, https://example.com/image-2x.jpg 2x, https://example.com/image-700w.jpg 700w, https://example.com/image-fallback.jpg"/>
             </body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, screenWidth = null, pixelDensity = 1f),
@@ -315,13 +302,13 @@ class HtmlLinearizerTest {
     @Test
     fun `simple image with dataImgUrl`() {
         val html = "<html><body><img data-img-url=\"https://example.com/image.jpg\"/></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -336,13 +323,13 @@ class HtmlLinearizerTest {
     @Test
     fun `simple image with relative url`() {
         val html = "<html><body><img src=\"/image.jpg\"/></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -360,13 +347,13 @@ class HtmlLinearizerTest {
             "<html><body><img src=\"" +
                 "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
                 "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==\" alt=\"Red dot\"></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(
@@ -377,7 +364,7 @@ class HtmlLinearizerTest {
                             screenWidth = null,
                         ),
                     ),
-                caption = LinearText("Red dot", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Red dot", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -387,18 +374,18 @@ class HtmlLinearizerTest {
     @Test
     fun `simple figure image with figcaption`() {
         val html = "<html><body><figure><img src=\"https://example.com/image.jpg\"/><figcaption>Alt <b>t</b>ext</figcaption></figure></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 4, 4)),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 4, 4)),
                 link = null,
             ),
             result[0],
@@ -413,18 +400,18 @@ class HtmlLinearizerTest {
             <figure><img src="https://example.com/image.jpg"/><figcaption>Alt text</figcaption></figure>
             </a></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationLink("https://example.com/link"), start = 0, end = 7)),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationLink("https://example.com/link"), start = 0, end = 7)),
                 link = "https://example.com/link",
             ),
             result[0],
@@ -434,7 +421,6 @@ class HtmlLinearizerTest {
     @Test
     fun `p in a blockquote does not add newlines at end and cite is null`() {
         val html = "<html><body><blockquote><p>Quote</p></blockquote></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
@@ -442,8 +428,9 @@ class HtmlLinearizerTest {
         assertTrue(result[0] is LinearBlockQuote, "Expected LinearBlockQuote: $result")
         assertEquals(
             LinearBlockQuote(
+                ids = emptySet(),
                 cite = null,
-                content = listOf(LinearText("Quote", LinearTextBlockStyle.TEXT)),
+                content = listOf(LinearText(ids = emptySet(), "Quote", LinearTextBlockStyle.TEXT)),
             ),
             result[0],
         )
@@ -458,13 +445,13 @@ class HtmlLinearizerTest {
             <img data-img-url="https://example.com/image.jpg"/>
             </figure></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = 1f, screenWidth = null),
@@ -486,13 +473,13 @@ class HtmlLinearizerTest {
             <img data-img-url="https://example.com/image-3x.jpg"/>
             </figure></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = 1f, screenWidth = null),
@@ -509,13 +496,12 @@ class HtmlLinearizerTest {
     @Test
     fun `pre block with code tag`() {
         val html = "<html><body><pre><code>\nCode\n  block\n</code></pre></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("\nCode\n  block", LinearTextBlockStyle.CODE_BLOCK, LinearTextAnnotation(LinearTextAnnotationCode, 0, 12)),
+            LinearText(ids = emptySet(), "\nCode\n  block", LinearTextBlockStyle.CODE_BLOCK, LinearTextAnnotation(LinearTextAnnotationCode, 0, 12)),
             result[0],
         )
     }
@@ -523,13 +509,12 @@ class HtmlLinearizerTest {
     @Test
     fun `pre block`() {
         val html = "<html><body><pre>\nCode\n  block\n</pre></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(ids = emptySet(), "Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
             result[0],
         )
     }
@@ -537,13 +522,12 @@ class HtmlLinearizerTest {
     @Test
     fun `pre block without code tag`() {
         val html = "<html><body><pre>Not a code block</pre></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("Not a code block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(ids = emptySet(), "Not a code block", LinearTextBlockStyle.PRE_FORMATTED),
             result[0],
         )
     }
@@ -551,7 +535,6 @@ class HtmlLinearizerTest {
     @Test
     fun `audio with no sources is ignored`() {
         val html = "<html><body><audio controls></audio></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
@@ -566,13 +549,13 @@ class HtmlLinearizerTest {
             <audio controls><source src="audio.mp3" type="audio/mpeg">
             <source src="https://example.com/audio.ogg" type="audio/ogg"></audio></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearAudio(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearAudioSource("https://example.com/audio.mp3", "audio/mpeg"),
@@ -594,8 +577,6 @@ class HtmlLinearizerTest {
             <img src="https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s640x960/75e2a17fad52257ac5c7326e123d125be18ecd14.png" data-orig-height="624" data-orig-width="1200" srcset="https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s75x75_c1/48387a66ca77d9e8af781b47efb733f8e5abe553.png 75w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s100x200/9387531174b8be87ae89fd6f967e274336b7f5a4.png 100w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s250x400/435ce8fba2aa5f75a548a497f1157f563245dd93.png 250w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s400x600/3fc4822b65cab32e05ed0611b6721ab3ab0ba5c8.png 400w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s500x750/f86d4df43eb0de4695d3261cca41739278c9e6bc.png 500w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s540x810/64c4028177a81a99d416b8994b07b8d228b25ea5.png 540w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s640x960/75e2a17fad52257ac5c7326e123d125be18ecd14.png 640w, https://64.media.tumblr.com/55359709d06eb4309538800b64745d40/5149f25c974a1479-f7/s1280x1920/258a6c4e80c6403aa4163c73cf39c09183dd4b4a.png 1200w" sizes="(max-width: 1200px) 100vw, 1200px"/>
             </figure></div><p>CHALLENGE!</p></blockquote>
             """.trimIndent()
-
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
@@ -620,7 +601,6 @@ class HtmlLinearizerTest {
     @Test
     fun `video with no sources is ignored`() {
         val html = "<html><body><video controls></video></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
@@ -636,13 +616,13 @@ class HtmlLinearizerTest {
             <source src="video.mp4" type="video/mp4">
             <source src="https://example.com/video.webm" type="video/webm"></video></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource("https://example.com/video.mp4", "https://example.com/video.mp4", null, null, null, "video/mp4"),
@@ -656,12 +636,13 @@ class HtmlLinearizerTest {
     @Test
     fun `video with 1 source and negative width`() {
         val html = "<html><body><video controls width=\"-1\"><source src=\"video.mp4\" type=\"video/mp4\"></video></body></html>"
-        val baseUrl = "https://example.com"
+
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource("https://example.com/video.mp4", "https://example.com/video.mp4", null, null, null, "video/mp4"),
@@ -674,12 +655,13 @@ class HtmlLinearizerTest {
     @Test
     fun `image with negative heightPx`() {
         val html = "<html><body><img src=\"https://example.com/image.jpg\" height=\"-1\"/></body></html>"
-        val baseUrl = "https://example.com"
+
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -694,13 +676,13 @@ class HtmlLinearizerTest {
     @Test
     fun `iframe with youtube video`() {
         val html = "<html><body><iframe src=\"https://www.youtube.com/embed/cjxnVO9RpaQ\"></iframe></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource(
@@ -728,13 +710,13 @@ class HtmlLinearizerTest {
             </div></figure>
             </body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource(
@@ -754,19 +736,21 @@ class HtmlLinearizerTest {
     @Test
     fun `table block 2x2`() {
         val html = "<html><body><table><tr><th>1</th><td>2</td></tr><tr><td>3</td><th>4</th></tr></table></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "2", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "4", LinearTextBlockStyle.TEXT))))
             },
             result[0],
         )
@@ -775,19 +759,21 @@ class HtmlLinearizerTest {
     @Test
     fun `table block 2x2 rtl`() {
         val html = "<html dir=\"rtl\"><body><table><tr><th>1</th><td>2</td></tr><tr><td>3</td><th>4</th></tr></table></body></html>"
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "2", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "4", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "3", LinearTextBlockStyle.TEXT))))
             },
             result[0],
         )
@@ -815,25 +801,27 @@ class HtmlLinearizerTest {
             </tr>
             </table></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 2, rowSpan = 1, content = listOf(LinearText("Money Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Age", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 2, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 2, rowSpan = 2, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}300", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("0", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 2, rowSpan = 2, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}300", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "0", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}400", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}400", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
             },
             table,
         )
@@ -858,20 +846,22 @@ class HtmlLinearizerTest {
             </tr>
             </table></body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Age", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 0, rowSpan = 1, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 0, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
             },
             table,
         )
@@ -926,8 +916,6 @@ class HtmlLinearizerTest {
             </table></body></html>
             """.trimIndent()
 
-        val baseUrl = "https://example.com"
-
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
@@ -953,29 +941,31 @@ class HtmlLinearizerTest {
             </table>
             </body></html>
             """.trimIndent()
-        val baseUrl = "https://example.com"
 
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size, "Expected one item: $result")
         val expected =
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Number", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Number", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("66", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "66", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}3", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Alice", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("999", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}999999", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Alice", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "999", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}999999", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("No Comment", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Early!", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Sad", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "No Comment", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Early!", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Sad", LinearTextBlockStyle.TEXT))))
             }
         val firstDiffIndex =
             expected.cells
@@ -1055,20 +1045,18 @@ class HtmlLinearizerTest {
             </ul>
             """.trimIndent()
 
-        val baseUrl = "https://example.com"
-
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected items: $result")
+        assertEquals(6, result.size, "Expected items: $result")
 
         // Expect one un ordered list
-        val linearList = result[0] as LinearList
+        val linearList = result.filterIsInstance<LinearListItem>()
 
         // This has 6 items
-        assertEquals(6, linearList.items.size, "Expected list items: $linearList")
+        assertEquals(6, linearList.size, "Expected list items: $linearList")
 
         // All contain only a single image
-        linearList.items.forEach {
+        linearList.forEach {
             assertEquals(1, it.content.size, "Expected single image: $it")
             // Image url ends with jpeg
             val image = it.content[0] as LinearImage
@@ -1171,16 +1159,16 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected items: $result")
+        assertEquals(6, result.size, "Expected items: $result")
 
         // Expect one un ordered list
-        val linearList = result[0] as LinearList
+        val linearList = result.filterIsInstance<LinearListItem>()
 
         // This has 6 items
-        assertEquals(6, linearList.items.size, "Expected list items: $linearList")
+        assertEquals(6, linearList.size, "Expected list items: $linearList")
 
         // All contain only a single image
-        linearList.items.forEach {
+        linearList.forEach {
             assertEquals(1, it.content.size, "Expected single image: $it")
             // Image url ends with jpeg
             val image = it.content[0] as LinearImage
@@ -1236,7 +1224,7 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(14, result.size, "Expected items: $result")
+        assertEquals(20, result.size, "Expected items: $result")
     }
 
     @Test
@@ -1453,8 +1441,6 @@ class HtmlLinearizerTest {
             </table>
             """.trimIndent()
 
-        val baseUrl = "https://example.com"
-
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(2, result.size, "Expected two text items: $result")
@@ -1565,5 +1551,93 @@ class HtmlLinearizerTest {
         assertTrue("Expected all to be linear text items: $result") {
             result.all { it is LinearText }
         }
+    }
+
+    @Test
+    fun `two divs enclosing a paragraph of text should return single LinearText with combined ids`() {
+        val html = "<html><body><div id=\"div1\"><div id=\"div2\"><p>Hello, world!</p></div></div></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearText)
+        val linearText = result[0] as LinearText
+        assertEquals("Hello, world!", linearText.text)
+        assertEquals(setOf("div1", "div2"), linearText.ids)
+    }
+
+    @Test
+    fun `should return single LinearImage with correct ids when input is an image`() {
+        val html = "<html><body><img id=\"img1\" src=\"https://example.com/image.jpg\" alt=\"Alt text\"/></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearImage)
+        val linearImage = result[0] as LinearImage
+        assertEquals(setOf("img1"), linearImage.ids)
+    }
+
+    @Test
+    fun `should return single LinearList with correct ids when input is an unordered list`() {
+        val html = "<html><body><ul id=\"list1\"><li id=\"item1\">Item 1</li><li id=\"item2\">Item 2</li></ul></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(2, result.size)
+        assertEquals(setOf("item1"), (result[0] as LinearListItem).ids)
+        assertEquals(setOf("item2"), (result[1] as LinearListItem).ids)
+    }
+
+    @Test
+    fun `should return single LinearBlockQuote with correct ids when input is a blockquote`() {
+        val html = "<html><body><blockquote id=\"quote1\"><p id=\"para1\">Quote</p></blockquote></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearBlockQuote)
+        val linearBlockQuote = result[0] as LinearBlockQuote
+        assertEquals(setOf("quote1", "para1"), linearBlockQuote.ids)
+    }
+
+    @Test
+    fun `should return single LinearAudio with correct ids when input is an audio element`() {
+        val html = "<html><body><audio id=\"audio1\" controls><source src=\"audio.mp3\" type=\"audio/mpeg\"></audio></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearAudio)
+        val linearAudio = result[0] as LinearAudio
+        assertEquals(setOf("audio1"), linearAudio.ids)
+    }
+
+    @Test
+    fun `should return single LinearTable with correct ids when input is a 2x2 table`() {
+        val html =
+            "<html><body><table id=\"table1\">" +
+                "<tr><td id=\"cell1\">Cell 1</td><td id=\"cell2\">Cell 2</td></tr>" +
+                "<tr><td id=\"cell3\">Cell 3</td><td id=\"cell4\">Cell 4</td></tr>" +
+                "</table></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearTable)
+        val linearTable = result[0] as LinearTable
+        assertEquals(setOf("table1", "cell1", "cell2", "cell3", "cell4"), linearTable.ids)
+    }
+
+    @Test
+    fun `should return single LinearVideo with correct ids when input is a video element`() {
+        val html = "<html><body><video id=\"video1\" controls><source src=\"video.mp4\" type=\"video/mp4\"></video></body></html>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearVideo)
+        val linearVideo = result[0] as LinearVideo
+        assertEquals(setOf("video1"), linearVideo.ids)
     }
 }

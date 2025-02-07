@@ -15,8 +15,13 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
+typealias IdHolder = (String) -> Unit
+
 class HtmlLinearizer {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
+    private var idHolder: IdHolder = {
+        linearTextBuilder.pushId(it)
+    }
 
     fun linearize(
         html: String,
@@ -32,11 +37,10 @@ class HtmlLinearizer {
                 try {
                     Jsoup
                         .parse(inputStream, null, baseUrl)
-                        ?.body()
-                        ?.let { body ->
+                        .body()
+                        .let { body ->
                             linearizeBody(body, baseUrl)
                         }
-                        ?: emptyList()
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "htmlFormattingFailed", e)
                     emptyList()
@@ -77,6 +81,8 @@ class HtmlLinearizer {
 
                 is Element -> {
                     val element = node
+                    // Id is used for in-page links
+                    pushId(element.id())
 
                     if (isHiddenByCSS(element)) {
                         // Element is not supposed to be shown because javascript and/or tracking
@@ -330,6 +336,10 @@ class HtmlLinearizer {
                             finalizeAndAddCurrentElement(blockStyle)
 
                             val cite = element.attr("cite").ifBlank { null }
+                            // This is not correct. If the blockquote contains elements which will split
+                            // the blockquote, then ids will be duplicated. This won't crash or anything
+                            // but in-page links will go to the wrong element
+                            val ids = element.allIds()
 
                             // Text should be collected into LinearBlockQuote
                             // Other types should be added separately
@@ -350,6 +360,7 @@ class HtmlLinearizer {
                                         if (acc.isNotEmpty()) {
                                             add(
                                                 LinearBlockQuote(
+                                                    ids = ids,
                                                     cite = cite,
                                                     content = acc,
                                                 ),
@@ -364,6 +375,7 @@ class HtmlLinearizer {
                                     if (it.isNotEmpty()) {
                                         add(
                                             LinearBlockQuote(
+                                                ids = ids,
                                                 cite = cite,
                                                 content = it,
                                             ),
@@ -404,6 +416,7 @@ class HtmlLinearizer {
                                     parseIframeVideo(it)
                                 }
                             } else {
+                                val ids = element.allIds()
                                 // Wordpress likes nested figures to get images side by side
                                 val imageCandidates =
                                     element.descendantImageCandidates(baseUrl = baseUrl)
@@ -429,6 +442,7 @@ class HtmlLinearizer {
 
                                     add(
                                         LinearImage(
+                                            ids = ids,
                                             sources = imageCandidates,
                                             caption = caption,
                                             link = link,
@@ -441,6 +455,8 @@ class HtmlLinearizer {
                         "img" -> {
                             finalizeAndAddCurrentElement(blockStyle)
 
+                            val ids = element.allIds()
+
                             getImageSource(baseUrl, element).let { candidates ->
                                 if (candidates.isNotEmpty()) {
                                     val captionText: String? =
@@ -448,11 +464,13 @@ class HtmlLinearizer {
                                             .takeIf { it.isNotBlank() }
                                     add(
                                         LinearImage(
+                                            ids = ids,
                                             sources = candidates,
                                             // Parse a LinearText with annotations from element.attr("alt")
                                             caption =
                                                 captionText?.let {
                                                     LinearText(
+                                                        ids = linearTextBuilder.ids,
                                                         text = it,
                                                         annotations = emptyList(),
                                                         blockStyle = LinearTextBlockStyle.TEXT,
@@ -468,32 +486,34 @@ class HtmlLinearizer {
                         "ul", "ol" -> {
                             finalizeAndAddCurrentElement(blockStyle)
 
-                            val list =
-                                LinearList.build(ordered = element.tagName() == "ol") {
-                                    element
-                                        .children()
-                                        .filter { it.tagName() == "li" }
-                                        .forEach { listItem ->
-                                            val item =
-                                                LinearListItem {
-                                                    asElement(blockStyle) {
-                                                        linearizeChildren(
-                                                            listItem.childNodes(),
-                                                            blockStyle = it,
-                                                            baseUrl = baseUrl,
-                                                        )
-                                                    }
-                                                }
-
-                                            if (item.isNotEmpty()) {
-                                                add(item)
+                            val ordered = element.tagName() == "ol"
+                            element
+                                .children()
+                                .filter { it.tagName() == "li" }
+                                .forEachIndexed { index, listItem ->
+                                    val item =
+                                        LinearListItem(
+                                            ids = listItem.allIds(),
+                                            orderedIndex =
+                                                if (ordered) {
+                                                    index + 1
+                                                } else {
+                                                    null
+                                                },
+                                        ) {
+                                            asElement(blockStyle) {
+                                                linearizeChildren(
+                                                    listItem.childNodes(),
+                                                    blockStyle = it,
+                                                    baseUrl = baseUrl,
+                                                )
                                             }
                                         }
-                                }
 
-                            if (list.isNotEmpty()) {
-                                add(list)
-                            }
+                                    if (item.isNotEmpty()) {
+                                        add(item)
+                                    }
+                                }
                         }
 
                         "td", "th" -> {
@@ -512,6 +532,7 @@ class HtmlLinearizer {
 
                             // This can also be auto, but for tables that's equivalent to LTR probably
                             val leftToRight = element.attrInHierarchy("dir") != "rtl"
+                            val ids = element.allIds()
 
                             val rowSequence =
                                 sequence<Element> {
@@ -553,7 +574,7 @@ class HtmlLinearizer {
                                 )
                             } else {
                                 add(
-                                    LinearTable.build(leftToRight = leftToRight) {
+                                    LinearTable.build(ids = ids, leftToRight = leftToRight) {
                                         rowSequence
                                             .forEach { row ->
                                                 newRow()
@@ -609,7 +630,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearAudio(sources))
+                                add(LinearAudio(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -640,7 +661,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearVideo(sources))
+                                add(LinearVideo(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -665,6 +686,7 @@ class HtmlLinearizer {
         getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
             add(
                 LinearVideo(
+                    ids = element.allIds(),
                     sources =
                         listOf(
                             LinearVideoSource(
@@ -683,6 +705,20 @@ class HtmlLinearizer {
 
     private fun append(c: String) {
         linearTextBuilder.append(c)
+    }
+
+    private fun pushId(id: String) {
+        idHolder(id)
+    }
+
+    private fun withIdHolder(
+        idHolder: IdHolder,
+        block: () -> Unit,
+    ) {
+        val oldHolder = this.idHolder
+        this.idHolder = idHolder
+        block()
+        this.idHolder = oldHolder
     }
 
     @Suppress("SameParameterValue")
@@ -1022,3 +1058,18 @@ private fun resolve(
     }
     return URL(base, rel)
 }
+
+private suspend fun SequenceScope<Element>.yieldDescendantsOf(element: Element) {
+    for (child in element.children()) {
+        yield(child)
+        yieldDescendantsOf(child)
+    }
+}
+
+private fun Element.allIds(): Set<String> =
+    sequence {
+        yield(this@allIds)
+        yieldDescendantsOf(this@allIds)
+    }.map { it.id() }
+        .filterNot { it.isEmpty() }
+        .toSet()
