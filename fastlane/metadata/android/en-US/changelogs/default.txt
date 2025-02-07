@@ -1,1 +1,2 @@
-* Bug fixes and improvements
+* Bug fixes and performance improvements.
+* See link to full changelog in app description.
