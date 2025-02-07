@@ -32,7 +32,7 @@ class HtmlLinearizerTest {
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[0])
     }
 
     @Test
@@ -47,7 +47,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size)
         assertEquals(
-            LinearText("Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
+            LinearText(ids = emptySet(), "Link small", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH2, 0, 9)),
             result[0],
         )
     }
@@ -62,6 +62,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size)
         assertEquals(
             LinearText(
+                ids = emptySet(),
                 "Hello, world!",
                 LinearTextBlockStyle.TEXT,
                 LinearTextAnnotation(LinearTextAnnotationBold, 0, 12),
@@ -82,6 +83,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size)
         assertEquals(
             LinearText(
+                ids = emptySet(),
                 "Hello, world!",
                 LinearTextBlockStyle.TEXT,
                 LinearTextAnnotation(LinearTextAnnotationBold, 0, 9),
@@ -101,8 +103,8 @@ class HtmlLinearizerTest {
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(2, result.size)
-        assertEquals(LinearText("Header 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH1, 0, 7)), result[0])
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[1])
+        assertEquals(LinearText(ids = emptySet(), "Header 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationH1, 0, 7)), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[1])
     }
 
     @Test
@@ -113,7 +115,7 @@ class HtmlLinearizerTest {
         val result = linearizer.linearize(html, baseUrl).elements
 
         assertEquals(1, result.size)
-        assertEquals(LinearText("Hello, world!", LinearTextBlockStyle.TEXT), result[0])
+        assertEquals(LinearText(ids = emptySet(), "Hello, world!", LinearTextBlockStyle.TEXT), result[0])
     }
 
     @Test
@@ -123,21 +125,21 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(2, result.size, "Expected one item: $result")
         assertEquals(
-            LinearList(
-                ordered = true,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 2", LinearTextBlockStyle.TEXT),
-                        ),
-                    ),
+            listOf(
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = 1,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = 2,
+                    LinearText(ids = emptySet(), "Item 2", LinearTextBlockStyle.TEXT),
+                ),
             ),
-            result[0],
+            result,
         )
     }
 
@@ -148,21 +150,21 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected one item: $result")
+        assertEquals(2, result.size, "Expected one item: $result")
         assertEquals(
-            LinearList(
-                ordered = false,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 2", LinearTextBlockStyle.TEXT),
-                        ),
-                    ),
+            listOf(
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 2", LinearTextBlockStyle.TEXT),
+                ),
             ),
-            result[0],
+            result,
         )
     }
 
@@ -173,29 +175,23 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(3, result.size, "Expected three items: $result")
+        assertEquals(4, result.size, "Expected three items: $result")
         assertEquals(
-            LinearText("Before it", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 0, 8)),
-            result[0],
-        )
-        assertEquals(
-            LinearList(
-                ordered = false,
-                items =
-                    listOf(
-                        LinearListItem(
-                            LinearText("Item 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 5)),
-                        ),
-                        LinearListItem(
-                            LinearText("Item 22", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 6)),
-                        ),
-                    ),
+            listOf(
+                LinearText(ids = emptySet(), "Before it", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 0, 8)),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 1", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 5)),
+                ),
+                LinearListItem(
+                    ids = emptySet(),
+                    orderedIndex = null,
+                    LinearText(ids = emptySet(), "Item 22", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 6)),
+                ),
+                LinearText(ids = emptySet(), "After", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 4)),
             ),
-            result[1],
-        )
-        assertEquals(
-            LinearText("After", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationBold, start = 0, end = 4)),
-            result[2],
+            result,
         )
     }
 
@@ -209,11 +205,12 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -230,11 +227,12 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Bold text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Bold text", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -251,11 +249,12 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT),
                 link = "https://example.com/link",
             ),
             result[0],
@@ -272,6 +271,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = 100, heightPx = 200, pixelDensity = null, screenWidth = null),
@@ -298,6 +298,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, screenWidth = null, pixelDensity = 1f),
@@ -322,6 +323,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -343,6 +345,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -367,6 +370,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(
@@ -377,7 +381,7 @@ class HtmlLinearizerTest {
                             screenWidth = null,
                         ),
                     ),
-                caption = LinearText("Red dot", LinearTextBlockStyle.TEXT),
+                caption = LinearText(ids = emptySet(), "Red dot", LinearTextBlockStyle.TEXT),
                 link = null,
             ),
             result[0],
@@ -394,11 +398,12 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 4, 4)),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(LinearTextAnnotationBold, 4, 4)),
                 link = null,
             ),
             result[0],
@@ -420,11 +425,12 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
                     ),
-                caption = LinearText("Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationLink("https://example.com/link"), start = 0, end = 7)),
+                caption = LinearText(ids = emptySet(), "Alt text", LinearTextBlockStyle.TEXT, LinearTextAnnotation(data = LinearTextAnnotationLink("https://example.com/link"), start = 0, end = 7)),
                 link = "https://example.com/link",
             ),
             result[0],
@@ -442,8 +448,9 @@ class HtmlLinearizerTest {
         assertTrue(result[0] is LinearBlockQuote, "Expected LinearBlockQuote: $result")
         assertEquals(
             LinearBlockQuote(
+                ids = emptySet(),
                 cite = null,
-                content = listOf(LinearText("Quote", LinearTextBlockStyle.TEXT)),
+                content = listOf(LinearText(ids = emptySet(), "Quote", LinearTextBlockStyle.TEXT)),
             ),
             result[0],
         )
@@ -465,6 +472,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = 1f, screenWidth = null),
@@ -493,6 +501,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = 1f, screenWidth = null),
@@ -515,7 +524,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("\nCode\n  block", LinearTextBlockStyle.CODE_BLOCK, LinearTextAnnotation(LinearTextAnnotationCode, 0, 12)),
+            LinearText(ids = emptySet(), "\nCode\n  block", LinearTextBlockStyle.CODE_BLOCK, LinearTextAnnotation(LinearTextAnnotationCode, 0, 12)),
             result[0],
         )
     }
@@ -529,7 +538,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(ids = emptySet(), "Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
             result[0],
         )
     }
@@ -543,7 +552,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText("Not a code block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(ids = emptySet(), "Not a code block", LinearTextBlockStyle.PRE_FORMATTED),
             result[0],
         )
     }
@@ -573,6 +582,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearAudio(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearAudioSource("https://example.com/audio.mp3", "audio/mpeg"),
@@ -643,6 +653,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource("https://example.com/video.mp4", "https://example.com/video.mp4", null, null, null, "video/mp4"),
@@ -662,6 +673,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource("https://example.com/video.mp4", "https://example.com/video.mp4", null, null, null, "video/mp4"),
@@ -680,6 +692,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearImage(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearImageSource(imgUri = "https://example.com/image.jpg", widthPx = null, heightPx = null, pixelDensity = null, screenWidth = null),
@@ -701,6 +714,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource(
@@ -735,6 +749,7 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
             LinearVideo(
+                ids = emptySet(),
                 sources =
                     listOf(
                         LinearVideoSource(
@@ -760,13 +775,16 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "2", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "4", LinearTextBlockStyle.TEXT))))
             },
             result[0],
         )
@@ -781,13 +799,16 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("2", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "2", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("4", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "4", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "3", LinearTextBlockStyle.TEXT))))
             },
             result[0],
         )
@@ -822,18 +843,21 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 2, rowSpan = 1, content = listOf(LinearText("Money Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Age", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 2, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 2, rowSpan = 2, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}300", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("0", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 2, rowSpan = 2, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}300", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "0", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}400", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("1", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}400", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "1", LinearTextBlockStyle.TEXT))))
             },
             table,
         )
@@ -865,13 +889,16 @@ class HtmlLinearizerTest {
         assertEquals(1, result.size, "Expected one item: $result")
         val table = result[0] as LinearTable
         assertEquals(
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Age", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Age", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 0, rowSpan = 1, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 0, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
             },
             table,
         )
@@ -959,23 +986,26 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         val expected =
-            LinearTable.build(leftToRight = true) {
+            LinearTable.build(
+                ids = emptySet(),
+                leftToRight = true,
+            ) {
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Name", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Number", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Money", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Name", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Number", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.HEADER, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Money", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Bob", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("66", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}3", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Bob", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "66", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}3", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Alice", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("999", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("${'$'}999999", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Alice", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "999", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "${'$'}999999", LinearTextBlockStyle.TEXT))))
                 newRow()
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("No Comment", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Early!", LinearTextBlockStyle.TEXT))))
-                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText("Sad", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "No Comment", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Early!", LinearTextBlockStyle.TEXT))))
+                add(LinearTableCellItem(type = LinearTableCellItemType.DATA, colSpan = 1, rowSpan = 1, content = listOf(LinearText(ids = emptySet(), "Sad", LinearTextBlockStyle.TEXT))))
             }
         val firstDiffIndex =
             expected.cells
@@ -1059,16 +1089,16 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected items: $result")
+        assertEquals(6, result.size, "Expected items: $result")
 
         // Expect one un ordered list
-        val linearList = result[0] as LinearList
+        val linearList = result.filterIsInstance<LinearListItem>()
 
         // This has 6 items
-        assertEquals(6, linearList.items.size, "Expected list items: $linearList")
+        assertEquals(6, linearList.size, "Expected list items: $linearList")
 
         // All contain only a single image
-        linearList.items.forEach {
+        linearList.forEach {
             assertEquals(1, it.content.size, "Expected single image: $it")
             // Image url ends with jpeg
             val image = it.content[0] as LinearImage
@@ -1171,16 +1201,16 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(1, result.size, "Expected items: $result")
+        assertEquals(6, result.size, "Expected items: $result")
 
         // Expect one un ordered list
-        val linearList = result[0] as LinearList
+        val linearList = result.filterIsInstance<LinearListItem>()
 
         // This has 6 items
-        assertEquals(6, linearList.items.size, "Expected list items: $linearList")
+        assertEquals(6, linearList.size, "Expected list items: $linearList")
 
         // All contain only a single image
-        linearList.items.forEach {
+        linearList.forEach {
             assertEquals(1, it.content.size, "Expected single image: $it")
             // Image url ends with jpeg
             val image = it.content[0] as LinearImage
@@ -1236,7 +1266,7 @@ class HtmlLinearizerTest {
 
         val result = linearizer.linearize(html, baseUrl).elements
 
-        assertEquals(14, result.size, "Expected items: $result")
+        assertEquals(20, result.size, "Expected items: $result")
     }
 
     @Test
