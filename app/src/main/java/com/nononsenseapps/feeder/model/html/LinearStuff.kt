@@ -30,27 +30,17 @@ data class LinearArticle(
  */
 sealed interface LinearElement
 
-fun LinearElement.ids(): Set<String> =
-    when (this) {
-        is LinearAudio -> emptySet() // TODO
-        is LinearBlockQuote -> idsSeq().toSet()
-        is LinearImage -> emptySet() // TODO
-        is LinearListItem -> idsSeq().toSet()
+fun LinearElement.ids(): Set<String> {
+    return when(this) {
+        is LinearAudio -> ids
+        is LinearBlockQuote -> ids
+        is LinearImage -> ids
+        is LinearListItem -> ids
         is LinearText -> ids
-        is LinearTable -> emptySet() // TODO
-        is LinearVideo -> emptySet() // TODO
+        is LinearTable -> ids
+        is LinearVideo -> ids
     }
-
-fun LinearElement.idsSeq(): Sequence<String> =
-    when (this) {
-        is LinearAudio -> emptySequence() // TODO
-        is LinearBlockQuote -> content.asSequence().flatMap { it.idsSeq() }
-        is LinearImage -> emptySequence() // TODO
-        is LinearListItem -> content.asSequence().flatMap { it.idsSeq() }
-        is LinearText -> ids.asSequence()
-        is LinearTable -> emptySequence() // TODO
-        is LinearVideo -> emptySequence() // TODO
-    }
+}
 
 /**
  * Represents a list of items, ordered or unordered
@@ -87,19 +77,21 @@ data class LinearList(
  * Represents a single item in a list
  */
 data class LinearListItem(
+    val ids: Set<String>,
     // If non-null, this is part of a ordered list and this is the user-visible index
     val orderedIndex: Int?,
     val content: List<LinearElement>,
-) : LinearElement {
-    constructor(orderedIndex: Int?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(orderedIndex = orderedIndex, content = ListBuilderScope(block).items)
+): LinearElement {
+    constructor(ids: Set<String>, orderedIndex: Int?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(ids = ids, orderedIndex = orderedIndex, content = ListBuilderScope(block).items)
 
-    constructor(orderedIndex: Int?, vararg elements: LinearElement) : this(orderedIndex = orderedIndex, content = elements.toList())
+    constructor(ids: Set<String>, orderedIndex: Int?, vararg elements: LinearElement) : this(ids = ids, orderedIndex = orderedIndex, content = elements.toList())
 
     fun isEmpty(): Boolean = content.isEmpty()
 
     fun isNotEmpty(): Boolean = content.isNotEmpty()
 
     class Builder {
+        var ids = mutableSetOf<String>()
         var orderedIndex: Int? = null
         private val content: MutableList<LinearElement> = mutableListOf()
 
@@ -107,7 +99,7 @@ data class LinearListItem(
             content.add(element)
         }
 
-        fun build(): LinearListItem = LinearListItem(orderedIndex = orderedIndex, content = content)
+        fun build(): LinearListItem = LinearListItem(ids = ids, orderedIndex = orderedIndex, content = content)
     }
 
     companion object {
@@ -119,6 +111,7 @@ data class LinearListItem(
  * Represents a table
  */
 data class LinearTable(
+    val ids: Set<String>,
     val rowCount: Int,
     val colCount: Int,
     private val cellsReal: ArrayMap<Coordinate, LinearTableCellItem>,
@@ -127,11 +120,13 @@ data class LinearTable(
         get() = cellsReal
 
     constructor(
+        ids: Set<String>,
         rowCount: Int,
         colCount: Int,
         cells: List<LinearTableCellItem>,
         leftToRight: Boolean,
     ) : this(
+        ids,
         rowCount,
         colCount,
         ArrayMap<Coordinate, LinearTableCellItem>().apply {
@@ -158,6 +153,7 @@ data class LinearTable(
     ): LinearTableCellItem? = cells[Coordinate(row = row, col = col)]
 
     class Builder(
+        val ids: Set<String>,
         val leftToRight: Boolean,
     ) {
         private val cells: ArrayMap<Coordinate, LinearTableCellItem> = ArrayMap()
@@ -208,6 +204,7 @@ data class LinearTable(
 
         fun build(): LinearTable =
             LinearTable(
+                ids = ids,
                 rowCount = rowCount,
                 colCount = colCount,
                 cellsReal =
@@ -231,9 +228,10 @@ data class LinearTable(
 
     companion object {
         fun build(
+            ids: Set<String>,
             leftToRight: Boolean,
             block: Builder.() -> Unit,
-        ): LinearTable = Builder(leftToRight = leftToRight).apply(block).build()
+        ): LinearTable = Builder(ids = ids, leftToRight = leftToRight).apply(block).build()
     }
 }
 
@@ -299,12 +297,13 @@ enum class LinearTableCellItemType {
 }
 
 data class LinearBlockQuote(
+    val ids: Set<String>,
     val cite: String?,
     val content: List<LinearElement>,
 ) : LinearElement {
-    constructor(cite: String?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(cite = cite, content = ListBuilderScope(block).items)
+    constructor(ids: Set<String>, cite: String?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(ids = ids,  cite = cite, content = ListBuilderScope(block).items)
 
-    constructor(cite: String?, vararg elements: LinearElement) : this(cite = cite, content = elements.toList())
+    constructor(ids: Set<String>, cite: String?, vararg elements: LinearElement) : this(ids = ids, cite = cite, content = elements.toList())
 }
 
 /**
@@ -342,6 +341,7 @@ val LinearTextBlockStyle.shouldSoftWrap: Boolean
  * Represents an image element
  */
 data class LinearImage(
+    val ids: Set<String>,
     val sources: List<LinearImageSource>,
     val caption: LinearText?,
     val link: String?,
@@ -374,6 +374,7 @@ data class LinearImageSource(
  * Represents a video element
  */
 data class LinearVideo(
+    val ids: Set<String>,
     val sources: List<LinearVideoSource>,
 ) : LinearElement {
     init {
@@ -411,6 +412,7 @@ data class LinearVideoSource(
  * Represents an audio element
  */
 data class LinearAudio(
+    val ids: Set<String>,
     val sources: List<LinearAudioSource>,
 ) : LinearElement {
     init {

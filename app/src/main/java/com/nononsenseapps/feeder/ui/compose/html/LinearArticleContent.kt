@@ -1055,6 +1055,7 @@ private fun PreviewTextElement() {
 private fun PreviewBlockQuote() {
     val blockQuote =
         LinearBlockQuote(
+            ids = emptySet(),
             cite = "https://example.com",
             content =
                 listOf(
@@ -1100,6 +1101,7 @@ private fun PreviewPreFormatted() {
 private fun PreviewLinearOrderedListContent() {
     PreviewContent(
         LinearListItem(
+            ids = emptySet(),
             orderedIndex = 1,
             content =
                 listOf(
@@ -1118,6 +1120,7 @@ private fun PreviewLinearOrderedListContent() {
 private fun PreviewLinearUnorderedListContent() {
     PreviewContent(
         LinearListItem(
+            ids = emptySet(),
             orderedIndex = null,
             content =
                 listOf(
@@ -1136,6 +1139,7 @@ private fun PreviewLinearUnorderedListContent() {
 private fun PreviewLinearImageContent() {
     val linearImage =
         LinearImage(
+            ids = emptySet(),
             sources =
                 listOf(
                     LinearImageSource(
@@ -1163,6 +1167,7 @@ private fun PreviewLinearImageContent() {
 private fun PreviewLinearTableContent() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             leftToRight = false,
@@ -1231,6 +1236,7 @@ private fun PreviewLinearTableContent() {
 private fun PreviewNestedTableContent() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             leftToRight = false,
@@ -1243,6 +1249,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearImage(
+                                    ids = emptySet(),
                                     sources =
                                         listOf(
                                             LinearImageSource(
@@ -1270,6 +1277,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearListItem(
+                                    ids = emptySet(),
                                     orderedIndex = 1,
                                     content =
                                         listOf(
@@ -1281,6 +1289,7 @@ private fun PreviewNestedTableContent() {
                                         ),
                                 ),
                                 LinearListItem(
+                                    ids = emptySet(),
                                     orderedIndex = 2,
                                     content =
                                         listOf(
@@ -1292,6 +1301,7 @@ private fun PreviewNestedTableContent() {
                                         ),
                                 ),
                                 LinearListItem(
+                                    ids = emptySet(),
                                     orderedIndex = 3,
                                     content =
                                         listOf(
@@ -1324,6 +1334,7 @@ private fun PreviewNestedTableContent() {
                         content =
                             listOf(
                                 LinearTable(
+                                    ids = emptySet(),
                                     rowCount = 2,
                                     colCount = 2,
                                     leftToRight = false,
@@ -1396,6 +1407,7 @@ private fun PreviewNestedTableContent() {
 private fun PreviewColSpanningTable() {
     val linearTable =
         LinearTable(
+            ids = emptySet(),
             rowCount = 2,
             colCount = 2,
             cellsReal =
