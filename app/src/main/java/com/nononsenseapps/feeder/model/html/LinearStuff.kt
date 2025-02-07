@@ -30,8 +30,8 @@ data class LinearArticle(
  */
 sealed interface LinearElement
 
-fun LinearElement.ids(): Set<String> {
-    return when (this) {
+fun LinearElement.ids(): Set<String> =
+    when (this) {
         is LinearAudio -> ids
         is LinearBlockQuote -> ids
         is LinearImage -> ids
@@ -40,7 +40,6 @@ fun LinearElement.ids(): Set<String> {
         is LinearTable -> ids
         is LinearVideo -> ids
     }
-}
 
 /**
  * Represents a list of items, ordered or unordered

@@ -1070,7 +1070,6 @@ private fun Element.allIds(): Set<String> =
     sequence {
         yield(this@allIds)
         yieldDescendantsOf(this@allIds)
-    }
-        .map { it.id() }
+    }.map { it.id() }
         .filterNot { it.isEmpty() }
         .toSet()
