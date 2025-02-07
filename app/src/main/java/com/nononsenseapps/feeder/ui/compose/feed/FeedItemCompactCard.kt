@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -44,6 +43,7 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
+import com.nononsenseapps.feeder.util.logDebug
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.net.URL
 import java.time.Instant
@@ -201,7 +201,7 @@ private fun FeedItemThumbnail(
                     .data(imageUrl)
                     .listener(
                         onError = { a, b ->
-                            Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
+                            logDebug("FEEDER_CARD", "error ${a.data}", b.throwable)
                         },
                     ).scale(Scale.FILL)
                     .size(sizePx)

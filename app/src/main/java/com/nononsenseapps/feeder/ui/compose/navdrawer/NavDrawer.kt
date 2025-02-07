@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -68,6 +67,7 @@ import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -162,6 +162,7 @@ fun ListOfFeedsAndTags(
                 null -> {
                     Placeholder()
                 }
+
                 ContentType.AllFeeds -> {
                     AllFeeds(
                         unreadCount = item.unreadCount,
@@ -171,6 +172,7 @@ fun ListOfFeedsAndTags(
                         },
                     )
                 }
+
                 ContentType.SavedArticles -> {
                     SavedArticles(
                         unreadCount = item.unreadCount,
@@ -180,6 +182,7 @@ fun ListOfFeedsAndTags(
                         },
                     )
                 }
+
                 ContentType.Tag -> {
                     ExpandableTag(
                         expanded = item.expanded,
@@ -191,6 +194,7 @@ fun ListOfFeedsAndTags(
                         },
                     )
                 }
+
                 ContentType.ChildFeed -> {
                     ChildFeed(
                         unreadCount = item.unreadCount,
@@ -201,6 +205,7 @@ fun ListOfFeedsAndTags(
                         },
                     )
                 }
+
                 ContentType.TopLevelFeed -> {
                     TopLevelFeed(
                         unreadCount = item.unreadCount,
@@ -548,7 +553,7 @@ private fun Feed(
                                 .data(imageUrl.toString())
                                 .listener(
                                     onError = { a, b ->
-                                        Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                                        logDebug("FEEDER_DRAWER", "error ${a.data}", b.throwable)
                                     },
                                 ).scale(Scale.FIT)
                                 .size(pixels)

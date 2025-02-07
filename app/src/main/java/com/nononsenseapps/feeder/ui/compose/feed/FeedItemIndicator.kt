@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +32,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
+import com.nononsenseapps.feeder.util.logDebug
 
 @Composable
 fun FeedItemEitherIndicator(
@@ -87,7 +87,7 @@ fun FeedItemImageIndicator(
                     .data(imageUrl)
                     .listener(
                         onError = { a, b ->
-                            Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                            logDebug("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
                         },
                     ).scale(Scale.FIT)
                     .size(pixels)
@@ -127,7 +127,7 @@ fun FeedItemFeedIconIndicator(
                     .data(feedImageUrl)
                     .listener(
                         onError = { a, b ->
-                            Log.e("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
+                            logDebug("FEEDER_INDICATOR", "error ${a.data}", b.throwable)
                         },
                     ).scale(Scale.FIT)
                     .size(pixels)
