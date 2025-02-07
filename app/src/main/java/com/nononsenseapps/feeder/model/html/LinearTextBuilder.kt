@@ -14,6 +14,10 @@ class LinearTextBuilder : Appendable {
     private val annotationsStack: MutableList<MutableRange<LinearTextAnnotationData>> = mutableListOf()
     private val mLastTwoChars: MutableList<Char> = mutableListOf()
 
+    private val _ids: MutableSet<String> = mutableSetOf()
+    val ids: Set<String>
+        get() = _ids
+
     val length: Int
         get() = text.length
 
@@ -34,6 +38,12 @@ class LinearTextBuilder : Appendable {
 
             return false
         }
+
+    fun pushId(id: String) {
+        if (id.isNotBlank()) {
+            _ids.add(id)
+        }
+    }
 
     fun append(text: String) {
         if (text.count() >= 2) {
@@ -124,6 +134,8 @@ class LinearTextBuilder : Appendable {
         // Chop of possible ending whitespace - looks bad in code blocks for instance
         val trimmed = text.toString().trimEnd()
         return LinearText(
+            // Copy the set to avoid modifications
+            ids = ids.toSet(),
             text = trimmed,
             blockStyle = blockStyle,
             annotations =
@@ -150,6 +162,7 @@ class LinearTextBuilder : Appendable {
      * Clears the text and resets annotations to start at the beginning
      */
     fun clearKeepingSpans() {
+        _ids.clear()
         text.clear()
         mLastTwoChars.clear()
         // Get rid of completed annotations
