@@ -40,10 +40,18 @@ then
   git add app/src/main/res/xml/locales_config.xml
 fi
 
-git cliff --tag "${NEXT_VERSION}" -o CHANGELOG.md
+CL="$(git cliff --tag "${NEXT_VERSION}" --unreleased --strip header --strip footer)"
+echo >&2 "${CL}"
 
-echo >&2 "Changelog for [${NEXT_VERSION}]:"
-head -n 40 CHANGELOG.md >&2
+read -r -p "Write changelog? [y/N] " response
+if [[ "$response" =~ ^[yY]$ ]]
+then
+  git cliff --tag "${NEXT_VERSION}" -o CHANGELOG.md
+  git add CHANGELOG.md
+fi
+
+echo "Verifying build"
+./gradlew check pixel2api30DebugAndroidTest || echo >&2 "Build failed"
 
 read -r -p "Update gradle versions? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
@@ -52,14 +60,10 @@ then
   sed -i "s|\(\s*versionName = \).*|\\1\"${NEXT_VERSION}\"|" app/build.gradle.kts
 fi
 
-echo "Verifying build"
-./gradlew check pixel2api30DebugAndroidTest || echo >&2 "Build failed"
-
 read -r -p "Commit changes? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
   git add app/build.gradle.kts
-  git add CHANGELOG.md
   git diff --staged
   git commit -m "chore: releasing ${NEXT_VERSION}"
 fi
@@ -67,7 +71,7 @@ fi
 read -r -p "Make tag? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  git tag -asm "$(git cliff --tag "${NEXT_VERSION}" --unreleased)" "${NEXT_VERSION}"
+  git tag -asm "$CL" "${NEXT_VERSION}"
 fi
 
 # Undo the changes to locales_config.xml
