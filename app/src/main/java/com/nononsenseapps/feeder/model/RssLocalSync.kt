@@ -412,10 +412,11 @@ class RssLocalSync(
                         .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
 
                 val articlesToDelete =
-                    repository.getItemsToBeCleanedFromFeed(
-                        feedId = feedSql.id,
-                        keepCount = max(maxFeedItemCount, items?.size ?: 0),
-                    ).filterNot { it in presentIds }
+                    repository
+                        .getItemsToBeCleanedFromFeed(
+                            feedId = feedSql.id,
+                            keepCount = max(maxFeedItemCount, items?.size ?: 0),
+                        ).filterNot { it in presentIds }
 
                 for (id in articlesToDelete) {
                     blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
