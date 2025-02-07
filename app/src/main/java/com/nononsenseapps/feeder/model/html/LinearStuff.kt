@@ -16,7 +16,7 @@ data class LinearArticle(
 
                 when {
                     itemIds.isNotEmpty() -> {
-                        logDebug(LOG_TAG, "mapping $itemIds to $index")
+                        logDebug(LOG_TAG, "mapping ${element.javaClass.simpleName} $itemIds to $index")
                         itemIds.map { it to index }
                     }
                     else -> null
@@ -31,7 +31,7 @@ data class LinearArticle(
 sealed interface LinearElement
 
 fun LinearElement.ids(): Set<String> {
-    return when(this) {
+    return when (this) {
         is LinearAudio -> ids
         is LinearBlockQuote -> ids
         is LinearImage -> ids
@@ -81,7 +81,7 @@ data class LinearListItem(
     // If non-null, this is part of a ordered list and this is the user-visible index
     val orderedIndex: Int?,
     val content: List<LinearElement>,
-): LinearElement {
+) : LinearElement {
     constructor(ids: Set<String>, orderedIndex: Int?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(ids = ids, orderedIndex = orderedIndex, content = ListBuilderScope(block).items)
 
     constructor(ids: Set<String>, orderedIndex: Int?, vararg elements: LinearElement) : this(ids = ids, orderedIndex = orderedIndex, content = elements.toList())
@@ -301,7 +301,7 @@ data class LinearBlockQuote(
     val cite: String?,
     val content: List<LinearElement>,
 ) : LinearElement {
-    constructor(ids: Set<String>, cite: String?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(ids = ids,  cite = cite, content = ListBuilderScope(block).items)
+    constructor(ids: Set<String>, cite: String?, block: ListBuilderScope<LinearElement>.() -> Unit) : this(ids = ids, cite = cite, content = ListBuilderScope(block).items)
 
     constructor(ids: Set<String>, cite: String?, vararg elements: LinearElement) : this(ids = ids, cite = cite, content = elements.toList())
 }

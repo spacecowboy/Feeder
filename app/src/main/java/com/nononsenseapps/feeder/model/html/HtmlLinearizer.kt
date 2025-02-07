@@ -493,7 +493,7 @@ class HtmlLinearizer {
                                 .forEachIndexed { index, listItem ->
                                     val item =
                                         LinearListItem(
-                                            ids = element.allIds(),
+                                            ids = listItem.allIds(),
                                             orderedIndex =
                                                 if (ordered) {
                                                     index + 1
@@ -1066,10 +1066,11 @@ private suspend fun SequenceScope<Element>.yieldDescendantsOf(element: Element) 
     }
 }
 
-private fun Element.allIds(): Set<String> = sequence {
-    yield(this@allIds)
-    yieldDescendantsOf(this@allIds)
-}
-    .map { it.id() }
-    .filterNot { it.isEmpty() }
-    .toSet()
+private fun Element.allIds(): Set<String> =
+    sequence {
+        yield(this@allIds)
+        yieldDescendantsOf(this@allIds)
+    }
+        .map { it.id() }
+        .filterNot { it.isEmpty() }
+        .toSet()
