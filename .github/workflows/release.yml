@@ -48,7 +48,9 @@ jobs:
 
       - name: deploy to play store
         shell: bash
-        run: ci/run-if-release ./deploy_playstore_fast.sh
+        run: ./deploy_playstore_fast.sh
+
+        ## TODO script to extract the body for the release from CHANGELOG.md
 
       - name: release
         uses: softprops/action-gh-release@v2
