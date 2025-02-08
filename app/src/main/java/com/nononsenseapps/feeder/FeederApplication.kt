@@ -49,6 +49,7 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
+import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okio.Path.Companion.toOkioPath
@@ -119,7 +120,8 @@ class FeederApplication :
             singleton {
                 val filePathProvider = instance<FilePathProvider>()
                 cachingHttpClient(
-                    cacheDirectory = (filePathProvider.httpCacheDir),
+                    cacheDirectory = filePathProvider.httpCacheDir,
+                    cacheSize = 25L * 1024 * 1024,
                 ) {
                     addNetworkInterceptor(UserAgentInterceptor)
                     addNetworkInterceptor(RateLimitedInterceptor)
@@ -150,6 +152,9 @@ class FeederApplication :
                 val okHttpClient =
                     instance<OkHttpClient>()
                         .newBuilder()
+                        // Use a separate cache for images so we don't evict feed responses
+                        // Note that coil has its own cache, so this is only for the network
+                        .cache(Cache(filePathProvider.httpImageCacheDir, 25L * 1024 * 1024))
                         .addInterceptor(AlwaysUseCacheIfPossibleRequestsInterceptor)
                         .addInterceptor { chain ->
                             chain.proceed(

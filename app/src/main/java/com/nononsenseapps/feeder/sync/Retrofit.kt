@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.sync
 
-import android.util.Log
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import com.nononsenseapps.feeder.util.logDebug
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -36,7 +36,7 @@ fun getFeederSyncClient(
                         val response = chain.proceed(chain.request())
                         val isCachedResponse =
                             response.cacheResponse != null && (response.networkResponse == null || response.networkResponse?.code == 304)
-                        Log.v(
+                        logDebug(
                             "FEEDER_SYNC_CLIENT",
                             "Response cached: $isCachedResponse, ${response.networkResponse?.code}, cache-Control: ${response.cacheControl}",
                         )
