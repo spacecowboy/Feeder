@@ -4,9 +4,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 /**
- * Interceptor that handles Too Many Requests (429) responses for Coil.
- *
- * It intercepts requests, checking if a 429 timeout was received. If so, it cancels the request.
+ * Interceptor that prevents more than one request to a host at a time
  */
 object RateLimitedInterceptor : Interceptor {
     private const val LOG_TAG = "FEEDER_RATEINTER"
