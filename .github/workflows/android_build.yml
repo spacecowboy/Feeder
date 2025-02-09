@@ -50,10 +50,6 @@ jobs:
         KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
         KEYALIAS: ${{ secrets.KEYALIAS }}
 
-    - name: bump version if not release
-      shell: bash
-      run: ci/run-if-not-release fastlane bump_version_code
-
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
     - name: gradle build
@@ -63,7 +59,7 @@ jobs:
       shell: bash
       run: ci/run-if-not-release ./deploy_playstore_fast.sh --dry-run
 
-    - name: validate deploy
+    - name: deploy beta to play store
       shell: bash
       run: ci/run-if-not-release ./deploy_playstore_fast.sh
 
