@@ -46,6 +46,9 @@
 -dontwarn java.awt.HeadlessException
 -dontwarn java.awt.Window
 
+# Charset detection
+-keep class com.ibm.icu.** { *; }
+
 # For Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
 -keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
