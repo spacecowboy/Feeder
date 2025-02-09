@@ -57,6 +57,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import rust.nostr.sdk.Client as NostrClient
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -608,8 +609,8 @@ suspend fun OkHttpClient.getResponse(
             .run {
                 if (forceNetwork) {
                     cacheControl(
-                        // Force network will make conditional requests for servers which support them
-                        CacheControl.FORCE_NETWORK,
+                        // Set a low max age to perform a conditional request, but preventing spamming the server
+                        CacheControl.Builder().maxAge(1, TimeUnit.MINUTES).build(),
                     )
                 } else {
                     this
