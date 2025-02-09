@@ -16,6 +16,7 @@ jobs:
         with:
           submodules: 'recursive'
           fetch-depth: 0
+          fetch-tags: true
 
       - name: version
         run: echo "::set-output name=versioncode::$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"

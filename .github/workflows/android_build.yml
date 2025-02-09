@@ -28,6 +28,7 @@ jobs:
       with:
         submodules: 'recursive'
         fetch-depth: 0
+        fetch-tags: true
 
     # Verify the SHA-sum
     - name: validate gradle wrapper
