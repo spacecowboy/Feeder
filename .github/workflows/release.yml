@@ -51,7 +51,8 @@ jobs:
         shell: bash
         run: ./deploy_playstore_fast.sh
 
-        ## TODO JONAS script to extract the body for the release from CHANGELOG.md
+      - name: get latest changelog entry
+        run: mkdir -p build && ci/latest-changelog.py CHANGELOG.md > build/release_notes.md
 
       - name: release
         uses: softprops/action-gh-release@v2
@@ -59,9 +60,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           draft: false
-          #tag_name: 2.4.20
-          # TODO JONAS fix this
-          body_path: fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.versioncode }}.txt
+          body_path: build/release_notes.md
           fail_on_unmatched_files: true
           files: |
             app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
