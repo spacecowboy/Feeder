@@ -12,16 +12,21 @@ elif [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}"
     echo "${CURRENT_VERSION} is a production release"
     fastlane validate_deploy track:production
   else
-    echo "${CURRENT_VERSION} is a beta release"
-    fastlane validate_deploy track:beta
+    echo "${CURRENT_VERSION} is a pre release"
+    fastlane validate_deploy track:alpha
   fi
 else
   echo "${CURRENT_VERSION} is a tag - deploying to store!"
   if [[ "${CURRENT_VERSION}" =~ ^[0-9.]*$ ]]; then
     echo "${CURRENT_VERSION} is a production release"
-    fastlane deploy track:production
+    fastlane deploy track:internal
+    fastlane promote track:internal track_promote_to:alpha
+    fastlane promote track:alpha track_promote_to:beta
+    fastlane promote track:beta track_promote_to:production
   else
-    echo "${CURRENT_VERSION} is a beta release"
-    fastlane deploy track:beta
+    echo "${CURRENT_VERSION} is a pre release"
+    fastlane deploy track:internal
+    fastlane promote track:internal track_promote_to:alpha
+    fastlane promote track:alpha track_promote_to:beta
   fi
 fi

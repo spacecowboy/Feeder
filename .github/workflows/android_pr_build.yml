@@ -40,7 +40,7 @@ jobs:
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
     - name: gradle build
-      run: ./gradlew assemble bundle packageDebugAndroidTest :app:lint test
+      run: ./gradlew assemble bundle packageFdroidDebugAndroidTest :app:lint test
 
     # Lint
   ktlint:

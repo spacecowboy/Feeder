@@ -56,11 +56,15 @@ jobs:
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
     - name: gradle build
-      run: ./gradlew build app:bundlePlay :app:lint check
+      run: ./gradlew build app:bundlePlayRelease :app:lint check
 
     - name: validate deploy
       shell: bash
       run: ci/run-if-not-release ./deploy_playstore_fast.sh --dry-run
+
+    - name: validate deploy
+      shell: bash
+      run: ci/run-if-not-release ./deploy_playstore_fast.sh
 
   # Runs emulator tests
   # connected_check:

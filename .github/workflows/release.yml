@@ -44,13 +44,13 @@ jobs:
       - name: gradle setup
         uses: gradle/actions/setup-gradle@v4
       - name: gradle build
-        run: ./gradlew build :app:lint check app:bundlePlay
+        run: ./gradlew build :app:lint check app:bundlePlayRelease
 
       - name: deploy to play store
         shell: bash
         run: ./deploy_playstore_fast.sh
 
-        ## TODO script to extract the body for the release from CHANGELOG.md
+        ## TODO JONAS script to extract the body for the release from CHANGELOG.md
 
       - name: release
         uses: softprops/action-gh-release@v2
@@ -59,8 +59,9 @@ jobs:
         with:
           draft: false
           #tag_name: 2.4.20
+          # TODO JONAS fix this
           body_path: fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.versioncode }}.txt
           fail_on_unmatched_files: true
           files: |
-            app/build/outputs/apk/release/app-release.apk
-            app/build/outputs/apk/play/app-play.apk
+            app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
+            app/build/outputs/apk/play/release/app-play-release.apk
