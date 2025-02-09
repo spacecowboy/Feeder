@@ -1,12 +1,13 @@
 package com.nononsenseapps.feeder.model
 
 import android.util.Log
+import com.ibm.icu.text.CharsetDetector
+import com.ibm.icu.text.CharsetMatch
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.estimateWordCount
-import com.nononsenseapps.feeder.model.FullTextParser.Companion.LOG_TAG
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -101,7 +102,17 @@ class FullTextParser(
                             ).left()
                         }
 
-                        val charset = contentType.charset() ?: findMetaCharset(bytes)
+                        var charset: Charset? = contentType.charset()
+
+                        if (charset == null) {
+                            charset = findMetaCharset(bytes)?.let { toJavaCharset(it) }
+                            logDebug(LOG_TAG, "No charset in content type, meta charset: $charset")
+                        }
+
+                        if (charset == null) {
+                            charset = detectCharset(bytes)?.let { toJavaCharset(it) }
+                            logDebug(LOG_TAG, "No charset in content type, guessing charset: $charset")
+                        }
 
                         logDebug(LOG_TAG, "Full article charset: $charset")
 
@@ -150,183 +161,157 @@ class FullTextParser(
         }
     }
 
-    /**
-     * For sites which don't use UTF-8 like http://www.muhasebetr.com/rss/
-     */
-    private fun findMetaCharset(html: ByteArray): Charset? {
-        val builder = StringBuilder()
-        var state = CharsetState.INIT
-        html.forEach { b ->
-            state = nextCharsetState(b, state)
-
-            when (state) {
-                CharsetState.CHARSET -> {
-                    builder.append(b.toInt().toChar())
-                }
-
-                CharsetState.END -> {
-                    try {
-                        return if (builder.isNotBlank()) {
-                            Charset.forName(builder.toString())
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        // No charset present
-                    }
-                }
-
-                else -> {
-                    // Nothing to do
-                }
-            }
-        }
-        return null
-    }
-
-    private fun nextCharsetState(
-        byte: Byte,
-        state: CharsetState,
-    ): CharsetState =
-        when (state) {
-            CharsetState.END -> CharsetState.END
-            CharsetState.INIT ->
-                when (byte.toInt().toChar()) {
-                    '<' -> CharsetState.TAG_START
-                    else -> CharsetState.INIT
-                }
-
-            CharsetState.TAG_START ->
-                when (byte.toInt().toChar()) {
-                    'm' -> CharsetState.META_M
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.TAG_END ->
-                when (byte.toInt().toChar()) {
-                    '>' -> CharsetState.INIT
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.META_M ->
-                when (byte.toInt().toChar()) {
-                    'e' -> CharsetState.META_E
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.META_E ->
-                when (byte.toInt().toChar()) {
-                    't' -> CharsetState.META_T
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.META_T ->
-                when (byte.toInt().toChar()) {
-                    'a' -> CharsetState.META_A
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.META_A -> {
-                val c = byte.toInt().toChar()
-                when {
-                    c.isWhitespace() -> CharsetState.META_SPACE
-                    else -> CharsetState.TAG_END
-                }
-            }
-
-            CharsetState.META_SPACE -> {
-                val c = byte.toInt().toChar()
-                when {
-                    c.isWhitespace() -> CharsetState.META_SPACE
-                    c == 'c' -> CharsetState.CHARSET_C
-                    else -> CharsetState.TAG_END
-                }
-            }
-
-            CharsetState.CHARSET_C ->
-                when (byte.toInt().toChar()) {
-                    'h' -> CharsetState.CHARSET_H
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_H ->
-                when (byte.toInt().toChar()) {
-                    'a' -> CharsetState.CHARSET_A
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_A ->
-                when (byte.toInt().toChar()) {
-                    'r' -> CharsetState.CHARSET_R
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_R ->
-                when (byte.toInt().toChar()) {
-                    's' -> CharsetState.CHARSET_S
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_S ->
-                when (byte.toInt().toChar()) {
-                    'e' -> CharsetState.CHARSET_E
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_E ->
-                when (byte.toInt().toChar()) {
-                    't' -> CharsetState.CHARSET_T
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_T ->
-                when (byte.toInt().toChar()) {
-                    '=' -> CharsetState.CHARSET_EQUALS
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_EQUALS ->
-                when (byte.toInt().toChar()) {
-                    '"' -> CharsetState.CHARSET_QUOTE
-                    else -> CharsetState.TAG_END
-                }
-
-            CharsetState.CHARSET_QUOTE ->
-                when (byte.toInt().toChar()) {
-                    '"' -> CharsetState.END
-                    else -> CharsetState.CHARSET
-                }
-
-            CharsetState.CHARSET ->
-                when (byte.toInt().toChar()) {
-                    '"' -> CharsetState.END
-                    else -> CharsetState.CHARSET
-                }
-        }
-
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
     }
 }
 
-enum class CharsetState {
-    END,
+/**
+ * For sites which don't use UTF-8 like http://www.muhasebetr.com/rss/
+ */
+fun findMetaCharset(html: ByteArray): String? {
+    var state = HtmlParserState.INIT
+    var tagName = StringBuilder()
+    var attrName = StringBuilder()
+    val attrValue = StringBuilder()
+
+    html.forEach { b ->
+        val char = b.toInt().toChar()
+        state = nextHtmlParseState(char, state)
+
+        when (state) {
+            HtmlParserState.TAG_NAME -> tagName.append(char)
+            HtmlParserState.TAG_ATTR_NAME -> attrName.append(char)
+            HtmlParserState.TAG_ATTR_VALUE -> attrValue.append(char)
+            HtmlParserState.TAG_START -> {
+                tagName.clear()
+                attrName.clear()
+                attrValue.clear()
+            }
+
+            HtmlParserState.TAG_NAME_POST -> {
+                // This is the state after a attribute has been parsed (but also before)
+
+                if (tagName.toString().equals("meta", ignoreCase = true)) {
+                    val name = attrName.toString()
+                    val value = attrValue.toString()
+                    when {
+                        name.equals("content", ignoreCase = true) && value.contains("charset=") -> {
+                            return attrValue.toString().substringAfter("charset=").substringBefore(';')
+                        }
+
+                        name.equals("charset", ignoreCase = true) -> {
+                            return value
+                        }
+                    }
+                }
+
+                attrName.clear()
+                attrValue.clear()
+            }
+
+            else -> {
+                // Nothing to do
+            }
+        }
+    }
+    return null
+}
+
+private fun nextHtmlParseState(
+    char: Char,
+    currentState: HtmlParserState,
+): HtmlParserState =
+    when (currentState) {
+        HtmlParserState.INIT ->
+            when (char) {
+                '<' -> HtmlParserState.TAG_START
+                else -> HtmlParserState.INIT
+            }
+
+        HtmlParserState.TAG_START ->
+            when (char) {
+                ' ' -> HtmlParserState.TAG_START
+                '/' -> HtmlParserState.TAG_START
+                '>' -> HtmlParserState.INIT
+                else -> HtmlParserState.TAG_NAME
+            }
+
+        HtmlParserState.TAG_NAME ->
+            when (char) {
+                ' ' -> HtmlParserState.TAG_NAME_POST
+                '/' -> HtmlParserState.TAG_START
+                '>' -> HtmlParserState.INIT
+                else -> HtmlParserState.TAG_NAME
+            }
+
+        HtmlParserState.TAG_NAME_POST ->
+            when (char) {
+                ' ' -> HtmlParserState.TAG_NAME_POST
+                '/' -> HtmlParserState.TAG_START
+                '>' -> HtmlParserState.INIT
+                else -> HtmlParserState.TAG_ATTR_NAME
+            }
+
+        HtmlParserState.TAG_ATTR_NAME ->
+            when (char) {
+                ' ' -> HtmlParserState.TAG_NAME_POST
+                '/' -> HtmlParserState.TAG_START
+                '>' -> HtmlParserState.INIT
+                '=' -> HtmlParserState.TAG_ATTR_EQUALS
+                else -> HtmlParserState.TAG_ATTR_NAME
+            }
+
+        HtmlParserState.TAG_ATTR_EQUALS ->
+            when (char) {
+                ' ' -> HtmlParserState.TAG_ATTR_EQUALS
+                '/' -> HtmlParserState.TAG_START
+                '>' -> HtmlParserState.INIT
+                '"' -> HtmlParserState.TAG_ATTR_QUOTE_START
+                else -> HtmlParserState.TAG_START
+            }
+
+        HtmlParserState.TAG_ATTR_QUOTE_START ->
+            when (char) {
+                '"' -> HtmlParserState.TAG_NAME_POST
+                else -> HtmlParserState.TAG_ATTR_VALUE
+            }
+
+        HtmlParserState.TAG_ATTR_VALUE ->
+            when (char) {
+                '"' -> HtmlParserState.TAG_NAME_POST
+                else -> HtmlParserState.TAG_ATTR_VALUE
+            }
+    }
+
+enum class HtmlParserState {
     INIT,
     TAG_START,
-    TAG_END,
-    META_M,
-    META_E,
-    META_T,
-    META_A,
-    META_SPACE,
-    CHARSET_C,
-    CHARSET_H,
-    CHARSET_A,
-    CHARSET_R,
-    CHARSET_S,
-    CHARSET_E,
-    CHARSET_T,
-    CHARSET_EQUALS,
-    CHARSET_QUOTE,
-    CHARSET,
+    TAG_NAME,
+    TAG_NAME_POST,
+    TAG_ATTR_NAME,
+    TAG_ATTR_EQUALS,
+    TAG_ATTR_QUOTE_START,
+    TAG_ATTR_VALUE,
+}
+
+/**
+ * For sites which don't use UTF-8 like http://www.muhasebetr.com/rss/
+ */
+fun detectCharset(html: ByteArray): String? {
+    val detector = CharsetDetector()
+    detector.setText(html)
+    val matches: Array<CharsetMatch> = detector.detectAll()
+
+    return matches.firstOrNull { it.confidence > 50 }?.name
+}
+
+private fun toJavaCharset(icuName: String): Charset {
+    // Handle ICU's charset name variations
+    return when (icuName.uppercase()) {
+        "GB2312" -> Charset.forName("GBK") // Android maps GB2312 to GBK
+        "BIG5-HKSCS" -> Charset.forName("Big5_HKSCS")
+        "Shift-JIS" -> Charset.forName("Shift_JIS")
+        else -> Charset.forName(icuName)
+    }
 }

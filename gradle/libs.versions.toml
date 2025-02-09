@@ -48,6 +48,7 @@ espresso = "3.6.1"
 mockk = "1.13.16"
 androidx-test-junit-ktx = "1.2.1"
 emoji2 = "1.5.0"
+icu4j = "76.1"
 
 [libraries]
 retrofit-bom = { module = "com.squareup.retrofit2:retrofit-bom", version.ref = "retrofit" }
@@ -87,6 +88,7 @@ accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive",
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 tagsoup = { module = "org.ccil.cowan.tagsoup:tagsoup", version.ref = "tagsoup" }
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 gofeed-android = { module = "com.nononsenseapps.gofeed:gofeed-android", version.ref = "gofeed" }
 rust-nostr = { module = "org.rust-nostr:nostr-sdk", version.ref = "rust-nostr" }
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "jetbrains-markdown" }
@@ -142,7 +144,7 @@ ktlint-gradle = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gr
 [bundles]
 okhttp-android = ["okhttp", "okio", "conscrypt-android"]
 kotlin = ["kotlin-stdlib", "kotlin-stdlib-common", "kotlin-coroutines-core", "kotlin-serialization-json"]
-jvm = ["jsoup", "tagsoup", "readability4j", "retrofit", "retrofit-converter-moshi", "moshi", "moshi-kotlin", "moshi-adapters", "qrgen", "gofeed-android"]
+jvm = ["jsoup", "tagsoup", "readability4j", "retrofit", "retrofit-converter-moshi", "moshi", "moshi-kotlin", "moshi-adapters", "qrgen", "gofeed-android", "icu4j"]
 android = ["lifecycle-runtime-ktx", "lifecycle-viewmodel-ktx", "lifecycle-viewmodel-savedstate", "paging-runtime-ktx", "room-ktx", "room-paging", "core-ktx", "androidx-appcompat", "androidx-preference", "coil-gif", "coil-svg", "coil-okhttp", "kotlin-coroutines-android", "kodein-androidx", "androidx-browser", "emoji2", "emoji2-view-helper"]
 compose = ["activity-compose", "ui", "foundation", "foundation-layout", "compose-material3", "compose-material", "compose-material-icons-extended", "runtime", "ui-tooling", "navigation-compose", "paging-compose", "window", "android-material", "accompanist-permissions", "accompanist-adaptive", "compose-material3-windowsizeclass", "lifecycle-runtime-compose", "coil-compose", "lazycolumnscrollbar"]
 test = ["kotlin-test-junit", "kotlin-coroutines-test", "junit", "mockk", "mockwebserver"]
