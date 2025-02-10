@@ -1,4 +1,4 @@
-name: PR Checks
+name: Continuous Integration
 
 on:
   push:
@@ -6,8 +6,10 @@ on:
       - master
     paths:
       - 'app/**'
+      - 'fastlane/**'
       - 'gradle/**'
       - 'build.gradle.kts'
+      - 'deploy_playstore_fast.sh'
       - 'settings.gradle.kts'
       - 'gradle.properties'
       - 'gradlew'
@@ -15,7 +17,6 @@ on:
       - 'gradle-wrapper.properties'
       - 'gradle-wrapper.jar'
       - '.github/workflows/android_pr_build.yml'
-      - 'fastlane/**'
   pull_request:
     paths:
       - 'app/**'
@@ -30,7 +31,7 @@ on:
       - '.github/workflows/android_pr_build.yml'
 
 jobs:
-  compile_and_lint:
+  compile-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -61,7 +62,7 @@ jobs:
     - name: lint
       run: ./gradlew lintFdroidDebug
 
-  compile_android_test:
+  compile-android-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -115,7 +116,7 @@ jobs:
     - name: test
       run: ./gradlew testFdroidDebug
 
-  release_apk:
+  release-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -142,7 +143,7 @@ jobs:
     - name: release apk
       run: ./gradlew assembleFdroidRelease
 
-  play_bundle:
+  play-bundle:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -169,7 +170,6 @@ jobs:
     - name: release bundle
       run: ./gradlew bundlePlayRelease
 
-    # Save bundle to artifacts for later use
     - name: save bundle
       uses: actions/upload-artifact@v4
       with:
@@ -179,11 +179,11 @@ jobs:
           app/build/outputs/bundle/playRelease/app-play-release.aab
           app/build/outputs/mapping/playRelease/mapping.txt
 
-  validate_deploy:
+  validate-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
-    needs: [play_bundle]
+    needs: [play-bundle]
     permissions:
       contents: read
     steps:
@@ -209,9 +209,16 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: bundle
+        path: app/build/outputs/
 
     - name: validate deploy
       run: ./deploy_playstore_fast.sh --dry-run
+
+  deploy-beta:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
 
   ktlint:
     runs-on: ubuntu-latest
