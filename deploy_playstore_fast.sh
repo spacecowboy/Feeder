@@ -3,30 +3,20 @@
 LATEST_TAG="$(git describe --tags "$(git rev-list --tags --max-count=1)")"
 CURRENT_VERSION="$(git describe --tags)"
 
-if [[ "${1:-}" == "--dry-run" ]] && [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]]; then
-  # CI runs master and tag pipelines concurrently and fastlane will conflict if run concurrently
-  echo "${CURRENT_VERSION} is a tag but --dry-run was specified - not doing anything"
-elif [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
-  echo "${CURRENT_VERSION} is not tag - validating deployment"
-  if [[ "${CURRENT_VERSION}" =~ ^[0-9.]*$ ]]; then
-    echo "${CURRENT_VERSION} is a production release"
-    fastlane validate_deploy track:production
-  else
-    echo "${CURRENT_VERSION} is a pre release"
-    fastlane validate_deploy track:alpha
-  fi
+echo "Current version: ${CURRENT_VERSION}"
+echo "Latest tag: ${LATEST_TAG}"
+
+if [[ "${1:-}" == "--dry-run" ]]; then
+  echo "Dry run was specified. Validating deployment"
+  fastlane validate_deploy track:internal|| { echo "Validation failed"; exit 1; }
 else
-  echo "${CURRENT_VERSION} is a tag - deploying to store!"
-  if [[ "${CURRENT_VERSION}" =~ ^[0-9.]*$ ]]; then
-    echo "${CURRENT_VERSION} is a production release"
-    fastlane deploy track:internal
-    fastlane promote track:internal track_promote_to:alpha
-    fastlane promote track:alpha track_promote_to:beta
-    fastlane promote track:beta track_promote_to:production
-  else
-    echo "${CURRENT_VERSION} is a pre release"
-    fastlane deploy track:internal
-    fastlane promote track:internal track_promote_to:alpha
-    fastlane promote track:alpha track_promote_to:beta
+  echo "Deploying to beta!"
+  fastlane deploy track:internal || { echo "Deployment failed"; exit 1; }
+  fastlane promote track:internal track_promote_to:alpha|| { echo "Promotion to alpha failed"; exit 1; }
+  fastlane promote track:alpha track_promote_to:beta || { echo "Promotion to beta failed"; exit 1; }
+
+  if [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]] && [[ "${CURRENT_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "${CURRENT_VERSION} is a release - deploying to production!"
+    fastlane promote track:beta track_promote_to:production|| { echo "Promotion to production failed"; exit 1; }
   fi
 fi
