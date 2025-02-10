@@ -134,7 +134,7 @@ jobs:
     - name: release apk
       run: ./gradlew assembleFdroidRelease
 
-  release_bundle:
+  play_bundle:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -161,10 +161,10 @@ jobs:
 
     # Running this first to ensure it is not run in parallel with minify due to memory
     - name: lint vital release
-      run: ./gradlew lintVitalFdroidRelease
+      run: ./gradlew lintVitalPlayRelease
 
     - name: release bundle
-      run: ./gradlew bundleFdroidRelease
+      run: ./gradlew bundlePlayRelease
 
   ktlint:
     runs-on: ubuntu-latest
