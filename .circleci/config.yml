@@ -69,6 +69,16 @@ jobs:
       name: android/android_machine
       tag: default
 
+    filters:
+      paths:
+        only:
+          - "app/**"
+          - "gradle/**"
+          - "build.gradle.kts"
+          - "gradle.properties"
+          - "settings.gradle.kts"
+        #   - ".circleci/**"
+
     steps:
       - checkout
       - restore_gradle_cache
