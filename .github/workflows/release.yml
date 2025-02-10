@@ -171,9 +171,11 @@ jobs:
         path: app/build/outputs/
     
     - name: deploy
+      if: startsWith(github.ref, 'refs/tags/')
       run: ./deploy_playstore_fast.sh
 
-  release-build:
+  github-release:
+    needs: [fdroid-apk, play-apk]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -210,8 +212,7 @@ jobs:
 
       - name: release
         uses: softprops/action-gh-release@v2
-        # Ignore if play store fails because Google sucks
-        if: ${{ !cancelled() }}
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: false
           body_path: build/release_notes.md

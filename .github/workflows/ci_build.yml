@@ -222,7 +222,7 @@ jobs:
 
     - name: validate deploy
       # Do not want this to run on tags
-      run: ci/run-if-not-release /deploy_playstore_fast.sh --dry-run
+      run: ci/run-if-not-release ./deploy_playstore_fast.sh --dry-run
 
   deploy-beta:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
