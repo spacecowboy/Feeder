@@ -6,31 +6,7 @@ on:
       - '*'
     branches:
       - master
-    paths:
-      - 'app/**'
-      - 'fastlane/**'
-      - 'gradle/**'
-      - 'build.gradle.kts'
-      - 'deploy_playstore_fast.sh'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradlew'
-      - 'gradlew.bat'
-      - 'gradle-wrapper.properties'
-      - 'gradle-wrapper.jar'
-      - '.github/workflows/android_pr_build.yml'
   pull_request:
-    paths:
-      - 'app/**'
-      - 'gradle/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradlew'
-      - 'gradlew.bat'
-      - 'gradle-wrapper.properties'
-      - 'gradle-wrapper.jar'
-      - '.github/workflows/android_pr_build.yml'
 
 jobs:
   ktlint:
@@ -350,6 +326,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: [fdroid-apk, play-apk]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: write
     steps:
