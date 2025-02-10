@@ -194,17 +194,6 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
-    - name: setup JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: gradle setup
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-
     - name: copy bundle
       uses: actions/download-artifact@v4
       with:
@@ -212,13 +201,31 @@ jobs:
         path: app/build/outputs/
 
     - name: validate deploy
-      run: ./deploy_playstore_fast.sh --dry-run
+      run: .ci/run-if-not-release /deploy_playstore_fast.sh --dry-run
 
   deploy-beta:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: [validate-deploy]
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
 
+    - name: copy bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: bundle
+        path: app/build/outputs/
+    
+    - name: deploy
+      run: ci/run-if-not-release ./deploy_playstore_fast.sh
 
   ktlint:
     runs-on: ubuntu-latest
