@@ -36,6 +36,9 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        # needed for configuration task cache
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: compile
       run: ./gradlew compileFdroidDebugKotlin
@@ -64,6 +67,8 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: compile android test
       run: ./gradlew compileFdroidDebugAndroidTestKotlin
@@ -89,6 +94,8 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: test
       run: ./gradlew testFdroidDebug
@@ -114,6 +121,8 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: release apk
       run: ./gradlew assembleFdroidRelease
@@ -139,6 +148,8 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: release bundle
       run: ./gradlew bundlePlayRelease
@@ -164,6 +175,8 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       
     - name: ktlint check
       run: ./gradlew ktlintCheck
