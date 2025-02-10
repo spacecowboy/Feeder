@@ -15,20 +15,18 @@ on:
       - '.github/workflows/android_pr_build.yml'
 
 jobs:
-  # this job builds and uploads the apk
-  build_the_apk:
+  compile_and_lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-    - name: perform the checkout
+    - name: checkout
       uses: actions/checkout@v4
       with:
         submodules: 'recursive'
         fetch-depth: 0
         fetch-tags: true
 
-    # Verify the SHA-sum
     - name: validate gradle wrapper
       uses: gradle/wrapper-validation-action@v3
 
@@ -38,13 +36,123 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # This initializes gradle and sets up caching. Default version is the wrapper version.
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
-    - name: gradle build
-      run: ./gradlew assemble bundle packageFdroidDebugAndroidTest :app:lint test
 
-    # Lint
+    - name: compile
+      run: ./gradlew compileFdroidDebugKotlin
+    
+    - name: lint
+      run: ./gradlew lintFdroidDebug
+
+  compile_android_test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: validate gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: compile android test
+      run: ./gradlew compileFdroidDebugAndroidTestKotlin
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: validate gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: test
+      run: ./gradlew testFdroidDebug
+
+  release_apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: validate gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: release apk
+      run: ./gradlew assembleFdroidRelease
+
+  release_bundle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: validate gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: release bundle
+      run: ./gradlew bundleFdroidRelease
+
   ktlint:
     runs-on: ubuntu-latest
     permissions:
@@ -57,6 +165,9 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
+    - name: validate gradle wrapper
+      uses: gradle/wrapper-validation-action@v3
+
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -65,5 +176,6 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
+      
     - name: ktlint check
       run: ./gradlew ktlintCheck
