@@ -167,6 +167,16 @@ jobs:
       with:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
     - name: release bundle
       run: ./gradlew bundlePlayRelease
 
@@ -194,6 +204,16 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
     - name: copy bundle
       uses: actions/download-artifact@v4
       with:
@@ -201,7 +221,8 @@ jobs:
         path: app/build/outputs/
 
     - name: validate deploy
-      run: .ci/run-if-not-release /deploy_playstore_fast.sh --dry-run
+      # Do not want this to run on tags
+      run: ci/run-if-not-release /deploy_playstore_fast.sh --dry-run
 
   deploy-beta:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -218,6 +239,16 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
     - name: copy bundle
       uses: actions/download-artifact@v4
       with:
@@ -225,6 +256,7 @@ jobs:
         path: app/build/outputs/
     
     - name: deploy
+      # do not want this to run on tags
       run: ci/run-if-not-release ./deploy_playstore_fast.sh
 
   ktlint:
