@@ -17,6 +17,7 @@ on:
 jobs:
   compile_and_lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -47,6 +48,7 @@ jobs:
 
   compile_android_test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -74,6 +76,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -101,6 +104,7 @@ jobs:
 
   release_apk:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -128,6 +132,7 @@ jobs:
 
   release_bundle:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -155,6 +160,7 @@ jobs:
 
   ktlint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
     steps:
