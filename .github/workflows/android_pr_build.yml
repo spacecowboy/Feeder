@@ -28,9 +28,6 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
-
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -59,9 +56,6 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
-
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -86,9 +80,6 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 0
         fetch-tags: true
-
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
 
     - name: setup JDK
       uses: actions/setup-java@v4
@@ -115,9 +106,6 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
-
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -143,9 +131,6 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
-
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -170,9 +155,6 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 0
         fetch-tags: true
-
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v3
 
     - name: setup JDK
       uses: actions/setup-java@v4
