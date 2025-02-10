@@ -110,6 +110,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
+        // See androidComponents below for related configurations
         flavorDimensions += "store"
         productFlavors {
             create("fdroid") {
@@ -190,6 +191,15 @@ android {
         ignoreWarnings = true
         textOutput = file("stdout")
         textReport = true
+    }
+}
+
+androidComponents {
+    beforeVariants { variantBuilder ->
+        if (variantBuilder.buildType == "debug") {
+            // Only allow debug build of fdroid flavor
+            variantBuilder.enable = variantBuilder.productFlavors.containsAll(listOf("store" to "fdroid"))
+        }
     }
 }
 
