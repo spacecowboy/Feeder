@@ -127,10 +127,6 @@ jobs:
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
 
-    # Running this first to ensure it is not run in parallel with minify due to memory
-    - name: lint vital release
-      run: ./gradlew lintVitalFdroidRelease
-
     - name: release apk
       run: ./gradlew assembleFdroidRelease
 
@@ -158,10 +154,6 @@ jobs:
 
     - name: gradle setup
       uses: gradle/actions/setup-gradle@v4
-
-    # Running this first to ensure it is not run in parallel with minify due to memory
-    - name: lint vital release
-      run: ./gradlew lintVitalPlayRelease
 
     - name: release bundle
       run: ./gradlew bundlePlayRelease
