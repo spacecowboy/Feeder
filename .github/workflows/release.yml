@@ -185,10 +185,6 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: version
-        id: version
-        run: echo "versionCode=$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")" >> $GITHUB_ENV
-
       - name: prepare for build
         shell: bash
         run: ./prepare_for_build.sh
