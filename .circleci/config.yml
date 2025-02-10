@@ -74,7 +74,7 @@ jobs:
       - restore_gradle_cache
       - run:
           name: Run Gradle Managed Emulator Tests
-          command: ./gradlew pixel2api30DebugAndroidTest --parallel
+          command: ./gradlew pixel2api30FdroidDebugAndroidTest --parallel
       - save_gradle_cache
 
 # Orchestrate jobs using workflows

@@ -8,12 +8,33 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
+val commitCount by project.extra {
+    providers
+        .exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+        }.standardOutput.asText
+        .get()
+        .trim()
+        .toInt()
+}
+
+val latestTag by project.extra {
+    providers
+        .exec {
+            commandLine("git", "describe")
+        }.standardOutput.asText
+        .get()
+        .trim()
+}
+
 android {
     namespace = "com.nononsenseapps.feeder"
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
+        // The version fields are set with actual values to support F-Droid
+        // In Play variant, they are overriden and taken from git.
         versionCode = 326
         versionName = "2.9.0"
         minSdk = 23
@@ -88,25 +109,20 @@ android {
             if (project.hasProperty("STORE_FILE")) {
                 signingConfig = signingConfigs.getByName("release")
             }
-//            else {
-//                signingConfig = signingConfigs.getByName("shareddebug")
-//            }
         }
-        val play by creating {
-            applicationIdSuffix = ".play"
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-            matchingFallbacks.add("release")
-            if (project.hasProperty("STORE_FILE")) {
-                signingConfig = signingConfigs.getByName("release")
+        // See androidComponents below for related configurations
+        flavorDimensions += "store"
+        productFlavors {
+            create("fdroid") {
+                dimension = "store"
+                // Keeping default version values for F-Droid
             }
-//            else {
-//                signingConfig = signingConfigs.getByName("shareddebug")
-//            }
+            create("play") {
+                dimension = "store"
+                versionName = latestTag
+                versionCode = commitCount
+                applicationIdSuffix = ".play"
+            }
         }
     }
     testOptions {
@@ -175,6 +191,15 @@ android {
         ignoreWarnings = true
         textOutput = file("stdout")
         textReport = true
+    }
+}
+
+androidComponents {
+    beforeVariants { variantBuilder ->
+        if (variantBuilder.buildType == "debug") {
+            // Only allow debug build of fdroid flavor
+            variantBuilder.enable = variantBuilder.productFlavors.containsAll(listOf("store" to "fdroid"))
+        }
     }
 }
 

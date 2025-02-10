@@ -13,7 +13,9 @@ read -r
 CURRENT_CODE="$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
 echo >&2 "Current code ${CURRENT_CODE}"
 
-next_code_default=$(( CURRENT_CODE+1 ))
+# Plus one to take the release commit into account
+COMMIT_COUNT="$(git rev-list --count HEAD)"
+next_code_default=$(( COMMIT_COUNT+1 ))
 
 echo >&2 -n "Next code [${next_code_default}]: "
 read -r next_code_in

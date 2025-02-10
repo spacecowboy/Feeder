@@ -1,0 +1,361 @@
+name: Continuous Integration
+
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  ktlint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+    - name: perform the checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      
+    - name: ktlint check
+      run: ./gradlew ktlintCheck
+
+  compile-and-lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        # needed for configuration task cache
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: compile
+      run: ./gradlew compileFdroidDebugKotlin
+    
+    - name: lint
+      run: ./gradlew lintFdroidDebug
+
+  compile-android-test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: compile android test
+      run: ./gradlew compileFdroidDebugAndroidTestKotlin
+
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: test
+      run: ./gradlew testFdroidDebug
+
+  fdroid-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: release apk
+      run: ./gradlew assembleFdroidRelease
+
+    - name: save fdroid apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: fdroid-apk
+        retention-days: 1
+        path: app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
+
+  play-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: release apk
+      run: ./gradlew assemblePlayRelease
+    
+    - name: save play apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: play-apk
+        retention-days: 1
+        path: app/build/outputs/apk/play/release/app-play-release.apk
+
+  play-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
+    - name: release bundle
+      run: ./gradlew bundlePlayRelease
+
+    - name: save bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: bundle
+        retention-days: 1
+        path: |
+          app/build/outputs/bundle/playRelease/app-play-release.aab
+          app/build/outputs/mapping/playRelease/mapping.txt
+
+  validate-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [play-bundle]
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
+    - name: copy bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: bundle
+        path: app/build/outputs/
+
+    - name: validate deploy
+      run: ./deploy_playstore_fast.sh --dry-run
+
+  deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [validate-deploy]
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: prepare for build
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
+    - name: copy bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: bundle
+        path: app/build/outputs/
+    
+    - name: deploy beta
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      # do not want this to run on master commit which is also a tag
+      run: ci/run-if-not-release ./deploy_playstore_fast.sh
+
+    - name: deploy production
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      run: ./deploy_playstore_fast.sh
+
+  github-release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: [fdroid-apk, play-apk]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: perform the checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: get latest changelog entry
+        run: mkdir -p build && ci/latest-changelog.py CHANGELOG.md > build/release_notes.md
+    
+      - name: copy fdroid apk
+        uses: actions/download-artifact@v4
+        with:
+          name: fdroid-apk
+        
+      - name: copy play apk
+        uses: actions/download-artifact@v4
+        with:
+          name: play-apk
+
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          body_path: build/release_notes.md
+          fail_on_unmatched_files: true
+          files: |
+            app-fdroid-release.apk
+            app-play-release.apk

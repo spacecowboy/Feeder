@@ -16,57 +16,48 @@
 default_platform(:android)
 
 platform :android do
-  desc "Fetch latest version code from Google Play"
-  lane :get_latest_version do
-    track_version_codes = []
-
-    # Fetch latest codes
-    track_version_codes += google_play_track_version_codes(track: "production")
-    track_version_codes += google_play_track_version_codes(track: "beta")
-
-    track_version_codes.max
-  end
-
-  desc "Bumps version code in gradle file"
-  lane :bump_version_code do
-    path = '../app/build.gradle.kts'
-    re = /versionCode = (\d+)/
-
-    last_version_code = get_latest_version
-
-    s = File.read(path)
-    if (s[re, 1].to_i <= last_version_code) then
-      s[re, 1] = (last_version_code + 1).to_s
-
-      f = File.new(path, 'w')
-      f.write(s)
-      f.close
-    end
-  end
-
   desc "Build play bundle"
   lane :build_play_bundle do
-    gradle(task: "app:bundlePlay")
+    gradle(task: "app:bundlePlayRelease")
   end
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do |options|
     upload_to_play_store(
-      mapping: "app/build/outputs/mapping/play/mapping.txt",
-      aab: "app/build/outputs/bundle/play/app-play.aab",
+      mapping: "app/build/outputs/mapping/playRelease/mapping.txt",
+      aab: "app/build/outputs/bundle/playRelease/app-play-release.aab",
       track: options[:track],
-      skip_upload_apk: true
+      skip_upload_apk: true,
+      skip_upload_changelogs: true,
+      sync_image_upload: true
     )
   end
 
   desc "Validate deployment of a new version to the Google Play"
   lane :validate_deploy do |options|
     upload_to_play_store(
-      mapping: "app/build/outputs/mapping/play/mapping.txt",
-      aab: "app/build/outputs/bundle/play/app-play.aab",
+      mapping: "app/build/outputs/mapping/playRelease/mapping.txt",
+      aab: "app/build/outputs/bundle/playRelease/app-play-release.aab",
       track: options[:track],
       validate_only: true,
-      skip_upload_apk: true
+      skip_upload_apk: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promotes between tracks"
+  lane :promote do |options|
+    upload_to_play_store(
+      track: options[:track],
+      track_promote_to: options[:track_promote_to],
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
     )
   end
 
@@ -79,8 +70,6 @@ platform :android do
 
   desc "Build and validate deployment of a new version to the Google Play"
   lane :build_and_validate do |options|
-    # Validation should never fail so bump version
-    bump_version_code
     build_play_bundle
     validate_deploy(options)
   end
