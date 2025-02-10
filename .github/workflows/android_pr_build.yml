@@ -1,6 +1,21 @@
 name: PR Checks
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'gradle-wrapper.properties'
+      - 'gradle-wrapper.jar'
+      - '.github/workflows/android_pr_build.yml'
+      - 'fastlane/**'
   pull_request:
     paths:
       - 'app/**'
@@ -153,6 +168,50 @@ jobs:
 
     - name: release bundle
       run: ./gradlew bundlePlayRelease
+
+    # Save bundle to artifacts for later use
+    - name: save bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: bundle
+        retention-days: 1
+        path: |
+          app/build/outputs/bundle/playRelease/app-play-release.aab
+          app/build/outputs/mapping/playRelease/mapping.txt
+
+  validate_deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    needs: [play_bundle]
+    permissions:
+      contents: read
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+    - name: copy bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: bundle
+
+    - name: validate deploy
+      run: ./deploy_playstore_fast.sh --dry-run
 
   ktlint:
     runs-on: ubuntu-latest
