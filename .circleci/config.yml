@@ -80,8 +80,12 @@ jobs:
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  emulator-tests: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  emulator-tests:
     jobs:
-    #   - emulator-test
-      - gradle-emulator-test
+      - gradle-emulator-test:
+          filters:
+            branches:
+              ignore:
+                # Only run on pull requests
+                - main
+
