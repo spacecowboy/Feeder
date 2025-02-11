@@ -17,3 +17,5 @@
 <li>Praktischer Zugriff auf eingefügte Links</li>
 <li>Material Design</li>
 </ul>
+
+Das vollständige Änderungsprotokoll ist <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">auf GitHub</a> verfügbar.
