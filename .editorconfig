@@ -4,6 +4,7 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 insert_final_newline = true
+trim_trailing_whitespace = true
 tab_width = 4
 ij_continuation_indent_size = 8
 ij_formatter_off_tag = @formatter:off
@@ -12,6 +13,9 @@ ij_formatter_tags_enabled = false
 ij_smart_tabs = false
 ij_visual_guides = none
 ij_wrap_on_typing = false
+
+[*.{yml,yaml}]
+indent_size = 2
 
 [*.{kt,kts}]
 max_line_length = 200
