@@ -1,10 +1,10 @@
-<p>A Feeder egy nyílt forráskódú feed olvasó (RSS/Atom/JSONFeed), mely létrehozásra került 2014-ben.</p>
+<p>A Feeder egy nyílt forráskódú hírolvasó (RSS/Atom/JSONFeed), mely 2014-ben lett létrehozva.</p>
 
-<p>A Feeder-rel elolvashatja a legújabb híreket és posztokat a kedvenc oldaláról.</p>
+<p>A Feederrel elolvashatja a legújabb híreket és posztokat a kedvenc oldaláról.</p>
 
-<p>A Feeder nem szinkronizál a tipikus távoli backend-ekkel, így nem szükséges semmilyen fiók regisztráció.</p>
+<p>A Feeder nem szinkronizál a tipikus távoli backend kiszolgálókkal, így nem szükséges semmilyen fiókot regisztrálni.</p>
 
-<p>A Feeder ingyenes, és lokálisan fut a készülékén. Az adata 100%-ban privát.</p>
+<p>A Feeder ingyenes, és csak az eszközén fut. Az adatai 100%-ban biztonságban vannak.</p>
 
 <p><b>Funkciók</b></p>
 
@@ -15,5 +15,7 @@
 <li>Értesítések</li>
 <li>OPML Importálás/Exportálás</li>
 <li>Könnyű hozzáférés a belsős linkekhez</li>
-<li>Material design</li>
+<li>Material felület</li>
 </ul>
+
+A teljes változáslista elérhető a <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHubon</a>.
