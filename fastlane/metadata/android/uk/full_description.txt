@@ -17,3 +17,5 @@
 <li>Зручний доступ до посилань на застосунки</li>
 <li>Матеріальний дизайн</li>
 </ul>
+
+Весь список змін доступний <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">на GitHub</a>.
