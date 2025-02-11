@@ -266,6 +266,7 @@ jobs:
           app/build/outputs/mapping/playRelease/mapping.txt
 
   validate-deploy:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [play-bundle]
