@@ -17,3 +17,5 @@
 <li>Згодан приступ приложеним линковима</li>
 <li>Material дизајн</li>
 </ul>
+
+Комплетан дневник измена је <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">на GitHub</a>.
