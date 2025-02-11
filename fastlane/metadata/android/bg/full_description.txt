@@ -17,3 +17,5 @@
  <li>Лесен достъп до вградени връзки</li>
  <li>Материален дизайн</li>
  </ul>
+
+Пълният списък с промените е достъпен <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">в GitHub</a>.
