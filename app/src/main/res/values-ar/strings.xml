@@ -229,4 +229,6 @@
     <string name="two_minutes">دقيقتان</string>
     <string name="two_words">كلمتان</string>
     <string name="one_word">كلمة واحدة</string>
+    <string name="export_saved_articles">صدّر المقالات المحفوظة</string>
+    <string name="nostr_feed_description">Nostr ا‏ةطساوب تالقم %1$s</string>
 </resources>
