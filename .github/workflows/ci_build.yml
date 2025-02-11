@@ -207,7 +207,7 @@ jobs:
       with:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-    - name: release apk
+    - name: play apk
       run: ./gradlew assemblePlayRelease
 
     - name: save play apk
@@ -253,7 +253,7 @@ jobs:
         KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
         KEYALIAS: ${{ secrets.KEYALIAS }}
 
-    - name: release bundle
+    - name: play bundle
       run: ./gradlew bundlePlayRelease
 
     - name: save bundle
