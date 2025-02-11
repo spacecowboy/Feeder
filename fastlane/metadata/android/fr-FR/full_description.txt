@@ -17,3 +17,5 @@
 <li>Accès pratique aux médias</li>
 <li>Material design</li>
 </ul>
+
+La liste complète des changements est disponible  <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">sur GitHub</a>.
