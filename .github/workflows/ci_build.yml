@@ -33,7 +33,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       with:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      
+
     - name: ktlint check
       run: ./gradlew ktlintCheck
 
@@ -65,7 +65,7 @@ jobs:
 
     - name: compile
       run: ./gradlew compileFdroidDebugKotlin
-    
+
     - name: lint
       run: ./gradlew lintFdroidDebug
 
@@ -138,6 +138,18 @@ jobs:
         fetch-depth: 0
         fetch-tags: true
 
+    - name: prepare for build
+      # Do not run for forks
+      if: github.repository == 'spacecowboy/feeder'
+      shell: bash
+      run: ./prepare_for_build.sh
+      env:
+        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+        KEYSTORE: ${{ secrets.KEYSTORE }}
+        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+        KEYALIAS: ${{ secrets.KEYALIAS }}
+
     - name: setup JDK
       uses: actions/setup-java@v4
       with:
@@ -173,6 +185,8 @@ jobs:
         fetch-tags: true
 
     - name: prepare for build
+      # Do not run for forks
+      if: github.repository == 'spacecowboy/feeder'
       shell: bash
       run: ./prepare_for_build.sh
       env:
@@ -195,7 +209,7 @@ jobs:
 
     - name: release apk
       run: ./gradlew assemblePlayRelease
-    
+
     - name: save play apk
       uses: actions/upload-artifact@v4
       with:
@@ -228,6 +242,8 @@ jobs:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: prepare for build
+      # Do not run for forks
+      if: github.repository == 'spacecowboy/feeder'
       shell: bash
       run: ./prepare_for_build.sh
       env:
@@ -264,6 +280,8 @@ jobs:
         fetch-tags: true
 
     - name: prepare for build
+      # Do not run for forks
+      if: github.repository == 'spacecowboy/feeder'
       shell: bash
       run: ./prepare_for_build.sh
       env:
@@ -280,6 +298,8 @@ jobs:
         path: app/build/outputs/
 
     - name: validate deploy
+      # Do not run for forks
+      if: github.repository == 'spacecowboy/feeder'
       run: ./deploy_playstore_fast.sh --dry-run
 
   deploy:
@@ -312,7 +332,7 @@ jobs:
       with:
         name: bundle
         path: app/build/outputs/
-    
+
     - name: deploy beta
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       # do not want this to run on master commit which is also a tag
@@ -339,12 +359,12 @@ jobs:
 
       - name: get latest changelog entry
         run: mkdir -p build && ci/latest-changelog.py CHANGELOG.md > build/release_notes.md
-    
+
       - name: copy fdroid apk
         uses: actions/download-artifact@v4
         with:
           name: fdroid-apk
-        
+
       - name: copy play apk
         uses: actions/download-artifact@v4
         with:
