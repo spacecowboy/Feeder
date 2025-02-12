@@ -54,3 +54,13 @@ Then build and install the app to your phone which is connected via USB:
 <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US_phone_portrait_light_list.png" width=50%/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US_phone_portrait_dark_list.png" width=50%/>
 <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US_phone_portrait_light_article.png" width=50%/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US_phone_portrait_dark_article.png" width=50%/>
 <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US_phone_portrait_light_settings.png" width=50%/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US_phone_portrait_dark_settings.png" width=50%/>
+
+### Download
+
+Feeder is availabe on [F-Droid](https://f-droid.org/en/packages/com.nononsenseapps.feeder/) and [Google Play](https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play) and there are APKs available for download on [GitHub Releases](https://github.com/spacecowboy/Feeder/releases).
+
+The GitHub releases are signed with a key matching this signature:
+
+```
+SHA-256: C5:EE:FF:22:48:81:35:FF:C2:58:3C:3A:43:B0:53:A1:61:CA:86:98:62:96:1A:B8:53:4F:44:C7:5F:D5:7D:97
+```
