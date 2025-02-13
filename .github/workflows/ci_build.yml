@@ -267,6 +267,10 @@ jobs:
 
   validate-deploy:
     if: github.event_name == 'pull_request' && github.repository == 'spacecowboy/feeder'
+    concurrency:
+      # Ensure this never runs at the same time as the deploy job
+      group: deploy-play
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [play-bundle]
@@ -305,6 +309,15 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+    # See Environment settings for Deployment protection rules
+    environment:
+      name: play
+      url: https://play.google.com/console/u/0/developers/5406252659647192004/app/4975713765305405500/releases/overview
+    concurrency:
+      # This name has nothing to do with the environment name
+      group: deploy-play
+      # Cancel any waiting jobs if a new one is queued (there is a wait timer configured in protection rules)
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [play-bundle]
