@@ -40,7 +40,7 @@ jobs:
   compile-and-lint:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -72,7 +72,7 @@ jobs:
   compile-android-test:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -100,7 +100,7 @@ jobs:
   test:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -127,7 +127,7 @@ jobs:
 
   fdroid-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -173,7 +173,7 @@ jobs:
 
   play-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -219,7 +219,7 @@ jobs:
 
   play-bundle:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -265,47 +265,48 @@ jobs:
           app/build/outputs/bundle/playRelease/app-play-release.aab
           app/build/outputs/mapping/playRelease/mapping.txt
 
-  validate-deploy:
-    if: github.event_name == 'pull_request' && github.repository == 'spacecowboy/feeder'
-    concurrency:
-      # Ensure this never runs at the same time as the deploy job
-      group: deploy-play
-      cancel-in-progress: false
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [play-bundle]
-    permissions:
-      contents: read
-    steps:
-    - name: checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-        fetch-depth: 0
-        fetch-tags: true
+  ## Commented out because it is not possible to NOT conflict with the real deploy job
+  # validate-deploy:
+  #   if: github.event_name == 'pull_request' && github.repository == 'spacecowboy/feeder'
+  #   concurrency:
+  #     # Ensure this never runs at the same time as the deploy job
+  #     group: deploy-play
+  #     cancel-in-progress: false
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   needs: [play-bundle]
+  #   permissions:
+  #     contents: read
+  #   steps:
+  #   - name: checkout
+  #     uses: actions/checkout@v4
+  #     with:
+  #       submodules: 'recursive'
+  #       fetch-depth: 0
+  #       fetch-tags: true
 
-    - name: prepare for build
-      # Do not run for forks
-      if: github.repository == 'spacecowboy/feeder'
-      shell: bash
-      run: ./prepare_for_build.sh
-      env:
-        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
-        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
-        KEYSTORE: ${{ secrets.KEYSTORE }}
-        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
-        KEYALIAS: ${{ secrets.KEYALIAS }}
+  #   - name: prepare for build
+  #     # Do not run for forks
+  #     if: github.repository == 'spacecowboy/feeder'
+  #     shell: bash
+  #     run: ./prepare_for_build.sh
+  #     env:
+  #       SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+  #       KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+  #       KEYSTORE: ${{ secrets.KEYSTORE }}
+  #       KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+  #       KEYALIAS: ${{ secrets.KEYALIAS }}
 
-    - name: copy bundle
-      uses: actions/download-artifact@v4
-      with:
-        name: bundle
-        path: app/build/outputs/
+  #   - name: copy bundle
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: bundle
+  #       path: app/build/outputs/
 
-    - name: validate deploy
-      # Do not run for forks
-      if: github.repository == 'spacecowboy/feeder'
-      run: ./deploy_playstore_fast.sh --dry-run
+  #   - name: validate deploy
+  #     # Do not run for forks
+  #     if: github.repository == 'spacecowboy/feeder'
+  #     run: ./deploy_playstore_fast.sh --dry-run
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
@@ -319,7 +320,7 @@ jobs:
       # Cancel any waiting jobs if a new one is queued (there is a wait timer configured in protection rules)
       cancel-in-progress: true
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     needs: [play-bundle]
     permissions:
       contents: read
@@ -360,7 +361,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: [fdroid-apk, play-apk]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
