@@ -265,47 +265,48 @@ jobs:
           app/build/outputs/bundle/playRelease/app-play-release.aab
           app/build/outputs/mapping/playRelease/mapping.txt
 
-  validate-deploy:
-    if: github.event_name == 'pull_request' && github.repository == 'spacecowboy/feeder'
-    concurrency:
-      # Ensure this never runs at the same time as the deploy job
-      group: deploy-play
-      cancel-in-progress: false
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [play-bundle]
-    permissions:
-      contents: read
-    steps:
-    - name: checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-        fetch-depth: 0
-        fetch-tags: true
+  ## Commented out because it is not possible to NOT conflict with the real deploy job
+  # validate-deploy:
+  #   if: github.event_name == 'pull_request' && github.repository == 'spacecowboy/feeder'
+  #   concurrency:
+  #     # Ensure this never runs at the same time as the deploy job
+  #     group: deploy-play
+  #     cancel-in-progress: false
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   needs: [play-bundle]
+  #   permissions:
+  #     contents: read
+  #   steps:
+  #   - name: checkout
+  #     uses: actions/checkout@v4
+  #     with:
+  #       submodules: 'recursive'
+  #       fetch-depth: 0
+  #       fetch-tags: true
 
-    - name: prepare for build
-      # Do not run for forks
-      if: github.repository == 'spacecowboy/feeder'
-      shell: bash
-      run: ./prepare_for_build.sh
-      env:
-        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
-        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
-        KEYSTORE: ${{ secrets.KEYSTORE }}
-        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
-        KEYALIAS: ${{ secrets.KEYALIAS }}
+  #   - name: prepare for build
+  #     # Do not run for forks
+  #     if: github.repository == 'spacecowboy/feeder'
+  #     shell: bash
+  #     run: ./prepare_for_build.sh
+  #     env:
+  #       SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+  #       KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+  #       KEYSTORE: ${{ secrets.KEYSTORE }}
+  #       KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+  #       KEYALIAS: ${{ secrets.KEYALIAS }}
 
-    - name: copy bundle
-      uses: actions/download-artifact@v4
-      with:
-        name: bundle
-        path: app/build/outputs/
+  #   - name: copy bundle
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: bundle
+  #       path: app/build/outputs/
 
-    - name: validate deploy
-      # Do not run for forks
-      if: github.repository == 'spacecowboy/feeder'
-      run: ./deploy_playstore_fast.sh --dry-run
+  #   - name: validate deploy
+  #     # Do not run for forks
+  #     if: github.repository == 'spacecowboy/feeder'
+  #     run: ./deploy_playstore_fast.sh --dry-run
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
