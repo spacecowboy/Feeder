@@ -318,7 +318,7 @@ jobs:
       # This name has nothing to do with the environment name
       group: deploy-play
       # Cancel any waiting jobs if a new one is queued (there is a wait timer configured in protection rules)
-      cancel-in-progress: true
+      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [play-bundle]
