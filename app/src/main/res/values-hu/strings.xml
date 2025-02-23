@@ -31,7 +31,7 @@
     <string name="dont_notify_for_new_items">Értesítések leállítása</string>
     <string name="toggle_read_status">Olvasónézet átváltása</string>
     <string name="open_link_in_browser">Hivatkozás megnyitása böngészőben</string>
-    <string name="no_such_feed">Nem található ilyen hírfolyam. Próbálja meg a HTTPS használatát.</string>
+    <string name="no_such_feed">Nem található ilyen hírfolyam. Megpróbálja a HTTPS használatát?</string>
     <string name="export_feeds_to_opml">Hírfolyamok exportálása OPML fájlba</string>
     <string name="import_feeds_from_opml">Hírfolyamok importálása OPML fájlból</string>
     <string name="indicator_for_mark_as_read">Megjelölés olvasottként jelző</string>
@@ -254,7 +254,7 @@
     <string name="model_id">Modell-azonosító</string>
     <string name="azure_api_version">Azure API verzió</string>
     <string name="no_models_were_found">Nem találhatók modellek</string>
-    <string name="azure_deployment_id">Azure üzembehelyezési azonosító</string>
+    <string name="azure_deployment_id">Azure üzembe helyezési azonosító</string>
     <string name="list_of_available_models">Elérhető modellek listája</string>
     <string name="summarize">Összefoglalás</string>
     <string name="openai_settings">OpenAI integráció</string>
