@@ -993,55 +993,55 @@ class HtmlLinearizerTest {
     fun `arctechnica list items are actually images readability4j`() {
         val html =
             """
-            <ul> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01.jpeg 2560" data-sub-html="#caption-2025663"> 
-              <figure> 
-               <figcaption id="caption-2025663"> 
-                <span></span> 
-                <p> Microsoft's Surface Pro 11 comes with Arm chips and an optional OLED display panel. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02.jpeg 2560" data-sub-html="#caption-2025664"> 
-              <figure> 
-               <figcaption id="caption-2025664"> 
-                <span></span> 
-                <p> The Surface Pro 11's design is near-identical to the Surface Pro 8 and Surface Pro 9, and they're compatible with the same accessories. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03.jpeg 2560" data-sub-html="#caption-2025665"> 
-              <figure> 
-               <figcaption id="caption-2025665"> 
-                <span></span> 
-                <p> Two USB-C ports, no headphone jack. A Smart Connect port is on the other side. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01.jpeg 2560" data-sub-html="#caption-2025667"> 
-              <figure> 
-               <figcaption id="caption-2025667"> 
-                <span></span> 
-                <p> The new Surface Laptop 7, available in 13.8- and 15-inch models. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02.jpeg 2560" data-sub-html="#caption-2025668"> 
-              <figure> 
-               <figcaption id="caption-2025668"> 
-                <span></span> 
-                <p> The keyboard, complete with Copilot key. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
-             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03.jpeg 2560" data-sub-html="#caption-2025669"> 
-              <figure> 
-               <figcaption id="caption-2025669"> 
-                <span></span> 
-                <p> You get one more USB-C port than you did before. USB-A, Smart Connect, and the headphone jack are also present and accounted for. </p> 
-                <p> <span></span> Microsoft </p> 
-               </figcaption> 
-              </figure> </li> 
+            <ul>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-01.jpeg 2560" data-sub-html="#caption-2025663">
+              <figure>
+               <figcaption id="caption-2025663">
+                <span></span>
+                <p> Microsoft's Surface Pro 11 comes with Arm chips and an optional OLED display panel. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-02.jpeg 2560" data-sub-html="#caption-2025664">
+              <figure>
+               <figcaption id="caption-2025664">
+                <span></span>
+                <p> The Surface Pro 11's design is near-identical to the Surface Pro 8 and Surface Pro 9, and they're compatible with the same accessories. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-11-03.jpeg 2560" data-sub-html="#caption-2025665">
+              <figure>
+               <figcaption id="caption-2025665">
+                <span></span>
+                <p> Two USB-C ports, no headphone jack. A Smart Connect port is on the other side. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-01.jpeg 2560" data-sub-html="#caption-2025667">
+              <figure>
+               <figcaption id="caption-2025667">
+                <span></span>
+                <p> The new Surface Laptop 7, available in 13.8- and 15-inch models. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-02.jpeg 2560" data-sub-html="#caption-2025668">
+              <figure>
+               <figcaption id="caption-2025668">
+                <span></span>
+                <p> The keyboard, complete with Copilot key. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
+             <li data-thumb="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03-150x150.jpeg" data-src="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03.jpeg" data-responsive="https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03-980x735.jpeg 1080, https://cdn.arstechnica.net/wp-content/uploads/2024/05/surface-laptop-03.jpeg 2560" data-sub-html="#caption-2025669">
+              <figure>
+               <figcaption id="caption-2025669">
+                <span></span>
+                <p> You get one more USB-C port than you did before. USB-A, Smart Connect, and the headphone jack are also present and accounted for. </p>
+                <p> <span></span> Microsoft </p>
+               </figcaption>
+              </figure> </li>
             </ul>
             """.trimIndent()
 
@@ -1231,60 +1231,60 @@ class HtmlLinearizerTest {
     fun `cowboyprogrammer transmission`() {
         val html =
             """
-            
+
 
             <p>Quick post to immortilize the configuration to get transmission-daemon working with a
             wireguard tunnel.</p>
-            
+
             <p>If you don&rsquo;t have a wireguard tunnel, head to <a
                 href="https://mullvad.net/en/">https://mullvad.net/en/</a> and get one.</p>
-            
+
             <h2
                 id="transmission-config">Transmission config</h2>
-            
+
             <p>First, the transmission config is
             really simple:</p>
-            
+
             <pre><code>#/etc/transmission-daemon/settings.json
             {
               [...]
-            
+
               &quot;bind-address-ipv4&quot;: &quot;X.X.X.X&quot;,
               &quot;bind-address-ipv6&quot;: &quot;xxxx:xxxx:xxxx:xxxx::xxxx&quot;,
               &quot;peer-port&quot;: 24328,
               &quot;rpc-bind-address&quot;: &quot;0.0.0.0&quot;,
-            
+
               [...]
             }
             </code></pre>
-            
-            
+
+
             <p>I also run the daemon using the following service for good measure:</p>
-            
-            
+
+
             <pre><code># /etc/systemd/system/transmission-daemon.service
             [Unit]
             Description=Transmission BitTorrent Daemon Under VPN
             After=network-online.target
             After=wg-quick@wgtorrents.service
             Requires=wg-quick@wgtorrents.service
-            
+
             [Service]
             User=debian-transmission
             ExecStart=/usr/bin/transmission-daemon -f --log-error --bind-address-ipv4 X.X.X.X --bind-address-ipv6 xxxx:xxxx:xxxx:xxxx::xxxx --rpc-bind-address 0.0.0.0
-            
+
             [Install]
             WantedBy=multi-user.target
-            
+
             </code></pre>
-            
-            
+
+
             <h2 id="wireguard-config">Wireguard config</h2>
-            
+
             <p>All the magic happens in the PostUp rule where
                 a routing rule is added for any traffic originating from the wireguard IP addresses.</p>
-            
-            
+
+
             <pre><code>#/etc/wireguard/wgtorrents.conf
             [Interface]
             PrivateKey=
@@ -1294,18 +1294,18 @@ class HtmlLinearizerTest {
             # But do create a default route for the specific ip addresses
             PostUp = systemd-resolve -i %i --set-dns=193.138.218.74 --set-domain=~.; ip rule add from X.X.X.X table 42; ip route add default dev %i table 42; ip -6 rule add from xxxx:xxxx:xxxx:xxxx::xxxx table 42
             PostDown = ip rule del from X.X.X.X table 42; ip -6 rule del from xxxx:xxxx:xxxx:xxxx::xxxx table 42
-            
+
             [Peer]
             PersistentKeepalive=25
             PublicKey=m4jnogFbACz7LByjo++8z5+1WV0BuR1T7E1OWA+n8h0=
             Endpoint=se4-wireguard.mullvad.net:51820
             AllowedIPs=0.0.0.0/0,::/0
             </code></pre>
-            
-            
+
+
             <p>Enable it all by doing</p>
-            
-            
+
+
             <pre><code>systemctl enable --now wg-quick@wgtorrents.timer
             systemctl enable --now transmission-daemon.service
             </code></pre>
@@ -1414,7 +1414,7 @@ class HtmlLinearizerTest {
             <hr/> <p>Other posts in the <b>Rewriting Feeder in Compose</b> series:</p>
             <ul class="series">
                 <li>2021-06-09 &mdash; The biggest update to Feeder so far</li>
-            </ul> 
+            </ul>
             """.trimIndent()
 
         val baseUrl = "https://cowboyprogrammer.org"
@@ -1639,5 +1639,24 @@ class HtmlLinearizerTest {
         assertTrue(result[0] is LinearVideo)
         val linearVideo = result[0] as LinearVideo
         assertEquals(setOf("video1"), linearVideo.ids)
+    }
+
+    @Test
+    fun `paragraph section followed by link will have space between`() {
+        val html =
+            "<p style=\"display: inline;\" class=\"readability-styled\">The SystemV file-system that implements Xenix FS, SystemV/386 FS, " +
+                "and Coherent FS is set to be removed from the Linux kernel. " +
+                "The SystemV file-system was</p><a href=\"https://www.phoronix.com/news/Linux-SysV-File-System-Orphan\">orphaned back in 2023</a>"
+
+        val result = linearizer.linearize(html, baseUrl).elements
+
+        assertEquals(1, result.size)
+        assertTrue(result[0] is LinearText)
+        val linearText = result[0] as LinearText
+        assertEquals(
+            "The SystemV file-system that implements Xenix FS, SystemV/386 FS, and Coherent FS is set to be removed from the Linux kernel. " +
+                "The SystemV file-system was orphaned back in 2023",
+            linearText.text,
+        )
     }
 }

@@ -1,10 +1,22 @@
 package com.nononsenseapps.feeder.model
 
 import org.junit.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class FullTextParserKtTest {
+    @Test
+    fun `phoronix full text`() {
+        val fullHtml =
+            assertNotNull(
+                parseFullArticle("https://www.phoronix.com/news/Removing-SystemV-Filesystem", String(phoronix)),
+            )
+
+        // Example where there is no explicit space between the end of a paragraph and the start of a link
+        assertContains(fullHtml, "The SystemV file-system was</p><a")
+    }
+
     @Test
     fun `detects gbk from html meta content`() {
         val charset = assertNotNull(findMetaCharset(gb2312))
@@ -53,5 +65,11 @@ class FullTextParserKtTest {
         get() =
             javaClass
                 .getResourceAsStream("muhasebetre_article.html")!!
+                .use { it.readBytes() }
+
+    private val phoronix: ByteArray
+        get() =
+            javaClass
+                .getResourceAsStream("phoronix.html")!!
                 .use { it.readBytes() }
 }

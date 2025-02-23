@@ -100,6 +100,8 @@ class HtmlLinearizer {
                                     blockStyle = LinearTextBlockStyle.TEXT,
                                     baseUrl = baseUrl,
                                 )
+                                // We do need to enforce space after the paragraph though. Sometimes it's missing.
+                                appendOneNormalizedWhitespace(linearTextBuilder)
                             } else {
                                 asElement(blockStyle) {
                                     linearizeChildren(
@@ -980,6 +982,12 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
                 false
             }
         }
+}
+
+fun appendOneNormalizedWhitespace(builder: LinearTextBuilder) {
+    if (!builder.endsWithWhitespace) {
+        builder.append(' ')
+    }
 }
 
 fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(builder: LinearTextBuilder) {

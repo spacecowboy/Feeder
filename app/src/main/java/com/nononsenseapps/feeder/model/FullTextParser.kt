@@ -143,26 +143,26 @@ class FullTextParser(
                 }.flatten()
         }
 
-    fun parseFullArticle(
-        uri: String,
-        html: String,
-    ): String? {
-        val article = Readability4JExtended(uri, html).parse()
-
-        val dir = article.dir
-
-        // Ensure dir is set on the outermost element
-        return article.contentWithUtf8Encoding?.let { fullHtml ->
-            if (dir?.isNotBlank() == true) {
-                fullHtml.replaceFirst("<html".toRegex(), "<html dir=\"$dir\"")
-            } else {
-                fullHtml
-            }
-        }
-    }
-
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
+    }
+}
+
+fun parseFullArticle(
+    uri: String,
+    html: String,
+): String? {
+    val article = Readability4JExtended(uri, html).parse()
+
+    val dir = article.dir
+
+    // Ensure dir is set on the outermost element
+    return article.contentWithUtf8Encoding?.let { fullHtml ->
+        if (dir?.isNotBlank() == true) {
+            fullHtml.replaceFirst("<html".toRegex(), "<html dir=\"$dir\"")
+        } else {
+            fullHtml
+        }
     }
 }
 
