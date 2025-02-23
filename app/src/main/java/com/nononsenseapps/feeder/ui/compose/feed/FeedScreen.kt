@@ -158,7 +158,8 @@ import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
 import org.kodein.di.instance
 import java.time.Instant
-import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 
@@ -339,7 +340,7 @@ fun FeedScreen(
                             "*/*",
                         ),
                     )
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // ActivityNotFoundException in particular
                     coroutineScope.launch {
                         toastMaker.makeToast(R.string.failed_to_import_OPML)
@@ -348,8 +349,8 @@ fun FeedScreen(
             },
             onExportOPML = {
                 try {
-                    opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml")
-                } catch (e: Exception) {
+                    opmlExporter.launch("feeder-export-${LocalDate.now()}-${LocalTime.now().toSecondOfDay()}.opml")
+                } catch (_: Exception) {
                     // ActivityNotFoundException in particular
                     coroutineScope.launch {
                         toastMaker.makeToast(R.string.failed_to_export_OPML)
@@ -358,8 +359,8 @@ fun FeedScreen(
             },
             onExportSavedArticles = {
                 try {
-                    savedArticleExporter.launch("feeder-saved-articles-${LocalDateTime.now()}.txt")
-                } catch (e: Exception) {
+                    savedArticleExporter.launch("feeder-saved-articles-${LocalDate.now()}-${LocalTime.now().toSecondOfDay()}.txt")
+                } catch (_: Exception) {
                     // ActivityNotFoundException in particular
                     coroutineScope.launch {
                         toastMaker.makeToast(R.string.failed_to_export_saved_articles)
