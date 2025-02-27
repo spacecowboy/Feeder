@@ -2,9 +2,9 @@
 # Compose compiler is highly coupled to Kotlin version
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
 kotlin = "2.1.10"
-ksp = "2.1.10-1.0.30"
+ksp = "2.1.10-1.0.31"
 kotlinxSerialization = "1.8.0"
-androidPlugin = "8.8.1"
+androidPlugin = "8.8.2"
 # BEGIN These should be upgraded in unison
 okhttp = "4.12.0"
 okio = "3.6.0"
