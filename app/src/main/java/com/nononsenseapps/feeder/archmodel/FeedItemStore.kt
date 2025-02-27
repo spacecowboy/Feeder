@@ -143,6 +143,12 @@ class FeedItemStore(
         }
 
         when {
+            filter.search.isNotEmpty() -> {
+                append("AND (\n")
+                append("plain_title LIKE ?\n").also { args.add("%${filter.search}%") }
+                append("OR plain_snippet LIKE ?\n").also { args.add("%${filter.search}%") }
+                append(")\n")
+            }
             onlySavedArticles -> append("AND bookmarked = 1\n")
             feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
             tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }

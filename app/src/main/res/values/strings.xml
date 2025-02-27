@@ -278,4 +278,5 @@
   <string name="open_drawer_on_fab">Show feeds after marking all as read</string>
     <string name="on">On</string>
   <string name="off">Off</string>
+  <string name="search_noun">Search</string>
 </resources>

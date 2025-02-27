@@ -138,6 +138,7 @@ class SettingsStore(
                 saved = sp.getBoolean(PREFS_FILTER_SAVED, false),
                 recentlyRead = sp.getBoolean(PREFS_FILTER_RECENTLY_READ, true),
                 read = sp.getBoolean(PREFS_FILTER_READ, true),
+                search = "",
             ),
         )
     val feedListFilter: StateFlow<FeedListFilter> = _feedListFilter.asStateFlow()
@@ -155,6 +156,10 @@ class SettingsStore(
     fun setFeedListFilterRead(value: Boolean) {
         _feedListFilter.update { it.copy(read = value) }
         sp.edit().putBoolean(PREFS_FILTER_READ, value).apply()
+    }
+
+    fun searchFor(value: String) {
+        _feedListFilter.update { it.copy(search = value) }
     }
 
     private val _currentTheme =
@@ -780,6 +785,7 @@ data class PrefsFeedListFilter(
     override val saved: Boolean,
     override val recentlyRead: Boolean,
     override val read: Boolean,
+    override val search: String
 ) : FeedListFilter {
     override val unread: Boolean = true
 }

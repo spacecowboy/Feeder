@@ -393,6 +393,10 @@ class FeedViewModel(
         repository.setFeedListFilterRead(value)
     }
 
+    override fun searchFor(value: String) {
+        repository.searchFor(value)
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_FeedVM"
     }
@@ -426,6 +430,7 @@ data class FeedState(
     override val showFilterMenu: Boolean = false,
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
+    override val searching: Boolean = false,
     override val showTitleUnreadCount: Boolean = false,
     override val isOpenDrawerOnFab: Boolean = false,
 ) : FeedScreenViewState
@@ -455,6 +460,7 @@ interface FeedScreenViewState {
     val showReadingTime: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
+    val searching: Boolean
     val showTitleUnreadCount: Boolean
     val isOpenDrawerOnFab: Boolean
 }
@@ -465,6 +471,7 @@ interface FeedListFilter {
     val saved: Boolean
     val recentlyRead: Boolean
     val read: Boolean
+    val search: String
 }
 
 val emptyFeedListFilter =
@@ -473,6 +480,7 @@ val emptyFeedListFilter =
         override val saved: Boolean = false
         override val recentlyRead: Boolean = false
         override val read: Boolean = false
+        override val search: String = ""
     }
 
 @Immutable
@@ -482,6 +490,8 @@ interface FeedListFilterCallback {
     fun setRecentlyRead(value: Boolean)
 
     fun setRead(value: Boolean)
+
+    fun searchFor(value: String)
 }
 
 val FeedListFilter.onlyUnread: Boolean

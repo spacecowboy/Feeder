@@ -43,6 +43,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -62,6 +64,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
@@ -84,6 +88,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
@@ -470,6 +475,15 @@ fun FeedScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val closeMenuText = stringResource(id = R.string.close_menu)
+    var textFieldState by rememberSaveable { mutableStateOf("") }
+    var searching by rememberSaveable { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(searching) {
+        if (searching) {
+            focusRequester.requestFocus()
+        }
+    }
 
     FeedScreen(
         modifier = modifier,
@@ -495,145 +509,380 @@ fun FeedScreen(
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
-            if (viewState.currentFeedOrTag.isNotSavedArticles) {
-                PlainTooltipBox(
-                    tooltip = {
-                        Text(stringResource(id = R.string.filter_noun))
+            if (searching) {
+                SearchBar(
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = textFieldState,
+                            onQueryChange = { textFieldState = it; filterCallback.searchFor(it) },
+                            onSearch = { searching = false; filterCallback.searchFor(it) },
+                            expanded = true,
+                            onExpandedChange = { searching = it },
+                            placeholder = { Text("search") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { filterCallback.searchFor(""); searching = false },
+                                ) {
+                                    Icon(Icons.Default.Close, contentDescription = "close search")
+                                }
+                            },
+                            modifier = Modifier.focusRequester(focusRequester)
+                        )
                     },
+                    expanded = true,
+                    onExpandedChange = { searching = it },
                 ) {
+                }
+            } else {
+                if (viewState.currentFeedOrTag.isNotSavedArticles) {
+                    PlainTooltipBox(
+                        tooltip = {
+                            Text(stringResource(id = R.string.filter_noun))
+                        },
+                    ) {
+                        Box {
+                            IconButton(
+                                onClick = { onShowFilterMenu(true) },
+                            ) {
+                                Icon(
+                                    Icons.Default.FilterList,
+                                    contentDescription = stringResource(R.string.filter_noun),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = viewState.showFilterMenu,
+                                onDismissRequest = { onShowFilterMenu(false) },
+                                modifier =
+                                    Modifier
+                                        .onKeyEventLikeEscape {
+                                            onShowFilterMenu(false)
+                                        },
+                            ) {
+                                DropdownMenuItem(
+                                    enabled = false,
+                                    onClick = { /* Can't be modified - only shown for completeness */ },
+                                    leadingIcon = {
+                                        Icon(
+                                            when (viewState.filter.unread) {
+                                                true -> Icons.Default.CheckBox
+                                                false -> Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.unread_adjective))
+                                    },
+                                    modifier =
+                                        Modifier
+                                            .safeSemantics {
+                                                stateDescription =
+                                                    when (viewState.filter.unread) {
+                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
+                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                    }
+                                                role = Role.Checkbox
+                                            },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        filterCallback.setSaved(!viewState.filter.saved)
+                                        onShowFilterMenu(false)
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            when (viewState.filter.saved) {
+                                                true -> Icons.Default.CheckBox
+                                                false -> Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.saved_adjective))
+                                    },
+                                    modifier =
+                                        Modifier
+                                            .safeSemantics {
+                                                stateDescription =
+                                                    when (viewState.filter.saved) {
+                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
+                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                    }
+                                                role = Role.Checkbox
+                                            },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        filterCallback.setRecentlyRead(!viewState.filter.recentlyRead)
+                                        onShowFilterMenu(false)
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            when (viewState.filter.recentlyRead) {
+                                                true -> Icons.Default.CheckBox
+                                                false -> Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.recently_read_adjective))
+                                    },
+                                    modifier =
+                                        Modifier
+                                            .safeSemantics {
+                                                stateDescription =
+                                                    when (viewState.filter.recentlyRead) {
+                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
+                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                    }
+                                                role = Role.Checkbox
+                                            },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        filterCallback.setRead(!viewState.filter.read)
+                                        // Closing it is important for accessibility
+                                        onShowFilterMenu(false)
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            when (viewState.filter.read) {
+                                                true -> Icons.Default.CheckBox
+                                                false -> Icons.Default.CheckBoxOutlineBlank
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.read_adjective))
+                                    },
+                                    modifier =
+                                        Modifier
+                                            .safeSemantics {
+                                                stateDescription =
+                                                    when (viewState.filter.read) {
+                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
+                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                    }
+                                                role = Role.Checkbox
+                                            },
+                                )
+                                // Hidden button for TalkBack
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowFilterMenu(false)
+                                    },
+                                    text = {},
+                                    modifier =
+                                        Modifier
+                                            .height(0.dp)
+                                            .safeSemantics {
+                                                contentDescription = closeMenuText
+                                                role = Role.Button
+                                            },
+                                )
+                            }
+                        }
+                    }
+                }
+
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.search_noun)) }) {
                     Box {
                         IconButton(
-                            onClick = { onShowFilterMenu(true) },
+                            onClick = { searching = true },
                         ) {
                             Icon(
-                                Icons.Default.FilterList,
-                                contentDescription = stringResource(R.string.filter_noun),
+                                Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search_noun),
+                            )
+                        }
+                    }
+                }
+
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.open_menu)) }) {
+                    Box {
+                        IconButton(
+                            onClick = { onShowToolbarMenu(true) },
+                        ) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.open_menu),
                             )
                         }
                         DropdownMenu(
-                            expanded = viewState.showFilterMenu,
-                            onDismissRequest = { onShowFilterMenu(false) },
+                            expanded = viewState.showToolbarMenu,
+                            onDismissRequest = { onShowToolbarMenu(false) },
                             modifier =
-                                Modifier
-                                    .onKeyEventLikeEscape {
-                                        onShowFilterMenu(false)
-                                    },
+                                Modifier.onKeyEventLikeEscape {
+                                    onShowToolbarMenu(false)
+                                },
                         ) {
                             DropdownMenuItem(
-                                enabled = false,
-                                onClick = { /* Can't be modified - only shown for completeness */ },
+                                onClick = {
+                                    onMarkAllAsRead()
+                                    onShowToolbarMenu(false)
+                                },
                                 leadingIcon = {
                                     Icon(
-                                        when (viewState.filter.unread) {
-                                            true -> Icons.Default.CheckBox
-                                            false -> Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        Icons.Default.DoneAll,
                                         contentDescription = null,
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.unread_adjective))
+                                    Text(stringResource(id = R.string.mark_all_as_read))
                                 },
-                                modifier =
-                                    Modifier
-                                        .safeSemantics {
-                                            stateDescription =
-                                                when (viewState.filter.unread) {
-                                                    true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                    else -> context.getString(androidx.compose.ui.R.string.not_selected)
-                                                }
-                                            role = Role.Checkbox
-                                        },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onRefreshAll()
+                                    onShowToolbarMenu(false)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = stringResource(R.string.synchronize_feeds),
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.synchronize_feeds))
+                                },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onAddFeed()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.add_feed))
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
-                                    filterCallback.setSaved(!viewState.filter.saved)
-                                    onShowFilterMenu(false)
+                                    if (viewState.visibleFeeds.size == 1) {
+                                        onEditFeed(viewState.visibleFeeds.first().id)
+                                    } else {
+                                        onShowEditDialog()
+                                    }
+                                    onShowToolbarMenu(false)
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        when (viewState.filter.saved) {
-                                            true -> Icons.Default.CheckBox
-                                            false -> Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        Icons.Default.Edit,
                                         contentDescription = null,
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.saved_adjective))
+                                    Text(stringResource(id = R.string.edit_feed))
                                 },
-                                modifier =
-                                    Modifier
-                                        .safeSemantics {
-                                            stateDescription =
-                                                when (viewState.filter.saved) {
-                                                    true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                    else -> context.getString(androidx.compose.ui.R.string.not_selected)
-                                                }
-                                            role = Role.Checkbox
-                                        },
                             )
                             DropdownMenuItem(
                                 onClick = {
-                                    filterCallback.setRecentlyRead(!viewState.filter.recentlyRead)
-                                    onShowFilterMenu(false)
+                                    onShowDeleteDialog()
+                                    onShowToolbarMenu(false)
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        when (viewState.filter.recentlyRead) {
-                                            true -> Icons.Default.CheckBox
-                                            false -> Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        Icons.Default.Delete,
                                         contentDescription = null,
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.recently_read_adjective))
+                                    Text(stringResource(id = R.string.delete_feed))
                                 },
-                                modifier =
-                                    Modifier
-                                        .safeSemantics {
-                                            stateDescription =
-                                                when (viewState.filter.recentlyRead) {
-                                                    true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                    else -> context.getString(androidx.compose.ui.R.string.not_selected)
-                                                }
-                                            role = Role.Checkbox
-                                        },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onImport()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.ImportExport,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.import_feeds_from_opml))
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
-                                    filterCallback.setRead(!viewState.filter.read)
-                                    // Closing it is important for accessibility
-                                    onShowFilterMenu(false)
+                                    onShowToolbarMenu(false)
+                                    onExportOPML()
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        when (viewState.filter.read) {
-                                            true -> Icons.Default.CheckBox
-                                            false -> Icons.Default.CheckBoxOutlineBlank
-                                        },
+                                        Icons.Default.ImportExport,
                                         contentDescription = null,
                                     )
                                 },
                                 text = {
-                                    Text(stringResource(id = R.string.read_adjective))
+                                    Text(stringResource(id = R.string.export_feeds_to_opml))
                                 },
-                                modifier =
-                                    Modifier
-                                        .safeSemantics {
-                                            stateDescription =
-                                                when (viewState.filter.read) {
-                                                    true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                    else -> context.getString(androidx.compose.ui.R.string.not_selected)
-                                                }
-                                            role = Role.Checkbox
-                                        },
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onExportSavedArticles()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.ImportExport,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.export_saved_articles))
+                                },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onSettings()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Settings,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.action_settings))
+                                },
+                            )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onSendFeedback()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.BugReport,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.send_bug_report))
+                                },
                             )
                             // Hidden button for TalkBack
                             DropdownMenuItem(
                                 onClick = {
-                                    onShowFilterMenu(false)
+                                    onShowToolbarMenu(false)
                                 },
                                 text = {},
                                 modifier =
@@ -645,201 +894,6 @@ fun FeedScreen(
                                         },
                             )
                         }
-                    }
-                }
-            }
-
-            PlainTooltipBox(tooltip = { Text(stringResource(R.string.open_menu)) }) {
-                Box {
-                    IconButton(
-                        onClick = { onShowToolbarMenu(true) },
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.open_menu),
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = viewState.showToolbarMenu,
-                        onDismissRequest = { onShowToolbarMenu(false) },
-                        modifier =
-                            Modifier.onKeyEventLikeEscape {
-                                onShowToolbarMenu(false)
-                            },
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                onMarkAllAsRead()
-                                onShowToolbarMenu(false)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.DoneAll,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.mark_all_as_read))
-                            },
-                        )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            onClick = {
-                                onRefreshAll()
-                                onShowToolbarMenu(false)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.synchronize_feeds),
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.synchronize_feeds))
-                            },
-                        )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onAddFeed()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.add_feed))
-                            },
-                        )
-                        DropdownMenuItem(
-                            onClick = {
-                                if (viewState.visibleFeeds.size == 1) {
-                                    onEditFeed(viewState.visibleFeeds.first().id)
-                                } else {
-                                    onShowEditDialog()
-                                }
-                                onShowToolbarMenu(false)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.edit_feed))
-                            },
-                        )
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowDeleteDialog()
-                                onShowToolbarMenu(false)
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.delete_feed))
-                            },
-                        )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onImport()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.import_feeds_from_opml))
-                            },
-                        )
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onExportOPML()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.export_feeds_to_opml))
-                            },
-                        )
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onExportSavedArticles()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.export_saved_articles))
-                            },
-                        )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onSettings()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.Settings,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.action_settings))
-                            },
-                        )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                                onSendFeedback()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Default.BugReport,
-                                    contentDescription = null,
-                                )
-                            },
-                            text = {
-                                Text(stringResource(id = R.string.send_bug_report))
-                            },
-                        )
-                        // Hidden button for TalkBack
-                        DropdownMenuItem(
-                            onClick = {
-                                onShowToolbarMenu(false)
-                            },
-                            text = {},
-                            modifier =
-                                Modifier
-                                    .height(0.dp)
-                                    .safeSemantics {
-                                        contentDescription = closeMenuText
-                                        role = Role.Button
-                                    },
-                        )
                     }
                 }
             }
