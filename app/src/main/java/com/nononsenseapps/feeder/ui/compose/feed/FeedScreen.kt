@@ -426,6 +426,7 @@ fun FeedScreen(
             },
             onShowFilterMenu = viewModel::setFilterMenuVisible,
             filterCallback = viewModel.filterCallback,
+            onShowSearchBar = viewModel::setSearchBarVisible,
             feedListState = feedListState,
             feedGridState = feedGridState,
             pagedFeedItems = pagedFeedItems,
@@ -467,6 +468,7 @@ fun FeedScreen(
     onSetBookmark: (Long, Boolean) -> Unit,
     onShowFilterMenu: (Boolean) -> Unit,
     filterCallback: FeedListFilterCallback,
+    onShowSearchBar: (Boolean) -> Unit,
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -475,12 +477,10 @@ fun FeedScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val closeMenuText = stringResource(id = R.string.close_menu)
-    var textFieldState by rememberSaveable { mutableStateOf("") }
-    var searching by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(searching) {
-        if (searching) {
+    LaunchedEffect(viewState.searchBarVisible) {
+        if (viewState.searchBarVisible) {
             focusRequester.requestFocus()
         }
     }
@@ -509,29 +509,31 @@ fun FeedScreen(
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
-            if (searching) {
+            if (viewState.searchBarVisible) {
                 SearchBar(
+                    expanded = true,
+                    onExpandedChange = { onShowSearchBar(it) },
                     inputField = {
                         SearchBarDefaults.InputField(
-                            query = textFieldState,
-                            onQueryChange = { textFieldState = it; filterCallback.searchFor(it) },
-                            onSearch = { searching = false; filterCallback.searchFor(it) },
+                            query = viewState.filter.search,
+                            onQueryChange = { filterCallback.searchFor(it) },
+                            onSearch = { onShowSearchBar(false); filterCallback.searchFor(it) },
                             expanded = true,
-                            onExpandedChange = { searching = it },
-                            placeholder = { Text("search") },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            onExpandedChange = { onShowSearchBar(it) },
+                            placeholder = { Text("query") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "search") },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { filterCallback.searchFor(""); searching = false },
+                                    onClick = { onShowSearchBar(false); filterCallback.searchFor("") },
                                 ) {
-                                    Icon(Icons.Default.Close, contentDescription = "close search")
+                                    Icon(Icons.Default.Close, contentDescription = "cancel search")
                                 }
                             },
-                            modifier = Modifier.focusRequester(focusRequester)
+                            modifier = Modifier
+                                .focusRequester(focusRequester)
+                                .onKeyEventLikeEscape { onShowSearchBar(false); filterCallback.searchFor("") }
                         )
                     },
-                    expanded = true,
-                    onExpandedChange = { searching = it },
                 ) {
                 }
             } else {
@@ -692,11 +694,12 @@ fun FeedScreen(
                 PlainTooltipBox(tooltip = { Text(stringResource(R.string.search_noun)) }) {
                     Box {
                         IconButton(
-                            onClick = { searching = true },
+                            onClick = { onShowSearchBar(true) },
                         ) {
                             Icon(
                                 Icons.Default.Search,
                                 contentDescription = stringResource(R.string.search_noun),
+                                tint = if (viewState.filter.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
                             )
                         }
                     }

@@ -184,6 +184,14 @@ class FeedViewModel(
 
     fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
 
+    private val searchBarVisible: MutableStateFlow<Boolean> =
+        MutableStateFlow(state["searchBarVisible"] ?: false)
+
+    fun setSearchBarVisible(visible: Boolean) {
+        state["searchBarVisible"] = visible
+        searchBarVisible.update { visible }
+    }
+
     private val editDialogVisible = MutableStateFlow(false)
 
     fun setShowEditDialog(visible: Boolean) {
@@ -260,6 +268,7 @@ class FeedViewModel(
             repository.syncWorkerRunning,
             // 25
             repository.isOpenDrawerOnFab,
+            searchBarVisible,
         ) { params: Array<Any> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
@@ -293,6 +302,7 @@ class FeedViewModel(
                 maxLines = params[18] as Int,
                 showFilterMenu = params[19] as Boolean,
                 filter = params[20] as FeedListFilter,
+                searchBarVisible = params[26] as Boolean,
                 showOnlyTitle = params[21] as Boolean,
                 showReadingTime = params[22] as Boolean,
                 showTitleUnreadCount = params[23] as Boolean,
@@ -430,7 +440,7 @@ data class FeedState(
     override val showFilterMenu: Boolean = false,
     override val filter: FeedListFilter = emptyFeedListFilter,
     val isArticleOpen: Boolean = false,
-    override val searching: Boolean = false,
+    override val searchBarVisible: Boolean = false,
     override val showTitleUnreadCount: Boolean = false,
     override val isOpenDrawerOnFab: Boolean = false,
 ) : FeedScreenViewState
@@ -460,7 +470,7 @@ interface FeedScreenViewState {
     val showReadingTime: Boolean
     val filter: FeedListFilter
     val showFilterMenu: Boolean
-    val searching: Boolean
+    val searchBarVisible: Boolean
     val showTitleUnreadCount: Boolean
     val isOpenDrawerOnFab: Boolean
 }
