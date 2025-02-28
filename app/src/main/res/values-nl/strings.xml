@@ -250,4 +250,18 @@
     <string name="touch_to_play_audio">Tik om audio af te spelen</string>
     <string name="feed_item_style_compact_card">Compacte Kaart</string>
     <string name="show_title_unread_count">Toon het aantal ongelezen artikelen in de titel</string>
+    <string name="nostr_feed_description">Nostr artikels door %1$s</string>
+    <string name="list_of_available_models">Lijst van beschikbare modellen</string>
+    <string name="open_drawer_on_fab">Toon feeds nadat alles als gelezen gemarkeerd is</string>
+    <string name="on">Actief</string>
+    <string name="off">Inactief</string>
+    <string name="show_message">Toon bericht</string>
+    <string name="summarize">Vat samen</string>
+    <string name="openai_settings">OpenAI integratie</string>
+    <string name="api_key">API-sleutel</string>
+    <string name="model_id">Model Id</string>
+    <string name="azure_api_version">Azure API versie</string>
+    <string name="unable_to_load_models">Kon de modellenlijst niet laden.</string>
+    <string name="no_models_were_found">Geen modellen gevonden</string>
+    <string name="azure_deployment_id">Azure deployment id</string>
 </resources>

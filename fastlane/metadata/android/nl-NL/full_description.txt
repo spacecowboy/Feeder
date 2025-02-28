@@ -17,3 +17,5 @@
 <li>Handige toegang tot ingesloten links</li>
 <li>Material Design</li>
 </ul>
+
+De volledige lijst van aanpassingen is beschikbaar <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">op GitHub</a>.
