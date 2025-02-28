@@ -517,21 +517,31 @@ fun FeedScreen(
                         SearchBarDefaults.InputField(
                             query = viewState.filter.search,
                             onQueryChange = { filterCallback.searchFor(it) },
-                            onSearch = { onShowSearchBar(false); filterCallback.searchFor(it) },
+                            onSearch = {
+                                onShowSearchBar(false)
+                                filterCallback.searchFor(it)
+                            },
                             expanded = true,
                             onExpandedChange = { onShowSearchBar(it) },
                             placeholder = { Text("query") },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "search") },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { onShowSearchBar(false); filterCallback.searchFor("") },
+                                    onClick = {
+                                        onShowSearchBar(false)
+                                        filterCallback.searchFor("")
+                                    },
                                 ) {
                                     Icon(Icons.Default.Close, contentDescription = "cancel search")
                                 }
                             },
-                            modifier = Modifier
-                                .focusRequester(focusRequester)
-                                .onKeyEventLikeEscape { onShowSearchBar(false); filterCallback.searchFor("") }
+                            modifier =
+                                Modifier
+                                    .focusRequester(focusRequester)
+                                    .onKeyEventLikeEscape {
+                                        onShowSearchBar(false)
+                                        filterCallback.searchFor("")
+                                    },
                         )
                     },
                 ) {

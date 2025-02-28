@@ -785,7 +785,7 @@ data class PrefsFeedListFilter(
     override val saved: Boolean,
     override val recentlyRead: Boolean,
     override val read: Boolean,
-    override val search: String
+    override val search: String,
 ) : FeedListFilter {
     override val unread: Boolean = true
 }
