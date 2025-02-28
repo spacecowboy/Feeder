@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.2] - 2025-02-28
+
+### 🐛 Bug Fixes & Minor Changes
+- Fixed missing spaces between text and links by @spacecowboy in [#632](https://github.com/spacecowboy/feeder/pull/632) 
+- Changed exported filenames to avoid characters not liked by som OSes (#635) by @spacecowboy in [#635](https://github.com/spacecowboy/feeder/pull/635) 
+
+### 🌐 Translations
+- Updated Bosnian translation using Weblate (#618) by @weblate in [#618](https://github.com/spacecowboy/feeder/pull/618) 
+- Updated Italian translation using Weblate by @Fs00 in [#624](https://github.com/spacecowboy/feeder/pull/624) 
+- Updated Hungarian translation using Weblate by @summoner001 in [#629](https://github.com/spacecowboy/feeder/pull/629) 
+- Updated Dutch translation using Weblate in [#646](https://github.com/spacecowboy/feeder/pull/646) 
+
+
 ## [2.9.1] - 2025-02-15
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -3042,18 +3055,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes & Minor Changes
 - Update Simplified Chinese translation in [commit](https://github.com/spacecowboy/feeder/commit/f9fdb071c6af3f70a9ab57c74fadbe156d1a2eed)
-- Add reverse sort option to settings menu in [commit](https://github.com/spacecowboy/feeder/commit/d130f0d098914c12571f83a72258eb3f30ead403)
-- Add sorting option utilities to PrefUtils.kt in [commit](https://github.com/spacecowboy/feeder/commit/cf70edfe2fed20b387230e9acca08b79029f13b5)
-- Modify FeedItemDao and FeedItemsViewModel to allow listing feeds in reverse order in [commit](https://github.com/spacecowboy/feeder/commit/61128e4f604c64eaa06290dbb8728defcfe22726)
-- Fix current feed order not changing when sorting setting changed in [commit](https://github.com/spacecowboy/feeder/commit/6f00288310e005d218d6c056621a9e87581e631b)
+- Add reverse sort option to settings menu by @duck-bark in [commit](https://github.com/spacecowboy/feeder/commit/d130f0d098914c12571f83a72258eb3f30ead403)
+- Add sorting option utilities to PrefUtils.kt by @duck-bark in [commit](https://github.com/spacecowboy/feeder/commit/cf70edfe2fed20b387230e9acca08b79029f13b5)
+- Modify FeedItemDao and FeedItemsViewModel to allow listing feeds in reverse order by @duck-bark in [commit](https://github.com/spacecowboy/feeder/commit/61128e4f604c64eaa06290dbb8728defcfe22726)
+- Fix current feed order not changing when sorting setting changed by @duck-bark in [commit](https://github.com/spacecowboy/feeder/commit/6f00288310e005d218d6c056621a9e87581e631b)
 - Apply 18 suggestion(s) to 4 file(s) in [commit](https://github.com/spacecowboy/feeder/commit/0b3c3a1c817b1cce6d4bfdf805398cf9e046769d)
 - Update Spanish strings.xml for new sort options by @pirujo in [commit](https://github.com/spacecowboy/feeder/commit/8aa6649e5d565101c685b8e4e7850e308392e276)
 - Update strings.xml for new sort options. Dropped string in previous commit. by @pirujo in [commit](https://github.com/spacecowboy/feeder/commit/2b9180c39d3a2e3b252f4bee0360394b97e0bfcf)
 - Fixed possible crash in case you pressed two feed items at once by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/47bc0a5c4c444ae92a2b44739d73444166a1ba87)
 - Update Indonesian translation by @zmni in [commit](https://github.com/spacecowboy/feeder/commit/4b67ce489576be064cfd9f87b0968ce075bb881a)
-- Modify FeedItemsViewModel to use LiveData for sorting preference in [commit](https://github.com/spacecowboy/feeder/commit/fd7570e7f909ccea132abb7c478e1f3a08c66273)
+- Modify FeedItemsViewModel to use LiveData for sorting preference by @duck-bark in [commit](https://github.com/spacecowboy/feeder/commit/fd7570e7f909ccea132abb7c478e1f3a08c66273)
 - Ignored youtube test which always fails on CI due to rate limiting or something by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/4c57959d9bd03ed8c1c524931b4590ea0d22e558)
 
+### ❤️  New Contributors
+* @duck-bark made their first contribution
 
 ## [1.9.5] - 2020-05-27
 
@@ -4371,6 +4386,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.9.2]: https://github.com/spacecowboy/feeder/compare/2.9.1..2.9.2
 [2.9.1]: https://github.com/spacecowboy/feeder/compare/2.9.0..2.9.1
 [2.9.0]: https://github.com/spacecowboy/feeder/compare/2.8.1..2.9.0
 [2.8.1]: https://github.com/spacecowboy/feeder/compare/2.8.0..2.8.1
