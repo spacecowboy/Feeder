@@ -262,4 +262,6 @@
     <string name="show_message">Εμφάνιση μηνύματος</string>
     <string name="open_drawer_on_fab">Εμφάνιση ροών μετά την επισήμανση όλων ως αναγνωσμένα</string>
     <string name="nostr_feed_description">Άρθρα Nostr από %1$s</string>
+    <string name="on">Ενεργό</string>
+    <string name="off">Ανενεργό</string>
 </resources>
