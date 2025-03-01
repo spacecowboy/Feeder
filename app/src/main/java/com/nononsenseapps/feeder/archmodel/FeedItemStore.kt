@@ -56,6 +56,7 @@ class FeedItemStore(
         tag: String,
         minReadTime: Instant,
         filter: FeedListFilter,
+        search: String,
     ): Flow<Int> {
         val queryString = StringBuilder()
         val args = mutableListOf<Any?>()
@@ -65,7 +66,7 @@ class FeedItemStore(
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
 
-            rawQueryFilter(filter, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
         }
 
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
@@ -77,6 +78,7 @@ class FeedItemStore(
         minReadTime: Instant,
         newestFirst: Boolean,
         filter: FeedListFilter,
+        search: String,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config =
@@ -95,7 +97,7 @@ class FeedItemStore(
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
-                rawQueryFilter(filter, args, minReadTime, feedId, tag)
+                rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
 
                 when (newestFirst) {
                     true -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC\n")
@@ -112,6 +114,7 @@ class FeedItemStore(
 
     private fun StringBuilder.rawQueryFilter(
         filter: FeedListFilter,
+        search: String,
         args: MutableList<Any?>,
         minReadTime: Instant,
         feedId: Long,
@@ -143,10 +146,16 @@ class FeedItemStore(
         }
 
         when {
-            filter.search.isNotEmpty() -> {
+            search.isNotEmpty() -> {
+                // User probably means the literal characters
+                val sanitizedSearch =
+                    search
+                        .replace("\\", "\\\\")
+                        .replace("%", "\\%")
+                        .replace("_", "\\_")
                 append("AND (\n")
-                append("plain_title LIKE ?\n").also { args.add("%${filter.search}%") }
-                append("OR plain_snippet LIKE ?\n").also { args.add("%${filter.search}%") }
+                append("plain_title LIKE ?\n").also { args.add("%$sanitizedSearch%") }
+                append("OR plain_snippet LIKE ?\n").also { args.add("%$sanitizedSearch%") }
                 append(")\n")
             }
             onlySavedArticles -> append("AND bookmarked = 1\n")
@@ -159,6 +168,7 @@ class FeedItemStore(
         feedId: Long,
         tag: String,
         filter: FeedListFilter,
+        search: String,
         minReadTime: Instant,
         descending: Boolean,
         cursor: FeedItemCursor,
@@ -175,7 +185,7 @@ class FeedItemStore(
             append("SELECT feed_items.id FROM feed_items\n")
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
-            rawQueryFilter(filter, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
             // this version of sqlite doesn't seem to support tuple comparisons
             append("and (\n")
 

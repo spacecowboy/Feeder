@@ -36,12 +36,14 @@ import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -102,6 +104,7 @@ class Repository(
         tag = tag,
         minReadTime = Instant.now(),
         filter = emptyFeedListFilter,
+        search = "",
     )
 
     fun setCurrentFeedAndTag(
@@ -172,9 +175,9 @@ class Repository(
         }
     }
 
-    fun searchFor(value: String) {
-        settingsStore.searchFor(value)
-    }
+    val search: MutableStateFlow<String> = MutableStateFlow("")
+
+    fun searchFor(value: String) = search.update { value }
 
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
 
@@ -315,7 +318,8 @@ class Repository(
             minReadTime,
             currentSorting,
             feedListFilter,
-        ) { feedAndTag, minReadTime, currentSorting, feedListFilter ->
+            search,
+        ) { feedAndTag, minReadTime, currentSorting, feedListFilter, search ->
             val (feedId, tag) = feedAndTag
             FeedListArgs(
                 feedId = feedId,
@@ -327,6 +331,7 @@ class Repository(
                     },
                 newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
                 filter = feedListFilter,
+                search = search,
             )
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
@@ -335,6 +340,7 @@ class Repository(
                 minReadTime = it.minReadTime,
                 newestFirst = it.newestFirst,
                 filter = it.filter,
+                search = it.search,
             )
         }
 
@@ -344,7 +350,8 @@ class Repository(
             currentFeedAndTag,
             minReadTime,
             feedListFilter,
-        ) { feedAndTag, minReadTime, feedListFilter ->
+            search,
+        ) { feedAndTag, minReadTime, feedListFilter, search ->
             val (feedId, tag) = feedAndTag
             FeedListArgs(
                 feedId = feedId,
@@ -356,6 +363,7 @@ class Repository(
                     },
                 newestFirst = false,
                 filter = feedListFilter,
+                search = search,
             )
         }.flatMapLatest {
             feedItemStore.getFeedItemCountRaw(
@@ -363,6 +371,7 @@ class Repository(
                 tag = it.tag,
                 minReadTime = it.minReadTime,
                 filter = it.filter,
+                search = it.search,
             )
         }
 
@@ -504,6 +513,7 @@ class Repository(
             feedId = feedId,
             tag = tag,
             filter = feedListFilter.value,
+            search = search.value,
             minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
@@ -520,6 +530,7 @@ class Repository(
             feedId = feedId,
             tag = tag,
             filter = feedListFilter.value,
+            search = search.value,
             minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
@@ -541,6 +552,7 @@ class Repository(
                 tag = "",
                 minReadTime = Instant.EPOCH,
                 filter = emptyFeedListFilter,
+                search = "",
             )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -785,6 +797,7 @@ private data class FeedListArgs(
     val newestFirst: Boolean,
     val minReadTime: Instant,
     val filter: FeedListFilter,
+    val search: String,
 )
 
 // Wrapper class because flow combine doesn't like nulls

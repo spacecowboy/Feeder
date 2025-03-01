@@ -427,6 +427,7 @@ fun FeedScreen(
             onShowFilterMenu = viewModel::setFilterMenuVisible,
             filterCallback = viewModel.filterCallback,
             onShowSearchBar = viewModel::setSearchBarVisible,
+            searchCallback = viewModel::searchCallback,
             feedListState = feedListState,
             feedGridState = feedGridState,
             pagedFeedItems = pagedFeedItems,
@@ -469,6 +470,7 @@ fun FeedScreen(
     onShowFilterMenu: (Boolean) -> Unit,
     filterCallback: FeedListFilterCallback,
     onShowSearchBar: (Boolean) -> Unit,
+    searchCallback: (String) -> Unit,
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -515,11 +517,11 @@ fun FeedScreen(
                     onExpandedChange = { onShowSearchBar(it) },
                     inputField = {
                         SearchBarDefaults.InputField(
-                            query = viewState.filter.search,
-                            onQueryChange = { filterCallback.searchFor(it) },
+                            query = viewState.search,
+                            onQueryChange = { searchCallback(it) },
                             onSearch = {
                                 onShowSearchBar(false)
-                                filterCallback.searchFor(it)
+                                searchCallback(it)
                             },
                             expanded = true,
                             onExpandedChange = { onShowSearchBar(it) },
@@ -529,7 +531,7 @@ fun FeedScreen(
                                 IconButton(
                                     onClick = {
                                         onShowSearchBar(false)
-                                        filterCallback.searchFor("")
+                                        searchCallback("")
                                     },
                                 ) {
                                     Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel_search))
@@ -540,7 +542,7 @@ fun FeedScreen(
                                     .focusRequester(focusRequester)
                                     .onKeyEventLikeEscape {
                                         onShowSearchBar(false)
-                                        filterCallback.searchFor("")
+                                        searchCallback("")
                                     },
                         )
                     },
@@ -555,7 +557,7 @@ fun FeedScreen(
                             Icon(
                                 Icons.Default.Search,
                                 contentDescription = stringResource(R.string.search_verb),
-                                tint = if (viewState.filter.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
+                                tint = if (viewState.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
