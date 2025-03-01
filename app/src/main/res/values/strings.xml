@@ -276,6 +276,8 @@
   <string name="list_of_available_models">List of available models</string>
   <string name="show_message">Show message</string>
   <string name="open_drawer_on_fab">Show feeds after marking all as read</string>
-    <string name="on">On</string>
+  <string name="on">On</string>
   <string name="off">Off</string>
+  <string name="search_verb">Search</string>
+  <string name="cancel_search">Cancel search</string>
 </resources>

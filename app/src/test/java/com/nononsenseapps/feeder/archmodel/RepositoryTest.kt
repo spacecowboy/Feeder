@@ -89,7 +89,7 @@ class RepositoryTest : DIAware {
         every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
 
-        every { feedItemStore.getFeedItemCountRaw(any(), any(), any(), any()) } returns flowOf(0)
+        every { feedItemStore.getFeedItemCountRaw(any(), any(), any(), any(), any()) } returns flowOf(0)
 
         every { syncRestClient.isConfigured } returns false
     }
