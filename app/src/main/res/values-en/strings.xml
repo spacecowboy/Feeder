@@ -2,5 +2,4 @@
 <resources>
 
     <string name="by_author_on_date">by %1$s, %2$s</string>
-  <string name="search_noun">Search</string>
 </resources>

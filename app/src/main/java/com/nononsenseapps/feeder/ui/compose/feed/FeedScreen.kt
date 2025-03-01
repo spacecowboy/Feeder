@@ -523,8 +523,8 @@ fun FeedScreen(
                             },
                             expanded = true,
                             onExpandedChange = { onShowSearchBar(it) },
-                            placeholder = { Text("query") },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "search") },
+                            placeholder = { Text(stringResource(R.string.search_verb)) },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             trailingIcon = {
                                 IconButton(
                                     onClick = {
@@ -532,7 +532,7 @@ fun FeedScreen(
                                         filterCallback.searchFor("")
                                     },
                                 ) {
-                                    Icon(Icons.Default.Close, contentDescription = "cancel search")
+                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel_search))
                                 }
                             },
                             modifier =
@@ -547,6 +547,20 @@ fun FeedScreen(
                 ) {
                 }
             } else {
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.search_verb)) }) {
+                    Box {
+                        IconButton(
+                            onClick = { onShowSearchBar(true) },
+                        ) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search_verb),
+                                tint = if (viewState.filter.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
+
                 if (viewState.currentFeedOrTag.isNotSavedArticles) {
                     PlainTooltipBox(
                         tooltip = {
@@ -697,20 +711,6 @@ fun FeedScreen(
                                             },
                                 )
                             }
-                        }
-                    }
-                }
-
-                PlainTooltipBox(tooltip = { Text(stringResource(R.string.search_noun)) }) {
-                    Box {
-                        IconButton(
-                            onClick = { onShowSearchBar(true) },
-                        ) {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = stringResource(R.string.search_noun),
-                                tint = if (viewState.filter.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
-                            )
                         }
                     }
                 }
