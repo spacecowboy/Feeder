@@ -307,7 +307,7 @@ class FeedViewModel(
                 maxLines = params[18] as Int,
                 showFilterMenu = params[19] as Boolean,
                 filter = params[20] as FeedListFilter,
-                searchBarVisible = params[21] as Boolean,
+                searchBarVisible = (params[22] as String).isNotEmpty() || params[21] as Boolean,
                 search = params[22] as String,
                 showOnlyTitle = params[23] as Boolean,
                 showReadingTime = params[24] as Boolean,

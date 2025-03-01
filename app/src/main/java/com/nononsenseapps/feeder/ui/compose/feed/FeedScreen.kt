@@ -518,13 +518,10 @@ fun FeedScreen(
                     inputField = {
                         SearchBarDefaults.InputField(
                             query = viewState.search,
-                            onQueryChange = { searchCallback(it) },
-                            onSearch = {
-                                onShowSearchBar(false)
-                                searchCallback(it)
-                            },
+                            onQueryChange = searchCallback,
+                            onSearch = searchCallback,
                             expanded = true,
-                            onExpandedChange = { onShowSearchBar(it) },
+                            onExpandedChange = onShowSearchBar,
                             placeholder = { Text(stringResource(R.string.search_verb)) },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             trailingIcon = {
@@ -557,7 +554,6 @@ fun FeedScreen(
                             Icon(
                                 Icons.Default.Search,
                                 contentDescription = stringResource(R.string.search_verb),
-                                tint = if (viewState.search.isEmpty()) androidx.compose.material3.LocalContentColor.current else MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
