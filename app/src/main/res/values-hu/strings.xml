@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">%1$s Nostr-cikkei</string>
     <string name="off">Kikapcsolva</string>
     <string name="on">Bekapcsolva</string>
+    <string name="search_verb">Keresés</string>
+    <string name="cancel_search">Keresés visszavonása</string>
 </resources>
