@@ -262,4 +262,6 @@
     <string name="show_message">Mostrar mensaje</string>
     <string name="open_drawer_on_fab">Mostrar feeds después de marcar todo como leído</string>
     <string name="nostr_feed_description">Artículos de Nostr por %1$s</string>
+    <string name="search_verb">Buscar</string>
+    <string name="cancel_search">Cancelar búsqueda</string>
 </resources>
