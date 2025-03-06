@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">Nostr чланци по %1$s</string>
     <string name="on">Укључено</string>
     <string name="off">Искључено</string>
+    <string name="search_verb">Претражи</string>
+    <string name="cancel_search">Откажи претрагу</string>
 </resources>
