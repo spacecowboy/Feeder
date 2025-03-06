@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">%1$s 提供的 Nostr 文章</string>
     <string name="on">开</string>
     <string name="off">关</string>
+    <string name="cancel_search">取消搜索</string>
+    <string name="search_verb">搜索</string>
 </resources>
