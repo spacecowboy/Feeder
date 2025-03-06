@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">Artykuły Nostr od %1$s</string>
     <string name="on">Włączone</string>
     <string name="off">Wyłączone</string>
+    <string name="search_verb">Szukaj</string>
+    <string name="cancel_search">Anuluj wyszukiwanie</string>
 </resources>
