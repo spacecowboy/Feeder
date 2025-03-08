@@ -35,8 +35,8 @@ android {
         applicationId = "com.nononsenseapps.feeder"
         // The version fields are set with actual values to support F-Droid
         // In Play variant, they are overriden and taken from git.
-        versionCode = 3587
-        versionName = "2.9.2"
+        versionCode = 3602
+        versionName = "2.10.0"
         minSdk = 23
         targetSdk = 35
 
@@ -119,7 +119,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = "2.9.2"
+                versionName = "2.10.0"
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
