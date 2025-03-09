@@ -63,7 +63,7 @@ interface FeedDao {
 
     @Query(
         """
-        SELECT 
+        SELECT
             id,
             COALESCE(NULLIF(custom_title, ''), title) as title,
             notify
@@ -154,7 +154,7 @@ interface FeedDao {
             where tag is '' or tag in (:expandedTags)
             group by feed_id
             -- sort them
-            order by sort_section, tag, sort_tag_or_feed, display_title
+            order by sort_section, tag, sort_tag_or_feed, display_title collate nocase
         """,
     )
     fun getPagedNavDrawerItems(expandedTags: Set<String>): PagingSource<Int, FeedUnreadCount>
