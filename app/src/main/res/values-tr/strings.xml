@@ -7,7 +7,7 @@
     <string name="title_activity_edit_feed">Beslemeye abone ol</string>
     <string name="url">URL</string>
     <string name="tag">Etiket</string>
-    <string name="add_feed_search_hint">Besleme URL'si</string>
+    <string name="add_feed_search_hint">Besleme URL\'si</string>
     <string name="title">Başlık</string>
     <string name="nostr_feed_description">%1$s tarafından Nostr makaleleri</string>
     <string name="by_author_on_date" comment="1 yazar, 2 tarih. Varsayılan format şu şekilde gösterilir:&#10;&#10;Ahmet Yılmaz, Cumartesi, 9 Ocak 2021 15:49&#10;&#10;Eğer başka bir dil için daha uygunsa, değiştirilebilir. Örneğin:&#10;&#10;%1$s, %2$s tarihinde:&#10;&#10;Ahmet Yılmaz, Cumartesi, 9 Ocak 2021 15:49">%1$s, %2$s</string>
@@ -42,8 +42,8 @@
     <string name="skip_to_next">Sonrakine geç</string>
     <string name="set_language">Dili ayarla</string>
     <string name="sync">Senkronize et</string>
-    <string name="export_feeds_to_opml">Beslemeleri OPML'ye aktar</string>
-    <string name="import_feeds_from_opml">Beslemeleri OPML'den içe aktar</string>
+    <string name="export_feeds_to_opml">Beslemeleri OPML\'ye aktar</string>
+    <string name="import_feeds_from_opml">Beslemeleri OPML\'den içe aktar</string>
     <string name="export_saved_articles">Kaydedilen makaleleri dışa aktar</string>
     <string name="view_debug_log">Hata ayıklama günlüğünü görüntüle</string>
     <string name="new_based_on_this">Buna dayanarak yeni</string>
