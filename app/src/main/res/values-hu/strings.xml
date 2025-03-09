@@ -79,7 +79,7 @@
     <string name="theme_day">Nappali</string>
     <string name="theme_night">Éjszakai</string>
     <string name="theme">Téma</string>
-    <string name="dark_theme_preference">Preferált sötét téma</string>
+    <string name="dark_theme_preference">Előnyben részesített sötét téma</string>
     <string name="dark_theme_preference_black">Fekete</string>
     <string name="dark_theme_preference_dark">Sötét</string>
     <string name="sort_newest_first">Legújabb elől</string>
