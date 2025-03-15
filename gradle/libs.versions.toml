@@ -48,7 +48,7 @@ espresso = "3.6.1"
 mockk = "1.13.17"
 androidx-test-junit-ktx = "1.2.1"
 emoji2 = "1.5.0"
-icu4j = "76.1"
+icu4j = "77.1"
 
 [libraries]
 retrofit-bom = { module = "com.squareup.retrofit2:retrofit-bom", version.ref = "retrofit" }
