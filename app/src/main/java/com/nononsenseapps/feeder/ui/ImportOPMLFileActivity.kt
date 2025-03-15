@@ -20,7 +20,7 @@ import com.nononsenseapps.feeder.util.logDebug
 /**
  * This activity should only be started via a Open File Intent.
  */
-class ImportOMPLFileActivity : DIAwareComponentActivity() {
+class ImportOPMLFileActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +56,7 @@ class ImportOMPLFileActivity : DIAwareComponentActivity() {
                                     Intent(
                                         Intent.ACTION_VIEW,
                                         deepLinkUri.toUri(),
-                                        this@ImportOMPLFileActivity,
+                                        this@ImportOPMLFileActivity,
                                         MainActivity::class.java,
                                     ).apply {
                                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
