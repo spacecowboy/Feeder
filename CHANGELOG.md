@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.1] - 2025-03-16
+
+### 🐛 Bug Fixes & Minor Changes
+- Made feed ordering case insensitive (#656) by @Friendly-Banana in [#656](https://github.com/spacecowboy/feeder/pull/656) 
+- Removed unsupported default link from the intent filter by @spacecowboy in [#669](https://github.com/spacecowboy/feeder/pull/669) 
+
+### 🌐 Translations
+- Updated Turkish Translation (#658) by @mikropsoft in [#658](https://github.com/spacecowboy/feeder/pull/658) 
+- Updated Spanish translation using Weblate by @Eskuero in [commit](https://github.com/spacecowboy/feeder/commit/850ae144ffb4072aaa3b520d26703517c6911ed9)
+- Updated Hungarian translation using Weblate by @summoner001 in [#659](https://github.com/spacecowboy/feeder/pull/659) 
+
+### ❤️  New Contributors
+* @Eskuero made their first contribution
+* @mikropsoft made their first contribution in [#658](https://github.com/spacecowboy/feeder/pull/658)
+
 ## [2.10.0] - 2025-03-08
 
 ### 🚀 Features
@@ -4407,6 +4422,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.10.1]: https://github.com/spacecowboy/feeder/compare/2.10.0..2.10.1
 [2.10.0]: https://github.com/spacecowboy/feeder/compare/2.9.2..2.10.0
 [2.9.2]: https://github.com/spacecowboy/feeder/compare/2.9.1..2.9.2
 [2.9.1]: https://github.com/spacecowboy/feeder/compare/2.9.0..2.9.1
