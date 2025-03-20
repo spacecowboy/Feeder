@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">Статті Nostr від %1$s</string>
     <string name="on">Увімк.</string>
     <string name="summarize">Підсумки</string>
+    <string name="cancel_search">Скасувати пошук</string>
+    <string name="search_verb">Пошук</string>
 </resources>
