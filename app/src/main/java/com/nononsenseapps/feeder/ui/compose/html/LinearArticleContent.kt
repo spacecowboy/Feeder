@@ -104,8 +104,10 @@ import com.nononsenseapps.feeder.ui.compose.text.asFontFamily
 import com.nononsenseapps.feeder.ui.compose.text.rememberMaxImageWidth
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.OnCodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
@@ -901,7 +903,7 @@ fun LinearText.toAnnotatedString(
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    style = SpanStyle(fontFamily = data.face.asFontFamily()),
+                    style = SpanStyle(fontFamily = data.face.asFontFamily(LocalFeederTypography.current)),
                 )
             }
 
@@ -957,7 +959,7 @@ fun LinearText.toAnnotatedString(
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    style = SpanStyle(fontFamily = FontFamily.Monospace),
+                    style = SpanStyle(fontFamily = LocalFeederTypography.current.monoFontFamily()),
                 )
             }
 

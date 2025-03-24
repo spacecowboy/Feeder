@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
@@ -133,6 +134,10 @@ class SettingsViewModel(
         repository.setTextScale(value.coerceIn(0.1f, 10f))
     }
 
+    fun setFont(value: FontOptions) {
+        repository.setFont(value)
+    }
+
     fun setIsMarkAsReadOnScroll(value: Boolean) {
         repository.setIsMarkAsReadOnScroll(value)
     }
@@ -235,6 +240,7 @@ class SettingsViewModel(
                 repository.openAISettings,
                 openAIModelsState,
                 repository.isOpenDrawerOnFab,
+                repository.font,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -271,6 +277,7 @@ class SettingsViewModel(
                             modelsResult = params[28] as OpenAIModelsState,
                         ),
                     isOpenDrawerOnFab = params[29] as Boolean,
+                    font = params[30] as FontOptions,
                 )
             }.collect {
                 _viewState.value = it
@@ -331,6 +338,7 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
+    val font: FontOptions = FontOptions.ROBOTO,
 )
 
 data class UIFeedSettings(

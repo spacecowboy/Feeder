@@ -265,6 +265,10 @@ class Repository(
 
     fun setTextScale(value: Float) = settingsStore.setTextScale(value)
 
+    val font = settingsStore.font
+
+    fun setFont(value: FontOptions) = settingsStore.setFont(value)
+
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)

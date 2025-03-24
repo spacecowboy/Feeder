@@ -288,6 +288,18 @@ class SettingsStore(
         sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
     }
 
+    private val _font =
+        MutableStateFlow(
+            FontOptions.fromFontName(sp.getStringNonNull(PREF_FONT, FontOptions.ROBOTO.fontName)),
+        )
+
+    val font = _font.asStateFlow()
+
+    fun setFont(value: FontOptions) {
+        _font.value = value
+        sp.edit().putString(PREF_FONT, value.fontName).apply()
+    }
+
     private val _maximumCountPerFeed =
         MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
@@ -552,6 +564,7 @@ const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
+const val PREF_FONT = "pref_font"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
@@ -782,4 +795,18 @@ data class PrefsFeedListFilter(
     override val read: Boolean,
 ) : FeedListFilter {
     override val unread: Boolean = true
+}
+
+enum class FontOptions(val fontName: String) {
+    ROBOTO("Roboto"),
+    ATKINSON_HYPERLEGIBLE("Atkinson Hyperlegible Next"), ;
+
+    override fun toString(): String {
+        return fontName
+    }
+
+    companion object {
+        fun fromFontName(fontName: String): FontOptions =
+            entries.firstOrNull { it.fontName == fontName } ?: ROBOTO
+    }
 }

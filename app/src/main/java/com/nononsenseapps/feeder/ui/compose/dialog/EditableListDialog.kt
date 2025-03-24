@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
@@ -162,7 +164,7 @@ private fun PreviewDialog() {
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalFeederTypography.current.monoFontFamily()),
                     )
                 }
             },

@@ -280,4 +280,7 @@
   <string name="off">Off</string>
   <string name="search_verb">Search</string>
   <string name="cancel_search">Cancel search</string>
+    <string name="text">Text</string>
+  <string name="font">Font</string>
+  <string name="text_preview">Text preview</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
+import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -24,4 +25,7 @@ class CommonActivityViewModel(
 
     val textScale: StateFlow<Float> =
         repository.textScale
+
+    val font: StateFlow<FontOptions> =
+        repository.font
 }

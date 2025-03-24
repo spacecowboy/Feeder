@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.StringRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Colors
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
@@ -56,6 +58,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -83,6 +86,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
@@ -93,7 +97,9 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
@@ -208,6 +214,8 @@ fun SettingsScreen(
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
+            currentFont = viewState.font,
+            onFontChanged = settingsViewModel::setFont,
             modifier = Modifier.padding(padding),
         )
     }
@@ -279,6 +287,8 @@ private fun SettingsScreenPreview() {
             onOpenAIEvent = {},
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
+            currentFont = FontOptions.ROBOTO,
+            onFontChanged = {},
             modifier = Modifier,
         )
     }
@@ -346,6 +356,8 @@ fun SettingsList(
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
+    currentFont: FontOptions,
+    onFontChanged: (FontOptions) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -427,7 +439,7 @@ fun SettingsList(
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalFeederTypography.current.monoFontFamily()),
                     )
                 }
             },
@@ -443,14 +455,67 @@ fun SettingsList(
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
+        val textScaleText = stringResource(id = R.string.text_scale)
+        val textPreviewText = stringResource(id = R.string.text_preview)
+
         SettingsGroup(
-            title = R.string.text_scale,
+            title = R.string.text,
         ) {
+            Row(
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth)
+                        .semantics {
+                            role = Role.Button
+                        },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(Modifier.width(64.dp))
+                Surface(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                    tonalElevation = 3.dp,
+                ) {
+                    Text(
+                        "B8 O0 1Iil EF pq ebgs gmnr Å9%. Âçēřß",
+                        style =
+                            MaterialTheme.typography.bodyLarge
+                                .merge(
+                                    TextStyle(
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                                    ),
+                                ),
+                        modifier =
+                            Modifier
+                                .width(dimens.maxContentWidth)
+                                .padding(4.dp)
+                                .safeSemantics {
+                                    contentDescription = textPreviewText
+                                }
+                    )
+                }
+            }
             ScaleSetting(
                 currentValue = textScale,
                 onValueChange = setTextScale,
                 valueRange = 1f..2f,
                 steps = 9,
+                modifier = Modifier.safeSemantics(mergeDescendants = true) {
+                    contentDescription = textScaleText
+                }
+            )
+            MenuSetting(
+                title = stringResource(id = R.string.font),
+                currentValue = currentFont,
+                values =
+                    immutableListHolderOf(
+                        FontOptions.ROBOTO,
+                        FontOptions.ATKINSON_HYPERLEGIBLE,
+                    ),
+                onSelection = onFontChanged,
             )
         }
 
@@ -1001,7 +1066,8 @@ fun NotificationsSetting(
 
                         PermissionStatus.Granted -> expanded = true
                     }
-                }.semantics {
+                }
+                .semantics {
                     role = Role.Button
                 },
         verticalAlignment = Alignment.CenterVertically,
@@ -1141,7 +1207,8 @@ fun SwitchSetting(
                 .clickable(
                     enabled = enabled,
                     onClick = { onCheckedChange(!checked) },
-                ).safeSemantics(mergeDescendants = true) {
+                )
+                .safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
                             true -> context.getString(R.string.on)
@@ -1206,26 +1273,6 @@ fun ScaleSetting(
                     stateDescription = "%.1fx".format(safeCurrentValue)
                 },
     ) {
-        Surface(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-            tonalElevation = 3.dp,
-        ) {
-            Text(
-                "Lorem ipsum dolor sit amet.",
-                style =
-                    MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
-                            ),
-                        ),
-                modifier = Modifier.padding(4.dp),
-            )
-        }
         SliderWithEndLabels(
             value = safeCurrentValue,
             startLabel = {

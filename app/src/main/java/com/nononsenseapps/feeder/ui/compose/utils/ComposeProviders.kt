@@ -26,6 +26,7 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
         val darkThemePreference by viewModel.darkThemePreference.collectAsStateWithLifecycle()
         val dynamicColors by viewModel.dynamicColors.collectAsStateWithLifecycle()
         val textScale by viewModel.textScale.collectAsStateWithLifecycle()
+        val font by viewModel.font.collectAsStateWithLifecycle()
         withFoldableHinge {
             withWindowMetrics {
                 withWindowSize {
@@ -33,6 +34,7 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
                         currentTheme = currentTheme,
                         darkThemePreference = darkThemePreference,
                         dynamicColors = dynamicColors,
+                        font = font,
                     ) {
                         ProvideFontScale(fontScale = textScale) {
                             WithFeederTextToolbar(content)
