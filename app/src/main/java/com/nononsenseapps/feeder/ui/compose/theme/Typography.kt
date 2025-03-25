@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import android.graphics.Typeface
 import androidx.annotation.FontRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -12,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.DeviceFontFamilyName
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -23,8 +25,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FontOptions
 
-class FeederTypography(val typographySettings: TypographySettings) {
-
+class FeederTypography(typographySettings: TypographySettings) {
     val typography: Typography =
         materialTypography.copy(
             displayLarge = materialTypography.displayLarge.merge(fontFamily = typographySettings.sansFontFamily),
@@ -118,9 +119,9 @@ fun atkinsonHyperlegibleMonoVariableFamily() =
 fun robotoFontFamily() =
     FontFamily(
         (
-            variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
-                variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
-        ).toList(),
+                variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
+                        variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
+                ).toList(),
     )
 
 fun robotoMonoFontFamily() =
@@ -130,6 +131,9 @@ fun robotoMonoFontFamily() =
                         variableFont(R.font.roboto_mono_italic_variable_wght, fontWeights, fontStylesItalic)
                 ).toList(),
     )
+
+fun systemSansSerifFontFamily() = FontFamily.SansSerif
+fun systemMonoFontFamily() = FontFamily.Monospace
 
 fun <A, B> cartesianProduct(
     list1: List<A>,
@@ -226,6 +230,7 @@ data class TypographySettings(
         when (font) {
             FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
             FontOptions.ROBOTO -> robotoFontFamily()
+            FontOptions.SYSTEM_DEFAULT -> systemSansSerifFontFamily()
         }
     }
 
@@ -233,6 +238,7 @@ data class TypographySettings(
         when (font) {
             FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleMonoVariableFamily()
             FontOptions.ROBOTO -> robotoMonoFontFamily()
+            FontOptions.SYSTEM_DEFAULT -> systemMonoFontFamily()
         }
     }
 

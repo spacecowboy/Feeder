@@ -290,7 +290,7 @@ class SettingsStore(
 
     private val _font =
         MutableStateFlow(
-            FontOptions.fromFontName(sp.getStringNonNull(PREF_FONT, FontOptions.ROBOTO.fontName)),
+            FontOptions.fromFontName(sp.getStringNonNull(PREF_FONT, FontOptions.SYSTEM_DEFAULT.fontName)),
         )
 
     val font = _font.asStateFlow()
@@ -799,7 +799,10 @@ data class PrefsFeedListFilter(
 
 enum class FontOptions(val fontName: String) {
     ROBOTO("Roboto"),
-    ATKINSON_HYPERLEGIBLE("Atkinson Hyperlegible Next"), ;
+    ATKINSON_HYPERLEGIBLE("Atkinson Hyperlegible Next"),
+    // TODO translate
+    SYSTEM_DEFAULT("System Default"),
+    ;
 
     override fun toString(): String {
         return fontName

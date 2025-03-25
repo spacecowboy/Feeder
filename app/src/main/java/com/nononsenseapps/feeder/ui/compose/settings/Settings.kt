@@ -68,6 +68,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
@@ -473,24 +474,65 @@ fun SettingsList(
                             .padding(vertical = 4.dp),
                     tonalElevation = 3.dp,
                 ) {
-                    Text(
-                        "B8 O0 1Iil EF pq ebgs gmnr Å9%. Âçēřß",
-                        style =
-                            MaterialTheme.typography.bodyLarge
-                                .merge(
-                                    TextStyle(
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                    Column {
+
+                        Text(
+                            "B8 O0 1Iil EF pq ebgs gmnr Å9%. Âçēřß 愛媛県今治市の火事は",
+                            style =
+                                MaterialTheme.typography.bodyLarge
+                                    .merge(
+                                        TextStyle(
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                                        ),
                                     ),
-                                ),
-                        modifier =
-                            Modifier
-                                .width(dimens.maxContentWidth)
-                                .padding(4.dp)
-                                .safeSemantics {
-                                    contentDescription = textPreviewText
-                                },
-                    )
+                            modifier =
+                                Modifier
+                                    .width(dimens.maxContentWidth)
+                                    .padding(4.dp)
+                                    .safeSemantics {
+                                        contentDescription = textPreviewText
+                                    },
+                        )
+                        Text(
+                            "B8 O0 1Iil Âçēřß 愛媛県今治市の火事は",
+                            style =
+                                MaterialTheme.typography.bodyLarge
+                                    .merge(
+                                        TextStyle(
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                                        ),
+                                    ),
+                            modifier =
+                                Modifier
+                                    .width(dimens.maxContentWidth)
+                                    .padding(4.dp)
+                                    .safeSemantics {
+                                        contentDescription = textPreviewText
+                                    },
+                        )
+                        Text(
+                            "B8 O0 1Iil Âçēřß 愛媛県今治市の火事は",
+                            style =
+                                MaterialTheme.typography.bodyLarge
+                                    .merge(
+                                        TextStyle(
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontStyle = FontStyle.Italic,
+                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                                        ),
+                                    ),
+                            modifier =
+                                Modifier
+                                    .width(dimens.maxContentWidth)
+                                    .padding(4.dp)
+                                    .safeSemantics {
+                                        contentDescription = textPreviewText
+                                    },
+                        )
+                    }
                 }
             }
             ScaleSetting(
@@ -508,8 +550,7 @@ fun SettingsList(
                 currentValue = currentFont,
                 values =
                     immutableListHolderOf(
-                        FontOptions.ROBOTO,
-                        FontOptions.ATKINSON_HYPERLEGIBLE,
+                        *FontOptions.entries.toTypedArray(),
                     ),
                 onSelection = onFontChanged,
             )

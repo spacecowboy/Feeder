@@ -338,7 +338,7 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
-    val font: FontOptions = FontOptions.ROBOTO,
+    val font: FontOptions = FontOptions.SYSTEM_DEFAULT,
 )
 
 data class UIFeedSettings(

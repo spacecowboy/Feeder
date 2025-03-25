@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.TypographySettings
 import com.nononsenseapps.feeder.util.asUTF8Sequence
 import org.jsoup.nodes.Element

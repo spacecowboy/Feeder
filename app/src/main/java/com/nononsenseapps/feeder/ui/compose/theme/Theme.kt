@@ -153,9 +153,10 @@ fun ComponentActivity.FeederTheme(
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     val typographySettings = LocalTypographySettings.current
 
-    val feederTypography = remember(typographySettings) {
-        FeederTypography(typographySettings)
-    }
+    val feederTypography =
+        remember(typographySettings) {
+            FeederTypography(typographySettings)
+        }
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -237,7 +238,7 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
         when (this) {
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
-                -> false
+            -> false
 
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> isSystemInDarkTheme()
@@ -273,7 +274,7 @@ private fun ThemeOptions.getColorScheme(
         when (this) {
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
-                -> false
+            -> false
 
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> {
