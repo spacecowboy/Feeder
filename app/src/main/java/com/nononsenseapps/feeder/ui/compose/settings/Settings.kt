@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.StringRes
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Colors
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
@@ -58,7 +56,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -71,7 +68,6 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
@@ -97,9 +93,8 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
@@ -439,7 +434,7 @@ fun SettingsList(
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalFeederTypography.current.monoFontFamily()),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalTypographySettings.current.monoFontFamily),
                     )
                 }
             },
@@ -494,7 +489,7 @@ fun SettingsList(
                                 .padding(4.dp)
                                 .safeSemantics {
                                     contentDescription = textPreviewText
-                                }
+                                },
                     )
                 }
             }
@@ -503,9 +498,10 @@ fun SettingsList(
                 onValueChange = setTextScale,
                 valueRange = 1f..2f,
                 steps = 9,
-                modifier = Modifier.safeSemantics(mergeDescendants = true) {
-                    contentDescription = textScaleText
-                }
+                modifier =
+                    Modifier.safeSemantics(mergeDescendants = true) {
+                        contentDescription = textScaleText
+                    },
             )
             MenuSetting(
                 title = stringResource(id = R.string.font),

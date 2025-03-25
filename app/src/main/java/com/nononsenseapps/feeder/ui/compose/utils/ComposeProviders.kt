@@ -15,7 +15,7 @@ import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
-import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
+import com.nononsenseapps.feeder.ui.compose.theme.ProvideTypographySettings
 import org.kodein.di.compose.withDI
 
 @Composable
@@ -30,13 +30,12 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
         withFoldableHinge {
             withWindowMetrics {
                 withWindowSize {
-                    FeederTheme(
-                        currentTheme = currentTheme,
-                        darkThemePreference = darkThemePreference,
-                        dynamicColors = dynamicColors,
-                        font = font,
-                    ) {
-                        ProvideFontScale(fontScale = textScale) {
+                    ProvideTypographySettings(fontScale = textScale, font = font) {
+                        FeederTheme(
+                            currentTheme = currentTheme,
+                            darkThemePreference = darkThemePreference,
+                            dynamicColors = dynamicColors,
+                        ) {
                             WithFeederTextToolbar(content)
                         }
                     }

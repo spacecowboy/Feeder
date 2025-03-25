@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
-import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.TypographySettings
 import com.nononsenseapps.feeder.util.asUTF8Sequence
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
@@ -43,11 +43,11 @@ private fun Element.ancestors(): Sequence<Element> =
         }
     }
 
-fun String.asFontFamily(feederTypography: FeederTypography): FontFamily? =
+fun String.asFontFamily(typographySettings: TypographySettings): FontFamily? =
     when (this.lowercase()) {
-        "monospace" -> feederTypography.monoFontFamily()
-        "serif" -> feederTypography.serifFontFamily()
-        "sans-serif" -> feederTypography.sansFontFamily
+        "monospace" -> typographySettings.monoFontFamily
+        "serif" -> typographySettings.serifFontFamily
+        "sans-serif" -> typographySettings.sansFontFamily
         else -> null
     }
 

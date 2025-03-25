@@ -6,7 +6,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
@@ -22,122 +23,113 @@ import androidx.compose.ui.text.style.TextDecoration
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FontOptions
 
-class FeederTypography(val font: FontOptions) {
-    val sansFontFamily by lazy {
-        when (font) {
-            FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
-            FontOptions.ROBOTO -> robotoFontFamily()
-        }
-    }
+class FeederTypography(val typographySettings: TypographySettings) {
 
     val typography: Typography =
         materialTypography.copy(
-            displayLarge = materialTypography.displayLarge.merge(fontFamily = sansFontFamily),
-            displayMedium = materialTypography.displayMedium.merge(fontFamily = sansFontFamily),
-            displaySmall = materialTypography.displaySmall.merge(fontFamily = sansFontFamily),
+            displayLarge = materialTypography.displayLarge.merge(fontFamily = typographySettings.sansFontFamily),
+            displayMedium = materialTypography.displayMedium.merge(fontFamily = typographySettings.sansFontFamily),
+            displaySmall = materialTypography.displaySmall.merge(fontFamily = typographySettings.sansFontFamily),
             headlineLarge =
                 materialTypography.headlineLarge.merge(
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
             headlineMedium =
                 materialTypography.headlineMedium.merge(
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
             headlineSmall =
                 materialTypography.headlineSmall.merge(
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
-            titleLarge = materialTypography.titleLarge.merge(fontFamily = sansFontFamily),
-            titleMedium = materialTypography.titleMedium.merge(fontFamily = sansFontFamily),
-            titleSmall = materialTypography.titleSmall.merge(fontFamily = sansFontFamily),
+            titleLarge = materialTypography.titleLarge.merge(fontFamily = typographySettings.sansFontFamily),
+            titleMedium = materialTypography.titleMedium.merge(fontFamily = typographySettings.sansFontFamily),
+            titleSmall = materialTypography.titleSmall.merge(fontFamily = typographySettings.sansFontFamily),
             bodyLarge =
                 materialTypography.bodyLarge.merge(
                     hyphens = Hyphens.Auto,
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
             bodyMedium =
                 materialTypography.bodyMedium.merge(
                     hyphens = Hyphens.Auto,
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
             bodySmall =
                 materialTypography.bodySmall.merge(
                     hyphens = Hyphens.Auto,
                     lineBreak = LineBreak.Paragraph,
-                    fontFamily = sansFontFamily,
+                    fontFamily = typographySettings.sansFontFamily,
                 ),
-            labelLarge = materialTypography.labelLarge.merge(fontFamily = sansFontFamily),
-            labelMedium = materialTypography.labelMedium.merge(fontFamily = sansFontFamily),
-            labelSmall = materialTypography.labelSmall.merge(fontFamily = sansFontFamily),
+            labelLarge = materialTypography.labelLarge.merge(fontFamily = typographySettings.sansFontFamily),
+            labelMedium = materialTypography.labelMedium.merge(fontFamily = typographySettings.sansFontFamily),
+            labelSmall = materialTypography.labelSmall.merge(fontFamily = typographySettings.sansFontFamily),
         )
-
-    // TODO options?
-    fun monoFontFamily() = atkinsonHyperlegibleMonoFamily
-
-    // TODO options?
-    fun serifFontFamily() = FontFamily.Serif
 
     companion object {
         private val materialTypography = Typography()
     }
 }
 
-val fontWeights = listOf(
-    FontWeight.Thin,
-    FontWeight.ExtraLight,
-    FontWeight.Light,
-    FontWeight.Normal,
-    FontWeight.Medium,
-    FontWeight.SemiBold,
-    FontWeight.Bold,
-    FontWeight.ExtraBold,
-    FontWeight.Black,
-)
+val fontWeights =
+    listOf(
+        FontWeight.Thin,
+        FontWeight.ExtraLight,
+        FontWeight.Light,
+        FontWeight.Normal,
+        FontWeight.Medium,
+        FontWeight.SemiBold,
+        FontWeight.Bold,
+        FontWeight.ExtraBold,
+        FontWeight.Black,
+    )
 
-val fontStylesNormalItalic = listOf(
-    FontStyle.Normal,
-    FontStyle.Italic,
-)
+val fontStylesNormalItalic =
+    listOf(
+        FontStyle.Normal,
+        FontStyle.Italic,
+    )
 
-val fontStylesNormal = listOf(
-    FontStyle.Normal,
-)
+val fontStylesNormal =
+    listOf(
+        FontStyle.Normal,
+    )
 
-val fontStylesItalic = listOf(
-    FontStyle.Italic,
-)
+val fontStylesItalic =
+    listOf(
+        FontStyle.Italic,
+    )
 
-fun atkinsonHyperlegibleNextVariableFamily() = FontFamily(
-    variableFont(R.font.atkinson_hyperlegible_next_variable, fontWeights, fontStylesNormalItalic).toList()
-)
+fun atkinsonHyperlegibleNextVariableFamily() =
+    FontFamily(
+        variableFont(R.font.atkinson_hyperlegible_next_variable, fontWeights, fontStylesNormalItalic).toList(),
+    )
 
-fun robotoFontFamily() = FontFamily(
-    (variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
-        variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)).toList(),
-)
+fun atkinsonHyperlegibleMonoVariableFamily() =
+    FontFamily(
+        variableFont(R.font.atkinson_hyperlegible_mono_variable, fontWeights, fontStylesNormalItalic).toList(),
+    )
 
-val atkinsonHyperlegibleMonoFamily = FontFamily(
-    // extra light, light, regular, medium, semi bold, bold, extra bold
-    Font(R.font.atkinson_hyperlegible_mono_extra_light, weight = FontWeight.ExtraLight),
-    Font(R.font.atkinson_hyperlegible_mono_extra_light_italic, weight = FontWeight.ExtraLight, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_light, weight = FontWeight.Light),
-    Font(R.font.atkinson_hyperlegible_mono_light_italic, weight = FontWeight.Light, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_regular),
-    Font(R.font.atkinson_hyperlegible_mono_regular_italic, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_medium, weight = FontWeight.Medium),
-    Font(R.font.atkinson_hyperlegible_mono_medium_italic, weight = FontWeight.Medium, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_semi_bold, weight = FontWeight.SemiBold),
-    Font(R.font.atkinson_hyperlegible_mono_semi_bold_italic, weight = FontWeight.SemiBold, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_bold, weight = FontWeight.Bold),
-    Font(R.font.atkinson_hyperlegible_mono_bold_italic, weight = FontWeight.Bold, style = FontStyle.Italic),
-    Font(R.font.atkinson_hyperlegible_mono_extra_bold, weight = FontWeight.ExtraBold),
-    Font(R.font.atkinson_hyperlegible_mono_extra_bold_italic, weight = FontWeight.ExtraBold, style = FontStyle.Italic),
-)
+fun robotoFontFamily() =
+    FontFamily(
+        (
+            variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
+                variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
+        ).toList(),
+    )
+
+fun robotoMonoFontFamily() =
+    FontFamily(
+        (
+                variableFont(R.font.roboto_mono_variable_wght, fontWeights, fontStylesNormal) +
+                        variableFont(R.font.roboto_mono_italic_variable_wght, fontWeights, fontStylesItalic)
+                ).toList(),
+    )
 
 fun <A, B> cartesianProduct(
     list1: List<A>,
@@ -156,25 +148,26 @@ fun variableFont(
     @FontRes resId: Int,
     fontWeights: List<FontWeight>,
     fontStyles: List<FontStyle>,
-): Sequence<Font> = cartesianProduct(fontWeights, fontStyles)
-    .map { (weight, style) ->
-        Font(
-            resId,
-            weight = weight,
-            style = style,
-            variationSettings = FontVariation.Settings(
-                FontVariation.weight(weight.weight),
-                FontVariation.italic(style.value.toFloat())
+): Sequence<Font> =
+    cartesianProduct(fontWeights, fontStyles)
+        .map { (weight, style) ->
+            Font(
+                resId,
+                weight = weight,
+                style = style,
+                variationSettings =
+                    FontVariation.Settings(
+                        FontVariation.weight(weight.weight),
+                        FontVariation.italic(style.value.toFloat()),
+                    ),
             )
-        )
-    }
+        }
 
 @Composable
 fun LinkTextStyle(): TextStyle =
     TextStyle(
         color = MaterialTheme.colorScheme.primary,
         textDecoration = TextDecoration.Underline,
-//        fontFamily = LocalFeederTypography.current.sansFontFamily,
     )
 
 fun titleFontWeight(unread: Boolean) =
@@ -215,18 +208,7 @@ fun TTSPlayerStyle(): TextStyle = MaterialTheme.typography.titleMedium
 fun CodeInlineStyle(): SpanStyle =
     SpanStyle(
         background = CodeBlockBackground(),
-        fontFamily = LocalFeederTypography.current.monoFontFamily(),
-    )
-
-/**
- * Has no background because it is meant to be put over a Surface which has the proper background.
- */
-@Composable
-fun CodeBlockStyle(): TextStyle =
-    MaterialTheme.typography.bodyMedium.merge(
-        SpanStyle(
-            fontFamily = LocalFeederTypography.current.monoFontFamily(),
-        ),
+        fontFamily = LocalTypographySettings.current.monoFontFamily,
     )
 
 @Composable
@@ -235,33 +217,42 @@ fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 @Composable
 fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
 
-@Composable
-fun BlockQuoteStyle(): SpanStyle =
-    MaterialTheme.typography.bodyLarge.toSpanStyle().merge(
-        SpanStyle(
-            fontWeight = FontWeight.Light,
-        ),
-    )
-
-// TODO resuse this for font?
 @Immutable
 data class TypographySettings(
-    val fontScale: Float = 1.0f,
-)
-
-val LocalTypographySettings =
-    staticCompositionLocalOf {
-        TypographySettings()
+    val fontScale: Float,
+    val font: FontOptions,
+) {
+    val sansFontFamily by lazy {
+        when (font) {
+            FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
+            FontOptions.ROBOTO -> robotoFontFamily()
+        }
     }
 
+    val monoFontFamily by lazy {
+        when (font) {
+            FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleMonoVariableFamily()
+            FontOptions.ROBOTO -> robotoMonoFontFamily()
+        }
+    }
+
+    val serifFontFamily by lazy {
+        FontFamily.Serif
+    }
+}
+
+val LocalTypographySettings: ProvidableCompositionLocal<TypographySettings> = compositionLocalOf { error("Missing TypographySettings!") }
+
 @Composable
-fun ProvideFontScale(
+fun ProvideTypographySettings(
     fontScale: Float,
+    font: FontOptions,
     content: @Composable () -> Unit,
 ) {
     val typographySettings =
         TypographySettings(
             fontScale = fontScale,
+            font = font,
         )
     CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)
 }

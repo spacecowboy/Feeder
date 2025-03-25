@@ -30,7 +30,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,8 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
-import com.nononsenseapps.feeder.ui.compose.theme.LocalFeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
@@ -164,7 +162,7 @@ private fun PreviewDialog() {
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalFeederTypography.current.monoFontFamily()),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalTypographySettings.current.monoFontFamily),
                     )
                 }
             },

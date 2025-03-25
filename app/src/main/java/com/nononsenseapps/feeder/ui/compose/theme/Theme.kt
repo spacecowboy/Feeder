@@ -11,7 +11,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -21,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 
 private val lightColors =
     lightColorScheme(
@@ -124,11 +122,13 @@ fun PreviewTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
-    val feederTypography = remember {
-        FeederTypography(FontOptions.ATKINSON_HYPERLEGIBLE)
-    }
 
-    CompositionLocalProvider(LocalFeederTypography provides feederTypography) {
+    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, FontOptions.ROBOTO)) {
+        val typographySettings = LocalTypographySettings.current
+        val feederTypography =
+            remember(typographySettings) {
+                FeederTypography(typographySettings)
+            }
         MaterialTheme(
             colorScheme = colorScheme,
             typography = feederTypography.typography,
@@ -146,89 +146,87 @@ fun ComponentActivity.FeederTheme(
     currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
     darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
     dynamicColors: Boolean = false,
-    font: FontOptions,
     content: @Composable () -> Unit,
 ) {
     val darkSystemIcons = currentTheme.isDarkSystemIcons()
     val darkNavIcons = currentTheme.isDarkNavIcons()
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
+    val typographySettings = LocalTypographySettings.current
 
-    val feederTypography = remember(font) {
-        FeederTypography(font)
+    val feederTypography = remember(typographySettings) {
+        FeederTypography(typographySettings)
     }
 
-    CompositionLocalProvider(LocalFeederTypography provides feederTypography) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = feederTypography.typography,
-        ) {
-            DisposableEffect(darkSystemIcons, darkNavIcons) {
-                enableEdgeToEdge(
-                    statusBarStyle =
-                        when (currentTheme) {
-                            ThemeOptions.DAY ->
-                                SystemBarStyle.light(
-                                    android.graphics.Color.TRANSPARENT,
-                                    android.graphics.Color.TRANSPARENT,
-                                )
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = feederTypography.typography,
+    ) {
+        DisposableEffect(darkSystemIcons, darkNavIcons) {
+            enableEdgeToEdge(
+                statusBarStyle =
+                    when (currentTheme) {
+                        ThemeOptions.DAY ->
+                            SystemBarStyle.light(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT,
+                            )
 
-                            ThemeOptions.NIGHT ->
-                                SystemBarStyle.dark(
-                                    android.graphics.Color.TRANSPARENT,
-                                )
+                        ThemeOptions.NIGHT ->
+                            SystemBarStyle.dark(
+                                android.graphics.Color.TRANSPARENT,
+                            )
 
-                            ThemeOptions.E_INK ->
-                                SystemBarStyle.light(
-                                    android.graphics.Color.TRANSPARENT,
-                                    android.graphics.Color.TRANSPARENT,
-                                )
+                        ThemeOptions.E_INK ->
+                            SystemBarStyle.light(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT,
+                            )
 
-                            ThemeOptions.SYSTEM ->
-                                SystemBarStyle.auto(
-                                    android.graphics.Color.TRANSPARENT,
-                                    android.graphics.Color.TRANSPARENT,
-                                )
-                        },
-                    //            systemUiController.setStatusBarColor(
+                        ThemeOptions.SYSTEM ->
+                            SystemBarStyle.auto(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT,
+                            )
+                    },
+                //            systemUiController.setStatusBarColor(
 //                surfaceColor,
 //                darkIcons = darkSystemIcons,
 //            )
-                    navigationBarStyle =
-                        when (currentTheme) {
-                            ThemeOptions.DAY ->
-                                SystemBarStyle.light(
-                                    lightScrim,
-                                    darkScrim,
-                                )
+                navigationBarStyle =
+                    when (currentTheme) {
+                        ThemeOptions.DAY ->
+                            SystemBarStyle.light(
+                                lightScrim,
+                                darkScrim,
+                            )
 
-                            ThemeOptions.NIGHT ->
-                                SystemBarStyle.dark(
-                                    darkScrim,
-                                )
+                        ThemeOptions.NIGHT ->
+                            SystemBarStyle.dark(
+                                darkScrim,
+                            )
 
-                            ThemeOptions.E_INK ->
-                                SystemBarStyle.light(
-                                    lightScrim,
-                                    darkScrim,
-                                )
+                        ThemeOptions.E_INK ->
+                            SystemBarStyle.light(
+                                lightScrim,
+                                darkScrim,
+                            )
 
-                            ThemeOptions.SYSTEM ->
-                                SystemBarStyle.auto(
-                                    lightScrim,
-                                    darkScrim,
-                                )
-                        },
-                    //                    systemUiController.setNavigationBarColor(
+                        ThemeOptions.SYSTEM ->
+                            SystemBarStyle.auto(
+                                lightScrim,
+                                darkScrim,
+                            )
+                    },
+                //                    systemUiController.setNavigationBarColor(
 //                        navBarColor,
 //                        darkIcons = darkNavIcons,
 //                    )
-                )
+            )
 
-                onDispose {}
-            }
-            ProvideDimens {
-                content()
-            }
+            onDispose {}
+        }
+        ProvideDimens {
+            content()
         }
     }
 }
@@ -239,7 +237,8 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
         when (this) {
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
-            -> false
+                -> false
+
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> isSystemInDarkTheme()
         }
@@ -274,7 +273,8 @@ private fun ThemeOptions.getColorScheme(
         when (this) {
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
-            -> false
+                -> false
+
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> {
                 isSystemInDarkTheme()

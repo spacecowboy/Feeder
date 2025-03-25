@@ -806,7 +806,6 @@ enum class FontOptions(val fontName: String) {
     }
 
     companion object {
-        fun fromFontName(fontName: String): FontOptions =
-            entries.firstOrNull { it.fontName == fontName } ?: ROBOTO
+        fun fromFontName(fontName: String): FontOptions = entries.firstOrNull { it.fontName == fontName } ?: ROBOTO
     }
 }
