@@ -4,7 +4,7 @@
 
 <p>Feeder se NEsynchronizuje s obvyklými vzdálenými úložišti, takže není potřeba registrace žádného účtu.</p>
 
-<p>Aplikace Feeder je zdarma a je spuštěna lokálně v zařízení. Vaše data jsou 100% soukromá.</p>
+<p>Aplikace Feeder je zdarma a běží lokálně v zařízení. Vaše data jsou 100% soukromá.</p>
 
 <p><b>Funkce</b></p>
 
@@ -17,3 +17,5 @@
 <li>Pohodlný přístup k odkazům na přílohy</li>
 <li>Material Design</li>
 </ul>
+
+Úplný seznam změn je k dispozici <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
