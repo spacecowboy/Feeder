@@ -17,3 +17,5 @@
 <li>Εύχρηστη πρόσβαση σε συνδέσμους περιβλήματος</li>
 <li>Material design</li>
 </ul>
+
+Η πλήρης λίστα αλλαγών είναι διαθέσιμη <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">στο GitHub</a>.

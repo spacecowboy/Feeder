@@ -264,4 +264,6 @@
     <string name="nostr_feed_description">Άρθρα Nostr από %1$s</string>
     <string name="on">Ενεργό</string>
     <string name="off">Ανενεργό</string>
+    <string name="search_verb">Αναζήτηση</string>
+    <string name="cancel_search">Ακύρωση αναζήτησης</string>
 </resources>
