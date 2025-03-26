@@ -66,7 +66,7 @@
     <string name="open_item_by_default_with">Ve výchozím nastavení otevírat články</string>
     <string name="open_links_with">Otevírat odkazy</string>
     <string name="reader_settings">Volby čtení</string>
-    <string name="open_link_in_web_view">Otevřít odkaz ve vloženém prohlížeči</string>
+    <string name="open_link_in_web_view">Otevřít odkaz ve webovém prohlížeči</string>
     <string name="max_feed_items">Maximum článků v jednom kanálu</string>
     <string name="could_not_load_url">Nelze načíst URL</string>
     <string name="theme_system">Dle systému</string>
@@ -106,7 +106,7 @@
     <string name="open_in_browser">Otevřít v prohlížeči</string>
     <string name="open_in_reader">Ve vnitřní čtečce</string>
     <string name="use_app_default">Použít výchozí</string>
-    <string name="open_in_web_view">Otevřít ve vloženém prohlížeči</string>
+    <string name="open_in_web_view">Otevřít ve webovém prohlížeči</string>
     <string name="dark_theme_preference_black">Černý</string>
     <string name="contracted_tag">Složený štítek</string>
     <string name="go_back">Jít zpět</string>
@@ -262,4 +262,6 @@
     <string name="nostr_feed_description">Nostr články od %1$s</string>
     <string name="open_drawer_on_fab">Zobrazit kanály poté, co označíte všechny jako přečtené</string>
     <string name="show_message">Zobrazit zprávu</string>
+    <string name="search_verb">Vyhledat</string>
+    <string name="cancel_search">Zrušit vyhledávání</string>
 </resources>
