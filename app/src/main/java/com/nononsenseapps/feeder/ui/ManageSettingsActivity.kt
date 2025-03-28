@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
+import com.nononsenseapps.feeder.ui.compose.navigation.AddFontDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
@@ -31,6 +32,17 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
                             Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse(SyncScreenDestination.deepLinks.first().uriPattern),
+                                this,
+                                MainActivity::class.java,
+                            ),
+                        )
+                        finish()
+                    },
+                    onNavigateToAddFontScreen = {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(AddFontDestination.deepLinks.first().uriPattern),
                                 this,
                                 MainActivity::class.java,
                             ),

@@ -798,6 +798,7 @@ data class PrefsFeedListFilter(
 }
 
 enum class FontOptions(val fontName: String) {
+    NOTO_JP("Noto JP"),
     ROBOTO("Roboto"),
     ATKINSON_HYPERLEGIBLE("Atkinson Hyperlegible Next"),
     // TODO translate

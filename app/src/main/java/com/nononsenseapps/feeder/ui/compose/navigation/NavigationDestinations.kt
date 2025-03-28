@@ -29,6 +29,7 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
+import com.nononsenseapps.feeder.ui.compose.font.AddFontScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
@@ -182,6 +183,33 @@ data object SearchFeedDestination : NavigationDestination(
     }
 }
 
+data object AddFontDestination : NavigationDestination(
+    path = "font/add",
+    navArguments = emptyList(),
+    deepLinks = emptyList(),
+) {
+    fun navigate(
+        navController: NavController,
+    ) {
+        navController.navigate(path) {
+            launchSingleTop = true
+        }
+    }
+
+    @Composable
+    override fun RegisterScreen(
+        navController: NavController,
+        backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
+    ) {
+        AddFontScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+        )
+    }
+}
+
 data object AddFeedDestination : NavigationDestination(
     path = "add/feed",
     navArguments =
@@ -302,6 +330,9 @@ data object SettingsDestination : NavigationDestination(
                     syncCode = "",
                     secretKey = "",
                 )
+            },
+            onNavigateToAddFontScreen = {
+                AddFontDestination.navigate(navController)
             },
             settingsViewModel = backStackEntry.diAwareViewModel(),
         )

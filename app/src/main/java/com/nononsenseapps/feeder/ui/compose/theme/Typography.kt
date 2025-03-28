@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
-import android.graphics.Typeface
 import androidx.annotation.FontRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -13,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.DeviceFontFamilyName
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -79,14 +77,15 @@ class FeederTypography(typographySettings: TypographySettings) {
 
 val fontWeights =
     listOf(
-        FontWeight.Thin,
-        FontWeight.ExtraLight,
+        // Only font weigths actually in use are listed here
+//        FontWeight.Thin,
+//        FontWeight.ExtraLight,
         FontWeight.Light,
         FontWeight.Normal,
-        FontWeight.Medium,
-        FontWeight.SemiBold,
+//        FontWeight.Medium,
+//        FontWeight.SemiBold,
         FontWeight.Bold,
-        FontWeight.ExtraBold,
+//        FontWeight.ExtraBold,
         FontWeight.Black,
     )
 
@@ -116,7 +115,7 @@ fun atkinsonHyperlegibleMonoVariableFamily() =
         variableFont(R.font.atkinson_hyperlegible_mono_variable, fontWeights, fontStylesNormalItalic).toList(),
     )
 
-fun robotoFontFamily() =
+fun robotoSansFontFamily() =
     FontFamily(
         (
                 variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
@@ -132,6 +131,19 @@ fun robotoMonoFontFamily() =
                 ).toList(),
     )
 
+
+fun notoSansJPFontFamily(): FontFamily {
+    // TODO ROBOT FALLBACK
+    return try {
+        FontFamily(
+            variableFont(R.font.noto_sans_jp_variable_wght, fontWeights, fontStylesNormal).toList(),
+        )
+    } catch (e: Exception) {
+        e.printStackTrace()
+        robotoSansFontFamily()
+    }
+}
+
 fun systemSansSerifFontFamily() = FontFamily.SansSerif
 fun systemMonoFontFamily() = FontFamily.Monospace
 
@@ -146,6 +158,28 @@ fun <A, B> cartesianProduct(
                     fontWeight to fontStyle
                 }
         }
+
+//@OptIn(ExperimentalTextApi::class)
+//fun variableFont(
+//    path: String,
+//    assetManager: AssetManager,
+//    fontWeights: List<FontWeight>,
+//    fontStyles: List<FontStyle>,
+//): Sequence<Font> =
+//    cartesianProduct(fontWeights, fontStyles)
+//        .map { (weight, style) ->
+//            Font(
+//                path = path,
+//                assetManager = assetManager,
+//                weight = weight,
+//                style = style,
+//                variationSettings =
+//                    FontVariation.Settings(
+//                        FontVariation.weight(weight.weight),
+//                        FontVariation.italic(style.value.toFloat()),
+//                    ),
+//            )
+//        }
 
 @OptIn(ExperimentalTextApi::class)
 fun variableFont(
@@ -221,31 +255,30 @@ fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 @Composable
 fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
 
+fun getSansFontFamily(font: FontOptions) =
+    when (font) {
+        FontOptions.NOTO_JP -> notoSansJPFontFamily()
+        FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
+        FontOptions.ROBOTO -> robotoSansFontFamily()
+        FontOptions.SYSTEM_DEFAULT -> systemSansSerifFontFamily()
+    }
+
+fun getMonoFontFamily(font: FontOptions) =
+    when (font) {
+        // TODO ?
+        FontOptions.NOTO_JP -> robotoMonoFontFamily()
+        FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleMonoVariableFamily()
+        FontOptions.ROBOTO -> robotoMonoFontFamily()
+        FontOptions.SYSTEM_DEFAULT -> systemMonoFontFamily()
+    }
+
 @Immutable
 data class TypographySettings(
     val fontScale: Float,
-    val font: FontOptions,
-) {
-    val sansFontFamily by lazy {
-        when (font) {
-            FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
-            FontOptions.ROBOTO -> robotoFontFamily()
-            FontOptions.SYSTEM_DEFAULT -> systemSansSerifFontFamily()
-        }
-    }
-
-    val monoFontFamily by lazy {
-        when (font) {
-            FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleMonoVariableFamily()
-            FontOptions.ROBOTO -> robotoMonoFontFamily()
-            FontOptions.SYSTEM_DEFAULT -> systemMonoFontFamily()
-        }
-    }
-
-    val serifFontFamily by lazy {
-        FontFamily.Serif
-    }
-}
+    val sansFontFamily: FontFamily,
+    val monoFontFamily: FontFamily,
+    val serifFontFamily: FontFamily = FontFamily.Serif,
+)
 
 val LocalTypographySettings: ProvidableCompositionLocal<TypographySettings> = compositionLocalOf { error("Missing TypographySettings!") }
 
@@ -258,7 +291,8 @@ fun ProvideTypographySettings(
     val typographySettings =
         TypographySettings(
             fontScale = fontScale,
-            font = font,
+            sansFontFamily = getSansFontFamily(font),
+            monoFontFamily = getMonoFontFamily(font),
         )
     CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)
 }

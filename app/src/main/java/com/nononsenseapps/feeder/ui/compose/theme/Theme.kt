@@ -123,7 +123,7 @@ fun PreviewTheme(
 ) {
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
 
-    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, FontOptions.ROBOTO)) {
+    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, sansFontFamily = robotoSansFontFamily(), monoFontFamily = robotoMonoFontFamily())) {
         val typographySettings = LocalTypographySettings.current
         val feederTypography =
             remember(typographySettings) {

@@ -639,7 +639,7 @@ private fun ErrorPreview() {
 @Preview(
     name = "Search with results Foldable",
     showSystemUi = true,
-    device = Devices.FOLDABLE,
+    device = Devices.PIXEL_FOLD,
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Preview(

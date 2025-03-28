@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.job.JobScheduler
 import android.content.ContentResolver
 import android.content.SharedPreferences
+import android.content.res.AssetManager
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
@@ -92,6 +93,7 @@ class FeederApplication :
 
         import(archModelModule)
 
+        bind<AssetManager>() with singleton { assets }
         bind<ContentResolver>() with singleton { contentResolver }
         bind<JobScheduler>() with singleton { getSystemService(JobScheduler::class.java) }
         bind<ToastMaker>() with

@@ -94,6 +94,7 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
+import com.nononsenseapps.feeder.ui.compose.navigation.AddFontDestination
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -111,6 +112,7 @@ import org.kodein.di.instance
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
+    onNavigateToAddFontScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -212,6 +214,7 @@ fun SettingsScreen(
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             currentFont = viewState.font,
             onFontChanged = settingsViewModel::setFont,
+            onAddFont = onNavigateToAddFontScreen,
             modifier = Modifier.padding(padding),
         )
     }
@@ -285,6 +288,7 @@ private fun SettingsScreenPreview() {
             onOpenDrawerOnFab = {},
             currentFont = FontOptions.ROBOTO,
             onFontChanged = {},
+            onAddFont = {},
             modifier = Modifier,
         )
     }
@@ -354,6 +358,7 @@ fun SettingsList(
     onOpenDrawerOnFab: (Boolean) -> Unit,
     currentFont: FontOptions,
     onFontChanged: (FontOptions) -> Unit,
+    onAddFont: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -553,6 +558,11 @@ fun SettingsList(
                         *FontOptions.entries.toTypedArray(),
                     ),
                 onSelection = onFontChanged,
+            )
+            ExternalSetting(
+                "",
+                title = "Add font",
+                onClick = onAddFont,
             )
         }
 

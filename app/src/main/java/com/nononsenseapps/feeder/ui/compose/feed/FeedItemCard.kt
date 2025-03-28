@@ -423,7 +423,7 @@ private fun PreviewWithImageUnread() {
             FeedItemCard(
                 item =
                     FeedListItem(
-                        title = "title can be one line",
+                        title = "西日本や東日本",
                         snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                         feedTitle = "Super Feed",
                         pubDate = "Jun 9, 2021",

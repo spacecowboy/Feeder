@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.background.runOnceSyncChainGetUpdates
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.AddFontDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
@@ -91,6 +92,8 @@ class MainActivity : DIAwareComponentActivity() {
             SettingsDestination.register(this, navController, navDrawerListState)
             // Sync settings
             SyncScreenDestination.register(this, navController, navDrawerListState)
+            // Add Fonts
+            AddFontDestination.register(this, navController, navDrawerListState)
         }
 
         DisposableEffect(navController) {
