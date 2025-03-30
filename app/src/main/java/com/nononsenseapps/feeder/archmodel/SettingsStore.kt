@@ -291,7 +291,11 @@ class SettingsStore(
 
     private val _font =
         MutableStateFlow(
-            FontSelection.fromString(sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path)),
+            try {
+                FontSelection.fromString(sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path))
+            } catch (_: Exception) {
+                FontSelection.SystemDefault
+            }
         )
 
     val font = _font.asStateFlow()

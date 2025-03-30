@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
@@ -270,6 +271,14 @@ class Repository(
     val font = settingsStore.font
 
     fun setFont(value: FontSelection) = settingsStore.setFont(value)
+
+    suspend fun addFont(uri: Uri) {
+        // Add font to the system
+        val userFont = fontStore.addFont(uri)
+
+        // Make it the selected font
+        setFont(userFont)
+    }
 
     val fontOptions = fontStore.fontOptions
 

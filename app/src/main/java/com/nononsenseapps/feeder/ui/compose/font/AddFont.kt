@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.font
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -44,6 +46,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -55,7 +58,9 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.settings.MenuSetting
@@ -67,6 +72,12 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
+import com.nononsenseapps.feeder.util.ToastMaker
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
+import kotlin.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,7 +239,7 @@ fun AddFontDualPane(
 fun ColumnScope.AddFontContent(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
-    ) {
+) {
     val dimens = LocalDimens.current
     val systemDefaultString = stringResource(R.string.system_default)
     val addFontString = stringResource(R.string.add_font)
@@ -263,13 +274,37 @@ fun ColumnScope.AddFontContent(
             .toList()
     }
 
+    val toastMaker: ToastMaker by org.kodein.di.compose.instance()
+    val coroutineScope = rememberCoroutineScope()
+    val addFontPicker =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            if (uri != null) {
+                onEvent(FontSettingsEvent.AddFont(uri))
+            }
+        }
+
     MenuSetting(
         title = stringResource(R.string.font),
         currentValue = currentUiFontOption,
         values = ImmutableHolder(uiFontOptions),
         onSelection = {
             if (it.realOption == null) {
-                // TODO add font
+                try {
+                    addFontPicker.launch(
+                        arrayOf(
+                            "application/x-font-ttf",
+                            "font/ttf",
+                        )
+                    )
+                } catch (_: Exception) {
+                    // ActivityNotFoundException
+                    coroutineScope.launch {
+                        // TODO translate
+                        toastMaker.makeToast("No picker?")
+                    }
+                }
             } else {
                 onEvent(FontSettingsEvent.SetFont(it.realOption))
             }

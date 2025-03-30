@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.font
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
@@ -27,6 +28,7 @@ class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
             is FontSettingsEvent.SetFontScale -> repository.setTextScale(event.fontScale)
             is FontSettingsEvent.SetWeightVariation -> setWeightVariation(event.value)
             is FontSettingsEvent.SetItalicVariation -> setItalicVariation(event.value)
+            is FontSettingsEvent.AddFont -> addFont(event.uri)
         }
     }
 
@@ -53,6 +55,12 @@ class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
             applicationCoroutineScope.launch {
                 repository.setFont(value)
             }
+        }
+    }
+
+    fun addFont(uri: Uri) {
+        applicationCoroutineScope.launch {
+            repository.addFont(uri)
         }
     }
 
@@ -95,6 +103,7 @@ sealed interface FontSettingsEvent {
     data class SetFontScale(val fontScale: Float) : FontSettingsEvent
     data class SetWeightVariation(val value: Boolean) : FontSettingsEvent
     data class SetItalicVariation(val value: Boolean) : FontSettingsEvent
+    data class AddFont(val uri: Uri) : FontSettingsEvent
 }
 
 sealed interface FontSelection {

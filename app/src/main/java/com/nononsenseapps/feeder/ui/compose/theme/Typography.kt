@@ -131,19 +131,6 @@ fun robotoMonoFontFamily() =
                 ).toList(),
     )
 
-
-fun notoSansJPFontFamily(): FontFamily {
-    // TODO ROBOT FALLBACK
-    return try {
-        FontFamily(
-            variableFont(R.font.noto_sans_jp_variable_wght, fontWeights, fontStylesNormal).toList(),
-        )
-    } catch (e: Exception) {
-        e.printStackTrace()
-        robotoSansFontFamily()
-    }
-}
-
 fun systemSansSerifFontFamily() = FontFamily.SansSerif
 fun systemMonoFontFamily() = FontFamily.Monospace
 
