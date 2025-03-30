@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
-import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
@@ -132,10 +131,6 @@ class SettingsViewModel(
     fun setTextScale(value: Float) {
         // Just some sanity validation
         repository.setTextScale(value.coerceIn(0.1f, 10f))
-    }
-
-    fun setFont(value: FontOptions) {
-        repository.setFont(value)
     }
 
     fun setIsMarkAsReadOnScroll(value: Boolean) {
@@ -277,7 +272,6 @@ class SettingsViewModel(
                             modelsResult = params[28] as OpenAIModelsState,
                         ),
                     isOpenDrawerOnFab = params[29] as Boolean,
-                    font = params[30] as FontOptions,
                 )
             }.collect {
                 _viewState.value = it
@@ -338,7 +332,6 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
-    val font: FontOptions = FontOptions.SYSTEM_DEFAULT,
 )
 
 data class UIFeedSettings(

@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
 import com.nononsenseapps.feeder.ui.compose.font.AddFontScreen
+import com.nononsenseapps.feeder.ui.compose.font.AddFontViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
@@ -202,10 +203,13 @@ data object AddFontDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry,
         navDrawerListState: LazyListState,
     ) {
+        val addFontViewModel: AddFontViewModel = backStackEntry.diAwareViewModel()
+
         AddFontScreen(
             onNavigateUp = {
                 navController.popBackStack()
             },
+            addFontViewModel = addFontViewModel,
         )
     }
 }

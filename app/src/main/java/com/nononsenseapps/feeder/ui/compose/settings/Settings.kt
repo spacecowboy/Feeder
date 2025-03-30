@@ -83,7 +83,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
-import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
@@ -94,7 +93,7 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
-import com.nononsenseapps.feeder.ui.compose.navigation.AddFontDestination
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -212,8 +211,6 @@ fun SettingsScreen(
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
-            currentFont = viewState.font,
-            onFontChanged = settingsViewModel::setFont,
             onAddFont = onNavigateToAddFontScreen,
             modifier = Modifier.padding(padding),
         )
@@ -286,8 +283,6 @@ private fun SettingsScreenPreview() {
             onOpenAIEvent = {},
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
-            currentFont = FontOptions.ROBOTO,
-            onFontChanged = {},
             onAddFont = {},
             modifier = Modifier,
         )
@@ -356,8 +351,6 @@ fun SettingsList(
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
-    currentFont: FontOptions,
-    onFontChanged: (FontOptions) -> Unit,
     onAddFont: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -550,15 +543,16 @@ fun SettingsList(
                         contentDescription = textScaleText
                     },
             )
-            MenuSetting(
-                title = stringResource(id = R.string.font),
-                currentValue = currentFont,
-                values =
-                    immutableListHolderOf(
-                        *FontOptions.entries.toTypedArray(),
-                    ),
-                onSelection = onFontChanged,
-            )
+            // TODO JONAS remove
+//            MenuSetting(
+//                title = stringResource(id = R.string.font),
+//                currentValue = currentFont,
+//                values =
+//                    immutableListHolderOf(
+//                        *FontOptions.entries.toTypedArray(),
+//                    ),
+//                onSelection = onFontChanged,
+//            )
             ExternalSetting(
                 "",
                 title = "Add font",
@@ -920,7 +914,7 @@ fun <T> MenuSetting(
     values: ImmutableHolder<List<T>>,
     onSelection: (T) -> Unit,
     modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit = {},
+    icon: (@Composable () -> Unit)? = {},
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -935,12 +929,14 @@ fun <T> MenuSetting(
                 },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                icon()
+        if (icon != null) {
+            Box(
+                modifier = Modifier.size(64.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    icon()
+                }
             }
         }
 

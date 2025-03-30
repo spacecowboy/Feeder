@@ -56,6 +56,9 @@ class RepositoryTest : DIAware {
     private lateinit var feedStore: FeedStore
 
     @MockK
+    private lateinit var fontStore: FontStore
+
+    @MockK
     private lateinit var syncRemoteStore: SyncRemoteStore
 
     @MockK
@@ -74,6 +77,7 @@ class RepositoryTest : DIAware {
         bind<SessionStore>() with instance(sessionStore)
         bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
+        bind<FontStore>() with instance(fontStore)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
         bind<SyncRestClient>() with instance(syncRestClient)
         bind<Application>() with instance(application)

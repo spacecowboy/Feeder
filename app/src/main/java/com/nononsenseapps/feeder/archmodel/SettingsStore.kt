@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -290,14 +291,14 @@ class SettingsStore(
 
     private val _font =
         MutableStateFlow(
-            FontOptions.fromFontName(sp.getStringNonNull(PREF_FONT, FontOptions.SYSTEM_DEFAULT.fontName)),
+            FontSelection.fromString(sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path)),
         )
 
     val font = _font.asStateFlow()
 
-    fun setFont(value: FontOptions) {
+    fun setFont(value: FontSelection) {
         _font.value = value
-        sp.edit().putString(PREF_FONT, value.fontName).apply()
+        sp.edit().putString(PREF_FONT, value.serialize()).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -797,19 +798,3 @@ data class PrefsFeedListFilter(
     override val unread: Boolean = true
 }
 
-enum class FontOptions(val fontName: String) {
-    NOTO_JP("Noto JP"),
-    ROBOTO("Roboto"),
-    ATKINSON_HYPERLEGIBLE("Atkinson Hyperlegible Next"),
-    // TODO translate
-    SYSTEM_DEFAULT("System Default"),
-    ;
-
-    override fun toString(): String {
-        return fontName
-    }
-
-    companion object {
-        fun fromFontName(fontName: String): FontOptions = entries.firstOrNull { it.fontName == fontName } ?: ROBOTO
-    }
-}

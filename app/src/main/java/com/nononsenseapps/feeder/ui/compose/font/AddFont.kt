@@ -4,7 +4,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -37,11 +36,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -49,19 +48,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
+import com.nononsenseapps.feeder.ui.compose.settings.MenuSetting
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -71,8 +72,11 @@ import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 @Composable
 fun AddFontScreen(
     onNavigateUp: () -> Unit,
+    addFontViewModel: AddFontViewModel,
     modifier: Modifier = Modifier,
 ) {
+    val viewState by addFontViewModel.viewState.collectAsStateWithLifecycle()
+
     val windowSize = LocalWindowSizeMetrics.current
     val screenType by remember(windowSize) {
         derivedStateOf {
@@ -115,6 +119,8 @@ fun AddFontScreen(
         }
     ) { padding ->
         AddFontView(
+            viewState = viewState,
+            onEvent = addFontViewModel::onEvent,
             screenType = screenType,
             modifier = Modifier.padding(padding),
         )
@@ -123,6 +129,8 @@ fun AddFontScreen(
 
 @Composable
 fun AddFontView(
+    viewState: FontSettingsState,
+    onEvent: (FontSettingsEvent) -> Unit,
     screenType: ScreenType,
     modifier: Modifier = Modifier,
 ) {
@@ -134,15 +142,23 @@ fun AddFontView(
                 .then(modifier),
     ) {
         if (screenType == ScreenType.DUAL) {
-            AddFontDualPane()
+            AddFontDualPane(
+                viewState = viewState,
+                onEvent = onEvent,
+            )
         } else {
-            AddFontSinglePane()
+            AddFontSinglePane(
+                viewState = viewState,
+                onEvent = onEvent,
+            )
         }
     }
 }
 
 @Composable
 fun AddFontSinglePane(
+    viewState: FontSettingsState,
+    onEvent: (FontSettingsEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dimens = LocalDimens.current
@@ -158,13 +174,18 @@ fun AddFontSinglePane(
                 .verticalScroll(scrollState)
                 .then(modifier),
     ) {
-        AddFontContent()
+        AddFontContent(
+            viewState = viewState,
+            onEvent = onEvent,
+        )
         PreviewFontContent()
     }
 }
 
 @Composable
 fun AddFontDualPane(
+    viewState: FontSettingsState,
+    onEvent: (FontSettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
@@ -181,7 +202,10 @@ fun AddFontDualPane(
                     .weight(1f, fill = true)
                     .padding(horizontal = dimens.margin, vertical = 8.dp),
         ) {
-            AddFontContent()
+            AddFontContent(
+                viewState = viewState,
+                onEvent = onEvent,
+            )
         }
 
         val scrollState = rememberScrollState()
@@ -201,47 +225,103 @@ fun AddFontDualPane(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColumnScope.AddFontContent() {
+fun ColumnScope.AddFontContent(
+    viewState: FontSettingsState,
+    onEvent: (FontSettingsEvent) -> Unit,
+    ) {
     val dimens = LocalDimens.current
+    val systemDefaultString = stringResource(R.string.system_default)
+    val addFontString = stringResource(R.string.add_font)
 
-    OutlinedTextField(
-        value = "font_file_name.ttf",
-        onValueChange = {},
-        readOnly = true,
-        modifier = Modifier.width(dimens.maxContentWidth),
+    val currentUiFontOption = remember(viewState.font, systemDefaultString) {
+        UiFontOption.fromFontSelection(viewState.font, systemDefaultString)
+    }
+
+    val uiFontOptions: List<UiFontOption> = remember(viewState.fontOptions, systemDefaultString, addFontString) {
+        sequence {
+            yield(
+                UiFontOption(
+                    name = addFontString,
+                    realOption = null,
+                )
+            )
+            for (font in viewState.fontOptions) {
+                yield(
+                    UiFontOption.fromFontSelection(font, systemDefaultString),
+                )
+            }
+        }
+            .sortedBy { value ->
+                when (value.realOption) {
+                    FontSelection.AtkinsonHyperLegible -> "20"
+                    FontSelection.Roboto -> "10"
+                    FontSelection.SystemDefault -> "30"
+                    is FontSelection.UserFont -> "40 ${value.name}"
+                    null -> "50"
+                }
+            }
+            .toList()
+    }
+
+    MenuSetting(
+        title = stringResource(R.string.font),
+        currentValue = currentUiFontOption,
+        values = ImmutableHolder(uiFontOptions),
+        onSelection = {
+            if (it.realOption == null) {
+                // TODO add font
+            } else {
+                onEvent(FontSettingsEvent.SetFont(it.realOption))
+            }
+        },
+        icon = null,
     )
 
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.width(dimens.maxContentWidth),
     ) {
-        // Default weight to true to indicate that it is clickable?
-        // Also is quite common
         FilterChip(
-            selected = true,
-            onClick = {},
+            selected = viewState.font.hasWeightVariation,
+            enabled = viewState.font is FontSelection.UserFont,
+            onClick = {
+                onEvent(FontSettingsEvent.SetWeightVariation(!viewState.font.hasWeightVariation))
+            },
             label = {
                 Text(
-                    text = "Weight",
+                    text = stringResource(R.string.weight),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                )
-            },
+            leadingIcon = if (viewState.font.hasWeightVariation) {
+                {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                    )
+                }
+            } else null,
         )
         FilterChip(
-            selected = false,
-            onClick = {},
+            selected = viewState.font.hasItalicVariation,
+            enabled = viewState.font is FontSelection.UserFont,
+            onClick = {
+                onEvent(FontSettingsEvent.SetItalicVariation(!viewState.font.hasItalicVariation))
+            },
             label = {
                 Text(
-                    text = "Italic",
+                    text = stringResource(R.string.italic),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
+            leadingIcon = if (viewState.font.hasItalicVariation) {
+                {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                    )
+                }
+            } else null,
         )
     }
 }
@@ -416,6 +496,33 @@ fun ColumnScope.PreviewFontContent() {
     )
 }
 
+@Immutable
+data class UiFontOption(
+    val name: String,
+    val realOption: FontSelection?,
+) {
+    override fun toString(): String {
+        return name
+    }
+
+    companion object {
+        fun fromFontSelection(
+            fontSelection: FontSelection,
+            systemDefaultString: String,
+        ): UiFontOption {
+            return UiFontOption(
+                name = when (fontSelection) {
+                    is FontSelection.Roboto -> "Roboto"
+                    is FontSelection.AtkinsonHyperLegible -> "Atkinson Hyper Legible"
+                    is FontSelection.SystemDefault -> systemDefaultString
+                    is FontSelection.UserFont -> fontSelection.path.substringAfter("/")
+                },
+                realOption = fontSelection,
+            )
+        }
+    }
+}
+
 @Composable
 @PreviewThemes
 fun PreviewSingle() {
@@ -425,7 +532,10 @@ fun PreviewSingle() {
             modifier = Modifier,
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                AddFontSinglePane()
+                AddFontSinglePane(
+                    viewState = FontSettingsState(),
+                    onEvent = {},
+                )
             }
         }
     }
@@ -449,7 +559,10 @@ fun PreviewDual() {
             modifier = Modifier,
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                AddFontDualPane()
+                AddFontDualPane(
+                    viewState = FontSettingsState(),
+                    onEvent = {},
+                )
             }
         }
     }

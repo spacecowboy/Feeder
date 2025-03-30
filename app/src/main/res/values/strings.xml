@@ -283,4 +283,8 @@
     <string name="text">Text</string>
   <string name="font">Font</string>
   <string name="text_preview">Text preview</string>
+    <string name="system_default">System default</string>
+  <string name="weight">Weight</string>
+  <string name="italic">Italic</string>
+  <string name="add_font">Add font…</string>
 </resources>

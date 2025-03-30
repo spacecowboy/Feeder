@@ -31,6 +31,7 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
@@ -65,6 +66,7 @@ class Repository(
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
+    private val fontStore: FontStore by instance()
 
     init {
         addFeederNewsIfInitialStart()
@@ -267,7 +269,9 @@ class Repository(
 
     val font = settingsStore.font
 
-    fun setFont(value: FontOptions) = settingsStore.setFont(value)
+    fun setFont(value: FontSelection) = settingsStore.setFont(value)
+
+    val fontOptions = fontStore.fontOptions
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 

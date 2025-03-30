@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
-import com.nononsenseapps.feeder.archmodel.FontOptions
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 
 private val lightColors =

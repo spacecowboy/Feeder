@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.archmodel.FontOptions
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 
 class FeederTypography(typographySettings: TypographySettings) {
     val typography: Typography =
@@ -255,21 +255,19 @@ fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 @Composable
 fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
 
-fun getSansFontFamily(font: FontOptions) =
+// TODO JONAS
+fun getSansFontFamily(font: FontSelection) =
     when (font) {
-        FontOptions.NOTO_JP -> notoSansJPFontFamily()
-        FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleNextVariableFamily()
-        FontOptions.ROBOTO -> robotoSansFontFamily()
-        FontOptions.SYSTEM_DEFAULT -> systemSansSerifFontFamily()
+        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
+        FontSelection.Roboto -> robotoSansFontFamily()
+        else -> systemSansSerifFontFamily()
     }
 
-fun getMonoFontFamily(font: FontOptions) =
+fun getMonoFontFamily(font: FontSelection) =
     when (font) {
-        // TODO ?
-        FontOptions.NOTO_JP -> robotoMonoFontFamily()
-        FontOptions.ATKINSON_HYPERLEGIBLE -> atkinsonHyperlegibleMonoVariableFamily()
-        FontOptions.ROBOTO -> robotoMonoFontFamily()
-        FontOptions.SYSTEM_DEFAULT -> systemMonoFontFamily()
+        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleMonoVariableFamily()
+        FontSelection.Roboto -> robotoMonoFontFamily()
+        else  -> systemMonoFontFamily()
     }
 
 @Immutable
@@ -285,7 +283,7 @@ val LocalTypographySettings: ProvidableCompositionLocal<TypographySettings> = co
 @Composable
 fun ProvideTypographySettings(
     fontScale: Float,
-    font: FontOptions,
+    font: FontSelection,
     content: @Composable () -> Unit,
 ) {
     val typographySettings =
