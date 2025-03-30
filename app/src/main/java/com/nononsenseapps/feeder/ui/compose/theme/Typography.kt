@@ -22,6 +22,10 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.util.FilePathProvider
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.compose.instance
+import java.io.File
 
 class FeederTypography(typographySettings: TypographySettings) {
     val typography: Typography =
@@ -89,6 +93,11 @@ val fontWeights =
         FontWeight.Black,
     )
 
+val fontWeightsNormal =
+    listOf(
+        FontWeight.Normal,
+    )
+
 val fontStylesNormalItalic =
     listOf(
         FontStyle.Normal,
@@ -104,6 +113,25 @@ val fontStylesItalic =
     listOf(
         FontStyle.Italic,
     )
+
+fun userFontFamily(file: File, font: FontSelection): FontFamily {
+    val weights = if (font.hasWeightVariation) {
+        fontWeights
+    } else {
+        fontWeightsNormal
+    }
+
+    val italics = if (font.hasItalicVariation) {
+        fontStylesNormalItalic
+    } else {
+        fontStylesNormal
+    }
+
+    return FontFamily(
+        variableFont(file, weights, italics).toList(),
+        // TODO JONAS roboto fallback?
+    )
+}
 
 fun atkinsonHyperlegibleNextVariableFamily() =
     FontFamily(
@@ -146,27 +174,24 @@ fun <A, B> cartesianProduct(
                 }
         }
 
-//@OptIn(ExperimentalTextApi::class)
-//fun variableFont(
-//    path: String,
-//    assetManager: AssetManager,
-//    fontWeights: List<FontWeight>,
-//    fontStyles: List<FontStyle>,
-//): Sequence<Font> =
-//    cartesianProduct(fontWeights, fontStyles)
-//        .map { (weight, style) ->
-//            Font(
-//                path = path,
-//                assetManager = assetManager,
-//                weight = weight,
-//                style = style,
-//                variationSettings =
-//                    FontVariation.Settings(
-//                        FontVariation.weight(weight.weight),
-//                        FontVariation.italic(style.value.toFloat()),
-//                    ),
-//            )
-//        }
+fun variableFont(
+    file: File,
+    fontWeights: List<FontWeight>,
+    fontStyles: List<FontStyle>,
+): Sequence<Font> =
+    cartesianProduct(fontWeights, fontStyles)
+        .map { (weight, style) ->
+            Font(
+                file = file,
+                weight = weight,
+                style = style,
+                variationSettings =
+                    FontVariation.Settings(
+                        FontVariation.weight(weight.weight),
+                        FontVariation.italic(style.value.toFloat()),
+                    ),
+            )
+        }
 
 @OptIn(ExperimentalTextApi::class)
 fun variableFont(
@@ -242,14 +267,6 @@ fun CodeBlockBackground(): Color = MaterialTheme.colorScheme.surfaceVariant
 @Composable
 fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
 
-// TODO JONAS
-fun getSansFontFamily(font: FontSelection) =
-    when (font) {
-        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
-        FontSelection.Roboto -> robotoSansFontFamily()
-        else -> systemSansSerifFontFamily()
-    }
-
 fun getMonoFontFamily(font: FontSelection) =
     when (font) {
         FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleMonoVariableFamily()
@@ -273,10 +290,21 @@ fun ProvideTypographySettings(
     font: FontSelection,
     content: @Composable () -> Unit,
 ) {
+    val sansFont = when (font) {
+        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
+        FontSelection.Roboto -> robotoSansFontFamily()
+        FontSelection.SystemDefault -> systemSansSerifFontFamily()
+        is FontSelection.UserFont -> {
+            val filePathProvider: FilePathProvider by instance()
+            val file = font.getFile(filePathProvider)
+            userFontFamily(file, font)
+        }
+    }
+
     val typographySettings =
         TypographySettings(
             fontScale = fontScale,
-            sansFontFamily = getSansFontFamily(font),
+            sansFontFamily = sansFont,
             monoFontFamily = getMonoFontFamily(font),
         )
     CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)

@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection.SystemDefault
+import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.io.File
 import kotlin.getValue
 
 class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
@@ -32,25 +34,19 @@ class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
         }
     }
 
-    fun setWeightVariation(value: Boolean) {
-        val userFont = viewState.value.font as? FontSelection.UserFont
-        if (userFont == null) {
-            return
-        }
+    private fun setWeightVariation(value: Boolean) {
+        val userFont = viewState.value.font as? FontSelection.UserFont ?: return
 
         setFontValues(userFont.copy(hasWeightVariation = value))
     }
 
-    fun setItalicVariation(value: Boolean) {
-        val userFont = viewState.value.font as? FontSelection.UserFont
-        if (userFont == null) {
-            return
-        }
+    private fun setItalicVariation(value: Boolean) {
+        val userFont = viewState.value.font as? FontSelection.UserFont ?: return
 
         setFontValues(userFont.copy(hasItalicVariation = value))
     }
 
-    fun setFontValues(value: FontSelection) {
+    private fun setFontValues(value: FontSelection) {
         if (value != viewState.value.font) {
             applicationCoroutineScope.launch {
                 repository.setFont(value)
@@ -58,7 +54,7 @@ class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
         }
     }
 
-    fun addFont(uri: Uri) {
+    private fun addFont(uri: Uri) {
         applicationCoroutineScope.launch {
             repository.addFont(uri)
         }
@@ -140,7 +136,11 @@ sealed interface FontSelection {
         override val path: String,
         override val hasWeightVariation: Boolean,
         override val hasItalicVariation: Boolean,
-    ) : FontSelection
+    ) : FontSelection {
+        fun getFile(filePathProvider: FilePathProvider): File {
+            return filePathProvider.fontsDir.resolve(path)
+        }
+    }
 
     companion object {
         fun fromString(value: String): FontSelection {

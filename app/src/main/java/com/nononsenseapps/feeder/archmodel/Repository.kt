@@ -34,6 +34,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.Either
+import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -273,11 +274,16 @@ class Repository(
     fun setFont(value: FontSelection) = settingsStore.setFont(value)
 
     suspend fun addFont(uri: Uri) {
-        // Add font to the system
-        val userFont = fontStore.addFont(uri)
+        try {
+            // Add font to the system
+            val userFont = fontStore.addFont(uri)
 
-        // Make it the selected font
-        setFont(userFont)
+            // Make it the selected font
+            setFont(userFont)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Failed to add user font", e)
+            // TODO JONAS Toast?
+        }
     }
 
     val fontOptions = fontStore.fontOptions

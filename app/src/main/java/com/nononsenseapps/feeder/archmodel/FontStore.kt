@@ -5,7 +5,7 @@ package com.nononsenseapps.feeder.archmodel
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
-import androidx.core.net.toFile
+import androidx.compose.ui.text.font.Font
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,8 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import java.io.FileOutputStream
-import java.io.FilenameFilter
+import java.io.InputStream
+import java.io.OutputStream
 
 class FontStore(
     override val di: DI,
@@ -47,26 +48,12 @@ class FontStore(
         // TODO JONAS exceptions
 
         // Get filename from uri
-        var filename: String? = null
-        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (nameIndex >= 0) {
-                    filename = cursor.getString(nameIndex)
-                }
-            }
-        }
-
-        if (filename == null) {
-            // TODO Exception
-            filename = "fallback.ttf"
-        }
+        val filename = getFilename(uri) ?: throw RuntimeException("No filename")
 
         // Copy the file to the fonts directory
         val fontFile = filePathProvider.fontsDir.resolve(filename)
 
         // Check if the file already exists
-
         if (fontFile.exists()) {
             // TODO Exception
             throw RuntimeException("File already exists")
@@ -80,9 +67,11 @@ class FontStore(
 
             val inputStream = contentResolver.openInputStream(uri)
 
+            // TODO verify font file is valid
+
             inputStream?.use {
                 outputStream.use {
-                    inputStream.transferTo(outputStream)
+                    transferTo(inputStream, outputStream)
                 }
             }
 
@@ -107,4 +96,28 @@ class FontStore(
             _fontOptions.value = getAllFonts()
         }
     }
+
+    private fun getFilename(uri: Uri): String? {
+        var filename: String? = null
+        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex >= 0) {
+                    filename = cursor.getString(nameIndex)
+                }
+            }
+        }
+
+        return filename
+    }
 }
+
+fun transferTo(inputStream: InputStream, outputStream: OutputStream) {
+    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+    var read: Int
+    while ((inputStream.read(buffer, 0, DEFAULT_BUFFER_SIZE).also { read = it }) >= 0) {
+        outputStream.write(buffer, 0, read)
+    }
+}
+
+private const val DEFAULT_BUFFER_SIZE = 8192
