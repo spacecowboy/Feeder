@@ -287,4 +287,5 @@
   <string name="weight">Weight</string>
   <string name="italic">Italic</string>
   <string name="add_font">Add font…</string>
+  <string name="bold">Bold</string>
 </resources>

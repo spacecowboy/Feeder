@@ -5,7 +5,9 @@ package com.nononsenseapps.feeder.archmodel
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
-import androidx.compose.ui.text.font.Font
+import android.util.Log
+import com.nononsenseapps.feeder.truetype.TrueTypeMetadata
+import com.nononsenseapps.feeder.truetype.parseTrueTypeFont
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +18,7 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -32,9 +35,18 @@ class FontStore(
     private fun getAllFonts(): List<FontSelection> {
         return sequence {
             for (file in filePathProvider.fontsDir.listFiles() ?: emptyArray()) {
-                if (file.isFile && file.name.endsWith(".json")) {
-                    val json = file.readText()
-                    yield(FontSelection.fromString(json))
+                if (file.isFile && file.name.endsWith(".ttf")) {
+                    val metadata = getFontMetadata(file) ?: continue
+
+                    val font = FontSelection.UserFont(
+                        path = file.name,
+                        minWeightValue = metadata.weightVariations?.minValue ?: 0f,
+                        maxWeightValue = metadata.weightVariations?.maxValue ?: 0f,
+                        minItalicValue = metadata.italicVariations?.minValue ?: 0f,
+                        maxItalicValue = metadata.italicVariations?.maxValue ?: 0f,
+                    )
+
+                    yield(font)
                 }
             }
 
@@ -53,47 +65,53 @@ class FontStore(
         // Copy the file to the fonts directory
         val fontFile = filePathProvider.fontsDir.resolve(filename)
 
-        // Check if the file already exists
         if (fontFile.exists()) {
             // TODO Exception
             throw RuntimeException("File already exists")
         }
 
         return withContext(Dispatchers.IO) {
-            fontFile.parentFile?.mkdirs()
-            fontFile.createNewFile()
+            // First copy to cache
+            val cacheFile = filePathProvider.cacheDir.resolve(filename)
+            if (cacheFile.exists()) {
+                cacheFile.delete()
+            }
+            cacheFile.createNewFile()
 
-            val outputStream = FileOutputStream(fontFile)
-
-            val inputStream = contentResolver.openInputStream(uri)
-
-            // TODO verify font file is valid
-
-            inputStream?.use {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                val outputStream = FileOutputStream(cacheFile)
                 outputStream.use {
                     transferTo(inputStream, outputStream)
                 }
             }
 
+            // Then verify font metadata
+            val fontMetadata = getFontMetadata(cacheFile)
+            if (fontMetadata == null) {
+                Log.e("FEEDER_FONT", "Error parsing font file: $filename")
+                cacheFile.delete()
+                throw RuntimeException("Error parsing font file")
+            }
+
+            // File is valid, copy to fonts directory
+            fontFile.parentFile?.mkdirs()
+            // Copy the file to the fonts directory
+            cacheFile.copyTo(fontFile)
+
             // Then write JSON file
             val userFont = FontSelection.UserFont(
                 path = filename,
-                hasWeightVariation = false,
-                hasItalicVariation = false,
+                minWeightValue = fontMetadata.weightVariations?.minValue ?: 0f,
+                maxWeightValue = fontMetadata.weightVariations?.maxValue ?: 0f,
+                minItalicValue = fontMetadata.italicVariations?.minValue ?: 0f,
+                maxItalicValue = fontMetadata.italicVariations?.maxValue ?: 0f,
             )
-
-            val jsonFilename = filename.replace(".ttf", ".json")
-            val jsonFile = filePathProvider.fontsDir.resolve(jsonFilename)
-
-            val jsonStream = FileOutputStream(jsonFile)
-
-            jsonStream.use {
-                jsonStream.write(userFont.serialize().toByteArray())
-            }
 
             userFont
         }.also {
-            _fontOptions.value = getAllFonts()
+            withContext(Dispatchers.IO) {
+                _fontOptions.value = getAllFonts()
+            }
         }
     }
 
@@ -109,6 +127,17 @@ class FontStore(
         }
 
         return filename
+    }
+}
+
+fun getFontMetadata(file: File): TrueTypeMetadata? {
+    return try {
+        file.inputStream().use {
+            parseTrueTypeFont(it)
+        }
+    } catch (e: Exception) {
+        Log.e("FEEDER_FONT", "Error parsing font file", e)
+        null
     }
 }
 

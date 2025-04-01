@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import androidx.annotation.FloatRange
 import androidx.annotation.FontRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.core.util.toRange
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -116,7 +118,7 @@ val fontStylesItalic =
 
 fun userFontFamily(file: File, font: FontSelection): FontFamily {
     val weights = if (font.hasWeightVariation) {
-        fontWeights
+        fontWeights.filter { it.weight in (font.minWeightValue.toInt())..(font.maxWeightValue.toInt()) }
     } else {
         fontWeightsNormal
     }

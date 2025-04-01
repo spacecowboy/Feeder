@@ -12,7 +12,10 @@ import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.ui.compose.font.getFontSelectionFromPath
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
+import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.getStringNonNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +35,7 @@ class SettingsStore(
 ) : DIAware {
     private val sp: SharedPreferences by instance()
     private val blocklistDao: BlocklistDao by instance()
+    private val filePathProvider: FilePathProvider by instance()
 
     private val _addedFeederNews = MutableStateFlow(sp.getBoolean(PREF_ADDED_FEEDER_NEWS, false))
     val addedFeederNews: StateFlow<Boolean> = _addedFeederNews.asStateFlow()
@@ -292,7 +296,9 @@ class SettingsStore(
     private val _font =
         MutableStateFlow(
             try {
-                FontSelection.fromString(sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path))
+                val fontPath = sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path)
+                getFontSelectionFromPath(filePathProvider, fontPath)
+                    ?: FontSelection.SystemDefault
             } catch (_: Exception) {
                 FontSelection.SystemDefault
             }

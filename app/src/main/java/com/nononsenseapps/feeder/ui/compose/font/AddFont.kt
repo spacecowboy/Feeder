@@ -38,15 +38,22 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -189,7 +196,7 @@ fun AddFontSinglePane(
             viewState = viewState,
             onEvent = onEvent,
         )
-        PreviewFontContent()
+        PreviewFontContent(viewState)
     }
 }
 
@@ -229,7 +236,7 @@ fun AddFontDualPane(
                     .padding(horizontal = dimens.margin, vertical = 8.dp)
                     .verticalScroll(scrollState),
         ) {
-            PreviewFontContent()
+            PreviewFontContent(viewState)
         }
     }
 }
@@ -240,7 +247,6 @@ fun ColumnScope.AddFontContent(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
 ) {
-    val dimens = LocalDimens.current
     val systemDefaultString = stringResource(R.string.system_default)
     val addFontString = stringResource(R.string.add_font)
 
@@ -274,8 +280,6 @@ fun ColumnScope.AddFontContent(
             .toList()
     }
 
-    val toastMaker: ToastMaker by org.kodein.di.compose.instance()
-    val coroutineScope = rememberCoroutineScope()
     val addFontPicker =
         rememberLauncherForActivityResult(
             ActivityResultContracts.OpenDocument(),
@@ -300,10 +304,7 @@ fun ColumnScope.AddFontContent(
                     )
                 } catch (_: Exception) {
                     // ActivityNotFoundException
-                    coroutineScope.launch {
-                        // TODO translate
-                        toastMaker.makeToast("No picker?")
-                    }
+                    // TODO message
                 }
             } else {
                 onEvent(FontSettingsEvent.SetFont(it.realOption))
@@ -312,89 +313,86 @@ fun ColumnScope.AddFontContent(
         icon = null,
     )
 
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.width(dimens.maxContentWidth),
-    ) {
-        FilterChip(
-            selected = viewState.font.hasWeightVariation,
-            enabled = viewState.font is FontSelection.UserFont,
-            onClick = {
-                onEvent(FontSettingsEvent.SetWeightVariation(!viewState.font.hasWeightVariation))
-            },
-            label = {
-                Text(
-                    text = stringResource(R.string.weight),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            },
-            leadingIcon = if (viewState.font.hasWeightVariation) {
-                {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                    )
-                }
-            } else null,
-        )
-        FilterChip(
-            selected = viewState.font.hasItalicVariation,
-            enabled = viewState.font is FontSelection.UserFont,
-            onClick = {
-                onEvent(FontSettingsEvent.SetItalicVariation(!viewState.font.hasItalicVariation))
-            },
-            label = {
-                Text(
-                    text = stringResource(R.string.italic),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            },
-            leadingIcon = if (viewState.font.hasItalicVariation) {
-                {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                    )
-                }
-            } else null,
-        )
+    var checked = remember {
+        mutableStateListOf<Int>()
+    }
+    val boldLabel = stringResource(R.string.bold)
+    val italicLabel = stringResource(R.string.italic)
+    MultiChoiceSegmentedButtonRow {
+        SegmentedButton(
+            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+            checked = viewState.previewBold,
+            onCheckedChange = {
+                onEvent(FontSettingsEvent.SetPreviewBold(!viewState.previewBold))
+            }
+        ) {
+            Text(boldLabel)
+        }
+
+        SegmentedButton(
+            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+            checked = viewState.previewItalic,
+            onCheckedChange = {
+                onEvent(FontSettingsEvent.SetPreviewItalic(!viewState.previewItalic))
+            }
+        ) {
+            Text(italicLabel)
+        }
     }
 }
 
 @Composable
-fun ColumnScope.PreviewFontContent() {
+fun ColumnScope.PreviewFontContent(
+    viewState: FontSettingsState,
+) {
     val dimens = LocalDimens.current
     val textPreviewText = stringResource(id = R.string.text_preview)
     val previewStyle = MaterialTheme.typography.bodyMedium
 
-    val infiniteTransition = rememberInfiniteTransition(label = "infinite")
+//    val infiniteTransition = rememberInfiniteTransition(label = "infinite")
+//
+//    val animatedWeight by infiniteTransition.animateFloat(
+//        initialValue = 400f,
+//        targetValue = 900f,
+//        animationSpec = infiniteRepeatable(
+//            animation = tween(durationMillis = 2000, easing = LinearEasing),
+//            repeatMode = RepeatMode.Reverse,
+//        ),
+//        label = "animated weight",
+//    )
+//
+//    val animatedItalic by infiniteTransition.animateFloat(
+//        initialValue = 0f,
+//        targetValue = 1f,
+//        animationSpec = infiniteRepeatable(
+//            animation = tween(durationMillis = 3000, easing = LinearEasing),
+//            repeatMode = RepeatMode.Reverse,
+//        ),
+//        label = "animated italic",
+//    )
 
-    val animatedWeight by infiniteTransition.animateFloat(
-        initialValue = 400f,
-        targetValue = 900f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "animated weight",
-    )
+    val fontWeight = remember(viewState.previewBold) {
+        if (viewState.previewBold) {
+            FontWeight.Bold
+        } else {
+            FontWeight.Normal
+        }
+    }
 
-    val animatedItalic by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "animated italic",
-    )
+    val fontStyle = remember(viewState.previewItalic) {
+        if (viewState.previewItalic) {
+            FontStyle.Italic
+        } else {
+            FontStyle.Normal
+        }
+    }
 
     Text(
         "The quick brown fox jumps over the lazy dog.",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -407,8 +405,8 @@ fun ColumnScope.PreviewFontContent() {
         "В чащах юга жил-был цитрус... да, но фальшивый экземпляр!",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -421,8 +419,8 @@ fun ColumnScope.PreviewFontContent() {
         "Η γρήγορη καφέ αλεπού πηδάει πάνω από τον τεμπέλη σκύλο",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -435,8 +433,8 @@ fun ColumnScope.PreviewFontContent() {
         "كل إنسان يولد حراً ومتساوياً في الكرامة والحقوق",
         style = previewStyle,
         textAlign = TextAlign.Right,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -449,8 +447,8 @@ fun ColumnScope.PreviewFontContent() {
         "כל בני האדם נולדו חופשיים ושווים בכבודם ובזכויותיהם",
         style = previewStyle,
         textAlign = TextAlign.Right,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -463,8 +461,8 @@ fun ColumnScope.PreviewFontContent() {
         "सभी मनुष्य स्वतंत्र और समान अधिकारों के साथ जन्म लेते",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -477,8 +475,8 @@ fun ColumnScope.PreviewFontContent() {
         "人人生而自由",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -491,8 +489,8 @@ fun ColumnScope.PreviewFontContent() {
         "日本語の漢字ひらがなカタカナ",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -505,8 +503,8 @@ fun ColumnScope.PreviewFontContent() {
         "모든 인간은 태어날 때부터 자유롭고 평등하다",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
@@ -519,8 +517,8 @@ fun ColumnScope.PreviewFontContent() {
         "มนุษย์ทุกคนเกิดมาอิสระและเท่าเทียมกันในศักดิ์ศรีและสิทธิ",
         style = previewStyle,
         textAlign = TextAlign.Left,
-        fontWeight = FontWeight(animatedWeight.toInt()),
-        fontStyle = if (animatedItalic > 0.5f) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
         modifier =
             Modifier
                 .width(dimens.maxContentWidth)
