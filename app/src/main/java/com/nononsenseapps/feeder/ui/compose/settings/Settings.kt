@@ -94,6 +94,7 @@ import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.ui.compose.font.UiFontOption
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -186,8 +187,6 @@ fun SettingsScreen(
             onOpenSyncSettings = onNavigateToSyncScreen,
             useDynamicTheme = viewState.useDynamicTheme,
             onUseDynamicTheme = settingsViewModel::setUseDynamicTheme,
-            textScale = viewState.textScale,
-            setTextScale = settingsViewModel::setTextScale,
             onBlockListAdd = settingsViewModel::addToBlockList,
             onBlockListRemove = settingsViewModel::removeFromBlockList,
             feedsSettings = ImmutableHolder(viewState.feedsSettings),
@@ -212,6 +211,7 @@ fun SettingsScreen(
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             onAddFont = onNavigateToAddFontScreen,
+            currentFontSelection = viewState.font,
             modifier = Modifier.padding(padding),
         )
     }
@@ -260,8 +260,6 @@ private fun SettingsScreenPreview() {
             onOpenSyncSettings = {},
             useDynamicTheme = true,
             onUseDynamicTheme = {},
-            textScale = 1.5f,
-            setTextScale = {},
             onBlockListAdd = {},
             onBlockListRemove = {},
             feedsSettings = ImmutableHolder(emptyList()),
@@ -284,6 +282,7 @@ private fun SettingsScreenPreview() {
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
             onAddFont = {},
+            currentFontSelection = FontSelection.SystemDefault,
             modifier = Modifier,
         )
     }
@@ -328,8 +327,6 @@ fun SettingsList(
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
     onUseDynamicTheme: (Boolean) -> Unit,
-    textScale: Float,
-    setTextScale: (Float) -> Unit,
     onBlockListAdd: (String) -> Unit,
     onBlockListRemove: (String) -> Unit,
     feedsSettings: ImmutableHolder<List<UIFeedSettings>>,
@@ -351,6 +348,7 @@ fun SettingsList(
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
+    currentFontSelection: FontSelection,
     onAddFont: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -449,113 +447,16 @@ fun SettingsList(
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        val textScaleText = stringResource(id = R.string.text_scale)
-        val textPreviewText = stringResource(id = R.string.text_preview)
-
         SettingsGroup(
             title = R.string.text,
         ) {
-            Row(
-                modifier =
-                    Modifier
-                        .width(dimens.maxContentWidth)
-                        .semantics {
-                            role = Role.Button
-                        },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Spacer(Modifier.width(64.dp))
-                Surface(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                    tonalElevation = 3.dp,
-                ) {
-                    Column {
-
-                        Text(
-                            "B8 O0 1Iil EF pq ebgs gmnr Å9%. Âçēřß 愛媛県今治市の火事は",
-                            style =
-                                MaterialTheme.typography.bodyLarge
-                                    .merge(
-                                        TextStyle(
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
-                                        ),
-                                    ),
-                            modifier =
-                                Modifier
-                                    .width(dimens.maxContentWidth)
-                                    .padding(4.dp)
-                                    .safeSemantics {
-                                        contentDescription = textPreviewText
-                                    },
-                        )
-                        Text(
-                            "B8 O0 1Iil Âçēřß 愛媛県今治市の火事は",
-                            style =
-                                MaterialTheme.typography.bodyLarge
-                                    .merge(
-                                        TextStyle(
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
-                                        ),
-                                    ),
-                            modifier =
-                                Modifier
-                                    .width(dimens.maxContentWidth)
-                                    .padding(4.dp)
-                                    .safeSemantics {
-                                        contentDescription = textPreviewText
-                                    },
-                        )
-                        Text(
-                            "B8 O0 1Iil Âçēřß 愛媛県今治市の火事は",
-                            style =
-                                MaterialTheme.typography.bodyLarge
-                                    .merge(
-                                        TextStyle(
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            fontStyle = FontStyle.Italic,
-                                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
-                                        ),
-                                    ),
-                            modifier =
-                                Modifier
-                                    .width(dimens.maxContentWidth)
-                                    .padding(4.dp)
-                                    .safeSemantics {
-                                        contentDescription = textPreviewText
-                                    },
-                        )
-                    }
-                }
+            val systemDefaultString = stringResource(R.string.system_default)
+            val currentUiFontOption = remember(currentFontSelection, systemDefaultString) {
+                UiFontOption.fromFontSelection(currentFontSelection, systemDefaultString)
             }
-            ScaleSetting(
-                currentValue = textScale,
-                onValueChange = setTextScale,
-                valueRange = 1f..2f,
-                steps = 9,
-                modifier =
-                    Modifier.safeSemantics(mergeDescendants = true) {
-                        contentDescription = textScaleText
-                    },
-            )
-            // TODO JONAS remove
-//            MenuSetting(
-//                title = stringResource(id = R.string.font),
-//                currentValue = currentFont,
-//                values =
-//                    immutableListHolderOf(
-//                        *FontOptions.entries.toTypedArray(),
-//                    ),
-//                onSelection = onFontChanged,
-//            )
             ExternalSetting(
-                "",
-                title = "Add font",
+                currentUiFontOption.name,
+                title = stringResource(R.string.font),
                 onClick = onAddFont,
             )
         }
@@ -898,7 +799,11 @@ fun ExternalSetting(
 
         TitleAndSubtitle(
             title = {
-                Text(title)
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
             subtitle = {
                 Text(currentValue)
@@ -942,10 +847,18 @@ fun <T> MenuSetting(
 
         TitleAndSubtitle(
             title = {
-                Text(title)
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
             subtitle = {
-                Text(currentValue.toString())
+                Text(
+                    currentValue.toString(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
         )
 
@@ -1289,64 +1202,6 @@ fun SwitchSetting(
             onCheckedChange = onCheckedChange,
             modifier = Modifier.clearAndSetSemantics { },
             enabled = enabled,
-        )
-    }
-}
-
-@Composable
-fun ScaleSetting(
-    currentValue: Float,
-    onValueChange: (Float) -> Unit,
-    valueRange: ClosedFloatingPointRange<Float>,
-    steps: Int,
-    modifier: Modifier = Modifier,
-) {
-    val dimens = LocalDimens.current
-    val safeCurrentValue = currentValue.coerceIn(valueRange)
-    // People using screen readers probably don't care that much about text size
-    // so no point in adding screen reader action?
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .padding(start = 64.dp)
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription = "%.1fx".format(safeCurrentValue)
-                },
-    ) {
-        SliderWithEndLabels(
-            value = safeCurrentValue,
-            startLabel = {
-                Text(
-                    "A",
-                    style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
-                )
-            },
-            endLabel = {
-                Text(
-                    "A",
-                    style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
-                )
-            },
-            valueRange = valueRange,
-            onValueChange = onValueChange,
-            steps = steps,
         )
     }
 }

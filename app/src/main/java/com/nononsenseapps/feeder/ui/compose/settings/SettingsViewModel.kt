@@ -18,6 +18,8 @@ import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.openai.OpenAIApi
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection.SystemDefault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -128,11 +130,6 @@ class SettingsViewModel(
         repository.setSwipeAsRead(value)
     }
 
-    fun setTextScale(value: Float) {
-        // Just some sanity validation
-        repository.setTextScale(value.coerceIn(0.1f, 10f))
-    }
-
     fun setIsMarkAsReadOnScroll(value: Boolean) {
         repository.setIsMarkAsReadOnScroll(value)
     }
@@ -224,7 +221,6 @@ class SettingsViewModel(
                 repository.blockList,
                 repository.useDetectLanguage,
                 repository.useDynamicTheme,
-                repository.textScale,
                 immutableFeedsSettings,
                 repository.isMarkAsReadOnScroll,
                 repository.maxLines,
@@ -258,20 +254,20 @@ class SettingsViewModel(
                     blockList = params[16] as List<String>,
                     useDetectLanguage = params[17] as Boolean,
                     useDynamicTheme = params[18] as Boolean,
-                    textScale = params[19] as Float,
-                    feedsSettings = params[20] as List<UIFeedSettings>,
-                    isMarkAsReadOnScroll = params[21] as Boolean,
-                    maxLines = params[22] as Int,
-                    showOnlyTitle = params[23] as Boolean,
-                    isOpenAdjacent = params[24] as Boolean,
-                    showReadingTime = params[25] as Boolean,
-                    showTitleUnreadCount = params[26] as Boolean,
+                    feedsSettings = params[19] as List<UIFeedSettings>,
+                    isMarkAsReadOnScroll = params[20] as Boolean,
+                    maxLines = params[21] as Int,
+                    showOnlyTitle = params[22] as Boolean,
+                    isOpenAdjacent = params[23] as Boolean,
+                    showReadingTime = params[24] as Boolean,
+                    showTitleUnreadCount = params[25] as Boolean,
                     openAIState =
                         _viewState.value.openAIState.copy(
-                            settings = params[27] as OpenAISettings,
-                            modelsResult = params[28] as OpenAIModelsState,
+                            settings = params[26] as OpenAISettings,
+                            modelsResult = params[27] as OpenAIModelsState,
                         ),
-                    isOpenDrawerOnFab = params[29] as Boolean,
+                    isOpenDrawerOnFab = params[28] as Boolean,
+                    font = params[29] as FontSelection,
                 )
             }.collect {
                 _viewState.value = it
@@ -322,7 +318,6 @@ data class SettingsViewState(
     val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     val useDetectLanguage: Boolean = true,
     val useDynamicTheme: Boolean = true,
-    val textScale: Float = 1f,
     val feedsSettings: List<UIFeedSettings> = emptyList(),
     val isMarkAsReadOnScroll: Boolean = false,
     val maxLines: Int = 2,
@@ -332,6 +327,7 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
+    val font: FontSelection = SystemDefault,
 )
 
 data class UIFeedSettings(

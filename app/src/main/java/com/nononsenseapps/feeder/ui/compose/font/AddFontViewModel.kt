@@ -7,6 +7,8 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.getFontMetadata
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection.AtkinsonHyperLegible
+import com.nononsenseapps.feeder.ui.compose.font.FontSelection.Roboto
 import com.nononsenseapps.feeder.ui.compose.font.FontSelection.SystemDefault
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +16,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
-import kotlin.getValue
 
 class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
@@ -110,7 +109,6 @@ sealed interface FontSelection {
     val maxItalicValue: Float
     fun serialize(): String {
         return when (this) {
-//            is UserFont -> Json.encodeToString(this)
             else -> path
         }
     }
@@ -151,7 +149,6 @@ sealed interface FontSelection {
         override val maxItalicValue: Float = 1f
     }
 
-//    @Serializable
     data class UserFont(
         override val path: String,
         override val minWeightValue: Float = 0f,
@@ -169,28 +166,13 @@ sealed interface FontSelection {
             return filePathProvider.fontsDir.resolve(path)
         }
     }
-
-//    companion object {
-//        private val format = Json { ignoreUnknownKeys = true }
-//
-//        fun fromString(value: String): FontSelection {
-//            return when {
-//                Roboto.path == value -> Roboto
-//                AtkinsonHyperLegible.path == value -> AtkinsonHyperLegible
-//                SystemDefault.path == value -> SystemDefault
-//                else -> {
-//                    format.decodeFromString<UserFont>(value)
-//                }
-//            }
-//        }
-//    }
 }
 
 fun getFontSelectionFromPath(filePathProvider: FilePathProvider, path: String): FontSelection? {
     return when (path) {
-        FontSelection.Roboto.path -> FontSelection.Roboto
-        FontSelection.AtkinsonHyperLegible.path -> FontSelection.AtkinsonHyperLegible
-        FontSelection.SystemDefault.path -> FontSelection.SystemDefault
+        Roboto.path -> Roboto
+        AtkinsonHyperLegible.path -> AtkinsonHyperLegible
+        SystemDefault.path -> SystemDefault
         else -> {
             val fontFile = filePathProvider.fontsDir.resolve(path)
             if (!fontFile.exists()) {
