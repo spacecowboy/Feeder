@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.font
+package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.net.Uri
 import android.util.Log
@@ -7,9 +7,9 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.getFontMetadata
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection.AtkinsonHyperLegible
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection.Roboto
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection.SystemDefault
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.AtkinsonHyperLegible
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.Roboto
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.SystemDefault
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
 
-class AddFontViewModel(di: DI) : DIAwareViewModel(di) {
+class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 

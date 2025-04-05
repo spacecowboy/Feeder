@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.util.toRange
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance

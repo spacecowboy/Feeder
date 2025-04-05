@@ -41,7 +41,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,7 +67,6 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
@@ -93,8 +91,6 @@ import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection
-import com.nononsenseapps.feeder.ui.compose.font.UiFontOption
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -112,7 +108,7 @@ import org.kodein.di.instance
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
-    onNavigateToAddFontScreen: () -> Unit,
+    onNavigateToTextSettingsScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -210,7 +206,7 @@ fun SettingsScreen(
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
-            onAddFont = onNavigateToAddFontScreen,
+            onTextSettings = onNavigateToTextSettingsScreen,
             currentFontSelection = viewState.font,
             modifier = Modifier.padding(padding),
         )
@@ -281,7 +277,7 @@ private fun SettingsScreenPreview() {
             onOpenAIEvent = {},
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
-            onAddFont = {},
+            onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
             modifier = Modifier,
         )
@@ -349,7 +345,7 @@ fun SettingsList(
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
-    onAddFont: () -> Unit,
+    onTextSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -456,8 +452,8 @@ fun SettingsList(
             }
             ExternalSetting(
                 currentUiFontOption.name,
-                title = stringResource(R.string.font),
-                onClick = onAddFont,
+                title = stringResource(R.string.text_settings),
+                onClick = onTextSettings,
             )
         }
 

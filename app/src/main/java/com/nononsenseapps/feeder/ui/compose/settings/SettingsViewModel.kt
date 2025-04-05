@@ -18,8 +18,8 @@ import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.openai.OpenAIApi
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection.SystemDefault
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.SystemDefault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

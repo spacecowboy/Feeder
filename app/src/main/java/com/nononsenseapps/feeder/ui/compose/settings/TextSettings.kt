@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.font
+package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -26,14 +25,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -63,9 +59,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
-import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
-import com.nononsenseapps.feeder.ui.compose.settings.MenuSetting
-import com.nononsenseapps.feeder.ui.compose.settings.SliderWithEndLabels
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -78,12 +71,12 @@ import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFontScreen(
+fun TextSettingsScreen(
     onNavigateUp: () -> Unit,
-    addFontViewModel: AddFontViewModel,
+    textSettingsViewModel: TextSettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val viewState by addFontViewModel.viewState.collectAsStateWithLifecycle()
+    val viewState by textSettingsViewModel.viewState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val windowSize = LocalWindowSizeMetrics.current
@@ -102,7 +95,7 @@ fun AddFontScreen(
         topBar = {
             SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = stringResource(R.string.text),
+                title = stringResource(R.string.text_settings),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -114,9 +107,9 @@ fun AddFontScreen(
             )
         },
     ) { padding ->
-        AddFontView(
+        TextSettingsView(
             viewState = viewState,
-            onEvent = addFontViewModel::onEvent,
+            onEvent = textSettingsViewModel::onEvent,
             screenType = screenType,
             modifier = Modifier
                 .padding(padding)
@@ -126,7 +119,7 @@ fun AddFontScreen(
 }
 
 @Composable
-fun AddFontView(
+fun TextSettingsView(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
     screenType: ScreenType,
@@ -138,12 +131,12 @@ fun AddFontView(
                 .fillMaxWidth(),
     ) {
         if (screenType == ScreenType.DUAL) {
-            AddFontDualPane(
+            TextSettingsDualPane(
                 viewState = viewState,
                 onEvent = onEvent,
             )
         } else {
-            AddFontSinglePane(
+            TextSettingsSinglePane(
                 viewState = viewState,
                 onEvent = onEvent,
             )
@@ -152,7 +145,7 @@ fun AddFontView(
 }
 
 @Composable
-fun AddFontSinglePane(
+fun TextSettingsSinglePane(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -170,7 +163,7 @@ fun AddFontSinglePane(
                 .verticalScroll(scrollState)
                 .then(modifier),
     ) {
-        AddFontContent(
+        TextSettingsContent(
             viewState = viewState,
             onEvent = onEvent,
         )
@@ -179,7 +172,7 @@ fun AddFontSinglePane(
 }
 
 @Composable
-fun AddFontDualPane(
+fun TextSettingsDualPane(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -199,7 +192,7 @@ fun AddFontDualPane(
                     .weight(1f, fill = true)
                     .padding(horizontal = dimens.margin, vertical = 8.dp),
         ) {
-            AddFontContent(
+            TextSettingsContent(
                 viewState = viewState,
                 onEvent = onEvent,
             )
@@ -223,7 +216,7 @@ fun AddFontDualPane(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColumnScope.AddFontContent(
+fun ColumnScope.TextSettingsContent(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
 ) {
@@ -611,7 +604,7 @@ fun PreviewSingle() {
             modifier = Modifier,
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                AddFontSinglePane(
+                TextSettingsSinglePane(
                     viewState = FontSettingsState(),
                     onEvent = {},
                 )
@@ -638,7 +631,7 @@ fun PreviewDual() {
             modifier = Modifier,
         ) {
             Box(modifier = Modifier.padding(8.dp)) {
-                AddFontDualPane(
+                TextSettingsDualPane(
                     viewState = FontSettingsState(),
                     onEvent = {},
                 )

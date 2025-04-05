@@ -23,7 +23,7 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
-import com.nononsenseapps.feeder.ui.compose.font.AddFontViewModel
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import org.kodein.di.DI
@@ -58,5 +58,5 @@ val archModelModule =
         bindWithComposableViewModelScope<ArticleViewModel>()
         bindWithComposableViewModelScope<FeedViewModel>()
         bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
-        bindWithComposableViewModelScope<AddFontViewModel>()
+        bindWithComposableViewModelScope<TextSettingsViewModel>()
     }

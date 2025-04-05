@@ -8,7 +8,7 @@ import android.provider.OpenableColumns
 import android.util.Log
 import com.nononsenseapps.feeder.truetype.TrueTypeMetadata
 import com.nononsenseapps.feeder.truetype.parseTrueTypeFont
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

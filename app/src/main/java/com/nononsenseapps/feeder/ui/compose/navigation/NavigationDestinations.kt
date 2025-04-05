@@ -29,10 +29,10 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
-import com.nononsenseapps.feeder.ui.compose.font.AddFontScreen
-import com.nononsenseapps.feeder.ui.compose.font.AddFontViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsScreen
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
@@ -184,7 +184,7 @@ data object SearchFeedDestination : NavigationDestination(
     }
 }
 
-data object AddFontDestination : NavigationDestination(
+data object TextSettingsDestination : NavigationDestination(
     path = "font/add",
     navArguments = emptyList(),
     deepLinks = emptyList(),
@@ -203,13 +203,13 @@ data object AddFontDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry,
         navDrawerListState: LazyListState,
     ) {
-        val addFontViewModel: AddFontViewModel = backStackEntry.diAwareViewModel()
+        val textSettingsViewModel: TextSettingsViewModel = backStackEntry.diAwareViewModel()
 
-        AddFontScreen(
+        TextSettingsScreen(
             onNavigateUp = {
                 navController.popBackStack()
             },
-            addFontViewModel = addFontViewModel,
+            textSettingsViewModel = textSettingsViewModel,
         )
     }
 }
@@ -335,8 +335,8 @@ data object SettingsDestination : NavigationDestination(
                     secretKey = "",
                 )
             },
-            onNavigateToAddFontScreen = {
-                AddFontDestination.navigate(navController)
+            onNavigateToTextSettingsScreen = {
+                TextSettingsDestination.navigate(navController)
             },
             settingsViewModel = backStackEntry.diAwareViewModel(),
         )

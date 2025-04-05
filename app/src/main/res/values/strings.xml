@@ -288,4 +288,5 @@
   <string name="italic">Italic</string>
   <string name="add_font">Add font…</string>
   <string name="bold">Bold</string>
+  <string name="text_settings">Text settings</string>
 </resources>

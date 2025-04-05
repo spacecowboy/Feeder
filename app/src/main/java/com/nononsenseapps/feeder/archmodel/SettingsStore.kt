@@ -11,8 +11,8 @@ import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
-import com.nononsenseapps.feeder.ui.compose.font.FontSelection
-import com.nononsenseapps.feeder.ui.compose.font.getFontSelectionFromPath
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
+import com.nononsenseapps.feeder.ui.compose.settings.getFontSelectionFromPath
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.filePathProvider
