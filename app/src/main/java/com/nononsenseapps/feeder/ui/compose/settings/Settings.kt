@@ -806,7 +806,11 @@ fun ExternalSetting(
                 )
             },
             subtitle = {
-                Text(currentValue)
+                Text(
+                    currentValue,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
         )
     }
@@ -905,6 +909,8 @@ fun <T> MenuSetting(
                         Text(
                             value.toString(),
                             style = style,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     },
                 )
