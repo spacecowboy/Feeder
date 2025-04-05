@@ -29,7 +29,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
         var streamOffset = 0L
         val bytes = ByteArray(4)
         var skipped = 0L
-        var readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+        var readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
 
         // First 4 bytes indicates the scalar type. The values
         // 'true' (0x74727565) and 0x00010000 are recognized by OS X
@@ -39,7 +39,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
         }
 
         // Next 2 bytes indicate the number of tables
-        readLen = stream.readNBytes(bytes, 0, 2).also { streamOffset += it }
+        readLen = stream.read(bytes, 0, 2).also { streamOffset += it }
         if (readLen != 2) {
             throw IllegalArgumentException("Invalid TrueType font file")
         }
@@ -60,7 +60,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
 
         for (tableIndex in 0.toUInt() until numTables) {
             // First 4 bytes is the tag
-            readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+            readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
             if (readLen != 4) {
                 throw IllegalArgumentException("Invalid TrueType font file")
             }
@@ -75,7 +75,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 }
 
                 // offset
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     throw IllegalArgumentException("Invalid TrueType font file")
                 }
@@ -84,7 +84,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 logDebug("FEEDER_FONT", "fvarOffset: $fvarOffset, bytes: ${bytes.toHexString()}")
 
                 // table length
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     throw IllegalArgumentException("Invalid TrueType font file")
                 }
@@ -138,7 +138,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
             }
 
             // Read axisCount
-            readLen = stream.readNBytes(bytes, 0, 2).also { streamOffset += it }
+            readLen = stream.read(bytes, 0, 2).also { streamOffset += it }
             if (readLen != 2) {
                 Log.e("FEEDER_FONT", "Failed to read axisCount. streamOffset: $streamOffset, readLen: $readLen")
                 throw IllegalArgumentException("Invalid TrueType font file")
@@ -148,7 +148,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
             logDebug("FEEDER_FONT", "axisCount: $axisCount")
 
             // read axisSize
-            readLen = stream.readNBytes(bytes, 0, 2).also { streamOffset += it }
+            readLen = stream.read(bytes, 0, 2).also { streamOffset += it }
             if (readLen != 2) {
                 Log.e("FEEDER_FONT", "Failed to read axisSize. streamOffset: $streamOffset, readLen: $readLen")
                 throw IllegalArgumentException("Invalid TrueType font file")
@@ -168,7 +168,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 val axisStartOffset = streamOffset
 
                 // read axis tag (4 bytes)
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     Log.e("FEEDER_FONT", "Failed to read axis tag. streamOffset: $streamOffset, readLen: $readLen")
                     throw IllegalArgumentException("Invalid TrueType font file")
@@ -178,7 +178,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 logDebug("FEEDER_FONT", "axisTag: ${String(axisTag)}")
 
                 // read min value (4 bytes)
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     Log.e("FEEDER_FONT", "Failed to read min value. streamOffset: $streamOffset, readLen: $readLen")
                     throw IllegalArgumentException("Invalid TrueType font file")
@@ -188,7 +188,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 logDebug("FEEDER_FONT", "minValue: $minValue, bytes: ${bytes.toHexString()}")
 
                 // read default value (4 bytes)
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     Log.e("FEEDER_FONT", "Failed to read default value. streamOffset: $streamOffset, readLen: $readLen")
                     throw IllegalArgumentException("Invalid TrueType font file")
@@ -197,7 +197,7 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 logDebug("FEEDER_FONT", "defaultValue: $defaultValue, bytes: ${bytes.toHexString()}")
 
                 // read max value (4 bytes)
-                readLen = stream.readNBytes(bytes, 0, 4).also { streamOffset += it }
+                readLen = stream.read(bytes, 0, 4).also { streamOffset += it }
                 if (readLen != 4) {
                     Log.e("FEEDER_FONT", "Failed to read max value. streamOffset: $streamOffset, readLen: $readLen")
                     throw IllegalArgumentException("Invalid TrueType font file")
