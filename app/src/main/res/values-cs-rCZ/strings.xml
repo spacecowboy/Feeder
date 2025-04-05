@@ -264,4 +264,6 @@
     <string name="show_message">Zobrazit zprávu</string>
     <string name="search_verb">Vyhledat</string>
     <string name="cancel_search">Zrušit vyhledávání</string>
+    <string name="on">Zapnout</string>
+    <string name="off">Vypnout</string>
 </resources>
