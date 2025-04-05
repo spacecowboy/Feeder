@@ -83,19 +83,19 @@ class FeederTypography(typographySettings: TypographySettings) {
 
 val fontWeights =
     listOf(
-        // Only font weigths actually in use are listed here
-//        FontWeight.Thin,
-//        FontWeight.ExtraLight,
+        // Weights actually used have comments. Not all fonts have all weights available.
+        FontWeight.Thin,
+        FontWeight.ExtraLight,
         // Used in BlockQuotes and Empty view
         FontWeight.Light,
         // Normal used in body, title, display
         FontWeight.Normal,
         // Medium used in title, label
         FontWeight.Medium,
-//        FontWeight.SemiBold,
+        FontWeight.SemiBold,
         // Used whenever bold is used
         FontWeight.Bold,
-//        FontWeight.ExtraBold,
+        FontWeight.ExtraBold,
         // Used in unread title
         FontWeight.Black,
     )
@@ -128,14 +128,14 @@ fun userFontFamily(file: File, font: FontSelection): FontFamily {
         fontWeightsNormal
     }
 
-    val italics = if (font.hasItalicVariation) {
+    val italics = if (font.hasItalicVariation || font.hasSlantVariation) {
         fontStylesNormalItalic
     } else {
         fontStylesNormal
     }
 
     return FontFamily(
-        variableFont(file, weights, italics).toList(),
+        variableFont(file, font, weights, italics).toList(),
         // TODO JONAS roboto fallback?
     )
 }
@@ -183,20 +183,42 @@ fun <A, B> cartesianProduct(
 
 fun variableFont(
     file: File,
+    font: FontSelection,
     fontWeights: List<FontWeight>,
     fontStyles: List<FontStyle>,
 ): Sequence<Font> =
     cartesianProduct(fontWeights, fontStyles)
         .map { (weight, style) ->
+            val variations = mutableListOf<FontVariation.Setting>()
+
+            if (font.hasWeightVariation) {
+                variations.add(FontVariation.weight(weight.weight))
+            }
+
+            if (font.hasSlantVariation) {
+                variations.add(
+                    if (style == FontStyle.Italic) {
+                        // Slant has a negative value for "forward" lean
+                        FontVariation.slant(font.minSlantValue)
+                    } else {
+                        FontVariation.slant(0f)
+                    }
+                )
+            } else if (font.hasItalicVariation) {
+                variations.add(
+                    if (style == FontStyle.Italic) {
+                        FontVariation.italic(font.maxItalicValue)
+                    } else {
+                        FontVariation.italic(0f)
+                    }
+                )
+            }
+
             Font(
                 file = file,
                 weight = weight,
                 style = style,
-                variationSettings =
-                    FontVariation.Settings(
-                        FontVariation.weight(weight.weight),
-                        FontVariation.italic(style.value.toFloat()),
-                    ),
+                variationSettings = FontVariation.Settings(*variations.toTypedArray()),
             )
         }
 

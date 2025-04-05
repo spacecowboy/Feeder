@@ -2,8 +2,10 @@ package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.FontRes
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.getFontMetadata
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -101,12 +103,23 @@ sealed interface FontSettingsEvent {
 
 sealed interface FontSelection {
     val path: String
-    val hasWeightVariation: Boolean
-    val hasItalicVariation: Boolean
     val minWeightValue: Float
     val maxWeightValue: Float
     val minItalicValue: Float
     val maxItalicValue: Float
+    val minSlantValue: Float
+    val maxSlantValue: Float
+
+    val hasWeightVariation: Boolean
+        get() = minWeightValue > 0f && maxWeightValue > minWeightValue
+
+    val hasItalicVariation: Boolean
+        get() = minItalicValue >= 0f && maxItalicValue > minItalicValue
+
+    val hasSlantVariation: Boolean
+        // -15f to 15f where -15 equals italic 1
+        get() = maxSlantValue >= 0f && maxSlantValue > minSlantValue
+
     fun serialize(): String {
         return when (this) {
             else -> path
@@ -123,6 +136,10 @@ sealed interface FontSelection {
 
         override val minItalicValue: Float = 0f
         override val maxItalicValue: Float = 1f
+
+        // TODO ?
+        override val minSlantValue: Float = 0f
+        override val maxSlantValue: Float = 0f
     }
 
     data object AtkinsonHyperLegible : FontSelection {
@@ -135,6 +152,10 @@ sealed interface FontSelection {
 
         override val minItalicValue: Float = 0f
         override val maxItalicValue: Float = 1f
+
+        // TODO ?
+        override val minSlantValue: Float = 0f
+        override val maxSlantValue: Float = 0f
     }
 
     data object SystemDefault : FontSelection {
@@ -147,6 +168,10 @@ sealed interface FontSelection {
 
         override val minItalicValue: Float = 0f
         override val maxItalicValue: Float = 1f
+
+        // TODO ?
+        override val minSlantValue: Float = 0f
+        override val maxSlantValue: Float = 0f
     }
 
     data class UserFont(
@@ -155,13 +180,9 @@ sealed interface FontSelection {
         override val maxWeightValue: Float = 0f,
         override val minItalicValue: Float = 0f,
         override val maxItalicValue: Float = 0f,
+        override val minSlantValue: Float = 0f,
+        override val maxSlantValue: Float = 0f,
     ) : FontSelection {
-        override val hasWeightVariation: Boolean
-            get() = minWeightValue > 0f && maxWeightValue > minWeightValue
-
-        override val hasItalicVariation: Boolean
-            get() = minItalicValue >= 0f && maxItalicValue > minItalicValue
-
         fun getFile(filePathProvider: FilePathProvider): File {
             return filePathProvider.fontsDir.resolve(path)
         }
@@ -192,6 +213,8 @@ fun getFontSelectionFromPath(filePathProvider: FilePathProvider, path: String): 
                 maxWeightValue = metadata.weightVariations?.maxValue ?: 0f,
                 minItalicValue = metadata.italicVariations?.minValue ?: 0f,
                 maxItalicValue = metadata.italicVariations?.maxValue ?: 0f,
+                minSlantValue = metadata.slantVariations?.minValue ?: 0f,
+                maxSlantValue = metadata.slantVariations?.maxValue ?: 0f,
             )
         }
     }
