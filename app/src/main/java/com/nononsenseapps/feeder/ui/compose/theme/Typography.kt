@@ -86,12 +86,17 @@ val fontWeights =
         // Only font weigths actually in use are listed here
 //        FontWeight.Thin,
 //        FontWeight.ExtraLight,
+        // Used in BlockQuotes and Empty view
         FontWeight.Light,
+        // Normal used in body, title, display
         FontWeight.Normal,
-//        FontWeight.Medium,
+        // Medium used in title, label
+        FontWeight.Medium,
 //        FontWeight.SemiBold,
+        // Used whenever bold is used
         FontWeight.Bold,
 //        FontWeight.ExtraBold,
+        // Used in unread title
         FontWeight.Black,
     )
 

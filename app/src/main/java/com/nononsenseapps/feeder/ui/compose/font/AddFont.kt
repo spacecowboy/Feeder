@@ -102,7 +102,7 @@ fun AddFontScreen(
         topBar = {
             SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = "Add font",
+                title = stringResource(R.string.text),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
