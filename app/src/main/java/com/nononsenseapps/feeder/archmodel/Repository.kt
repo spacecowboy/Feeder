@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
@@ -31,6 +32,7 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.ui.compose.feedarticle.emptyFeedListFilter
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
@@ -65,6 +67,7 @@ class Repository(
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
+    private val fontStore: FontStore by instance()
 
     init {
         addFeederNewsIfInitialStart()
@@ -264,6 +267,42 @@ class Repository(
     val textScale = settingsStore.textScale
 
     fun setTextScale(value: Float) = settingsStore.setTextScale(value)
+
+    val font = settingsStore.font
+
+    fun setFont(value: FontSelection) = settingsStore.setFont(value)
+
+    suspend fun addFont(uri: Uri): Either<AddFontError, Unit> =
+        Either.catching(
+            onCatch = { e ->
+                Log.e(LOG_TAG, "Failed to add user font", e)
+                AddFontError(e)
+            },
+        ) {
+            // Add font to the system
+            val userFont = fontStore.addFont(uri)
+
+            // Make it the selected font
+            setFont(userFont)
+        }
+
+    suspend fun removeFont(font: FontSelection): Either<RemoveFontError, Unit> =
+        Either.catching(
+            onCatch = { e ->
+                Log.e(LOG_TAG, "Failed to remove user font", e)
+                RemoveFontError(e)
+            },
+        ) {
+            if (font is FontSelection.UserFont) {
+                // Set font to default
+                setFont(defaultFont)
+
+                // Now remove the font
+                fontStore.removeFont(font)
+            }
+        }
+
+    val fontOptions = fontStore.fontOptions
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 

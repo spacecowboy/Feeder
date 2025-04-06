@@ -11,7 +11,11 @@ import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
+import com.nononsenseapps.feeder.ui.compose.settings.getFontSelectionFromPath
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
+import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.getStringNonNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +35,7 @@ class SettingsStore(
 ) : DIAware {
     private val sp: SharedPreferences by instance()
     private val blocklistDao: BlocklistDao by instance()
+    private val filePathProvider: FilePathProvider by instance()
 
     private val _addedFeederNews = MutableStateFlow(sp.getBoolean(PREF_ADDED_FEEDER_NEWS, false))
     val addedFeederNews: StateFlow<Boolean> = _addedFeederNews.asStateFlow()
@@ -286,6 +291,24 @@ class SettingsStore(
     fun setTextScale(value: Float) {
         _textScale.value = value
         sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
+    }
+
+    private val _font =
+        MutableStateFlow(
+            try {
+                val fontPath = sp.getStringNonNull(PREF_FONT, defaultFont.path)
+                getFontSelectionFromPath(filePathProvider, fontPath)
+                    ?: defaultFont
+            } catch (_: Exception) {
+                defaultFont
+            },
+        )
+
+    val font = _font.asStateFlow()
+
+    fun setFont(value: FontSelection) {
+        _font.value = value
+        sp.edit().putString(PREF_FONT, value.serialize()).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -552,6 +575,7 @@ const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
+const val PREF_FONT = "pref_font"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
@@ -783,3 +807,5 @@ data class PrefsFeedListFilter(
 ) : FeedListFilter {
     override val unread: Boolean = true
 }
+
+val defaultFont = FontSelection.RobotoFlex

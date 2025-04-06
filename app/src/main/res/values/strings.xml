@@ -280,4 +280,16 @@
   <string name="off">Off</string>
   <string name="search_verb">Search</string>
   <string name="cancel_search">Cancel search</string>
+    <string name="text">Text</string>
+  <string name="font">Font</string>
+  <string name="text_preview">Text preview</string>
+    <string name="system_default">System default</string>
+  <string name="weight">Weight</string>
+  <string name="italic">Italic</string>
+  <string name="add_font">Add font…</string>
+  <string name="bold">Bold</string>
+  <string name="text_settings">Text settings</string>
+  <string name="could_not_add_font">Could not add font</string>
+  <string name="could_not_remove_font">Could not remove font</string>
+  <string name="something_went_wrong">Something went wrong</string>
 </resources>

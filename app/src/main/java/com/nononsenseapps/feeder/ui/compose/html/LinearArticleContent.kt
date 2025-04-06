@@ -45,7 +45,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
@@ -106,6 +105,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.OnCodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
@@ -901,7 +901,7 @@ fun LinearText.toAnnotatedString(
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    style = SpanStyle(fontFamily = data.face.asFontFamily()),
+                    style = SpanStyle(fontFamily = data.face.asFontFamily(LocalTypographySettings.current)),
                 )
             }
 
@@ -957,7 +957,7 @@ fun LinearText.toAnnotatedString(
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    style = SpanStyle(fontFamily = FontFamily.Monospace),
+                    style = SpanStyle(fontFamily = LocalTypographySettings.current.monoFontFamily),
                 )
             }
 

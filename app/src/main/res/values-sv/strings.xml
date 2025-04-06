@@ -264,4 +264,7 @@
     <string name="show_message">Visa meddelande</string>
     <string name="on">På</string>
     <string name="off">Av</string>
+    <string name="text">Text</string>
+    <string name="font">Typsnitt</string>
+    <string name="text_preview">Textförhandsvisning</string>
 </resources>

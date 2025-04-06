@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.FontStore
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
 import com.nononsenseapps.feeder.archmodel.SettingsStore
@@ -83,6 +84,7 @@ class RssLocalSyncKtTest : DIAware {
                     it.setAddedFeederNews(true)
                 }
             }
+        bind<FontStore>() with singleton { FontStore(di) }
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }

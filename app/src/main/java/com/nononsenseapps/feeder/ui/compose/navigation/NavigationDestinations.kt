@@ -31,6 +31,8 @@ import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsScreen
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
@@ -182,6 +184,34 @@ data object SearchFeedDestination : NavigationDestination(
     }
 }
 
+data object TextSettingsDestination : NavigationDestination(
+    path = "font/add",
+    navArguments = emptyList(),
+    deepLinks = emptyList(),
+) {
+    fun navigate(navController: NavController) {
+        navController.navigate(path) {
+            launchSingleTop = true
+        }
+    }
+
+    @Composable
+    override fun RegisterScreen(
+        navController: NavController,
+        backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
+    ) {
+        val textSettingsViewModel: TextSettingsViewModel = backStackEntry.diAwareViewModel()
+
+        TextSettingsScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+            textSettingsViewModel = textSettingsViewModel,
+        )
+    }
+}
+
 data object AddFeedDestination : NavigationDestination(
     path = "add/feed",
     navArguments =
@@ -302,6 +332,9 @@ data object SettingsDestination : NavigationDestination(
                     syncCode = "",
                     secretKey = "",
                 )
+            },
+            onNavigateToTextSettingsScreen = {
+                TextSettingsDestination.navigate(navController)
             },
             settingsViewModel = backStackEntry.diAwareViewModel(),
         )

@@ -20,6 +20,11 @@ interface FilePathProvider {
     val fullArticleDir: File
 
     /**
+     * Where fonts should be placed
+     */
+    val fontsDir: File
+
+    /**
      * Where http cache should reside
      */
     val httpCacheDir: File
@@ -44,6 +49,7 @@ private class FilePathProviderImpl(
     override val httpCacheDir: File = cacheDir.resolve("http")
     override val imageCacheDir: File = cacheDir.resolve("image_cache")
     override val httpImageCacheDir: File = cacheDir.resolve("http_image_cache")
+    override val fontsDir: File = filesDir.resolve("fonts")
 }
 
 fun filePathProvider(

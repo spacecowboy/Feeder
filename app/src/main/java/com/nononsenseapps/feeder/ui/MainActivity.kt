@@ -23,6 +23,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.TextSettingsDestination
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
@@ -91,6 +92,8 @@ class MainActivity : DIAwareComponentActivity() {
             SettingsDestination.register(this, navController, navDrawerListState)
             // Sync settings
             SyncScreenDestination.register(this, navController, navDrawerListState)
+            // Add Fonts
+            TextSettingsDestination.register(this, navController, navDrawerListState)
         }
 
         DisposableEffect(navController) {

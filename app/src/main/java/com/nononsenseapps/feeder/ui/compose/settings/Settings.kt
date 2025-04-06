@@ -41,7 +41,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,7 +67,6 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
@@ -94,6 +92,7 @@ import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WithAllPreviewProviders
@@ -109,6 +108,7 @@ import org.kodein.di.instance
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
+    onNavigateToTextSettingsScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -183,8 +183,6 @@ fun SettingsScreen(
             onOpenSyncSettings = onNavigateToSyncScreen,
             useDynamicTheme = viewState.useDynamicTheme,
             onUseDynamicTheme = settingsViewModel::setUseDynamicTheme,
-            textScale = viewState.textScale,
-            setTextScale = settingsViewModel::setTextScale,
             onBlockListAdd = settingsViewModel::addToBlockList,
             onBlockListRemove = settingsViewModel::removeFromBlockList,
             feedsSettings = ImmutableHolder(viewState.feedsSettings),
@@ -208,6 +206,8 @@ fun SettingsScreen(
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
+            onTextSettings = onNavigateToTextSettingsScreen,
+            currentFontSelection = viewState.font,
             modifier = Modifier.padding(padding),
         )
     }
@@ -256,8 +256,6 @@ private fun SettingsScreenPreview() {
             onOpenSyncSettings = {},
             useDynamicTheme = true,
             onUseDynamicTheme = {},
-            textScale = 1.5f,
-            setTextScale = {},
             onBlockListAdd = {},
             onBlockListRemove = {},
             feedsSettings = ImmutableHolder(emptyList()),
@@ -279,6 +277,8 @@ private fun SettingsScreenPreview() {
             onOpenAIEvent = {},
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
+            onTextSettings = {},
+            currentFontSelection = FontSelection.SystemDefault,
             modifier = Modifier,
         )
     }
@@ -323,8 +323,6 @@ fun SettingsList(
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
     onUseDynamicTheme: (Boolean) -> Unit,
-    textScale: Float,
-    setTextScale: (Float) -> Unit,
     onBlockListAdd: (String) -> Unit,
     onBlockListRemove: (String) -> Unit,
     feedsSettings: ImmutableHolder<List<UIFeedSettings>>,
@@ -346,6 +344,8 @@ fun SettingsList(
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
+    currentFontSelection: FontSelection,
+    onTextSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -378,6 +378,9 @@ fun SettingsList(
                     ThemeOptions.E_INK.asThemeOption(),
                 ),
             onSelection = onThemeChange,
+            modifier =
+                Modifier
+                    .width(dimens.maxContentWidth),
         )
 
         SwitchSetting(
@@ -409,6 +412,9 @@ fun SettingsList(
                     DarkThemePreferences.DARK.asDarkThemeOption(),
                 ),
             onSelection = onDarkThemePreferenceChange,
+            modifier =
+                Modifier
+                    .width(dimens.maxContentWidth),
         )
 
         ListDialogSetting(
@@ -427,7 +433,7 @@ fun SettingsList(
                     )
                     Text(
                         text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalTypographySettings.current.monoFontFamily),
                     )
                 }
             },
@@ -444,13 +450,17 @@ fun SettingsList(
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
         SettingsGroup(
-            title = R.string.text_scale,
+            title = R.string.text,
         ) {
-            ScaleSetting(
-                currentValue = textScale,
-                onValueChange = setTextScale,
-                valueRange = 1f..2f,
-                steps = 9,
+            val systemDefaultString = stringResource(R.string.system_default)
+            val currentUiFontOption =
+                remember(currentFontSelection, systemDefaultString) {
+                    UiFontOption.fromFontSelection(currentFontSelection, systemDefaultString)
+                }
+            ExternalSetting(
+                currentUiFontOption.name,
+                title = stringResource(R.string.text_settings),
+                onClick = onTextSettings,
             )
         }
 
@@ -471,6 +481,9 @@ fun SettingsList(
                 onSelection = {
                     onSyncFrequencyChange(it.syncFrequency)
                 },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -503,6 +516,9 @@ fun SettingsList(
                         1000,
                     ),
                 onSelection = onMaxItemsPerFeedChange,
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             ExternalSetting(
@@ -540,6 +556,9 @@ fun SettingsList(
                         SortingOptions.OLDEST_FIRST.asSortOption(),
                     ),
                 onSelection = onSortingChange,
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -561,6 +580,9 @@ fun SettingsList(
                 onSelection = {
                     onFeedItemStyleChange(it.feedItemStyle)
                 },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             MenuSetting(
@@ -568,6 +590,9 @@ fun SettingsList(
                 currentValue = maxLines,
                 values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
                 onSelection = setMaxLines,
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -583,6 +608,9 @@ fun SettingsList(
                 onSelection = {
                     onSwipeAsReadOptionChange(it.swipeAsRead)
                 },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -627,6 +655,9 @@ fun SettingsList(
                 onSelection = {
                     onItemOpenerChange(it.itemOpener)
                 },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             MenuSetting(
@@ -640,6 +671,9 @@ fun SettingsList(
                 onSelection = {
                     onLinkOpenerChange(it.linkOpener)
                 },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
             )
 
             val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
@@ -792,10 +826,18 @@ fun ExternalSetting(
 
         TitleAndSubtitle(
             title = {
-                Text(title)
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
             subtitle = {
-                Text(currentValue)
+                Text(
+                    currentValue,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
         )
     }
@@ -808,7 +850,7 @@ fun <T> MenuSetting(
     values: ImmutableHolder<List<T>>,
     onSelection: (T) -> Unit,
     modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit = {},
+    icon: (@Composable () -> Unit)? = {},
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -816,28 +858,37 @@ fun <T> MenuSetting(
     Row(
         modifier =
             modifier
-                .width(dimens.maxContentWidth)
                 .clickable { expanded = !expanded }
                 .semantics {
                     role = Role.Button
                 },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                icon()
+        if (icon != null) {
+            Box(
+                modifier = Modifier.size(64.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    icon()
+                }
             }
         }
 
         TitleAndSubtitle(
             title = {
-                Text(title)
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
             subtitle = {
-                Text(currentValue.toString())
+                Text(
+                    currentValue.toString(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             },
         )
 
@@ -884,6 +935,8 @@ fun <T> MenuSetting(
                         Text(
                             value.toString(),
                             style = style,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     },
                 )
@@ -1179,84 +1232,6 @@ fun SwitchSetting(
             onCheckedChange = onCheckedChange,
             modifier = Modifier.clearAndSetSemantics { },
             enabled = enabled,
-        )
-    }
-}
-
-@Composable
-fun ScaleSetting(
-    currentValue: Float,
-    onValueChange: (Float) -> Unit,
-    valueRange: ClosedFloatingPointRange<Float>,
-    steps: Int,
-    modifier: Modifier = Modifier,
-) {
-    val dimens = LocalDimens.current
-    val safeCurrentValue = currentValue.coerceIn(valueRange)
-    // People using screen readers probably don't care that much about text size
-    // so no point in adding screen reader action?
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier =
-            modifier
-                .width(dimens.maxContentWidth)
-                .heightIn(min = 64.dp)
-                .padding(start = 64.dp)
-                .safeSemantics(mergeDescendants = true) {
-                    stateDescription = "%.1fx".format(safeCurrentValue)
-                },
-    ) {
-        Surface(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-            tonalElevation = 3.dp,
-        ) {
-            Text(
-                "Lorem ipsum dolor sit amet.",
-                style =
-                    MaterialTheme.typography.bodyLarge
-                        .merge(
-                            TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
-                            ),
-                        ),
-                modifier = Modifier.padding(4.dp),
-            )
-        }
-        SliderWithEndLabels(
-            value = safeCurrentValue,
-            startLabel = {
-                Text(
-                    "A",
-                    style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
-                )
-            },
-            endLabel = {
-                Text(
-                    "A",
-                    style =
-                        MaterialTheme.typography.bodyLarge
-                            .merge(
-                                TextStyle(
-                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
-                                ),
-                            ),
-                    modifier = Modifier.alignByBaseline(),
-                )
-            },
-            valueRange = valueRange,
-            onValueChange = onValueChange,
-            steps = steps,
         )
     }
 }

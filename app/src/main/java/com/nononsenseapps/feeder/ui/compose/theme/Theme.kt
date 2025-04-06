@@ -12,11 +12,14 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 
 private val lightColors =
     lightColorScheme(
@@ -120,11 +123,18 @@ fun PreviewTheme(
 ) {
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = FeederTypography.typography,
-    ) {
-        content()
+    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, sansFontFamily = robotoSansFontFamily(FontSelection.RobotoFlex), monoFontFamily = robotoMonoFontFamily())) {
+        val typographySettings = LocalTypographySettings.current
+        val feederTypography =
+            remember(typographySettings) {
+                FeederTypography(typographySettings)
+            }
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = feederTypography.typography,
+        ) {
+            content()
+        }
     }
 }
 
@@ -140,13 +150,18 @@ fun ComponentActivity.FeederTheme(
 ) {
     val darkSystemIcons = currentTheme.isDarkSystemIcons()
     val darkNavIcons = currentTheme.isDarkNavIcons()
-//    val navBarColor = currentTheme.getNavBarColor()
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
+    val typographySettings = LocalTypographySettings.current
+
+    val feederTypography =
+        remember(typographySettings) {
+            FeederTypography(typographySettings)
+        }
+
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = FeederTypography.typography,
+        typography = feederTypography.typography,
     ) {
-//        val surfaceColor = Color(MaterialTheme.colorScheme.surface.value)
         DisposableEffect(darkSystemIcons, darkNavIcons) {
             enableEdgeToEdge(
                 statusBarStyle =
@@ -156,15 +171,18 @@ fun ComponentActivity.FeederTheme(
                                 android.graphics.Color.TRANSPARENT,
                                 android.graphics.Color.TRANSPARENT,
                             )
+
                         ThemeOptions.NIGHT ->
                             SystemBarStyle.dark(
                                 android.graphics.Color.TRANSPARENT,
                             )
+
                         ThemeOptions.E_INK ->
                             SystemBarStyle.light(
                                 android.graphics.Color.TRANSPARENT,
                                 android.graphics.Color.TRANSPARENT,
                             )
+
                         ThemeOptions.SYSTEM ->
                             SystemBarStyle.auto(
                                 android.graphics.Color.TRANSPARENT,
@@ -182,15 +200,18 @@ fun ComponentActivity.FeederTheme(
                                 lightScrim,
                                 darkScrim,
                             )
+
                         ThemeOptions.NIGHT ->
                             SystemBarStyle.dark(
                                 darkScrim,
                             )
+
                         ThemeOptions.E_INK ->
                             SystemBarStyle.light(
                                 lightScrim,
                                 darkScrim,
                             )
+
                         ThemeOptions.SYSTEM ->
                             SystemBarStyle.auto(
                                 lightScrim,
@@ -218,6 +239,7 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
             -> false
+
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> isSystemInDarkTheme()
         }
@@ -253,6 +275,7 @@ private fun ThemeOptions.getColorScheme(
             ThemeOptions.DAY,
             ThemeOptions.E_INK,
             -> false
+
             ThemeOptions.NIGHT -> true
             ThemeOptions.SYSTEM -> {
                 isSystemInDarkTheme()

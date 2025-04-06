@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.di
 
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.FontStore
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
@@ -24,6 +25,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.bindFactory
@@ -38,6 +40,7 @@ val archModelModule =
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SettingsStore>() with singleton { SettingsStore(di) }
         bind<FeedStore>() with singleton { FeedStore(di) }
+        bind<FontStore>() with singleton { FontStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
@@ -55,4 +58,5 @@ val archModelModule =
         bindWithComposableViewModelScope<ArticleViewModel>()
         bindWithComposableViewModelScope<FeedViewModel>()
         bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
+        bindWithComposableViewModelScope<TextSettingsViewModel>()
     }
