@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.truetype
 
-import org.junit.Assert.*
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class TrueTypeParserKtTest {

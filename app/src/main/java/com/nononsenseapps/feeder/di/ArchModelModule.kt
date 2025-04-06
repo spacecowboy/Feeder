@@ -23,9 +23,9 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
-import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
+import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.bindFactory

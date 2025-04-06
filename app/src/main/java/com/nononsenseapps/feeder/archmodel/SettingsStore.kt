@@ -301,7 +301,7 @@ class SettingsStore(
                     ?: defaultFont
             } catch (_: Exception) {
                 defaultFont
-            }
+            },
         )
 
     val font = _font.asStateFlow()

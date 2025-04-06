@@ -34,14 +34,12 @@ import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -139,9 +137,10 @@ fun TextSettingsScreen(
             viewState = viewState,
             onEvent = textSettingsViewModel::onEvent,
             screenType = screenType,
-            modifier = Modifier
-                .padding(padding)
-                .navigationBarsPadding(),
+            modifier =
+                Modifier
+                    .padding(padding)
+                    .navigationBarsPadding(),
         )
     }
 }
@@ -155,8 +154,9 @@ fun TextSettingsView(
 ) {
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
     ) {
         if (screenType == ScreenType.DUAL) {
             TextSettingsDualPane(
@@ -176,7 +176,7 @@ fun TextSettingsView(
 fun TextSettingsSinglePane(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     val scrollState = rememberScrollState()
@@ -208,9 +208,10 @@ fun TextSettingsDualPane(
     val dimens = LocalDimens.current
 
     Row(
-        modifier = Modifier
-            .width(dimens.maxContentWidth)
-            .then(modifier),
+        modifier =
+            Modifier
+                .width(dimens.maxContentWidth)
+                .then(modifier),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -247,29 +248,31 @@ fun TextSettingsDualPane(
 fun ColumnScope.TextSettingsContent(
     viewState: FontSettingsState,
     onEvent: (FontSettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val systemDefaultString = stringResource(R.string.system_default)
     val addFontString = stringResource(R.string.add_font)
 
-    val currentUiFontOption = remember(viewState.sansSerifFont, systemDefaultString) {
-        UiFontOption.fromFontSelection(viewState.sansSerifFont, systemDefaultString)
-    }
-
-    val uiFontOptions: List<UiFontOption> = remember(viewState.fontOptions, systemDefaultString, addFontString) {
-        sequence {
-            yield(
-                UiFontOption(
-                    name = addFontString,
-                    realOption = null,
-                )
-            )
-            for (font in viewState.fontOptions) {
-                yield(
-                    UiFontOption.fromFontSelection(font, systemDefaultString),
-                )
-            }
+    val currentUiFontOption =
+        remember(viewState.sansSerifFont, systemDefaultString) {
+            UiFontOption.fromFontSelection(viewState.sansSerifFont, systemDefaultString)
         }
-            .sortedBy { value ->
+
+    val uiFontOptions: List<UiFontOption> =
+        remember(viewState.fontOptions, systemDefaultString, addFontString) {
+            sequence {
+                yield(
+                    UiFontOption(
+                        name = addFontString,
+                        realOption = null,
+                    ),
+                )
+                for (font in viewState.fontOptions) {
+                    yield(
+                        UiFontOption.fromFontSelection(font, systemDefaultString),
+                    )
+                }
+            }.sortedBy { value ->
                 when (value.realOption) {
                     FontSelection.AtkinsonHyperLegible -> "20"
                     FontSelection.Roboto -> "10"
@@ -277,9 +280,8 @@ fun ColumnScope.TextSettingsContent(
                     is FontSelection.UserFont -> "40 ${value.name}"
                     null -> "50"
                 }
-            }
-            .toList()
-    }
+            }.toList()
+        }
 
     val addFontPicker =
         rememberLauncherForActivityResult(
@@ -293,6 +295,7 @@ fun ColumnScope.TextSettingsContent(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier,
     ) {
         MenuSetting(
             title = stringResource(R.string.font),
@@ -305,7 +308,7 @@ fun ColumnScope.TextSettingsContent(
                             arrayOf(
                                 "application/x-font-ttf",
                                 "font/ttf",
-                            )
+                            ),
                         )
                     } catch (_: Exception) {
                         // ActivityNotFoundException
@@ -316,8 +319,9 @@ fun ColumnScope.TextSettingsContent(
                 }
             },
             icon = null,
-            modifier = Modifier
-                .weight(1f, fill = true),
+            modifier =
+                Modifier
+                    .weight(1f, fill = true),
         )
 
         if (viewState.sansSerifFont is FontSelection.UserFont) {
@@ -353,7 +357,6 @@ fun ColumnScope.TextSettingsContent(
             },
     )
 
-
     Header(
         R.string.text_preview,
         modifier = Modifier.padding(top = 8.dp),
@@ -387,7 +390,7 @@ fun ColumnScope.TextSettingsContent(
             checked = viewState.previewBold,
             onCheckedChange = {
                 onEvent(FontSettingsEvent.SetPreviewBold(!viewState.previewBold))
-            }
+            },
         ) {
             Text(stringResource(R.string.bold))
         }
@@ -397,7 +400,7 @@ fun ColumnScope.TextSettingsContent(
             checked = viewState.previewItalic,
             onCheckedChange = {
                 onEvent(FontSettingsEvent.SetPreviewItalic(!viewState.previewItalic))
-            }
+            },
         ) {
             Text(stringResource(R.string.italic))
         }
@@ -411,13 +414,15 @@ fun Header(
 ) {
     Text(
         stringResource(text),
-        style = MaterialTheme.typography.labelMedium.merge(
-            TextStyle(color = MaterialTheme.colorScheme.primary),
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(Modifier.semantics { heading() })
-            .then(modifier),
+        style =
+            MaterialTheme.typography.labelMedium.merge(
+                TextStyle(color = MaterialTheme.colorScheme.primary),
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .then(Modifier.semantics { heading() })
+                .then(modifier),
     )
 }
 
@@ -481,33 +486,38 @@ fun ScaleSetting(
 @Composable
 fun ColumnScope.PreviewFontContent(
     viewState: FontSettingsState,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     val textPreviewText = stringResource(id = R.string.text_preview)
-    val fontWeight = remember(viewState.previewBold) {
-        if (viewState.previewBold) {
-            FontWeight.Bold
-        } else {
-            FontWeight.Normal
+    val fontWeight =
+        remember(viewState.previewBold) {
+            if (viewState.previewBold) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Normal
+            }
         }
-    }
 
-    val fontStyle = remember(viewState.previewItalic) {
-        if (viewState.previewItalic) {
-            FontStyle.Italic
-        } else {
-            FontStyle.Normal
+    val fontStyle =
+        remember(viewState.previewItalic) {
+            if (viewState.previewItalic) {
+                FontStyle.Italic
+            } else {
+                FontStyle.Normal
+            }
         }
-    }
 
-    val previewStyle = MaterialTheme.typography.bodyMedium.copy(
-        fontWeight = fontWeight,
-        fontStyle = fontStyle,
-        fontFamily = when (viewState.previewMonospace) {
-            true -> LocalTypographySettings.current.monoFontFamily
-            false -> LocalTypographySettings.current.sansFontFamily
-        }
-    )
+    val previewStyle =
+        MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = fontWeight,
+            fontStyle = fontStyle,
+            fontFamily =
+                when (viewState.previewMonospace) {
+                    true -> LocalTypographySettings.current.monoFontFamily
+                    false -> LocalTypographySettings.current.sansFontFamily
+                },
+        )
 
     ProvideScaledText(style = previewStyle) {
         Text(
@@ -519,7 +529,9 @@ fun ColumnScope.PreviewFontContent(
                     .padding(4.dp)
                     .safeSemantics {
                         contentDescription = textPreviewText
-                    },
+                    }
+                    // To shut linter up
+                    .then(modifier),
         )
         Text(
             "В чащах юга жил-был цитрус... да, но фальшивый экземпляр!",
@@ -628,31 +640,29 @@ data class UiFontOption(
     val name: String,
     val realOption: FontSelection?,
 ) {
-    override fun toString(): String {
-        return name
-    }
+    override fun toString(): String = name
 
     companion object {
         fun fromFontSelection(
             fontSelection: FontSelection,
             systemDefaultString: String,
-        ): UiFontOption {
-            return UiFontOption(
-                name = when (fontSelection) {
-                    is FontSelection.Roboto -> "Roboto"
-                    is FontSelection.AtkinsonHyperLegible -> "Atkinson Hyper Legible"
-                    is FontSelection.SystemDefault -> systemDefaultString
-                    is FontSelection.UserFont -> fontSelection.path.substringAfter("/")
-                },
+        ): UiFontOption =
+            UiFontOption(
+                name =
+                    when (fontSelection) {
+                        is FontSelection.Roboto -> "Roboto"
+                        is FontSelection.AtkinsonHyperLegible -> "Atkinson Hyper Legible"
+                        is FontSelection.SystemDefault -> systemDefaultString
+                        is FontSelection.UserFont -> fontSelection.path.substringAfter("/")
+                    },
                 realOption = fontSelection,
             )
-        }
     }
 }
 
 @Composable
 @PreviewThemes
-fun PreviewSingle() {
+private fun PreviewSingle() {
     PreviewTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,
@@ -679,7 +689,7 @@ fun PreviewSingle() {
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Composable
-fun PreviewDual() {
+private fun PreviewDual() {
     PreviewTheme {
         Surface(
             color = MaterialTheme.colorScheme.background,

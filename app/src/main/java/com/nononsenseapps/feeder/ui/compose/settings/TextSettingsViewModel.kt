@@ -20,7 +20,9 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
 
-class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
+class TextSettingsViewModel(
+    di: DI,
+) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
@@ -45,7 +47,8 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     private fun addFont(uri: Uri) {
         applicationCoroutineScope.launch {
-            repository.addFont(uri)
+            repository
+                .addFont(uri)
                 .onLeft {
                     errorToDisplay.value = it
                 }
@@ -54,7 +57,8 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     fun removeFont(font: FontSelection) {
         applicationCoroutineScope.launch {
-            repository.removeFont(font)
+            repository
+                .removeFont(font)
                 .onLeft {
                     errorToDisplay.value = it
                 }
@@ -90,7 +94,6 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 )
             }.collect { state ->
                 _viewState.value = state
-
             }
         }
     }
@@ -107,12 +110,29 @@ data class FontSettingsState(
 )
 
 sealed interface FontSettingsEvent {
-    data class SetSansSerifFont(val font: FontSelection) : FontSettingsEvent
-    data class SetFontScale(val fontScale: Float) : FontSettingsEvent
-    data class AddFont(val uri: Uri) : FontSettingsEvent
-    data class RemoveFont(val font: FontSelection) : FontSettingsEvent
-    data class SetPreviewBold(val value: Boolean) : FontSettingsEvent
-    data class SetPreviewItalic(val value: Boolean) : FontSettingsEvent
+    data class SetSansSerifFont(
+        val font: FontSelection,
+    ) : FontSettingsEvent
+
+    data class SetFontScale(
+        val fontScale: Float,
+    ) : FontSettingsEvent
+
+    data class AddFont(
+        val uri: Uri,
+    ) : FontSettingsEvent
+
+    data class RemoveFont(
+        val font: FontSelection,
+    ) : FontSettingsEvent
+
+    data class SetPreviewBold(
+        val value: Boolean,
+    ) : FontSettingsEvent
+
+    data class SetPreviewItalic(
+        val value: Boolean,
+    ) : FontSettingsEvent
 }
 
 sealed interface FontSelection {
@@ -134,11 +154,10 @@ sealed interface FontSelection {
         // -15f to 15f where -15 equals italic 1
         get() = maxSlantValue >= 0f && maxSlantValue > minSlantValue
 
-    fun serialize(): String {
-        return when (this) {
+    fun serialize(): String =
+        when (this) {
             else -> path
         }
-    }
 
     data object Roboto : FontSelection {
         override val path: String = "bundled/roboto"
@@ -197,13 +216,14 @@ sealed interface FontSelection {
         override val minSlantValue: Float = 0f,
         override val maxSlantValue: Float = 0f,
     ) : FontSelection {
-        fun getFile(filePathProvider: FilePathProvider): File {
-            return filePathProvider.fontsDir.resolve(path)
-        }
+        fun getFile(filePathProvider: FilePathProvider): File = filePathProvider.fontsDir.resolve(path)
     }
 }
 
-fun getFontSelectionFromPath(filePathProvider: FilePathProvider, path: String): FontSelection? {
+fun getFontSelectionFromPath(
+    filePathProvider: FilePathProvider,
+    path: String,
+): FontSelection? {
     return when (path) {
         Roboto.path -> Roboto
         AtkinsonHyperLegible.path -> AtkinsonHyperLegible

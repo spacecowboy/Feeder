@@ -209,25 +209,28 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
                 logDebug("FEEDER_FONT", "maxValue: $maxValue, bytes: ${bytes.toHexString()}")
 
                 if (axisTag.contentEquals(WGHT_BYTES)) {
-                    weightVariations = FloatVariations(
-                        minValue = minValue,
-                        defaultValue = defaultValue,
-                        maxValue = maxValue,
-                    )
+                    weightVariations =
+                        FloatVariations(
+                            minValue = minValue,
+                            defaultValue = defaultValue,
+                            maxValue = maxValue,
+                        )
                     logDebug("FEEDER_FONT", "Found weight variations: $weightVariations")
                 } else if (axisTag.contentEquals(ITAL_BYTES)) {
-                    italicVariations = FloatVariations(
-                        minValue = minValue,
-                        defaultValue = defaultValue,
-                        maxValue = maxValue,
-                    )
+                    italicVariations =
+                        FloatVariations(
+                            minValue = minValue,
+                            defaultValue = defaultValue,
+                            maxValue = maxValue,
+                        )
                     logDebug("FEEDER_FONT", "Found italic variations: $italicVariations")
                 } else if (axisTag.contentEquals(SLNT_BYTES)) {
-                    slantVariations = FloatVariations(
-                        minValue = minValue,
-                        defaultValue = defaultValue,
-                        maxValue = maxValue,
-                    )
+                    slantVariations =
+                        FloatVariations(
+                            minValue = minValue,
+                            defaultValue = defaultValue,
+                            maxValue = maxValue,
+                        )
                     logDebug("FEEDER_FONT", "Found slant variations: $minValue, $defaultValue, $maxValue")
                 }
 
@@ -250,7 +253,10 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
-fun uBytesToUInt(bytes: UByteArray, numBytes: Int): UInt {
+fun uBytesToUInt(
+    bytes: UByteArray,
+    numBytes: Int,
+): UInt {
     var result: UInt = 0.toUInt()
     for (i in 0 until numBytes) {
         result = (result shl 8) or bytes[i].toUInt()

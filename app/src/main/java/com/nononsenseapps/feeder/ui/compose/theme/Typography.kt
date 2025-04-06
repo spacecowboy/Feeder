@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
-import androidx.annotation.FloatRange
 import androidx.annotation.FontRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -21,15 +20,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.core.util.toRange
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.util.FilePathProvider
-import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
 import java.io.File
 
-class FeederTypography(typographySettings: TypographySettings) {
+class FeederTypography(
+    typographySettings: TypographySettings,
+) {
     val typography: Typography =
         materialTypography.copy(
             displayLarge = materialTypography.displayLarge.merge(fontFamily = typographySettings.sansFontFamily),
@@ -121,18 +120,23 @@ val fontStylesItalic =
         FontStyle.Italic,
     )
 
-fun userFontFamily(file: File, font: FontSelection): FontFamily {
-    val weights = if (font.hasWeightVariation) {
-        fontWeights.filter { it.weight in (font.minWeightValue.toInt())..(font.maxWeightValue.toInt()) }
-    } else {
-        fontWeightsNormal
-    }
+fun userFontFamily(
+    file: File,
+    font: FontSelection,
+): FontFamily {
+    val weights =
+        if (font.hasWeightVariation) {
+            fontWeights.filter { it.weight in (font.minWeightValue.toInt())..(font.maxWeightValue.toInt()) }
+        } else {
+            fontWeightsNormal
+        }
 
-    val italics = if (font.hasItalicVariation || font.hasSlantVariation) {
-        fontStylesNormalItalic
-    } else {
-        fontStylesNormal
-    }
+    val italics =
+        if (font.hasItalicVariation || font.hasSlantVariation) {
+            fontStylesNormalItalic
+        } else {
+            fontStylesNormal
+        }
 
     return FontFamily(
         variableFont(file, font, weights, italics).toList(),
@@ -152,29 +156,32 @@ fun atkinsonHyperlegibleMonoVariableFamily() =
 fun robotoSansFontFamily() =
     FontFamily(
         (
-                variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
-                        variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
-                ).toList(),
+            variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
+                variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
+        ).toList(),
     )
 
 fun robotoMonoFontFamily() =
     FontFamily(
         (
-                variableFont(R.font.roboto_mono_variable_wght, fontWeights, fontStylesNormal) +
-                        variableFont(R.font.roboto_mono_italic_variable_wght, fontWeights, fontStylesItalic)
-                ).toList(),
+            variableFont(R.font.roboto_mono_variable_wght, fontWeights, fontStylesNormal) +
+                variableFont(R.font.roboto_mono_italic_variable_wght, fontWeights, fontStylesItalic)
+        ).toList(),
     )
 
 fun systemSansSerifFontFamily() = FontFamily.SansSerif
+
 fun systemMonoFontFamily() = FontFamily.Monospace
 
 fun <A, B> cartesianProduct(
     list1: List<A>,
     list2: List<B>,
 ): Sequence<Pair<A, B>> =
-    list1.asSequence()
+    list1
+        .asSequence()
         .flatMap { fontWeight ->
-            list2.asSequence()
+            list2
+                .asSequence()
                 .map { fontStyle ->
                     fontWeight to fontStyle
                 }
@@ -201,7 +208,7 @@ fun variableFont(
                         FontVariation.slant(font.minSlantValue)
                     } else {
                         FontVariation.slant(0f)
-                    }
+                    },
                 )
             } else if (font.hasItalicVariation) {
                 variations.add(
@@ -209,7 +216,7 @@ fun variableFont(
                         FontVariation.italic(font.maxItalicValue)
                     } else {
                         FontVariation.italic(0f)
-                    }
+                    },
                 )
             }
 
@@ -299,7 +306,7 @@ fun getMonoFontFamily(font: FontSelection) =
     when (font) {
         FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleMonoVariableFamily()
         FontSelection.Roboto -> robotoMonoFontFamily()
-        else  -> systemMonoFontFamily()
+        else -> systemMonoFontFamily()
     }
 
 @Immutable
@@ -318,16 +325,17 @@ fun ProvideTypographySettings(
     font: FontSelection,
     content: @Composable () -> Unit,
 ) {
-    val sansFont = when (font) {
-        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
-        FontSelection.Roboto -> robotoSansFontFamily()
-        FontSelection.SystemDefault -> systemSansSerifFontFamily()
-        is FontSelection.UserFont -> {
-            val filePathProvider: FilePathProvider by instance()
-            val file = font.getFile(filePathProvider)
-            userFontFamily(file, font)
+    val sansFont =
+        when (font) {
+            FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
+            FontSelection.Roboto -> robotoSansFontFamily()
+            FontSelection.SystemDefault -> systemSansSerifFontFamily()
+            is FontSelection.UserFont -> {
+                val filePathProvider: FilePathProvider by instance()
+                val file = font.getFile(filePathProvider)
+                userFontFamily(file, font)
+            }
         }
-    }
 
     val typographySettings =
         TypographySettings(

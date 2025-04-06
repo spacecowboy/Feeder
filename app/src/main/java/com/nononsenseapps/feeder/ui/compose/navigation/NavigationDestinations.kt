@@ -189,9 +189,7 @@ data object TextSettingsDestination : NavigationDestination(
     navArguments = emptyList(),
     deepLinks = emptyList(),
 ) {
-    fun navigate(
-        navController: NavController,
-    ) {
+    fun navigate(navController: NavController) {
         navController.navigate(path) {
             launchSingleTop = true
         }

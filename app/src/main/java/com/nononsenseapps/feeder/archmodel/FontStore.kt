@@ -32,19 +32,20 @@ class FontStore(
     private val _fontOptions = MutableStateFlow(getAllFonts())
     val fontOptions: StateFlow<List<FontSelection>> = _fontOptions.asStateFlow()
 
-    private fun getAllFonts(): List<FontSelection> {
-        return sequence {
+    private fun getAllFonts(): List<FontSelection> =
+        sequence {
             for (file in filePathProvider.fontsDir.listFiles() ?: emptyArray()) {
                 if (file.isFile && file.name.endsWith(".ttf")) {
                     val metadata = getFontMetadata(file) ?: continue
 
-                    val font = FontSelection.UserFont(
-                        path = file.name,
-                        minWeightValue = metadata.weightVariations?.minValue ?: 0f,
-                        maxWeightValue = metadata.weightVariations?.maxValue ?: 0f,
-                        minItalicValue = metadata.italicVariations?.minValue ?: 0f,
-                        maxItalicValue = metadata.italicVariations?.maxValue ?: 0f,
-                    )
+                    val font =
+                        FontSelection.UserFont(
+                            path = file.name,
+                            minWeightValue = metadata.weightVariations?.minValue ?: 0f,
+                            maxWeightValue = metadata.weightVariations?.maxValue ?: 0f,
+                            minItalicValue = metadata.italicVariations?.minValue ?: 0f,
+                            maxItalicValue = metadata.italicVariations?.maxValue ?: 0f,
+                        )
 
                     yield(font)
                 }
@@ -54,7 +55,6 @@ class FontStore(
             yield(FontSelection.Roboto)
             yield(FontSelection.AtkinsonHyperLegible)
         }.toList()
-    }
 
     suspend fun addFont(uri: Uri): FontSelection.UserFont {
         // Get filename from uri
@@ -97,13 +97,14 @@ class FontStore(
             cacheFile.copyTo(fontFile)
 
             // Then write JSON file
-            val userFont = FontSelection.UserFont(
-                path = filename,
-                minWeightValue = fontMetadata.weightVariations?.minValue ?: 0f,
-                maxWeightValue = fontMetadata.weightVariations?.maxValue ?: 0f,
-                minItalicValue = fontMetadata.italicVariations?.minValue ?: 0f,
-                maxItalicValue = fontMetadata.italicVariations?.maxValue ?: 0f,
-            )
+            val userFont =
+                FontSelection.UserFont(
+                    path = filename,
+                    minWeightValue = fontMetadata.weightVariations?.minValue ?: 0f,
+                    maxWeightValue = fontMetadata.weightVariations?.maxValue ?: 0f,
+                    minItalicValue = fontMetadata.italicVariations?.minValue ?: 0f,
+                    maxItalicValue = fontMetadata.italicVariations?.maxValue ?: 0f,
+                )
 
             userFont
         }.also {
@@ -139,8 +140,8 @@ class FontStore(
     }
 }
 
-fun getFontMetadata(file: File): TrueTypeMetadata? {
-    return try {
+fun getFontMetadata(file: File): TrueTypeMetadata? =
+    try {
         file.inputStream().use {
             parseTrueTypeFont(it)
         }
@@ -148,9 +149,11 @@ fun getFontMetadata(file: File): TrueTypeMetadata? {
         Log.e("FEEDER_FONT", "Error parsing font file", e)
         null
     }
-}
 
-fun transferTo(inputStream: InputStream, outputStream: OutputStream) {
+fun transferTo(
+    inputStream: InputStream,
+    outputStream: OutputStream,
+) {
     val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
     var read: Int
     while ((inputStream.read(buffer, 0, DEFAULT_BUFFER_SIZE).also { read = it }) >= 0) {
