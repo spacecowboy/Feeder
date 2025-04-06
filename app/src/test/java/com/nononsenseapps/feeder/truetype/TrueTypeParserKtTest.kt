@@ -17,7 +17,7 @@ class TrueTypeParserKtTest {
     fun convertBytesToFixedTypeInt() {
         val bytes = ubyteArrayOf(0x02u, 0xd8u, 0x01u, 0x01u)
         val expected = 728u
-        val result = fixedType32ToInt(bytes)
+        val result = fixedType32ToUInt(bytes)
         assertEquals(expected, result)
     }
 

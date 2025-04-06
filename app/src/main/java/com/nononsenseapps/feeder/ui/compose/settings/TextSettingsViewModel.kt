@@ -2,10 +2,8 @@ package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.net.Uri
 import android.util.Log
-import androidx.annotation.FontRes
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.getFontMetadata
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -28,16 +26,17 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     fun onEvent(event: FontSettingsEvent) {
         when (event) {
-            is FontSettingsEvent.SetFont -> setFontValues(event.font)
+            is FontSettingsEvent.SetSansSerifFont -> setFontValues(event.font)
             is FontSettingsEvent.SetFontScale -> repository.setTextScale(event.fontScale)
             is FontSettingsEvent.AddFont -> addFont(event.uri)
+            is FontSettingsEvent.RemoveFont -> removeFont(event.font)
             is FontSettingsEvent.SetPreviewBold -> previewBoldState.value = event.value
             is FontSettingsEvent.SetPreviewItalic -> previewItalicState.value = event.value
         }
     }
 
     private fun setFontValues(value: FontSelection) {
-        if (value != viewState.value.font) {
+        if (value != viewState.value.sansSerifFont) {
             applicationCoroutineScope.launch {
                 repository.setFont(value)
             }
@@ -50,8 +49,10 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
         }
     }
 
-    fun onDeleteFont(font: String) {
-        // TODO
+    fun removeFont(font: FontSelection) {
+        applicationCoroutineScope.launch {
+            repository.removeFont(font)
+        }
     }
 
     private val previewBoldState = MutableStateFlow(false)
@@ -71,7 +72,7 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 previewItalicState,
             ) { font, textScale, fontOptions, previewBold, previewItalic ->
                 FontSettingsState(
-                    font = font,
+                    sansSerifFont = font,
                     fontScale = textScale,
                     fontOptions = fontOptions,
                     previewBold = previewBold,
@@ -87,16 +88,18 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
 data class FontSettingsState(
     val fontOptions: List<FontSelection> = listOf(SystemDefault),
-    val font: FontSelection = SystemDefault,
+    val sansSerifFont: FontSelection = SystemDefault,
     val fontScale: Float = 1f,
     val previewBold: Boolean = false,
     val previewItalic: Boolean = false,
+    val previewMonospace: Boolean = false,
 )
 
 sealed interface FontSettingsEvent {
-    data class SetFont(val font: FontSelection) : FontSettingsEvent
+    data class SetSansSerifFont(val font: FontSelection) : FontSettingsEvent
     data class SetFontScale(val fontScale: Float) : FontSettingsEvent
     data class AddFont(val uri: Uri) : FontSettingsEvent
+    data class RemoveFont(val font: FontSelection) : FontSettingsEvent
     data class SetPreviewBold(val value: Boolean) : FontSettingsEvent
     data class SetPreviewItalic(val value: Boolean) : FontSettingsEvent
 }

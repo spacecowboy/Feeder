@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -60,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -128,7 +131,7 @@ fun TextSettingsView(
     Box(
         contentAlignment = Alignment.TopCenter,
         modifier = modifier
-                .fillMaxWidth(),
+            .fillMaxWidth(),
     ) {
         if (screenType == ScreenType.DUAL) {
             TextSettingsDualPane(
@@ -223,8 +226,8 @@ fun ColumnScope.TextSettingsContent(
     val systemDefaultString = stringResource(R.string.system_default)
     val addFontString = stringResource(R.string.add_font)
 
-    val currentUiFontOption = remember(viewState.font, systemDefaultString) {
-        UiFontOption.fromFontSelection(viewState.font, systemDefaultString)
+    val currentUiFontOption = remember(viewState.sansSerifFont, systemDefaultString) {
+        UiFontOption.fromFontSelection(viewState.sansSerifFont, systemDefaultString)
     }
 
     val uiFontOptions: List<UiFontOption> = remember(viewState.fontOptions, systemDefaultString, addFontString) {
@@ -262,29 +265,49 @@ fun ColumnScope.TextSettingsContent(
             }
         }
 
-    MenuSetting(
-        title = stringResource(R.string.font),
-        currentValue = currentUiFontOption,
-        values = ImmutableHolder(uiFontOptions),
-        onSelection = {
-            if (it.realOption == null) {
-                try {
-                    addFontPicker.launch(
-                        arrayOf(
-                            "application/x-font-ttf",
-                            "font/ttf",
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        MenuSetting(
+            title = stringResource(R.string.font),
+            currentValue = currentUiFontOption,
+            values = ImmutableHolder(uiFontOptions),
+            onSelection = {
+                if (it.realOption == null) {
+                    try {
+                        addFontPicker.launch(
+                            arrayOf(
+                                "application/x-font-ttf",
+                                "font/ttf",
+                            )
                         )
-                    )
-                } catch (_: Exception) {
-                    // ActivityNotFoundException
-                    // TODO message
+                    } catch (_: Exception) {
+                        // ActivityNotFoundException
+                        // TODO message
+                    }
+                } else {
+                    onEvent(FontSettingsEvent.SetSansSerifFont(it.realOption))
                 }
-            } else {
-                onEvent(FontSettingsEvent.SetFont(it.realOption))
+            },
+            icon = null,
+            modifier = Modifier
+                .weight(1f, fill = true),
+        )
+
+        if (viewState.sansSerifFont is FontSelection.UserFont) {
+            IconButton(
+                onClick = {
+                    onEvent(FontSettingsEvent.RemoveFont(viewState.sansSerifFont))
+                },
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.remove),
+                )
             }
-        },
-        icon = null,
-    )
+        }
+    }
 
     Header(
         R.string.text_scale,
@@ -311,8 +334,28 @@ fun ColumnScope.TextSettingsContent(
         modifier = Modifier.padding(top = 8.dp),
     )
 
-    val boldLabel = stringResource(R.string.bold)
-    val italicLabel = stringResource(R.string.italic)
+// If/When monospace font is configurable
+//    SingleChoiceSegmentedButtonRow {
+//        SegmentedButton(
+//            selected = !viewState.previewMonospace,
+//            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+//            onClick = {
+//                onEvent(FontSettingsEvent.SetPreviewMonospace(false))
+//            }
+//        ) {
+//            Text("Sans-Serif")
+//        }
+//        SegmentedButton(
+//            selected = viewState.previewMonospace,
+//            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+//            onClick = {
+//                onEvent(FontSettingsEvent.SetPreviewMonospace(true))
+//            }
+//        ) {
+//            Text("Monospace")
+//        }
+//    }
+
     MultiChoiceSegmentedButtonRow {
         SegmentedButton(
             shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
@@ -321,7 +364,7 @@ fun ColumnScope.TextSettingsContent(
                 onEvent(FontSettingsEvent.SetPreviewBold(!viewState.previewBold))
             }
         ) {
-            Text(boldLabel)
+            Text(stringResource(R.string.bold))
         }
 
         SegmentedButton(
@@ -331,7 +374,7 @@ fun ColumnScope.TextSettingsContent(
                 onEvent(FontSettingsEvent.SetPreviewItalic(!viewState.previewItalic))
             }
         ) {
-            Text(italicLabel)
+            Text(stringResource(R.string.italic))
         }
     }
 }
@@ -416,8 +459,6 @@ fun ColumnScope.PreviewFontContent(
 ) {
     val dimens = LocalDimens.current
     val textPreviewText = stringResource(id = R.string.text_preview)
-    val previewStyle = MaterialTheme.typography.bodyMedium
-
     val fontWeight = remember(viewState.previewBold) {
         if (viewState.previewBold) {
             FontWeight.Bold
@@ -434,12 +475,19 @@ fun ColumnScope.PreviewFontContent(
         }
     }
 
+    val previewStyle = MaterialTheme.typography.bodyMedium.copy(
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
+        fontFamily = when (viewState.previewMonospace) {
+            true -> LocalTypographySettings.current.monoFontFamily
+            false -> LocalTypographySettings.current.sansFontFamily
+        }
+    )
+
     ProvideScaledText(style = previewStyle) {
         Text(
             "The quick brown fox jumps over the lazy dog.",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -451,8 +499,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "В чащах юга жил-был цитрус... да, но фальшивый экземпляр!",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -464,8 +510,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "Η γρήγορη καφέ αλεπού πηδάει πάνω από τον τεμπέλη σκύλο",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -477,8 +521,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "كل إنسان يولد حراً ومتساوياً في الكرامة والحقوق",
             textAlign = TextAlign.Right,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -490,8 +532,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "כל בני האדם נולדו חופשיים ושווים בכבודם ובזכויותיהם",
             textAlign = TextAlign.Right,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -503,8 +543,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "सभी मनुष्य स्वतंत्र और समान अधिकारों के साथ जन्म लेते",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -516,8 +554,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "人人生而自由",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -529,8 +565,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "日本語の漢字ひらがなカタカナ",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -542,8 +576,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "모든 인간은 태어날 때부터 자유롭고 평등하다",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)
@@ -555,8 +587,6 @@ fun ColumnScope.PreviewFontContent(
         Text(
             "มนุษย์ทุกคนเกิดมาอิสระและเท่าเทียมกันในศักดิ์ศรีและสิทธิ",
             textAlign = TextAlign.Left,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
             modifier =
                 Modifier
                     .width(dimens.maxContentWidth)

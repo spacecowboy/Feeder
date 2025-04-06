@@ -378,6 +378,8 @@ fun SettingsList(
                     ThemeOptions.E_INK.asThemeOption(),
                 ),
             onSelection = onThemeChange,
+            modifier = Modifier
+            .width(dimens.maxContentWidth),
         )
 
         SwitchSetting(
@@ -409,6 +411,8 @@ fun SettingsList(
                     DarkThemePreferences.DARK.asDarkThemeOption(),
                 ),
             onSelection = onDarkThemePreferenceChange,
+            modifier = Modifier
+                .width(dimens.maxContentWidth),
         )
 
         ListDialogSetting(
@@ -474,6 +478,8 @@ fun SettingsList(
                 onSelection = {
                     onSyncFrequencyChange(it.syncFrequency)
                 },
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -506,6 +512,8 @@ fun SettingsList(
                         1000,
                     ),
                 onSelection = onMaxItemsPerFeedChange,
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             ExternalSetting(
@@ -543,6 +551,8 @@ fun SettingsList(
                         SortingOptions.OLDEST_FIRST.asSortOption(),
                     ),
                 onSelection = onSortingChange,
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -564,6 +574,8 @@ fun SettingsList(
                 onSelection = {
                     onFeedItemStyleChange(it.feedItemStyle)
                 },
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             MenuSetting(
@@ -571,6 +583,8 @@ fun SettingsList(
                 currentValue = maxLines,
                 values = ImmutableHolder(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)),
                 onSelection = setMaxLines,
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -586,6 +600,8 @@ fun SettingsList(
                 onSelection = {
                     onSwipeAsReadOptionChange(it.swipeAsRead)
                 },
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             SwitchSetting(
@@ -630,6 +646,8 @@ fun SettingsList(
                 onSelection = {
                     onItemOpenerChange(it.itemOpener)
                 },
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             MenuSetting(
@@ -643,6 +661,8 @@ fun SettingsList(
                 onSelection = {
                     onLinkOpenerChange(it.linkOpener)
                 },
+                modifier = Modifier
+                    .width(dimens.maxContentWidth),
             )
 
             val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600
@@ -827,7 +847,6 @@ fun <T> MenuSetting(
     Row(
         modifier =
             modifier
-                .width(dimens.maxContentWidth)
                 .clickable { expanded = !expanded }
                 .semantics {
                     role = Role.Button

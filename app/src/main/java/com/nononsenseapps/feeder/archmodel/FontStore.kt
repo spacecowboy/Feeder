@@ -115,6 +115,17 @@ class FontStore(
         }
     }
 
+    suspend fun removeFont(font: FontSelection.UserFont) {
+        withContext(Dispatchers.IO) {
+            val file = filePathProvider.fontsDir.resolve(font.path)
+            if (file.exists()) {
+                file.delete()
+            }
+
+            _fontOptions.value = getAllFonts()
+        }
+    }
+
     private fun getFilename(uri: Uri): String? {
         var filename: String? = null
         contentResolver.query(uri, null, null, null, null)?.use { cursor ->

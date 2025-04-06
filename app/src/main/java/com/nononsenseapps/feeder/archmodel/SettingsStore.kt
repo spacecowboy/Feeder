@@ -296,11 +296,11 @@ class SettingsStore(
     private val _font =
         MutableStateFlow(
             try {
-                val fontPath = sp.getStringNonNull(PREF_FONT, FontSelection.SystemDefault.path)
+                val fontPath = sp.getStringNonNull(PREF_FONT, defaultFont.path)
                 getFontSelectionFromPath(filePathProvider, fontPath)
-                    ?: FontSelection.SystemDefault
+                    ?: defaultFont
             } catch (_: Exception) {
-                FontSelection.SystemDefault
+                defaultFont
             }
         )
 
@@ -808,3 +808,4 @@ data class PrefsFeedListFilter(
     override val unread: Boolean = true
 }
 
+val defaultFont = FontSelection.Roboto

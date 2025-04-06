@@ -285,6 +285,16 @@ class Repository(
         }
     }
 
+    suspend fun removeFont(font: FontSelection) {
+        if (font is FontSelection.UserFont) {
+            // Set font to default
+            setFont(defaultFont)
+
+            // Now remove the font
+            fontStore.removeFont(font)
+        }
+    }
+
     val fontOptions = fontStore.fontOptions
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed

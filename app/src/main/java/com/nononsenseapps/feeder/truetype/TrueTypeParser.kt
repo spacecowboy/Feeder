@@ -249,22 +249,6 @@ fun parseTrueTypeFont(inputStream: InputStream): TrueTypeMetadata {
     }
 }
 
-//fun bytesToInt(bytes: ByteArray, numBytes: Int): Int {
-//    var result = 0
-//    for (i in 0 until numBytes) {
-//        result = (result shl 8) or bytes[i].toInt()
-//    }
-//    return result
-//}
-
-//fun bytesToUInt(bytes: ByteArray, numBytes: Int): UInt {
-//    var result: UInt = 0.toUInt()
-//    for (i in 0 until numBytes) {
-//        result = (result shl 8) or bytes[i].toUInt()
-//    }
-//    return result
-//}
-
 @OptIn(ExperimentalUnsignedTypes::class)
 fun uBytesToUInt(bytes: UByteArray, numBytes: Int): UInt {
     var result: UInt = 0.toUInt()
@@ -275,13 +259,7 @@ fun uBytesToUInt(bytes: UByteArray, numBytes: Int): UInt {
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
-fun fixedType32ToInt(bytes: UByteArray): UInt {
-    var result: UInt = 0.toUInt()
-    for (i in 0 until 2) {
-        result = (result shl 8) or bytes[i].toUInt()
-    }
-    return result
-}
+fun fixedType32ToUInt(bytes: UByteArray): UInt = uBytesToUInt(bytes, 2)
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun fixedType32ToSignedFloat(bytes: UByteArray): Float {
@@ -294,10 +272,7 @@ fun fixedType32ToSignedFloat(bytes: UByteArray): Float {
     }
 
     // Convert to float. Sign logic for decimal is unclear as no examples were found\
-    val floatValue = integer.toFloat() + sign * (decimal.toFloat() / 65536.0f)
-
-    return floatValue
-
+    return integer.toFloat() + sign * (decimal.toFloat() / 65536.0f)
 }
 
 data class FloatVariations(
