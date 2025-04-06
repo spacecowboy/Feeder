@@ -136,7 +136,6 @@ fun userFontFamily(file: File, font: FontSelection): FontFamily {
 
     return FontFamily(
         variableFont(file, font, weights, italics).toList(),
-        // TODO JONAS roboto fallback?
     )
 }
 

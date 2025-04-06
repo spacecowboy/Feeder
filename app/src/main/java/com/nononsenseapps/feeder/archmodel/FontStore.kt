@@ -57,8 +57,6 @@ class FontStore(
     }
 
     suspend fun addFont(uri: Uri): FontSelection.UserFont {
-        // TODO JONAS exceptions
-
         // Get filename from uri
         val filename = getFilename(uri) ?: throw RuntimeException("No filename")
 
@@ -66,7 +64,7 @@ class FontStore(
         val fontFile = filePathProvider.fontsDir.resolve(filename)
 
         if (fontFile.exists()) {
-            // TODO Exception
+            Log.e("FEEDER_FONT", "File already exists: $filename")
             throw RuntimeException("File already exists")
         }
 
