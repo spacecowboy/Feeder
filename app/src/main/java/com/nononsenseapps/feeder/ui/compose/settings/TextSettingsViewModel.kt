@@ -46,15 +46,22 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
     private fun addFont(uri: Uri) {
         applicationCoroutineScope.launch {
             repository.addFont(uri)
+                .onLeft {
+                    errorToDisplay.value = it
+                }
         }
     }
 
     fun removeFont(font: FontSelection) {
         applicationCoroutineScope.launch {
             repository.removeFont(font)
+                .onLeft {
+                    errorToDisplay.value = it
+                }
         }
     }
 
+    private val errorToDisplay = MutableStateFlow<Any?>(null)
     private val previewBoldState = MutableStateFlow(false)
     private val previewItalicState = MutableStateFlow(false)
 
@@ -70,13 +77,16 @@ class TextSettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.fontOptions,
                 previewBoldState,
                 previewItalicState,
-            ) { font, textScale, fontOptions, previewBold, previewItalic ->
+                errorToDisplay,
+            ) { params ->
+                @Suppress("UNCHECKED_CAST")
                 FontSettingsState(
-                    sansSerifFont = font,
-                    fontScale = textScale,
-                    fontOptions = fontOptions,
-                    previewBold = previewBold,
-                    previewItalic = previewItalic,
+                    sansSerifFont = params[0] as FontSelection,
+                    fontScale = params[1] as Float,
+                    fontOptions = params[2] as List<FontSelection>,
+                    previewBold = params[3] as Boolean,
+                    previewItalic = params[4] as Boolean,
+                    errorToDisplay = params[5],
                 )
             }.collect { state ->
                 _viewState.value = state
@@ -93,6 +103,7 @@ data class FontSettingsState(
     val previewBold: Boolean = false,
     val previewItalic: Boolean = false,
     val previewMonospace: Boolean = false,
+    val errorToDisplay: Any? = null,
 )
 
 sealed interface FontSettingsEvent {

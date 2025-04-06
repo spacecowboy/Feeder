@@ -272,28 +272,35 @@ class Repository(
 
     fun setFont(value: FontSelection) = settingsStore.setFont(value)
 
-    suspend fun addFont(uri: Uri) {
-        try {
+    suspend fun addFont(uri: Uri): Either<AddFontError, Unit> =
+        Either.catching(
+            onCatch = { e ->
+                Log.e(LOG_TAG, "Failed to add user font", e)
+                AddFontError(e)
+            },
+        ) {
             // Add font to the system
             val userFont = fontStore.addFont(uri)
 
             // Make it the selected font
             setFont(userFont)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG, "Failed to add user font", e)
-            // TODO JONAS Toast?
         }
-    }
 
-    suspend fun removeFont(font: FontSelection) {
-        if (font is FontSelection.UserFont) {
-            // Set font to default
-            setFont(defaultFont)
+    suspend fun removeFont(font: FontSelection): Either<RemoveFontError, Unit> =
+        Either.catching(
+            onCatch = { e ->
+                Log.e(LOG_TAG, "Failed to remove user font", e)
+                RemoveFontError(e)
+            },
+        ) {
+            if (font is FontSelection.UserFont) {
+                // Set font to default
+                setFont(defaultFont)
 
-            // Now remove the font
-            fontStore.removeFont(font)
+                // Now remove the font
+                fontStore.removeFont(font)
+            }
         }
-    }
 
     val fontOptions = fontStore.fontOptions
 

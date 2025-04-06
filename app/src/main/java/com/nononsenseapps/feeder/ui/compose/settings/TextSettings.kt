@@ -40,6 +40,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -60,6 +62,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.AddFontError
+import com.nononsenseapps.feeder.archmodel.RemoveFontError
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
@@ -71,6 +75,9 @@ import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
+import com.nononsenseapps.feeder.util.ToastMaker
+import org.kodein.di.direct
+import org.kodein.di.instance
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +93,24 @@ fun TextSettingsScreen(
     val screenType by remember(windowSize) {
         derivedStateOf {
             getScreenType(windowSize)
+        }
+    }
+
+    LaunchedEffect(viewState.errorToDisplay) {
+        if (viewState.errorToDisplay != null) {
+            val toastMaker: ToastMaker = textSettingsViewModel.di.direct.instance()
+
+            when (viewState.errorToDisplay) {
+                is AddFontError -> {
+                    toastMaker.makeToast(R.string.could_not_add_font)
+                }
+                is RemoveFontError -> {
+                    toastMaker.makeToast(R.string.could_not_remove_font)
+                }
+                else -> {
+                    toastMaker.makeToast(R.string.something_went_wrong)
+                }
+            }
         }
     }
 
