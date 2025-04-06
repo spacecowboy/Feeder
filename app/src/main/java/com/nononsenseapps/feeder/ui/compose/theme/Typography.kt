@@ -138,36 +138,28 @@ fun userFontFamily(
             fontStylesNormal
         }
 
-    return FontFamily(
-        variableFont(file, font, weights, italics).toList(),
-    )
+    return FontFamily(variableFont(file, font, weights, italics).toList())
 }
 
-fun atkinsonHyperlegibleNextVariableFamily() =
-    FontFamily(
-        variableFont(R.font.atkinson_hyperlegible_next_variable, fontWeights, fontStylesNormalItalic).toList(),
-    )
+fun robotoSansFontFamily(font: FontSelection.RobotoFlex): FontFamily {
+    val weights =
+        if (font.hasWeightVariation) {
+            fontWeights.filter { it.weight in (font.minWeightValue.toInt())..(font.maxWeightValue.toInt()) }
+        } else {
+            fontWeightsNormal
+        }
 
-fun atkinsonHyperlegibleMonoVariableFamily() =
-    FontFamily(
-        variableFont(R.font.atkinson_hyperlegible_mono_variable, fontWeights, fontStylesNormalItalic).toList(),
-    )
+    val italics =
+        if (font.hasItalicVariation || font.hasSlantVariation) {
+            fontStylesNormalItalic
+        } else {
+            fontStylesNormal
+        }
 
-fun robotoSansFontFamily() =
-    FontFamily(
-        (
-            variableFont(R.font.roboto_wdth_wght, fontWeights, fontStylesNormal) +
-                variableFont(R.font.roboto_italic_wdth_wght, fontWeights, fontStylesItalic)
-        ).toList(),
-    )
+    return FontFamily(variableFont(font.resId, weights, italics).toList())
+}
 
-fun robotoMonoFontFamily() =
-    FontFamily(
-        (
-            variableFont(R.font.roboto_mono_variable_wght, fontWeights, fontStylesNormal) +
-                variableFont(R.font.roboto_mono_italic_variable_wght, fontWeights, fontStylesItalic)
-        ).toList(),
-    )
+fun robotoMonoFontFamily() = FontFamily(variableFont(R.font.roboto_mono_variable_wght, fontWeights, fontStylesNormal).toList())
 
 fun systemSansSerifFontFamily() = FontFamily.SansSerif
 
@@ -304,8 +296,7 @@ fun OnCodeBlockBackground(): Color = MaterialTheme.colorScheme.onSurfaceVariant
 
 fun getMonoFontFamily(font: FontSelection) =
     when (font) {
-        FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleMonoVariableFamily()
-        FontSelection.Roboto -> robotoMonoFontFamily()
+        FontSelection.RobotoFlex -> robotoMonoFontFamily()
         else -> systemMonoFontFamily()
     }
 
@@ -327,9 +318,8 @@ fun ProvideTypographySettings(
 ) {
     val sansFont =
         when (font) {
-            FontSelection.AtkinsonHyperLegible -> atkinsonHyperlegibleNextVariableFamily()
-            FontSelection.Roboto -> robotoSansFontFamily()
-            FontSelection.SystemDefault -> systemSansSerifFontFamily()
+            is FontSelection.RobotoFlex -> robotoSansFontFamily(font)
+            is FontSelection.SystemDefault -> systemSansSerifFontFamily()
             is FontSelection.UserFont -> {
                 val filePathProvider: FilePathProvider by instance()
                 val file = font.getFile(filePathProvider)

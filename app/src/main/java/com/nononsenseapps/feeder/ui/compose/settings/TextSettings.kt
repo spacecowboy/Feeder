@@ -274,8 +274,7 @@ fun ColumnScope.TextSettingsContent(
                 }
             }.sortedBy { value ->
                 when (value.realOption) {
-                    FontSelection.AtkinsonHyperLegible -> "20"
-                    FontSelection.Roboto -> "10"
+                    FontSelection.RobotoFlex -> "10"
                     FontSelection.SystemDefault -> "30"
                     is FontSelection.UserFont -> "40 ${value.name}"
                     null -> "50"
@@ -650,8 +649,7 @@ data class UiFontOption(
             UiFontOption(
                 name =
                     when (fontSelection) {
-                        is FontSelection.Roboto -> "Roboto"
-                        is FontSelection.AtkinsonHyperLegible -> "Atkinson Hyper Legible"
+                        is FontSelection.RobotoFlex -> "Roboto"
                         is FontSelection.SystemDefault -> systemDefaultString
                         is FontSelection.UserFont -> fontSelection.path.substringAfter("/")
                     },

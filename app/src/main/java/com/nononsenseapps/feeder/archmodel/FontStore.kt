@@ -52,8 +52,7 @@ class FontStore(
             }
 
             yield(FontSelection.SystemDefault)
-            yield(FontSelection.Roboto)
-            yield(FontSelection.AtkinsonHyperLegible)
+            yield(FontSelection.RobotoFlex)
         }.toList()
 
     suspend fun addFont(uri: Uri): FontSelection.UserFont {

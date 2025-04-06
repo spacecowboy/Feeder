@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 
 private val lightColors =
     lightColorScheme(
@@ -122,7 +123,7 @@ fun PreviewTheme(
 ) {
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
 
-    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, sansFontFamily = robotoSansFontFamily(), monoFontFamily = robotoMonoFontFamily())) {
+    CompositionLocalProvider(LocalTypographySettings provides TypographySettings(1f, sansFontFamily = robotoSansFontFamily(FontSelection.RobotoFlex), monoFontFamily = robotoMonoFontFamily())) {
         val typographySettings = LocalTypographySettings.current
         val feederTypography =
             remember(typographySettings) {

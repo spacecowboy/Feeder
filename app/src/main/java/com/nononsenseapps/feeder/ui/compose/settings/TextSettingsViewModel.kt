@@ -2,13 +2,14 @@ package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.net.Uri
 import android.util.Log
+import androidx.annotation.FontRes
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.getFontMetadata
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.AtkinsonHyperLegible
-import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.Roboto
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.RobotoFlex
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.SystemDefault
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -151,7 +152,7 @@ sealed interface FontSelection {
         get() = minItalicValue >= 0f && maxItalicValue > minItalicValue
 
     val hasSlantVariation: Boolean
-        // -15f to 15f where -15 equals italic 1
+        // -15f to 15f where negative values means regular italic lean
         get() = maxSlantValue >= 0f && maxSlantValue > minSlantValue
 
     fun serialize(): String =
@@ -159,35 +160,24 @@ sealed interface FontSelection {
             else -> path
         }
 
-    data object Roboto : FontSelection {
-        override val path: String = "bundled/roboto"
-        override val hasWeightVariation: Boolean = true
-        override val hasItalicVariation: Boolean = true
+    /**
+     * Grad: -200, 0, 150
+     * Wdth: 25, 100, 151
+     * Slnt: -10, 0, 0
+     * Wght: 100, 400, 1000
+     */
+    data object RobotoFlex : FontSelection {
+        @FontRes
+        val resId: Int = R.font.roboto_flex
+        override val path: String = "bundled/roboto_flex"
 
         override val minWeightValue: Float = 100f
-        override val maxWeightValue: Float = 900f
+        override val maxWeightValue: Float = 1000f
 
         override val minItalicValue: Float = 0f
-        override val maxItalicValue: Float = 1f
+        override val maxItalicValue: Float = 0f
 
-        // TODO ?
-        override val minSlantValue: Float = 0f
-        override val maxSlantValue: Float = 0f
-    }
-
-    data object AtkinsonHyperLegible : FontSelection {
-        override val path: String = "bundled/atkinson_hyper_legible"
-        override val hasWeightVariation: Boolean = true
-        override val hasItalicVariation: Boolean = true
-
-        override val minWeightValue: Float = 100f
-        override val maxWeightValue: Float = 900f
-
-        override val minItalicValue: Float = 0f
-        override val maxItalicValue: Float = 1f
-
-        // TODO ?
-        override val minSlantValue: Float = 0f
+        override val minSlantValue: Float = -10f
         override val maxSlantValue: Float = 0f
     }
 
@@ -202,7 +192,6 @@ sealed interface FontSelection {
         override val minItalicValue: Float = 0f
         override val maxItalicValue: Float = 1f
 
-        // TODO ?
         override val minSlantValue: Float = 0f
         override val maxSlantValue: Float = 0f
     }
@@ -225,8 +214,7 @@ fun getFontSelectionFromPath(
     path: String,
 ): FontSelection? {
     return when (path) {
-        Roboto.path -> Roboto
-        AtkinsonHyperLegible.path -> AtkinsonHyperLegible
+        RobotoFlex.path -> RobotoFlex
         SystemDefault.path -> SystemDefault
         else -> {
             val fontFile = filePathProvider.fontsDir.resolve(path)

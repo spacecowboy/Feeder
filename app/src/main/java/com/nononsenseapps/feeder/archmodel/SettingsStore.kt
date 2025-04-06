@@ -808,4 +808,4 @@ data class PrefsFeedListFilter(
     override val unread: Boolean = true
 }
 
-val defaultFont = FontSelection.Roboto
+val defaultFont = FontSelection.RobotoFlex
