@@ -266,4 +266,16 @@
     <string name="off">Искључено</string>
     <string name="search_verb">Претражи</string>
     <string name="cancel_search">Откажи претрагу</string>
+    <string name="text_preview">Преглед текста</string>
+    <string name="system_default">Подразумевано у систему</string>
+    <string name="weight">Тежина</string>
+    <string name="add_font">Додај фонт…</string>
+    <string name="could_not_add_font">Фонт није могао да се дода</string>
+    <string name="could_not_remove_font">Фонт није могао да се уклони</string>
+    <string name="something_went_wrong">Нешто је пошло наопако</string>
+    <string name="font">Фонт</string>
+    <string name="bold">Подебљано</string>
+    <string name="text_settings">Подешавања текста</string>
+    <string name="text">Текст</string>
+    <string name="italic">Курзив</string>
 </resources>
