@@ -266,4 +266,16 @@
     <string name="cancel_search">Cancelar búsqueda</string>
     <string name="on">Activo</string>
     <string name="off">Inactivo</string>
+    <string name="font">Fuente</string>
+    <string name="text_preview">Vista previa</string>
+    <string name="system_default">Por defecto</string>
+    <string name="add_font">Añadir fuente…</string>
+    <string name="bold">Negrita</string>
+    <string name="weight">Tamaño</string>
+    <string name="text_settings">Ajustes de texto</string>
+    <string name="could_not_remove_font">No se pudo eliminar la fuente</string>
+    <string name="italic">Itálica</string>
+    <string name="something_went_wrong">Algo fue mal</string>
+    <string name="text">Texto</string>
+    <string name="could_not_add_font">No se pudo añadir la fuente</string>
 </resources>
