@@ -266,4 +266,16 @@
     <string name="off">Aus</string>
     <string name="cancel_search">Suche abbrechen</string>
     <string name="search_verb">Suche</string>
+    <string name="text">Text</string>
+    <string name="font">Schriftart</string>
+    <string name="text_preview">Textvorschau</string>
+    <string name="system_default">Systemstandard</string>
+    <string name="italic">Kursiv</string>
+    <string name="add_font">Schriftart hinzufügen …</string>
+    <string name="weight">Stärke</string>
+    <string name="bold">Fett</string>
+    <string name="text_settings">Texteinstellungen</string>
+    <string name="could_not_add_font">Schriftart konnte nicht hinzugefügt werden</string>
+    <string name="could_not_remove_font">Schriftart konnte nicht entfernt werden</string>
+    <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
 </resources>
