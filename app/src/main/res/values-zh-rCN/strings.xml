@@ -190,7 +190,7 @@
     <string name="saved_article">已保存文章</string>
     <string name="save_article">保存文章</string>
     <string name="unsave_article">停止保存文章</string>
-    <string name="mark_as_read_on_scroll">随滚动标记为已读</string>
+    <string name="mark_as_read_on_scroll">滚动时自动标记为已读</string>
     <string name="zero_feeds">%1$s 个订阅源</string>
     <string name="one_feed">%1$s 个订阅源</string>
     <string name="two_feeds">%1$s 个订阅源</string>
@@ -266,4 +266,16 @@
     <string name="off">关</string>
     <string name="cancel_search">取消搜索</string>
     <string name="search_verb">搜索</string>
+    <string name="font">字体</string>
+    <string name="text_preview">文本预览</string>
+    <string name="system_default">系统默认</string>
+    <string name="italic">斜体</string>
+    <string name="add_font">添加字体…</string>
+    <string name="bold">粗体</string>
+    <string name="could_not_add_font">无法添加字体</string>
+    <string name="weight">字体粗细</string>
+    <string name="something_went_wrong">出了点问题</string>
+    <string name="text">文本</string>
+    <string name="text_settings">文本设置</string>
+    <string name="could_not_remove_font">无法移除字体</string>
 </resources>
