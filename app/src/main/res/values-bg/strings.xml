@@ -266,4 +266,16 @@
     <string name="off">Изключено</string>
     <string name="search_verb">Търсене</string>
     <string name="cancel_search">Отмени търсенето</string>
+    <string name="text_preview">Преглед на текст</string>
+    <string name="system_default">Система по подразбиране</string>
+    <string name="weight">Дебелина</string>
+    <string name="text_settings">Настройки на текста</string>
+    <string name="could_not_add_font">Шрифтът не можа да бъде добавен</string>
+    <string name="something_went_wrong">Нещо се обърка</string>
+    <string name="italic">Курсив</string>
+    <string name="bold">Удебелен</string>
+    <string name="text">Текст</string>
+    <string name="font">Шрифт</string>
+    <string name="could_not_remove_font">Шрифтът не можа да бъде премахнат</string>
+    <string name="add_font">Добавяне на шрифт…</string>
 </resources>
