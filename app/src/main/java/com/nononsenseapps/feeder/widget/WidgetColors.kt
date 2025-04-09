@@ -5,8 +5,9 @@ import com.nononsenseapps.feeder.ui.compose.theme.darkColors
 import com.nononsenseapps.feeder.ui.compose.theme.lightColors
 
 object WidgetColors {
-    val colors = ColorProviders(
-        light = lightColors,
-        dark = darkColors
-    )
+    val colors =
+        ColorProviders(
+            light = lightColors,
+            dark = darkColors,
+        )
 }
