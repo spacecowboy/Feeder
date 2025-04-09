@@ -266,4 +266,16 @@
     <string name="on">Actif</string>
     <string name="cancel_search">Annuler la recherche</string>
     <string name="search_verb">Rechercher</string>
+    <string name="text">Texte</string>
+    <string name="font">Police</string>
+    <string name="text_preview">Prévisualisation du texte</string>
+    <string name="italic">Italique</string>
+    <string name="add_font">Ajouter une police…</string>
+    <string name="bold">Gras</string>
+    <string name="system_default">Valeur par défaut du système</string>
+    <string name="weight">Style</string>
+    <string name="could_not_add_font">Impossible d\'ajouter la police</string>
+    <string name="something_went_wrong">Quelque chose ne s\'est pas bien passé</string>
+    <string name="could_not_remove_font">Impossible de supprimer la police</string>
+    <string name="text_settings">Préférences de texte</string>
 </resources>
