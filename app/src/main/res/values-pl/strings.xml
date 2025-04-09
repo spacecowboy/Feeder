@@ -266,4 +266,16 @@
     <string name="off">Wyłączone</string>
     <string name="search_verb">Szukaj</string>
     <string name="cancel_search">Anuluj wyszukiwanie</string>
+    <string name="text">Tekst</string>
+    <string name="font">Czcionka</string>
+    <string name="system_default">Domyślna systemowa</string>
+    <string name="weight">Grubość</string>
+    <string name="italic">Kursywa</string>
+    <string name="bold">Pogrubienie</string>
+    <string name="text_settings">Ustawienia tekstu</string>
+    <string name="could_not_remove_font">Nie udało się usunąć czcionki</string>
+    <string name="something_went_wrong">Coś poszło nie tak</string>
+    <string name="text_preview">Podgląd tekstu</string>
+    <string name="add_font">Dodaj czcionkę…</string>
+    <string name="could_not_add_font">Nie udało się dodać czcionki</string>
 </resources>
