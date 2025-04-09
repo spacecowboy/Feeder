@@ -76,7 +76,7 @@ class FeederTypography(
         )
 
     companion object {
-        private val materialTypography = Typography()
+        val materialTypography = Typography()
     }
 }
 

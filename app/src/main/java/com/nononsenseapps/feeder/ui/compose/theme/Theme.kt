@@ -21,7 +21,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 
-private val lightColors =
+val lightColors =
     lightColorScheme(
         primary = md_theme_light_primary,
         onPrimary = md_theme_light_onPrimary,
@@ -52,7 +52,7 @@ private val lightColors =
         surfaceTint = md_theme_light_surfaceTint,
     )
 
-private val darkColors =
+val darkColors =
     darkColorScheme(
         primary = md_theme_dark_primary,
         onPrimary = md_theme_dark_onPrimary,

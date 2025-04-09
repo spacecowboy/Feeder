@@ -242,6 +242,7 @@ dependencies {
     // Dependencies
     implementation(libs.bundles.android)
     implementation(libs.bundles.compose)
+    implementation(libs.bundles.glance)
     implementation(libs.bundles.jvm)
     implementation(libs.bundles.okhttp.android)
     implementation(libs.bundles.kotlin)
