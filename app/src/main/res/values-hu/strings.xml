@@ -266,4 +266,16 @@
     <string name="on">Bekapcsolva</string>
     <string name="search_verb">Keresés</string>
     <string name="cancel_search">Keresés visszavonása</string>
+    <string name="italic">Dőlt</string>
+    <string name="bold">Félkövér</string>
+    <string name="text">Szöveg</string>
+    <string name="could_not_remove_font">Nem sikerült eltávolítani a betűtípust</string>
+    <string name="text_settings">Szövegbeállítások</string>
+    <string name="could_not_add_font">Nem sikerült hozzáadni a betűtípust</string>
+    <string name="weight">Betűméret</string>
+    <string name="add_font">Betűtípus hozzáadása…</string>
+    <string name="font">Betűtípus</string>
+    <string name="text_preview">Szöveg előnézete</string>
+    <string name="something_went_wrong">Valamilyen hiba történt</string>
+    <string name="system_default">Rendszer alapértelmezett</string>
 </resources>
