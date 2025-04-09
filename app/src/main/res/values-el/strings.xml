@@ -266,4 +266,16 @@
     <string name="off">Ανενεργό</string>
     <string name="search_verb">Αναζήτηση</string>
     <string name="cancel_search">Ακύρωση αναζήτησης</string>
+    <string name="text">Κείμενο</string>
+    <string name="font">Γραμματοσειρά</string>
+    <string name="text_preview">Προεπισκόπηση κειμένου</string>
+    <string name="system_default">Προεπιλογή συστήματος</string>
+    <string name="weight">Ένταση</string>
+    <string name="italic">Πλάγια</string>
+    <string name="add_font">Προσθήκη γραμματοσειράς…</string>
+    <string name="bold">Έντονο</string>
+    <string name="text_settings">Ρυθμίσεις κειμένου</string>
+    <string name="could_not_add_font">Δεν ήταν δυνατή η προσθήκη γραμματοσειράς</string>
+    <string name="could_not_remove_font">Δεν ήταν δυνατή η αφαίρεση γραμματοσειράς</string>
+    <string name="something_went_wrong">Κάτι πήγε στραβά</string>
 </resources>
