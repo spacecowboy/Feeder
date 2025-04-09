@@ -264,4 +264,18 @@
     <string name="nostr_feed_description">Nostr-artikler af %1$s</string>
     <string name="on">Til</string>
     <string name="off">Fra</string>
+    <string name="search_verb">Søg</string>
+    <string name="cancel_search">Annuller søgning</string>
+    <string name="text">Tekst</string>
+    <string name="font">Skrifttype</string>
+    <string name="text_preview">Tekst forhåndsvisning</string>
+    <string name="system_default">Systemstandard</string>
+    <string name="weight">Vægt</string>
+    <string name="italic">Kursiv</string>
+    <string name="add_font">Tilføj skrifttype…</string>
+    <string name="bold">Fed</string>
+    <string name="text_settings">Tekstindstillinger</string>
+    <string name="could_not_add_font">Kunne ikke tilføje skrifttype</string>
+    <string name="could_not_remove_font">Kunne ikke fjerne skrifttype</string>
+    <string name="something_went_wrong">Noget gik galt</string>
 </resources>
