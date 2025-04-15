@@ -110,4 +110,16 @@
     <string name="many_minutes">%1$s minūtes</string>
     <string name="show_reading_time">Rādīt aptuveno lasīšanas ilgumu</string>
     <string name="touch_to_play_audio">Pieskarieties, lai atskaņotu audio</string>
+    <string name="show_all_items">Rādīt visus rakstus</string>
+    <string name="show_unread_items">Rādīt nelasītos rakstus</string>
+    <string name="delete_feed">Dzēst ziņu plūsmu</string>
+    <string name="notification_channel_name">Nelasītās ziņu plūsmas</string>
+    <string name="only_enable_for_bad_id_feeds">Iespējojiet tikai ziņu plūsmām ar sliktiem (kļūdainiem) ID</string>
+    <string name="feeder_device_sync_code">Feeder ierīces sinhronizācijas kods</string>
+    <string name="disabled">Atspējots</string>
+    <string name="secret_key">Slepenā atslēga</string>
+    <string name="article_image">Raksta attēls</string>
+    <string name="feed_icon">Ziņu plūsmas ikona</string>
+    <string name="saved_articles">Saglabātie raksti</string>
+    <string name="saved_article">Saglabāts raksts</string>
 </resources>
