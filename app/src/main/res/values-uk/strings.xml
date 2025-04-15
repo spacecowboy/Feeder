@@ -266,4 +266,16 @@
     <string name="summarize">Підсумки</string>
     <string name="cancel_search">Скасувати пошук</string>
     <string name="search_verb">Пошук</string>
+    <string name="text">Текст</string>
+    <string name="font">Шрифт</string>
+    <string name="text_preview">Перегляд тексту</string>
+    <string name="italic">Курсив</string>
+    <string name="add_font">Додати шрифт…</string>
+    <string name="system_default">По замовчуванню в системі</string>
+    <string name="weight">Товщина</string>
+    <string name="text_settings">Налаштування тексту</string>
+    <string name="could_not_add_font">Не можливо додати шрифт</string>
+    <string name="could_not_remove_font">Не можливо вилучити шрифт</string>
+    <string name="something_went_wrong">Щось пішло не так</string>
+    <string name="bold">Жирний</string>
 </resources>
