@@ -266,4 +266,16 @@
     <string name="cancel_search">Zrušit vyhledávání</string>
     <string name="on">Zapnout</string>
     <string name="off">Vypnout</string>
+    <string name="text">Text</string>
+    <string name="font">Font</string>
+    <string name="text_preview">Náhled textu</string>
+    <string name="system_default">Výchozí nastavení systému</string>
+    <string name="weight">Váha</string>
+    <string name="add_font">Přidat font…</string>
+    <string name="bold">Tučné</string>
+    <string name="italic">Kurzíva</string>
+    <string name="text_settings">Nastavení textu</string>
+    <string name="could_not_add_font">Nepodařilo se přidat font</string>
+    <string name="could_not_remove_font">Nepodařilo se smazat font</string>
+    <string name="something_went_wrong">Něco se nepovedlo</string>
 </resources>
