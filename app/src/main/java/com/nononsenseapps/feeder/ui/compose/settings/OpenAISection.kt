@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -36,14 +37,17 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
@@ -150,6 +154,9 @@ fun OpenAISectionEdit(
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
+    var timeoutString by remember { mutableStateOf(current.timeout) }
+    val isTimeoutInputValid = timeoutString.isNotEmpty() &&
+            timeoutString.isDigitsOnly() && timeoutString.toInt() in 30..600
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -219,6 +226,33 @@ fun OpenAISectionEdit(
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
             },
         )
+
+        TextField(
+            modifier = Modifier.fillMaxWidth().onFocusChanged {
+                if (!(it.isFocused || isTimeoutInputValid)){
+                    timeoutString = timeoutString.toInt().coerceIn(30, 600).toString()
+                }
+            },
+            value = timeoutString,
+            placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
+            label = {
+                Text(stringResource(R.string.time_out))
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            supportingText = {
+                if (!isTimeoutInputValid){
+                    Text(stringResource(R.string.time_out_validation_error))
+                }
+            },
+            onValueChange = { input ->
+                timeoutString = input.filter { it.isDigit() }
+                if (isTimeoutInputValid){
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeout = timeoutString)))
+                }
+            },
+            isError = !isTimeoutInputValid,
+        )
+
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = current.azureDeploymentId,

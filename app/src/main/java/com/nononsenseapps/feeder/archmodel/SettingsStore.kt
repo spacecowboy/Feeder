@@ -724,6 +724,7 @@ enum class SwipeAsRead(
 data class OpenAISettings(
     val modelId: String = "",
     val baseUrl: String = "",
+    val timeout: String = "30",
     val azureApiVersion: String = "",
     val azureDeploymentId: String = "",
     val key: String = "",
