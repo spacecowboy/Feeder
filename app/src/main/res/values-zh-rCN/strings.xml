@@ -278,4 +278,7 @@
     <string name="text">文本</string>
     <string name="text_settings">文本设置</string>
     <string name="could_not_remove_font">无法移除字体</string>
+    <string name="time_out">超时(秒)</string>
+    <string name="time_out_validation_error">超时时间必须在 30 到 600 秒之间</string>
+    <string name="time_out_placeholder">OpenAI 请求的超时时间</string>
 </resources>
