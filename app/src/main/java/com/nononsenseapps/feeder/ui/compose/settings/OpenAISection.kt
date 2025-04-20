@@ -155,8 +155,10 @@ fun OpenAISectionEdit(
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var timeoutString by remember { mutableStateOf(current.timeout) }
-    val isTimeoutInputValid = timeoutString.isNotEmpty() &&
-            timeoutString.isDigitsOnly() && timeoutString.toInt() in 30..600
+    val isTimeoutInputValid =
+        timeoutString.isNotEmpty() &&
+            timeoutString.isDigitsOnly() &&
+            timeoutString.toInt() in 30..600
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier.verticalScroll(scrollState),
@@ -228,11 +230,12 @@ fun OpenAISectionEdit(
         )
 
         TextField(
-            modifier = Modifier.fillMaxWidth().onFocusChanged {
-                if (!(it.isFocused || isTimeoutInputValid)){
-                    timeoutString = timeoutString.toInt().coerceIn(30, 600).toString()
-                }
-            },
+            modifier =
+                Modifier.fillMaxWidth().onFocusChanged {
+                    if (!(it.isFocused || isTimeoutInputValid)) {
+                        timeoutString = timeoutString.toInt().coerceIn(30, 600).toString()
+                    }
+                },
             value = timeoutString,
             placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
             label = {
@@ -240,13 +243,13 @@ fun OpenAISectionEdit(
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             supportingText = {
-                if (!isTimeoutInputValid){
+                if (!isTimeoutInputValid) {
                     Text(stringResource(R.string.time_out_validation_error))
                 }
             },
             onValueChange = { input ->
                 timeoutString = input.filter { it.isDigit() }
-                if (isTimeoutInputValid){
+                if (isTimeoutInputValid) {
                     onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeout = timeoutString)))
                 }
             },
