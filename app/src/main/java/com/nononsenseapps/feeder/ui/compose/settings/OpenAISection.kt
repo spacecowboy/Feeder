@@ -46,7 +46,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
@@ -156,8 +155,7 @@ fun OpenAISectionEdit(
     var timeoutString by remember { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         timeoutString.trim().isNotEmpty() &&
-            timeoutString.isDigitsOnly() &&
-            timeoutString.toInt() in 30..600
+            timeoutString.toIntOrNull()?.takeIf { it in 30..600 } != null
     val scrollState = rememberScrollState()
     Column(
         modifier = modifier.verticalScroll(scrollState),
