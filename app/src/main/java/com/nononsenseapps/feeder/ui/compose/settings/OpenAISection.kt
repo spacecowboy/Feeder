@@ -37,7 +37,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -154,9 +153,9 @@ fun OpenAISectionEdit(
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
-    var timeoutString by remember { mutableStateOf(current.timeout) }
+    var timeoutString by remember { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
-        timeoutString.isNotEmpty() &&
+        timeoutString.trim().isNotEmpty() &&
             timeoutString.isDigitsOnly() &&
             timeoutString.toInt() in 30..600
     val scrollState = rememberScrollState()
@@ -231,11 +230,7 @@ fun OpenAISectionEdit(
 
         TextField(
             modifier =
-                Modifier.fillMaxWidth().onFocusChanged {
-                    if (!(it.isFocused || isTimeoutInputValid)) {
-                        timeoutString = timeoutString.toInt().coerceIn(30, 600).toString()
-                    }
-                },
+                Modifier.fillMaxWidth(),
             value = timeoutString,
             placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
             label = {
@@ -248,9 +243,9 @@ fun OpenAISectionEdit(
                 }
             },
             onValueChange = { input ->
-                timeoutString = input.filter { it.isDigit() }
-                if (isTimeoutInputValid) {
-                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeout = timeoutString)))
+                timeoutString = input.filter { it.isDigit() && !it.isWhitespace() }
+                if (timeoutString.isNotEmpty()) {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
                 }
             },
             isError = !isTimeoutInputValid,
