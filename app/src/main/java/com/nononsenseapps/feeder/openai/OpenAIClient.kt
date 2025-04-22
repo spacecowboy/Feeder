@@ -42,7 +42,7 @@ class OpenAIClientDefault(
 private fun OpenAISettings.toOpenAIConfig(): OpenAIConfig =
     OpenAIConfig(
         token = key,
-        timeout = Timeout(socket = timeoutSeconds.seconds),
+        timeout = Timeout(socket = timeoutSeconds.coerceIn(30, 600).seconds),
         logging = LoggingConfig(logLevel = LogLevel.Headers, sanitize = !BuildConfig.DEBUG),
         host = toOpenAIHost(withAzureDeploymentId = false),
         httpClientConfig = {
