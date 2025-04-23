@@ -476,7 +476,7 @@ class SettingsStore(
             .putString(PREF_OPENAI_URL, value.baseUrl)
             .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
             .putString(PREF_OPENAI_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
-            .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds.coerceIn(30, 600))
+            .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
             .apply()
     }
 
