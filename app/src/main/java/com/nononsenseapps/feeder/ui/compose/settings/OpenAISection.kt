@@ -144,9 +144,7 @@ private fun OpenAISectionItem(
     }
 }
 
-fun isTimeoutInputValid(input: String): Boolean {
-    return input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
-}
+fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
 
 @Composable
 fun OpenAISectionEdit(
