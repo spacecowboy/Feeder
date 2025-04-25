@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -36,11 +38,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -137,6 +144,8 @@ private fun OpenAISectionItem(
     }
 }
 
+fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
+
 @Composable
 fun OpenAISectionEdit(
     state: OpenAISettingsState,
@@ -150,7 +159,14 @@ fun OpenAISectionEdit(
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
+    var timeoutString by remember { mutableStateOf(current.timeoutSeconds.toString()) }
+    val isTimeoutInputValid =
+        remember(timeoutString) {
+            isTimeoutInputValid(timeoutString)
+        }
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -161,6 +177,17 @@ fun OpenAISectionEdit(
             label = {
                 Text(stringResource(R.string.api_key))
             },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Ascii,
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(key = it)))
             },
@@ -173,6 +200,17 @@ fun OpenAISectionEdit(
             label = {
                 Text(stringResource(R.string.model_id))
             },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Ascii,
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
             },
@@ -215,16 +253,72 @@ fun OpenAISectionEdit(
             label = {
                 Text(stringResource(R.string.url))
             },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Uri,
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
             },
         )
+
+        TextField(
+            modifier =
+                Modifier.fillMaxWidth(),
+            value = timeoutString,
+            placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
+            label = {
+                Text(stringResource(R.string.time_out))
+            },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
+            supportingText = {
+                if (!isTimeoutInputValid) {
+                    Text(stringResource(R.string.time_out_validation_error))
+                }
+            },
+            onValueChange = { input ->
+                timeoutString = input
+                if (isTimeoutInputValid(timeoutString)) {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
+                }
+            },
+            isError = !isTimeoutInputValid,
+        )
+
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = current.azureDeploymentId,
             label = {
                 Text(stringResource(R.string.azure_deployment_id))
             },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Ascii,
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureDeploymentId = it)))
             },
@@ -239,6 +333,17 @@ fun OpenAISectionEdit(
             label = {
                 Text(stringResource(R.string.azure_api_version))
             },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Ascii,
+                    imeAction = ImeAction.Done,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                    },
+                ),
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureApiVersion = it)))
             },

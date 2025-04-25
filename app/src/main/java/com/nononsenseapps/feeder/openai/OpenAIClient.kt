@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.openai
 import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.core.RequestOptions
+import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.Model
 import com.aallam.openai.client.LoggingConfig
@@ -14,6 +15,7 @@ import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.url
 import io.ktor.http.appendPathSegments
+import kotlin.time.Duration.Companion.seconds
 
 interface OpenAIClient {
     suspend fun models(requestOptions: RequestOptions? = null): List<Model>
@@ -40,6 +42,7 @@ class OpenAIClientDefault(
 private fun OpenAISettings.toOpenAIConfig(): OpenAIConfig =
     OpenAIConfig(
         token = key,
+        timeout = Timeout(socket = timeoutSeconds.coerceIn(30, 600).seconds),
         logging = LoggingConfig(logLevel = LogLevel.Headers, sanitize = !BuildConfig.DEBUG),
         host = toOpenAIHost(withAzureDeploymentId = false),
         httpClientConfig = {

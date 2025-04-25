@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.ui.compose.settings.getFontSelectionFromPath
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
-import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.getStringNonNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -463,6 +462,7 @@ class SettingsStore(
                 baseUrl = sp.getStringNonNull(PREF_OPENAI_URL, ""),
                 azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, ""),
                 azureDeploymentId = sp.getStringNonNull(PREF_OPENAI_AZURE_DEPLOYMENT_ID, ""),
+                timeoutSeconds = sp.getInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, 30),
             ),
         )
     val openAiSettings = _openAiSettings.asStateFlow()
@@ -476,6 +476,7 @@ class SettingsStore(
             .putString(PREF_OPENAI_URL, value.baseUrl)
             .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
             .putString(PREF_OPENAI_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
+            .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
             .apply()
     }
 
@@ -604,6 +605,7 @@ const val PREF_OPENAI_MODEL_ID = "pref_openai_model_id"
 const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
+const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
 
 /**
  * Appearance settings
@@ -724,6 +726,7 @@ enum class SwipeAsRead(
 data class OpenAISettings(
     val modelId: String = "",
     val baseUrl: String = "",
+    val timeoutSeconds: Int = 30,
     val azureApiVersion: String = "",
     val azureDeploymentId: String = "",
     val key: String = "",

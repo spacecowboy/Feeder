@@ -228,6 +228,9 @@
   <string name="failed_to_fetch_full_article_missing_link">Feed is missing link to article</string>
   <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
   <string name="max_lines">Max lines</string>
+  <string name="time_out">Timeout (seconds)</string>
+  <string name="time_out_validation_error">Timeout must be between 30 and 600 seconds</string>
+  <string name="time_out_placeholder">Timeout for OpenAI requests</string>
   <string name="filter_noun">Filter</string>
   <string name="recently_read_adjective">Recently read</string>
   <string name="read_adjective">Read</string>
