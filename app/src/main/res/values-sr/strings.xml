@@ -278,4 +278,7 @@
     <string name="text_settings">Подешавања текста</string>
     <string name="text">Текст</string>
     <string name="italic">Курзив</string>
+    <string name="time_out_placeholder">Тајмаут за OpenAI захтеве</string>
+    <string name="time_out_validation_error">Тајмаут мора да буде између 30 и 600 секунди</string>
+    <string name="time_out">Тајмаут (секунди)</string>
 </resources>
