@@ -278,4 +278,7 @@
     <string name="could_not_add_font">Schriftart konnte nicht hinzugefügt werden</string>
     <string name="could_not_remove_font">Schriftart konnte nicht entfernt werden</string>
     <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
+    <string name="time_out_placeholder">Zeitüberschreitung für OpenAI-Anfragen</string>
+    <string name="time_out">Zeitüberschreitung (Sekunden)</string>
+    <string name="time_out_validation_error">Die Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
 </resources>
