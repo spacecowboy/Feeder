@@ -278,4 +278,7 @@
     <string name="could_not_add_font">Nepodařilo se přidat font</string>
     <string name="could_not_remove_font">Nepodařilo se smazat font</string>
     <string name="something_went_wrong">Něco se nepovedlo</string>
+    <string name="time_out">Časový limit (sekundy)</string>
+    <string name="time_out_placeholder">Časový limit pro OpenAI požadavky</string>
+    <string name="time_out_validation_error">Časový limit musí být v rozmezí 30 až 600 sekund</string>
 </resources>
