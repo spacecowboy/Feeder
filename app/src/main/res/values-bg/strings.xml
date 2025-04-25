@@ -278,4 +278,7 @@
     <string name="font">Шрифт</string>
     <string name="could_not_remove_font">Шрифтът не можа да бъде премахнат</string>
     <string name="add_font">Добавяне на шрифт…</string>
+    <string name="time_out">Време за изчакване (секунди)</string>
+    <string name="time_out_validation_error">Времето за изчакване трябва да бъде между 30 и 600 секунди</string>
+    <string name="time_out_placeholder">Време за изчакване за OpenAI заявки</string>
 </resources>
