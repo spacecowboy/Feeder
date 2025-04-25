@@ -278,4 +278,7 @@
     <string name="text_preview">Podgląd tekstu</string>
     <string name="add_font">Dodaj czcionkę…</string>
     <string name="could_not_add_font">Nie udało się dodać czcionki</string>
+    <string name="time_out_placeholder">Limit czasu dla zapytań OpenAI</string>
+    <string name="time_out">Limit czasu zapytania (sekundy)</string>
+    <string name="time_out_validation_error">Limit czasu musi być między 30 a 600 sekund</string>
 </resources>
