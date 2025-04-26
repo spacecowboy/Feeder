@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] - 2025-04-26
+
+### 🐛 Bug Fixes & Minor Changes
+- Added ability to set timeout in OpenAI config (#714) by @KevinSJ in [#714](https://github.com/spacecowboy/feeder/pull/714) 
+
+### 🌐 Translations
+- Updated Latvian translation using Weblate by @Coool in [commit](https://github.com/spacecowboy/feeder/commit/de1d0e6fe31244af06495d7d8513e62dd5a917ab)
+- Updated French translation using Weblate by @Matth7878 in [commit](https://github.com/spacecowboy/feeder/commit/327d691c9b039808121889966143fe1510761189)
+- Updated Norwegian Bokmål translation using Weblate by @bbacow2 in [commit](https://github.com/spacecowboy/feeder/commit/9b8a9384074fac52450ee210daf50814683d3c8d)
+- Updated Ukrainian translation using Weblate by @andmizyk in [#711](https://github.com/spacecowboy/feeder/pull/711) 
+- Updated Czech translation using Weblate in [#713](https://github.com/spacecowboy/feeder/pull/713) 
+- Updated Spanish translation using Weblate by @Eskuero in [commit](https://github.com/spacecowboy/feeder/commit/ced52c57a40580eb39a72962d9a587e2e36171e9)
+- Updated Polish translation using Weblate by @Aga-C in [commit](https://github.com/spacecowboy/feeder/commit/c91ab1b40a9b5f848bfffd4ca7be673bed4d56ac)
+- Updated Serbian translation using Weblate by @eevan78 in [commit](https://github.com/spacecowboy/feeder/commit/aea72a66f0ccd46dff602170e794971e38a36899)
+- Updated German translation using Weblate by @VfBFan in [commit](https://github.com/spacecowboy/feeder/commit/c3f8f0d914936356f6dc64297f5c8908a07ce83b)
+- Updated Bulgarian translation using Weblate by @trunars in [#717](https://github.com/spacecowboy/feeder/pull/717) 
+
+### ❤️  New Contributors
+* @bbacow2 made their first contribution
+
 ## [2.11.0] - 2025-04-11
 
 ### 🚀 Features
@@ -4458,6 +4478,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.11.1]: https://github.com/spacecowboy/feeder/compare/2.11.0..2.11.1
 [2.11.0]: https://github.com/spacecowboy/feeder/compare/2.10.2..2.11.0
 [2.10.2]: https://github.com/spacecowboy/feeder/compare/2.10.1..2.10.2
 [2.10.1]: https://github.com/spacecowboy/feeder/compare/2.10.0..2.10.1
