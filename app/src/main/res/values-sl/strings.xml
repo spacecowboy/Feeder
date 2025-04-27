@@ -278,4 +278,7 @@
     <string name="no_models_were_found">Ni bilo mogoče najti modelov</string>
     <string name="azure_deployment_id">Azure deployment identifikacija</string>
     <string name="list_of_available_models">Seznam razpoložljivih modelov</string>
+    <string name="time_out_placeholder">Časovni iztek za OpenAI zahteve</string>
+    <string name="time_out">Časovni iztek (v sekundah)</string>
+    <string name="time_out_validation_error">Časovni iztek mora biti med 30 in 600 sekundami</string>
 </resources>
