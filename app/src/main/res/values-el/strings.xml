@@ -278,4 +278,7 @@
     <string name="could_not_add_font">Δεν ήταν δυνατή η προσθήκη γραμματοσειράς</string>
     <string name="could_not_remove_font">Δεν ήταν δυνατή η αφαίρεση γραμματοσειράς</string>
     <string name="something_went_wrong">Κάτι πήγε στραβά</string>
+    <string name="time_out">Χρονικό όριο (δευτερόλεπτα)</string>
+    <string name="time_out_validation_error">Το χρονικό όριο πρέπει να είναι μεταξύ 30 και 600 δευτερολέπτων</string>
+    <string name="time_out_placeholder">Χρονικό όριο για αιτήσεις OpenAI</string>
 </resources>
