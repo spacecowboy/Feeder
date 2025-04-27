@@ -278,4 +278,7 @@
     <string name="could_not_remove_font">Не можливо вилучити шрифт</string>
     <string name="something_went_wrong">Щось пішло не так</string>
     <string name="bold">Жирний</string>
+    <string name="time_out">Час завершення (секунди)</string>
+    <string name="time_out_placeholder">Час завершення для запитів OpenAI</string>
+    <string name="time_out_validation_error">Час завершення має бути між 30 і 600 секунд</string>
 </resources>
