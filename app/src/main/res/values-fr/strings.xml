@@ -278,4 +278,7 @@
     <string name="something_went_wrong">Quelque chose ne s\'est pas bien passé</string>
     <string name="could_not_remove_font">Impossible de supprimer la police</string>
     <string name="text_settings">Affichage du texte</string>
+    <string name="time_out_validation_error">Le timeout doit être compris entre 30 et 600 secondes</string>
+    <string name="time_out_placeholder">Timeout lors des requêtes à OpenAI</string>
+    <string name="time_out">Timeout (secondes)</string>
 </resources>
