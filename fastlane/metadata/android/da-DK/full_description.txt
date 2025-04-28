@@ -17,3 +17,5 @@
 <li>Praktisk adgang til indkapslingslinks</li>
 <li>Material design</li>
 </ul>
+
+Fuld ændringslog er tilgængelig <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
