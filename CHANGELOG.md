@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.2] - 2025-05-04
+
+### 🌐 Translations
+- Updated French translation using Weblate by @Matth7878 in [commit](https://github.com/spacecowboy/feeder/commit/1673835622dfef8a581fa1ef450a6016f6e07e84)
+- Updated Slovenian translation using Weblate by @StellarStoic in [commit](https://github.com/spacecowboy/feeder/commit/8c7f0419eb53fdf3b3d9abe9688d2011f0a700b8)
+- Updated Ukrainian translation using Weblate by @andmizyk in [commit](https://github.com/spacecowboy/feeder/commit/786bf529021400fc4f58f69086e9ad81954d6fba)
+- Updated Hungarian translation using Weblate by @summoner001 in [commit](https://github.com/spacecowboy/feeder/commit/6a9b06746f0e00b4269db476647834b360c803da)
+- Updated Greek translation using Weblate by @GiannosOB in [#719](https://github.com/spacecowboy/feeder/pull/719) 
+- Updated Danish translation using Weblate in [#721](https://github.com/spacecowboy/feeder/pull/721) 
+
+### ❤️  New Contributors
+* @GiannosOB made their first contribution in [#719](https://github.com/spacecowboy/feeder/pull/719)
+* @StellarStoic made their first contribution
+
 ## [2.11.1] - 2025-04-26
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -4478,6 +4492,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.11.2]: https://github.com/spacecowboy/feeder/compare/2.11.1..2.11.2
 [2.11.1]: https://github.com/spacecowboy/feeder/compare/2.11.0..2.11.1
 [2.11.0]: https://github.com/spacecowboy/feeder/compare/2.10.2..2.11.0
 [2.10.2]: https://github.com/spacecowboy/feeder/compare/2.10.1..2.10.2
