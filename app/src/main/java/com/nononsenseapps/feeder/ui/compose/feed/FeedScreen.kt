@@ -584,8 +584,10 @@ fun FeedScreen(
                                         },
                             ) {
                                 DropdownMenuItem(
-                                    enabled = false,
-                                    onClick = { /* Can't be modified - only shown for completeness */ },
+                                    onClick = {
+                                        filterCallback.setUnread(!viewState.filter.unread)
+                                        onShowFilterMenu(false)
+                                    },
                                     leadingIcon = {
                                         Icon(
                                             when (viewState.filter.unread) {
