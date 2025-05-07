@@ -33,7 +33,6 @@ import com.nononsenseapps.feeder.db.legacy.FEED_ITEM_TABLE_NAME
 import com.nononsenseapps.feeder.db.legacy.FEED_TABLE_NAME
 import com.nononsenseapps.feeder.db.legacy.LegacyDatabaseHandler
 import com.nononsenseapps.feeder.db.legacy.createViewsAndTriggers
-import com.nononsenseapps.feeder.util.DoNotUseInProd
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
@@ -55,7 +54,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-@OptIn(DoNotUseInProd::class)
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MigrationFromLegacy6ToLatest {
@@ -243,7 +241,7 @@ class MigrationFromLegacy6ToLatest {
             roomDb.let { db ->
                 val feed = db.feedDao().getAllFeeds()[0]
                 assertEquals("feedA", feed.title)
-                val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+                val items = db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId = feed.id)
 
                 assertEquals(2, items.size)
 
@@ -277,7 +275,7 @@ class MigrationFromLegacy6ToLatest {
             roomDb.let { db ->
                 val feed = db.feedDao().getAllFeeds()[1]
                 assertEquals("feedB", feed.title)
-                val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+                val items = db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId = feed.id)
 
                 assertEquals(2, items.size)
 
