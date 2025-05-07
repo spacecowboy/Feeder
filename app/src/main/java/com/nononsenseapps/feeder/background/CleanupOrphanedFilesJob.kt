@@ -46,9 +46,6 @@ class CleanupOrphanedFilesJob(
             // Clean up article files in articleDir
             cleanupDirectory(filePathProvider.articleDir, validFeedItemIds, ::blobFile)
 
-            // Clean up article files in oldArticleDir
-            cleanupDirectory(filePathProvider.oldArticleDir, validFeedItemIds, ::blobFile)
-
             // Clean up full article files in fullArticleDir
             cleanupDirectory(filePathProvider.fullArticleDir, validFeedItemIds, ::blobFullFile)
 
