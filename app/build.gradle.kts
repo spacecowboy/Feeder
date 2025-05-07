@@ -130,7 +130,7 @@ android {
             isReturnDefaultValues = true
         }
         managedDevices {
-            devices {
+            allDevices {
                 maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel2api30").apply {
                     // Use device profiles you typically see in Android Studio.
                     device = "Pixel 2"

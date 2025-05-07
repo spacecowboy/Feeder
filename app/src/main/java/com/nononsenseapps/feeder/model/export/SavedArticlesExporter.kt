@@ -42,10 +42,8 @@ suspend fun exportSavedArticles(
                         feedItemDao
                             .getLinksOfBookmarks()
                             .forEach { link ->
-                                if (link != null) {
-                                    bw.write(link)
-                                    bw.newLine()
-                                }
+                                bw.write(link)
+                                bw.newLine()
                             }
                     }
                 }
