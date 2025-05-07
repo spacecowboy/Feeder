@@ -183,7 +183,7 @@ class RssLocalSyncKtTest : DIAware {
                 10,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyJsonId)
                     .size,
             )
         }
@@ -210,7 +210,7 @@ class RssLocalSyncKtTest : DIAware {
                 15,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
         }
@@ -238,7 +238,7 @@ class RssLocalSyncKtTest : DIAware {
                 13,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(duplicateIdRss)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(duplicateIdRss)
                     .size,
             )
         }
@@ -271,7 +271,7 @@ class RssLocalSyncKtTest : DIAware {
                 10,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyJsonId)
                     .size,
             )
 
@@ -280,7 +280,7 @@ class RssLocalSyncKtTest : DIAware {
                 15,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
         }
@@ -515,7 +515,7 @@ class RssLocalSyncKtTest : DIAware {
 
             // Assert the feed was retrieved
             assertEquals("/news-rss.xml", server.takeRequest().path)
-            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
             assertEquals(
                 "Unique IDs should have been generated for items",
                 99,
@@ -557,7 +557,7 @@ class RssLocalSyncKtTest : DIAware {
             // Assert the feed was retrieved
             assertEquals("/rss", server.takeRequest().path)
 
-            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
 
             assertNotNull(
                 "Item should have gotten a pubDate generated",
@@ -617,7 +617,7 @@ class RssLocalSyncKtTest : DIAware {
             // Assert the feed was retrieved
             assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
+            testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId).let { items ->
                 assertEquals(
                     "Feed should have no less items than in the raw feed even if that's more than cleanup count",
                     feedItemCount,
@@ -643,7 +643,7 @@ class RssLocalSyncKtTest : DIAware {
                 15,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
         }
@@ -663,7 +663,7 @@ class RssLocalSyncKtTest : DIAware {
                 0,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
         }
@@ -683,7 +683,7 @@ class RssLocalSyncKtTest : DIAware {
                 15,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
 
@@ -699,7 +699,7 @@ class RssLocalSyncKtTest : DIAware {
                 0,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyJsonId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyJsonId)
                     .size,
             )
         }
@@ -719,7 +719,7 @@ class RssLocalSyncKtTest : DIAware {
                 15,
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
                     .size,
             )
 
@@ -736,7 +736,7 @@ class RssLocalSyncKtTest : DIAware {
             val items =
                 testDb.db
                     .feedItemDao()
-                    .loadFeedItemsInFeedDesc(cowboyAtomId)
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
 
             assertEquals(
                 "Items should have been deleted, one is left over due to math",

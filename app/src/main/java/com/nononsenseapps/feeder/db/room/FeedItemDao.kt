@@ -17,7 +17,6 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PREVIEW_COLUMNS
 import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.util.DoNotUseInProd
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
@@ -100,7 +99,6 @@ interface FeedItemDao {
     )
     suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
-    @DoNotUseInProd
     @Query(
         """
         SELECT *
@@ -109,7 +107,7 @@ interface FeedItemDao {
         ORDER BY primary_sort_time DESC, pub_date DESC
         """,
     )
-    suspend fun loadFeedItemsInFeedDesc(feedId: Long): List<FeedItem>
+    suspend fun loadFeedItemsInFeedDescDoNotUseInProd(feedId: Long): List<FeedItem>
 
     @Query(
         """
@@ -233,7 +231,7 @@ interface FeedItemDao {
         SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag 
+        WHERE tag IS :tag
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND block_time is null
