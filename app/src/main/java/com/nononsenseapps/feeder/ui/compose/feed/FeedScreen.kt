@@ -368,11 +368,11 @@ fun FeedScreen(
                 }
             },
             drawerState = drawerState,
-            markAsUnread = { itemId, unread, feedOrTag ->
+            markAsUnread = { itemId, unread ->
                 if (unread) {
                     viewModel.markAsUnread(itemId)
                 } else {
-                    viewModel.markAsRead(itemId, feedOrTag)
+                    viewModel.markAsRead(itemId)
                 }
             },
             markAsReadOnSwipe = { itemId, unread, saved ->
@@ -392,7 +392,7 @@ fun FeedScreen(
                     }
 
                     else -> {
-                        viewModel.markAsRead(itemId, null)
+                        viewModel.markAsRead(itemId)
                     }
                 }
             },
@@ -456,7 +456,7 @@ fun FeedScreen(
     onExportOPML: () -> Unit,
     onExportSavedArticles: () -> Unit,
     drawerState: DrawerState,
-    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
@@ -1173,7 +1173,7 @@ fun FeedListContent(
     viewState: FeedScreenViewState,
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
-    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
@@ -1275,7 +1275,7 @@ fun FeedListContent(
                             if (itemWasVisible) {
                                 coroutineScope.launch {
                                     logDebug(LOG_TAG, "Marking ${previewItem.id} as read")
-                                    markAsUnread(previewItem.id, false, viewState.currentFeedOrTag)
+                                    markAsUnread(previewItem.id, false)
                                 }
                             }
                         }
@@ -1357,7 +1357,7 @@ fun FeedListContent(
                                                         // Marks as read in disposable effect
                                                     } else {
                                                         logDebug(LOG_TAG, "Item $itemIndex marking as read")
-                                                        markAsUnread(previewItem.id, false, viewState.currentFeedOrTag)
+                                                        markAsUnread(previewItem.id, false)
                                                     }
                                                 }
                                             }
@@ -1408,7 +1408,7 @@ fun FeedGridContent(
     viewState: FeedScreenViewState,
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
-    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
+    markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
@@ -1489,7 +1489,7 @@ fun FeedGridContent(
                             if (itemWasVisible) {
                                 coroutineScope.launch {
                                     logDebug(LOG_TAG, "Marking ${previewItem.id} as read")
-                                    markAsUnread(previewItem.id, false, viewState.currentFeedOrTag)
+                                    markAsUnread(previewItem.id, false)
                                 }
                             }
                         }
@@ -1561,7 +1561,7 @@ fun FeedGridContent(
                                                 // Marks as read in disposable effect
                                             } else {
                                                 logDebug(LOG_TAG, "Item $itemIndex marking as read")
-                                                markAsUnread(previewItem.id, false, viewState.currentFeedOrTag)
+                                                markAsUnread(previewItem.id, false)
                                             }
                                         }
                                     }
