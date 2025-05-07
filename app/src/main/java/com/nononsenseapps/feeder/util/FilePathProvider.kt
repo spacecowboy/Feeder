@@ -15,6 +15,11 @@ interface FilePathProvider {
     val articleDir: File
 
     /**
+     * This is where articles regular text used to be placed. Kept for backwards compatibility.
+     */
+    val oldArticleDir: File
+
+    /**
      * This is where the full text of articles should be placed
      */
     val fullArticleDir: File
@@ -44,7 +49,8 @@ private class FilePathProviderImpl(
     override val cacheDir: File,
     override val filesDir: File,
 ) : FilePathProvider {
-    override val articleDir: File = cacheDir.resolve("articles")
+    override val articleDir: File = filesDir.resolve("articles")
+    override val oldArticleDir: File = cacheDir.resolve("articles")
     override val fullArticleDir: File = cacheDir.resolve("full_articles")
     override val httpCacheDir: File = cacheDir.resolve("http")
     override val imageCacheDir: File = cacheDir.resolve("image_cache")

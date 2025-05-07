@@ -429,6 +429,16 @@ class RssLocalSync(
                         }
                         Unit
                     }
+                    blobFile(itemId = id, filesDir = filePathProvider.oldArticleDir).let { file ->
+                        try {
+                            if (file.isFile) {
+                                file.delete()
+                            }
+                        } catch (e: IOException) {
+                            Log.e(LOG_TAG, "Failed to delete $file", e)
+                        }
+                        Unit
+                    }
                     blobFullFile(
                         itemId = id,
                         filesDir = filePathProvider.fullArticleDir,
