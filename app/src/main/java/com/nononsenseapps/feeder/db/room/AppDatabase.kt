@@ -168,18 +168,19 @@ class MigrationFrom36To37(
                 Log.i(LOG_TAG, "Source directory does not exist: ${srcDir.absolutePath}")
                 return
             }
-            srcDir.list { _, name ->
-                name.endsWith(".txt.gz")
-            }?.forEach { name ->
-                try {
-                    val src = srcDir.resolve(name)
-                    val dst = filePathProvider.articleDir.resolve(name)
+            srcDir
+                .list { _, name ->
+                    name.endsWith(".txt.gz")
+                }?.forEach { name ->
+                    try {
+                        val src = srcDir.resolve(name)
+                        val dst = filePathProvider.articleDir.resolve(name)
 
-                    src.renameTo(dst)
-                } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to delete: $name", t)
+                        src.renameTo(dst)
+                    } catch (t: Throwable) {
+                        Log.e(LOG_TAG, "Failed to delete: $name", t)
+                    }
                 }
-            }
 
             Log.i(LOG_TAG, "Completed migration of article files")
         } catch (e: Exception) {

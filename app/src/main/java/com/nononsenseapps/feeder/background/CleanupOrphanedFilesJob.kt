@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit
 class CleanupOrphanedFilesJob(
     context: Context,
     override val params: JobParameters,
-) : BackgroundJob, DIAware {
+) : BackgroundJob,
+    DIAware {
     override val di: DI by closestDI(context)
 
     private val filePathProvider: FilePathProvider by instance()
@@ -66,9 +67,10 @@ class CleanupOrphanedFilesJob(
         }
 
         val validFilePaths =
-            validIds.map { id ->
-                fileProvider(id, directory).canonicalPath
-            }.toSet()
+            validIds
+                .map { id ->
+                    fileProvider(id, directory).canonicalPath
+                }.toSet()
 
         var deletedCount = 0
         withContext(Dispatchers.IO) {
@@ -117,7 +119,8 @@ fun schedulePeriodicOrphanedFilesCleanup(di: DI) {
         val dailyIntervalMillis = TimeUnit.DAYS.toMillis(1)
 
         val jobInfo =
-            JobInfo.Builder(BackgroundJobId.CLEANUP_ORPHANED_FILES.jobId, componentName)
+            JobInfo
+                .Builder(BackgroundJobId.CLEANUP_ORPHANED_FILES.jobId, componentName)
                 // Run when device is idle
                 .setRequiresDeviceIdle(true)
                 // Run when device is charging
