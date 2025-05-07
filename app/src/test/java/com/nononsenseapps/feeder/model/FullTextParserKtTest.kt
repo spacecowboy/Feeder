@@ -13,8 +13,13 @@ class FullTextParserKtTest {
                 parseFullArticle("https://www.phoronix.com/news/Removing-SystemV-Filesystem", String(phoronix)),
             )
 
-        // Example where there is no explicit space between the end of a paragraph and the start of a link
-        assertContains(fullHtml, "The SystemV file-system was</p><a")
+        // Used to be example where there is no explicit space between the end of a paragraph and the start of a link
+        // Upgrade to JSoup changed that
+        assertContains(
+            fullHtml,
+            "he SystemV file-system was</p>\n" +
+                "  <a",
+        )
     }
 
     @Test
