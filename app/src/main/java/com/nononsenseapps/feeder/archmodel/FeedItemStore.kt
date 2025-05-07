@@ -35,6 +35,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.ArrayList
 import java.util.Locale
 
 class FeedItemStore(
@@ -126,23 +127,27 @@ class FeedItemStore(
         append("block_time is null\n")
         // List filter
         if (!onlySavedArticles) {
-            append("AND (\n")
-            if (filter.unread && !filter.recentlyRead && !filter.read) {
-                append("read_time is null\n")
-            } else {
-                append("(read_time is null or read_time >= ?)\n").also {
-                    args.add(
-                        when {
-                            filter.read -> Instant.EPOCH
-                            else -> minReadTime
-                        }.toEpochMilli(),
-                    )
-                }
+            val filterQueries = ArrayList<String>()
+            if (filter.unread) {
+                filterQueries.add("read_time is null")
+            }
+            if (filter.read || filter.recentlyRead) {
+                filterQueries.add("read_time >= ?")
+                args.add(
+                    when {
+                        filter.read -> Instant.EPOCH
+                        else -> minReadTime
+                    }.toEpochMilli(),
+                )
             }
             if (filter.saved) {
-                append("OR (bookmarked = 1)\n")
+                filterQueries.add("bookmarked = 1")
             }
-            append(")\n")
+            if (filterQueries.isNotEmpty()) {
+                append("AND (")
+                append(filterQueries.joinToString(separator = "\nOR "))
+                append(")\n")
+            }
         }
 
         when {
