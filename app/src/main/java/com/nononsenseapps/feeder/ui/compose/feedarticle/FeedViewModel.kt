@@ -110,16 +110,10 @@ class FeedViewModel(
             repository.markAsUnread(itemId)
         }
 
-    fun markAsRead(
-        itemId: Long,
-        feedOrTag: FeedOrTag?,
-    ) = applicationCoroutineScope.launch {
-        val (feedId, tag) = repository.currentFeedAndTag.value
-        // Ensure mark as read on scroll doesn't fire when navigating between feeds
-        if (feedOrTag == null || feedId == feedOrTag.id && tag == feedOrTag.tag) {
+    fun markAsRead(itemId: Long) =
+        applicationCoroutineScope.launch {
             repository.markAsReadAndNotified(itemId)
         }
-    }
 
     fun markAsReadOnSwipe(itemId: Long) =
         applicationCoroutineScope.launch {
@@ -235,7 +229,7 @@ class FeedViewModel(
                 navigateToArticle()
             }
         }
-        markAsRead(itemId, null)
+        markAsRead(itemId)
     }
 
     val viewState: StateFlow<FeedScreenViewState> =
