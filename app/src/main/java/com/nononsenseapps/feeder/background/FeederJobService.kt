@@ -58,6 +58,9 @@ class FeederJobService : DIAwareJobService() {
             BackgroundJobId.BLOCKLIST_UPDATE.jobId -> {
                 runJob(BlocklistUpdateJob(context = this, params = params))
             }
+            BackgroundJobId.CLEANUP_ORPHANED_FILES.jobId -> {
+                runJob(CleanupOrphanedFilesJob(context = this, params = params))
+            }
             else -> {
                 Log.i(LOG_TAG, "Unknown job id: ${params.jobId}")
                 false

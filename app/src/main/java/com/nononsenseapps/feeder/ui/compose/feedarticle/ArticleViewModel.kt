@@ -204,8 +204,24 @@ class ArticleViewModel(
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
+                        } else if (blobFile(article.id, filePathProvider.oldArticleDir).isFile) {
+                            try {
+                                blobInputStream(article.id, filePathProvider.oldArticleDir)
+                                    .use {
+                                        htmlLinearizer.linearize(
+                                            inputStream = it,
+                                            baseUrl = article.feedUrl ?: "",
+                                        )
+                                    }.also {
+                                        textToDisplay.update { TextToDisplay.CONTENT }
+                                    }
+                            } catch (e: Exception) {
+                                // EOFException is possible
+                                Log.e(LOG_TAG, "Could not open blob", e)
+                                textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
+                                LinearArticle(elements = emptyList())
+                            }
                         } else {
-                            // TODO use oldArticleDir as fallback
                             Log.e(LOG_TAG, "No default file to parse. Attempting to fetch feed again")
                             // Should not happen after moving articles to filesDir instead of cacheDir
                             // but this is needed as the migration step
