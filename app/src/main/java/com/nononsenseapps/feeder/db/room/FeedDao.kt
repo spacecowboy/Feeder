@@ -130,7 +130,7 @@ interface FeedDao {
     suspend fun loadFeedIdsToNotify(): List<Long>
 
     // Suppressing sort fields
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH, RoomWarnings.QUERY_MISMATCH)
+    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Query(
         """
             -- wrap in select so we can collate in order
