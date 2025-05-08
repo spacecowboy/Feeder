@@ -158,8 +158,9 @@ class MigrationFrom36To37(
 
         try {
             // Ensure target directory exists
-            if (!filePathProvider.articleDir.exists()) {
-                filePathProvider.articleDir.mkdirs()
+            val dstDir = filePathProvider.filesDir.resolve("articles")
+            if (!dstDir.exists()) {
+                dstDir.mkdirs()
             }
 
             // Migrate files from oldArticleDir to articleDir
@@ -174,7 +175,7 @@ class MigrationFrom36To37(
                 }?.forEach { name ->
                     try {
                         val src = srcDir.resolve(name)
-                        val dst = filePathProvider.articleDir.resolve(name)
+                        val dst = dstDir.resolve(name)
 
                         src.renameTo(dst)
                     } catch (t: Throwable) {
@@ -376,7 +377,7 @@ class MigrationFrom24To25(
                 try {
                     filePathProvider.filesDir.resolve(name).delete()
                 } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to delete: $name")
+                    Log.e(LOG_TAG, "Failed to delete: $name", t)
                 }
             }
 
@@ -387,15 +388,15 @@ class MigrationFrom24To25(
             }?.forEach { name ->
                 try {
                     val src = filePathProvider.filesDir.resolve(name)
-                    val dst = filePathProvider.articleDir.resolve(name)
+                    val dst = filePathProvider.cacheDir.resolve("articles").resolve(name)
 
-                    if (!filePathProvider.articleDir.isDirectory) {
-                        filePathProvider.articleDir.mkdirs()
+                    if (!filePathProvider.cacheDir.resolve("articles").isDirectory) {
+                        filePathProvider.cacheDir.resolve("articles").mkdirs()
                     }
 
                     src.renameTo(dst)
                 } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to delete: $name")
+                    Log.e(LOG_TAG, "Failed to delete: $name", t)
                 }
             }
     }
