@@ -163,7 +163,6 @@ class MigrationFrom36To37(
                 dstDir.mkdirs()
             }
 
-            // Migrate files from oldArticleDir to articleDir
             val srcDir = filePathProvider.cacheDir.resolve("articles")
             if (!srcDir.isDirectory) {
                 Log.i(LOG_TAG, "Source directory does not exist: ${srcDir.absolutePath}")

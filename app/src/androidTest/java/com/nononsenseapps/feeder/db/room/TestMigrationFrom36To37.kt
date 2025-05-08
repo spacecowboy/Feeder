@@ -29,6 +29,7 @@ class TestMigrationFrom36To37 : DIAware {
     override val di: DI by closestDI(feederApplication)
     private val filePathProvider: FilePathProvider by instance()
     private val oldDir = File(feederApplication.cacheDir, "articles")
+    private val newDir = File(feederApplication.filesDir, "articles")
 
     @Rule
     @JvmField
@@ -42,7 +43,9 @@ class TestMigrationFrom36To37 : DIAware {
 
     @Before
     fun setUp() {
+        oldDir.deleteRecursively()
         oldDir.mkdirs()
+        newDir.deleteRecursively()
     }
 
     @After
@@ -77,8 +80,6 @@ class TestMigrationFrom36To37 : DIAware {
             true,
             MigrationFrom36To37(di),
         )
-
-        val newDir = feederApplication.filesDir.resolve("articles")
 
         assertTrue {
             newDir.resolve(name1).isFile
