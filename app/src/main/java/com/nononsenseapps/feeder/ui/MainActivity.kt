@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.background.runOnceSyncChainGetUpdates
+import com.nononsenseapps.feeder.background.schedulePeriodicOrphanedFilesCleanup
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
@@ -66,6 +67,9 @@ class MainActivity : DIAwareComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel.ensurePeriodicSyncConfigured()
+
+        // Configure daily cleanup of orphaned article files
+        schedulePeriodicOrphanedFilesCleanup(di)
 
         enableEdgeToEdge()
 

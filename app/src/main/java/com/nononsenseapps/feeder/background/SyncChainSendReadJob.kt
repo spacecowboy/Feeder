@@ -54,7 +54,7 @@ fun runOnceSyncChainSendRead(di: DI) {
     val context: Application by di.instance()
 
     if (!repository.isSyncChainConfigured) {
-        Log.e(SyncChainSendReadJob.LOG_TAG, "Sync chain not enabled")
+        // Not an error, just means that sync chain is not configured
         return
     }
 

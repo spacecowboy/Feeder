@@ -44,7 +44,7 @@ private class FilePathProviderImpl(
     override val cacheDir: File,
     override val filesDir: File,
 ) : FilePathProvider {
-    override val articleDir: File = cacheDir.resolve("articles")
+    override val articleDir: File = filesDir.resolve("articles")
     override val fullArticleDir: File = cacheDir.resolve("full_articles")
     override val httpCacheDir: File = cacheDir.resolve("http")
     override val imageCacheDir: File = cacheDir.resolve("image_cache")

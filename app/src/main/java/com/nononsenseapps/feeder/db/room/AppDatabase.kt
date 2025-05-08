@@ -12,7 +12,6 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceBlocklistUpdate
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
@@ -55,7 +54,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
     views = [
         FeedsWithItemsForNavDrawer::class,
     ],
-    version = 36,
+    version = 37,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -136,12 +135,60 @@ fun getAllMigrations(di: DI) =
         MigrationFrom33To34(di),
         MigrationFrom34To35(di),
         MigrationFrom35To36(di),
+        MigrationFrom36To37(di),
     )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+
+/**
+ * Moving main articles back to data dir because of issues some have
+ * reported with missing files. Possibly due to Android clearing cache.
+ */
+class MigrationFrom36To37(
+    override val di: DI,
+) : Migration(36, 37),
+    DIAware {
+    private val filePathProvider: FilePathProvider by instance()
+
+    override fun migrate(database: SupportSQLiteDatabase) {
+        Log.i(LOG_TAG, "Starting migration of article files from oldArticleDir to articleDir")
+
+        try {
+            // Ensure target directory exists
+            val dstDir = filePathProvider.filesDir.resolve("articles")
+            if (!dstDir.exists()) {
+                dstDir.mkdirs()
+            }
+
+            val srcDir = filePathProvider.cacheDir.resolve("articles")
+            if (!srcDir.isDirectory) {
+                Log.i(LOG_TAG, "Source directory does not exist: ${srcDir.absolutePath}")
+                return
+            }
+            srcDir
+                .list { _, name ->
+                    name.endsWith(".txt.gz")
+                }?.forEach { name ->
+                    try {
+                        val src = srcDir.resolve(name)
+                        val dst = dstDir.resolve(name)
+
+                        src.renameTo(dst)
+                    } catch (t: Throwable) {
+                        Log.e(LOG_TAG, "Failed to delete: $name", t)
+                    }
+                }
+
+            Log.i(LOG_TAG, "Completed migration of article files")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error during migration of article files from oldArticleDir to articleDir", e)
+        }
+    }
+}
+
 class MigrationFrom35To36(
     override val di: DI,
 ) : Migration(35, 36),
@@ -160,8 +207,6 @@ class MigrationFrom34To35(
     override val di: DI,
 ) : Migration(34, 35),
     DIAware {
-    private val repository: Repository by instance()
-
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("drop view feeds_with_items_for_nav_drawer")
 
@@ -331,7 +376,7 @@ class MigrationFrom24To25(
                 try {
                     filePathProvider.filesDir.resolve(name).delete()
                 } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to delete: $name")
+                    Log.e(LOG_TAG, "Failed to delete: $name", t)
                 }
             }
 
@@ -342,15 +387,15 @@ class MigrationFrom24To25(
             }?.forEach { name ->
                 try {
                     val src = filePathProvider.filesDir.resolve(name)
-                    val dst = filePathProvider.articleDir.resolve(name)
+                    val dst = filePathProvider.cacheDir.resolve("articles").resolve(name)
 
-                    if (!filePathProvider.articleDir.isDirectory) {
-                        filePathProvider.articleDir.mkdirs()
+                    if (!filePathProvider.cacheDir.resolve("articles").isDirectory) {
+                        filePathProvider.cacheDir.resolve("articles").mkdirs()
                     }
 
                     src.renameTo(dst)
                 } catch (t: Throwable) {
-                    Log.e(LOG_TAG, "Failed to delete: $name")
+                    Log.e(LOG_TAG, "Failed to delete: $name", t)
                 }
             }
     }
@@ -366,7 +411,7 @@ class MigrationFrom23To24(
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `blocklist`
-                (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                  `glob_pattern` TEXT NOT NULL)
             """.trimIndent(),
         )
@@ -485,13 +530,13 @@ object MIGRATION_19_20 : Migration(19, 20) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
-            ALTER TABLE sync_remote 
+            ALTER TABLE sync_remote
               ADD COLUMN device_id INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
         )
         database.execSQL(
             """
-            ALTER TABLE sync_remote 
+            ALTER TABLE sync_remote
               ADD COLUMN device_name TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
         )
