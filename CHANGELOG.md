@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.3] - 2025-05-10
+
+### 🐛 Bug Fixes & Minor Changes
+- Improved behavior of mark as read on scroll (#737) by @spacecowboy in [#737](https://github.com/spacecowboy/feeder/pull/737) 
+- Fixed mark as read on scroll not firing when navigating (#738) by @spacecowboy in [#738](https://github.com/spacecowboy/feeder/pull/738) 
+- Moved articles (not full) out of cache dir to avoid Android deleting them (#742) by @spacecowboy in [#742](https://github.com/spacecowboy/feeder/pull/742) 
+
+### 🌐 Translations
+- Updated Hungarian translation using Weblate by @summoner001 in [#732](https://github.com/spacecowboy/feeder/pull/732) 
+
+
 ## [2.11.2] - 2025-05-04
 
 ### 🌐 Translations
@@ -555,7 +566,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Chinese (Simplified) translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/8dd7ee20dd12db7358185c837ebf525c12743d8d)
 - Updated Hungarian translation using Weblate by @zoli111 in [commit](https://github.com/spacecowboy/feeder/commit/2d57c6355c084531436329f519bc38b6959f73a7)
 - Translated using Weblate (Thai) by @bowornsin in [commit](https://github.com/spacecowboy/feeder/commit/3d094c7d61e2dfca0ea52e07c7ab6ffc163fb410)
-- Translated using Weblate (Dutch) by @5mikachu in [commit](https://github.com/spacecowboy/feeder/commit/d3f877f0b8060b7057b896727c1ab1d357e8e7df)
+- Translated using Weblate (Dutch) in [commit](https://github.com/spacecowboy/feeder/commit/d3f877f0b8060b7057b896727c1ab1d357e8e7df)
 - Updated Czech translation using Weblate by @pchelium in [commit](https://github.com/spacecowboy/feeder/commit/72fdcc0f4e54bb5545b7ebe88e8805081f656bbd)
 - Updated Spanish translation using Weblate by @gallegonovato in [commit](https://github.com/spacecowboy/feeder/commit/6e7caea3d42fa2c38c11d4375cbbc28d14032d93)
 - Updated French translation using Weblate by @Matth7878 in [commit](https://github.com/spacecowboy/feeder/commit/c4a15c318715f3acfb086385044136be4265a733)
@@ -567,7 +578,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Japanese translation using Weblate by @spacecowboy in [#235](https://github.com/spacecowboy/feeder/pull/235) 
 
 ### ❤️  New Contributors
-* @5mikachu made their first contribution
 * @anod made their first contribution in [#243](https://github.com/spacecowboy/feeder/pull/243)
 * @dracarys18 made their first contribution in [#234](https://github.com/spacecowboy/feeder/pull/234)
 
@@ -4492,6 +4502,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.11.3]: https://github.com/spacecowboy/feeder/compare/2.11.2..2.11.3
 [2.11.2]: https://github.com/spacecowboy/feeder/compare/2.11.1..2.11.2
 [2.11.1]: https://github.com/spacecowboy/feeder/compare/2.11.0..2.11.1
 [2.11.0]: https://github.com/spacecowboy/feeder/compare/2.10.2..2.11.0
