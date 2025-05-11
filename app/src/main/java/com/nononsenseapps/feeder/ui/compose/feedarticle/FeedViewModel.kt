@@ -306,7 +306,7 @@ class FeedViewModel(
                 showOnlyTitle = params[23] as Boolean,
                 showReadingTime = params[24] as Boolean,
                 showTitleUnreadCount = params[25] as Boolean,
-                isOpenDrawerOnFab = params[26] as Boolean,
+                isOpenDrawerOnFab = params[27] as Boolean,
             )
         }.stateIn(
             viewModelScope,
