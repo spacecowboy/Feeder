@@ -1,8 +1,8 @@
 [versions]
 # Compose compiler is highly coupled to Kotlin version
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-kotlin = "2.1.20"
-ksp = "2.1.20-2.0.1"
+kotlin = "2.1.21"
+ksp = "2.1.21-2.0.1"
 kotlinxSerialization = "1.8.1"
 androidPlugin = "8.10.0"
 # BEGIN These should be upgraded in unison
