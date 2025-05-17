@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.4] - 2025-05-17
+
+### 🐛 Bug Fixes & Minor Changes
+- Fixed drawer not showing anymore when tapping on fab (#746) by @Matth7878 in [#746](https://github.com/spacecowboy/feeder/pull/746) 
+
+### 🌐 Translations
+- Updated Ukrainian translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/a3cc8770046e24c8b3a5f3007f3bf4874a929b8d)
+- Updated Hungarian translation using Weblate by @summoner001 in [#747](https://github.com/spacecowboy/feeder/pull/747) 
+
+
 ## [2.11.3] - 2025-05-10
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -4502,6 +4512,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.11.4]: https://github.com/spacecowboy/feeder/compare/2.11.3..2.11.4
 [2.11.3]: https://github.com/spacecowboy/feeder/compare/2.11.2..2.11.3
 [2.11.2]: https://github.com/spacecowboy/feeder/compare/2.11.1..2.11.2
 [2.11.1]: https://github.com/spacecowboy/feeder/compare/2.11.0..2.11.1
