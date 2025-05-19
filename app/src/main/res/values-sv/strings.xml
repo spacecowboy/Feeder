@@ -267,4 +267,17 @@
     <string name="text">Text</string>
     <string name="font">Typsnitt</string>
     <string name="text_preview">Textförhandsvisning</string>
+    <string name="search_verb">Sök</string>
+    <string name="cancel_search">Avbryt sök</string>
+    <string name="system_default">Systemstandard</string>
+    <string name="weight">Vikt</string>
+    <string name="text_settings">Textinställningar</string>
+    <string name="bold">Fet</string>
+    <string name="add_font">Lägg till typsnitt…</string>
+    <string name="italic">Kursiv</string>
+    <string name="could_not_add_font">Kunde ej lägga till typsnitt</string>
+    <string name="could_not_remove_font">Kunde ej ta bort typsnitt</string>
+    <string name="something_went_wrong">Någonting gick fel</string>
+    <string name="time_out">Timeout (sekunder)</string>
+    <string name="time_out_validation_error">Timeout måste vara mellan 30 och 600 sekunder</string>
 </resources>
