@@ -16,7 +16,7 @@
     <string name="open_enclosed_media_file">Atvērt %1$s</string>
     <string name="set_language">Iestatīt valodu</string>
     <string name="sync">Sinhronizēt</string>
-    <string name="export_saved_articles">Eksportēt saglabātos rakstus</string>
+    <string name="export_saved_articles">Izgūt saglabātos rakstus</string>
     <string name="title_activity_settings">Iestatījumi</string>
     <string name="share">Dalīties</string>
     <string name="sync_option_every_15min">Ik pēc 15 minūtēm</string>
@@ -122,4 +122,33 @@
     <string name="feed_icon">Ziņu plūsmas ikona</string>
     <string name="saved_articles">Saglabātie raksti</string>
     <string name="saved_article">Saglabāts raksts</string>
+    <string name="title_activity_edit_feed">Abonēt ziņu plūsmu</string>
+    <string name="url">URL</string>
+    <string name="title">Nosaukums</string>
+    <string name="search_feed_empty_hint">Ievadiet ziņu plūsmas adresi</string>
+    <string name="empty_feed_top">Šeit nav ko lasīt. Vai vēlaties…</string>
+    <string name="empty_feed_add">Vai <annotation style="link">pievienot</annotation> vairāk ziņu plūsmu?</string>
+    <string name="new_items_available">Pieejami jauni raksti</string>
+    <string name="view">Skatīt</string>
+    <string name="no_tag">Nav birkas</string>
+    <string name="notify_for_new_items">Paziņot par jauniem rakstiem</string>
+    <string name="open_enclosed_media">Atvērt pievienoto multivides datni</string>
+    <string name="dont_notify_for_new_items">Neziņot</string>
+    <string name="read_article">Lasīt priekšā</string>
+    <string name="stop_reading">Pārtraukt lasīšanu priekšā</string>
+    <string name="pause_reading">Apturēt lasīšanu priekšā</string>
+    <string name="resume_reading">Turpināt lasīšanu priekšā</string>
+    <string name="skip_to_next">Pārlekt uz nākamo rindkopu</string>
+    <string name="export_feeds_to_opml">Izgūt ziņu plūsmas OPML datnē</string>
+    <string name="import_feeds_from_opml">Ievietot ziņu plūsmas no OPML datnes</string>
+    <string name="view_debug_log">Skatīt atkļūdošanas žurnālu</string>
+    <string name="no_such_feed">Šāda ziņu plūsmas URL neeksistē. Vai mēģinājiet ar HTTPS?</string>
+    <string name="nothing_to_display">Šeit nekā nav!</string>
+    <string name="all_feeds">Visas ziņu plūsmas</string>
+    <string name="failed_to_export_OPML">Neizdevās izgūt OPML datni</string>
+    <string name="failed_to_export_saved_articles">Neizdevās izgūt saglabātos rakstus</string>
+    <string name="failed_to_import_OPML">Neizdevās ievietot OPML datni</string>
+    <string name="import_x_feeds_with_y_tags">Vai ievietot %1$s ar %2$s?</string>
+    <string name="nostr_feed_description">Nostr raksti no %1$s</string>
+    <string name="empty_feed_open">Vai <annotation style="link">atvērt</annotation> citu ziņu plūsmu?</string>
 </resources>
