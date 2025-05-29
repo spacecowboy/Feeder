@@ -45,9 +45,9 @@ Then build and install the app to your phone which is connected via USB:
 
 * Offline reading
 * Notification support
-* OPML Import/Export
-* Material design
-* Nostr Feeds
+* OPML import/export
+* Material Design
+* Nostr feeds
 
 ### Screenshots
 
@@ -57,7 +57,7 @@ Then build and install the app to your phone which is connected via USB:
 
 ### Download
 
-Feeder is availabe on [F-Droid](https://f-droid.org/en/packages/com.nononsenseapps.feeder/) and [Google Play](https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play) and there are APKs available for download on [GitHub Releases](https://github.com/spacecowboy/Feeder/releases).
+Feeder is available on [F-Droid](https://f-droid.org/en/packages/com.nononsenseapps.feeder/) and [Google Play](https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play) and there are APKs available for download on [GitHub Releases](https://github.com/spacecowboy/Feeder/releases).
 
 The GitHub releases are signed with a key matching this signature:
 
