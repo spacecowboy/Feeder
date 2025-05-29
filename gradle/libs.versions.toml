@@ -5,10 +5,11 @@ kotlin = "2.1.21"
 ksp = "2.1.21-2.0.1"
 kotlinxSerialization = "1.8.1"
 androidPlugin = "8.10.1"
-# BEGIN These should be upgraded in unison
+# BEGIN These should be upgraded in unison. See https://square.github.io/okhttp/changelogs/changelog_4x/
 okhttp = "4.12.0"
 okio = "3.6.0"
-conscrypt = "2.5.2"
+# 2.5.3 and above are 16kb aligned
+conscrypt = "2.5.3"
 # END Unison
 ktlint-gradle = "12.3.0"
 ktlint-compose = "0.4.22"
