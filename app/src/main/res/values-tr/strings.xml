@@ -163,8 +163,8 @@
     <string name="generate_extra_unique_ids">Ekstra benzersiz kimlikler oluştur</string>
     <string name="only_enable_for_bad_id_feeds">Yalnızca hatalı kimliklere sahip akışlar için etkinleştir</string>
     <string name="invalid_url">Geçersiz URL</string>
-    <string name="failed_to_import_OPML">OPML içe aktarma başarısız</string>
-    <string name="failed_to_export_OPML">OPML dışa aktarma başarısız</string>
+    <string name="failed_to_import_OPML">"OPML içe aktarma başarısız"</string>
+    <string name="failed_to_export_OPML">"OPML dışa aktarma başarısız"</string>
     <string name="failed_to_export_saved_articles">Kayıtlı makaleleri dışa aktarma başarısız</string>
     <string name="device_sync">Cihaz senkronizasyonu</string>
     <string name="add_new_device">Yeni cihaz ekle</string>
