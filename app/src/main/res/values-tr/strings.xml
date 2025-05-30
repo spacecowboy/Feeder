@@ -104,14 +104,14 @@
     <string name="theme_automatic">Otomatik</string>
     <string name="theme_day">Gündüz</string>
     <string name="theme_night">Gece</string>
-    <string name="theme_e_ink">E Mürekkep</string>
+    <string name="theme_e_ink">E-Mürekkep</string>
     <string name="theme">Tema</string>
     <string name="dynamic_theme_use">Dinamik renkler</string>
     <string name="dark_theme_preference">Tercih edilen karanlık tema</string>
     <string name="dark_theme_preference_black">Siyah</string>
     <string name="dark_theme_preference_dark">Koyu</string>
-    <string name="sort_newest_first">En yeni önce</string>
-    <string name="sort_oldest_first">En eski önce</string>
+    <string name="sort_newest_first">Önce en yenisi</string>
+    <string name="sort_oldest_first">Önce en eskisi</string>
     <string name="sort">Sırala</string>
     <string name="send_bug_report">Hata raporu gönder</string>
     <string name="no_email_client">E-posta istemcisi açılamadı</string>
