@@ -6,8 +6,46 @@ import java.net.URL
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class LinkUtilsKtTest {
+    @Test
+    fun urlHasNoQueryParamsReturnsTrueWhenNoQuery() {
+        val url = URL("https://example.com/path")
+        assertTrue(urlHasNoQueryParams(url))
+    }
+
+    @Test
+    fun urlHasNoQueryParamsReturnsFalseWhenQueryPresent() {
+        val url = URL("https://example.com/path?foo=bar")
+        assertFalse(urlHasNoQueryParams(url))
+    }
+
+    @Test
+    fun urlHasNoQueryParamsReturnsTrueWhenQueryIsEmpty() {
+        val url = URL("https://example.com/path?")
+        assertTrue(urlHasNoQueryParams(url))
+    }
+
+    @Test
+    fun urlHasNoAuthParamsReturnsTrueWhenNoUserInfo() {
+        val url = URL("https://example.com/path")
+        assertTrue(urlHasNoAuthParams(url))
+    }
+
+    @Test
+    fun urlHasNoAuthParamsReturnsFalseWhenUserInfoPresent() {
+        val url = URL("https://user:pass@example.com/path")
+        assertFalse(urlHasNoAuthParams(url))
+    }
+
+    @Test
+    fun urlHasNoAuthParamsReturnsTrueWhenUserInfoIsEmpty() {
+        val url = URL("https://@example.com/path")
+        assertTrue(urlHasNoAuthParams(url))
+    }
+
     @Test
     fun testSloppyToStrictAddsRespectsUnknownProtocols() {
         assertFails {
