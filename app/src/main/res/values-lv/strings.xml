@@ -16,7 +16,7 @@
     <string name="open_enclosed_media_file">Atvērt %1$s</string>
     <string name="set_language">Iestatīt valodu</string>
     <string name="sync">Sinhronizēt</string>
-    <string name="export_saved_articles">Izgūt saglabātos rakstus</string>
+    <string name="export_saved_articles">Izgūt atzīmētos rakstus</string>
     <string name="title_activity_settings">Iestatījumi</string>
     <string name="share">Dalīties</string>
     <string name="sync_option_every_15min">Ik pēc 15 minūtēm</string>
@@ -67,8 +67,8 @@
     <string name="sync_code">Sinhronizācijas kods</string>
     <string name="device_sync_description_2">Vienkārši skenējiet sinhronizācijas kodu, kas izveidots uz citas ierīces, vai izveidojiet jaunu sinhronizācijas ķēdi (grupu).</string>
     <string name="device_sync_description_1">Ierīces sinhronizācija ļauj sinhronizēt ziņu plūsmas abonementus un lasītos rakstus starp dažādām ierīcēm.</string>
-    <string name="save_article">Saglabāt rakstu</string>
-    <string name="saved_adjective">Saglabātie</string>
+    <string name="save_article">Pievienot atzīmētiem</string>
+    <string name="saved_adjective">Atzīmētie</string>
     <string name="show_only_title">Rādīt tikai virsrakstu</string>
     <string name="content_is_not_html">Saturs nav HTML</string>
     <string name="add_anyway">Tik un tā pievienot</string>
@@ -120,8 +120,8 @@
     <string name="secret_key">Slepenā atslēga</string>
     <string name="article_image">Raksta attēls</string>
     <string name="feed_icon">Ziņu plūsmas ikona</string>
-    <string name="saved_articles">Saglabātie raksti</string>
-    <string name="saved_article">Saglabāts raksts</string>
+    <string name="saved_articles">Atzīmētie raksti</string>
+    <string name="saved_article">Atzīmētais raksts</string>
     <string name="title_activity_edit_feed">Abonēt ziņu plūsmu</string>
     <string name="url">URL</string>
     <string name="title">Nosaukums</string>
@@ -146,9 +146,30 @@
     <string name="nothing_to_display">Šeit nekā nav!</string>
     <string name="all_feeds">Visas ziņu plūsmas</string>
     <string name="failed_to_export_OPML">Neizdevās izgūt OPML datni</string>
-    <string name="failed_to_export_saved_articles">Neizdevās izgūt saglabātos rakstus</string>
+    <string name="failed_to_export_saved_articles">Neizdevās izgūt atzīmētos rakstus</string>
     <string name="failed_to_import_OPML">Neizdevās ievietot OPML datni</string>
     <string name="import_x_feeds_with_y_tags">Vai ievietot %1$s ar %2$s?</string>
     <string name="nostr_feed_description">Nostr raksti no %1$s</string>
     <string name="empty_feed_open">Vai <annotation style="link">atvērt</annotation> citu ziņu plūsmu?</string>
+    <string name="unsave_article">Noņemt no atzīmētiem</string>
+    <string name="check_for_updates">Atjaunināt ziņu plūsmas…</string>
+    <string name="zero_feeds">%1$s ziņu plūsmu</string>
+    <string name="one_feed">%1$s ziņu plūsma</string>
+    <string name="two_feeds">%1$s ziņu plūsmas</string>
+    <string name="few_feeds">%1$s ziņu plūsmas</string>
+    <string name="many_feeds">%1$s ziņu plūsmas</string>
+    <string name="other_feeds">%1$s ziņu plūsmas</string>
+    <string name="zero_tags">%1$s birku</string>
+    <string name="one_tags">%1$s birka</string>
+    <string name="two_tags">%1$s birkas</string>
+    <string name="few_tags">%1$s birkas</string>
+    <string name="many_tags">%1$s birkas</string>
+    <string name="other_tags">%1$s birkas</string>
+    <string name="filter_noun">Atlasīt</string>
+    <string name="recently_read_adjective">Nesen lasītie</string>
+    <string name="read_adjective">Lasītie</string>
+    <string name="italic">Slīpraksts</string>
+    <string name="text_preview">Teksta priekšskatījums</string>
+    <string name="could_not_add_font">Nevarēja pievienot fontu</string>
+    <string name="bold">Treknraksts</string>
 </resources>
