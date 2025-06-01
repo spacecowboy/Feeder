@@ -17,3 +17,5 @@ Estàs fart d'haver de crear comptes a tot arreu?<br/></p>
 <li>Accés pràctics a enllaços adjunts</li>
 <li>Disseny "Material"</li>
 </ul>
+
+El llistat complet de canvis està disponible <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">a GitHub</a>.
