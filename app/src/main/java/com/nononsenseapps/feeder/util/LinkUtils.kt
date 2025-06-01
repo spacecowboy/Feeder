@@ -41,13 +41,9 @@ fun sloppyLinkToStrictURLOrNull(url: String): URL? =
         null
     }
 
-fun urlHasNoAuthParams(url: URL): Boolean {
-    return url.userInfo == null || url.userInfo.isEmpty()
-}
+fun urlHasNoAuthParams(url: URL): Boolean = url.userInfo == null || url.userInfo.isEmpty()
 
-fun urlHasNoQueryParams(url: URL): Boolean {
-    return url.query?.isEmpty() != false
-}
+fun urlHasNoQueryParams(url: URL): Boolean = url.query?.isEmpty() != false
 
 /**
  * Returns a URL but does not guarantee that it accurately represents the input string if the input string is an invalid URL.
