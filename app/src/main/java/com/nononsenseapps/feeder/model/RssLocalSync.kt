@@ -18,6 +18,8 @@ import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.right
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import com.nononsenseapps.feeder.util.urlHasNoAuthParams
+import com.nononsenseapps.feeder.util.urlHasNoQueryParams
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -375,9 +377,10 @@ class RssLocalSync(
                     // for the rare case that the job is cancelled prematurely
                     feedSql.title = feed.title ?: feedSql.title
 
-                    // Not changing feed url because I don't want to override auth or token params
-                    // See https://gitlab.com/spacecowboy/Feeder/-/issues/390
-                    //        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+                    // Do not update feed url if auth or token params
+                    if (urlHasNoAuthParams(feedSql.url) && urlHasNoQueryParams(feedSql.url)) {
+                        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+                    }
 
                     // Important to keep image if there is one in case of null
                     // the image is fetched when adding a feed by fetching the main site and looking
