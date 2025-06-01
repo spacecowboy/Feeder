@@ -4,19 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.FeedParserError
-import com.nononsenseapps.feeder.model.FetchError
 import com.nononsenseapps.feeder.model.HttpError
 import com.nononsenseapps.feeder.model.NoAlternateFeeds
 import com.nononsenseapps.feeder.model.NotInitializedYet
 import com.nononsenseapps.feeder.model.SiteMetaData
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
-import com.nononsenseapps.feeder.util.isAdaptedUrlFromNostrUri
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -42,77 +39,51 @@ class SearchFeedViewModel(
     )
 
     fun searchForFeeds(initialUrl: URL): Flow<Either<FeedParserError, SearchResult>> =
-        if (initialUrl.isAdaptedUrlFromNostrUri()) {
-            flow {
-                val nostrProfile = feedParser.getProfileMetadata(initialUrl)
-                nostrProfile
-                    .onRight {
-                        emit(Either.Right(it))
-                    }.onLeft {
-                        emit(Either.Left(it))
-                    }
-            }.map { profileResult ->
-                profileResult.flatMap { metadata ->
+        flow {
+            siteMetaData = feedParser.getSiteMetaData(initialUrl)
+            // Flow collection makes this block concurrent with map below
+            val initialSiteMetaData = siteMetaData
 
-                    Either.catching(
-                        onCatch = { t -> FetchError(url = metadata.uri, throwable = t) },
-                    ) {
-                        SearchResult(
-                            title = metadata.name,
-                            url = metadata.uri,
-                            description = application.applicationContext.getString(R.string.nostr_feed_description, metadata.name),
-                            feedImage = metadata.imageUrl,
-                        )
+            initialSiteMetaData
+                .onRight { metaData ->
+                    metaData.alternateFeedLinks.forEach {
+                        emit(Either.Right(it.link))
                     }
+                    if (metaData.alternateFeedLinks.isEmpty()) {
+                        emit(Either.Left(NoAlternateFeeds(initialUrl.toString())))
+                    }
+                }.onLeft {
+                    if (it is HttpError) {
+                        handleHttpError(it)
+                    }
+                    emit(Either.Right(initialUrl))
                 }
-            }.flowOn(Dispatchers.Default)
-        } else {
-            flow {
-                siteMetaData = feedParser.getSiteMetaData(initialUrl)
-                // Flow collection makes this block concurrent with map below
-                val initialSiteMetaData = siteMetaData
-
-                initialSiteMetaData
-                    .onRight { metaData ->
-                        metaData.alternateFeedLinks.forEach {
-                            emit(Either.Right(it.link))
+        }.map { urlResult ->
+            urlResult.flatMap { url ->
+                feedParser
+                    .parseFeedUrl(url)
+                    .onRight { feed ->
+                        if (siteMetaData.isLeft()) {
+                            feed.home_page_url?.let { pageLink ->
+                                sloppyLinkToStrictURLOrNull(pageLink)?.let { pageUrl ->
+                                    siteMetaData = feedParser.getSiteMetaData(pageUrl)
+                                }
+                            }
                         }
-                        if (metaData.alternateFeedLinks.isEmpty()) {
-                            emit(Either.Left(NoAlternateFeeds(initialUrl.toString())))
-                        }
+                    }.map { feed ->
+                        SearchResult(
+                            title = feed.title ?: "",
+                            url = feed.feed_url ?: url.toString(),
+                            description = feed.description ?: "",
+                            feedImage = siteMetaData.getOrNull()?.feedImage ?: "",
+                        )
                     }.onLeft {
                         if (it is HttpError) {
                             handleHttpError(it)
                         }
-                        emit(Either.Right(initialUrl))
                     }
-            }.map { urlResult ->
-                urlResult.flatMap { url ->
-                    feedParser
-                        .parseFeedUrl(url)
-                        .onRight { feed ->
-                            if (siteMetaData.isLeft()) {
-                                feed.home_page_url?.let { pageLink ->
-                                    sloppyLinkToStrictURLOrNull(pageLink)?.let { pageUrl ->
-                                        siteMetaData = feedParser.getSiteMetaData(pageUrl)
-                                    }
-                                }
-                            }
-                        }.map { feed ->
-                            SearchResult(
-                                title = feed.title ?: "",
-                                url = feed.feed_url ?: url.toString(),
-                                description = feed.description ?: "",
-                                feedImage = siteMetaData.getOrNull()?.feedImage ?: "",
-                            )
-                        }.onLeft {
-                            if (it is HttpError) {
-                                handleHttpError(it)
-                            }
-                        }
-                }
-            }.flowOn(Dispatchers.Default)
-        }
+            }
+        }.flowOn(Dispatchers.Default)
 
     private suspend fun handleHttpError(httpError: HttpError) {
         httpError.retryAfterSeconds?.let { retryAfterSeconds ->

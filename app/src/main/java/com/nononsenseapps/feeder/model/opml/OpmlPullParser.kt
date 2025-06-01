@@ -6,8 +6,6 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
-import com.nononsenseapps.feeder.util.getOrCreateFromUri
-import com.nononsenseapps.feeder.util.isNostrUri
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.toByteString
@@ -255,7 +253,7 @@ class OpmlPullParser(
             )
         try {
             val parsedUrlOrUri = parser.getAttributeValue(null, ATTR_XMLURL)
-            val feedUrl = URL(parsedUrlOrUri.getOrCreateFromUri())
+            val feedUrl = URL(parsedUrlOrUri)
             val feed =
                 Feed(
                     // Ensure not both are empty string: title will get replaced on sync
@@ -272,21 +270,17 @@ class OpmlPullParser(
                                 ?.toBoolean()
                                 ?: feed.notify,
                         fullTextByDefault =
-                            if (parsedUrlOrUri.isNostrUri()) {
-                                false
-                            } else {
-                                (
-                                    parser
-                                        .getAttributeValue(
-                                            OPML_FEEDER_NAMESPACE,
-                                            ATTR_FULL_TEXT_BY_DEFAULT,
-                                        )?.toBoolean()
-                                        // Support Flym's value for this
-                                        ?: parser
-                                            .getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
-                                            ?.toBoolean()
-                                ) ?: feed.fullTextByDefault
-                            },
+                            (
+                                parser
+                                    .getAttributeValue(
+                                        OPML_FEEDER_NAMESPACE,
+                                        ATTR_FULL_TEXT_BY_DEFAULT,
+                                    )?.toBoolean()
+                                    // Support Flym's value for this
+                                    ?: parser
+                                        .getAttributeValue(null, ATTR_FLYM_RETRIEVE_FULL_TEXT)
+                                        ?.toBoolean()
+                            ) ?: feed.fullTextByDefault,
                         alternateId =
                             parser
                                 .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALTERNATE_ID)

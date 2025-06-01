@@ -47,7 +47,6 @@ Then build and install the app to your phone which is connected via USB:
 * Notification support
 * OPML import/export
 * Material Design
-* Nostr feeds
 
 ### Screenshots
 
