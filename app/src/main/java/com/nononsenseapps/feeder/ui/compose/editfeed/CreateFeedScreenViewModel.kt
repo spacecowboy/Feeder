@@ -14,8 +14,6 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
-import com.nononsenseapps.feeder.util.getOrCreateFromUri
-import com.nononsenseapps.feeder.util.isNostrUri
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -84,11 +82,11 @@ class CreateFeedScreenViewModel(
             val feedId =
                 repository.saveFeed(
                     Feed(
-                        url = URL(feedUrl.getOrCreateFromUri()),
+                        url = URL(feedUrl),
                         title = feedTitle,
                         customTitle = feedTitle,
                         tag = feedTag,
-                        fullTextByDefault = if (feedUrl.isNostrUri()) false else fullTextByDefault,
+                        fullTextByDefault = fullTextByDefault,
                         notify = notify,
                         skipDuplicates = skipDuplicates,
                         openArticlesWith = articleOpener,

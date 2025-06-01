@@ -248,9 +248,6 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
 
-    // Nostr
-    implementation(libs.rust.nostr)
-
     // Markdown
     implementation(libs.jetbrains.markdown)
 

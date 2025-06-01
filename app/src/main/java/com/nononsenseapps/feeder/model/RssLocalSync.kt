@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model
 
 import android.app.Application
 import android.util.Log
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceFullTextSync
 import com.nononsenseapps.feeder.blob.blobFile
@@ -15,7 +14,6 @@ import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.flatMap
-import com.nononsenseapps.feeder.util.isAdaptedUrlFromNostrUri
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.right
@@ -257,199 +255,183 @@ class RssLocalSync(
         }
 
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
-        // Alternate based on Nostr feed
 
-        return if (url.isAdaptedUrlFromNostrUri()) {
-            Either
-                .catching(
-                    onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
-                ) {
-                    feedParser.getProfileMetadata(url).getOrNull() ?: throw NostrMetadataException("Could not find metadata for $url")
-                }.flatMap { profile ->
-                    feedParser
-                        .findNostrFeed(profile)
-                        .map {
-                            it.copy(description = application.applicationContext.getString(R.string.nostr_feed_description, profile.name))
-                        }
-                }
-        } else {
-            Either
-                .catching(
-                    onCatch = { t ->
-                        FetchError(url = url.toString(), throwable = t)
-                    },
-                ) {
-                    okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
-                }.flatMap { response ->
-                    response.use {
-                        if (response.isSuccessful) {
-                            response.body?.let { responseBody ->
-                                feedParser.parseFeedResponse(
-                                    response.request.url.toUrl(),
-                                    responseBody,
-                                )
-                            } ?: NoBody(url = url.toString()).left()
-                        } else {
-                            response.retryAfterSeconds?.let { retryAfterSeconds ->
-                                logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
-                            }
-                            HttpError(
-                                url = url.toString(),
-                                code = response.code,
-                                retryAfterSeconds = response.retryAfterSeconds,
-                                message = response.message,
-                            ).left()
-                        }
-                    }
-                }
-        }.onLeft {
-            // Nothing was parsed, nothing to do. lastSync time has already been updated
-        }.flatMap { feed ->
-            Either.catching(
+        return Either
+            .catching(
                 onCatch = { t ->
                     FetchError(url = url.toString(), throwable = t)
                 },
             ) {
-                val items = feed.items
-                val uniqueIdCount = items?.map { it.id }?.toSet()?.size
-                // This can only detect between items present in one feed. See NIXOS
-                val isNotUniqueIds = uniqueIdCount != items?.size
+                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
+            }.flatMap { response ->
+                response.use {
+                    if (response.isSuccessful) {
+                        response.body?.let { responseBody ->
+                            feedParser.parseFeedResponse(
+                                response.request.url.toUrl(),
+                                responseBody,
+                            )
+                        } ?: NoBody(url = url.toString()).left()
+                    } else {
+                        response.retryAfterSeconds?.let { retryAfterSeconds ->
+                            logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+                        }
+                        HttpError(
+                            url = url.toString(),
+                            code = response.code,
+                            retryAfterSeconds = response.retryAfterSeconds,
+                            message = response.message,
+                        ).left()
+                    }
+                }
+            }.onLeft {
+                // Nothing was parsed, nothing to do. lastSync time has already been updated
+            }.flatMap { feed ->
+                Either.catching(
+                    onCatch = { t ->
+                        FetchError(url = url.toString(), throwable = t)
+                    },
+                ) {
+                    val items = feed.items
+                    val uniqueIdCount = items?.map { it.id }?.toSet()?.size
+                    // This can only detect between items present in one feed. See NIXOS
+                    val isNotUniqueIds = uniqueIdCount != items?.size
 
-                val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
+                    val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
 
-                val feedItemSqls =
-                    items
-                        ?.map {
-                            val guid =
-                                when (isNotUniqueIds || feedSql.alternateId) {
-                                    true -> it.alternateId
-                                    else -> it.id ?: it.alternateId
+                    val feedItemSqls =
+                        items
+                            ?.map {
+                                val guid =
+                                    when (isNotUniqueIds || feedSql.alternateId) {
+                                        true -> it.alternateId
+                                        else -> it.id ?: it.alternateId
+                                    }
+
+                                it to guid
+                            }?.reversed()
+                            ?.mapNotNull { (item, guid) ->
+                                // Always attempt to load existing items using both id schemes
+                                // Id is rewritten to preferred on update
+                                val feedItemSql =
+                                    repository.loadFeedItem(
+                                        guid = item.alternateId,
+                                        feedId = feedSql.id,
+                                    ) ?: repository.loadFeedItem(
+                                        guid = item.id ?: item.alternateId,
+                                        feedId = feedSql.id,
+                                    ) ?: FeedItem(firstSyncedTime = downloadTime)
+
+                                // If new item, see if duplicates exist
+                                if (feedItemSql.id != ID_UNSET || !feedSql.skipDuplicates || !repository.duplicateStoryExists(id = feedItemSql.id, title = item.title ?: "", link = item.url)) {
+                                    feedItemSql.updateFromParsedEntry(item, guid, feed)
+                                    feedItemSql.feedId = feedSql.id
+
+                                    if (feedItemSql.guid in alreadyReadGuids) {
+                                        // TODO get read time from sync service
+                                        feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
+                                        feedItemSql.notified = true
+                                    }
+
+                                    feedItemSql to (item.content_html ?: item.content_text ?: "")
+                                } else {
+                                    Log.i(LOG_TAG, "Duplicate story ignored: [${item.title}] [${feed.title}]")
+                                    null
                                 }
+                            } ?: emptyList()
 
-                            it to guid
-                        }?.reversed()
-                        ?.mapNotNull { (item, guid) ->
-                            // Always attempt to load existing items using both id schemes
-                            // Id is rewritten to preferred on update
-                            val feedItemSql =
-                                repository.loadFeedItem(
-                                    guid = item.alternateId,
-                                    feedId = feedSql.id,
-                                ) ?: repository.loadFeedItem(
-                                    guid = item.id ?: item.alternateId,
-                                    feedId = feedSql.id,
-                                ) ?: FeedItem(firstSyncedTime = downloadTime)
-
-                            // If new item, see if duplicates exist
-                            if (feedItemSql.id != ID_UNSET || !feedSql.skipDuplicates || !repository.duplicateStoryExists(id = feedItemSql.id, title = item.title ?: "", link = item.url)) {
-                                feedItemSql.updateFromParsedEntry(item, guid, feed)
-                                feedItemSql.feedId = feedSql.id
-
-                                if (feedItemSql.guid in alreadyReadGuids) {
-                                    // TODO get read time from sync service
-                                    feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
-                                    feedItemSql.notified = true
-                                }
-
-                                feedItemSql to (item.content_html ?: item.content_text ?: "")
-                            } else {
-                                Log.i(LOG_TAG, "Duplicate story ignored: [${item.title}] [${feed.title}]")
+                    repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
+                        filePathProvider.articleDir.mkdirs()
+                        blobOutputStream(feedItem.id, filePathProvider.articleDir)
+                            .bufferedWriter()
+                            .use {
+                                it.write(text)
+                            }
+                    }
+                    // Try to look for image if not done before
+                    if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
+                        val siteUrl =
+                            try {
+                                URL(feed.home_page_url)
+                            } catch (e: Throwable) {
+                                logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
                                 null
                             }
-                        } ?: emptyList()
-
-                repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
-                    filePathProvider.articleDir.mkdirs()
-                    blobOutputStream(feedItem.id, filePathProvider.articleDir)
-                        .bufferedWriter()
-                        .use {
-                            it.write(text)
-                        }
-                }
-                // Try to look for image if not done before
-                if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
-                    val siteUrl =
-                        try {
-                            URL(feed.home_page_url)
-                        } catch (e: Throwable) {
-                            logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
-                            null
-                        }
-                    if (siteUrl != null) {
-                        feedSql.siteFetched = Instant.now()
-                        feedParser
-                            .getSiteMetaData(siteUrl)
-                            .onRight { metadata ->
-                                try {
-                                    feedSql.imageUrl = URL(metadata.feedImage)
-                                } catch (e: Throwable) {
-                                    logDebug(LOG_TAG, "Bad feedImage url: ${feed.home_page_url}", e)
+                        if (siteUrl != null) {
+                            feedSql.siteFetched = Instant.now()
+                            feedParser
+                                .getSiteMetaData(siteUrl)
+                                .onRight { metadata ->
+                                    try {
+                                        feedSql.imageUrl = URL(metadata.feedImage)
+                                    } catch (e: Throwable) {
+                                        logDebug(LOG_TAG, "Bad feedImage url: ${feed.home_page_url}", e)
+                                    }
                                 }
-                            }
-                    }
-                }
-
-                // Update feed last so lastsync is only set after all items have been handled
-                // for the rare case that the job is cancelled prematurely
-                feedSql.title = feed.title ?: feedSql.title
-
-                // Not changing feed url because I don't want to override auth or token params
-                // See https://gitlab.com/spacecowboy/Feeder/-/issues/390
-                //        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
-
-                // Important to keep image if there is one in case of null
-                // the image is fetched when adding a feed by fetching the main site and looking
-                // for favicons - but only when first added and icon missing from feed.
-                feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
-                    ?: feedSql.imageUrl
-
-                repository.upsertFeed(feedSql)
-
-                // Finally, prune database of old items
-                // Ensure we don't delete items that are still present in the feed
-                val presentIds =
-                    feedItemSqls
-                        .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
-
-                val articlesToDelete =
-                    repository
-                        .getItemsToBeCleanedFromFeed(
-                            feedId = feedSql.id,
-                            keepCount = max(maxFeedItemCount, items?.size ?: 0),
-                        ).filterNot { it in presentIds }
-
-                for (id in articlesToDelete) {
-                    blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
-                        try {
-                            if (file.isFile) {
-                                file.delete()
-                            }
-                        } catch (e: IOException) {
-                            Log.e(LOG_TAG, "Failed to delete $file", e)
                         }
-                        Unit
                     }
-                    blobFullFile(
-                        itemId = id,
-                        filesDir = filePathProvider.fullArticleDir,
-                    ).let { file ->
-                        try {
-                            if (file.isFile) {
-                                file.delete()
+
+                    // Update feed last so lastsync is only set after all items have been handled
+                    // for the rare case that the job is cancelled prematurely
+                    feedSql.title = feed.title ?: feedSql.title
+
+                    // Not changing feed url because I don't want to override auth or token params
+                    // See https://gitlab.com/spacecowboy/Feeder/-/issues/390
+                    //        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+
+                    // Important to keep image if there is one in case of null
+                    // the image is fetched when adding a feed by fetching the main site and looking
+                    // for favicons - but only when first added and icon missing from feed.
+                    feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
+                        ?: feedSql.imageUrl
+
+                    repository.upsertFeed(feedSql)
+
+                    // Finally, prune database of old items
+                    // Ensure we don't delete items that are still present in the feed
+                    val presentIds =
+                        feedItemSqls
+                            .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
+
+                    val articlesToDelete =
+                        repository
+                            .getItemsToBeCleanedFromFeed(
+                                feedId = feedSql.id,
+                                keepCount = max(maxFeedItemCount, items?.size ?: 0),
+                            ).filterNot { it in presentIds }
+
+                    for (id in articlesToDelete) {
+                        blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
+                            try {
+                                if (file.isFile) {
+                                    file.delete()
+                                }
+                            } catch (e: IOException) {
+                                Log.e(LOG_TAG, "Failed to delete $file", e)
                             }
-                        } catch (e: IOException) {
-                            Log.e(LOG_TAG, "Failed to delete $file", e)
+                            Unit
                         }
-                        Unit
+                        blobFullFile(
+                            itemId = id,
+                            filesDir = filePathProvider.fullArticleDir,
+                        ).let { file ->
+                            try {
+                                if (file.isFile) {
+                                    file.delete()
+                                }
+                            } catch (e: IOException) {
+                                Log.e(LOG_TAG, "Failed to delete $file", e)
+                            }
+                            Unit
+                        }
                     }
+
+                    repository.deleteFeedItems(articlesToDelete)
+                    repository.deleteStaleRemoteReadMarks()
+
+                    logDebug(LOG_TAG, "Fetched ${feedSql.displayTitle}")
                 }
-
-                repository.deleteFeedItems(articlesToDelete)
-                repository.deleteStaleRemoteReadMarks()
-
-                logDebug(LOG_TAG, "Fetched ${feedSql.displayTitle}")
             }
-        }
     }
 
     internal suspend fun feedsToSync(

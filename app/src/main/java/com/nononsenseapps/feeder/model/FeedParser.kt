@@ -10,7 +10,6 @@ import com.nononsenseapps.feeder.model.gofeed.GoFeedAdapter
 import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
-import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
@@ -24,41 +23,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
-import org.intellij.markdown.parser.MarkdownParser
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import rust.nostr.sdk.Alphabet
-import rust.nostr.sdk.Coordinate
-import rust.nostr.sdk.Event
-import rust.nostr.sdk.Filter
-import rust.nostr.sdk.Kind
-import rust.nostr.sdk.KindStandard
-import rust.nostr.sdk.Nip19Profile
-import rust.nostr.sdk.Nip21
-import rust.nostr.sdk.Nip21Enum
-import rust.nostr.sdk.NostrSdkException
-import rust.nostr.sdk.PublicKey
-import rust.nostr.sdk.RelayMetadata
-import rust.nostr.sdk.SingleLetterTag
-import rust.nostr.sdk.TagKind
-import rust.nostr.sdk.extractRelayList
-import rust.nostr.sdk.getNip05Profile
 import java.io.IOException
-import java.lang.NullPointerException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneId
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import rust.nostr.sdk.Client as NostrClient
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -67,17 +42,6 @@ class FeedParser(
 ) : DIAware {
     private val client: OkHttpClient by instance()
     private val goFeedAdapter = GoFeedAdapter()
-
-    // Initializing the Nostr Client
-    // This can crash in emulator tests so initialize it lazily.
-    private val nostrClient by lazy {
-        NostrClient()
-    }
-
-    // The default relays to get info from, separated by purpose.
-    private val defaultFetchRelays = listOf("wss://relay.nostr.band", "wss://relay.damus.io")
-    private val defaultMetadataRelays = listOf("wss://purplepag.es", "wss://user.kindpag.es")
-    private val defaultArticleFetchRelays = setOf("wss://nos.lol") + defaultFetchRelays
 
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
@@ -241,141 +205,6 @@ class FeedParser(
      */
     private suspend fun curl(url: URL) = client.curl(url)
 
-    private suspend fun parseNostrUri(adaptedNostrUri: String): Nip19Profile {
-        val nostrUri = adaptedNostrUri.removePrefix("https://njump.me/")
-        if (nostrUri.contains("@")) { // It means it is a Nip05 address
-            val rawString = nostrUri.removePrefix("nostr:")
-            val parsedNip5 = getNip05Profile(rawString)
-            val (pubkey, relays) = parsedNip5.publicKey() to parsedNip5.relays()
-            return Nip19Profile(pubkey, relays)
-        } else {
-            val parsedProfile = Nip21.parse(nostrUri).asEnum()
-            when (parsedProfile) {
-                is Nip21Enum.Pubkey -> return Nip19Profile(parsedProfile.publicKey)
-                is Nip21Enum.Profile -> return Nip19Profile(parsedProfile.profile.publicKey(), parsedProfile.profile.relays())
-                else -> throw NostrUriParserException(message = "Could not find the user's info: $nostrUri")
-            }
-        }
-    }
-
-    suspend fun getProfileMetadata(nostrUri: URL): Either<MetaDataParseError, AuthorNostrData> =
-        Either.catching(
-            onCatch = { t -> MetaDataParseError(url = nostrUri.toString(), throwable = t) },
-        ) {
-            val possibleNostrProfile = parseNostrUri(nostrUri.toString())
-            val publicKey = possibleNostrProfile.publicKey()
-            val relayList =
-                possibleNostrProfile
-                    .relays()
-                    .takeIf {
-                        it.size < 4
-                    }.orEmpty()
-                    .ifEmpty { getUserPublishRelays(publicKey) }
-            logDebug(LOG_TAG, "Relays from Nip19 -> ${relayList.joinToString(separator = ", ")}")
-            relayList
-                .ifEmpty { defaultFetchRelays }
-                .forEach { relayUrl ->
-                    nostrClient.addReadRelay(relayUrl)
-                }
-            nostrClient.connect()
-            val profileInfo =
-                try {
-                    nostrClient.fetchMetadata(
-                        publicKey = publicKey,
-                        timeout = Duration.ofSeconds(5L),
-                    )
-                } catch (e: NostrSdkException) {
-                    // We will use a default relay regardless of whether it is added above, to keep things simple.
-                    nostrClient.addReadRelay(defaultFetchRelays.random())
-                    nostrClient.connect()
-                    nostrClient.fetchMetadata(
-                        publicKey = publicKey,
-                        timeout = Duration.ofSeconds(5L),
-                    )
-                }
-            logDebug(LOG_TAG, profileInfo.asPrettyJson())
-
-            // Check if all relays in relaylist can be connected to
-            AuthorNostrData(
-                uri = possibleNostrProfile.toNostrUri(),
-                name = profileInfo.getName().toString(),
-                publicKey = publicKey,
-                imageUrl = profileInfo.getPicture().toString(),
-                relayList = nostrClient.relays().map { relayEntry -> relayEntry.key },
-            )
-        }
-
-    private suspend fun getUserPublishRelays(userPubkey: PublicKey): List<String> {
-        val userRelaysFilter =
-            Filter()
-                .author(userPubkey)
-                .kind(
-                    Kind.fromStd(KindStandard.RELAY_LIST),
-                )
-
-        nostrClient.removeAllRelays()
-        defaultMetadataRelays.forEach { relayUrl ->
-            nostrClient.addReadRelay(relayUrl)
-        }
-        nostrClient.connect()
-        val potentialUserRelays =
-            nostrClient.fetchEventsFrom(
-                urls = defaultMetadataRelays,
-                filter = userRelaysFilter,
-                timeout = Duration.ofSeconds(5),
-            )
-        val relayList = extractRelayList(potentialUserRelays.toVec().first())
-        val relaysToUse =
-            if (relayList.any { (_, relayType) -> relayType == RelayMetadata.WRITE }) {
-                relayList.filter { it.value == RelayMetadata.WRITE }.map { entry -> entry.key }
-            } else if (relayList.size < 7) {
-                relayList.map { entry -> entry.key } // This represents the relay URL, just as the operation above.
-            } else {
-                defaultArticleFetchRelays.map { it }
-            }
-
-        return relaysToUse
-    }
-
-    private suspend fun fetchArticlesForAuthor(
-        author: PublicKey,
-        relays: List<String>,
-    ): List<Event> {
-        val articlesByAuthorFilter =
-            Filter()
-                .author(author)
-                .kind(Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE))
-        logDebug(LOG_TAG, "Relay List size: ${relays.size}")
-
-        nostrClient.removeAllRelays()
-        val relaysToUse =
-            relays
-                .take(3)
-                .plus(defaultArticleFetchRelays.random())
-                .ifEmpty { defaultFetchRelays }
-        relaysToUse.forEach { relay -> nostrClient.addReadRelay(relay) }
-        nostrClient.connect()
-        logDebug(LOG_TAG, "FETCHING ARTICLES")
-        val articleEventSet =
-            nostrClient
-                .fetchEventsFrom(
-                    urls = relaysToUse,
-                    filter = articlesByAuthorFilter,
-                    timeout = Duration.ofSeconds(10L),
-                ).toVec()
-        val articleEvents = articleEventSet.distinctBy { it.tags().find(TagKind.Title) }
-        nostrClient.removeAllRelays() // This is necessary to avoid piling relays to fetch from(on each fetch).
-        return articleEvents
-    }
-
-    suspend fun findNostrFeed(authorNostrData: AuthorNostrData): Either<FeedParserError, ParsedFeed> =
-        Either.catching(
-            onCatch = { t -> FetchError(url = authorNostrData.uri, throwable = t) },
-        ) {
-            val fetchedArticles = fetchArticlesForAuthor(authorNostrData.publicKey, authorNostrData.relayList)
-            fetchedArticles.mapToFeed(authorNostrData.uri, authorNostrData.name, authorNostrData.imageUrl)
-        }
-
     suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> =
         client
             .curlAndOnResponse(url) {
@@ -451,102 +280,6 @@ class FeedParser(
     companion object {
         private const val LOG_TAG = "FEEDER_FEEDPARSER"
     }
-}
-
-private fun List<Event>.mapToFeed(
-    nostrUri: String,
-    authorName: String,
-    imageUrl: String,
-): ParsedFeed {
-    val description = "Nostr: $authorName"
-    val author =
-        ParsedAuthor(
-            name = authorName,
-            url = "https://njump.me/${first().author().toBech32()}",
-            avatar = imageUrl,
-        )
-    val articles =
-        this
-            .sortedByDescending {
-                it
-                    .tags()
-                    .find(TagKind.PublishedAt)
-                    ?.content()
-                    ?.toLong() ?: 0L
-            }.map { event: Event ->
-                event.asArticle(authorName, imageUrl)
-            }
-
-    return ParsedFeed(
-        title = authorName,
-        home_page_url = null,
-        feed_url = nostrUri,
-        description = description,
-        user_comment = null,
-        next_url = null,
-        icon = imageUrl,
-        favicon = null,
-        author = author,
-        expired = null,
-        items = articles,
-    )
-}
-
-fun Event.asArticle(
-    authorName: String,
-    imageUrl: String,
-): ParsedArticle {
-    val articleId = id().toString()
-    val articleUri = id().toNostrUri()
-    val articleNostrAddress =
-        Coordinate(
-            Kind.fromStd(KindStandard.LONG_FORM_TEXT_NOTE),
-            author(),
-            tags()
-                .find(
-                    TagKind.SingleLetter(
-                        SingleLetterTag.lowercase(Alphabet.D),
-                    ),
-                )?.content()
-                .toString(),
-        ).toBech32()
-    // Highlighter is a service for reading Nostr articles on the web.
-    val externalLink = "https://highlighter.com/a/$articleNostrAddress"
-    val articleAuthor =
-        ParsedAuthor(
-            name = authorName,
-            url = "https://njump.me/${author().toBech32()}",
-            avatar = imageUrl,
-        )
-    val articleTitle = tags().find(TagKind.Title)?.content()
-    val publishDate =
-        Instant
-            .ofEpochSecond(
-                tags().find(TagKind.PublishedAt)?.content()?.toLong() ?: Instant.EPOCH.epochSecond,
-            ).atZone(ZoneId.systemDefault())
-            .withFixedOffsetZone()
-    val articleTags = tags().hashtags()
-    val articleImage = tags().find(TagKind.Image)?.content()
-    val articleSummary = tags().find(TagKind.Summary)?.content()
-    val articleContent = content()
-    val parsedMarkdown = markDownParser.buildMarkdownTreeFromString(articleContent)
-    val htmlContent = HtmlGenerator(articleContent, parsedMarkdown, CommonMarkFlavourDescriptor()).generateHtml()
-
-    return ParsedArticle(
-        id = articleId,
-        url = articleUri,
-        external_url = externalLink,
-        title = articleTitle,
-        content_html = htmlContent,
-        content_text = articleContent,
-        summary = articleSummary,
-        image = if (articleImage != null) MediaImage(url = articleImage.toString()) else null,
-        date_published = publishDate.toString(),
-        date_modified = publishDate.toString(),
-        author = articleAuthor,
-        tags = articleTags,
-        attachments = null,
-    )
 }
 
 private fun GoFeed.asFeed(url: URL): ParsedFeed =
@@ -740,28 +473,6 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
                 )
             }
         }
-
-private val markDownParser = MarkdownParser(CommonMarkFlavourDescriptor())
-
-class AuthorNostrData(
-    val uri: String,
-    val name: String,
-    val publicKey: PublicKey,
-    val imageUrl: String,
-    val relayList: List<String>,
-)
-
-sealed class NostrException(
-    message: String,
-) : Exception(message)
-
-class NostrUriParserException(
-    override val message: String,
-) : NostrException(message)
-
-class NostrMetadataException(
-    override val message: String,
-) : NostrException(message)
 
 @Parcelize
 sealed class FeedParserError : Parcelable {
