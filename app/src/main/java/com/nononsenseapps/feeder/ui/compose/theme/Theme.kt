@@ -250,7 +250,7 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
 @Composable
 private fun ThemeOptions.isDarkNavIcons(): Boolean {
     // Only Api 27+ supports dark nav bar icons
-    return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) && isDarkSystemIcons()
+    return isDarkSystemIcons()
 }
 
 @Composable
