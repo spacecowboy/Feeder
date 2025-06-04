@@ -265,8 +265,7 @@ class TTSStateHolder(
                     allAvailableLanguages
                         .asSequence()
                         .sortedBy { it.getDisplayName(it).lowercase(it) },
-                )
-                .distinctBy { it.toLanguageTag() }
+                ).distinctBy { it.toLanguageTag() }
                 .toList()
 
         _availableLanguages.update {
