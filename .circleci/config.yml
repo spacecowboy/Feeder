@@ -56,7 +56,7 @@ jobs:
       # Then start the emulator and run the Instrumentation tests!
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest --parallel
-          system-image: system-images;android-25;google_apis;x86
+          system-image: system-images;android-29;google_apis;x86
 
       # And finally run the release build
       #- run:
