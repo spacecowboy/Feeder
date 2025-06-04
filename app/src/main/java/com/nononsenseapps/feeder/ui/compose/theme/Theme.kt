@@ -254,18 +254,6 @@ private fun ThemeOptions.isDarkNavIcons(): Boolean {
 }
 
 @Composable
-private fun ThemeOptions.getNavBarColor(): Color {
-    // Api 29 handles transparency
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        Color.Transparent
-    } else if (isDarkNavIcons()) {
-        NavBarScrimLight
-    } else {
-        NavBarScrimDark
-    }
-}
-
-@Composable
 private fun ThemeOptions.getColorScheme(
     darkThemePreference: DarkThemePreferences,
     dynamicColors: Boolean,
