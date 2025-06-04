@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.os.Build
-import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
@@ -99,22 +98,24 @@ class TTSStateHolder(
         textToSpeechQueue.firstOrNull()?.let { text ->
             val lang = _language.value
             val localesToUse: Sequence<Locale> =
-                when {
-                    lang is ForcedAuto && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                when (lang) {
+                    is ForcedAuto -> {
                         context
                             .detectLocaleFromText(text)
                             .sortedByDescending { it.confidence }
                             .map { it.locale }
                             .plus(_availableLanguages.value)
                     }
-                    lang is ForcedLocale -> {
+
+                    is ForcedLocale -> {
                         sequenceOf(
                             lang.locale,
                         )
                     }
+
                     else -> {
                         // Use app setting
-                        if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        if (useDetectLanguage) {
                             context
                                 .detectLocaleFromText(text)
                                 .sortedByDescending { it.confidence }
@@ -131,21 +132,12 @@ class TTSStateHolder(
 
             setFirstBestLocale(localesToUse)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                textToSpeech?.speak(
-                    text,
-                    TextToSpeech.QUEUE_ADD,
-                    null,
-                    "0",
-                )
-            } else {
-                textToSpeech?.speak(
-                    text,
-                    TextToSpeech.QUEUE_ADD,
-                    Bundle.EMPTY,
-                    "0",
-                )
-            }
+            textToSpeech?.speak(
+                text,
+                TextToSpeech.QUEUE_ADD,
+                null,
+                "0",
+            )
         }
     }
 
@@ -259,32 +251,21 @@ class TTSStateHolder(
         allAvailableLanguages = textToSpeech?.availableLanguages ?: emptySet()
 
         val sortedLanguages =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                context
-                    .detectLocaleFromText(
-                        textToSpeechQueue.joinToString("\n\n"),
-                        minConfidence = 0f,
-                    ).sortedByDescending { it.confidence }
-                    .map { it.locale }
-                    .plus(
-                        context
-                            .getLocales()
-                            .sortedBy { it.getDisplayName(it).lowercase(it) },
-                    ).plus(
-                        allAvailableLanguages
-                            .asSequence()
-                            .sortedBy { it.getDisplayName(it).lowercase(it) },
-                    )
-            } else {
-                context
-                    .getLocales()
-                    .sortedBy { it.displayName }
-                    .plus(
-                        allAvailableLanguages
-                            .asSequence()
-                            .sortedBy { it.getDisplayName(it).lowercase(it) },
-                    )
-            }.distinctBy { it.toLanguageTag() }
+            context
+                .detectLocaleFromText(
+                    textToSpeechQueue.joinToString("\n\n"),
+                    minConfidence = 0f,
+                ).sortedByDescending { it.confidence }
+                .map { it.locale }
+                .plus(
+                    context
+                        .getLocales()
+                        .sortedBy { it.getDisplayName(it).lowercase(it) },
+                ).plus(
+                    allAvailableLanguages
+                        .asSequence()
+                        .sortedBy { it.getDisplayName(it).lowercase(it) },
+                ).distinctBy { it.toLanguageTag() }
                 .toList()
 
         _availableLanguages.update {
@@ -300,13 +281,16 @@ class TTSStateHolder(
                         TextToSpeech.SUCCESS -> {
                             true
                         }
+
                         else -> {
                             // In this case, try without region because the TTS engine lies about
                             // what locales are available
                             when (textToSpeech?.setLanguage(Locale.forLanguageTag(locale.language))) {
                                 TextToSpeech.SUCCESS -> {
                                     true
-                                } else -> {
+                                }
+
+                                else -> {
                                     Log.e(LOG_TAG, "${locale.toLanguageTag()} is not supported")
                                     false
                                 }
@@ -385,17 +369,12 @@ class TTSStateHolder(
 }
 
 fun Context.getLocales(): Sequence<Locale> =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        sequence {
-            val locales = resources.configuration.locales
+    sequence {
+        val locales = resources.configuration.locales
 
-            for (i in 0 until locales.size()) {
-                yield(locales[i])
-            }
+        for (i in 0 until locales.size()) {
+            yield(locales[i])
         }
-    } else {
-        @Suppress("DEPRECATION")
-        sequenceOf(resources.configuration.locale)
     }
 
 @RequiresApi(Build.VERSION_CODES.Q)

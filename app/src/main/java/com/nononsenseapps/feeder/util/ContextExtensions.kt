@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
@@ -36,56 +35,54 @@ fun Context.addDynamicShortcutToFeed(
     icon: Icon? = null,
 ) {
     try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
+        val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
 
-            val intent =
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
-                    this,
-                    MainActivity::class.java,
-                ).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-
-            val current = shortcutManager.dynamicShortcuts.toMutableList()
-
-            // Update shortcuts
-            val shortcut: ShortcutInfo =
-                ShortcutInfo
-                    .Builder(this, "$id")
-                    .setShortLabel(label)
-                    .setLongLabel(label)
-                    .setIcon(
-                        icon
-                            ?: Icon.createWithBitmap(
-                                getLetterIcon(
-                                    label,
-                                    id,
-                                    radius = shortcutManager.iconMaxHeight,
-                                ),
-                            ),
-                    ).setIntent(intent)
-                    .setDisabledMessage("Feed deleted")
-                    .setRank(0)
-                    .build()
-
-            if (current.map { it.id }.contains(shortcut.id)) {
-                // Just update existing one
-                shortcutManager.updateShortcuts(listOf(shortcut))
-            } else {
-                // Ensure we do not exceed max limits
-                if (current.size >= shortcutManager.maxShortcutCountPerActivity.coerceAtMost(3)) {
-                    current.sortBy { it.rank }
-                    current.lastOrNull()?.let {
-                        shortcutManager.removeDynamicShortcuts(listOf(it.id))
-                    }
-                }
-
-                // It's new!
-                shortcutManager.addDynamicShortcuts(listOf(shortcut))
+        val intent =
+            Intent(
+                Intent.ACTION_VIEW,
+                "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
+                this,
+                MainActivity::class.java,
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
+
+        val current = shortcutManager.dynamicShortcuts.toMutableList()
+
+        // Update shortcuts
+        val shortcut: ShortcutInfo =
+            ShortcutInfo
+                .Builder(this, "$id")
+                .setShortLabel(label)
+                .setLongLabel(label)
+                .setIcon(
+                    icon
+                        ?: Icon.createWithBitmap(
+                            getLetterIcon(
+                                label,
+                                id,
+                                radius = shortcutManager.iconMaxHeight,
+                            ),
+                        ),
+                ).setIntent(intent)
+                .setDisabledMessage("Feed deleted")
+                .setRank(0)
+                .build()
+
+        if (current.map { it.id }.contains(shortcut.id)) {
+            // Just update existing one
+            shortcutManager.updateShortcuts(listOf(shortcut))
+        } else {
+            // Ensure we do not exceed max limits
+            if (current.size >= shortcutManager.maxShortcutCountPerActivity.coerceAtMost(3)) {
+                current.sortBy { it.rank }
+                current.lastOrNull()?.let {
+                    shortcutManager.removeDynamicShortcuts(listOf(it.id))
+                }
+            }
+
+            // It's new!
+            shortcutManager.addDynamicShortcuts(listOf(shortcut))
         }
     } catch (error: Throwable) {
         Log.d("FeederDynamicShortcut", "Error during add of shortcut: ${error.message}")
@@ -98,10 +95,8 @@ fun Context.addDynamicShortcutToFeed(
  */
 fun Context.reportShortcutToFeedUsed(id: Any) {
     try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
-            shortcutManager.reportShortcutUsed("$id")
-        }
+        val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
+        shortcutManager.reportShortcutUsed("$id")
     } catch (error: Throwable) {
         Log.d("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
     }
@@ -109,13 +104,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
 
 fun Context.unicodeWrap(text: String): String = BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
 
-fun Context.getLocale(): Locale =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        resources.configuration.locales[0]
-    } else {
-        @Suppress("DEPRECATION")
-        resources.configuration.locale
-    }
+fun Context.getLocale(): Locale = resources.configuration.locales[0]
 
 const val DEEP_LINK_HOST = "feederapp.nononsenseapps.com"
 const val DEEP_LINK_BASE_URI = "https://$DEEP_LINK_HOST"
