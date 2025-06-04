@@ -350,10 +350,6 @@ fun SettingsList(
 ) {
     val scrollState = rememberScrollState()
     val dimens = LocalDimens.current
-    val isAndroidQAndAbove =
-        remember {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-        }
     val isAndroidSAndAbove =
         remember {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -708,16 +704,7 @@ fun SettingsList(
                 title = stringResource(id = R.string.use_detect_language),
                 checked = useDetectLanguage,
                 onCheckedChange = onUseDetectLanguageChange,
-                description =
-                    when {
-                        isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
-                        else ->
-                            stringResource(
-                                id = R.string.only_available_on_android_n,
-                                "10",
-                            )
-                    },
-                enabled = isAndroidQAndAbove,
+                description = stringResource(id = R.string.description_for_read_aloud),
             )
         }
 

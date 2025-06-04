@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
@@ -96,10 +95,8 @@ fun Context.addDynamicShortcutToFeed(
  */
 fun Context.reportShortcutToFeedUsed(id: Any) {
     try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
-            shortcutManager.reportShortcutUsed("$id")
-        }
+        val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
+        shortcutManager.reportShortcutUsed("$id")
     } catch (error: Throwable) {
         Log.d("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
     }

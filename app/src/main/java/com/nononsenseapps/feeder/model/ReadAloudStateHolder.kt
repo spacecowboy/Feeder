@@ -98,8 +98,8 @@ class TTSStateHolder(
         textToSpeechQueue.firstOrNull()?.let { text ->
             val lang = _language.value
             val localesToUse: Sequence<Locale> =
-                when {
-                    lang is ForcedAuto && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                when (lang) {
+                    is ForcedAuto -> {
                         context
                             .detectLocaleFromText(text)
                             .sortedByDescending { it.confidence }
@@ -107,7 +107,7 @@ class TTSStateHolder(
                             .plus(_availableLanguages.value)
                     }
 
-                    lang is ForcedLocale -> {
+                    is ForcedLocale -> {
                         sequenceOf(
                             lang.locale,
                         )
@@ -115,7 +115,7 @@ class TTSStateHolder(
 
                     else -> {
                         // Use app setting
-                        if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        if (useDetectLanguage) {
                             context
                                 .detectLocaleFromText(text)
                                 .sortedByDescending { it.confidence }
