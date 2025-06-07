@@ -267,7 +267,7 @@
   <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
   <string name="summarize">Summarize</string>
   <string name="openai_settings">OpenAI integration</string>
-  <string name="api_key">API Key</string>
+  <string name="api_key">API key</string>
   <string name="model_id">Model Id</string>
   <string name="azure_api_version">Azure API version</string>
   <string name="touch_to_play_audio">Touch to play audio</string>
