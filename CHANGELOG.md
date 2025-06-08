@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] - 2025-06-08
+
+### 🚀 Features
+- Removed Nostr support (#784) by @spacecowboy in [#784](https://github.com/spacecowboy/feeder/pull/784) 
+- Removed Conscrypt library (#789) by @spacecowboy in [#789](https://github.com/spacecowboy/feeder/pull/789) 
+- Android 10 (sdk29) is now the oldest supported version (#796) by @spacecowboy in [#796](https://github.com/spacecowboy/feeder/pull/796) 
+
+### 🐛 Bug Fixes & Minor Changes
+- Ensured app is compatible with 16KB page sizes on modern Android devices (#781) by @spacecowboy in [#781](https://github.com/spacecowboy/feeder/pull/781) 
+- Update feed URLs based on reported URL in feed (#785) by @spacecowboy in [#785](https://github.com/spacecowboy/feeder/pull/785) 
+
+### 🌐 Translations
+- Updated Japanese translation using Weblate by @larouxn in [#765](https://github.com/spacecowboy/feeder/pull/765) 
+- Updated Turkish translation (#783) by @mikropsoft in [#783](https://github.com/spacecowboy/feeder/pull/783) 
+- Updated Catalan translation using Weblate by @sf0nt in [commit](https://github.com/spacecowboy/feeder/commit/4f18b7ea0bddd89238515932e12ee8b48190922e)
+- Updated Latvian translation using Weblate by @Coool in [#782](https://github.com/spacecowboy/feeder/pull/782) 
+- Changed "API Key" to "API key" (#802) by @GerbillLife in [#802](https://github.com/spacecowboy/feeder/pull/802) 
+
+### ❤️  New Contributors
+* @GerbillLife made their first contribution in [#802](https://github.com/spacecowboy/feeder/pull/802)
+
 ## [2.11.5] - 2025-05-24
 
 ### 🌐 Translations
@@ -4519,6 +4540,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.12.0]: https://github.com/spacecowboy/feeder/compare/2.11.5..2.12.0
 [2.11.5]: https://github.com/spacecowboy/feeder/compare/2.11.4..2.11.5
 [2.11.4]: https://github.com/spacecowboy/feeder/compare/2.11.3..2.11.4
 [2.11.3]: https://github.com/spacecowboy/feeder/compare/2.11.2..2.11.3
