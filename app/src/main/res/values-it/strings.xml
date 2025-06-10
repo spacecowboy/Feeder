@@ -264,4 +264,21 @@
     <string name="nostr_feed_description">Articoli di Nostr da %1$s</string>
     <string name="on">Abilitato</string>
     <string name="off">Disabilitato</string>
+    <string name="text">Testo</string>
+    <string name="add_font">Aggiungi font…</string>
+    <string name="italic">Corsivo</string>
+    <string name="bold">Grassetto</string>
+    <string name="text_settings">Impostazioni testo</string>
+    <string name="could_not_add_font">Impossibile aggiungere il font</string>
+    <string name="could_not_remove_font">Impossibile rimuovere il font</string>
+    <string name="something_went_wrong">Qualcosa è andato storto</string>
+    <string name="cancel_search">Cancella ricerca</string>
+    <string name="search_verb">Cerca</string>
+    <string name="time_out_validation_error">Il timeout deve essere compreso tra 30 e 600 secondi</string>
+    <string name="time_out_placeholder">Timeout per richieste OpenAI</string>
+    <string name="font">Font</string>
+    <string name="text_preview">Anteprima testo</string>
+    <string name="system_default">Sistema predefinito</string>
+    <string name="weight">Peso</string>
+    <string name="time_out">Timeout (secondi)</string>
 </resources>
