@@ -2,7 +2,7 @@
 <resources>
     <string name="tag">Címke</string>
     <string name="url">Webcím</string>
-    <string name="add_feed_search_hint">Hírfolyam webcíme</string>
+    <string name="add_feed_search_hint">Hírforrás webcíme</string>
     <string name="empty_feed_top">Nincs itt semmi olvasnivaló. Szeretne inkább…</string>
     <string name="title">Cím</string>
     <string name="save">Mentés</string>
@@ -12,16 +12,16 @@
     <string name="navigation_drawer_close">Navigációs fiók becsukása</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="action_settings">Beállítások</string>
-    <string name="add_feed">Hírfolyam hozzáadása</string>
-    <string name="title_activity_edit_feed">Feliratkozás hírfolyamra</string>
-    <string name="empty_feed_open">Másik hírfolyamot <annotation style="link">megnyitni</annotation>\?</string>
-    <string name="empty_feed_add">Több hírfolyamot <annotation style="link">hozzáadni</annotation>\?</string>
-    <string name="search_feed_empty_hint">Adjon meg egy hírfolyam címet</string>
+    <string name="add_feed">Hírforrás hozzáadása</string>
+    <string name="title_activity_edit_feed">Feliratkozás egy hírforrásra</string>
+    <string name="empty_feed_open">Másik hírforrást <annotation style="link">megnyitni</annotation>\?</string>
+    <string name="empty_feed_add">Több hírforrást <annotation style="link">hozzáadni</annotation>\?</string>
+    <string name="search_feed_empty_hint">Adjon meg egy címet a hírforráshoz</string>
     <string name="mark_as_read">Megjelölés olvasottként</string>
     <string name="mark_as_unread">Megjelölés olvasatlanként</string>
     <string name="mark_all_as_read">Az összes megjelölése olvasottként</string>
-    <string name="edit_feed">Hírfolyam szerkesztése</string>
-    <string name="delete_feed">Hírfolyam törlése</string>
+    <string name="edit_feed">Hírforrás szerkesztése</string>
+    <string name="delete_feed">Hírforrás törlése</string>
     <string name="show_all_items">Az összes elem megjelenítése</string>
     <string name="show_unread_items">Olvasatlan elemek megjelenítése</string>
     <string name="new_items_available">Új elemek érhetők el</string>
@@ -31,9 +31,9 @@
     <string name="dont_notify_for_new_items">Értesítések leállítása</string>
     <string name="toggle_read_status">Olvasónézet átváltása</string>
     <string name="open_link_in_browser">Hivatkozás megnyitása böngészőben</string>
-    <string name="no_such_feed">Nem található ilyen hírfolyam. Megpróbálja a HTTPS használatát?</string>
-    <string name="export_feeds_to_opml">Hírfolyamok exportálása OPML fájlba</string>
-    <string name="import_feeds_from_opml">Hírfolyamok importálása OPML fájlból</string>
+    <string name="no_such_feed">Nem található ilyen hírforrás. Megpróbálja a HTTPS használatát?</string>
+    <string name="export_feeds_to_opml">Hírforrások exportálása OPML-fájlba</string>
+    <string name="import_feeds_from_opml">Hírforrások importálása OPML-fájlból</string>
     <string name="indicator_for_mark_as_read">Megjelölés olvasottként jelző</string>
     <string name="share">Megosztás</string>
     <string name="nothing_to_display">Nincs mint megjeleníteni!</string>
@@ -59,9 +59,9 @@
     <string name="add_item">Elem hozzáadása</string>
     <string name="show_fab">Lebegő akciógomb megjelenítése</string>
     <string name="include_mobile_hotspots">Mobil hotspotokat is beleértve</string>
-    <string name="updated_feeds">Frissített hírfolyamok</string>
-    <string name="notification_channel_name">Olvasatlan hírfolyamok</string>
-    <string name="notification_channel_description">Az értesítések csak a konfigurált hírfolyamok olvasatlan elemeihez jelennek meg</string>
+    <string name="updated_feeds">Frissített hírforrások</string>
+    <string name="notification_channel_name">Olvasatlan hírforrások</string>
+    <string name="notification_channel_description">Az értesítések csak a konfigurált hírforrások olvasatlan elemeihez jelennek meg</string>
     <string name="open_in_reader">Olvasó</string>
     <string name="open_in_webview">Webes nézet</string>
     <string name="open_in_default_browser">Alapértelmezett böngésző</string>
@@ -72,7 +72,7 @@
     <string name="reader_settings">Olvasó</string>
     <string name="open_link_in_web_view">Hivatkozás megnyitása webes nézetben</string>
     <string name="open_in_web_view">Megnyitás webes nézetben</string>
-    <string name="max_feed_items">Maximális elemszám hírfolyamonként</string>
+    <string name="max_feed_items">Maximális elemszám hírforrásonként</string>
     <string name="could_not_load_url">Nem tölthető be a webcím</string>
     <string name="theme_system">Rendszer</string>
     <string name="theme_automatic">Automatikus</string>
@@ -89,7 +89,7 @@
     <string name="no_email_client">Nem nyitható meg az E-mail kliens</string>
     <string name="javascript">JavaScript</string>
     <string name="mark_items_above_as_read">A fentebbiek megjelölése olvasottként</string>
-    <string name="discovered_feeds_list">Talált hírfolyamok listája</string>
+    <string name="discovered_feeds_list">Felfedezett hírforrások listája</string>
     <string name="toggle_tag_expansion">Címke-kiegészítés átváltása</string>
     <string name="expanded_tag">Címke megnyitása</string>
     <string name="contracted_tag">Bezárt címke</string>
@@ -108,7 +108,7 @@
     <string name="already_read">Már elolvasott</string>
     <string name="showing_only_unread_articles">Csak olvasatlan cikkek megjelenítése</string>
     <string name="showing_all_articles">Az összes cikk megjelenítése</string>
-    <string name="synchronize_feeds">Hírfolyamok szinkronizálása</string>
+    <string name="synchronize_feeds">Hírforrások szinkronizálása</string>
     <string name="zero_unread_articles">%1$s olvasatlan cikk</string>
     <string name="one_unread_article">%1$s olvasatlan cikk</string>
     <string name="two_unread_articles">%1$s olvasatlan cikk</string>
@@ -118,9 +118,9 @@
     <string name="feed_item_style">Cikkstílus</string>
     <string name="feed_item_style_card">Kártya</string>
     <string name="generate_extra_unique_ids">Extra egyéni azonosítók generálása</string>
-    <string name="only_enable_for_bad_id_feeds">Csak rossz azonosítókkal rendelkező hírfolyamok számára engedélyezze</string>
-    <string name="failed_to_import_OPML">Nem sikerült a hírfolyamok importálás az OPML fájlból</string>
-    <string name="failed_to_export_OPML">Nem sikerült a hírfolyamok exportálása az OPML fájlba</string>
+    <string name="only_enable_for_bad_id_feeds">Csak rossz azonosítókkal rendelkező hírforrások számára engedélyezze</string>
+    <string name="failed_to_import_OPML">Nem sikerült az OPML-fájlt importálni</string>
+    <string name="failed_to_export_OPML">Nem sikerült exportálni az OPML-fájlba</string>
     <string name="device_sync">Eszközszinkronizálás</string>
     <string name="add_new_device">Új eszköz hozzáadása</string>
     <string name="device_sync_financed_by_community">Ezt a szolgáltatást a közösség fizeti. Fontolja meg az adományozást, ha hasznosnak találja.</string>
@@ -135,7 +135,7 @@
     <string name="remove_device_question">Biztosan el akarja távolítani ezt az eszközt: %1$s?</string>
     <string name="press_scan_sync">Az eszközén navigáljon az eszköz szinkronizációhoz, és nyomjon a szinkronizálási kód beolvasására.</string>
     <string name="or_open_device_sync_link">Vagy nyissa meg a hivatkozást az eszközén.</string>
-    <string name="device_sync_description_1">Az eszközszinkronizálás lehetővé teszi, a feliratkozások és cikkek különböző eszközök közötti szinkronizálását.</string>
+    <string name="device_sync_description_1">Az eszközszinkronizálás lehetővé teszi a feliratkozott hírforrások és cikkek különböző eszközök közötti szinkronizálását.</string>
     <string name="device_sync_description_2">Egyszerűen olvassa be a kódot a szinkronizálási láncból, amit egy másik eszközön hozott létre, vagy hozzon létre egy újat.</string>
     <string name="scan_or_enter_code">Olvasson be vagy adjon meg egy szinkronizálási kódot</string>
     <string name="start_new_sync_chain">Új szinkronizálási lánc indítása</string>
@@ -148,7 +148,7 @@
     <string name="swipe_to_mark_as_read">Csúsztatás az olvasottnak jelöléshez</string>
     <string name="are_you_sure_leave_sync_chain">Biztosan el akarja hagyni a szinkronizálási láncot?</string>
     <string name="no_barcode_scanner_installed">Nem található vonalkódolvasó</string>
-    <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy hírfolyamokat és cikkeket olvasson</string>
+    <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy hírforrásokat és cikkeket olvasson</string>
     <string name="permission_read_label">Feeder csak olvasási engedély</string>
     <string name="open_enclosed_media">Médiamelléklet megnyitása</string>
     <string name="open_enclosed_media_file">%1$s megnyitása</string>
@@ -159,11 +159,11 @@
     <string name="sync">Szinkronizálás</string>
     <string name="view_debug_log">Hibakeresési napló megtekintése</string>
     <string name="new_based_on_this">Ehhez hasonló újak</string>
-    <string name="all_feeds">Összes hírfolyam</string>
+    <string name="all_feeds">Összes hírforrás</string>
     <string name="check_for_updates">Új cikkek lekérdezése…</string>
     <string name="sync_status">Szinkronizálás állapota</string>
     <string name="touch_to_play_video">Érintse meg a videó indításhoz</string>
-    <string name="open_feed">Hírfolyam megnyitása</string>
+    <string name="open_feed">Hírforrás megnyitása</string>
     <string name="mark_items_below_as_read">A lentebbiek megjelölése olvasottként</string>
     <string name="battery_optimization_disabled">Kikapcsolva</string>
     <string name="battery_optimization">Akkumulátoroptimalizáció</string>
@@ -176,13 +176,13 @@
     <string name="new_indicator">Új</string>
     <string name="explanation_permission_notifications">Az engedélyt meg kell adni, az értesítések engedélyezése előtt.</string>
     <string name="block_list_description">Elrejti azokat a cikkeket, amelyek címe tartalmazza a fenti szűrők bármelyikét. Néhány példa a szűrőkhöz:</string>
-    <string name="no_feeds">Nincsenek hírfolyamok</string>
-    <string name="zero_feeds">%1$s hírfolyam</string>
-    <string name="one_feed">%1$s hírfolyam</string>
-    <string name="two_feeds">%1$s hírfolyam</string>
-    <string name="few_feeds">%1$s hírfolyam</string>
-    <string name="many_feeds">%1$s hírfolyam</string>
-    <string name="other_feeds">%1$s hírfolyam</string>
+    <string name="no_feeds">Nincsenek hírforrások</string>
+    <string name="zero_feeds">%1$s hírforrás</string>
+    <string name="one_feed">%1$s hírforrás</string>
+    <string name="two_feeds">%1$s hírforrás</string>
+    <string name="few_feeds">%1$s hírforrás</string>
+    <string name="many_feeds">%1$s hírforrás</string>
+    <string name="other_feeds">%1$s hírforrás</string>
     <string name="import_x_feeds_with_y_tags">%1$s importálása a következővel: %2$s?</string>
     <string name="zero_tags">%1$s címke</string>
     <string name="one_tags">%1$s címke</string>
@@ -190,11 +190,11 @@
     <string name="few_tags">%1$s címke</string>
     <string name="many_tags">%1$s címke</string>
     <string name="other_tags">%1$s címke</string>
-    <string name="failed_to_fetch_full_article_missing_link">A hírfolyamból hiányzik a cikk hivatkozása</string>
+    <string name="failed_to_fetch_full_article_missing_link">A hírforrásból hiányzik a cikk hivatkozása</string>
     <string name="failed_to_fetch_full_article_not_html">A hivatkozás nem egy HTML-dokumentum</string>
     <string name="failed_to_fetch_full_article_missing_body">Semmi nem található a lekéréshez</string>
     <string name="dynamic_theme_use">Dinamikus színek</string>
-    <string name="feed_icon">Hírfolyam ikonja</string>
+    <string name="feed_icon">Hírforrás ikonja</string>
     <string name="mark_as_read_on_scroll">Megjelölés olvasottként görgetéskor</string>
     <string name="skip_to_next">Ugrás a következőre</string>
     <string name="set_language">Nyelv beállítása</string>
@@ -216,9 +216,9 @@
     <string name="read_adjective">Olvasott</string>
     <string name="saved_adjective">Mentett</string>
     <string name="failed_to_download">Nem sikerült a letöltés</string>
-    <string name="failed_to_parse_rss_feed">Nem sikerült feldolgozni az RSS hírfolyamot</string>
+    <string name="failed_to_parse_rss_feed">Nem sikerült feldolgozni az RSS-hírforrást</string>
     <string name="http_error">HTTP hiba</string>
-    <string name="failed_to_parse_json_feed">Nem sikerült feldolgozni a JSON hírfolyamot</string>
+    <string name="failed_to_parse_json_feed">Nem sikerült feldolgozni a JSON-hírforrást</string>
     <string name="unsupported_content_type">Nem támogatott tartalomtípus</string>
     <string name="failed_to_parse_full_article">Nem sikerült feldolgozni a teljes cikket</string>
     <string name="no_url">Nincs webcím</string>
@@ -226,7 +226,7 @@
     <string name="max_lines">Maximális sorok</string>
     <string name="failed_to_parse_the_page">Nem sikerült feldolgozni az oldalt</string>
     <string name="no_body_in_response">Nincs tartalma a válasznak</string>
-    <string name="no_feeds_in_the_page">Nincsenek hírfolyamok az oldalon</string>
+    <string name="no_feeds_in_the_page">Nincsenek hírforrások az oldalon</string>
     <string name="show_reading_time">Várható olvasási idő megjelenítése</string>
     <string name="many_words">%1$s szó</string>
     <string name="other_minutes">%1$s perc</string>
@@ -260,7 +260,7 @@
     <string name="openai_settings">OpenAI-integráció</string>
     <string name="unable_to_load_models">Nem lehet betölteni a modelleket.</string>
     <string name="show_message">Üzenet megjelenítése</string>
-    <string name="open_drawer_on_fab">A hírfolyam megjelenítése miután az összes cikk meg lett jelölve olvasottként</string>
+    <string name="open_drawer_on_fab">A hírforrás megjelenítése miután az összes cikk meg lett jelölve olvasottként</string>
     <string name="nostr_feed_description">%1$s Nostr-cikkei</string>
     <string name="off">Kikapcsolva</string>
     <string name="on">Bekapcsolva</string>
