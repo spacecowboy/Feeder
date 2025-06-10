@@ -1,4 +1,4 @@
-<p>Feeder è un lettore open source di feed per Android creato nel 2014.</p>
+<p>Feeder è un lettore open source di feed (RSS/Atom/JSONFeed) per Android creato nel 2014.</p>
 
 <p>Con Feeder potete leggere le ultime notizie e i post dei vostri siti preferiti.</p>
 
@@ -17,3 +17,5 @@
 <li>Comodo accesso ai collegamenti degli allegati </li>
 <li>Material design</li>
 </ul>
+
+Il changelog completo è disponibile su  <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHub</a>.
