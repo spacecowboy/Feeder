@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.1] - 2025-06-14
+
+### 🌐 Translations
+- Updated Turkish translation using Weblate by @weblate in [commit](https://github.com/spacecowboy/feeder/commit/aba362a134c73b5ca023f45da2225889e0b74eed)
+- Updated Hungarian translation using Weblate by @summoner001 in [commit](https://github.com/spacecowboy/feeder/commit/b86e0e433fb2d1ca762e3a92e45494966f5a7ab3)
+- Updated Italian translation using Weblate by @Wiccio in [#804](https://github.com/spacecowboy/feeder/pull/804) 
+
+
 ## [2.12.0] - 2025-06-08
 
 ### 🚀 Features
@@ -4540,6 +4548,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.12.1]: https://github.com/spacecowboy/feeder/compare/2.12.0..2.12.1
 [2.12.0]: https://github.com/spacecowboy/feeder/compare/2.11.5..2.12.0
 [2.11.5]: https://github.com/spacecowboy/feeder/compare/2.11.4..2.11.5
 [2.11.4]: https://github.com/spacecowboy/feeder/compare/2.11.3..2.11.4

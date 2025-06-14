@@ -35,8 +35,8 @@ android {
         applicationId = "com.nononsenseapps.feeder"
         // The version fields are set with actual values to support F-Droid
         // In Play variant, they are overridden and taken from git.
-        versionCode = 3715
-        versionName = "2.12.0"
+        versionCode = 3720
+        versionName = "2.12.1"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk = 35
@@ -120,7 +120,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = "2.12.0"
+                versionName = "2.12.1"
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
