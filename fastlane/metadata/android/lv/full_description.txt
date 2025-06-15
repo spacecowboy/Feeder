@@ -1,21 +1,21 @@
-<p>Feeder is an open source feed reader (RSS/Atom/JSONFeed) for Android created in 2014.</p>
+<p>Feeder — atvērtā pirmkoda ziņu plūsmas lasītājs (RSS/Atom/JSONFeed) Android ierīcēm, kas tapa 2014. gadā.</p>
 
-<p>With Feeder you can read the latest news and posts from your favorite sites.</p>
+<p>Ar Feeder jūs variet sekot savām iecienītāko vietņu jaunākajām ziņām un rakstiem.</p>
 
-<p>Feeder does NOT sync with usual remote backends so no account registration of any kind is necessary.</p>
+<p>Feeder NEIZMANTO nekādus attālinātos serverus un pakalpojumus, lai atsvaidzinātu ziņu plūsmas, tāpēc nav nepieciešama nekāda konta reģistrācija.</p>
 
-<p>Feeder is free to use and runs locally on your device. Your data is 100% private.</p>
+<p>Feeder ir pieejams bez maksas, un darbojas tikai jūsu ierīcē. Jūsu dati ir 100% drošībā.</p>
 
-<p><b>Features</b></p>
+<p><b>Funkcionalitāte</b></p>
 
 <ul>
-<li>Parses HTML and displays it in a native TextView</li>
-<li>Offline reading</li>
-<li>Background synchronization</li>
-<li>Notifications</li>
-<li>OPML Import/Export</li>
-<li>Handy access to enclosure links</li>
-<li>Material design</li>
+<li>Parsē HTML un parāda to sākotnējā teksta skatā</li>
+<li>Iespēja lasīt bezsaistē</li>
+<li>Fona ziņu plūsmas atsvaidzināšana</li>
+<li>Paziņojumi</li>
+<li>Iespēja ievietot/izgūt ziņu plūsmas, izmantojot OPML</li>
+<li>Ērta piekļuve ielīmētajām saitēm</li>
+<li>Material dizains</li>
 </ul>
 
-Full changelog is available <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
+Pilnais izmaiņu žurnāls pieejams <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHub</a>.
