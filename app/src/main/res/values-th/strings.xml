@@ -259,4 +259,20 @@
     <string name="cancel_search">ยกเลิกการค้นหา</string>
     <string name="on">เปิด</string>
     <string name="off">ปิด</string>
+    <string name="something_went_wrong">มีบางอย่างผิดปกติ</string>
+    <string name="font">ฟ้อนต์</string>
+    <string name="could_not_remove_font">ถอนฟ้อนต์ไม่ได้</string>
+    <string name="text_settings">การตั้งค่าตัวอักษร</string>
+    <string name="could_not_add_font">เพื่มฟ้อนต์ไม่ได้</string>
+    <string name="add_font">เพื่มฟ้อนต์…</string>
+    <string name="italic">ตัวเอียง</string>
+    <string name="text_preview">ตัวอย่างตัวอักษร</string>
+    <string name="bold">ตัวหนา</string>
+    <string name="system_default">ค่าเรื่มต้นของระบบ</string>
+    <string name="weight">น้ำหนัก</string>
+    <string name="time_out">หมดเวลา (วินาที)</string>
+    <string name="time_out_validation_error">ระยะหมดเวลาต้องอยู่ระหว่าง 30 ถึง 600 วินาที</string>
+    <string name="time_out_placeholder">หมดเวลาคำขอสำหรับ OpenAI</string>
+    <string name="azure_api_version">เวอร์ชั่น Azure API</string>
+    <string name="text">ข้อความ</string>
 </resources>
