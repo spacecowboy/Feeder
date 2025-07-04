@@ -124,7 +124,7 @@
     <string name="theme_night">Нощ</string>
     <string name="no_activity_for_link">Първо инсталирайте нещо, с което да отворите тази връзка</string>
     <string name="battery_optimization_enabled">Включи</string>
-    <string name="explanation_permission_notifications">Трябва да се даде разрешение, преди да могат да се активират известията.</string>
+    <string name="explanation_permission_notifications">Разрешението трябва да бъде предоставено, преди да бъдат активирани известията.</string>
     <string name="fetch_full_articles_by_default">Извлечи цели статии по подразбиране</string>
     <string name="zero_tags">%1$s категории</string>
     <string name="sync_option_every_day">Всеки ден</string>
