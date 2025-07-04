@@ -7,7 +7,7 @@ kotlinxSerialization = "1.8.1"
 androidPlugin = "8.10.1"
 # BEGIN These should be upgraded in unison. See https://square.github.io/okhttp/changelogs/changelog_4x/
 okhttp = "5.0.0"
-okio = "3.6.0"
+okio = "3.15.0"
 # END Unison
 ktlint-gradle = "12.3.0"
 ktlint-compose = "0.4.22"
