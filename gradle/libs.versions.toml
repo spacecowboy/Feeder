@@ -9,7 +9,7 @@ androidPlugin = "8.11.0"
 okhttp = "5.1.0"
 okio = "3.15.0"
 # END Unison
-ktlint-gradle = "12.3.0"
+ktlint-gradle = "13.0.0"
 ktlint-compose = "0.4.22"
 kodein = "7.26.1"
 coroutines = "1.10.2"
