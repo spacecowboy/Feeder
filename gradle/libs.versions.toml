@@ -4,7 +4,7 @@
 kotlin = "2.2.0"
 ksp = "2.2.0-2.0.2"
 kotlinxSerialization = "1.9.0"
-androidPlugin = "8.11.0"
+androidPlugin = "8.11.1"
 # BEGIN These should be upgraded in unison. See https://square.github.io/okhttp/changelogs/changelog_4x/
 okhttp = "5.1.0"
 okio = "3.15.0"
