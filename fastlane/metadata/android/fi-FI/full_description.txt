@@ -1,19 +1,21 @@
-<p>Feeder on vuonna 2014 luotu avoimen lähdekoodin syötteenlukija (RSS/Atom/JSONFeed) Androidille.</p>
+<p>Feeder on avoimen lähdekoodin syötteidenlukija (RSS/Atom/JSONFeed) Androidille, joka luotiin vuonna 2014.</p>
 
-<p>Feederin avulla voit lukea uusimmat uutiset ja viestit suosikkisivustoistasi.</p>
+<p>Feederin avulla voit lukea uusimmat uutiset ja julkaisut suosikkisivustoiltasi.</p>
 
-<p>Feeder EI synkronoidu tavallisten etätaustajärjestelmien kanssa, joten minkäänlaista tilin rekisteröintiä ei tarvita.</p>
+<p>Feeder ei synkronoidu tavallisten etätaustapalveluiden kanssa, joten minkäänlaista tilin rekisteröintiä ei tarvita.</p>
 
-<p>Feederin käyttö on ilmaista, ja se toimii paikallisesti laitteellasi. Tietosi ovat 100 % yksityisiä.</p>
+<p>Feeder on ilmainen käyttää ja toimii paikallisesti laitteellasi. Tietosi ovat täysin yksityisiä.</p>
 
 <p><b>Ominaisuudet</b></p>
 
 <ul>
-<li>Jäsentää HTML:n ja näyttää sen alkuperäisessä TextView-näkymässä</li>
-<li>Ei-verkkolukeminen</li>
+<li>Jäsentää HTML:n ja näyttää sen natiivissa TextView'ssa</li>
+<li>Offline-lukeminen</li>
 <li>Taustasynkronointi</li>
 <li>Ilmoitukset</li>
 <li>OPML-tuonti/vienti</li>
-<li>Kätevä pääsy kotelon linkkeihin</li>
+<li>Kätevä pääsy kotelolinkkeihin</li>
 <li>Materiaalisuunnittelu</li>
 </ul>
+
+Täydellinen muutosloki on saatavilla <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHubissa</a>.
