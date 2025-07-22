@@ -264,4 +264,21 @@
     <string name="nostr_feed_description">Artikel Nostr oleh %1$s</string>
     <string name="on">Aktif</string>
     <string name="off">Nonaktif</string>
+    <string name="time_out">Waktu habis (detik)</string>
+    <string name="time_out_validation_error">Waktu habis harus antara 30 dan 600 detik</string>
+    <string name="search_verb">Cari</string>
+    <string name="cancel_search">Batal cari</string>
+    <string name="text">Teks</string>
+    <string name="font">Fonta</string>
+    <string name="text_preview">Pratinjau teks</string>
+    <string name="system_default">Bawaan sistem</string>
+    <string name="weight">Berat</string>
+    <string name="italic">Miring</string>
+    <string name="add_font">Tambah fonta…</string>
+    <string name="bold">Tebal</string>
+    <string name="text_settings">Pengaturan teks</string>
+    <string name="could_not_add_font">Tidak bisa menambahkan fonta</string>
+    <string name="could_not_remove_font">Tidak bisa menghapus fonta</string>
+    <string name="something_went_wrong">Telah terjadi kesalahan</string>
+    <string name="time_out_placeholder">Waktu habis untuk permintaan OpenAI</string>
 </resources>
