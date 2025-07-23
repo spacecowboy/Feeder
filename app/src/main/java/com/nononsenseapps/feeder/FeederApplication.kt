@@ -13,6 +13,7 @@ import coil3.SingletonImageLoader
 import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
+import coil3.memoryCacheMaxSizePercentWhileInBackground
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.request.maxBitmapSize
@@ -180,6 +181,7 @@ class FeederApplication :
                     .crossfade(true)
                     .coroutineContext(applicationCoroutineScope.coroutineContext)
                     .maxBitmapSize(Size(2500, 2500))
+                    .memoryCacheMaxSizePercentWhileInBackground(0.05)
                     .diskCache(
                         DiskCache
                             .Builder()
