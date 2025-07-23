@@ -118,7 +118,7 @@ class FeederApplication :
                 val filePathProvider = instance<FilePathProvider>()
                 cachingHttpClient(
                     cacheDirectory = filePathProvider.httpCacheDir,
-                    cacheSize = 25L * 1024 * 1024,
+                    cacheSize = 200L * 1024 * 1024,
                 ) {
                     addNetworkInterceptor(UserAgentInterceptor)
                     addNetworkInterceptor(RateLimitedInterceptor)
@@ -151,7 +151,7 @@ class FeederApplication :
                         .newBuilder()
                         // Use a separate cache for images so we don't evict feed responses
                         // Note that coil has its own cache, so this is only for the network
-                        .cache(Cache(filePathProvider.httpImageCacheDir, 25L * 1024 * 1024))
+                        .cache(Cache(filePathProvider.httpImageCacheDir, 300L * 1024 * 1024))
                         .addInterceptor(AlwaysUseCacheIfPossibleRequestsInterceptor)
                         .addInterceptor { chain ->
                             chain.proceed(
@@ -184,12 +184,12 @@ class FeederApplication :
                         DiskCache
                             .Builder()
                             .directory(filePathProvider.imageCacheDir.toOkioPath())
-                            .maxSizeBytes(250L * 1024 * 1024)
+                            .maxSizeBytes(200L * 1024 * 1024)
                             .build(),
                     ).memoryCache {
                         MemoryCache
                             .Builder()
-                            .maxSizeBytes(50 * 1024 * 1024)
+                            .maxSizeBytes(100 * 1024 * 1024)
                             .build()
                     }.components {
                         add(OneImageRequestPerHostInterceptor)
