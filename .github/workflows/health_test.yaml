@@ -1,0 +1,21 @@
+name: Health Test
+
+on:
+  push:
+    branches:
+      - healthcheck
+  pull_request:
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping start
+        run: curl -X GET "https://hc-ping.com/77c53451-1da6-4101-93d9-0eb5e24cf107/start"
+
+      - name: Wait for 10 seconds
+        run: sleep 10
+
+      - name: Ping end
+        run: curl -X GET "https://hc-ping.com/77c53451-1da6-4101-93d9-0eb5e24cf107"
