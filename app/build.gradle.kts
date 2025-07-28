@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -139,13 +141,10 @@ android {
                     apiLevel = 30
                     // To include Google services, use "google".
                     systemImageSource = "aosp-atd"
+                    testedAbi = "x86"
                 }
             }
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = "11"
     }
 
     compileOptions {
@@ -213,6 +212,7 @@ kotlin {
     jvmToolchain(17)
     compilerOptions {
         allWarningsAsErrors = false
+        jvmTarget = JvmTarget.JVM_11
     }
 }
 
