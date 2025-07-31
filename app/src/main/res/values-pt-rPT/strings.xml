@@ -275,4 +275,9 @@
     <string name="close_menu">Fechar menu</string>
     <string name="off">Desativada</string>
     <string name="add_font">Adicionar fonte…</string>
+    <string name="nostr_feed_description">Artigos Nostr por %1$s</string>
+    <string name="time_out_validation_error">O tempo limite deve ser entre 30 e 600 segundos</string>
+    <string name="time_out">Tempo limite (segundos)</string>
+    <string name="time_out_placeholder">Tempo limite para requerimentos do OpenAI</string>
+    <string name="azure_deployment_id">Id de implantação do Azure</string>
 </resources>
