@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.2] - 2025-08-03
+
+### 🐛 Bug Fixes & Minor Changes
+- Increased allowed cache sizes (#862) by @spacecowboy in [#862](https://github.com/spacecowboy/feeder/pull/862) 
+
+### 🌐 Translations
+- Updated Latvian translation using Weblate by @Coool in [commit](https://github.com/spacecowboy/feeder/commit/4281a146e2cc3228b188a9339144e4cb87c284f1)
+- Updated Hungarian translation using Weblate in [#811](https://github.com/spacecowboy/feeder/pull/811) 
+- Updated Thai translation using Weblate by @bowornsin in [commit](https://github.com/spacecowboy/feeder/commit/5f4cb2734917c860c817436cc42a36970aa200f8)
+- Updated Bulgarian translation using Weblate by @trunars in [commit](https://github.com/spacecowboy/feeder/commit/b4c0d966abb9b05bd7f372312fe42bbab7ffff82)
+- Updated Tamil translation using Weblate by @TamilNeram in [#825](https://github.com/spacecowboy/feeder/pull/825) 
+- Updated Slovak translation using Weblate by @martinco78 in [#850](https://github.com/spacecowboy/feeder/pull/850) 
+- Updated Indonesian translation using Weblate by @zmni in [commit](https://github.com/spacecowboy/feeder/commit/501b1e92303f9217822e447175ac6de5e0395595)
+- Updated Finnish translation using Weblate by @Ricky-Tigg in [#861](https://github.com/spacecowboy/feeder/pull/861) 
+- Updated Portuguese (Portugal) translation using Weblate by @SantosSi in [commit](https://github.com/spacecowboy/feeder/commit/0b63187eb6bcdf0c17d54a52813a918b57cc72b1)
+
+### ❤️  New Contributors
+* @martinco78 made their first contribution in [#850](https://github.com/spacecowboy/feeder/pull/850)
+
 ## [2.12.1] - 2025-06-14
 
 ### 🌐 Translations
@@ -29,10 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Turkish translation (#783) by @mikropsoft in [#783](https://github.com/spacecowboy/feeder/pull/783) 
 - Updated Catalan translation using Weblate by @sf0nt in [commit](https://github.com/spacecowboy/feeder/commit/4f18b7ea0bddd89238515932e12ee8b48190922e)
 - Updated Latvian translation using Weblate by @Coool in [#782](https://github.com/spacecowboy/feeder/pull/782) 
-- Changed "API Key" to "API key" (#802) by @GerbillLife in [#802](https://github.com/spacecowboy/feeder/pull/802) 
+- Changed "API Key" to "API key" (#802) in [#802](https://github.com/spacecowboy/feeder/pull/802) 
 
-### ❤️  New Contributors
-* @GerbillLife made their first contribution in [#802](https://github.com/spacecowboy/feeder/pull/802)
 
 ## [2.11.5] - 2025-05-24
 
@@ -245,8 +262,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.8.1] - 2025-01-18
 
 ### 🐛 Bug Fixes & Minor Changes
-- Nostr Mention in Readme by @nostrdev-com in [commit](https://github.com/spacecowboy/feeder/commit/bb16f879b399a7da01c568f51d5e17f038b01f75)
-- Removing example by @nostrdev-com in [#483](https://github.com/spacecowboy/feeder/pull/483) 
+- Nostr Mention in Readme in [commit](https://github.com/spacecowboy/feeder/commit/bb16f879b399a7da01c568f51d5e17f038b01f75)
+- Removing example in [#483](https://github.com/spacecowboy/feeder/pull/483) 
 - Changed memory caching of images to be max 50MB instead of 25% of RAM by @spacecowboy in [#480](https://github.com/spacecowboy/feeder/pull/480) 
 
 ### 🌐 Translations
@@ -263,7 +280,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @jesusFx made their first contribution
 * @yukibtc made their first contribution in [#489](https://github.com/spacecowboy/feeder/pull/489)
-* @nostrdev-com made their first contribution in [#483](https://github.com/spacecowboy/feeder/pull/483)
 
 ## [2.8.0] - 2025-01-04
 
@@ -1348,7 +1364,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes & Minor Changes
 - Fixed articles marking themselves as unread when toggling view unread by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/736935e516596db76eb8502b95cbd1c7ad60699a)
-- Adjust URLs of screenshots by @felix-otto in [commit](https://github.com/spacecowboy/feeder/commit/b14eb75854e30e6fc0bdb1d023432597acbfe7e2)
+- Adjust URLs of screenshots in [commit](https://github.com/spacecowboy/feeder/commit/b14eb75854e30e6fc0bdb1d023432597acbfe7e2)
 - Fixed trailing commas by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/cac7d5e85b96e1806afbeaa6c6052a881c3a4b9a)
 
 ### 🌐 Translations
@@ -1359,7 +1375,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Portuguese (Brazil) translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/da1703167971e1314f49bcd9195aa95540865023)
 
 ### ❤️  New Contributors
-* @felix-otto made their first contribution
 * @carlesmu made their first contribution
 
 ## [2.4.7] - 2023-02-04
@@ -4548,6 +4563,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.12.2]: https://github.com/spacecowboy/feeder/compare/2.12.1..2.12.2
 [2.12.1]: https://github.com/spacecowboy/feeder/compare/2.12.0..2.12.1
 [2.12.0]: https://github.com/spacecowboy/feeder/compare/2.11.5..2.12.0
 [2.11.5]: https://github.com/spacecowboy/feeder/compare/2.11.4..2.11.5
