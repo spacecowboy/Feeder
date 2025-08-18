@@ -152,7 +152,7 @@
     <string name="nostr_feed_description">Nostr raksti no %1$s</string>
     <string name="empty_feed_open">Vai <annotation style="link">atvērt</annotation> citu ziņu plūsmu?</string>
     <string name="unsave_article">Noņemt no atzīmētiem</string>
-    <string name="check_for_updates">Atjaunināt ziņu plūsmas…</string>
+    <string name="check_for_updates">Atsvaidzināt ziņu plūsmas…</string>
     <string name="zero_feeds">%1$s ziņu plūsmu</string>
     <string name="one_feed">%1$s ziņu plūsma</string>
     <string name="two_feeds">%1$s ziņu plūsmas</string>
@@ -226,8 +226,8 @@
     <string name="add_item">Pievienot ierakstu</string>
     <string name="updated_feeds">Atjauninātas ziņu plūsmas</string>
     <string name="open_in_default_browser">Noklusējuma pārlūkā</string>
-    <string name="open_item_by_default_with">Pēc noklusējuma atvērt rakstus ar</string>
-    <string name="open_links_with">Atvērt saites ar</string>
+    <string name="open_item_by_default_with">Pēc noklusējuma atvērt rakstus</string>
+    <string name="open_links_with">Atvērt saites</string>
     <string name="no_email_client">Nevarēja atvērt e-pasta klientu</string>
     <string name="mark_items_below_as_read">Atzīmēt zemāk minētos rakstus kā lasītus</string>
     <string name="battery_optimization">Akumulatora optimizācija</string>
@@ -265,4 +265,6 @@
     <string name="feed_item_style_card">Karšu</string>
     <string name="send_bug_report">Ziņot par kļūdu</string>
     <string name="discovered_feeds_list">Atklāto ziņu plūsmu saraksts</string>
+    <string name="sync_option_manually">Pēc pašu izvēles</string>
+    <string name="permission_read_label">Tikai lasīšanas piekļuve</string>
 </resources>
