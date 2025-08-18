@@ -12,7 +12,7 @@
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Toca per reproduir el vídeo</string>
     <string name="no_email_client">No s\'ha pogut obrir el client de correu</string>
-    <string name="send_bug_report">Enviar un informe d\'error</string>
+    <string name="send_bug_report">Envia un informe d\'error</string>
     <string name="sort">Ordena per</string>
     <string name="sort_oldest_first">El més antic primer</string>
     <string name="sort_newest_first">El més nou primer</string>
