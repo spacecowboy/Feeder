@@ -254,7 +254,7 @@
     <string name="skip_duplicate_articles_desc">Bağlantıları veya başlıkları mevcut makalelerle aynı olan makaleler yok sayılır</string>
     <string name="summarize">Özetle</string>
     <string name="openai_settings">OpenAI entegrasyonu</string>
-    <string name="api_key">API Anahtarı</string>
+    <string name="api_key">API anahtarı</string>
     <string name="model_id">Model Kimliği</string>
     <string name="azure_api_version">Azure API sürümü</string>
     <string name="touch_to_play_audio">Sesi oynatmak için dokunun</string>

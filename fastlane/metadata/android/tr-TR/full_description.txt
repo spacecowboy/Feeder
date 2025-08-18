@@ -17,3 +17,5 @@
 <li>Bağlantılara kullanışlı erişim</li>
 <li>Material tasarımı</li>
 </ul>
+
+Değişikliklerin tam kaydı <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHub'da</a>mevcuttur.
