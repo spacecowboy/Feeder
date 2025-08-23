@@ -54,7 +54,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
     views = [
         FeedsWithItemsForNavDrawer::class,
     ],
-    version = 37,
+    version = 38,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -136,6 +136,7 @@ fun getAllMigrations(di: DI) =
         MigrationFrom34To35(di),
         MigrationFrom35To36(di),
         MigrationFrom36To37(di),
+        MigrationFrom37To38(di),
     )
 
 /*
@@ -186,6 +187,19 @@ class MigrationFrom36To37(
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error during migration of article files from oldArticleDir to articleDir", e)
         }
+    }
+}
+
+class MigrationFrom37To38(
+    override val di: DI,
+) : Migration(37, 38),
+    DIAware {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            ALTER TABLE feeds ADD COLUMN summarize_on_open INTEGER NOT NULL DEFAULT 0
+            """.trimIndent(),
+        )
     }
 }
 

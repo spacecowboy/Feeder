@@ -43,6 +43,7 @@ class CreateFeedScreenViewModel(
     override var notify: Boolean by mutableSavedStateOf(state, false)
     override var articleOpener: String by mutableSavedStateOf(state, "")
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
+    override var summarizeOnOpen: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
     override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")
     override var feedImage: String by mutableStateOf(state["feedImage"] ?: "")

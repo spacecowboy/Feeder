@@ -266,6 +266,7 @@
   <string name="skip_duplicate_articles">Skip duplicate articles</string>
   <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
   <string name="summarize">Summarize</string>
+  <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">OpenAI integration</string>
   <string name="api_key">API key</string>
   <string name="model_id">Model Id</string>

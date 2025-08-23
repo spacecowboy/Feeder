@@ -177,6 +177,21 @@ class ArticleViewModel(
             initialValue = ArticleState(),
         )
 
+    init {
+        viewModelScope.launch {
+            articleFlow.collect { article ->
+                val feedId = article?.item?.feedId
+                if (feedId != null) {
+                    val feed = repository.getFeed(feedId)
+                    if (feed?.summarizeOnOpen == true) {
+                        summarize()
+                        return@collect // Only summarize on first load
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun parseArticleContent(
         article: Article,
         fullText: Boolean,

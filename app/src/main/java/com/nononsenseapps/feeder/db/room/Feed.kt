@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.db.COL_RESPONSEHASH
 import com.nononsenseapps.feeder.db.COL_RETRY_AFTER
 import com.nononsenseapps.feeder.db.COL_SITE_FETCHED
 import com.nononsenseapps.feeder.db.COL_SKIP_DUPLICATES
+import com.nononsenseapps.feeder.db.COL_SUMMARIZE_ON_OPEN
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -59,6 +60,7 @@ data class Feed
         @ColumnInfo(name = COL_SKIP_DUPLICATES) var skipDuplicates: Boolean = false,
         // Time when feed is allowed to be synced again earliest, based on retry-after response header
         @ColumnInfo(name = COL_RETRY_AFTER) var retryAfter: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_SUMMARIZE_ON_OPEN) var summarizeOnOpen: Boolean = false,
     ) {
         constructor() : this(id = ID_UNSET)
 
