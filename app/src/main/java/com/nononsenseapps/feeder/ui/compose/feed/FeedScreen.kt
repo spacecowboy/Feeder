@@ -40,7 +40,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
@@ -151,7 +150,6 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
-import com.nononsenseapps.feeder.util.openGithubIssues
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -320,12 +318,6 @@ fun FeedScreen(
             onSettings = {
                 SettingsDestination.navigate(navController)
             },
-            onSendFeedback = {
-                activityLauncher.startActivity(
-                    openAdjacentIfSuitable = true,
-                    intent = openGithubIssues(),
-                )
-            },
             onImport = {
                 try {
                     opmlImporter.launch(
@@ -451,7 +443,6 @@ fun FeedScreen(
     onShowDeleteDialog: () -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onSettings: () -> Unit,
-    onSendFeedback: () -> Unit,
     onImport: () -> Unit,
     onExportOPML: () -> Unit,
     onExportSavedArticles: () -> Unit,
@@ -867,22 +858,6 @@ fun FeedScreen(
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.action_settings))
-                                },
-                            )
-                            HorizontalDivider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    onSendFeedback()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.BugReport,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.send_bug_report))
                                 },
                             )
                             // Hidden button for TalkBack

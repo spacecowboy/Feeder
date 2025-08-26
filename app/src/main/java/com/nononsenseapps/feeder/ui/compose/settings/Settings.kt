@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +30,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,6 +100,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 import com.nononsenseapps.feeder.util.ActivityLauncher
+import com.nononsenseapps.feeder.util.openGithubIssues
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 
@@ -208,6 +209,12 @@ fun SettingsScreen(
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             onTextSettings = onNavigateToTextSettingsScreen,
             currentFontSelection = viewState.font,
+            onSendFeedback = {
+                activityLauncher.startActivity(
+                    openAdjacentIfSuitable = true,
+                    intent = openGithubIssues(),
+                )
+            },
             modifier = Modifier.padding(padding),
         )
     }
@@ -279,6 +286,7 @@ private fun SettingsScreenPreview() {
             onOpenDrawerOnFab = {},
             onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
+            onSendFeedback = {},
             modifier = Modifier,
         )
     }
@@ -346,6 +354,7 @@ fun SettingsList(
     onOpenDrawerOnFab: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
     onTextSettings: () -> Unit,
+    onSendFeedback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -470,7 +479,7 @@ fun SettingsList(
                 currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
                 values =
                     ImmutableHolder(
-                        SyncFrequency.values().map {
+                        SyncFrequency.entries.map {
                             it.asSyncFreqOption()
                         },
                     ),
@@ -572,7 +581,7 @@ fun SettingsList(
             MenuSetting(
                 title = stringResource(id = R.string.feed_item_style),
                 currentValue = feedItemStyleValue.asFeedItemStyleOption(),
-                values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
+                values = ImmutableHolder(FeedItemStyle.entries.map { it.asFeedItemStyleOption() }),
                 onSelection = {
                     onFeedItemStyleChange(it.feedItemStyle)
                 },
@@ -600,7 +609,7 @@ fun SettingsList(
             MenuSetting(
                 title = stringResource(id = R.string.swipe_to_mark_as_read),
                 currentValue = swipeAsReadValue.asSwipeAsReadOption(),
-                values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
+                values = ImmutableHolder(SwipeAsRead.entries.map { it.asSwipeAsReadOption() }),
                 onSelection = {
                     onSwipeAsReadOptionChange(it.swipeAsRead)
                 },
@@ -721,12 +730,27 @@ fun SettingsList(
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 
+        ActionSetting(
+            title = stringResource(id = R.string.send_bug_report),
+            onClick = {
+                onSendFeedback()
+            },
+            icon = {
+                Icon(
+                    Icons.Default.BugReport,
+                    contentDescription = null,
+                )
+            },
+        )
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
         Spacer(modifier = Modifier.navigationBarsPadding())
     }
 }
 
 @Composable
-fun ColumnScope.SettingsGroup(
+fun SettingsGroup(
     @StringRes title: Int,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -780,6 +804,45 @@ fun GroupTitle(
                 title(Modifier.semantics { heading() })
             }
         }
+    }
+}
+
+@Composable
+fun ActionSetting(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable () -> Unit = {},
+) {
+    val dimens = LocalDimens.current
+    Row(
+        modifier =
+            modifier
+                .width(dimens.maxContentWidth)
+                .clickable { onClick() }
+                .semantics {
+                    role = Role.Button
+                },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier.size(64.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                icon()
+            }
+        }
+
+        TitleAndSubtitle(
+            title = {
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
+        )
     }
 }
 
@@ -840,7 +903,6 @@ fun <T> MenuSetting(
     icon: (@Composable () -> Unit)? = {},
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val dimens = LocalDimens.current
     val closeMenuText = stringResource(id = R.string.close_menu)
     Row(
         modifier =
