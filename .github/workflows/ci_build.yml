@@ -323,16 +323,16 @@ jobs:
     permissions:
       contents: read
     steps:
-    - name: Healthcheck start
-      env:
-        HC_PING_URL: ${{ secrets.HC_PING_URL }}
-      run: curl -X GET "$HC_PING_URL/start"
     - name: checkout
       uses: actions/checkout@v4
       with:
         submodules: 'recursive'
         fetch-depth: 0
         fetch-tags: true
+    - name: Healthcheck start
+      env:
+        HC_PING_URL: ${{ secrets.HC_PING_URL }}
+      run: curl -X GET "$HC_PING_URL/start"
 
     - name: prepare for build
       shell: bash
@@ -375,16 +375,16 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Healthcheck start
-        env:
-          HC_PING_URL: ${{ secrets.HC_PING_URL }}
-        run: ci/run-if-not-release curl -X GET "$HC_PING_URL/start"
       - name: checkout
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
           fetch-depth: 0
           fetch-tags: true
+      - name: Healthcheck start
+        env:
+          HC_PING_URL: ${{ secrets.HC_PING_URL }}
+        run: ci/run-if-not-release curl -X GET "$HC_PING_URL/start"
 
       - name: prepare for build
         shell: bash
