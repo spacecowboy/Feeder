@@ -36,7 +36,8 @@ android {
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
         // The version fields are set with actual values to support F-Droid
-        // In Play variant, they are overridden and taken from git.
+        // In Play variant, they are overridden and taken from git to support alpha/beta testing.
+        // Actual releases do match versionCode however.
         versionCode = 3754
         versionName = "2.12.2"
         // TLS1.3 is enabled in Android 10 (29) and above
@@ -49,6 +50,13 @@ android {
 
         // For espresso tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (not wanted for reproducible builds)
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles
+        includeInBundle = false
     }
 
     ksp {
