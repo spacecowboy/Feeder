@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] - 2025-08-26
+
+### 🚀 Features
+- Moved bug report button to settings (#892) by @crazicus in [#892](https://github.com/spacecowboy/feeder/pull/892) 
+
+### 🌐 Translations
+- Updated Latvian translation using Weblate by @Coool in [commit](https://github.com/spacecowboy/feeder/commit/2352e1b7ad09f595f4041942f2f90476eae4b0ac)
+- Updated Turkish translation using Weblate by @Ruzgarland in [commit](https://github.com/spacecowboy/feeder/commit/de19e86258aa9dbbab3f216701d1828fd7b90732)
+- Updated Catalan translation using Weblate in [#881](https://github.com/spacecowboy/feeder/pull/881) 
+
+### ❤️  New Contributors
+* @Ruzgarland made their first contribution
+* @crazicus made their first contribution in [#892](https://github.com/spacecowboy/feeder/pull/892)
+
 ## [2.12.2] - 2025-08-03
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -375,7 +389,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 Bug Fixes & Minor Changes
 - Feed title empty on initial app start by @svenjacobs in [#388](https://github.com/spacecowboy/feeder/pull/388) 
-- Open drawer after hitting fab mark all articles fab (#386) by @maksimowiczm in [#386](https://github.com/spacecowboy/feeder/pull/386) 
+- Open drawer after hitting fab mark all articles fab (#386) in [commit](https://github.com/spacecowboy/feeder/commit/0348b6d8f9081a7f8e6423aaea1088af6b251c6e)
 - Cleaned up some sync code by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/a0d0583470bdcdf664e8c41110824cc1bcdc6123)
 - Added article summary with OpenAI integration (#399) by @anod in [#399](https://github.com/spacecowboy/feeder/pull/399) 
 - Changed default for read-filter to reduce confusion for new users by @spacecowboy in [#387](https://github.com/spacecowboy/feeder/pull/387) 
@@ -396,7 +410,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ❤️  New Contributors
 * @532910 made their first contribution in [#415](https://github.com/spacecowboy/feeder/pull/415)
-* @maksimowiczm made their first contribution in [#386](https://github.com/spacecowboy/feeder/pull/386)
 
 ## [2.6.33] - 2024-10-09
 
@@ -1025,7 +1038,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Portuguese (Brazil) translation using Weblate by @edxkl in [commit](https://github.com/spacecowboy/feeder/commit/07dadfa5bd24855a9a15253a772ab86b0db07623)
 - Updated Serbian translation using Weblate by @eevan78 in [commit](https://github.com/spacecowboy/feeder/commit/f1b655603c42e37a61502516dbbd1c91b8fd9c90)
 - Updated Thai translation using Weblate by @bowornsin in [commit](https://github.com/spacecowboy/feeder/commit/ef1222ddd0760f7ce0b6bcd58c8f6b1fb8597035)
-- Updated Ukrainian translation using Weblate by @Kefir2105 in [#87](https://github.com/spacecowboy/feeder/pull/87) 
+- Updated Ukrainian translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/eb6eebd9439a5aef0c80eaf596998786bc6ff984)
 - Updated Finnish translation using Weblate by @jkinnunen in [#88](https://github.com/spacecowboy/feeder/pull/88) 
 - Updated Italian translation using Weblate by @amelillo in [#90](https://github.com/spacecowboy/feeder/pull/90) 
 - Updated Polish translation using Weblate by @Aga-C in [commit](https://github.com/spacecowboy/feeder/commit/f72747797fcfcc5a94c9a3834c3f8d1fdacd7763)
@@ -4563,6 +4576,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.13.0]: https://github.com/spacecowboy/feeder/compare/2.12.2..2.13.0
 [2.12.2]: https://github.com/spacecowboy/feeder/compare/2.12.1..2.12.2
 [2.12.1]: https://github.com/spacecowboy/feeder/compare/2.12.0..2.12.1
 [2.12.0]: https://github.com/spacecowboy/feeder/compare/2.11.5..2.12.0
