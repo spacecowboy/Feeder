@@ -10,8 +10,8 @@ NEXT_VERSION="$(git cliff --bumped-version)"
 echo >&2 -n "Next version [${NEXT_VERSION}]. Press any key to continue..."
 read -r
 
-CURRENT_CODE="$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
-echo >&2 "Current code ${CURRENT_CODE}"
+CURRENT_CODE="$(grep --perl-regexp "versionCode = \d" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
+echo >&2 "Current code [${CURRENT_CODE}]"
 
 # Plus one to take the release commit into account
 COMMIT_COUNT="$(git rev-list --count HEAD)"
