@@ -92,3 +92,5 @@ then
   git push
   popd
 fi
+
+echo "Now go to fdroiddata, run 'task signatures', and open a PR"
