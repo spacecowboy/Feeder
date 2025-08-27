@@ -606,6 +606,7 @@ const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
+const val PREF_OPENAI_SUMMARIZE_ON_OPEN = "pref_openai_summarize_on_open"
 
 /**
  * Appearance settings
