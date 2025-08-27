@@ -348,8 +348,6 @@ fun OpenAISectionEdit(
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureApiVersion = it)))
             },
         )
-
-
     }
 }
 
