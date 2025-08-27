@@ -112,7 +112,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val viewState = settingsViewModel.viewState.collectAsStateWithLifecycle().value
+    val viewState by settingsViewModel.viewState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
