@@ -226,4 +226,17 @@
     <string name="failed_to_download">Error al descarregar</string>
     <string name="content_is_not_html">El contingut no és HTML</string>
     <string name="export_saved_articles">Exporta els articles desats</string>
+    <string name="feed_item_style_compact_card">Targeta compacta</string>
+    <string name="failed_to_export_saved_articles">Ha fallat l\'exportació d\'articles desats</string>
+    <string name="time_out">Temps d\'espera (segons)</string>
+    <string name="time_out_validation_error">El temps d\'espera ha de ser entre 30 i 600 segons</string>
+    <string name="time_out_placeholder">Temps d\'espera per OpenAI</string>
+    <string name="failed_to_parse_full_article">Error analitzant l\'article complet</string>
+    <string name="no_url">No hi ha URL</string>
+    <string name="search_verb">Cercar</string>
+    <string name="cancel_search">Cancel·la la cerca</string>
+    <string name="text">Text</string>
+    <string name="font">Font</string>
+    <string name="text_preview">Vista prèvia</string>
+    <string name="italic">Itàlica</string>
 </resources>
