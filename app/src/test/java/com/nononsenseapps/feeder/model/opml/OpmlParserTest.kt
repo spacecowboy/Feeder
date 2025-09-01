@@ -4,6 +4,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.SortingOptions
@@ -13,11 +14,16 @@ import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.archmodel.UserSettings
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
+import com.nononsenseapps.feeder.util.FilePathProvider
+import io.mockk.Runs
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -30,16 +36,18 @@ import org.kodein.di.singleton
 class OpmlParserTest : DIAware {
     private val feedDao: FeedDao = mockk()
     private val settingsStore: SettingsStore = mockk(relaxUnitFun = true)
+    private val filePathProvider: FilePathProvider = mockk(relaxUnitFun = true)
     override val di =
         DI.lazy {
             bind<FeedDao>() with instance(feedDao)
             bind<SettingsStore>() with instance(settingsStore)
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+            bind<FilePathProvider>() with singleton { filePathProvider }
         }
     private val opmlImporter: OPMLParserHandler by instance()
 
     private suspend fun setAllSettings() {
-        for (userSetting in UserSettings.values()) {
+        for (userSetting in UserSettings.entries) {
             opmlImporter.saveSetting(
                 key = userSetting.key,
                 value =
@@ -69,6 +77,17 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_FONT -> "bundled/roboto_flex"
+                        UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
+                        UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
+                        UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
+                        UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
+                        UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
+                        UserSettings.SETTING_OPENAI_MODEL_ID -> "gpt-4o-mini"
+                        UserSettings.SETTING_OPENAI_URL -> "https://api.openai.com"
+                        UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
+                        UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
+                        UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
                     },
             )
         }
@@ -77,6 +96,8 @@ class OpmlParserTest : DIAware {
     @Test
     fun handlesAllSettings(): Unit =
         runBlocking {
+            every { settingsStore.openAiSettings } returns MutableStateFlow(OpenAISettings())
+            every { settingsStore.setOpenAiSettings(any()) } just Runs
             setAllSettings()
             verify {
                 settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
@@ -104,6 +125,23 @@ class OpmlParserTest : DIAware {
                 settingsStore.setFeedListFilterSaved(true)
                 settingsStore.setShowOnlyTitles(true)
                 settingsStore.setOpenAdjacent(true)
+                settingsStore.setFont(FontSelection.RobotoFlex)
+                settingsStore.setShowReadingTime(false)
+                settingsStore.setOpenDrawerOnFab(true)
+                settingsStore.setShowTitleUnreadCount(true)
+                settingsStore.setMaxCountPerFeed(200)
+                settingsStore.openAiSettings
+                settingsStore.setOpenAiSettings(any())
+//                settingsStore.setOpenAiSettings(
+//                    OpenAISettings(
+//                        modelId = "gpt-4o-mini",
+//                        baseUrl = "https://api.openai.com",
+//                        timeoutSeconds = 45,
+//                        azureApiVersion = "2023-05-15",
+//                        azureDeploymentId = "test-deployment",
+//                        key = "test-api-key",
+//                    )
+//                )
             }
 
             confirmVerified(settingsStore)
