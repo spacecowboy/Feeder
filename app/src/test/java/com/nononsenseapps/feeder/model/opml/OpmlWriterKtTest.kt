@@ -137,6 +137,17 @@ class OpmlWriterKtTest {
               <feeder:setting key="prefs_filter_recently_read" value="true"/>
               <feeder:setting key="prefs_filter_read" value="false"/>
               <feeder:setting key="prefs_list_show_only_titles" value="true"/>
+              <feeder:setting key="pref_font" value="bundled/roboto_flex"/>
+              <feeder:setting key="pref_show_reading_time" value="false"/>
+              <feeder:setting key="pref_open_drawer_on_fab" value="true"/>
+              <feeder:setting key="pref_show_title_unread_count" value="true"/>
+              <feeder:setting key="pref_max_item_count_per_feed" value="200"/>
+              <feeder:setting key="pref_openai_key" value="test-api-key"/>
+              <feeder:setting key="pref_openai_model_id" value="gpt-4o-mini"/>
+              <feeder:setting key="pref_openai_url" value="https://api.openai.com"/>
+              <feeder:setting key="pref_openai_azure_version" value="2023-05-15"/>
+              <feeder:setting key="pref_openai_azure_deployment_id" value="test-deployment"/>
+              <feeder:setting key="pref_openai_request_timeout_seconds" value="45"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -146,7 +157,7 @@ class OpmlWriterKtTest {
 
     companion object {
         private val ALL_SETTINGS_WITH_VALUES: Map<String, String> =
-            UserSettings.values().associate { userSetting ->
+            UserSettings.entries.associate { userSetting ->
                 userSetting.key to
                     when (userSetting) {
                         UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -174,6 +185,17 @@ class OpmlWriterKtTest {
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_FONT -> "bundled/roboto_flex"
+                        UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
+                        UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
+                        UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
+                        UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
+                        UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
+                        UserSettings.SETTING_OPENAI_MODEL_ID -> "gpt-4o-mini"
+                        UserSettings.SETTING_OPENAI_URL -> "https://api.openai.com"
+                        UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
+                        UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
+                        UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
                     }
             }
     }

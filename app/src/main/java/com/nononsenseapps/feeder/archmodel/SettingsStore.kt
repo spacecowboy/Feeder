@@ -499,7 +499,7 @@ class SettingsStore(
     fun getAllSettings(): Map<String, String> {
         val all = sp.all ?: emptyMap()
 
-        val userPrefs = UserSettings.values().mapTo(mutableSetOf()) { it.key }
+        val userPrefs = UserSettings.entries.mapTo(mutableSetOf()) { it.key }
 
         return all
             .filterKeys { it in userPrefs }
@@ -606,7 +606,6 @@ const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
-const val PREF_OPENAI_SUMMARIZE_ON_OPEN = "pref_openai_summarize_on_open"
 
 /**
  * Appearance settings
@@ -648,10 +647,21 @@ enum class UserSettings(
     SETTINGS_FILTER_RECENTLY_READ(key = PREFS_FILTER_RECENTLY_READ),
     SETTINGS_FILTER_READ(key = PREFS_FILTER_READ),
     SETTINGS_LIST_SHOW_ONLY_TITLES(key = PREF_LIST_SHOW_ONLY_TITLES),
+    SETTING_FONT(key = PREF_FONT),
+    SETTING_LIST_SHOW_READING_TIME(key = PREF_LIST_SHOW_READING_TIME),
+    SETTING_OPEN_DRAWER_ON_FAB(key = PREF_OPEN_DRAWER_ON_FAB),
+    SETTING_SHOW_TITLE_UNREAD_COUNT(key = PREF_SHOW_TITLE_UNREAD_COUNT),
+    SETTING_MAX_ITEM_COUNT_PER_FEED(key = PREF_MAX_ITEM_COUNT_PER_FEED),
+    SETTING_OPENAI_KEY(key = PREF_OPENAI_KEY),
+    SETTING_OPENAI_MODEL_ID(key = PREF_OPENAI_MODEL_ID),
+    SETTING_OPENAI_URL(key = PREF_OPENAI_URL),
+    SETTING_OPENAI_AZURE_VERSION(key = PREF_OPENAI_AZURE_VERSION),
+    SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
+    SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
     ;
 
     companion object {
-        fun fromKey(key: String): UserSettings? = values().firstOrNull { it.key.equals(key, ignoreCase = true) }
+        fun fromKey(key: String): UserSettings? = entries.firstOrNull { it.key.equals(key, ignoreCase = true) }
     }
 }
 
@@ -797,8 +807,7 @@ fun feedItemStyleFromString(value: String) =
     }
 
 fun syncFrequencyFromString(value: String) =
-    SyncFrequency
-        .values()
+    SyncFrequency.entries
         .firstOrNull {
             it.minutes == value.toLongOrNull()
         }

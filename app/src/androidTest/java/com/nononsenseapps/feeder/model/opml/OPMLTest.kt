@@ -10,6 +10,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
+import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.SettingsStore
@@ -21,7 +22,9 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.ToastMaker
+import com.nononsenseapps.feeder.util.filePathProvider
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -60,6 +63,13 @@ class OPMLTest : DIAware {
             bind<SettingsStore>() with singleton { SettingsStore(di) }
             bind<FeedStore>() with singleton { FeedStore(di) }
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+            bind<FilePathProvider>() with
+                singleton {
+                    filePathProvider(
+                        cacheDir = getApplicationContext<FeederApplication>().cacheDir,
+                        filesDir = getApplicationContext<FeederApplication>().filesDir,
+                    )
+                }
             bind<ToastMaker>() with
                 instance(
                     object : ToastMaker {
@@ -109,12 +119,8 @@ class OPMLTest : DIAware {
                 db.feedDao().getFeedsByTitle(tag = tag)
             }
 
-            // check contents of file
-            path!!.bufferedReader().useLines { lines ->
-                lines.forEachIndexed { i, line ->
-                    assertEquals("line $i differed", sampleFile[i], line)
-                }
-            }
+            val fullFile = path!!.bufferedReader().use { it.readText() }
+            assertEquals(sampleFile.joinToString("\n"), fullFile.trim())
         }
 
     @MediumTest
@@ -731,7 +737,7 @@ class OPMLTest : DIAware {
     companion object {
         private val BLOCKED_PATTERNS: List<String> = listOf("foo")
         private val ALL_SETTINGS_WITH_VALUES: Map<String, String> =
-            UserSettings.values().associate { userSetting ->
+            UserSettings.entries.associate { userSetting ->
                 userSetting.key to
                     when (userSetting) {
                         UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -759,6 +765,17 @@ class OPMLTest : DIAware {
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_FONT -> "bundled/roboto_flex"
+                        UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
+                        UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
+                        UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
+                        UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
+                        UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
+                        UserSettings.SETTING_OPENAI_MODEL_ID -> "gpt-4o-mini"
+                        UserSettings.SETTING_OPENAI_URL -> "https://api.openai.com"
+                        UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
+                        UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
+                        UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
                     }
             }
     }
@@ -776,7 +793,7 @@ suspend fun OpmlPullParser.parseFile(path: String): Either<OpmlError, Unit> =
 private val sampleFile: List<String> =
     """
     <?xml version="1.0" encoding="UTF-8"?>
-    <opml version="1.1" xmlns:feeder="$OPML_FEEDER_NAMESPACE">
+    <opml version="1.1" xmlns:feeder="https://nononsenseapps.com/feeder">
       <head>
         <title>
           Feeder
@@ -823,6 +840,17 @@ private val sampleFile: List<String> =
           <feeder:setting key="prefs_filter_recently_read" value="true"/>
           <feeder:setting key="prefs_filter_read" value="false"/>
           <feeder:setting key="prefs_list_show_only_titles" value="true"/>
+          <feeder:setting key="pref_font" value="bundled/roboto_flex"/>
+          <feeder:setting key="pref_show_reading_time" value="false"/>
+          <feeder:setting key="pref_open_drawer_on_fab" value="true"/>
+          <feeder:setting key="pref_show_title_unread_count" value="true"/>
+          <feeder:setting key="pref_max_item_count_per_feed" value="200"/>
+          <feeder:setting key="pref_openai_key" value="test-api-key"/>
+          <feeder:setting key="pref_openai_model_id" value="gpt-4o-mini"/>
+          <feeder:setting key="pref_openai_url" value="https://api.openai.com"/>
+          <feeder:setting key="pref_openai_azure_version" value="2023-05-15"/>
+          <feeder:setting key="pref_openai_azure_deployment_id" value="test-deployment"/>
+          <feeder:setting key="pref_openai_request_timeout_seconds" value="45"/>
           <feeder:blocked pattern="foo"/>
         </feeder:settings>
       </body>

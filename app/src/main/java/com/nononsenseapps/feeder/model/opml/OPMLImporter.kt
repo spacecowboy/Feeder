@@ -4,6 +4,7 @@ import android.util.Log
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.UserSettings
 import com.nononsenseapps.feeder.archmodel.darkThemePreferenceFromString
+import com.nononsenseapps.feeder.archmodel.defaultFont
 import com.nononsenseapps.feeder.archmodel.feedItemStyleFromString
 import com.nononsenseapps.feeder.archmodel.itemOpenerFromString
 import com.nononsenseapps.feeder.archmodel.linkOpenerFromString
@@ -14,6 +15,7 @@ import com.nononsenseapps.feeder.archmodel.themeOptionsFromString
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
+import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -25,6 +27,7 @@ open class OPMLImporter(
     DIAware {
     private val feedDao: FeedDao by instance()
     private val settingsStore: SettingsStore by instance()
+    private val filePathProvider: FilePathProvider by instance()
 
     override suspend fun saveFeed(feed: Feed) {
         val existing = feedDao.loadFeedWithUrl(feed.url)
@@ -91,6 +94,39 @@ open class OPMLImporter(
             UserSettings.SETTINGS_FILTER_READ -> settingsStore.setFeedListFilterRead(value.toBoolean())
             UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> settingsStore.setShowOnlyTitles(value.toBoolean())
             UserSettings.SETTING_OPEN_ADJACENT -> settingsStore.setOpenAdjacent(value.toBoolean())
+            UserSettings.SETTING_FONT ->
+                settingsStore.setFont(
+                    com.nononsenseapps.feeder.ui.compose.settings.getFontSelectionFromPath(
+                        filePathProvider,
+                        value,
+                    ) ?: defaultFont,
+                )
+            UserSettings.SETTING_LIST_SHOW_READING_TIME -> settingsStore.setShowReadingTime(value.toBoolean())
+            UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> settingsStore.setOpenDrawerOnFab(value.toBoolean())
+            UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> settingsStore.setShowTitleUnreadCount(value.toBoolean())
+            UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> settingsStore.setMaxCountPerFeed(value.toIntOrNull() ?: 100)
+
+            // OpenAI related settings
+            UserSettings.SETTING_OPENAI_KEY,
+            UserSettings.SETTING_OPENAI_MODEL_ID,
+            UserSettings.SETTING_OPENAI_URL,
+            UserSettings.SETTING_OPENAI_AZURE_VERSION,
+            UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID,
+            UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS,
+            -> {
+                val current = settingsStore.openAiSettings.value
+                val newSettings =
+                    when (UserSettings.fromKey(key)) {
+                        UserSettings.SETTING_OPENAI_KEY -> current.copy(key = value)
+                        UserSettings.SETTING_OPENAI_MODEL_ID -> current.copy(modelId = value)
+                        UserSettings.SETTING_OPENAI_URL -> current.copy(baseUrl = value)
+                        UserSettings.SETTING_OPENAI_AZURE_VERSION -> current.copy(azureApiVersion = value)
+                        UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> current.copy(azureDeploymentId = value)
+                        UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
+                        else -> current
+                    }
+                settingsStore.setOpenAiSettings(newSettings)
+            }
         }
     }
 
