@@ -69,6 +69,7 @@ import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -318,7 +319,7 @@ private fun ExpandableTag(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(Locale.getDefault(), unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier
@@ -451,7 +452,7 @@ private fun AllFeeds(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(Locale.getDefault(), unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
@@ -517,7 +518,7 @@ private fun Feed(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(Locale.getDefault(), unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
