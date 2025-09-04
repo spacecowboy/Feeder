@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -69,7 +70,6 @@ import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -319,7 +319,7 @@ private fun ExpandableTag(
                     unreadCount,
                 )
             Text(
-                text = "%d".format(Locale.getDefault(), unreadCount),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier
@@ -452,7 +452,7 @@ private fun AllFeeds(
                     unreadCount,
                 )
             Text(
-                text = "%d".format(Locale.getDefault(), unreadCount),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
@@ -518,7 +518,7 @@ private fun Feed(
                     unreadCount,
                 )
             Text(
-                text = "%d".format(Locale.getDefault(), unreadCount),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
