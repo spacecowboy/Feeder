@@ -17,3 +17,5 @@
 <li>Acesso prático aos Enclosure Links</li>
 <li>Material design</li>
 </ul>
+
+O registro de mudanças completo está disponível <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
