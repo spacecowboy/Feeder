@@ -281,4 +281,5 @@
     <string name="time_out_placeholder">Časovni iztek za OpenAI zahteve</string>
     <string name="time_out">Časovni iztek (v sekundah)</string>
     <string name="time_out_validation_error">Časovni iztek mora biti med 30 in 600 sekundami</string>
+    <string name="summarize_on_open">Povzemi ob odprtju</string>
 </resources>

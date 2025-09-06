@@ -200,10 +200,10 @@
     <string name="no_feeds">Akış yok</string>
     <string name="zero_feeds">%1$s akış</string>
     <string name="one_feed">%1$s akış</string>
-    <string name="two_feeds">%1$s akış</string>
+    <string name="two_feeds">%1$s akışlar</string>
     <string name="few_feeds">%1$s akış</string>
-    <string name="many_feeds">%1$s akış</string>
-    <string name="other_feeds">%1$s akış</string>
+    <string name="many_feeds">%1$s akışlar</string>
+    <string name="other_feeds">%1$s akışlar</string>
     <string name="import_x_feeds_with_y_tags">%1$s akışı %2$s etiketiyle içe aktar?</string>
     <string name="zero_tags">%1$s etiket</string>
     <string name="one_tags">%1$s etiket</string>
@@ -282,4 +282,5 @@
     <string name="could_not_add_font">Yazı tipi eklenemedi</string>
     <string name="could_not_remove_font">Yazı tipi kaldırılamadı</string>
     <string name="something_went_wrong">Bir şeyler ters gitti</string>
+    <string name="summarize_on_open">Açıldığında özetle</string>
 </resources>
