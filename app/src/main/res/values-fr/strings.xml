@@ -281,4 +281,5 @@
     <string name="time_out_validation_error">Le timeout doit être compris entre 30 et 600 secondes</string>
     <string name="time_out_placeholder">Timeout lors des requêtes à OpenAI</string>
     <string name="time_out">Timeout (secondes)</string>
+    <string name="summarize_on_open">Résumé à l\'ouverture</string>
 </resources>
