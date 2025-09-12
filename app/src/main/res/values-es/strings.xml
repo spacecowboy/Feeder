@@ -281,4 +281,5 @@
     <string name="time_out_placeholder">Tiempo de espera por OpenAI</string>
     <string name="time_out">Tiempo de espera (segundos)</string>
     <string name="time_out_validation_error">El tiempo de espera debe ser entre 30 y 600 segundos</string>
+    <string name="summarize_on_open">Resumir al abrir</string>
 </resources>
