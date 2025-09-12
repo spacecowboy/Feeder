@@ -281,4 +281,5 @@
     <string name="time_out_placeholder">Zeitüberschreitung für OpenAI-Anfragen</string>
     <string name="time_out">Zeitüberschreitung (Sekunden)</string>
     <string name="time_out_validation_error">Die Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
+    <string name="summarize_on_open">Beim Öffnen zusammenfassen</string>
 </resources>
