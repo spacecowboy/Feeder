@@ -281,4 +281,5 @@
     <string name="time_out_placeholder">Időtúllépés az OpenAI-kérésekhez</string>
     <string name="time_out">Időtúllépés (másodpercben)</string>
     <string name="time_out_validation_error">Az időtúllépésnek 30 és 600 másodperc között kell lennie</string>
+    <string name="summarize_on_open">Összegzés megnyitáskor</string>
 </resources>
