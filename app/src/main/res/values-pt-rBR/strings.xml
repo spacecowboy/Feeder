@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="navigation_drawer_open">Abrir a gaveta de navegação</string>
-    <string name="navigation_drawer_close">Fechar a gaveta de navegação</string>
+    <string name="navigation_drawer_open">Abrir menu de navegação</string>
+    <string name="navigation_drawer_close">Fechar o menu de navegação</string>
     <string name="action_settings">Configurações</string>
     <string name="add_feed">Adicionar um feed</string>
     <string name="title_activity_edit_feed">Inscreva-se no feed</string>
@@ -256,4 +256,30 @@
     <string name="summarize">Resumir</string>
     <string name="openai_settings">Integração OpenAI</string>
     <string name="api_key">Chave API</string>
+    <string name="nostr_feed_description">Artigos Nostr por %1$s</string>
+    <string name="time_out">Tempo limite (segundos)</string>
+    <string name="time_out_validation_error">Tempo limite deve ser entre 30 e 600 segundos</string>
+    <string name="time_out_placeholder">Tempo limite para solicitações da OpenAI</string>
+    <string name="summarize_on_open">Resumir ao abrir</string>
+    <string name="no_models_were_found">Nenhum modelo foi encontrado</string>
+    <string name="azure_deployment_id">ID de implementação do Azure</string>
+    <string name="list_of_available_models">Lista de modelos disponíveis</string>
+    <string name="show_message">Mostrar mensagem</string>
+    <string name="open_drawer_on_fab">Mostrar feeds depois de marcar tudo como lido</string>
+    <string name="on">Ligado</string>
+    <string name="off">Desligado</string>
+    <string name="search_verb">Buscar</string>
+    <string name="cancel_search">Cancelar busca</string>
+    <string name="text">Texto</string>
+    <string name="font">Fonte</string>
+    <string name="text_preview">Visualização de texto</string>
+    <string name="system_default">Padrão do sistema</string>
+    <string name="weight">Peso</string>
+    <string name="italic">Itálico</string>
+    <string name="add_font">Adicionar fonte…</string>
+    <string name="bold">Negrito</string>
+    <string name="text_settings">Configurações de texto</string>
+    <string name="could_not_add_font">Não foi possível adicionar a fonte</string>
+    <string name="could_not_remove_font">Não foi possível remover a fonte</string>
+    <string name="something_went_wrong">Algo deu errado</string>
 </resources>
