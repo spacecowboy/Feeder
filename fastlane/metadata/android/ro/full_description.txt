@@ -6,7 +6,7 @@
 
 <p>Feeder este gratuit și rulează local pe dispozitivul dumneavoastră. Datele dumneavoastră sunt 100% private.</p>
 
-<p><b>Features</b></p>
+<p><b>Caracteristici</b></p>
 
 <ul>
 <li>Analizează HTML și îl afișează într-un TextView nativ</li>
@@ -17,3 +17,5 @@
 <li>Acces la îndemână la linkurile de închidere</li>
 <li>Material design</li>
 </ul>
+
+Jurnalul complet de modificări este disponibil<a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md"> pe Github</a>.
