@@ -281,4 +281,5 @@
     <string name="system_default">Sistema predefinito</string>
     <string name="weight">Peso</string>
     <string name="time_out">Timeout (secondi)</string>
+    <string name="summarize_on_open">Riepilogo all\'apertura</string>
 </resources>
