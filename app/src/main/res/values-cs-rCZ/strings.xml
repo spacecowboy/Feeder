@@ -281,4 +281,5 @@
     <string name="time_out">Časový limit (sekundy)</string>
     <string name="time_out_placeholder">Časový limit pro OpenAI požadavky</string>
     <string name="time_out_validation_error">Časový limit musí být v rozmezí 30 až 600 sekund</string>
+    <string name="summarize_on_open">Shrnout při otevření</string>
 </resources>
