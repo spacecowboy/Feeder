@@ -31,7 +31,10 @@ val latestTag by project.extra {
 
 android {
     namespace = "com.nononsenseapps.feeder"
-    compileSdk = 35
+    compileSdk =
+        libs.versions.compileSdk
+            .get()
+            .toInt()
 
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
@@ -42,7 +45,10 @@ android {
         versionName = "2.13.0"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
-        targetSdk = 35
+        targetSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
 
         vectorDrawables.useSupportLibrary = true
 
