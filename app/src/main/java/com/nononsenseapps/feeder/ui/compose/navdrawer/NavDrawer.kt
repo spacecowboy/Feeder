@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -318,7 +319,7 @@ private fun ExpandableTag(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier
@@ -451,7 +452,7 @@ private fun AllFeeds(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
@@ -517,7 +518,7 @@ private fun Feed(
                     unreadCount,
                 )
             Text(
-                text = unreadCount.toString(),
+                text = "%d".format(LocalConfiguration.current.locales[0], unreadCount),
                 maxLines = 1,
                 modifier =
                     Modifier.semantics {
