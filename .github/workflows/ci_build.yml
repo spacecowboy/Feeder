@@ -24,7 +24,7 @@ jobs:
         fetch-tags: true
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -52,7 +52,7 @@ jobs:
         fetch-tags: true
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -84,7 +84,7 @@ jobs:
         fetch-tags: true
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -112,7 +112,7 @@ jobs:
         fetch-tags: true
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -151,7 +151,7 @@ jobs:
         KEYALIAS: ${{ secrets.KEYALIAS }}
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -197,7 +197,7 @@ jobs:
         KEYALIAS: ${{ secrets.KEYALIAS }}
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -231,7 +231,7 @@ jobs:
         fetch-tags: true
 
     - name: setup JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
