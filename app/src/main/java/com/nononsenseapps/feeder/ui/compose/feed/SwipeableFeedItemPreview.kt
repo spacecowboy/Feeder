@@ -1,28 +1,22 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -30,21 +24,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -56,12 +44,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactLandscape
-import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
-
-private const val LOG_TAG = "FEEDER_SWIPEITEM"
 
 /**
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
@@ -91,14 +74,20 @@ fun SwipeableFeedItemPreview(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
-    val onSwipeCallback by rememberUpdatedState(newValue = onSwipe)
+    val swipeableState = rememberSwipeToDismissBoxState(
+        confirmValueChange = {
+            if (it != SwipeToDismissBoxValue.Settled) {
+                onSwipe(item.unread)
+                true
+            } else {
+                false
+            }
+        }
+    )
 
     val color by animateColorAsState(
         targetValue =
             when {
-                swipeableState.targetValue == FeedItemSwipeState.NONE -> Color.Transparent
                 item.unread || filter.onlyUnread -> SwipingItemToReadColor
                 else -> SwipingItemToUnreadColor
             },
@@ -107,22 +96,17 @@ fun SwipeableFeedItemPreview(
 
     LaunchedEffect(filter, item.unread) {
         // critical state changes - reset ui state
-        swipeableState.animateTo(FeedItemSwipeState.NONE)
-    }
-
-    LaunchedEffect(swipeableState.currentValue, swipeableState.isAnimationRunning) {
-        if (!swipeableState.isAnimationRunning && swipeableState.currentValue != FeedItemSwipeState.NONE) {
-            logDebug(LOG_TAG, "onSwipe ${item.unread}")
-            onSwipeCallback(item.unread)
+        if (swipeableState.currentValue != SwipeToDismissBoxValue.Settled) {
+            swipeableState.reset()
         }
     }
 
     var swipeIconAlignment by remember { mutableStateOf(Alignment.CenterStart) }
     // Launched effect because I don't want a value change to zero to change the variable
-    LaunchedEffect(swipeableState.direction) {
-        if (swipeableState.direction == 1f) {
+    LaunchedEffect(swipeableState.dismissDirection) {
+        if (swipeableState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
             swipeIconAlignment = Alignment.CenterStart
-        } else if (swipeableState.direction == -1f) {
+        } else if (swipeableState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
             swipeIconAlignment = Alignment.CenterEnd
         }
     }
@@ -151,8 +135,32 @@ fun SwipeableFeedItemPreview(
     }
 
     val dimens = LocalDimens.current
+    val compactLandscape = isCompactLandscape()
 
-    BoxWithConstraints(
+    // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
+    // It's very important that clickable stuff is handled by its parent - or a direct child
+    // Wrapped in an outer box to get the height set properly
+    SwipeToDismissBox(
+        state = swipeableState,
+        backgroundContent = {
+            Box(
+                contentAlignment = swipeIconAlignment,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(color)
+                        .padding(horizontal = 24.dp),
+            ) {
+                Icon(
+                    when (item.unread) {
+                        true -> Icons.Default.VisibilityOff
+                        false -> Icons.Default.Visibility
+                    },
+                    contentDescription = null,
+                )
+            }
+        },
         modifier =
             modifier
                 .width(dimens.maxContentWidth)
@@ -161,7 +169,8 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = true
                     },
                     onClick = onItemClick,
-                ).safeSemantics {
+                )
+                .safeSemantics {
                     stateDescription = readStatusLabel
                     customActions =
                         listOf(
@@ -194,48 +203,10 @@ fun SwipeableFeedItemPreview(
                             },
                         )
                 },
+        enableDismissFromStartToEnd = swipeAsRead == SwipeAsRead.FROM_ANYWHERE,
+        enableDismissFromEndToStart = swipeAsRead == SwipeAsRead.FROM_ANYWHERE || swipeAsRead == SwipeAsRead.ONLY_FROM_END,
+        gesturesEnabled = swipeAsRead != SwipeAsRead.DISABLED
     ) {
-        val maxWidthPx =
-            with(LocalDensity.current) {
-                maxWidth.toPx()
-            }
-        Box(
-            contentAlignment = swipeIconAlignment,
-            modifier =
-                Modifier
-                    .matchParentSize()
-                    .background(color)
-                    .padding(horizontal = 24.dp),
-        ) {
-            AnimatedVisibility(
-                visible = swipeableState.targetValue != FeedItemSwipeState.NONE,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Icon(
-                    when (item.unread) {
-                        true -> Icons.Default.VisibilityOff
-                        false -> Icons.Default.Visibility
-                    },
-                    contentDescription = null,
-                )
-            }
-        }
-
-        val itemAlpha by remember(swipeableState.progress) {
-            derivedStateOf {
-                if (swipeableState.progress.to == FeedItemSwipeState.NONE) {
-                    1f
-                } else if (swipeableState.progress.from != FeedItemSwipeState.NONE) {
-                    0f
-                } else {
-                    (1f - swipeableState.progress.fraction.absoluteValue).coerceIn(0f, 1f)
-                }
-            }
-        }
-
-        val compactLandscape = isCompactLandscape()
-
         when (feedItemStyle) {
             FeedItemStyle.CARD -> {
                 FeedItemCard(
@@ -251,10 +222,6 @@ fun SwipeableFeedItemPreview(
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
                     showReadingTime = showReadingTime,
-                    modifier =
-                        Modifier
-                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                            .graphicsLayer(alpha = itemAlpha),
                 )
             }
 
@@ -269,15 +236,12 @@ fun SwipeableFeedItemPreview(
                             maxLines = maxLines,
                             showReadingTime = showReadingTime,
                         ),
-                    modifier =
-                        Modifier
-                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                            .graphicsLayer(alpha = itemAlpha),
                     onEvent = { event ->
                         when (event) {
                             FeedItemEvent.DismissDropdown -> {
                                 dropDownMenuExpanded = false
                             }
+
                             FeedItemEvent.MarkAboveAsRead -> onMarkAboveAsRead()
                             FeedItemEvent.MarkBelowAsRead -> onMarkBelowAsRead()
                             FeedItemEvent.ShareItem -> onShareItem()
@@ -301,10 +265,6 @@ fun SwipeableFeedItemPreview(
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
                     showReadingTime = showReadingTime,
-                    modifier =
-                        Modifier
-                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                            .graphicsLayer(alpha = itemAlpha),
                     imageWidth =
                         when (compactLandscape) {
                             true -> 196.dp
@@ -326,70 +286,8 @@ fun SwipeableFeedItemPreview(
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
                     showReadingTime = showReadingTime,
-                    modifier =
-                        Modifier
-                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                            .graphicsLayer(alpha = itemAlpha),
-                )
-            }
-        }
-
-        // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
-        // It's very important that clickable stuff is handled by its parent - or a direct child
-        // Wrapped in an outer box to get the height set properly
-        if (swipeAsRead != SwipeAsRead.DISABLED) {
-            Box(
-                modifier =
-                    Modifier
-                        .matchParentSize(),
-            ) {
-                val anchors = mutableMapOf(0f to FeedItemSwipeState.NONE)
-                Box(
-                    modifier =
-                        Modifier
-                            .run {
-                                @Suppress("KotlinConstantConditions")
-                                when (swipeAsRead) {
-                                    // This never actually gets called due to outer if
-                                    SwipeAsRead.DISABLED ->
-                                        this
-                                            .height(0.dp)
-                                            .width(0.dp)
-
-                                    SwipeAsRead.ONLY_FROM_END -> {
-                                        anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
-                                        this
-                                            .fillMaxHeight()
-                                            .width(this@BoxWithConstraints.maxWidth / 4)
-                                            .align(Alignment.CenterEnd)
-                                    }
-
-                                    SwipeAsRead.FROM_ANYWHERE -> {
-                                        anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
-                                        anchors[maxWidthPx] = FeedItemSwipeState.RIGHT
-                                        this
-                                            .padding(start = 48.dp)
-                                            .matchParentSize()
-                                    }
-                                }
-                            }.swipeable(
-                                state = swipeableState,
-                                anchors = anchors,
-                                orientation = Orientation.Horizontal,
-                                reverseDirection = isRtl,
-                                velocityThreshold = 1000.dp,
-                                thresholds = { _, _ ->
-                                    FractionalThreshold(0.50f)
-                                },
-                            ),
                 )
             }
         }
     }
-}
-
-enum class FeedItemSwipeState {
-    NONE,
-    LEFT,
-    RIGHT,
 }
