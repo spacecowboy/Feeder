@@ -1309,6 +1309,7 @@ fun FeedListContent(
                         },
                         modifier =
                             Modifier
+                                .animateItem()
                                 .safeSemantics {
                                     collectionItemInfo =
                                         CollectionItemInfo(
@@ -1524,26 +1525,28 @@ fun FeedGridContent(
                         },
                         modifier =
                             if (viewState.markAsReadOnScroll && previewItem.unread) {
-                                Modifier.trackVisibility(0.9f) { info ->
-                                    if (info.isAboveThreshold) {
-                                        // Using itemCoroutineScope because that scope gets destroyed when item scrolls off screen
-                                        // So implicitly, if user is scrolling very fast, the coroutine will be cancelled
-                                        // before marking as read
-                                        itemCoroutineScope.launch {
-                                            delay(REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ)
-                                            if (viewState.filter.unread) {
-                                                logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
-                                                itemWasVisible = true
-                                                // Marks as read in disposable effect
-                                            } else {
-                                                logDebug(LOG_TAG, "Item $itemIndex marking as read")
-                                                markAsUnread(previewItem.id, false)
+                                Modifier
+                                    .trackVisibility(0.9f) { info ->
+                                        if (info.isAboveThreshold) {
+                                            // Using itemCoroutineScope because that scope gets destroyed when item scrolls off screen
+                                            // So implicitly, if user is scrolling very fast, the coroutine will be cancelled
+                                            // before marking as read
+                                            itemCoroutineScope.launch {
+                                                delay(REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ)
+                                                if (viewState.filter.unread) {
+                                                    logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
+                                                    itemWasVisible = true
+                                                    // Marks as read in disposable effect
+                                                } else {
+                                                    logDebug(LOG_TAG, "Item $itemIndex marking as read")
+                                                    markAsUnread(previewItem.id, false)
+                                                }
                                             }
                                         }
                                     }
-                                }
+                                    .animateItem()
                             } else {
-                                Modifier
+                                Modifier.animateItem()
                             },
                         swipeEnabled = !gridState.isScrollInProgress
                     )
