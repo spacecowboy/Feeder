@@ -1341,6 +1341,7 @@ fun FeedListContent(
                                         modifier
                                     }
                                 },
+                        swipeEnabled = !listState.isScrollInProgress
                     )
 
                     if (viewState.feedItemStyle != FeedItemStyle.CARD &&
@@ -1544,6 +1545,7 @@ fun FeedGridContent(
                             } else {
                                 Modifier
                             },
+                        swipeEnabled = !gridState.isScrollInProgress
                     )
                 }
             }

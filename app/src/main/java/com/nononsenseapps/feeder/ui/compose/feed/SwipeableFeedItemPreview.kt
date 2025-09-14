@@ -72,6 +72,7 @@ fun SwipeableFeedItemPreview(
     onShareItem: () -> Unit,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
+    swipeEnabled: Boolean = true,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeableState = rememberSwipeToDismissBoxState(
@@ -205,7 +206,7 @@ fun SwipeableFeedItemPreview(
                 },
         enableDismissFromStartToEnd = swipeAsRead == SwipeAsRead.FROM_ANYWHERE,
         enableDismissFromEndToStart = swipeAsRead == SwipeAsRead.FROM_ANYWHERE || swipeAsRead == SwipeAsRead.ONLY_FROM_END,
-        gesturesEnabled = swipeAsRead != SwipeAsRead.DISABLED
+        gesturesEnabled = swipeAsRead != SwipeAsRead.DISABLED && swipeEnabled,
     ) {
         when (feedItemStyle) {
             FeedItemStyle.CARD -> {
