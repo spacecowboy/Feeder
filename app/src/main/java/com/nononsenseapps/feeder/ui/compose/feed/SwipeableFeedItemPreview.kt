@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -24,10 +25,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
@@ -43,7 +48,9 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import com.nononsenseapps.feeder.ui.compose.utils.isCompactLandscape
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 /**
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
@@ -80,6 +87,33 @@ fun SwipeableFeedItemPreview(
             }
         }
     )
+
+    val hapticFeedback = LocalHapticFeedback.current
+    val density = LocalDensity.current
+    val threshold = SwipeToDismissBoxDefaults.positionalThreshold(0f)
+    var thresholdReached by remember { mutableStateOf(false) }
+    LaunchedEffect(swipeableState) {
+        snapshotFlow {
+            try {
+                with(density) {
+                    val offset = swipeableState.requireOffset().absoluteValue
+                    offset >= threshold
+                }
+            } catch (_: IllegalStateException) {
+                false
+            }
+        }
+            .distinctUntilChanged()
+            .collect { isOverThreshold ->
+                if (isOverThreshold && !thresholdReached) {
+                    thresholdReached = true
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                } else if (!isOverThreshold && thresholdReached) {
+                    thresholdReached = false
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                }
+            }
+    }
 
     val color by animateColorAsState(
         targetValue =
