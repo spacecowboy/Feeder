@@ -1,14 +1,12 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -51,10 +49,6 @@ import kotlinx.coroutines.launch
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
  * called multiple times by several DisposableEffects.
  */
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterialApi::class,
-)
 @Composable
 fun SwipeableFeedItemPreview(
     onSwipe: (Boolean) -> Unit,
@@ -138,10 +132,6 @@ fun SwipeableFeedItemPreview(
 
     val dimens = LocalDimens.current
     val compactLandscape = isCompactLandscape()
-
-    // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
-    // It's very important that clickable stuff is handled by its parent - or a direct child
-    // Wrapped in an outer box to get the height set properly
     SwipeToDismissBox(
         state = swipeableState,
         backgroundContent = {
