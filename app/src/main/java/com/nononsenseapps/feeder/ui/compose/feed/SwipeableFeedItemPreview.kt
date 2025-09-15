@@ -77,16 +77,15 @@ fun SwipeableFeedItemPreview(
     swipeEnabled: Boolean = true,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val swipeableState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
+    val swipeableState =
+        rememberSwipeToDismissBoxState(confirmValueChange = {
             if (it != SwipeToDismissBoxValue.Settled) {
                 onSwipe(item.unread)
                 true
             } else {
                 false
             }
-        }
-    )
+        })
 
     val hapticFeedback = LocalHapticFeedback.current
     val density = LocalDensity.current
@@ -102,8 +101,7 @@ fun SwipeableFeedItemPreview(
             } catch (_: IllegalStateException) {
                 false
             }
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
             .collect { isOverThreshold ->
                 if (isOverThreshold && !thresholdReached) {
                     thresholdReached = true
@@ -174,11 +172,13 @@ fun SwipeableFeedItemPreview(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .clip(shape = when (feedItemStyle) {
-                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
-                            else -> MaterialTheme.shapes.medium
-                        })
-                        .background(color)
+                        .clip(
+                            shape =
+                                when (feedItemStyle) {
+                                    FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
+                                    else -> MaterialTheme.shapes.medium
+                                },
+                        ).background(color)
                         .padding(horizontal = 24.dp),
             ) {
                 Icon(
@@ -198,8 +198,7 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = true
                     },
                     onClick = onItemClick,
-                )
-                .safeSemantics {
+                ).safeSemantics {
                     stateDescription = readStatusLabel
                     customActions =
                         listOf(

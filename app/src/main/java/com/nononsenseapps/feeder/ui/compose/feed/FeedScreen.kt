@@ -1342,7 +1342,7 @@ fun FeedListContent(
                                         modifier
                                     }
                                 },
-                        swipeEnabled = !listState.isScrollInProgress
+                        swipeEnabled = !listState.isScrollInProgress,
                     )
 
                     if (viewState.feedItemStyle != FeedItemStyle.CARD &&
@@ -1543,12 +1543,11 @@ fun FeedGridContent(
                                                 }
                                             }
                                         }
-                                    }
-                                    .animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    }.animateItem(fadeInSpec = null, fadeOutSpec = null)
                             } else {
                                 Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
                             },
-                        swipeEnabled = !gridState.isScrollInProgress
+                        swipeEnabled = !gridState.isScrollInProgress,
                     )
                 }
             }

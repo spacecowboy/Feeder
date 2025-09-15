@@ -33,14 +33,11 @@ fun FeedItemSuperCompact(
     showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Surface {
+    Surface(modifier = modifier.requiredHeightIn(min = minimumTouchSize)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier =
-                modifier
-                    .requiredHeightIn(min = minimumTouchSize)
-                    .padding(vertical = 8.dp, horizontal = LocalDimens.current.margin),
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = LocalDimens.current.margin),
         ) {
             FeedItemEitherIndicator(
                 bookmarked = item.bookmarked && bookmarkIndicator,

@@ -62,13 +62,10 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
-    Surface {
+    Surface(modifier = modifier.height(IntrinsicSize.Min)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier =
-                modifier
-                    .height(IntrinsicSize.Min)
-                    .padding(start = LocalDimens.current.margin),
+            modifier = Modifier.padding(start = LocalDimens.current.margin),
         ) {
             FeedItemText(
                 item = item,
