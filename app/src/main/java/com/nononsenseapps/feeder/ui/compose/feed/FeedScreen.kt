@@ -1309,7 +1309,7 @@ fun FeedListContent(
                         },
                         modifier =
                             Modifier
-                                .animateItem()
+                                .animateItem(fadeInSpec = null, fadeOutSpec = null)
                                 .safeSemantics {
                                     collectionItemInfo =
                                         CollectionItemInfo(
@@ -1544,9 +1544,9 @@ fun FeedGridContent(
                                             }
                                         }
                                     }
-                                    .animateItem()
+                                    .animateItem(fadeInSpec = null, fadeOutSpec = null)
                             } else {
-                                Modifier.animateItem()
+                                Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
                             },
                         swipeEnabled = !gridState.isScrollInProgress
                     )
