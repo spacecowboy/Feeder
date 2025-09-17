@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -129,6 +132,12 @@ fun SwipeableFeedItemPreview(
         label = "swipeBackground",
     )
 
+    val alpha by animateFloatAsState(
+        targetValue = if (thresholdReached) 1.0f else 0.2f,
+        animationSpec = tween(),
+        label = "alphaAnimation",
+    )
+
     LaunchedEffect(filter, item.unread) {
         // critical state changes - reset ui state
         if (swipeableState.currentValue != SwipeToDismissBoxValue.Settled) {
@@ -186,7 +195,9 @@ fun SwipeableFeedItemPreview(
                                     FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
                                     else -> MaterialTheme.shapes.medium
                                 },
-                        ).drawBehind {
+                        ).graphicsLayer {
+                            this.alpha = alpha
+                        }.drawBehind {
                             drawRect(color = color)
                         }.padding(horizontal = 24.dp),
             ) {
