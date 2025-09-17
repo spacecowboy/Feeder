@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,12 +22,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
@@ -76,12 +77,18 @@ fun SwipeableFeedItemPreview(
     modifier: Modifier = Modifier,
     swipeEnabled: Boolean = true,
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    // Use rememberUpdatedState for these as they are referenced inside long-lived lambdas.
+    val currentFilter by rememberUpdatedState(newValue = filter)
+    val currentOnSwipeCallback by rememberUpdatedState(newValue = onSwipe)
+    val currentItem by rememberUpdatedState(newValue = item)
+
     val swipeableState =
         rememberSwipeToDismissBoxState(confirmValueChange = {
             if (it != SwipeToDismissBoxValue.Settled) {
-                onSwipe(item.unread)
-                true
+                currentOnSwipeCallback(currentItem.unread)
+
+                // Only commit the change if we're only viewing unread items, in all other cases we'll snap back the swipe position as the item isn't removed from view.
+                currentFilter.onlyUnread
             } else {
                 false
             }
@@ -164,6 +171,7 @@ fun SwipeableFeedItemPreview(
 
     val dimens = LocalDimens.current
     val compactLandscape = isCompactLandscape()
+    val coroutineScope = rememberCoroutineScope()
     SwipeToDismissBox(
         state = swipeableState,
         backgroundContent = {
@@ -178,8 +186,9 @@ fun SwipeableFeedItemPreview(
                                     FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
                                     else -> MaterialTheme.shapes.medium
                                 },
-                        ).background(color)
-                        .padding(horizontal = 24.dp),
+                        ).drawBehind {
+                            drawRect(color = color)
+                        }.padding(horizontal = 24.dp),
             ) {
                 Icon(
                     when (item.unread) {
@@ -204,7 +213,7 @@ fun SwipeableFeedItemPreview(
                         listOf(
                             CustomAccessibilityAction(toggleReadStatusLabel) {
                                 coroutineScope.launch {
-                                    onSwipe(item.unread)
+                                    currentOnSwipeCallback(item.unread)
                                 }
                                 true
                             },
