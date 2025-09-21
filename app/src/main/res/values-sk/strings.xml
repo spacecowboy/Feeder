@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="theme_e_ink">E-papier</string>
-    <string name="navigation_drawer_open">Otvoriť bočný panel</string>
+    <string name="navigation_drawer_open">Otvoriť navigačnú lištu</string>
     <string name="navigation_drawer_close">Zavrieť navigačný panel</string>
     <string name="action_settings">Nastavenia</string>
     <string name="add_feed">Pridať kanál</string>
-    <string name="title_activity_edit_feed">Odobrať kanál</string>
+    <string name="title_activity_edit_feed">Odoberať kanál</string>
     <string name="url">URL</string>
     <string name="tag">Štítok</string>
     <string name="add_feed_search_hint">URL kanálu</string>
@@ -14,4 +14,35 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Uložiť</string>
+    <string name="empty_feed_top">Nič na prečítanie tu nieje. Chceli by ste…</string>
+    <string name="empty_feed_open"><annotation style="link">Otvoriť</annotation> iný kanál?</string>
+    <string name="empty_feed_add"><annotation style="link">Pridať</annotation> viac kanálov?</string>
+    <string name="search_feed_empty_hint">Vložte adresu kanálu</string>
+    <string name="mark_as_read">Označiť ako prečítané</string>
+    <string name="mark_as_unread">Označiť ako neprečítané</string>
+    <string name="mark_all_as_read">Označiť všetky ako prečítané</string>
+    <string name="edit_feed">Pozmeniť kanál</string>
+    <string name="delete_feed">Odstrániť kanál</string>
+    <string name="show_all_items">Zobraziť všetky položky</string>
+    <string name="show_unread_items">Zobraziť neprečítané položky</string>
+    <string name="no_tag">Žiaden štítok</string>
+    <string name="notify_for_new_items">Upozorniť na nové položky</string>
+    <string name="dont_notify_for_new_items">Pozastaviť upozornenia</string>
+    <string name="toggle_read_status">Prepnúť stav prečítania</string>
+    <string name="open_link_in_browser">Otvoriť odkaz v prehliadači</string>
+    <string name="open_in_browser">Otvoriť v prehliadači</string>
+    <string name="open_enclosed_media">Otvoriť priložené média</string>
+    <string name="open_enclosed_media_file">Otvoriť%1$s</string>
+    <string name="read_article">Čitať nahlas</string>
+    <string name="text_to_speech">Prevod textu na reč</string>
+    <string name="pause_reading">Pozastav čítanie</string>
+    <string name="resume_reading">Pokračovať v čítaní</string>
+    <string name="stop_reading">Pozastaviť čítanie</string>
+    <string name="skip_to_next">Preskočiť na nasledujúce</string>
+    <string name="set_language">Nastaviť jazyk</string>
+    <string name="sync">Synchronizovať</string>
+    <string name="export_feeds_to_opml">Exportovať kanály do OPML</string>
+    <string name="import_feeds_from_opml">Importovať kanály do OPML</string>
+    <string name="export_saved_articles">Exportovať uložené články</string>
+    <string name="view_debug_log">Zobraziť diagnostický záznam</string>
 </resources>
