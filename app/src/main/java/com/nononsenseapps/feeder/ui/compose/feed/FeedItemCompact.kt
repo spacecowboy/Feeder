@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -62,88 +62,87 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier =
-            modifier
-                .height(IntrinsicSize.Min)
-                .padding(start = LocalDimens.current.margin),
-    ) {
-        FeedItemText(
-            item = item,
-            onMarkAboveAsRead = onMarkAboveAsRead,
-            onMarkBelowAsRead = onMarkBelowAsRead,
-            onShareItem = onShareItem,
-            onToggleBookmark = onToggleBookmark,
-            dropDownMenuExpanded = dropDownMenuExpanded,
-            onDismissDropdown = onDismissDropdown,
-            maxLines = maxLines,
-            showOnlyTitle = showOnlyTitle,
-            showReadingTime = showReadingTime,
-            modifier =
-                Modifier
-                    .requiredHeightIn(min = minimumTouchSize)
-                    .padding(vertical = 8.dp),
-        )
+    Surface(modifier = modifier.height(IntrinsicSize.Min)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(start = LocalDimens.current.margin),
+        ) {
+            FeedItemText(
+                item = item,
+                onMarkAboveAsRead = onMarkAboveAsRead,
+                onMarkBelowAsRead = onMarkBelowAsRead,
+                onShareItem = onShareItem,
+                onToggleBookmark = onToggleBookmark,
+                dropDownMenuExpanded = dropDownMenuExpanded,
+                onDismissDropdown = onDismissDropdown,
+                maxLines = maxLines,
+                showOnlyTitle = showOnlyTitle,
+                showReadingTime = showReadingTime,
+                modifier =
+                    Modifier
+                        .requiredHeightIn(min = minimumTouchSize)
+                        .padding(vertical = 8.dp),
+            )
 
-        if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.image != null || item.feedImageUrl != null)) {
-            Box(
-                modifier = Modifier.fillMaxHeight(),
-                contentAlignment = Alignment.TopEnd,
-            ) {
-                if (item.bookmarked && bookmarkIndicator) {
-                    FeedItemEitherIndicator(
-                        bookmarked = true,
-                        itemImage = null,
-                        feedImageUrl = null,
-                        size = 24.dp,
-                        modifier =
-                            Modifier
-                                .fillMaxHeight()
-                                .width(64.dp),
-                    )
-                } else {
-                    (item.image?.url ?: item.feedImageUrl?.toString())?.let { imageUrl ->
-                        val pixelDensity = LocalDensity.current.density
-                        val scale =
-                            if (item.image != null) {
-                                RestrainedCropScaling(pixelDensity)
-                            } else {
-                                RestrainedFitScaling(pixelDensity)
-                            }
-                        val pixels =
-                            with(LocalDensity.current) {
-                                val px = imageWidth.toPx()
-                                Size(px.roundToInt(), (px * 1.5).roundToInt())
-                            }
-                        AsyncImage(
-                            model =
-                                ImageRequest
-                                    .Builder(LocalContext.current)
-                                    .data(imageUrl)
-                                    .listener(
-                                        onError = { a, b ->
-                                            logDebug("FEEDER_COMPACT", "error ${a.data}", b.throwable)
-                                        },
-                                    ).scale(Scale.FILL)
-                                    .size(pixels)
-                                    .precision(Precision.INEXACT)
-                                    .build(),
-                            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
-                            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                            contentDescription = null,
-                            contentScale = scale,
+            if ((item.bookmarked && bookmarkIndicator) || showThumbnail && (item.image != null || item.feedImageUrl != null)) {
+                Box(
+                    modifier = Modifier.fillMaxHeight(),
+                    contentAlignment = Alignment.TopEnd,
+                ) {
+                    if (item.bookmarked && bookmarkIndicator) {
+                        FeedItemEitherIndicator(
+                            bookmarked = true,
+                            itemImage = null,
+                            feedImageUrl = null,
+                            size = 24.dp,
                             modifier =
                                 Modifier
-                                    .width(imageWidth)
-                                    .fillMaxHeight(),
+                                    .fillMaxHeight()
+                                    .width(64.dp),
                         )
+                    } else {
+                        (item.image?.url ?: item.feedImageUrl?.toString())?.let { imageUrl ->
+                            val pixelDensity = LocalDensity.current.density
+                            val scale =
+                                if (item.image != null) {
+                                    RestrainedCropScaling(pixelDensity)
+                                } else {
+                                    RestrainedFitScaling(pixelDensity)
+                                }
+                            val pixels =
+                                with(LocalDensity.current) {
+                                    val px = imageWidth.toPx()
+                                    Size(px.roundToInt(), (px * 1.5).roundToInt())
+                                }
+                            AsyncImage(
+                                model =
+                                    ImageRequest
+                                        .Builder(LocalContext.current)
+                                        .data(imageUrl)
+                                        .listener(
+                                            onError = { a, b ->
+                                                logDebug("FEEDER_COMPACT", "error ${a.data}", b.throwable)
+                                            },
+                                        ).scale(Scale.FILL)
+                                        .size(pixels)
+                                        .precision(Precision.INEXACT)
+                                        .build(),
+                                placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+                                error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                contentDescription = null,
+                                contentScale = scale,
+                                modifier =
+                                    Modifier
+                                        .width(imageWidth)
+                                        .fillMaxHeight(),
+                            )
+                        }
                     }
                 }
+            } else {
+                // Taking Row spacing into account
+                Spacer(modifier = Modifier.width(LocalDimens.current.margin - 4.dp))
             }
-        } else {
-            // Taking Row spacing into account
-            Spacer(modifier = Modifier.width(LocalDimens.current.margin - 4.dp))
         }
     }
 }
@@ -185,10 +184,88 @@ data class FeedListItem(
 }
 
 @Composable
-@Preview(showBackground = true)
+@PreviewLightDark
 private fun PreviewRead() {
     PreviewTheme {
-        Surface {
+        FeedItemCompact(
+            item =
+                @Suppress("ktlint:standard:max-line-length")
+                FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = false,
+                    image = null,
+                    link = null,
+                    id = ID_UNSET,
+                    bookmarked = false,
+                    feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
+                    wordCount = 900,
+                ),
+            showThumbnail = true,
+            onMarkAboveAsRead = {},
+            onMarkBelowAsRead = {},
+            onShareItem = {},
+            onToggleBookmark = {},
+            dropDownMenuExpanded = false,
+            onDismissDropdown = {},
+            bookmarkIndicator = true,
+            maxLines = 5,
+            showOnlyTitle = false,
+            showReadingTime = true,
+            imageWidth = 64.dp,
+        )
+    }
+}
+
+@Composable
+@PreviewLightDark
+private fun PreviewUnread() {
+    PreviewTheme {
+        FeedItemCompact(
+            item =
+                @Suppress("ktlint:standard:max-line-length")
+                FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = true,
+                    image = null,
+                    link = null,
+                    id = ID_UNSET,
+                    bookmarked = true,
+                    feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
+                    wordCount = 900,
+                ),
+            showThumbnail = true,
+            onMarkAboveAsRead = {},
+            onMarkBelowAsRead = {},
+            onShareItem = {},
+            onToggleBookmark = {},
+            dropDownMenuExpanded = false,
+            onDismissDropdown = {},
+            bookmarkIndicator = true,
+            maxLines = 5,
+            showOnlyTitle = false,
+            showReadingTime = true,
+            imageWidth = 64.dp,
+        )
+    }
+}
+
+@Composable
+@PreviewLightDark
+private fun PreviewWithImage() {
+    PreviewTheme {
+        Box(
+            modifier = Modifier.width(400.dp),
+        ) {
             FeedItemCompact(
                 item =
                     @Suppress("ktlint:standard:max-line-length")
@@ -197,8 +274,8 @@ private fun PreviewRead() {
                         snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                         feedTitle = "Super Duper Feed One two three hup di too dasf",
                         pubDate = "Jun 9, 2021",
-                        unread = false,
-                        image = null,
+                        unread = true,
+                        image = MediaImage("blabla"),
                         link = null,
                         id = ID_UNSET,
                         bookmarked = false,
@@ -220,90 +297,6 @@ private fun PreviewRead() {
                 showReadingTime = true,
                 imageWidth = 64.dp,
             )
-        }
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun PreviewUnread() {
-    PreviewTheme {
-        Surface {
-            FeedItemCompact(
-                item =
-                    @Suppress("ktlint:standard:max-line-length")
-                    FeedListItem(
-                        title = "title",
-                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                        feedTitle = "Super Duper Feed One two three hup di too dasf",
-                        pubDate = "Jun 9, 2021",
-                        unread = true,
-                        image = null,
-                        link = null,
-                        id = ID_UNSET,
-                        bookmarked = true,
-                        feedImageUrl = null,
-                        primarySortTime = Instant.EPOCH,
-                        rawPubDate = null,
-                        wordCount = 900,
-                    ),
-                showThumbnail = true,
-                onMarkAboveAsRead = {},
-                onMarkBelowAsRead = {},
-                onShareItem = {},
-                onToggleBookmark = {},
-                dropDownMenuExpanded = false,
-                onDismissDropdown = {},
-                bookmarkIndicator = true,
-                maxLines = 5,
-                showOnlyTitle = false,
-                showReadingTime = true,
-                imageWidth = 64.dp,
-            )
-        }
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun PreviewWithImage() {
-    PreviewTheme {
-        Surface {
-            Box(
-                modifier = Modifier.width(400.dp),
-            ) {
-                FeedItemCompact(
-                    item =
-                        @Suppress("ktlint:standard:max-line-length")
-                        FeedListItem(
-                            title = "title",
-                            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                            feedTitle = "Super Duper Feed One two three hup di too dasf",
-                            pubDate = "Jun 9, 2021",
-                            unread = true,
-                            image = MediaImage("blabla"),
-                            link = null,
-                            id = ID_UNSET,
-                            bookmarked = false,
-                            feedImageUrl = null,
-                            primarySortTime = Instant.EPOCH,
-                            rawPubDate = null,
-                            wordCount = 900,
-                        ),
-                    showThumbnail = true,
-                    onMarkAboveAsRead = {},
-                    onMarkBelowAsRead = {},
-                    onShareItem = {},
-                    onToggleBookmark = {},
-                    dropDownMenuExpanded = false,
-                    onDismissDropdown = {},
-                    bookmarkIndicator = true,
-                    maxLines = 5,
-                    showOnlyTitle = false,
-                    showReadingTime = true,
-                    imageWidth = 64.dp,
-                )
-            }
         }
     }
 }
