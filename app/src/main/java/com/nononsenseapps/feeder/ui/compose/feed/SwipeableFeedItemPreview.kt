@@ -108,32 +108,34 @@ fun SwipeableFeedItemPreview(
         label = "swipeBackground",
     )
 
-    LaunchedEffect(filter, item.unread) {
+    LaunchedEffect(filter) {
         // critical state changes - reset ui state
-        anchoredDraggableState.animateTo(FeedItemSwipeState.CENTER)
+        if (anchoredDraggableState.currentValue != FeedItemSwipeState.CENTER) {
+            anchoredDraggableState.animateTo(FeedItemSwipeState.CENTER)
+        }
     }
 
     var skipHapticFeedback by remember { mutableStateOf(false) }
     LaunchedEffect(anchoredDraggableState.settledValue) {
         if (anchoredDraggableState.settledValue != FeedItemSwipeState.CENTER) {
             logDebug(LOG_TAG, "onSwipe ${item.unread}")
-            onSwipeCallback(item.unread)
-
             if (!filter.onlyUnread) {
                 skipHapticFeedback = true
                 anchoredDraggableState.animateTo(FeedItemSwipeState.CENTER)
             }
+
+            onSwipeCallback(item.unread)
         }
     }
 
     var swipeIconAlignment by remember { mutableStateOf(Alignment.CenterStart) }
     // Launched effect because I don't want a value change to zero to change the variable
-    LaunchedEffect(anchoredDraggableState.currentValue) {
-        if (anchoredDraggableState.currentValue == FeedItemSwipeState.END) {
-            swipeIconAlignment = Alignment.CenterStart
-        } else if (anchoredDraggableState.currentValue == FeedItemSwipeState.START) {
-            swipeIconAlignment = Alignment.CenterEnd
-        }
+    LaunchedEffect(anchoredDraggableState.offset) {
+        swipeIconAlignment =
+            when {
+                anchoredDraggableState.offset > 0 -> Alignment.CenterStart
+                else -> Alignment.CenterEnd
+            }
     }
 
     var dropDownMenuExpanded by rememberSaveable {
