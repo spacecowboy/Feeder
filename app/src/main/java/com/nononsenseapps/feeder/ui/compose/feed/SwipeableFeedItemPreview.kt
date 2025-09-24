@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -70,10 +68,6 @@ private const val LOG_TAG = "FEEDER_SWIPEITEM"
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
  * called multiple times by several DisposableEffects.
  */
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterialApi::class,
-)
 @Composable
 fun SwipeableFeedItemPreview(
     onSwipe: (Boolean) -> Unit,
@@ -108,7 +102,7 @@ fun SwipeableFeedItemPreview(
         label = "swipeBackground",
     )
 
-    LaunchedEffect(filter) {
+    LaunchedEffect(filter, item.unread) {
         // critical state changes - reset ui state
         if (anchoredDraggableState.currentValue != FeedItemSwipeState.CENTER) {
             anchoredDraggableState.animateTo(FeedItemSwipeState.CENTER)
@@ -128,14 +122,13 @@ fun SwipeableFeedItemPreview(
         }
     }
 
-    var swipeIconAlignment by remember { mutableStateOf(Alignment.CenterStart) }
-    // Launched effect because I don't want a value change to zero to change the variable
-    LaunchedEffect(anchoredDraggableState.offset) {
-        swipeIconAlignment =
+    val swipeIconAlignment by remember {
+        derivedStateOf {
             when {
                 anchoredDraggableState.offset > 0 -> Alignment.CenterStart
                 else -> Alignment.CenterEnd
             }
+        }
     }
 
     var dropDownMenuExpanded by rememberSaveable {
