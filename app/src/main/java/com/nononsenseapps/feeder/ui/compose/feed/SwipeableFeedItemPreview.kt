@@ -412,6 +412,7 @@ fun SwipeableFeedItemPreview(
                             ),
                 )
 
+                // Dividing the maxWidth by 2 means you only have to swipe a quarter of the screen width to reach the swipe threshold, instead of a full half of the screen by default.
                 LaunchedEffect(swipeAsRead) {
                     anchoredDraggableState.updateAnchors(
                         DraggableAnchors {
@@ -422,14 +423,14 @@ fun SwipeableFeedItemPreview(
                                     FeedItemSwipeState.END at 0f
                                 }
                                 SwipeAsRead.ONLY_FROM_END -> {
-                                    FeedItemSwipeState.START at -maxWidthPx
+                                    FeedItemSwipeState.START at -(maxWidthPx / 2)
                                     FeedItemSwipeState.CENTER at 0f
                                     FeedItemSwipeState.END at 0f
                                 }
                                 SwipeAsRead.FROM_ANYWHERE -> {
-                                    FeedItemSwipeState.START at -maxWidthPx
+                                    FeedItemSwipeState.START at -(maxWidthPx / 2)
                                     FeedItemSwipeState.CENTER at 0f
-                                    FeedItemSwipeState.END at maxWidthPx
+                                    FeedItemSwipeState.END at maxWidthPx / 2
                                 }
                             }
                         },
