@@ -160,7 +160,13 @@ fun SwipeableFeedItemPreview(
         modifier =
             modifier
                 .width(dimens.maxContentWidth)
-                .combinedClickable(
+                .clip(
+                    shape =
+                        when (feedItemStyle) {
+                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
+                            else -> MaterialTheme.shapes.medium
+                        },
+                ).combinedClickable(
                     onLongClick = {
                         dropDownMenuExpanded = true
                     },
@@ -233,13 +239,7 @@ fun SwipeableFeedItemPreview(
             modifier =
                 Modifier
                     .matchParentSize()
-                    .clip(
-                        shape =
-                            when (feedItemStyle) {
-                                FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
-                                else -> MaterialTheme.shapes.medium
-                            },
-                    ).graphicsLayer {
+                    .graphicsLayer {
                         this.alpha = alpha
                     }.drawBehind {
                         drawRect(color = color)
