@@ -85,12 +85,15 @@ fun SwipeableFeedItemPreview(
     val currentOnSwipeCallback by rememberUpdatedState(newValue = onSwipe)
     val currentItem by rememberUpdatedState(newValue = item)
 
+    var autoSnappedBack by remember { mutableStateOf(false) }
     val swipeableState =
         rememberSwipeToDismissBoxState(confirmValueChange = {
             if (it != SwipeToDismissBoxValue.Settled) {
                 currentOnSwipeCallback(currentItem.unread)
 
-                // Only commit the change if we're only viewing unread items, in all other cases we'll snap back the swipe position as the item isn't removed from view.
+                // Only commit the change if we're only viewing unread items, in all other cases we'll snap back the swipe position as the item isn't removed from view. In cases where we snapped
+                // back automatically, track this so we don't provide haptic feedback in the LaunchedEffect down below.
+                autoSnappedBack = !currentFilter.onlyUnread
                 currentFilter.onlyUnread
             } else {
                 false
@@ -113,12 +116,22 @@ fun SwipeableFeedItemPreview(
             }
         }.distinctUntilChanged()
             .collect { isOverThreshold ->
+                // Don't perform haptic feedback if the swipe position automatically snapped back (and thus crossed the threshold again) as a result of the user swiping to read/unread an article
+                // when the filter is set to 'Read' or 'Recently read'.
                 if (isOverThreshold && !thresholdReached) {
                     thresholdReached = true
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    if (!autoSnappedBack) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    } else {
+                        autoSnappedBack = false
+                    }
                 } else if (!isOverThreshold && thresholdReached) {
                     thresholdReached = false
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    if (!autoSnappedBack) {
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                    } else {
+                        autoSnappedBack = false
+                    }
                 }
             }
     }
