@@ -416,22 +416,13 @@ fun SwipeableFeedItemPreview(
                 LaunchedEffect(swipeAsRead) {
                     anchoredDraggableState.updateAnchors(
                         DraggableAnchors {
-                            when (swipeAsRead) {
-                                SwipeAsRead.DISABLED -> {
-                                    FeedItemSwipeState.START at 0f
-                                    FeedItemSwipeState.CENTER at 0f
-                                    FeedItemSwipeState.END at 0f
-                                }
-                                SwipeAsRead.ONLY_FROM_END -> {
-                                    FeedItemSwipeState.START at -(maxWidthPx / 2)
-                                    FeedItemSwipeState.CENTER at 0f
-                                    FeedItemSwipeState.END at 0f
-                                }
-                                SwipeAsRead.FROM_ANYWHERE -> {
-                                    FeedItemSwipeState.START at -(maxWidthPx / 2)
-                                    FeedItemSwipeState.CENTER at 0f
-                                    FeedItemSwipeState.END at maxWidthPx / 2
-                                }
+                            if (swipeAsRead == SwipeAsRead.ONLY_FROM_END) {
+                                FeedItemSwipeState.START at -(maxWidthPx / 2)
+                                FeedItemSwipeState.CENTER at 0f
+                            } else if (swipeAsRead == SwipeAsRead.FROM_ANYWHERE) {
+                                FeedItemSwipeState.START at -(maxWidthPx / 2)
+                                FeedItemSwipeState.CENTER at 0f
+                                FeedItemSwipeState.END at maxWidthPx / 2
                             }
                         },
                     )
