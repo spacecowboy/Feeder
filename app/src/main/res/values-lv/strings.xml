@@ -267,4 +267,7 @@
     <string name="discovered_feeds_list">Atklāto ziņu plūsmu saraksts</string>
     <string name="sync_option_manually">Pēc pašu izvēles</string>
     <string name="permission_read_label">Tikai lasīšanas piekļuve</string>
+    <string name="go_to_feed">Doties uz %1$s</string>
+    <string name="explanation_permission_notifications">Pirms paziņojumu iespējošanas ir jāpiešķir atļauja.</string>
+    <string name="summarize_on_open">Apkopot, kad atver</string>
 </resources>
