@@ -41,8 +41,8 @@ android {
         // The version fields are set with actual values to support F-Droid
         // In Play variant, they are overridden and taken from git to support alpha/beta testing.
         // For actual releases they match.
-        versionCode = 3806
-        versionName = "2.15.0"
+        versionCode = 3813
+        versionName = "2.15.1"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -136,7 +136,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = "2.15.0"
+                versionName = "2.15.1"
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
