@@ -18,4 +18,4 @@
 <li>Material design</li>
 </ul>
 
-O registro de mudanças completo está disponível <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
+O registro de mudanças completo está disponível <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">no GitHub</a>.
