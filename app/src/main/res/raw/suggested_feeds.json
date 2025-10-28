@@ -1,497 +1,732 @@
 [
-  {
-    "title": "Dwarkesh Patel",
-    "website": "https://dwarkeshpatel.com",
-    "feed_url": "https://www.dwarkeshpatel.com/rss.xml"
-  },
-  {
-    "title": "Bryan Caplan (Bet On It)",
-    "website": "https://betonit.substack.com",
-    "feed_url": "https://betonit.substack.com/feed"
-  },
-  {
-    "title": "Slate Star Codex (archive)",
-    "website": "https://slatestarcodex.com",
-    "feed_url": "https://slatestarcodex.com/feed/"
-  },
-  {
-    "title": "Astral Codex Ten",
-    "website": "https://astralcodexten.substack.com",
-    "feed_url": "https://astralcodexten.substack.com/feed"
-  },
-  {
-    "title": "Marginal Revolution",
-    "website": "https://marginalrevolution.com",
-    "feed_url": "https://marginalrevolution.com/feed"
-  },
-  {
-    "title": "Noahpinion",
-    "website": "https://noahpinion.blog",
-    "feed_url": "https://noahpinion.substack.com/feed"
-  },
-  {
-    "title": "Paul Graham (Essays RSS mirrors vary)",
-    "website": "http://paulgraham.com",
-    "feed_url": ""
-  },
-  {
-    "title": "Ben Thompson – Stratechery (headlines)",
-    "website": "https://stratechery.com",
-    "feed_url": "https://stratechery.com/feed/"
-  },
-  {
-    "title": "Gwern",
-    "website": "https://gwern.net",
-    "feed_url": "https://www.gwern.net/atom.xml"
-  },
-  {
-    "title": "Construction Physics",
-    "website": "https://construction-physics.com",
-    "feed_url": "https://www.construction-physics.com/feed"
-  },
-  {
-    "title": "Experimental History",
-    "website": "https://experimental-history.com",
-    "feed_url": "https://experimentalhistory.substack.com/feed"
-  },
-  {
-    "title": "The Diff",
-    "website": "https://thediff.co",
-    "feed_url": "https://thediff.substack.com/feed"
-  },
-  {
-    "title": "Applied Divinity Studies",
-    "website": "https://applieddivinitystudies.com",
-    "feed_url": "https://applieddivinitystudies.com/feed.xml"
-  },
-  {
-    "title": "Kevin Drum",
-    "website": "https://jabberwocking.com",
-    "feed_url": "https://jabberwocking.com/feed/"
-  },
-  {
-    "title": "Cold Takes (Holden Karnofsky)",
-    "website": "https://cold-takes.com",
-    "feed_url": "https://www.cold-takes.com/feed.xml"
-  },
-  {
-    "title": "ACX Book Reviews",
-    "website": "https://astralcodexten.substack.com/s/book-reviews",
-    "feed_url": "https://astralcodexten.substack.com/feed"
-  },
-  {
-    "title": "LessWrong (frontpage)",
-    "website": "https://lesswrong.com",
-    "feed_url": "https://www.lesswrong.com/feed.xml?view=curated-rss"
-  },
-  {
-    "title": "EA Forum",
-    "website": "https://forum.effectivealtruism.org",
-    "feed_url": "https://forum.effectivealtruism.org/feed.xml"
-  },
-  {
-    "title": "Jason Crawford – Roots of Progress",
-    "website": "https://rootsofprogress.org",
-    "feed_url": "https://rootsofprogress.org/rss.xml"
-  },
-  {
-    "title": "Patrick Collison (Notes)",
-    "website": "https://patrickcollison.com",
-    "feed_url": "https://patrickcollison.com/atom.xml"
-  },
-  {
-    "title": "Anton Howes",
-    "website": "https://antonhowes.substack.com",
-    "feed_url": "https://antonhowes.substack.com/feed"
-  },
-  {
-    "title": "Alexey Guzey",
-    "website": "https://guzey.com",
-    "feed_url": "https://guzey.com/atom.xml"
-  },
-  {
-    "title": "Nat Friedman (posts)",
-    "website": "https://nat.org",
-    "feed_url": "https://nat.org/rss.xml"
-  },
-  {
-    "title": "Dynomight",
-    "website": "https://dynomight.net",
-    "feed_url": "https://dynomight.net/feed.xml"
-  },
-  {
-    "title": "Nintil (Artir)",
-    "website": "https://nintil.com",
-    "feed_url": "https://nintil.com/feed.xml"
-  },
-  {
-    "title": "Overcoming Bias (Robin Hanson)",
-    "website": "https://overcomingbias.com",
-    "feed_url": "https://www.overcomingbias.com/feed"
-  },
-  {
-    "title": "Alex Tabarrok (MR)",
-    "website": "https://marginalrevolution.com",
-    "feed_url": "https://marginalrevolution.com/feed"
-  },
-  {
-    "title": "Eliezer Yudkowsky",
-    "website": "https://lesswrong.com/users/eliezer_yudkowsky/overview",
-    "feed_url": "https://www.lesswrong.com/feed.xml?view=curated-rss"
-  },
-  {
-    "title": "The Browser Company (Arc)",
-    "website": "https://browser.company",
-    "feed_url": "https://browser.company/blog/rss.xml"
-  },
-  {
-    "title": "Ben Kuhn",
-    "website": "https://benkuhn.net",
-    "feed_url": "https://www.benkuhn.net/feed.xml"
-  },
-  {
-    "title": "Julia Galef",
-    "website": "https://juliagalef.com",
-    "feed_url": ""
-  },
-  {
-    "title": "Kelsey Piper",
-    "website": "https://vox.com/authors/kelsey-piper",
-    "feed_url": ""
-  },
-  {
-    "title": "Zvi Mowshowitz",
-    "website": "https://thezvi.substack.com",
-    "feed_url": "https://thezvi.substack.com/feed"
-  },
-  {
-    "title": "Simon Willison",
-    "website": "https://simonwillison.net",
-    "feed_url": "https://til.simonwillison.net/atom.xml"
-  },
-  {
-    "title": "Benedict Evans",
-    "website": "https://ben-evans.com",
-    "feed_url": ""
-  },
-  {
-    "title": "Daring Fireball (Gruber)",
-    "website": "https://daringfireball.net",
-    "feed_url": "https://daringfireball.net/feeds/main"
-  },
-  {
-    "title": "Asterisk (mag)",
-    "website": "https://asteriskmag.com",
-    "feed_url": "https://asteriskmag.com/feed.xml"
-  },
-  {
-    "title": "Wait But Why",
-    "website": "https://waitbutwhy.com",
-    "feed_url": "https://waitbutwhy.com/feed"
-  },
-  {
-    "title": "Kevin Kelly – The Technium",
-    "website": "https://kk.org",
-    "feed_url": "https://kk.org/feed/"
-  },
-  {
-    "title": "Morgan Housel – Collaborative Fund",
-    "website": "https://collaborativefund.com/blog",
-    "feed_url": "https://www.collaborativefund.com/blog/rss/"
-  },
-  {
-    "title": "Patrick McKenzie (patio11)",
-    "website": "https://kalzumeus.com",
-    "feed_url": "https://www.kalzumeus.com/feed/"
-  },
-  {
-    "title": "Dan Luu",
-    "website": "https://danluu.com",
-    "feed_url": "https://danluu.com/atom.xml"
-  },
-  {
-    "title": "Stephen Wolfram Writings",
-    "website": "https://writings.stephenwolfram.com",
-    "feed_url": "https://writings.stephenwolfram.com/feed/"
-  },
-  {
-    "title": "MIT AI News",
-    "website": "https://news.mit.edu/topic/artificial-intelligence2",
-    "feed_url": "https://news.mit.edu/rss/topic/artificial-intelligence2"
-  },
-  {
-    "title": "OpenAI Blog",
-    "website": "https://openai.com/blog",
-    "feed_url": "https://openai.com/blog/rss"
-  },
-  {
-    "title": "astralcodexten",
-    "website": "https://astralcodexten.substack.com",
-    "feed_url": "https://astralcodexten.substack.com/feed"
-  },
-  {
-    "title": "betonit",
-    "website": "https://betonit.substack.com",
-    "feed_url": "https://betonit.substack.com/feed"
-  },
-  {
-    "title": "noahpinion",
-    "website": "https://noahpinion.substack.com",
-    "feed_url": "https://noahpinion.substack.com/feed"
-  },
-  {
-    "title": "thezvi",
-    "website": "https://thezvi.substack.com",
-    "feed_url": "https://thezvi.substack.com/feed"
-  },
-  {
-    "title": "experimentalhistory",
-    "website": "https://experimentalhistory.substack.com",
-    "feed_url": "https://experimentalhistory.substack.com/feed"
-  },
-  {
-    "title": "construction-physics",
-    "website": "https://construction-physics.substack.com",
-    "feed_url": "https://construction-physics.substack.com/feed"
-  },
-  {
-    "title": "applieddivinitystudies",
-    "website": "https://applieddivinitystudies.substack.com",
-    "feed_url": "https://applieddivinitystudies.substack.com/feed"
-  },
-  {
-    "title": "thebrowser",
-    "website": "https://thebrowser.substack.com",
-    "feed_url": "https://thebrowser.substack.com/feed"
-  },
-  {
-    "title": "thegeneralistreview",
-    "website": "https://thegeneralistreview.substack.com",
-    "feed_url": "https://thegeneralistreview.substack.com/feed"
-  },
-  {
-    "title": "lynalden",
-    "website": "https://lynalden.substack.com",
-    "feed_url": "https://lynalden.substack.com/feed"
-  },
-  {
-    "title": "thediff",
-    "website": "https://thediff.substack.com",
-    "feed_url": "https://thediff.substack.com/feed"
-  },
-  {
-    "title": "napkinmath",
-    "website": "https://napkinmath.substack.com",
-    "feed_url": "https://napkinmath.substack.com/feed"
-  },
-  {
-    "title": "worksinprogress",
-    "website": "https://worksinprogress.substack.com",
-    "feed_url": "https://worksinprogress.substack.com/feed"
-  },
-  {
-    "title": "latticedata",
-    "website": "https://latticedata.substack.com",
-    "feed_url": "https://latticedata.substack.com/feed"
-  },
-  {
-    "title": "danromero",
-    "website": "https://danromero.substack.com",
-    "feed_url": "https://danromero.substack.com/feed"
-  },
-  {
-    "title": "forourposterity",
-    "website": "https://forourposterity.substack.com",
-    "feed_url": "https://forourposterity.substack.com/feed"
-  },
-  {
-    "title": "collabfund",
-    "website": "https://collabfund.substack.com",
-    "feed_url": "https://collabfund.substack.com/feed"
-  },
-  {
-    "title": "juliagalef",
-    "website": "https://juliagalef.substack.com",
-    "feed_url": "https://juliagalef.substack.com/feed"
-  },
-  {
-    "title": "ben-evans",
-    "website": "https://ben-evans.substack.com",
-    "feed_url": "https://ben-evans.substack.com/feed"
-  },
-  {
-    "title": "azeem",
-    "website": "https://azeem.substack.com",
-    "feed_url": "https://azeem.substack.com/feed"
-  },
-  {
-    "title": "density-wave",
-    "website": "https://density-wave.substack.com",
-    "feed_url": "https://density-wave.substack.com/feed"
-  },
-  {
-    "title": "alexeyguzey",
-    "website": "https://alexeyguzey.substack.com",
-    "feed_url": "https://alexeyguzey.substack.com/feed"
-  },
-  {
-    "title": "antonz",
-    "website": "https://antonz.substack.com",
-    "feed_url": "https://antonz.substack.com/feed"
-  },
-  {
-    "title": "jasoncrawford",
-    "website": "https://jasoncrawford.substack.com",
-    "feed_url": "https://jasoncrawford.substack.com/feed"
-  },
-  {
-    "title": "rootsofprogress",
-    "website": "https://rootsofprogress.substack.com",
-    "feed_url": "https://rootsofprogress.substack.com/feed"
-  },
-  {
-    "title": "slimemoldtime",
-    "website": "https://slimemoldtime.substack.com",
-    "feed_url": "https://slimemoldtime.substack.com/feed"
-  },
-  {
-    "title": "marginalrevolution",
-    "website": "https://marginalrevolution.substack.com",
-    "feed_url": "https://marginalrevolution.substack.com/feed"
-  },
-  {
-    "title": "thepullrequest",
-    "website": "https://thepullrequest.substack.com",
-    "feed_url": "https://thepullrequest.substack.com/feed"
-  },
-  {
-    "title": "near-future-labs",
-    "website": "https://near-future-labs.substack.com",
-    "feed_url": "https://near-future-labs.substack.com/feed"
-  },
-  {
-    "title": "hardfork",
-    "website": "https://hardfork.substack.com",
-    "feed_url": "https://hardfork.substack.com/feed"
-  },
-  {
-    "title": "theintrinsicperspective",
-    "website": "https://theintrinsicperspective.substack.com",
-    "feed_url": "https://theintrinsicperspective.substack.com/feed"
-  },
-  {
-    "title": "thedispatch",
-    "website": "https://thedispatch.substack.com",
-    "feed_url": "https://thedispatch.substack.com/feed"
-  },
-  {
-    "title": "slowboring",
-    "website": "https://slowboring.substack.com",
-    "feed_url": "https://slowboring.substack.com/feed"
-  },
-  {
-    "title": "andreessenhorowitz",
-    "website": "https://andreessenhorowitz.substack.com",
-    "feed_url": "https://andreessenhorowitz.substack.com/feed"
-  },
-  {
-    "title": "stratechery",
-    "website": "https://stratechery.substack.com",
-    "feed_url": "https://stratechery.substack.com/feed"
-  },
-  {
-    "title": "matthewball",
-    "website": "https://matthewball.substack.com",
-    "feed_url": "https://matthewball.substack.com/feed"
-  },
-  {
-    "title": "margins",
-    "website": "https://margins.substack.com",
-    "feed_url": "https://margins.substack.com/feed"
-  },
-  {
-    "title": "bskynews",
-    "website": "https://bskynews.substack.com",
-    "feed_url": "https://bskynews.substack.com/feed"
-  },
-  {
-    "title": "chaosprime",
-    "website": "https://chaosprime.substack.com",
-    "feed_url": "https://chaosprime.substack.com/feed"
-  },
-  {
-    "title": "parthsharma",
-    "website": "https://parthsharma.substack.com",
-    "feed_url": "https://parthsharma.substack.com/feed"
-  },
-  {
-    "title": "thediffmail",
-    "website": "https://thediffmail.substack.com",
-    "feed_url": "https://thediffmail.substack.com/feed"
-  },
-  {
-    "title": "habitweekly",
-    "website": "https://habitweekly.substack.com",
-    "feed_url": "https://habitweekly.substack.com/feed"
-  },
-  {
-    "title": "reasoned-choice",
-    "website": "https://reasoned-choice.substack.com",
-    "feed_url": "https://reasoned-choice.substack.com/feed"
-  },
-  {
-    "title": "fromfirstprinciples",
-    "website": "https://fromfirstprinciples.substack.com",
-    "feed_url": "https://fromfirstprinciples.substack.com/feed"
-  },
-  {
-    "title": "quantumcountry",
-    "website": "https://quantumcountry.substack.com",
-    "feed_url": "https://quantumcountry.substack.com/feed"
-  },
-  {
-    "title": "thebrowsercompany",
-    "website": "https://thebrowsercompany.substack.com",
-    "feed_url": "https://thebrowsercompany.substack.com/feed"
-  },
-  {
-    "title": "danco",
-    "website": "https://danco.substack.com",
-    "feed_url": "https://danco.substack.com/feed"
-  },
-  {
-    "title": "unrelatedwaffle",
-    "website": "https://unrelatedwaffle.substack.com",
-    "feed_url": "https://unrelatedwaffle.substack.com/feed"
-  },
-  {
-    "title": "notesonattention",
-    "website": "https://notesonattention.substack.com",
-    "feed_url": "https://notesonattention.substack.com/feed"
-  },
-  {
-    "title": "notboring",
-    "website": "https://notboring.substack.com",
-    "feed_url": "https://notboring.substack.com/feed"
-  },
-  {
-    "title": "esaya",
-    "website": "https://esaya.substack.com",
-    "feed_url": "https://esaya.substack.com/feed"
-  },
-  {
-    "title": "appliedhistory",
-    "website": "https://appliedhistory.substack.com",
-    "feed_url": "https://appliedhistory.substack.com/feed"
-  },
-  {
-    "title": "acquiring",
-    "website": "https://acquiring.substack.com",
-    "feed_url": "https://acquiring.substack.com/feed"
-  },
-  {
-    "title": "every",
-    "website": "https://every.substack.com",
-    "feed_url": "https://every.substack.com/feed"
-  }
+    {
+        "title": "Bryan Caplan (Bet On It)",
+        "website": "https://betonit.substack.com",
+        "feed_url": "https://betonit.substack.com/feed"
+    },
+    {
+        "title": "Slate Star Codex (archive)",
+        "website": "https://slatestarcodex.com",
+        "feed_url": "https://slatestarcodex.com/feed/"
+    },
+    {
+        "title": "Astral Codex Ten",
+        "website": "https://astralcodexten.substack.com",
+        "feed_url": "https://astralcodexten.substack.com/feed"
+    },
+    {
+        "title": "Marginal Revolution",
+        "website": "https://marginalrevolution.com",
+        "feed_url": "https://marginalrevolution.com/feed"
+    },
+    {
+        "title": "Noahpinion",
+        "website": "https://noahpinion.blog",
+        "feed_url": "https://noahpinion.substack.com/feed"
+    },
+    {
+        "title": "Ben Thompson – Stratechery (headlines)",
+        "website": "https://stratechery.com",
+        "feed_url": "https://stratechery.com/feed/"
+    },
+    {
+        "title": "Construction Physics",
+        "website": "https://construction-physics.com",
+        "feed_url": "https://www.construction-physics.com/feed"
+    },
+    {
+        "title": "Experimental History",
+        "website": "https://experimental-history.com",
+        "feed_url": "https://experimentalhistory.substack.com/feed"
+    },
+    {
+        "title": "The Diff",
+        "website": "https://thediff.co",
+        "feed_url": "https://thediff.substack.com/feed"
+    },
+    {
+        "title": "Kevin Drum",
+        "website": "https://jabberwocking.com",
+        "feed_url": "https://jabberwocking.com/feed/"
+    },
+    {
+        "title": "ACX Book Reviews",
+        "website": "https://astralcodexten.substack.com/s/book-reviews",
+        "feed_url": "https://astralcodexten.substack.com/feed"
+    },
+    {
+        "title": "LessWrong (frontpage)",
+        "website": "https://lesswrong.com",
+        "feed_url": "https://www.lesswrong.com/feed.xml?view=curated-rss"
+    },
+    {
+        "title": "EA Forum",
+        "website": "https://forum.effectivealtruism.org",
+        "feed_url": "https://forum.effectivealtruism.org/feed.xml"
+    },
+    {
+        "title": "Anton Howes",
+        "website": "https://antonhowes.substack.com",
+        "feed_url": "https://antonhowes.substack.com/feed"
+    },
+    {
+        "title": "Dynomight",
+        "website": "https://dynomight.net",
+        "feed_url": "https://dynomight.net/feed.xml"
+    },
+    {
+        "title": "Overcoming Bias (Robin Hanson)",
+        "website": "https://overcomingbias.com",
+        "feed_url": "https://www.overcomingbias.com/feed"
+    },
+    {
+        "title": "Alex Tabarrok (MR)",
+        "website": "https://marginalrevolution.com",
+        "feed_url": "https://marginalrevolution.com/feed"
+    },
+    {
+        "title": "Eliezer Yudkowsky",
+        "website": "https://lesswrong.com/users/eliezer_yudkowsky/overview",
+        "feed_url": "https://www.lesswrong.com/feed.xml?view=curated-rss"
+    },
+    {
+        "title": "Ben Kuhn",
+        "website": "https://benkuhn.net",
+        "feed_url": "https://www.benkuhn.net/feed.xml"
+    },
+    {
+        "title": "Zvi Mowshowitz",
+        "website": "https://thezvi.substack.com",
+        "feed_url": "https://thezvi.substack.com/feed"
+    },
+    {
+        "title": "Daring Fireball (Gruber)",
+        "website": "https://daringfireball.net",
+        "feed_url": "https://daringfireball.net/feeds/main"
+    },
+    {
+        "title": "Wait But Why",
+        "website": "https://waitbutwhy.com",
+        "feed_url": "https://waitbutwhy.com/feed"
+    },
+    {
+        "title": "Kevin Kelly – The Technium",
+        "website": "https://kk.org",
+        "feed_url": "https://kk.org/feed/"
+    },
+    {
+        "title": "Patrick McKenzie (patio11)",
+        "website": "https://kalzumeus.com",
+        "feed_url": "https://www.kalzumeus.com/feed/"
+    },
+    {
+        "title": "Dan Luu",
+        "website": "https://danluu.com",
+        "feed_url": "https://danluu.com/atom.xml"
+    },
+    {
+        "title": "Stephen Wolfram Writings",
+        "website": "https://writings.stephenwolfram.com",
+        "feed_url": "https://writings.stephenwolfram.com/feed/"
+    },
+    {
+        "title": "MIT AI News",
+        "website": "https://news.mit.edu/topic/artificial-intelligence2",
+        "feed_url": "https://news.mit.edu/rss/topic/artificial-intelligence2"
+    },
+    {
+        "title": "astralcodexten",
+        "website": "https://astralcodexten.substack.com",
+        "feed_url": "https://astralcodexten.substack.com/feed"
+    },
+    {
+        "title": "betonit",
+        "website": "https://betonit.substack.com",
+        "feed_url": "https://betonit.substack.com/feed"
+    },
+    {
+        "title": "noahpinion",
+        "website": "https://noahpinion.substack.com",
+        "feed_url": "https://noahpinion.substack.com/feed"
+    },
+    {
+        "title": "thezvi",
+        "website": "https://thezvi.substack.com",
+        "feed_url": "https://thezvi.substack.com/feed"
+    },
+    {
+        "title": "experimentalhistory",
+        "website": "https://experimentalhistory.substack.com",
+        "feed_url": "https://experimentalhistory.substack.com/feed"
+    },
+    {
+        "title": "construction-physics",
+        "website": "https://construction-physics.substack.com",
+        "feed_url": "https://construction-physics.substack.com/feed"
+    },
+    {
+        "title": "thebrowser",
+        "website": "https://thebrowser.substack.com",
+        "feed_url": "https://thebrowser.substack.com/feed"
+    },
+    {
+        "title": "thediff",
+        "website": "https://thediff.substack.com",
+        "feed_url": "https://thediff.substack.com/feed"
+    },
+    {
+        "title": "napkinmath",
+        "website": "https://napkinmath.substack.com",
+        "feed_url": "https://napkinmath.substack.com/feed"
+    },
+    {
+        "title": "worksinprogress",
+        "website": "https://worksinprogress.substack.com",
+        "feed_url": "https://worksinprogress.substack.com/feed"
+    },
+    {
+        "title": "danromero",
+        "website": "https://danromero.substack.com",
+        "feed_url": "https://danromero.substack.com/feed"
+    },
+    {
+        "title": "collabfund",
+        "website": "https://collabfund.substack.com",
+        "feed_url": "https://collabfund.substack.com/feed"
+    },
+    {
+        "title": "juliagalef",
+        "website": "https://juliagalef.substack.com",
+        "feed_url": "https://juliagalef.substack.com/feed"
+    },
+    {
+        "title": "ben-evans",
+        "website": "https://ben-evans.substack.com",
+        "feed_url": "https://ben-evans.substack.com/feed"
+    },
+    {
+        "title": "azeem",
+        "website": "https://azeem.substack.com",
+        "feed_url": "https://azeem.substack.com/feed"
+    },
+    {
+        "title": "antonz",
+        "website": "https://antonz.substack.com",
+        "feed_url": "https://antonz.substack.com/feed"
+    },
+    {
+        "title": "rootsofprogress",
+        "website": "https://rootsofprogress.substack.com",
+        "feed_url": "https://rootsofprogress.substack.com/feed"
+    },
+    {
+        "title": "hardfork",
+        "website": "https://hardfork.substack.com",
+        "feed_url": "https://hardfork.substack.com/feed"
+    },
+    {
+        "title": "slowboring",
+        "website": "https://slowboring.substack.com",
+        "feed_url": "https://slowboring.substack.com/feed"
+    },
+    {
+        "title": "stratechery",
+        "website": "https://stratechery.substack.com",
+        "feed_url": "https://stratechery.substack.com/feed"
+    },
+    {
+        "title": "matthewball",
+        "website": "https://matthewball.substack.com",
+        "feed_url": "https://matthewball.substack.com/feed"
+    },
+    {
+        "title": "margins",
+        "website": "https://margins.substack.com",
+        "feed_url": "https://margins.substack.com/feed"
+    },
+    {
+        "title": "parthsharma",
+        "website": "https://parthsharma.substack.com",
+        "feed_url": "https://parthsharma.substack.com/feed"
+    },
+    {
+        "title": "habitweekly",
+        "website": "https://habitweekly.substack.com",
+        "feed_url": "https://habitweekly.substack.com/feed"
+    },
+    {
+        "title": "fromfirstprinciples",
+        "website": "https://fromfirstprinciples.substack.com",
+        "feed_url": "https://fromfirstprinciples.substack.com/feed"
+    },
+    {
+        "title": "danco",
+        "website": "https://danco.substack.com",
+        "feed_url": "https://danco.substack.com/feed"
+    },
+    {
+        "title": "notesonattention",
+        "website": "https://notesonattention.substack.com",
+        "feed_url": "https://notesonattention.substack.com/feed"
+    },
+    {
+        "title": "notboring",
+        "website": "https://notboring.substack.com",
+        "feed_url": "https://notboring.substack.com/feed"
+    },
+    {
+        "title": "appliedhistory",
+        "website": "https://appliedhistory.substack.com",
+        "feed_url": "https://appliedhistory.substack.com/feed"
+    },
+    {
+        "title": "Strong Towns",
+        "website": "https://www.strongtowns.org",
+        "feed_url": "https://www.strongtowns.org/journal?format=rss"
+    },
+    {
+        "title": "TechCrunch",
+        "website": "https://techcrunch.com",
+        "feed_url": "https://techcrunch.com/feed/"
+    },
+    {
+        "title": "The Verge",
+        "website": "https://www.theverge.com",
+        "feed_url": "https://www.theverge.com/rss/index.xml"
+    },
+    {
+        "title": "Ars Technica",
+        "website": "https://arstechnica.com",
+        "feed_url": "https://arstechnica.com/feed/"
+    },
+    {
+        "title": "WIRED",
+        "website": "https://www.wired.com",
+        "feed_url": "https://www.wired.com/feed/rss"
+    },
+    {
+        "title": "The Atlantic",
+        "website": "https://www.theatlantic.com",
+        "feed_url": "https://www.theatlantic.com/feed/all/"
+    },
+    {
+        "title": "The Guardian",
+        "website": "https://www.theguardian.com",
+        "feed_url": "https://www.theguardian.com/world/rss"
+    },
+    {
+        "title": "The New York Times (Home Page)",
+        "website": "https://www.nytimes.com",
+        "feed_url": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+    },
+    {
+        "title": "BBC News (Top Stories)",
+        "website": "https://www.bbc.com/news",
+        "feed_url": "https://feeds.bbci.co.uk/news/rss.xml"
+    },
+    {
+        "title": "MIT Technology Review",
+        "website": "https://www.technologyreview.com",
+        "feed_url": "https://www.technologyreview.com/feed/"
+    },
+    {
+        "title": "Hacker News (Front Page)",
+        "website": "https://news.ycombinator.com",
+        "feed_url": "https://news.ycombinator.com/rss"
+    },
+    {
+        "title": "GitHub Blog",
+        "website": "https://github.blog",
+        "feed_url": "https://github.blog/feed/"
+    },
+    {
+        "title": "Stack Overflow Blog",
+        "website": "https://stackoverflow.blog",
+        "feed_url": "https://stackoverflow.blog/feed/"
+    },
+    {
+        "title": "Mozilla Blog",
+        "website": "https://blog.mozilla.org",
+        "feed_url": "https://blog.mozilla.org/feed/"
+    },
+    {
+        "title": "Microsoft Research Blog",
+        "website": "https://www.microsoft.com/en-us/research/blog",
+        "feed_url": "https://www.microsoft.com/en-us/research/blog/feed/"
+    },
+    {
+        "title": "NVIDIA Blog",
+        "website": "https://blogs.nvidia.com",
+        "feed_url": "https://blogs.nvidia.com/feed/"
+    },
+    {
+        "title": "Android Developers Blog",
+        "website": "https://android-developers.googleblog.com",
+        "feed_url": "https://android-developers.googleblog.com/atom.xml"
+    },
+    {
+        "title": "Chrome Releases",
+        "website": "https://chromereleases.googleblog.com",
+        "feed_url": "https://chromereleases.googleblog.com/atom.xml"
+    },
+    {
+        "title": "Kubernetes Blog",
+        "website": "https://kubernetes.io/blog",
+        "feed_url": "https://kubernetes.io/feed.xml"
+    },
+    {
+        "title": "Docker Blog",
+        "website": "https://www.docker.com/blog",
+        "feed_url": "https://www.docker.com/blog/feed/"
+    },
+    {
+        "title": "AWS News Blog",
+        "website": "https://aws.amazon.com/blogs/aws",
+        "feed_url": "https://aws.amazon.com/blogs/aws/feed/"
+    },
+    {
+        "title": "Cloudflare Blog",
+        "website": "https://blog.cloudflare.com",
+        "feed_url": "https://blog.cloudflare.com/rss/"
+    },
+    {
+        "title": "Airbnb Engineering & Data Science",
+        "website": "https://medium.com/airbnb-engineering",
+        "feed_url": "https://medium.com/feed/airbnb-engineering"
+    },
+    {
+        "title": "Rust Blog",
+        "website": "https://blog.rust-lang.org",
+        "feed_url": "https://blog.rust-lang.org/feed.xml"
+    },
+    {
+        "title": "Go Blog",
+        "website": "https://go.dev/blog",
+        "feed_url": "https://go.dev/blog/feed.atom"
+    },
+    {
+        "title": "Python (Insider)",
+        "website": "https://blog.python.org",
+        "feed_url": "https://blog.python.org/feeds/posts/default"
+    },
+    {
+        "title": "TensorFlow Blog",
+        "website": "https://blog.tensorflow.org",
+        "feed_url": "https://blog.tensorflow.org/feeds/posts/default"
+    },
+    {
+        "title": "Nature (Journal)",
+        "website": "https://www.nature.com",
+        "feed_url": "https://www.nature.com/nature.rss"
+    },
+    {
+        "title": "Science Magazine (News)",
+        "website": "https://www.science.org",
+        "feed_url": "https://www.science.org/rss/news_current.xml"
+    },
+    {
+        "title": "arXiv (Computer Science)",
+        "website": "https://arxiv.org",
+        "feed_url": "https://arxiv.org/rss/cs"
+    },
+    {
+        "title": "NASA Breaking News",
+        "website": "https://www.nasa.gov",
+        "feed_url": "https://www.nasa.gov/rss/dyn/breaking_news.rss"
+    },
+    {
+        "title": "ESA News",
+        "website": "https://www.esa.int",
+        "feed_url": "https://www.esa.int/rssfeed/Our_Activities"
+    },
+    {
+        "title": "Phys.org",
+        "website": "https://phys.org",
+        "feed_url": "https://phys.org/rss-feed/"
+    },
+    {
+        "title": "MIT News – AI",
+        "website": "https://news.mit.edu",
+        "feed_url": "https://news.mit.edu/rss/topic/artificial-intelligence2"
+    },
+    {
+        "title": "Foreign Affairs",
+        "website": "https://www.foreignaffairs.com",
+        "feed_url": "https://www.foreignaffairs.com/rss.xml"
+    },
+    {
+        "title": "The Hill",
+        "website": "https://thehill.com",
+        "feed_url": "https://thehill.com/feed/"
+    },
+    {
+        "title": "ProPublica",
+        "website": "https://www.propublica.org",
+        "feed_url": "https://www.propublica.org/feeds/propublica/main"
+    },
+    {
+        "title": "Vox (All)",
+        "website": "https://www.vox.com",
+        "feed_url": "https://www.vox.com/rss/index.xml"
+    },
+    {
+        "title": "FiveThirtyEight",
+        "website": "https://fivethirtyeight.com",
+        "feed_url": "https://fivethirtyeight.com/feed/"
+    },
+    {
+        "title": "The Conversation (US)",
+        "website": "https://theconversation.com/us",
+        "feed_url": "https://theconversation.com/us/articles.atom"
+    },
+    {
+        "title": "Quartz",
+        "website": "https://qz.com",
+        "feed_url": "https://qz.com/feed"
+    },
+    {
+        "title": "Smashing Magazine",
+        "website": "https://www.smashingmagazine.com",
+        "feed_url": "https://www.smashingmagazine.com/feed/"
+    },
+    {
+        "title": "A List Apart",
+        "website": "https://alistapart.com",
+        "feed_url": "https://alistapart.com/main/feed/"
+    },
+    {
+        "title": "CSS-Tricks (Archive)",
+        "website": "https://css-tricks.com",
+        "feed_url": "https://css-tricks.com/feed/"
+    },
+    {
+        "title": "HackerNoon",
+        "website": "https://hackernoon.com",
+        "feed_url": "https://hackernoon.com/feed"
+    },
+    {
+        "title": "Lobsters",
+        "website": "https://lobste.rs",
+        "feed_url": "https://lobste.rs/rss"
+    },
+    {
+        "title": "ZDNet",
+        "website": "https://www.zdnet.com",
+        "feed_url": "https://www.zdnet.com/news/rss.xml"
+    },
+    {
+        "title": "The Register",
+        "website": "https://www.theregister.com",
+        "feed_url": "https://www.theregister.com/headlines.atom"
+    },
+    {
+        "title": "BleepingComputer",
+        "website": "https://www.bleepingcomputer.com",
+        "feed_url": "https://www.bleepingcomputer.com/feed/"
+    },
+    {
+        "title": "Tom's Hardware",
+        "website": "https://www.tomshardware.com",
+        "feed_url": "https://www.tomshardware.com/feeds/all"
+    },
+    {
+        "title": "PC Gamer",
+        "website": "https://www.pcgamer.com",
+        "feed_url": "https://www.pcgamer.com/rss/"
+    },
+    {
+        "title": "Polygon",
+        "website": "https://www.polygon.com",
+        "feed_url": "https://www.polygon.com/rss/index.xml"
+    },
+    {
+        "title": "Seth Godin",
+        "website": "https://seths.blog",
+        "feed_url": "https://seths.blog/feed"
+    },
+    {
+        "title": "Cal Newport",
+        "website": "https://www.calnewport.com",
+        "feed_url": "https://www.calnewport.com/feed/"
+    },
+    {
+        "title": "James Clear",
+        "website": "https://jamesclear.com",
+        "feed_url": "https://jamesclear.com/feed"
+    },
+    {
+        "title": "Tim Ferriss",
+        "website": "https://tim.blog",
+        "feed_url": "https://tim.blog/feed/"
+    },
+    {
+        "title": "Mark Manson",
+        "website": "https://markmanson.net",
+        "feed_url": "https://markmanson.net/feed"
+    },
+    {
+        "title": "Farnam Street (FS)",
+        "website": "https://fs.blog",
+        "feed_url": "https://fs.blog/feed/"
+    },
+    {
+        "title": "AVC (Fred Wilson)",
+        "website": "https://avc.com",
+        "feed_url": "https://avc.com/feed/"
+    },
+    {
+        "title": "Y Combinator Blog",
+        "website": "https://www.ycombinator.com/blog",
+        "feed_url": "https://www.ycombinator.com/blog/rss/"
+    },
+    {
+        "title": "Sequoia Capital",
+        "website": "https://www.sequoiacap.com",
+        "feed_url": "https://www.sequoiacap.com/feed/"
+    },
+    {
+        "title": "Increment by Stripe",
+        "website": "https://increment.com",
+        "feed_url": "https://increment.com/feed.xml"
+    },
+    {
+        "title": "Martin Fowler",
+        "website": "https://martinfowler.com",
+        "feed_url": "https://martinfowler.com/feed.atom"
+    },
+    {
+        "title": "CNCF (Cloud Native Computing Foundation)",
+        "website": "https://www.cncf.io/blog",
+        "feed_url": "https://www.cncf.io/feed/"
+    },
+    {
+        "title": "Heroku Blog",
+        "website": "https://blog.heroku.com",
+        "feed_url": "https://blog.heroku.com/feed"
+    },
+    {
+        "title": "GitLab Blog",
+        "website": "https://about.gitlab.com/blog",
+        "feed_url": "https://about.gitlab.com/atom.xml"
+    },
+    {
+        "title": "JetBrains Blog",
+        "website": "https://blog.jetbrains.com",
+        "feed_url": "https://blog.jetbrains.com/feed/"
+    },
+    {
+        "title": "Planet GNOME",
+        "website": "https://planet.gnome.org",
+        "feed_url": "https://planet.gnome.org/rss20.xml"
+    },
+    {
+        "title": "Phoronix",
+        "website": "https://www.phoronix.com",
+        "feed_url": "https://www.phoronix.com/rss.php"
+    },
+    {
+        "title": "Open Culture",
+        "website": "https://www.openculture.com",
+        "feed_url": "https://www.openculture.com/feed"
+    },
+    {
+        "title": "Krebs on Security",
+        "website": "https://krebsonsecurity.com",
+        "feed_url": "https://krebsonsecurity.com/feed/"
+    },
+    {
+        "title": "Schneier on Security",
+        "website": "https://www.schneier.com",
+        "feed_url": "https://www.schneier.com/feed/atom/"
+    },
+    {
+        "title": "Electrek",
+        "website": "https://electrek.co",
+        "feed_url": "https://electrek.co/feed/"
+    },
+    {
+        "title": "The Register (Security)",
+        "website": "https://www.theregister.com/security",
+        "feed_url": "https://www.theregister.com/headlines.atom"
+    },
+    {
+        "title": "VentureBeat",
+        "website": "https://venturebeat.com",
+        "feed_url": "https://venturebeat.com/feed/"
+    },
+    {
+        "title": "Vox – Technology",
+        "website": "https://www.vox.com/technology",
+        "feed_url": "https://www.vox.com/rss/technology/index.xml"
+    },
+    {
+        "title": "Engadget",
+        "website": "https://www.engadget.com",
+        "feed_url": "https://www.engadget.com/rss.xml"
+    },
+    {
+        "title": "Product Hunt",
+        "website": "https://www.producthunt.com",
+        "feed_url": "https://www.producthunt.com/feed"
+    },
+    {
+        "title": "MakeUseOf",
+        "website": "https://www.makeuseof.com",
+        "feed_url": "https://www.makeuseof.com/feed/"
+    },
+    {
+        "title": "VoxEU (CEPR)",
+        "website": "https://voxeu.org",
+        "feed_url": "https://voxeu.org/rss.xml"
+    },
+    {
+        "title": "The Economist – Latest",
+        "website": "https://www.economist.com",
+        "feed_url": "https://www.economist.com/latest/rss.xml"
+    },
+    {
+        "title": "Financial Times – World",
+        "website": "https://www.ft.com",
+        "feed_url": "https://www.ft.com/rss/world"
+    },
+    {
+        "title": "Planet Money (NPR podcast)",
+        "website": "https://www.npr.org/sections/money/",
+        "feed_url": "https://feeds.npr.org/510289/podcast.xml"
+    },
+    {
+        "title": "MIT Sloan Management Review",
+        "website": "https://sloanreview.mit.edu",
+        "feed_url": "https://sloanreview.mit.edu/feed/"
+    },
+    {
+        "title": "NextBigFuture",
+        "website": "https://www.nextbigfuture.com",
+        "feed_url": "https://www.nextbigfuture.com/feed"
+    },
+    {
+        "title": "ScienceDaily – Top Science",
+        "website": "https://www.sciencedaily.com",
+        "feed_url": "https://www.sciencedaily.com/rss/top/science.xml"
+    },
+    {
+        "title": "Curbed",
+        "website": "https://www.curbed.com",
+        "feed_url": "https://www.curbed.com/rss/index.xml"
+    },
+    {
+        "title": "City Observatory",
+        "website": "https://cityobservatory.org",
+        "feed_url": "https://cityobservatory.org/feed/"
+    },
+    {
+        "title": "Streetsblog USA",
+        "website": "https://usa.streetsblog.org",
+        "feed_url": "https://usa.streetsblog.org/feed/"
+    },
+    {
+        "title": "The Urbanist",
+        "website": "https://www.theurbanist.org",
+        "feed_url": "https://www.theurbanist.org/feed/"
+    }
 ]
