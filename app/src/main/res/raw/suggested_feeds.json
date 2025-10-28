@@ -728,5 +728,10 @@
         "title": "The Urbanist",
         "website": "https://www.theurbanist.org",
         "feed_url": "https://www.theurbanist.org/feed/"
+    },
+    {
+        "title": "Dwarkesh Patel",
+        "website": "https://www.dwarkesh.com",
+        "feed_url": "https://www.dwarkesh.com/feed"
     }
 ]
