@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.di
 
+import android.app.Application
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.FontStore
@@ -10,6 +11,7 @@ import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.SyncRemoteStore
 import com.nononsenseapps.feeder.base.bindWithActivityViewModelScope
 import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
+import com.nononsenseapps.feeder.data.suggestions.SuggestedFeedRepository
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
 import com.nononsenseapps.feeder.openai.OpenAIApi
@@ -26,6 +28,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.bindFactory
@@ -46,6 +49,16 @@ val archModelModule =
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
         bindFactory<OpenAISettings, OpenAIClient> { settings -> OpenAIClientDefault(settings) }
         bind<OpenAIApi>() with singleton { OpenAIApi(instance(), appLang = Locale.getDefault().getISO3Language(), factory()) }
+        bind<SuggestedFeedRepository>() with
+            singleton {
+                SuggestedFeedRepository(
+                    resources = instance<Application>().resources,
+                    json =
+                        Json {
+                            ignoreUnknownKeys = true
+                        },
+                )
+            }
 
         bindWithActivityViewModelScope<MainActivityViewModel>()
         bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()

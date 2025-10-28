@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.data.suggestions.SuggestedFeedRepository
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.HttpError
@@ -31,6 +32,7 @@ class SearchFeedViewModel(
     private val feedParser: FeedParser by instance()
     private val repository: Repository by instance()
     private val application = getApplication<FeederApplication>()
+    private val suggestedFeedRepository: SuggestedFeedRepository by instance()
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
@@ -97,4 +99,16 @@ class SearchFeedViewModel(
     companion object {
         const val LOG_TAG = "FEEDER_SearchFeed"
     }
+
+    fun suggestionsFor(query: String): List<SearchResult> =
+        suggestedFeedRepository
+            .search(query)
+            .map { suggestedFeed ->
+                SearchResult(
+                    title = suggestedFeed.title,
+                    url = suggestedFeed.feedUrl,
+                    description = suggestedFeed.website,
+                    feedImage = "",
+                )
+            }
 }

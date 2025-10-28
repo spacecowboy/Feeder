@@ -170,11 +170,21 @@ fun SearchFeedView(
     var errors by rememberSaveable {
         mutableStateOf(listOf<FeedParserError>())
     }
+    var suggestions by rememberSaveable {
+        mutableStateOf(listOf<SearchResult>())
+    }
+
+    LaunchedEffect(initialFeedUrl) {
+        if (initialFeedUrl.isNotBlank()) {
+            suggestions = searchFeedViewModel.suggestionsFor(initialFeedUrl)
+        }
+    }
 
     SearchFeedView(
         screenType = screenType,
         onUrlChange = {
             feedUrl = it
+            suggestions = searchFeedViewModel.suggestionsFor(it)
         },
         onSearch = { url ->
             results = emptyList()
@@ -201,6 +211,12 @@ fun SearchFeedView(
         onClick = onClick,
         modifier = modifier,
         feedUrl = feedUrl,
+        suggestions = StableHolder(suggestions),
+        onSuggestionClick = { suggestion ->
+            feedUrl = suggestion.url
+            suggestions = searchFeedViewModel.suggestionsFor(suggestion.url)
+            onClick(suggestion)
+        },
     )
 }
 
@@ -213,6 +229,8 @@ fun SearchFeedView(
     errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
+    suggestions: StableHolder<List<SearchResult>>,
+    onSuggestionClick: (SearchResult) -> Unit,
     modifier: Modifier = Modifier,
     feedUrl: String = "",
 ) {
@@ -281,6 +299,8 @@ fun SearchFeedView(
                         errors = errors,
                         currentlySearching = currentlySearching,
                         onClick = onClick,
+                        suggestions = suggestions,
+                        onSuggestionClick = onSuggestionClick,
                     )
                 }
             }
@@ -308,6 +328,8 @@ fun SearchFeedView(
                     errors = errors,
                     currentlySearching = currentlySearching,
                     onClick = onClick,
+                    suggestions = suggestions,
+                    onSuggestionClick = onSuggestionClick,
                 )
             }
         }
@@ -399,11 +421,31 @@ fun ColumnScope.leftContent(
 
 @Composable
 fun ColumnScope.rightContent(
+    suggestions: StableHolder<List<SearchResult>>,
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
+    onSuggestionClick: (SearchResult) -> Unit,
 ) {
+    if (suggestions.item.isNotEmpty()) {
+        Text(
+            text = stringResource(id = R.string.feed_search_suggestions_header),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.Start),
+        )
+        suggestions.item.forEach { suggestion ->
+            SearchResultView(
+                title = suggestion.title,
+                url = suggestion.url,
+                description = suggestion.description,
+                onClick = {
+                    onSuggestionClick(suggestion)
+                },
+            )
+        }
+    }
+
     if (results.item.isEmpty()) {
         for (error in errors.item) {
             val title =
@@ -588,7 +630,17 @@ private fun SearchPreview() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Suggested feed",
+                            url = "https://example.com/rss",
+                            description = "https://example.com",
+                            feedImage = "",
+                        ),
+                    ),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
             )
@@ -619,7 +671,9 @@ private fun ErrorPreview() {
                         ),
                     ),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions = stableListHolderOf(),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
             )
@@ -664,7 +718,17 @@ private fun SearchPreviewLarge() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Suggested feed",
+                            url = "https://example.com/rss",
+                            description = "https://example.com",
+                            feedImage = "",
+                        ),
+                    ),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
             )
