@@ -10,24 +10,57 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
+val baseVersionCode = 3813
+val baseVersionName = "2.15.1"
+
+val configurationCacheRequested = gradle.startParameter.isConfigurationCacheRequested
+
+fun gitOutputOrNull(vararg args: String): String? {
+    if (configurationCacheRequested) {
+        logger.info("Configuration cache active: skipping git ${args.joinToString(" ")}")
+        return null
+    }
+    return runCatching {
+        val process =
+            ProcessBuilder(listOf("git") + args)
+                .directory(rootDir)
+                .redirectErrorStream(true)
+                .start()
+        val output =
+            process
+                .inputStream
+                .bufferedReader()
+                .use { it.readText() }
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            error(
+                "git ${args.joinToString(" ")} exited with $exitCode: $output",
+            )
+        }
+        output.trim()
+    }.getOrElse { throwable ->
+        logger.warn("Falling back because git ${args.joinToString(" ")} failed: ${throwable.message}", throwable)
+        null
+    }
+}
+
 val commitCount by project.extra {
-    providers
-        .exec {
-            commandLine("git", "rev-list", "--count", "HEAD")
-        }.standardOutput.asText
-        .get()
-        .trim()
-        .toInt()
+    gitOutputOrNull("rev-list", "--count", "HEAD")
+        ?.toIntOrNull()
+        ?: baseVersionCode
 }
 
 val latestTag by project.extra {
-    providers
-        .exec {
-            commandLine("git", "describe")
-        }.standardOutput.asText
-        .get()
-        .trim()
+    gitOutputOrNull("describe") ?: baseVersionName
 }
+
+val kotlinToolchainVersion =
+    JavaVersion.current()
+        .majorVersion
+        .toIntOrNull()
+        ?.takeIf { JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17) }
+        ?.coerceAtLeast(17)
+        ?: 17
 
 android {
     namespace = "com.nononsenseapps.feeder"
@@ -41,8 +74,8 @@ android {
         // The version fields are set with actual values to support F-Droid
         // In Play variant, they are overridden and taken from git to support alpha/beta testing.
         // For actual releases they match.
-        versionCode = 3813
-        versionName = "2.15.1"
+        versionCode = baseVersionCode
+        versionName = baseVersionName
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -136,7 +169,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = "2.15.1"
+                versionName = baseVersionName
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
@@ -223,7 +256,7 @@ composeCompiler {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(kotlinToolchainVersion)
     compilerOptions {
         allWarningsAsErrors = false
         jvmTarget = JvmTarget.JVM_11
