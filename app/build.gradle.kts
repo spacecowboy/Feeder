@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage", "SpellCheckingInspection", "DEPRECATION")
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -33,13 +35,13 @@ fun gitOutputOrNull(vararg args: String): String? {
                 .use { it.readText() }
         val exitCode = process.waitFor()
         if (exitCode != 0) {
-            error(
-                "git ${args.joinToString(" ")} exited with $exitCode: $output",
-            )
+            logger.info("Falling back because git ${args.joinToString(" ")} exited with $exitCode: ${output.trim()}")
+            null
+        } else {
+            output.trim()
         }
-        output.trim()
     }.getOrElse { throwable ->
-        logger.warn("Falling back because git ${args.joinToString(" ")} failed: ${throwable.message}", throwable)
+        logger.info("Falling back because git ${args.joinToString(" ")} failed: ${throwable.message}")
         null
     }
 }
@@ -48,10 +50,6 @@ val commitCount by project.extra {
     gitOutputOrNull("rev-list", "--count", "HEAD")
         ?.toIntOrNull()
         ?: baseVersionCode
-}
-
-val latestTag by project.extra {
-    gitOutputOrNull("describe") ?: baseVersionName
 }
 
 val kotlinToolchainVersion =
@@ -138,7 +136,7 @@ android {
     }
 
     buildTypes {
-        val debug by getting {
+        getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
             applicationIdSuffix = ".debug"
@@ -149,7 +147,7 @@ android {
             )
             signingConfig = signingConfigs.getByName("shareddebug")
         }
-        val release by getting {
+        getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -169,7 +167,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = baseVersionName
+                versionName = gitOutputOrNull("describe") ?: baseVersionName
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
