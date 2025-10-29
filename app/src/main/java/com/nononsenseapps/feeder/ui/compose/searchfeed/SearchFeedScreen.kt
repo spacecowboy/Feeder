@@ -551,10 +551,12 @@ fun SearchResultView(
                 url,
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Text(
-                description,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            if (description.isNotBlank()) {
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
     }
 }
@@ -642,7 +644,7 @@ private fun SearchPreview() {
                         SearchResult(
                             title = "Suggested feed",
                             url = "https://example.com/rss",
-                            description = "https://example.com",
+                            description = "",
                             feedImage = "",
                         ),
                     ),
@@ -732,7 +734,7 @@ private fun SearchPreviewLarge() {
                         SearchResult(
                             title = "Suggested feed",
                             url = "https://example.com/rss",
-                            description = "https://example.com",
+                            description = "",
                             feedImage = "",
                         ),
                     ),

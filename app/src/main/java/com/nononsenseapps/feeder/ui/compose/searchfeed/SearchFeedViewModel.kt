@@ -107,7 +107,7 @@ class SearchFeedViewModel(
                 SearchResult(
                     title = suggestedFeed.title,
                     url = suggestedFeed.feedUrl,
-                    description = suggestedFeed.website,
+                    description = "",
                     feedImage = "",
                 )
             }

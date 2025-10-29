@@ -12,7 +12,6 @@ import kotlinx.serialization.json.decodeFromStream
 @Serializable
 data class SuggestedFeed(
     val title: String,
-    val website: String,
     @SerialName("feed_url")
     val feedUrl: String,
 )
@@ -62,7 +61,7 @@ class SuggestedFeedRepository(
 
     private val SuggestedFeed.searchableText: String
         get() =
-            listOf(title, website, feedUrl)
+            listOf(title, feedUrl)
                 .joinToString(separator = " ")
                 .lowercase(Locale.ROOT)
 
