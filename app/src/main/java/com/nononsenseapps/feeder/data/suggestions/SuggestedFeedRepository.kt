@@ -98,21 +98,7 @@ class SuggestedFeedRepository(
             .filter { scored ->
                 scored.containsQueryText
             }
-            .sortedWith(
-                compareByDescending<ScoredFeed> { it.isExactHeadlineTokensMatch }
-                    .thenByDescending { it.isExactAuthorTokensMatch }
-                    .thenByDescending { it.isExactHeadlineTextMatch }
-                    .thenByDescending { it.isExactAuthorTextMatch }
-                    .thenByDescending { it.headlineContainsQueryText }
-                    .thenByDescending { it.authorContainsQueryText }
-                    .thenByDescending { it.urlContainsQueryText }
-                    .thenByDescending { it.headlineTokenMatches }
-                    .thenByDescending { it.authorTokenMatches }
-                    .thenByDescending { it.urlTokenMatches }
-                    .thenByDescending { it.urlPartialMatches }
-                    .thenByDescending { it.feed.totalSubscribers }
-                    .thenBy { it.feed.headline },
-            )
+            .sortedByDescending { it.feed.totalSubscribers }
             .take(limit)
             .map { it.feed }
             .toList()
