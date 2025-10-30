@@ -106,19 +106,26 @@ class SearchFeedViewModel(
         const val LOG_TAG = "FEEDER_SearchFeed"
     }
 
-    fun suggestionsFor(query: String): List<SearchResult> =
-        suggestedFeedRepository
-            .search(query)
-            .map { suggestedFeed ->
-                val author = suggestedFeed.authorName
-                val showAuthor =
-                    author.isNotBlank() &&
-                        !suggestedFeed.headline.contains(author, ignoreCase = true)
-                SearchResult(
-                    title = suggestedFeed.headline,
-                    url = suggestedFeed.feedUrl,
-                    description = if (showAuthor) author else "",
-                    feedImage = "",
-                )
-            }
+    suspend fun suggestionsFor(query: String): List<SearchResult> {
+        ensureSuggestionsLoaded()
+        if (query.isBlank()) {
+            return emptyList()
+        }
+        return withContext(Dispatchers.Default) {
+            suggestedFeedRepository
+                .search(query)
+                .map { suggestedFeed ->
+                    val author = suggestedFeed.authorName
+                    val showAuthor =
+                        author.isNotBlank() &&
+                            !suggestedFeed.headline.contains(author, ignoreCase = true)
+                    SearchResult(
+                        title = suggestedFeed.headline,
+                        url = suggestedFeed.feedUrl,
+                        description = if (showAuthor) author else "",
+                        feedImage = "",
+                    )
+                }
+        }
+    }
 }

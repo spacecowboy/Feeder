@@ -45,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -88,7 +89,10 @@ import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.net.MalformedURLException
@@ -106,10 +110,6 @@ fun SearchFeedScreen(
     modifier: Modifier = Modifier,
     initialFeedUrl: String? = null,
 ) {
-    LaunchedEffect(Unit) {
-        searchFeedViewModel.ensureSuggestionsLoaded()
-    }
-
     val windowSize = LocalWindowSizeMetrics.current
     val screenType by remember(windowSize) {
         derivedStateOf {
@@ -174,8 +174,27 @@ fun SearchFeedView(
     var errors by rememberSaveable {
         mutableStateOf(listOf<FeedParserError>())
     }
-    val suggestions = remember(feedUrl) {
-        searchFeedViewModel.suggestionsFor(feedUrl)
+    LaunchedEffect(Unit) {
+        searchFeedViewModel.ensureSuggestionsLoaded()
+    }
+
+    var suggestions by remember {
+        mutableStateOf<List<SearchResult>>(emptyList())
+    }
+
+    @OptIn(FlowPreview::class)
+    LaunchedEffect(Unit) {
+        searchFeedViewModel.ensureSuggestionsLoaded()
+        snapshotFlow { feedUrl }
+            .debounce(150)
+            .collectLatest { query ->
+                suggestions =
+                    if (query.length < 2) {
+                        emptyList()
+                    } else {
+                        searchFeedViewModel.suggestionsFor(query)
+                    }
+            }
     }
     var currentSearchJob by remember { mutableStateOf<Job?>(null) }
 
