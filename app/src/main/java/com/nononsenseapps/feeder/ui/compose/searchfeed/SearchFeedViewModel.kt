@@ -104,10 +104,19 @@ class SearchFeedViewModel(
         suggestedFeedRepository
             .search(query)
             .map { suggestedFeed ->
+                val author = suggestedFeed.authorName
+                val description =
+                    if (author.isBlank()) {
+                        ""
+                    } else if (suggestedFeed.headline.contains(author, ignoreCase = true)) {
+                        ""
+                    } else {
+                        author
+                    }
                 SearchResult(
-                    title = suggestedFeed.title,
+                    title = suggestedFeed.headline,
                     url = suggestedFeed.feedUrl,
-                    description = "",
+                    description = description,
                     feedImage = "",
                 )
             }

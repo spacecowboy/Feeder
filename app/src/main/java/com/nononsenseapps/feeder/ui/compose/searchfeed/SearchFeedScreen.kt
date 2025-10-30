@@ -547,16 +547,16 @@ fun SearchResultView(
                 title,
                 style = MaterialTheme.typography.titleSmall,
             )
-            Text(
-                url,
-                style = MaterialTheme.typography.bodyMedium,
-            )
             if (description.isNotBlank()) {
                 Text(
                     description,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+            Text(
+                url,
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
     }
 }
