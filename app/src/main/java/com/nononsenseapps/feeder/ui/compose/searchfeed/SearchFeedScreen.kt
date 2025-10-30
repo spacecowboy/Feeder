@@ -106,6 +106,10 @@ fun SearchFeedScreen(
     modifier: Modifier = Modifier,
     initialFeedUrl: String? = null,
 ) {
+    LaunchedEffect(Unit) {
+        searchFeedViewModel.ensureSuggestionsLoaded()
+    }
+
     val windowSize = LocalWindowSizeMetrics.current
     val screenType by remember(windowSize) {
         derivedStateOf {

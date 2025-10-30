@@ -77,6 +77,11 @@ class SuggestedFeedRepository(
 ) {
     private val suggestedFeeds: List<SuggestedFeed> by lazy { loadFeeds() }
 
+    fun preload() {
+        // Accessing the lazy property forces the dataset to load.
+        suggestedFeeds
+    }
+
     fun search(query: String, limit: Int = DEFAULT_RESULT_LIMIT): List<SuggestedFeed> {
         if (query.length < MIN_SEARCH_LENGTH) {
             return emptyList()

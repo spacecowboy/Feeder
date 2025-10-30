@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.URL
@@ -33,6 +34,11 @@ class SearchFeedViewModel(
     private val repository: Repository by instance()
     private val application = getApplication<FeederApplication>()
     private val suggestedFeedRepository: SuggestedFeedRepository by instance()
+
+    suspend fun ensureSuggestionsLoaded() =
+        withContext(Dispatchers.IO) {
+            suggestedFeedRepository.preload()
+        }
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
@@ -105,18 +111,13 @@ class SearchFeedViewModel(
             .search(query)
             .map { suggestedFeed ->
                 val author = suggestedFeed.authorName
-                val description =
-                    if (author.isBlank()) {
-                        ""
-                    } else if (suggestedFeed.headline.contains(author, ignoreCase = true)) {
-                        ""
-                    } else {
-                        author
-                    }
+                val showAuthor =
+                    author.isNotBlank() &&
+                        !suggestedFeed.headline.contains(author, ignoreCase = true)
                 SearchResult(
                     title = suggestedFeed.headline,
                     url = suggestedFeed.feedUrl,
-                    description = description,
+                    description = if (showAuthor) author else "",
                     feedImage = "",
                 )
             }
