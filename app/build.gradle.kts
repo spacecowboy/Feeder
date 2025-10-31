@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage", "SpellCheckingInspection", "DEPRECATION")
-
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -12,44 +10,14 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
-val baseVersionCode = 3813
-val baseVersionName = "2.15.1"
-
-val configurationCacheRequested = gradle.startParameter.isConfigurationCacheRequested
-
-fun gitOutputOrNull(vararg args: String): String? {
-    if (configurationCacheRequested) {
-        logger.info("Configuration cache active: skipping git ${args.joinToString(" ")}")
-        return null
-    }
-    return runCatching {
-        val process =
-            ProcessBuilder(listOf("git") + args)
-                .directory(rootDir)
-                .redirectErrorStream(true)
-                .start()
-        val output =
-            process
-                .inputStream
-                .bufferedReader()
-                .use { it.readText() }
-        val exitCode = process.waitFor()
-        if (exitCode != 0) {
-            logger.info("Falling back because git ${args.joinToString(" ")} exited with $exitCode: ${output.trim()}")
-            null
-        } else {
-            output.trim()
-        }
-    }.getOrElse { throwable ->
-        logger.info("Falling back because git ${args.joinToString(" ")} failed: ${throwable.message}")
-        null
-    }
-}
-
 val commitCount by project.extra {
-    gitOutputOrNull("rev-list", "--count", "HEAD")
-        ?.toIntOrNull()
-        ?: baseVersionCode
+    providers
+        .exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+        }.standardOutput.asText
+        .get()
+        .trim()
+        .toInt()
 }
 
 val kotlinToolchainVersion =
@@ -72,8 +40,8 @@ android {
         // The version fields are set with actual values to support F-Droid
         // In Play variant, they are overridden and taken from git to support alpha/beta testing.
         // For actual releases they match.
-        versionCode = baseVersionCode
-        versionName = baseVersionName
+        versionCode = 3813
+        versionName = "2.15.1"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -136,7 +104,7 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        val debug by getting {
             isMinifyEnabled = false
             isShrinkResources = false
             applicationIdSuffix = ".debug"
@@ -147,7 +115,7 @@ android {
             )
             signingConfig = signingConfigs.getByName("shareddebug")
         }
-        getByName("release") {
+        val release by getting {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -167,7 +135,7 @@ android {
             }
             create("play") {
                 dimension = "store"
-                versionName = gitOutputOrNull("describe") ?: baseVersionName
+                versionName = "2.15.1"
                 versionCode = commitCount
                 applicationIdSuffix = ".play"
             }
