@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 
 private val WORD_REGEX = Regex("[\\p{L}\\p{N}']+")
+private val SUBSTACK_FEED_REGEX = Regex("^https://([\\p{L}\\p{N}-]+)\\.substack\\.com/feed/?$", RegexOption.IGNORE_CASE)
 
 private fun tokenize(text: String): List<String> =
     WORD_REGEX
@@ -20,6 +21,11 @@ private fun tokenize(text: String): List<String> =
 
 private fun normalizeForTextMatch(text: String): String =
     tokenize(text).joinToString(separator = " ")
+
+private fun String.toSearchableUrlText(): String {
+    val match = SUBSTACK_FEED_REGEX.matchEntire(this.trim())
+    return match?.groupValues?.getOrNull(1) ?: this
+}
 
 @Serializable
 data class SuggestedFeed(
@@ -41,7 +47,9 @@ data class SuggestedFeed(
     @Transient
     val authorTokenSet: Set<String> = authorTokens.toSet()
     @Transient
-    val urlTokens: List<String> = tokenize(feedUrl)
+    val urlSearchText: String = feedUrl.toSearchableUrlText()
+    @Transient
+    val urlTokens: List<String> = tokenize(urlSearchText)
     @Transient
     val urlTokenSet: Set<String> = urlTokens.toSet()
     @Transient
@@ -49,7 +57,7 @@ data class SuggestedFeed(
     @Transient
     val normalizedAuthorText: String = normalizeForTextMatch(authorName)
     @Transient
-    val normalizedUrlText: String = normalizeForTextMatch(feedUrl)
+    val normalizedUrlText: String = normalizeForTextMatch(urlSearchText)
     @Transient
     val totalSubscribers: Int = totalSubscribersRaw.toIntOrNull() ?: 0
 }
