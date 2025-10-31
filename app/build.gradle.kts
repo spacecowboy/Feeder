@@ -21,6 +21,7 @@ val commitCount by project.extra {
 }
 
 val latestTag by project.extra {
+    if (!file(".git").exists()) return@extra "unknown"
     providers
         .exec {
             commandLine("git", "describe")
