@@ -20,6 +20,15 @@ val commitCount by project.extra {
         .toInt()
 }
 
+val latestTag by project.extra {
+    providers
+        .exec {
+            commandLine("git", "describe")
+        }.standardOutput.asText
+        .get()
+        .trim()
+}
+
 val kotlinToolchainVersion =
     JavaVersion.current()
         .majorVersion
