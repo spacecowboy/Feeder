@@ -21,6 +21,7 @@ val commitCount by project.extra {
 }
 
 val latestTag by project.extra {
+    if (!file(".git").exists()) return@extra "unknown"
     providers
         .exec {
             commandLine("git", "describe")
@@ -28,6 +29,14 @@ val latestTag by project.extra {
         .get()
         .trim()
 }
+
+val kotlinToolchainVersion =
+    JavaVersion.current()
+        .majorVersion
+        .toIntOrNull()
+        ?.takeIf { JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17) }
+        ?.coerceAtLeast(17)
+        ?: 17
 
 android {
     namespace = "com.nononsenseapps.feeder"
@@ -223,7 +232,7 @@ composeCompiler {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(kotlinToolchainVersion)
     compilerOptions {
         allWarningsAsErrors = false
         jvmTarget = JvmTarget.JVM_11

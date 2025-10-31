@@ -45,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -88,7 +89,10 @@ import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.net.MalformedURLException
@@ -170,30 +174,64 @@ fun SearchFeedView(
     var errors by rememberSaveable {
         mutableStateOf(listOf<FeedParserError>())
     }
+    LaunchedEffect(Unit) {
+        searchFeedViewModel.ensureSuggestionsLoaded()
+    }
+
+    var suggestions by remember {
+        mutableStateOf<List<SearchResult>>(emptyList())
+    }
+
+    @OptIn(FlowPreview::class)
+    LaunchedEffect(Unit) {
+        searchFeedViewModel.ensureSuggestionsLoaded()
+        snapshotFlow { feedUrl }
+            .debounce(150)
+            .collectLatest { query ->
+                suggestions =
+                    if (query.length < 2) {
+                        emptyList()
+                    } else {
+                        searchFeedViewModel.suggestionsFor(query)
+                    }
+            }
+    }
+    var currentSearchJob by remember { mutableStateOf<Job?>(null) }
 
     SearchFeedView(
         screenType = screenType,
-        onUrlChange = {
-            feedUrl = it
+        onUrlChange = { newUrl ->
+            feedUrl = newUrl
+            currentSearchJob?.cancel()
+            currentSearchJob = null
+            currentlySearching = false
+            results = emptyList()
+            errors = emptyList()
         },
         onSearch = { url ->
             results = emptyList()
             errors = emptyList()
             currentlySearching = true
-            coroutineScope.launch {
-                searchFeedViewModel
-                    .searchForFeeds(url)
-                    .onCompletion {
-                        currentlySearching = false
-                    }.collect {
-                        it
-                            .onLeft { e ->
-                                errors = errors + e
-                            }.onRight { r ->
-                                results = results + r
-                            }
-                    }
+            currentSearchJob?.cancel()
+            val job =
+                coroutineScope.launch {
+                    searchFeedViewModel
+                        .searchForFeeds(url)
+                        .collect { result ->
+                            result
+                                .onLeft { e ->
+                                    errors = errors + e
+                                }.onRight { r ->
+                                    results = results + r
+                                }
+                        }
+                }
+            job.invokeOnCompletion {
+                if (currentSearchJob == job) {
+                    currentlySearching = false
+                }
             }
+            currentSearchJob = job
         },
         results = StableHolder(results),
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
@@ -201,6 +239,11 @@ fun SearchFeedView(
         onClick = onClick,
         modifier = modifier,
         feedUrl = feedUrl,
+        suggestions = StableHolder(suggestions),
+        onSuggestionClick = { suggestion ->
+            onClick(suggestion)
+        },
+        initialFeedUrl = initialFeedUrl,
     )
 }
 
@@ -213,8 +256,11 @@ fun SearchFeedView(
     errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
+    suggestions: StableHolder<List<SearchResult>>,
+    onSuggestionClick: (SearchResult) -> Unit,
     modifier: Modifier = Modifier,
     feedUrl: String = "",
+    initialFeedUrl: String = "",
 ) {
     val focusManager = LocalFocusManager.current
     val dimens = LocalDimens.current
@@ -223,14 +269,15 @@ fun SearchFeedView(
     val onSearchCallback by rememberUpdatedState(newValue = onSearch)
 
     // If screen is opened from intent with pre-filled URL, trigger search directly
-    LaunchedEffect(Unit) {
-        if (results.item.isEmpty() &&
+    LaunchedEffect(initialFeedUrl) {
+        if (initialFeedUrl.isNotBlank() &&
+            feedUrl == initialFeedUrl &&
+            results.item.isEmpty() &&
             errors.item.isEmpty() &&
-            feedUrl.isNotBlank() &&
-            (isValidUrl(feedUrl))
+            isValidUrl(initialFeedUrl)
         ) {
             onSearchCallback(
-                sloppyLinkToStrictURLNoThrows(feedUrl),
+                sloppyLinkToStrictURLNoThrows(initialFeedUrl),
             )
         }
     }
@@ -281,6 +328,8 @@ fun SearchFeedView(
                         errors = errors,
                         currentlySearching = currentlySearching,
                         onClick = onClick,
+                        suggestions = suggestions,
+                        onSuggestionClick = onSuggestionClick,
                     )
                 }
             }
@@ -308,6 +357,8 @@ fun SearchFeedView(
                     errors = errors,
                     currentlySearching = currentlySearching,
                     onClick = onClick,
+                    suggestions = suggestions,
+                    onSuggestionClick = onSuggestionClick,
                 )
             }
         }
@@ -399,11 +450,31 @@ fun ColumnScope.leftContent(
 
 @Composable
 fun ColumnScope.rightContent(
+    suggestions: StableHolder<List<SearchResult>>,
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<FeedParserError>>,
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
+    onSuggestionClick: (SearchResult) -> Unit,
 ) {
+    if (suggestions.item.isNotEmpty()) {
+        Text(
+            text = stringResource(id = R.string.feed_search_suggestions_header),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.align(Alignment.Start),
+        )
+        suggestions.item.forEach { suggestion ->
+            SearchResultView(
+                title = suggestion.title,
+                url = suggestion.url,
+                description = suggestion.description,
+                onClick = {
+                    onSuggestionClick(suggestion)
+                },
+            )
+        }
+    }
+
     if (results.item.isEmpty()) {
         for (error in errors.item) {
             val title =
@@ -499,12 +570,14 @@ fun SearchResultView(
                 title,
                 style = MaterialTheme.typography.titleSmall,
             )
+            if (description.isNotBlank()) {
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             Text(
                 url,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                description,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -588,9 +661,20 @@ private fun SearchPreview() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Suggested feed",
+                            url = "https://example.com/rss",
+                            description = "",
+                            feedImage = "",
+                        ),
+                    ),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
+                initialFeedUrl = "",
             )
         }
     }
@@ -619,9 +703,12 @@ private fun ErrorPreview() {
                         ),
                     ),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions = stableListHolderOf(),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
+                initialFeedUrl = "",
             )
         }
     }
@@ -664,9 +751,20 @@ private fun SearchPreviewLarge() {
                     ),
                 errors = stableListHolderOf(),
                 currentlySearching = false,
-                {},
+                onClick = {},
+                suggestions =
+                    stableListHolderOf(
+                        SearchResult(
+                            title = "Suggested feed",
+                            url = "https://example.com/rss",
+                            description = "",
+                            feedImage = "",
+                        ),
+                    ),
+                onSuggestionClick = {},
                 modifier = Modifier,
                 feedUrl = "https://cowboyprogrammer.org",
+                initialFeedUrl = "",
             )
         }
     }

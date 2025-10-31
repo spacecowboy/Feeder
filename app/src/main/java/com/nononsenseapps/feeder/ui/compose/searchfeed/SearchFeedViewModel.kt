@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.data.suggestions.SuggestedFeedRepository
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.HttpError
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.URL
@@ -31,6 +33,12 @@ class SearchFeedViewModel(
     private val feedParser: FeedParser by instance()
     private val repository: Repository by instance()
     private val application = getApplication<FeederApplication>()
+    private val suggestedFeedRepository: SuggestedFeedRepository by instance()
+
+    suspend fun ensureSuggestionsLoaded() =
+        withContext(Dispatchers.IO) {
+            suggestedFeedRepository.preload()
+        }
 
     private var siteMetaData: Either<FeedParserError, SiteMetaData> by mutableStateOf(
         Either.Left(
@@ -96,5 +104,28 @@ class SearchFeedViewModel(
 
     companion object {
         const val LOG_TAG = "FEEDER_SearchFeed"
+    }
+
+    suspend fun suggestionsFor(query: String): List<SearchResult> {
+        ensureSuggestionsLoaded()
+        if (query.isBlank()) {
+            return emptyList()
+        }
+        return withContext(Dispatchers.Default) {
+            suggestedFeedRepository
+                .search(query)
+                .map { suggestedFeed ->
+                    val author = suggestedFeed.authorName
+                    val showAuthor =
+                        author.isNotBlank() &&
+                            !suggestedFeed.headline.contains(author, ignoreCase = true)
+                    SearchResult(
+                        title = suggestedFeed.headline,
+                        url = suggestedFeed.feedUrl,
+                        description = if (showAuthor) author else "",
+                        feedImage = "",
+                    )
+                }
+        }
     }
 }
