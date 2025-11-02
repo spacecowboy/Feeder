@@ -456,72 +456,79 @@ fun ColumnScope.rightContent(
     currentlySearching: Boolean,
     onClick: (SearchResult) -> Unit,
     onSuggestionClick: (SearchResult) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    if (suggestions.item.isNotEmpty()) {
-        Text(
-            text = stringResource(id = R.string.feed_search_suggestions_header),
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.align(Alignment.Start),
-        )
-        suggestions.item.forEach { suggestion ->
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier,
+    ) {
+        if (suggestions.item.isNotEmpty()) {
+            Text(
+                text = stringResource(id = R.string.feed_search_suggestions_header),
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.align(Alignment.Start),
+            )
+            suggestions.item.forEach { suggestion ->
+                SearchResultView(
+                    title = suggestion.title,
+                    url = suggestion.url,
+                    description = suggestion.description,
+                    onClick = {
+                        onSuggestionClick(suggestion)
+                    },
+                )
+            }
+        }
+
+        if (results.item.isEmpty()) {
+            for (error in errors.item) {
+                val title =
+                    when (error) {
+                        is FetchError -> stringResource(R.string.failed_to_download)
+                        is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
+                        is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
+                        is NotHTML -> stringResource(R.string.content_is_not_html)
+                        is NotInitializedYet -> "Not initialized yet" // Should never happen
+                        is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
+                        is HttpError -> stringResource(R.string.http_error)
+                        is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)
+                        is NoBody -> stringResource(R.string.no_body_in_response)
+                        is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
+                        is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
+                        is NoUrl -> stringResource(R.string.no_url)
+                    }
+
+                ErrorResultView(
+                    title = title,
+                    description = error.description,
+                    url = error.url,
+                    {
+                        onClick(
+                            SearchResult(
+                                title = error.url,
+                                url = error.url,
+                                description = "",
+                                feedImage = "",
+                            ),
+                        )
+                    },
+                )
+            }
+        }
+        for (result in results.item) {
             SearchResultView(
-                title = suggestion.title,
-                url = suggestion.url,
-                description = suggestion.description,
-                onClick = {
-                    onSuggestionClick(suggestion)
-                },
-            )
-        }
-    }
-
-    if (results.item.isEmpty()) {
-        for (error in errors.item) {
-            val title =
-                when (error) {
-                    is FetchError -> stringResource(R.string.failed_to_download)
-                    is MetaDataParseError -> stringResource(R.string.failed_to_parse_the_page)
-                    is NoAlternateFeeds -> stringResource(R.string.no_feeds_in_the_page)
-                    is NotHTML -> stringResource(R.string.content_is_not_html)
-                    is NotInitializedYet -> "Not initialized yet" // Should never happen
-                    is RSSParseError -> stringResource(R.string.failed_to_parse_rss_feed)
-                    is HttpError -> stringResource(R.string.http_error)
-                    is JsonFeedParseError -> stringResource(R.string.failed_to_parse_json_feed)
-                    is NoBody -> stringResource(R.string.no_body_in_response)
-                    is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
-                    is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
-                    is NoUrl -> stringResource(R.string.no_url)
-                }
-
-            ErrorResultView(
-                title = title,
-                description = error.description,
-                url = error.url,
+                title = result.title,
+                url = result.url,
+                description = result.description,
                 {
-                    onClick(
-                        SearchResult(
-                            title = error.url,
-                            url = error.url,
-                            description = "",
-                            feedImage = "",
-                        ),
-                    )
+                    onClick(result)
                 },
             )
         }
-    }
-    for (result in results.item) {
-        SearchResultView(
-            title = result.title,
-            url = result.url,
-            description = result.description,
-            {
-                onClick(result)
-            },
-        )
-    }
-    AnimatedVisibility(visible = currentlySearching) {
-        SearchingIndicator()
+        AnimatedVisibility(visible = currentlySearching) {
+            SearchingIndicator()
+        }
     }
 }
 
