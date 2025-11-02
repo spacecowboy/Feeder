@@ -1,0 +1,1 @@
+In case the list of feeds needs to be updated in the future, this is the source of the feeds_mapped.json: https://github.com/JaredTweed/sidestack_scraper
