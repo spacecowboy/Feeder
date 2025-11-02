@@ -20,18 +20,9 @@ val commitCount by project.extra {
         .toInt()
 }
 
-val latestTag by project.extra {
-    if (!file(".git").exists()) return@extra "unknown"
-    providers
-        .exec {
-            commandLine("git", "describe")
-        }.standardOutput.asText
-        .get()
-        .trim()
-}
-
 val kotlinToolchainVersion =
-    JavaVersion.current()
+    JavaVersion
+        .current()
         .majorVersion
         .toIntOrNull()
         ?.takeIf { JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17) }

@@ -2,13 +2,13 @@ package com.nononsenseapps.feeder.data.suggestions
 
 import android.content.res.Resources
 import com.nononsenseapps.feeder.R
-import java.util.Locale
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import java.util.Locale
 
 private val WORD_REGEX = Regex("[\\p{L}\\p{N}']+")
 private val SUBSTACK_FEED_REGEX = Regex("^https://([\\p{L}\\p{N}-]+)\\.substack\\.com/feed/?$", RegexOption.IGNORE_CASE)
@@ -19,8 +19,7 @@ private fun tokenize(text: String): List<String> =
         .map { it.value.lowercase(Locale.ROOT) }
         .toList()
 
-private fun normalizeForTextMatch(text: String): String =
-    tokenize(text).joinToString(separator = " ")
+private fun normalizeForTextMatch(text: String): String = tokenize(text).joinToString(separator = " ")
 
 private fun String.toSearchableUrlText(): String {
     val match = SUBSTACK_FEED_REGEX.matchEntire(this.trim())
@@ -40,24 +39,34 @@ data class SuggestedFeed(
 ) {
     @Transient
     val headlineTokens: List<String> = tokenize(headline)
+
     @Transient
     val headlineTokenSet: Set<String> = headlineTokens.toSet()
+
     @Transient
     val authorTokens: List<String> = tokenize(authorName)
+
     @Transient
     val authorTokenSet: Set<String> = authorTokens.toSet()
+
     @Transient
     val urlSearchText: String = feedUrl.toSearchableUrlText()
+
     @Transient
     val urlTokens: List<String> = tokenize(urlSearchText)
+
     @Transient
     val urlTokenSet: Set<String> = urlTokens.toSet()
+
     @Transient
     val normalizedHeadlineText: String = normalizeForTextMatch(headline)
+
     @Transient
     val normalizedAuthorText: String = normalizeForTextMatch(authorName)
+
     @Transient
     val normalizedUrlText: String = normalizeForTextMatch(urlSearchText)
+
     @Transient
     val totalSubscribers: Int = totalSubscribersRaw.toIntOrNull() ?: 0
 }
@@ -90,7 +99,10 @@ class SuggestedFeedRepository(
         suggestedFeeds
     }
 
-    fun search(query: String, limit: Int = DEFAULT_RESULT_LIMIT): List<SuggestedFeed> {
+    fun search(
+        query: String,
+        limit: Int = DEFAULT_RESULT_LIMIT,
+    ): List<SuggestedFeed> {
         if (query.length < MIN_SEARCH_LENGTH) {
             return emptyList()
         }
@@ -110,8 +122,7 @@ class SuggestedFeedRepository(
             .map { feed -> scoreFeed(feed, tokens, normalizedQueryText) }
             .filter { scored ->
                 scored.containsQueryText
-            }
-            .sortedByDescending { it.feed.totalSubscribers }
+            }.sortedByDescending { it.feed.totalSubscribers }
             .take(limit)
             .map { it.feed }
             .toList()
@@ -126,7 +137,11 @@ class SuggestedFeedRepository(
             emptyList()
         }
 
-    private fun scoreFeed(feed: SuggestedFeed, queryTokens: List<String>, normalizedQueryText: String): ScoredFeed {
+    private fun scoreFeed(
+        feed: SuggestedFeed,
+        queryTokens: List<String>,
+        normalizedQueryText: String,
+    ): ScoredFeed {
         val cleanedQueryTokens =
             queryTokens.mapNotNull { token ->
                 token.trim().takeIf { it.isNotEmpty() }
@@ -212,8 +227,10 @@ class SuggestedFeedRepository(
         )
     }
 
-    private fun countMatches(tokenSet: Set<String>, queryTokens: Set<String>): Int =
-        queryTokens.count { it in tokenSet }
+    private fun countMatches(
+        tokenSet: Set<String>,
+        queryTokens: Set<String>,
+    ): Int = queryTokens.count { it in tokenSet }
 
     companion object {
         private const val MIN_SEARCH_LENGTH = 2
