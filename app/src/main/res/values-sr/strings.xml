@@ -282,4 +282,5 @@
     <string name="time_out_validation_error">Тајмаут мора да буде између 30 и 600 секунди</string>
     <string name="time_out">Тајмаут (секунди)</string>
     <string name="summarize_on_open">Резимирај приликом отварања</string>
+    <string name="feed_search_suggestions_header">Предлози</string>
 </resources>
