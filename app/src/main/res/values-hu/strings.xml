@@ -217,7 +217,7 @@
     <string name="saved_adjective">Mentett</string>
     <string name="failed_to_download">Nem sikerült a letöltés</string>
     <string name="failed_to_parse_rss_feed">Nem sikerült feldolgozni az RSS-hírforrást</string>
-    <string name="http_error">HTTP hiba</string>
+    <string name="http_error">HTTP-hiba</string>
     <string name="failed_to_parse_json_feed">Nem sikerült feldolgozni a JSON-hírforrást</string>
     <string name="unsupported_content_type">Nem támogatott tartalomtípus</string>
     <string name="failed_to_parse_full_article">Nem sikerült feldolgozni a teljes cikket</string>
@@ -282,4 +282,5 @@
     <string name="time_out">Időtúllépés (másodpercben)</string>
     <string name="time_out_validation_error">Az időtúllépésnek 30 és 600 másodperc között kell lennie</string>
     <string name="summarize_on_open">Összegzés megnyitáskor</string>
+    <string name="feed_search_suggestions_header">Javaslatok</string>
 </resources>
