@@ -280,4 +280,7 @@
     <string name="something_went_wrong">Någonting gick fel</string>
     <string name="time_out">Timeout (sekunder)</string>
     <string name="time_out_validation_error">Timeout måste vara mellan 30 och 600 sekunder</string>
+    <string name="feed_search_suggestions_header">Förslag</string>
+    <string name="time_out_placeholder">Tidsgräns för OpenAI-anrop</string>
+    <string name="summarize_on_open">Sammanfatta vid öppning</string>
 </resources>
