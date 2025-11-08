@@ -282,4 +282,5 @@
     <string name="time_out">Limit czasu zapytania (sekundy)</string>
     <string name="time_out_validation_error">Limit czasu musi być między 30 a 600 sekund</string>
     <string name="summarize_on_open">Podsumowuj przy otwieraniu</string>
+    <string name="feed_search_suggestions_header">Sugestie</string>
 </resources>
