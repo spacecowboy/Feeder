@@ -282,4 +282,5 @@
     <string name="time_out_validation_error">Времето за изчакване трябва да бъде между 30 и 600 секунди</string>
     <string name="time_out_placeholder">Време за изчакване за OpenAI заявки</string>
     <string name="summarize_on_open">Обобщение при отваряне</string>
+    <string name="feed_search_suggestions_header">Предложения</string>
 </resources>
