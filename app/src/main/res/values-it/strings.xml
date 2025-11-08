@@ -282,4 +282,5 @@
     <string name="weight">Peso</string>
     <string name="time_out">Timeout (secondi)</string>
     <string name="summarize_on_open">Riepilogo all\'apertura</string>
+    <string name="feed_search_suggestions_header">Suggerimenti</string>
 </resources>
