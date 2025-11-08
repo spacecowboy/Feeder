@@ -281,4 +281,6 @@
     <string name="time_out">Timeout (sekunder)</string>
     <string name="time_out_validation_error">Timeouten skal være på mellem 30 og 600 sekunder</string>
     <string name="time_out_placeholder">Timeout for OpenAI-anmodninger</string>
+    <string name="feed_search_suggestions_header">Forslag</string>
+    <string name="summarize_on_open">Opsummer ved åbning</string>
 </resources>
