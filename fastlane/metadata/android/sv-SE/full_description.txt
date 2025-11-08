@@ -17,3 +17,5 @@
 <li>Enkel åtkomst till bifogad media</li>
 <li>Material design</li>
 </ul>
+
+Hela listan med ändringar finns <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">på GitHub</a>.
