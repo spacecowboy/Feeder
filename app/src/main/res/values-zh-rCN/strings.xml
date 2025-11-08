@@ -282,4 +282,5 @@
     <string name="time_out_validation_error">超时时间必须在 30 到 600 秒之间</string>
     <string name="time_out_placeholder">OpenAI 请求的超时时间</string>
     <string name="summarize_on_open">打开时总结</string>
+    <string name="feed_search_suggestions_header">建议</string>
 </resources>
