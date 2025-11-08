@@ -35,7 +35,7 @@
     <string name="sync">Synchronisieren</string>
     <string name="export_feeds_to_opml">Feeds als OPML exportieren</string>
     <string name="import_feeds_from_opml">Feeds aus OPML importieren</string>
-    <string name="view_debug_log">Debug Log betrachten</string>
+    <string name="view_debug_log">Fehlerprotokoll anzeigen</string>
     <string name="new_based_on_this">Neu darauf basierend</string>
     <string name="indicator_for_mark_as_read">Indikator für Gelesenmarkierung</string>
     <string name="share">Teilen</string>
@@ -282,4 +282,5 @@
     <string name="time_out">Zeitüberschreitung (Sekunden)</string>
     <string name="time_out_validation_error">Die Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
     <string name="summarize_on_open">Beim Öffnen zusammenfassen</string>
+    <string name="feed_search_suggestions_header">Vorschläge</string>
 </resources>
