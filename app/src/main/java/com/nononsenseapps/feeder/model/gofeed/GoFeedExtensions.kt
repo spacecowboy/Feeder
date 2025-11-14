@@ -313,7 +313,8 @@ private fun pointsToImage(url: String): Boolean =
             u.path.endsWith(".jpeg", ignoreCase = true) ||
             u.path.endsWith(".gif", ignoreCase = true) ||
             u.path.endsWith(".png", ignoreCase = true) ||
-            u.path.endsWith(".webp", ignoreCase = true)
+            u.path.endsWith(".webp", ignoreCase = true) ||
+            u.path.endsWith(".avif", ignoreCase = true)
     } catch (_: Exception) {
         false
     }
