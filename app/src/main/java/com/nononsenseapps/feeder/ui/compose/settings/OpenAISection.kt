@@ -171,6 +171,12 @@ fun OpenAISectionEdit(
         modifier = modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        Text(
+            text = stringResource(R.string.openai_settings_info),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline,
+            modifier = Modifier.padding(bottom = 3.dp),
+        )
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = current.key,
