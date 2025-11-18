@@ -250,7 +250,7 @@
     <string name="feed_item_style_compact_card">Tarjeta compacta</string>
     <string name="touch_to_play_audio">Toca para reproducir el audio</string>
     <string name="show_title_unread_count">Mostrar número de artículos no leídos en el título</string>
-    <string name="openai_settings">Integración de OpenAI</string>
+    <string name="openai_settings">Integración de IA</string>
     <string name="no_models_were_found">Sin modelos</string>
     <string name="summarize">Resumir</string>
     <string name="model_id">Identificación del modelo</string>
@@ -278,9 +278,10 @@
     <string name="something_went_wrong">Algo fue mal</string>
     <string name="text">Texto</string>
     <string name="could_not_add_font">No se pudo añadir la fuente</string>
-    <string name="time_out_placeholder">Tiempo de espera por OpenAI</string>
+    <string name="time_out_placeholder">Tiempo de espera por IA</string>
     <string name="time_out">Tiempo de espera (segundos)</string>
     <string name="time_out_validation_error">El tiempo de espera debe ser entre 30 y 600 segundos</string>
     <string name="summarize_on_open">Resumir al abrir</string>
     <string name="feed_search_suggestions_header">Sugerencias</string>
+    <string name="openai_settings_info">Compatible con muchos proveedores IA, pero no todos</string>
 </resources>
