@@ -251,7 +251,7 @@
     <string name="skip_duplicate_articles_desc">Artikler med links eller titler, der er identiske med eksisterende artikler, ignoreres</string>
     <string name="show_title_unread_count">Vis antallet af ulæste artikler i titlen</string>
     <string name="summarize">Opsummer</string>
-    <string name="openai_settings">OpenAI-integration</string>
+    <string name="openai_settings">AI-integration</string>
     <string name="api_key">API-nøgle</string>
     <string name="model_id">Model-id</string>
     <string name="azure_api_version">Azure API version</string>
@@ -280,7 +280,7 @@
     <string name="something_went_wrong">Noget gik galt</string>
     <string name="time_out">Timeout (sekunder)</string>
     <string name="time_out_validation_error">Timeouten skal være på mellem 30 og 600 sekunder</string>
-    <string name="time_out_placeholder">Timeout for OpenAI-anmodninger</string>
+    <string name="time_out_placeholder">Timeout for AI-anmodninger</string>
     <string name="feed_search_suggestions_header">Forslag</string>
     <string name="summarize_on_open">Opsummer ved åbning</string>
 </resources>
