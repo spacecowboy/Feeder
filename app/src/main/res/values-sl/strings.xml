@@ -270,7 +270,7 @@
     <string name="skip_duplicate_articles_desc">Članki s povezavami ali naslovi, ki so identični obstoječim, se preskočeni</string>
     <string name="show_title_unread_count">V naslovu prikaži število neprebranih člankov</string>
     <string name="summarize">Povzemi</string>
-    <string name="openai_settings">OpenAI integracija</string>
+    <string name="openai_settings">AI integracija</string>
     <string name="model_id">ID modela</string>
     <string name="azure_api_version">Različica Azure API</string>
     <string name="touch_to_play_audio">Tapni za predvajanje zvoka</string>
@@ -278,9 +278,10 @@
     <string name="no_models_were_found">Ni bilo mogoče najti modelov</string>
     <string name="azure_deployment_id">Azure deployment identifikacija</string>
     <string name="list_of_available_models">Seznam razpoložljivih modelov</string>
-    <string name="time_out_placeholder">Časovni iztek za OpenAI zahteve</string>
+    <string name="time_out_placeholder">Časovni iztek za AI zahteve</string>
     <string name="time_out">Časovni iztek (v sekundah)</string>
     <string name="time_out_validation_error">Časovni iztek mora biti med 30 in 600 sekundami</string>
     <string name="summarize_on_open">Povzemi ob odprtju</string>
     <string name="feed_search_suggestions_header">Predlogi</string>
+    <string name="openai_settings_info">Podpira mnogo AI ponudnikov, a ne vseh</string>
 </resources>
