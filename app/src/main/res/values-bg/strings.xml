@@ -254,7 +254,7 @@
     <string name="model_id">ID модел</string>
     <string name="azure_deployment_id">Azure ID внедряване</string>
     <string name="summarize">Обобщение</string>
-    <string name="openai_settings">OpenAI интеграция</string>
+    <string name="openai_settings">AI интеграция</string>
     <string name="unable_to_load_models">Не могат да се заредят модели.</string>
     <string name="no_models_were_found">Няма намерени модели</string>
     <string name="list_of_available_models">Списък на налични модели</string>
@@ -280,7 +280,8 @@
     <string name="add_font">Добавяне на шрифт…</string>
     <string name="time_out">Време за изчакване (секунди)</string>
     <string name="time_out_validation_error">Времето за изчакване трябва да бъде между 30 и 600 секунди</string>
-    <string name="time_out_placeholder">Време за изчакване за OpenAI заявки</string>
+    <string name="time_out_placeholder">Време на изчакване за AI заявки</string>
     <string name="summarize_on_open">Обобщение при отваряне</string>
     <string name="feed_search_suggestions_header">Предложения</string>
+    <string name="openai_settings_info">Съвместим с много доставчици на AI, но не с всички</string>
 </resources>

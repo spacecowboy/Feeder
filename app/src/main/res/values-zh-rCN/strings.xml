@@ -251,7 +251,7 @@
     <string name="touch_to_play_audio">轻触播放音频</string>
     <string name="show_title_unread_count">在标题中显示未读数</string>
     <string name="no_models_were_found">未找到模型</string>
-    <string name="openai_settings">OpenAI 集成</string>
+    <string name="openai_settings">AI 集成</string>
     <string name="api_key">API 密钥</string>
     <string name="model_id">模型 Id</string>
     <string name="summarize">概述</string>
@@ -278,9 +278,10 @@
     <string name="text">文本</string>
     <string name="text_settings">文本设置</string>
     <string name="could_not_remove_font">无法移除字体</string>
-    <string name="time_out">超时(秒)</string>
+    <string name="time_out">超时时间（秒）</string>
     <string name="time_out_validation_error">超时时间必须在 30 到 600 秒之间</string>
-    <string name="time_out_placeholder">OpenAI 请求的超时时间</string>
+    <string name="time_out_placeholder">AI 请求的超时时间</string>
     <string name="summarize_on_open">打开时总结</string>
     <string name="feed_search_suggestions_header">建议</string>
+    <string name="openai_settings_info">兼容众多 AI 提供者，但非全部</string>
 </resources>
