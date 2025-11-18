@@ -281,4 +281,5 @@
     <string name="time_out">Час очікування (у секундах)</string>
     <string name="time_out_placeholder">Час очікування для запитів OpenAI</string>
     <string name="time_out_validation_error">Час очікування має бути від 30 до 600 секунд</string>
+    <string name="feed_search_suggestions_header">Пропозиції</string>
 </resources>
