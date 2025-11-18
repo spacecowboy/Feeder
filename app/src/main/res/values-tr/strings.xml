@@ -283,4 +283,5 @@
     <string name="could_not_remove_font">Yazı tipi kaldırılamadı</string>
     <string name="something_went_wrong">Bir şeyler ters gitti</string>
     <string name="summarize_on_open">Açıldığında özetle</string>
+    <string name="feed_search_suggestions_header">Öneriler</string>
 </resources>
