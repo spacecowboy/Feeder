@@ -254,7 +254,7 @@
     <string name="no_models_were_found">Aucun modèle trouvé</string>
     <string name="azure_deployment_id">Id de déploiement Azure</string>
     <string name="summarize">Faire un résumé</string>
-    <string name="openai_settings">Intégration d\'OpenAI</string>
+    <string name="openai_settings">Intégration IA</string>
     <string name="api_key">Clé API</string>
     <string name="azure_api_version">Version API Azure</string>
     <string name="unable_to_load_models">Échec du chargement des modèles.</string>
@@ -279,8 +279,9 @@
     <string name="could_not_remove_font">Impossible de supprimer la police</string>
     <string name="text_settings">Affichage du texte</string>
     <string name="time_out_validation_error">Le timeout doit être compris entre 30 et 600 secondes</string>
-    <string name="time_out_placeholder">Timeout lors des requêtes à OpenAI</string>
+    <string name="time_out_placeholder">Timeout des requêtes IA</string>
     <string name="time_out">Timeout (secondes)</string>
     <string name="summarize_on_open">Résumé à l\'ouverture</string>
     <string name="feed_search_suggestions_header">Suggestions</string>
+    <string name="openai_settings_info">Beaucoup d\'IA sont compatibles mais pas toutes</string>
 </resources>
