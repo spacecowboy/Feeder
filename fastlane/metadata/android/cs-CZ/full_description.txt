@@ -18,4 +18,4 @@
 <li>Material Design</li>
 </ul>
 
-Úplný seznam změn je k dispozici <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">on GitHub</a>.
+Úplný seznam změn je k dispozici <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">na GitHubu</a>.
