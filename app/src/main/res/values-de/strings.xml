@@ -250,7 +250,7 @@
     <string name="feed_item_style_compact_card">Kompakte Kartei</string>
     <string name="show_title_unread_count">Anzahl ungelesener Artikel im Titel anzeigen</string>
     <string name="touch_to_play_audio">Berühren, um Audio abzuspielen</string>
-    <string name="openai_settings">OpenAI-Integration</string>
+    <string name="openai_settings">KI-Integration</string>
     <string name="model_id">Modell-ID</string>
     <string name="unable_to_load_models">Modelle konnten nicht geladen werden.</string>
     <string name="no_models_were_found">Es wurden keine Modelle gefunden</string>
@@ -278,9 +278,10 @@
     <string name="could_not_add_font">Schriftart konnte nicht hinzugefügt werden</string>
     <string name="could_not_remove_font">Schriftart konnte nicht entfernt werden</string>
     <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
-    <string name="time_out_placeholder">Zeitüberschreitung für OpenAI-Anfragen</string>
+    <string name="time_out_placeholder">Zeitüberschreitung für KI-Anfragen</string>
     <string name="time_out">Zeitüberschreitung (Sekunden)</string>
     <string name="time_out_validation_error">Die Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
     <string name="summarize_on_open">Beim Öffnen zusammenfassen</string>
     <string name="feed_search_suggestions_header">Vorschläge</string>
+    <string name="openai_settings_info">Mit vielen KI-Anbietern kompatibel, jedoch nicht mit allen</string>
 </resources>
