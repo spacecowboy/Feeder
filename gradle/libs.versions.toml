@@ -13,7 +13,7 @@ okio = "3.16.2"
 # END Unison
 ktlint-gradle = "13.1.0"
 ktlint-compose = "0.4.24"
-kodein = "7.28.0"
+kodein = "7.30.0"
 coroutines = "1.10.2"
 gofeed = "0.2.1"
 moshi = "1.15.2"
