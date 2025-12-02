@@ -87,6 +87,7 @@ fun FeedItemCompactCard(
             modifier =
                 Modifier
                     .requiredHeightIn(min = minimumTouchSize)
+                    .alpha(if (!state.item.unread) 0.75f else 1.0f)
                     .fillMaxWidth(),
         ) {
             if (state.showThumbnail) {

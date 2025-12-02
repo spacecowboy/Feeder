@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -62,7 +63,9 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
-    Surface(modifier = modifier.height(IntrinsicSize.Min)) {
+    Surface(modifier = modifier
+        .height(IntrinsicSize.Min)
+        .alpha(if (!item.unread) 0.75f else 1.0f)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(start = LocalDimens.current.margin),
