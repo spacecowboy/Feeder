@@ -34,9 +34,12 @@ fun FeedItemSuperCompact(
     showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Surface(modifier = modifier
-        .requiredHeightIn(min = minimumTouchSize)
-        .alpha(if (!item.unread) 0.75f else 1.0f)) {
+    Surface(
+        modifier =
+            modifier
+                .requiredHeightIn(min = minimumTouchSize)
+                .alpha(if (!item.unread) 0.75f else 1.0f),
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
