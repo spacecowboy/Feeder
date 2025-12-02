@@ -91,7 +91,8 @@ fun FeedItemCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier =
                 Modifier
-                    .requiredHeightIn(min = minimumTouchSize),
+                    .requiredHeightIn(min = minimumTouchSize)
+                    .alpha(if (!item.unread) 0.75f else 1.0f),
         ) {
             if (showThumbnail) {
                 item.image?.let { image ->
