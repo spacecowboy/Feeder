@@ -226,7 +226,7 @@
     <string name="failed_to_parse_json_feed">Nie udało się przetworzyć kanału JSON</string>
     <string name="failed_to_parse_full_article">Nie udało się przetworzyć całego artykułu</string>
     <string name="no_url">Brak adresu URL</string>
-    <string name="theme_e_ink">E Ink</string>
+    <string name="theme_e_ink">E-papier</string>
     <string name="add_anyway">Dodaj mimo to</string>
     <string name="open_browser_in_split_screen">Otwieraj przeglądarkę na podzielonym ekranie</string>
     <string name="show_reading_time">Pokazuj szacowany czas czytania</string>
@@ -256,7 +256,7 @@
     <string name="summarize">Streść</string>
     <string name="openai_settings">Integracja z AI</string>
     <string name="api_key">Klucz API</string>
-    <string name="unable_to_load_models">Nie udało się załadować modeli</string>
+    <string name="unable_to_load_models">Nie udało się załadować modeli.</string>
     <string name="no_models_were_found">Nie znaleziono modeli</string>
     <string name="list_of_available_models">Lista dostępnych modeli</string>
     <string name="show_message">Pokaż wiadomość</string>
