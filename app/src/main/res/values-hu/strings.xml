@@ -3,13 +3,13 @@
     <string name="tag">Címke</string>
     <string name="url">Webcím</string>
     <string name="add_feed_search_hint">Hírforrás webcíme</string>
-    <string name="empty_feed_top">Nincs itt semmi olvasnivaló. Szeretne inkább…</string>
+    <string name="empty_feed_top">Itt nincs semmi olvasnivaló. Szeretne inkább…</string>
     <string name="title">Cím</string>
     <string name="save">Mentés</string>
     <string name="open_in_browser">Megnyitása böngészőben</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="navigation_drawer_open">Navigációs fiók kinyitása</string>
-    <string name="navigation_drawer_close">Navigációs fiók becsukása</string>
+    <string name="navigation_drawer_close">Navigációs fiók bezárása</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="action_settings">Beállítások</string>
     <string name="add_feed">Hírforrás hozzáadása</string>
