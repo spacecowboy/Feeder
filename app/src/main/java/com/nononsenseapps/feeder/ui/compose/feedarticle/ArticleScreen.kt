@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,10 +66,12 @@ import com.nononsenseapps.feeder.ui.compose.html.linearArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.text.htmlStringToAnnotatedString
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
+import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.unicodeWrap
 import kotlinx.coroutines.launch
@@ -507,11 +510,31 @@ private fun SummarySection(summary: OpenAISummaryState) {
                 LinearProgressIndicator(
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 )
-            is OpenAISummaryState.Result ->
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = summary.value.content,
-                )
+            is OpenAISummaryState.Result -> {
+                val markdownConverter = remember { MarkdownToHtmlConverter() }
+                val htmlContent =
+                    remember(summary.value.content) {
+                        markdownConverter.convertToHtml(summary.value.content)
+                    }
+
+                // Convert HTML to AnnotatedString for rich text display
+                val annotatedStrings =
+                    remember(htmlContent) {
+                        htmlStringToAnnotatedString(htmlContent)
+                    }
+
+                Column(modifier = Modifier.padding(8.dp)) {
+                    annotatedStrings.forEachIndexed { index, annotatedString ->
+                        Text(
+                            text = annotatedString,
+                            modifier =
+                                Modifier.padding(
+                                    bottom = if (index < annotatedStrings.size - 1) 8.dp else 0.dp,
+                                ),
+                        )
+                    }
+                }
+            }
         }
     }
 }
