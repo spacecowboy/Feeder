@@ -213,6 +213,13 @@ class Repository(
         runOnceBlocklistUpdate(di)
     }
 
+    val applyBlocklistToSummaries: StateFlow<Boolean> = settingsStore.applyBlocklistToSummaries
+
+    suspend fun setApplyBlocklistToSummaries(value: Boolean) {
+        settingsStore.setApplyBlocklistToSummaries(value)
+        runOnceBlocklistUpdate(di)
+    }
+
     suspend fun setBlockStatusForNewInFeed(
         feedId: Long,
         blockTime: Instant,

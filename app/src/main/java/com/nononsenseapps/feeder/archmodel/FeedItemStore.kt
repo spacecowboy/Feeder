@@ -43,12 +43,13 @@ class FeedItemStore(
     private val dao: FeedItemDao by instance()
     private val blocklistDao: BlocklistDao by instance()
     private val appDatabase: AppDatabase by instance()
+    private val settingsStore: SettingsStore by instance()
 
     suspend fun setBlockStatusForNewInFeed(
         feedId: Long,
         blockTime: Instant,
     ) {
-        blocklistDao.setItemBlockStatusForNewInFeed(feedId, blockTime)
+        blocklistDao.setItemBlockStatusForNewInFeed(feedId, blockTime, settingsStore.applyBlocklistToSummaries.value)
     }
 
     fun getFeedItemCountRaw(

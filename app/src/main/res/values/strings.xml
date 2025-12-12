@@ -81,6 +81,7 @@
   <string name="on_startup">Upon app start</string>
   <string name="block_list">Block list</string>
   <string name="block_list_description">Hides articles with titles containing any of these filters. Example filters:</string>
+  <string name="apply_blocklist_to_summaries">Apply to summaries</string>
   <string name="add_item">Add item</string>
   <string name="show_fab">Show floating action button</string>
   <string name="include_mobile_hotspots">Include mobile hotspots</string>

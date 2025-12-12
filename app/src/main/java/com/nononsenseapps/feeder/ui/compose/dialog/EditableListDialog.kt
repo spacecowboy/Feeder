@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.dialog
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,6 +54,10 @@ fun EditableListDialog(
     onRemoveItem: (String) -> Unit,
     onAddItem: (String) -> Unit,
     modifier: Modifier = Modifier,
+    showToggle: Boolean = false,
+    toggleValue: Boolean = false,
+    toggleLabel: String = "",
+    onToggleChange: (Boolean) -> Unit = {},
 ) {
     var newValue by rememberSaveable {
         mutableStateOf("")
@@ -102,39 +109,67 @@ fun EditableListDialog(
         },
         title = title,
         text = {
-            LazyColumn(
-                state = lazyListState,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
+            Column(
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                items(
-                    items.item,
-                    key = { item -> item },
-                ) { item ->
+                if (showToggle) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .heightIn(min = minimumTouchSize),
+                                .heightIn(min = minimumTouchSize)
+                                .clickable(
+                                    role = Role.Switch,
+                                    onClick = { onToggleChange(!toggleValue) },
+                                ),
                     ) {
                         Text(
-                            text = item,
-                            style = MaterialTheme.typography.titleMedium,
+                            text = toggleLabel,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f, fill = true),
                         )
-                        IconButton(
-                            onClick = {
-                                onRemoveItem(item)
-                            },
+                        Switch(
+                            checked = toggleValue,
+                            onCheckedChange = null,
+                        )
+                    }
+                }
+                LazyColumn(
+                    state = lazyListState,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
+                ) {
+                    items(
+                        items.item,
+                        key = { item -> item },
+                    ) { item ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = minimumTouchSize),
                         ) {
-                            Icon(
-                                Icons.Filled.Delete,
-                                contentDescription = stringResource(R.string.remove),
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f, fill = true),
                             )
+                            IconButton(
+                                onClick = {
+                                    onRemoveItem(item)
+                                },
+                            ) {
+                                Icon(
+                                    Icons.Filled.Delete,
+                                    contentDescription = stringResource(R.string.remove),
+                                )
+                            }
                         }
                     }
                 }

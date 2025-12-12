@@ -119,6 +119,11 @@ class SettingsViewModel(
             repository.removeBlocklistPattern(value)
         }
 
+    fun setApplyBlocklistToSummaries(value: Boolean) =
+        applicationCoroutineScope.launch {
+            repository.setApplyBlocklistToSummaries(value)
+        }
+
     fun toggleNotifications(
         feedId: Long,
         value: Boolean,
@@ -219,6 +224,7 @@ class SettingsViewModel(
                 repository.feedItemStyle,
                 repository.swipeAsRead,
                 repository.blockList,
+                repository.applyBlocklistToSummaries,
                 repository.useDetectLanguage,
                 repository.useDynamicTheme,
                 immutableFeedsSettings,
@@ -252,22 +258,23 @@ class SettingsViewModel(
                     feedItemStyle = params[14] as FeedItemStyle,
                     swipeAsRead = params[15] as SwipeAsRead,
                     blockList = params[16] as List<String>,
-                    useDetectLanguage = params[17] as Boolean,
-                    useDynamicTheme = params[18] as Boolean,
-                    feedsSettings = params[19] as List<UIFeedSettings>,
-                    isMarkAsReadOnScroll = params[20] as Boolean,
-                    maxLines = params[21] as Int,
-                    showOnlyTitle = params[22] as Boolean,
-                    isOpenAdjacent = params[23] as Boolean,
-                    showReadingTime = params[24] as Boolean,
-                    showTitleUnreadCount = params[25] as Boolean,
+                    applyBlocklistToSummaries = params[17] as Boolean,
+                    useDetectLanguage = params[18] as Boolean,
+                    useDynamicTheme = params[19] as Boolean,
+                    feedsSettings = params[20] as List<UIFeedSettings>,
+                    isMarkAsReadOnScroll = params[21] as Boolean,
+                    maxLines = params[22] as Int,
+                    showOnlyTitle = params[23] as Boolean,
+                    isOpenAdjacent = params[24] as Boolean,
+                    showReadingTime = params[25] as Boolean,
+                    showTitleUnreadCount = params[26] as Boolean,
                     openAIState =
                         _viewState.value.openAIState.copy(
-                            settings = params[26] as OpenAISettings,
-                            modelsResult = params[27] as OpenAIModelsState,
+                            settings = params[27] as OpenAISettings,
+                            modelsResult = params[28] as OpenAIModelsState,
                         ),
-                    isOpenDrawerOnFab = params[28] as Boolean,
-                    font = params[29] as FontSelection,
+                    isOpenDrawerOnFab = params[29] as Boolean,
+                    font = params[30] as FontSelection,
                 )
             }.collect {
                 _viewState.value = it
@@ -305,6 +312,7 @@ data class SettingsViewState(
     val showFab: Boolean = true,
     val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     val blockList: List<String> = emptyList(),
+    val applyBlocklistToSummaries: Boolean = false,
     val syncOnResume: Boolean = false,
     val syncOnlyOnWifi: Boolean = false,
     val syncOnlyWhenCharging: Boolean = false,
