@@ -1,0 +1,21 @@
+<p>Feeder on 2014. aastal loodud avatud lähtekoodiga Androidi uudistelugeja (RSS/Atom/JSONFeed).</p>
+
+<p>Feederi abiga saad lugeda oma lemmiksaitide viimaseid uudiseid ja postitusi.</p>
+
+<p>Feeder EI kasuta sünkroonimist tavapäraste veebipõhiste taustateenustega ja seega pole ka vaja end kusagil registreerida.</p>
+
+<p>Feederi kasutamine on tasuta ja vaba ning ta toimib vaid sinu nutiseadmes. Sinu andmed on 100% privaatsed.</p>
+
+<p><b>Funktsionaalsused</b></p>
+
+<ul>
+<li>Loeb HTML-i kuvab seda sisseehitatud brauseris</li>
+<li>Saad sisu lugeda ilma võrguühendust kasutamata</li>
+<li>Sünkroonimine taustal</li>
+<li>Teavitused</li>
+<li>OPML-vormingu kasutamine impordil/ekspordil </li>
+<li>Mugav ligipääs artiklite linkidele</li>
+<li>MD kujunduspõhimõtted</li>
+</ul>
+
+Terviklik muudatuste logi asub <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHubis</a>.
