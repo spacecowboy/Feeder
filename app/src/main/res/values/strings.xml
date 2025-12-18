@@ -298,4 +298,6 @@
   <string name="could_not_add_font">Could not add font</string>
   <string name="could_not_remove_font">Could not remove font</string>
   <string name="something_went_wrong">Something went wrong</string>
+
+  <string name="widget_title">Feeder</string>
 </resources>
