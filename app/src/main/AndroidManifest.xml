@@ -178,6 +178,9 @@
               android:resource="@xml/feed_app_widget_info" />
     </receiver>
 
+    <activity
+            android:name=".widget.FeedWidgetSettingsActivity"
+            android:exported="false" />
 
   </application>
 </manifest>

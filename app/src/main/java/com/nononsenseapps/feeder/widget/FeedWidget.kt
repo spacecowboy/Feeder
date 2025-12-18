@@ -7,6 +7,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -20,12 +22,16 @@ import androidx.glance.appwidget.components.TitleBar
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.material3.ColorProviders
 import androidx.glance.preview.ExperimentalGlancePreviewApi
+import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -47,9 +53,10 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.kodein.di.instance
+import java.io.File
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -96,53 +103,76 @@ object FeederWidgetGlanceColorScheme {
         )
 }
 
+private class WidgetStateDataStore(
+    private val context: Context,
+) : DataStore<PagingData<FeedWidgetItem>> {
+    private val app = (context.applicationContext as FeederApplication)
+    private val imageLoader = app.imageLoader
+    private val loadImageBitmap: suspend (String) -> Bitmap? = { url ->
+        val request =
+            ImageRequest
+                .Builder(context)
+                .data(url)
+                .scale(Scale.FIT)
+                .precision(Precision.INEXACT)
+                .allowHardware(false)
+                .build()
+
+        (imageLoader.execute(request) as? SuccessResult)?.image?.toBitmap(200, 200)
+    }
+
+    private val repository: Repository by app.di.instance()
+
+    override val data: Flow<PagingData<FeedWidgetItem>>
+        get() =
+            repository
+                .getCurrentWidgetFeedListItems()
+                .map { pagingData ->
+                    pagingData
+                        .map { listItem ->
+                            val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
+                            Pair(listItem, bitmap)
+                        }.filter { it.second != null }
+                        .map {
+                            it.first.toWidgetItem(it.second!!)
+                        }
+                }
+
+    override suspend fun updateData(transform: suspend (t: PagingData<FeedWidgetItem>) -> PagingData<FeedWidgetItem>): PagingData<FeedWidgetItem> =
+        throw NotImplementedError("Widget does not need to update its own data")
+}
+
 class FeedWidget : GlanceAppWidget() {
+    override val stateDefinition: GlanceStateDefinition<PagingData<FeedWidgetItem>>
+        get() =
+            object : GlanceStateDefinition<PagingData<FeedWidgetItem>> {
+                override suspend fun getDataStore(
+                    context: Context,
+                    fileKey: String,
+                ): DataStore<PagingData<FeedWidgetItem>> = WidgetStateDataStore(context)
+
+                override fun getLocation(
+                    context: Context,
+                    fileKey: String,
+                ): File = throw NotImplementedError("Widget does not provide a concrete state file location")
+            }
+
     override suspend fun provideGlance(
         context: Context,
         id: GlanceId,
     ) {
-        val app = (context.applicationContext as FeederApplication)
-
-        val imageLoader = app.imageLoader
-        val loadImageBitmap: suspend (String) -> Bitmap? = { url ->
-            val request =
-                ImageRequest
-                    .Builder(context)
-                    .data(url)
-                    .scale(Scale.FIT)
-                    .precision(Precision.INEXACT)
-                    .allowHardware(false)
-                    .build()
-
-            (imageLoader.execute(request) as? SuccessResult)?.image?.toBitmap(200, 200)
-        }
-
         provideContent {
-            val repository: Repository by app.di.instance()
-            val itemFlow =
-                repository
-                    .getCurrentFeedListItems()
-                    .map { pagingData ->
-                        pagingData
-                            .map { listItem ->
-                                val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                                Pair(listItem, bitmap)
-                            }.filter { it.second != null }
-                            .map {
-                                it.first.toWidgetItem(it.second!!)
-                            }
-                    }
             GlanceTheme(colors = FeederWidgetGlanceColorScheme.colors) {
                 WidgetContent(
-                    itemFlow = itemFlow,
+                    pagingItems = currentState(),
                 )
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(itemFlow: Flow<PagingData<FeedWidgetItem>>) {
-        val items = itemFlow.collectAsLazyPagingItems()
+    private fun WidgetContent(pagingItems: PagingData<FeedWidgetItem>) {
+        val items = flowOf(pagingItems).collectAsLazyPagingItems()
         Column(modifier = GlanceModifier.background(GlanceTheme.colors.background).padding(4.dp)) {
             FeederTitleBar()
             LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
@@ -165,6 +195,14 @@ class FeedWidget : GlanceAppWidget() {
             title = LocalContext.current.getString(R.string.widget_title),
             modifier = GlanceModifier.clickable(onClick = actionStartActivity(MainActivity::class.java)),
             actions = {
+                Spacer(modifier = GlanceModifier.width(8.dp))
+
+                Image(
+                    provider = ImageProvider(R.drawable.ic_settings),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                    modifier = GlanceModifier.clickable(actionStartActivity(FeedWidgetSettingsActivity::class.java)),
+                )
             },
         )
     }
@@ -225,6 +263,6 @@ class FeedWidget : GlanceAppWidget() {
                     wordCount = 900,
                 ),
             )
-        WidgetContent(MutableStateFlow(PagingData.from(previewItems)))
+        WidgetContent(PagingData.from(previewItems))
     }
 }
