@@ -499,7 +499,7 @@ fun FeedScreen(
         toolbarActions = {
             if (viewState.searchBarVisible) {
                 SearchBar(
-                    expanded = true,
+                    expanded = false,
                     onExpandedChange = { onShowSearchBar(it) },
                     inputField = {
                         SearchBarDefaults.InputField(
