@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.core.DataStore
@@ -24,9 +25,11 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.material3.ColorProviders
@@ -50,11 +53,14 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.kodein.di.instance
 import java.io.File
 import java.net.URL
@@ -95,6 +101,14 @@ private fun FeedListItem.toWidgetItem(bitmap: Bitmap) =
         wordCount,
     )
 
+sealed class WidgetState {
+    data object Syncing : WidgetState()
+
+    data class Ready(
+        val items: PagingData<FeedWidgetItem>,
+    ) : WidgetState()
+}
+
 object FeederWidgetGlanceColorScheme {
     val colors =
         ColorProviders(
@@ -105,7 +119,7 @@ object FeederWidgetGlanceColorScheme {
 
 private class WidgetStateDataStore(
     private val context: Context,
-) : DataStore<PagingData<FeedWidgetItem>> {
+) : DataStore<WidgetState> {
     private val app = (context.applicationContext as FeederApplication)
     private val imageLoader = app.imageLoader
     private val loadImageBitmap: suspend (String) -> Bitmap? = { url ->
@@ -123,33 +137,41 @@ private class WidgetStateDataStore(
 
     private val repository: Repository by app.di.instance()
 
-    override val data: Flow<PagingData<FeedWidgetItem>>
+    override val data: Flow<WidgetState>
         get() =
-            repository
-                .getCurrentWidgetFeedListItems()
-                .map { pagingData ->
-                    pagingData
-                        .map { listItem ->
-                            val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                            Pair(listItem, bitmap)
-                        }.filter { it.second != null }
-                        .map {
-                            it.first.toWidgetItem(it.second!!)
-                        }
+            combine(
+                repository.syncWorkerRunning,
+                repository
+                    .getCurrentWidgetFeedListItems()
+                    .map { pagingData ->
+                        pagingData
+                            .map { listItem ->
+                                val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
+                                Pair(listItem, bitmap)
+                            }.filter { it.second != null }
+                            .map {
+                                it.first.toWidgetItem(it.second!!)
+                            }
+                    },
+            ) { syncWorkerRunning, feedWidgetItems ->
+                if (syncWorkerRunning) {
+                    WidgetState.Syncing
+                } else {
+                    WidgetState.Ready(feedWidgetItems)
                 }
+            }
 
-    override suspend fun updateData(transform: suspend (t: PagingData<FeedWidgetItem>) -> PagingData<FeedWidgetItem>): PagingData<FeedWidgetItem> =
-        throw NotImplementedError("Widget does not need to update its own data")
+    override suspend fun updateData(transform: suspend (t: WidgetState) -> WidgetState): WidgetState = throw NotImplementedError("Widget does not need to update its own data")
 }
 
 class FeedWidget : GlanceAppWidget() {
-    override val stateDefinition: GlanceStateDefinition<PagingData<FeedWidgetItem>>
+    override val stateDefinition: GlanceStateDefinition<WidgetState>
         get() =
-            object : GlanceStateDefinition<PagingData<FeedWidgetItem>> {
+            object : GlanceStateDefinition<WidgetState> {
                 override suspend fun getDataStore(
                     context: Context,
                     fileKey: String,
-                ): DataStore<PagingData<FeedWidgetItem>> = WidgetStateDataStore(context)
+                ): DataStore<WidgetState> = WidgetStateDataStore(context)
 
                 override fun getLocation(
                     context: Context,
@@ -162,39 +184,56 @@ class FeedWidget : GlanceAppWidget() {
         id: GlanceId,
     ) {
         provideContent {
+            val app = (context.applicationContext as FeederApplication)
+            val coroutineScope = rememberCoroutineScope()
+            val runSync = {
+                val rssLocalSync by app.di.instance<RssLocalSync>()
+                coroutineScope.launch { rssLocalSync.syncFeeds() }
+                Unit
+            }
             GlanceTheme(colors = FeederWidgetGlanceColorScheme.colors) {
                 WidgetContent(
-                    pagingItems = currentState(),
+                    widgetState = currentState(),
+                    runSync = runSync,
                 )
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(pagingItems: PagingData<FeedWidgetItem>) {
-        val items = flowOf(pagingItems).collectAsLazyPagingItems()
-        Column(modifier = GlanceModifier.background(GlanceTheme.colors.background).padding(4.dp)) {
-            FeederTitleBar()
-            LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
-                items(
-                    count = items.itemCount,
-                    itemId = { items[it]?.id ?: 0 },
-                ) { index ->
-                    items[index]?.let {
-                        WidgetCard(it)
-                    }
-                }
+    private fun WidgetContent(
+        widgetState: WidgetState,
+        runSync: () -> Unit,
+    ) {
+        Column(
+            modifier =
+                GlanceModifier
+                    .fillMaxHeight()
+                    .background(GlanceTheme.colors.background)
+                    .padding(4.dp),
+        ) {
+            FeederTitleBar(runSync)
+            when (widgetState) {
+                is WidgetState.Syncing -> WidgetSyncingContent()
+                is WidgetState.Ready -> WidgetReadyContent(widgetState.items)
             }
         }
     }
 
     @Composable
-    private fun FeederTitleBar() {
+    private fun FeederTitleBar(runSync: () -> Unit) {
         TitleBar(
             startIcon = ImageProvider(R.drawable.ic_stat_f),
             title = LocalContext.current.getString(R.string.widget_title),
             modifier = GlanceModifier.clickable(onClick = actionStartActivity(MainActivity::class.java)),
             actions = {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_stat_sync),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                    modifier = GlanceModifier.clickable(runSync),
+                )
+
                 Spacer(modifier = GlanceModifier.width(8.dp))
 
                 Image(
@@ -205,6 +244,31 @@ class FeedWidget : GlanceAppWidget() {
                 )
             },
         )
+    }
+
+    @Composable
+    private fun WidgetSyncingContent() {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = LocalContext.current.getString(R.string.widget_refreshing),
+                style = TextStyle(color = GlanceTheme.colors.onSurface),
+            )
+        }
+    }
+
+    @Composable
+    private fun WidgetReadyContent(data: PagingData<FeedWidgetItem>) {
+        val items = flowOf(data).collectAsLazyPagingItems()
+        LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
+            items(
+                count = items.itemCount,
+                itemId = { items[it]?.id ?: 0 },
+            ) { index ->
+                items[index]?.let {
+                    WidgetCard(it)
+                }
+            }
+        }
     }
 
     @Composable
@@ -263,6 +327,6 @@ class FeedWidget : GlanceAppWidget() {
                     wordCount = 900,
                 ),
             )
-        WidgetContent(PagingData.from(previewItems))
+        WidgetContent(WidgetState.Ready(PagingData.from(previewItems)), {})
     }
 }
