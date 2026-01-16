@@ -282,4 +282,6 @@
     <string name="could_not_add_font">Não foi possível adicionar a fonte</string>
     <string name="could_not_remove_font">Não foi possível remover a fonte</string>
     <string name="something_went_wrong">Algo deu errado</string>
+    <string name="feed_search_suggestions_header">Sugestões</string>
+    <string name="openai_settings_info">Compatível com muitos provedores de IA, mas não todos</string>
 </resources>
