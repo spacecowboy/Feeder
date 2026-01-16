@@ -252,7 +252,7 @@
     <string name="show_title_unread_count">Показувати кількість непрочитаних статей у заголовку</string>
     <string name="off">Вимк.</string>
     <string name="show_message">Показати повідомлення</string>
-    <string name="openai_settings">Інтеграція OpenAI</string>
+    <string name="openai_settings">Інтеграція ШІ</string>
     <string name="api_key">Ключ API</string>
     <string name="model_id">ID моделі</string>
     <string name="azure_api_version">Версія Azure API</string>
@@ -279,7 +279,9 @@
     <string name="something_went_wrong">Щось пішло не так</string>
     <string name="bold">Жирний</string>
     <string name="time_out">Час очікування (у секундах)</string>
-    <string name="time_out_placeholder">Час очікування для запитів OpenAI</string>
+    <string name="time_out_placeholder">Час очікування для запитів ШІ</string>
     <string name="time_out_validation_error">Час очікування має бути від 30 до 600 секунд</string>
     <string name="feed_search_suggestions_header">Пропозиції</string>
+    <string name="summarize_on_open">Підсумувати при відкритті</string>
+    <string name="openai_settings_info">Сумісний з багатьма постачальниками ШІ, але не з усіма</string>
 </resources>
