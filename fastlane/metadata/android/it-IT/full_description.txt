@@ -2,7 +2,7 @@
 
 <p>Con Feeder potete leggere le ultime notizie e i post dei vostri siti preferiti.</p>
 
-<p>Feeder NON si sincronizza con i soliti backend remoti, quindi non è necessaria registrazione di alcun tipo di account.</p>
+<p>Feeder NON si sincronizza con i soliti backend remoti, quindi non è necessaria la registrazione di alcun tipo di account.</p>
 
 <p>Feeder è gratuito e funziona localmente sul vostro dispositivo. I vostri dati sono privati al 100%.</p>
 
@@ -14,8 +14,8 @@
 <li>Sincronizzazione in background</li>
 <li>Notifiche</li>
 <li>Importazione/esportazione OPML</li>
-<li>Comodo accesso ai collegamenti degli allegati </li>
+<li>Comodo accesso ai collegamenti degli allegati</li>
 <li>Material design</li>
 </ul>
 
-Il changelog completo è disponibile su  <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHub</a>.
+Il changelog completo è disponibile su <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">GitHub</a>.
