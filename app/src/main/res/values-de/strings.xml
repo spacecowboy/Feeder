@@ -67,7 +67,7 @@
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
     <string name="open_in_reader">Feedreader</string>
     <string name="open_in_webview">Webansicht</string>
-    <string name="open_in_default_browser">Standard-Browser</string>
+    <string name="open_in_default_browser">Standardbrowser</string>
     <string name="open_in_custom_tab">Benutzerdefinierte Registerkarte</string>
     <string name="open_item_by_default_with">Nachrichten standardmäßig öffnen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
@@ -92,11 +92,11 @@
     <string name="mark_items_above_as_read">Obere als gelesen markieren</string>
     <string name="mark_items_below_as_read">Untere als gelesen markieren</string>
     <string name="discovered_feeds_list">Liste der entdeckten Feeds</string>
-    <string name="toggle_tag_expansion">Gruppen-Erweiterung umschalten</string>
+    <string name="toggle_tag_expansion">Gruppenerweiterung umschalten</string>
     <string name="battery_optimization">Akkuoptimierung</string>
     <string name="battery_optimization_disabled">Aus</string>
     <string name="battery_optimization_enabled">Ein</string>
-    <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
+    <string name="preload_custom_tab">Standardregisterkarte vorladen</string>
     <string name="failed_to_parse">%1$s konnte nicht analysiert werden</string>
     <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
     <string name="failed_to_fetch_full_article">Vollständiger Artikel konnte nicht abgerufen werden</string>
