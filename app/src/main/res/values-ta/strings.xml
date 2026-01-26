@@ -261,4 +261,27 @@
     <string name="openai_settings">OpenAI ஒருங்கிணைப்பு</string>
     <string name="api_key">பநிஇ விசை</string>
     <string name="model_id">மாதிரி ஐடி</string>
+    <string name="nostr_feed_description">%1$s இன் Nostr கட்டுரைகள்</string>
+    <string name="feed_search_suggestions_header">பரிந்துரைகள்</string>
+    <string name="time_out">நேரம் முடிந்தது (வினாடிகள்)</string>
+    <string name="time_out_validation_error">காலக்கெடு 30 முதல் 600 வினாடிகளுக்குள் இருக்க வேண்டும்</string>
+    <string name="time_out_placeholder">AI கோரிக்கைகளுக்கான நேரம் முடிந்தது</string>
+    <string name="summarize_on_open">திறந்ததை சுருக்கவும்</string>
+    <string name="openai_settings_info">பல AI வழங்குநர்களுடன் இணக்கமானது, ஆனால் அனைவருக்கும் இல்லை</string>
+    <string name="on">அன்று</string>
+    <string name="off">அணை</string>
+    <string name="search_verb">தேடல்</string>
+    <string name="cancel_search">தேடலை நீக்கறல்</string>
+    <string name="text">உரை</string>
+    <string name="font">எழுத்துரு</string>
+    <string name="text_preview">உரை முன்னோட்டம்</string>
+    <string name="system_default">கணினி இயல்புநிலை</string>
+    <string name="weight">எடை</string>
+    <string name="italic">சாய்வு</string>
+    <string name="add_font">எழுத்துருவைச் சேர்…</string>
+    <string name="bold">தடிமான</string>
+    <string name="text_settings">உரை அமைப்புகள்</string>
+    <string name="could_not_add_font">எழுத்துருவை சேர்க்க முடியவில்லை</string>
+    <string name="could_not_remove_font">எழுத்துருவை அகற்ற முடியவில்லை</string>
+    <string name="something_went_wrong">ஏதோ தவறாகிவிட்டது</string>
 </resources>
