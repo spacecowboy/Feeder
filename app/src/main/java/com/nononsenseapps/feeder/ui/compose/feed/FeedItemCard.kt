@@ -109,12 +109,6 @@ fun FeedItemCard(
                                     val pxWidth = maxWidth.roundToPx()
                                     Size(pxWidth, (pxWidth * 9) / 16)
                                 }
-                            val alpha =
-                                if (item.unread) {
-                                    1f
-                                } else {
-                                    0.74f
-                                }
                             AsyncImage(
                                 model =
                                     ImageRequest
@@ -139,7 +133,6 @@ fun FeedItemCard(
                                         .fillMaxWidth()
                                         .aspectRatio(16.0f / 9.0f)
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .alpha(alpha)
                                         .safeSemantics {
                                             testTag = "card_image"
                                         },
