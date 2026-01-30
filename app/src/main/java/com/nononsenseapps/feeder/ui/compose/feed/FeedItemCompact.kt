@@ -64,10 +64,13 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
+    val alpha = if (item.unread) 1f else readArticleAlpha
     Surface(modifier = modifier.height(IntrinsicSize.Min)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(start = LocalDimens.current.margin),
+            modifier = Modifier
+                .padding(start = LocalDimens.current.margin)
+                .alpha(alpha),
         ) {
             FeedItemText(
                 item = item,
