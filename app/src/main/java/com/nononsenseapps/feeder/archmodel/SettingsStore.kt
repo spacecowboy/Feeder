@@ -501,6 +501,9 @@ class SettingsStore(
 
     fun setReadArticleAlpha(value: Float) {
         val safeValue = value.coerceIn(0.1f, 1.0f)
+        if (value != safeValue) {
+            android.util.Log.w("SettingsStore", "setReadArticleAlpha: value $value out of range, clamped to $safeValue")
+        }
         _readArticleAlpha.value = safeValue
         sp.edit().putFloat(PREF_READ_ARTICLE_ALPHA, safeValue).apply()
     }

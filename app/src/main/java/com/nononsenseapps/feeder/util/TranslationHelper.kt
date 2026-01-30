@@ -8,18 +8,12 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 object TranslationHelper {
-
-    private val mutex = Mutex()
-    private var translator: Translator? = null
-    private var currentTargetLanguage: String? = null
 
     /**
      * Translates the given text from English to the specified target language.
@@ -31,29 +25,24 @@ object TranslationHelper {
      * @return The translated text with formatting preserved
      */
     suspend fun translate(text: String, targetLanguage: TargetLanguage): String = withContext(Dispatchers.IO) {
-        mutex.withLock {
-            val mlKitLanguage = targetLanguage.toMlKitLanguage()
-            
-            val options = TranslatorOptions.Builder()
-                .setSourceLanguage(TranslateLanguage.ENGLISH)
-                .setTargetLanguage(mlKitLanguage)
-                .build()
-
-            // Reuse translator if target language hasn't changed
-            if (currentTargetLanguage != mlKitLanguage) {
-                translator?.close()
-                translator = Translation.getClient(options)
-                currentTargetLanguage = mlKitLanguage
-            }
-            val activeTranslator = translator!!
-
+        val mlKitLanguage = targetLanguage.toMlKitLanguage()
+        
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.ENGLISH)
+            .setTargetLanguage(mlKitLanguage)
+            .build()
+        
+        // Create a new translator instance for this request (thread-safe)
+        val translator = Translation.getClient(options)
+        
+        try {
             // Allow download on any network (WiFi or mobile data)
             val conditions = DownloadConditions.Builder()
                 .build()
 
             // Wait for model download
             suspendCancellableCoroutine { continuation ->
-                activeTranslator.downloadModelIfNeeded(conditions)
+                translator.downloadModelIfNeeded(conditions)
                     .addOnSuccessListener {
                         continuation.resume(Unit)
                     }
@@ -63,7 +52,9 @@ object TranslationHelper {
             }
 
             // Translate paragraph by paragraph to preserve formatting
-            translateWithFormatPreservation(text, activeTranslator)
+            translateWithFormatPreservation(text, translator)
+        } finally {
+            translator.close()
         }
     }
 
@@ -101,18 +92,6 @@ object TranslationHelper {
                 .addOnFailureListener { exception ->
                     continuation.resumeWithException(exception)
                 }
-        }
-    }
-
-    /**
-     * Closes the translator and releases resources.
-     * Thread-safe.
-     */
-    suspend fun close() {
-        mutex.withLock {
-            translator?.close()
-            translator = null
-            currentTargetLanguage = null
         }
     }
 

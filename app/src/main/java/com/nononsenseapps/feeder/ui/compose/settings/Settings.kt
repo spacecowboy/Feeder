@@ -668,7 +668,7 @@ fun SettingsList(
                 value = readArticleAlpha,
                 onValueChange = onReadArticleAlphaChange,
                 valueRange = 0.1f..1f,
-                steps = 17, // 5% increments: (1.0 - 0.1) / 0.05 = 18 intervals -> 17 steps
+                steps = 17, // 0.05 (5%) increments: (1.0f - 0.1f) / 0.05f = 18 intervals -> 19 values, so steps = values - 2 = 17
             )
         }
 
