@@ -45,6 +45,7 @@
     <string name="translating">正在翻译...</string>
     <string name="translation_failed">翻译失败</string>
     <string name="translation_source">翻译引擎</string>
+    <string name="source_language">源语言</string>
     <string name="translation_engine_mlkit">Google ML Kit (离线)</string>
     <string name="translation_engine_openai">AI 智能翻译 (OpenAI)</string>
     <string name="translation_engine_external">调用外部 App</string>

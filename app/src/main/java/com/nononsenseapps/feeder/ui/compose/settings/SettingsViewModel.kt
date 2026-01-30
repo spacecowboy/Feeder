@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SortingOptions
+import com.nononsenseapps.feeder.archmodel.SourceLanguage
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.TargetLanguage
@@ -20,7 +21,6 @@ import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.archmodel.TranslationEngine
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.openai.OpenAIApi
-import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.SystemDefault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -172,6 +172,10 @@ class SettingsViewModel(
         repository.setTargetLanguage(value)
     }
 
+    fun setSourceLanguage(value: SourceLanguage) {
+        repository.setSourceLanguage(value)
+    }
+
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
             is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
@@ -250,6 +254,7 @@ class SettingsViewModel(
                 repository.readArticleAlpha,
                 repository.translationEngine,
                 repository.targetLanguage,
+                repository.sourceLanguage,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -290,6 +295,7 @@ class SettingsViewModel(
                     readArticleAlpha = params[30] as Float,
                     translationEngine = params[31] as TranslationEngine,
                     targetLanguage = params[32] as TargetLanguage,
+                    sourceLanguage = params[33] as SourceLanguage,
                 )
             }.collect {
                 _viewState.value = it
@@ -354,6 +360,7 @@ data class SettingsViewState(
     val readArticleAlpha: Float = 0.6f,
     val translationEngine: TranslationEngine = TranslationEngine.ML_KIT,
     val targetLanguage: TargetLanguage = TargetLanguage.SYSTEM,
+    val sourceLanguage: SourceLanguage = SourceLanguage.AUTO,
 )
 
 data class UIFeedSettings(

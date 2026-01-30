@@ -59,6 +59,7 @@
   <string name="translate_article">Translate article</string>
   <string name="show_original">Show original</string>
   <string name="translation_source">Translation Engine</string>
+  <string name="source_language">Source Language</string>
   <string name="translation_engine_mlkit">Google ML Kit (Offline)</string>
   <string name="translation_engine_openai">AI Translation (OpenAI)</string>
   <string name="translation_engine_external">External App</string>

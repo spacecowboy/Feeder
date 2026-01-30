@@ -534,6 +534,19 @@ class SettingsStore(
         sp.edit().putString(PREF_TARGET_LANGUAGE, value.name).apply()
     }
 
+    private val _sourceLanguage =
+        MutableStateFlow(
+            sourceLanguageFromString(
+                sp.getStringNonNull(PREF_SOURCE_LANGUAGE, SourceLanguage.AUTO.name),
+            ),
+        )
+    val sourceLanguage: StateFlow<SourceLanguage> = _sourceLanguage.asStateFlow()
+
+    fun setSourceLanguage(value: SourceLanguage) {
+        _sourceLanguage.value = value
+        sp.edit().putString(PREF_SOURCE_LANGUAGE, value.name).apply()
+    }
+
     fun getAllSettings(): Map<String, String> {
         val all = sp.all ?: emptyMap()
 
@@ -632,6 +645,7 @@ const val PREF_OPEN_DRAWER_ON_FAB = "pref_open_drawer_on_fab"
 const val PREF_READ_ARTICLE_ALPHA = "pref_read_article_alpha"
 const val PREF_TRANSLATION_ENGINE = "pref_translation_engine"
 const val PREF_TARGET_LANGUAGE = "pref_target_language"
+const val PREF_SOURCE_LANGUAGE = "pref_source_language"
 
 /**
  * Read Aloud Settings
@@ -866,6 +880,13 @@ fun targetLanguageFromString(value: String): TargetLanguage =
         TargetLanguage.valueOf(value.uppercase())
     } catch (_: Exception) {
         TargetLanguage.SYSTEM
+    }
+
+fun sourceLanguageFromString(value: String): SourceLanguage =
+    try {
+        SourceLanguage.valueOf(value.uppercase())
+    } catch (_: Exception) {
+        SourceLanguage.AUTO
     }
 
 data class PrefsFeedListFilter(

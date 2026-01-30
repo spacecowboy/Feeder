@@ -434,11 +434,12 @@ class ArticleViewModel(
                 val content = loadArticleContent()
                 val translationEngine = repository.translationEngine.value
                 val targetLanguage = repository.targetLanguage.value
+                val sourceLanguage = repository.sourceLanguage.value
 
                 val (translatedTitle, translatedContent) = when (translationEngine) {
                     TranslationEngine.ML_KIT -> {
-                        val tTitle = TranslationHelper.translate(title, targetLanguage)
-                        val tContent = TranslationHelper.translate(content, targetLanguage)
+                        val tTitle = TranslationHelper.translate(title, targetLanguage, sourceLanguage)
+                        val tContent = TranslationHelper.translate(content, targetLanguage, sourceLanguage)
                         tTitle to tContent
                     }
                     TranslationEngine.OPENAI -> {

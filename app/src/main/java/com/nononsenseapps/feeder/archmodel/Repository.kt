@@ -268,6 +268,10 @@ class Repository(
 
     fun setTargetLanguage(value: TargetLanguage) = settingsStore.setTargetLanguage(value)
 
+    val sourceLanguage = settingsStore.sourceLanguage
+
+    fun setSourceLanguage(value: SourceLanguage) = settingsStore.setSourceLanguage(value)
+
     val useDetectLanguage = settingsStore.useDetectLanguage
 
     fun setUseDetectLanguage(value: Boolean) = settingsStore.setUseDetectLanguage(value)

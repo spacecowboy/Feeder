@@ -87,6 +87,7 @@ import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
+import com.nononsenseapps.feeder.archmodel.SourceLanguage
 import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.archmodel.TranslationEngine
@@ -224,6 +225,8 @@ fun SettingsScreen(
             onTranslationEngineChange = { settingsViewModel.setTranslationEngine(it.engine) },
             targetLanguage = viewState.targetLanguage.asOption(),
             onTargetLanguageChange = { settingsViewModel.setTargetLanguage(it.language) },
+            sourceLanguage = viewState.sourceLanguage.asOption(),
+            onSourceLanguageChange = { settingsViewModel.setSourceLanguage(it.language) },
             modifier = Modifier.padding(padding),
         )
     }
@@ -302,6 +305,8 @@ private fun SettingsScreenPreview() {
             onTranslationEngineChange = {},
             targetLanguage = TargetLanguageOption(TargetLanguage.SYSTEM, "System Default"),
             onTargetLanguageChange = {},
+            sourceLanguage = SourceLanguageOption(SourceLanguage.AUTO, "Auto"),
+            onSourceLanguageChange = {},
             modifier = Modifier,
         )
     }
@@ -376,6 +381,8 @@ fun SettingsList(
     onTranslationEngineChange: (TranslationEngineOption) -> Unit,
     targetLanguage: TargetLanguageOption,
     onTargetLanguageChange: (TargetLanguageOption) -> Unit,
+    sourceLanguage: SourceLanguageOption,
+    onSourceLanguageChange: (SourceLanguageOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -760,6 +767,16 @@ fun SettingsList(
                     TranslationEngine.entries.map { it.asOption() }
                 ),
                 onSelection = onTranslationEngineChange,
+                modifier = Modifier.width(dimens.maxContentWidth),
+            )
+
+            MenuSetting(
+                title = stringResource(id = R.string.source_language),
+                currentValue = sourceLanguage,
+                values = ImmutableHolder(
+                    SourceLanguage.entries.map { it.asOption() }
+                ),
+                onSelection = onSourceLanguageChange,
                 modifier = Modifier.width(dimens.maxContentWidth),
             )
 
@@ -1537,6 +1554,21 @@ fun TargetLanguage.asOption() =
 @Immutable
 data class TargetLanguageOption(
     val language: TargetLanguage,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun SourceLanguage.asOption() =
+    SourceLanguageOption(
+        language = this,
+        name = stringResource(id = stringRes),
+    )
+
+@Immutable
+data class SourceLanguageOption(
+    val language: SourceLanguage,
     val name: String,
 ) {
     override fun toString() = name

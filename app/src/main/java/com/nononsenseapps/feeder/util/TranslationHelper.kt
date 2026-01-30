@@ -5,6 +5,7 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
+import com.nononsenseapps.feeder.archmodel.SourceLanguage
 import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -22,19 +23,25 @@ object TranslationHelper {
      *
      * @param text The text to translate
      * @param targetLanguage The target language for translation
+     * @param sourceLanguage The source language for translation
      * @return The translated text with formatting preserved
      */
-    suspend fun translate(text: String, targetLanguage: TargetLanguage): String = withContext(Dispatchers.IO) {
-        val mlKitLanguage = targetLanguage.toMlKitLanguage()
-        
+    suspend fun translate(
+        text: String,
+        targetLanguage: TargetLanguage,
+        sourceLanguage: SourceLanguage
+    ): String = withContext(Dispatchers.IO) {
+        val mlKitTargetLanguage = targetLanguage.toMlKitLanguage()
+        val mlKitSourceLanguage = sourceLanguage.toMlKitLanguage()
+
         val options = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(mlKitLanguage)
+            .setSourceLanguage(mlKitSourceLanguage)
+            .setTargetLanguage(mlKitTargetLanguage)
             .build()
-        
+
         // Create a new translator instance for this request (thread-safe)
         val translator = Translation.getClient(options)
-        
+
         try {
             // Allow download on any network (WiFi or mobile data)
             val conditions = DownloadConditions.Builder()
@@ -79,7 +86,7 @@ object TranslationHelper {
                 translateSingleText(token, translator)
             }
         }
-        
+
         return translatedTokens.joinToString("")
     }
 
@@ -111,6 +118,22 @@ object TranslationHelper {
             TargetLanguage.RUSSIAN -> TranslateLanguage.RUSSIAN
             TargetLanguage.PORTUGUESE -> TranslateLanguage.PORTUGUESE
             TargetLanguage.ARABIC -> TranslateLanguage.ARABIC
+        }
+    }
+
+    private fun SourceLanguage.toMlKitLanguage(): String {
+        return when (this) {
+            SourceLanguage.AUTO -> TranslateLanguage.ENGLISH // Fallback to English for Auto without detection
+            SourceLanguage.ENGLISH -> TranslateLanguage.ENGLISH
+            SourceLanguage.CHINESE -> TranslateLanguage.CHINESE
+            SourceLanguage.JAPANESE -> TranslateLanguage.JAPANESE
+            SourceLanguage.KOREAN -> TranslateLanguage.KOREAN
+            SourceLanguage.FRENCH -> TranslateLanguage.FRENCH
+            SourceLanguage.GERMAN -> TranslateLanguage.GERMAN
+            SourceLanguage.SPANISH -> TranslateLanguage.SPANISH
+            SourceLanguage.RUSSIAN -> TranslateLanguage.RUSSIAN
+            SourceLanguage.PORTUGUESE -> TranslateLanguage.PORTUGUESE
+            SourceLanguage.ARABIC -> TranslateLanguage.ARABIC
         }
     }
 
