@@ -88,7 +88,7 @@ fun FeedItemCard(
     val alpha = if (item.unread) 1f else readArticleAlpha
 
     ElevatedCard(
-        modifier = modifier.alpha(alpha),
+        modifier = modifier,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -135,6 +135,7 @@ fun FeedItemCard(
                                         .fillMaxWidth()
                                         .aspectRatio(16.0f / 9.0f)
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .alpha(alpha)
                                         .safeSemantics {
                                             testTag = "card_image"
                                         },

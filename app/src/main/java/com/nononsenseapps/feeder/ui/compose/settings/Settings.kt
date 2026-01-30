@@ -751,16 +751,7 @@ fun SettingsList(
         SettingsGroup(
             title = R.string.translation_settings,
         ) {
-            val translationEngineOptions = remember {
-                ImmutableHolder(
-                    TranslationEngine.entries.map { it }
-                )
-            }
-            val targetLanguageOptions = remember {
-                ImmutableHolder(
-                    TargetLanguage.entries.map { it }
-                )
-            }
+
 
             MenuSetting(
                 title = stringResource(id = R.string.translation_source),

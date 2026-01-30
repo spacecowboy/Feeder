@@ -8,6 +8,8 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -15,6 +17,7 @@ import kotlin.coroutines.resumeWithException
 
 object TranslationHelper {
 
+    private val mutex = Mutex()
     private var translator: Translator? = null
     private var currentTargetLanguage: String? = null
 
@@ -28,38 +31,40 @@ object TranslationHelper {
      * @return The translated text with formatting preserved
      */
     suspend fun translate(text: String, targetLanguage: TargetLanguage): String = withContext(Dispatchers.IO) {
-        val mlKitLanguage = targetLanguage.toMlKitLanguage()
-        
-        val options = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(mlKitLanguage)
-            .build()
+        mutex.withLock {
+            val mlKitLanguage = targetLanguage.toMlKitLanguage()
+            
+            val options = TranslatorOptions.Builder()
+                .setSourceLanguage(TranslateLanguage.ENGLISH)
+                .setTargetLanguage(mlKitLanguage)
+                .build()
 
-        // Reuse translator if target language hasn't changed
-        if (currentTargetLanguage != mlKitLanguage) {
-            translator?.close()
-            translator = Translation.getClient(options)
-            currentTargetLanguage = mlKitLanguage
+            // Reuse translator if target language hasn't changed
+            if (currentTargetLanguage != mlKitLanguage) {
+                translator?.close()
+                translator = Translation.getClient(options)
+                currentTargetLanguage = mlKitLanguage
+            }
+            val activeTranslator = translator!!
+
+            // Allow download on any network (WiFi or mobile data)
+            val conditions = DownloadConditions.Builder()
+                .build()
+
+            // Wait for model download
+            suspendCancellableCoroutine { continuation ->
+                activeTranslator.downloadModelIfNeeded(conditions)
+                    .addOnSuccessListener {
+                        continuation.resume(Unit)
+                    }
+                    .addOnFailureListener { exception ->
+                        continuation.resumeWithException(exception)
+                    }
+            }
+
+            // Translate paragraph by paragraph to preserve formatting
+            translateWithFormatPreservation(text, activeTranslator)
         }
-        val activeTranslator = translator!!
-
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-
-        // Wait for model download
-        suspendCancellableCoroutine { continuation ->
-            activeTranslator.downloadModelIfNeeded(conditions)
-                .addOnSuccessListener {
-                    continuation.resume(Unit)
-                }
-                .addOnFailureListener { exception ->
-                    continuation.resumeWithException(exception)
-                }
-        }
-
-        // Translate paragraph by paragraph to preserve formatting
-        translateWithFormatPreservation(text, activeTranslator)
     }
 
     /**

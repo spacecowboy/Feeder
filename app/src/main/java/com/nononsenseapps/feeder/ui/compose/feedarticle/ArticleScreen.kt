@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.focusGroup
@@ -93,12 +94,57 @@ fun ArticleScreen(
 ) {
     BackHandler(onBack = onNavigateUp)
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
+    val context = LocalContext.current
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val articleListState = rememberLazyListState()
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
+
+    // Handle external app translation request
+    LaunchedEffect(viewState.translationState) {
+        val state = viewState.translationState
+        if (state is TranslationState.ExternalAppRequested) {
+            try {
+                // Try to launch a translation app
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, "${state.title}\n\n${state.content}")
+                    // Prefer Google Translate if available
+                    setPackage("com.google.android.apps.translate")
+                }
+                
+                val chooserIntent = Intent.createChooser(
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, "${state.title}\n\n${state.content}")
+                    },
+                    context.getString(R.string.translate_article)
+                )
+                
+                try {
+                    activityLauncher.startActivity(
+                        openAdjacentIfSuitable = true,
+                        intent = intent,
+                    )
+                } catch (e: Exception) {
+                    // If Google Translate is not installed, show chooser
+                    activityLauncher.startActivity(
+                        openAdjacentIfSuitable = true,
+                        intent = chooserIntent,
+                    )
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    R.string.no_translation_app,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            viewModel.dismissTranslation()
+        }
+    }
 
     ArticleScreen(
         viewState = viewState,
@@ -434,7 +480,7 @@ fun ArticleScreen(
                         }
                     },
                     title = { Text(stringResource(R.string.translation_failed)) },
-                    text = { Text(errorState.message) }
+                    text = { Text(stringResource(R.string.translation_failed)) }
                 )
             }
         }
@@ -506,12 +552,18 @@ fun ArticleContent(
                     // If we have translated content, display it instead of original
                     val translatedState = viewState.translationState
                     if (translatedState is TranslationState.Translated) {
-                        item {
-                            Text(
-                                text = translatedState.translatedContent,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                        // Split translated content by paragraphs for better readability
+                        val paragraphs = translatedState.translatedContent.split(Regex("\n\n+"))
+                            .filter { it.isNotBlank() }
+                        
+                        paragraphs.forEach { paragraph ->
+                            item {
+                                Text(
+                                    text = paragraph.trim(),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            }
                         }
                     } else {
                         linearArticleContent(

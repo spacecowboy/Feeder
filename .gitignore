@@ -24,3 +24,7 @@ keystore
 
 .DS_Store
 Thumbs.db
+
+# Build logs and output metadata
+build_log.txt
+output-metadata.json

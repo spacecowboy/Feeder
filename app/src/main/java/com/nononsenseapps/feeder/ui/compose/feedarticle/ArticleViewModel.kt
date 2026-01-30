@@ -463,9 +463,12 @@ class ArticleViewModel(
                         }
                     }
                     TranslationEngine.EXTERNAL_APP -> {
-                        // External app translation is handled by launching an intent
-                        // For now, just return the original text with a note
-                        throw IllegalStateException("External app translation requires launching an external app")
+                        // External app translation - set special state that triggers intent in UI
+                        translationState.value = TranslationState.ExternalAppRequested(
+                            title = title,
+                            content = content,
+                        )
+                        return@launch
                     }
                 }
 
@@ -583,6 +586,10 @@ sealed interface TranslationState {
         val translatedContent: String,
     ) : TranslationState
     data class Error(val message: String) : TranslationState
+    data class ExternalAppRequested(
+        val title: String,
+        val content: String,
+    ) : TranslationState
 
     val isShowingTranslation: Boolean
         get() = this is Translated
