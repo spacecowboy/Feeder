@@ -452,13 +452,8 @@ class ArticleViewModel(
                             }
                             titleResult is OpenAIApi.TranslationResult.Error -> {
                                 throw IllegalStateException((titleResult as OpenAIApi.TranslationResult.Error).message)
-                            }
-                            contentResult is OpenAIApi.TranslationResult.Error -> {
-                                throw IllegalStateException((contentResult as OpenAIApi.TranslationResult.Error).message)
-                            }
-                            else -> {
-                                (titleResult as OpenAIApi.TranslationResult.Success).translatedText to
-                                (contentResult as OpenAIApi.TranslationResult.Success).translatedText
+                                (titleResult.translatedText to
+                                contentResult.translatedText)
                             }
                         }
                     }
@@ -479,7 +474,9 @@ class ArticleViewModel(
                 )
             } catch (e: Exception) {
                 logDebug(LOG_TAG, "Translation failed", e)
-                translationState.value = TranslationState.Error(e.message ?: "Unknown error")
+                translationState.value = TranslationState.Error(
+                    message = e.message ?: "Unknown error"
+                )
             }
         }
     }

@@ -69,33 +69,27 @@ object TranslationHelper {
 
     /**
      * Translates text while preserving paragraph structure.
-     * Splits by newlines, translates each paragraph, and rejoins.
+     * Tokenizes by newlines to preserve all separators.
      */
     private suspend fun translateWithFormatPreservation(
         text: String,
         translator: Translator
     ): String {
-        // Split by double newlines (paragraphs) or single newlines
-        val paragraphs = text.split(Regex("(\r?\n\r?\n|\r?\n)"))
-        val separators = Regex("(\r?\n\r?\n|\r?\n)").findAll(text).map { it.value }.toList()
-        
-        val translatedParagraphs = paragraphs.mapIndexed { index, paragraph ->
-            if (paragraph.isBlank()) {
-                paragraph
+        // Use lookahead/lookbehind to keep delimiters in the list
+        // This regex splits but keeps the delimiters (newlines) as separate tokens
+        val tokens = text.split(Regex("(?<=[\n])|(?=[\n])"))
+
+        val translatedTokens = tokens.map { token ->
+            if (token.isBlank()) {
+                // Preserve whitespace/newline tokens exactly as is
+                token
             } else {
-                translateSingleText(paragraph, translator)
+                // Translate actual content
+                translateSingleText(token, translator)
             }
         }
         
-        // Rejoin with original separators
-        return buildString {
-            translatedParagraphs.forEachIndexed { index, translated ->
-                append(translated)
-                if (index < separators.size) {
-                    append(separators[index])
-                }
-            }
-        }
+        return translatedTokens.joinToString("")
     }
 
     private suspend fun translateSingleText(text: String, translator: Translator): String {
@@ -112,11 +106,14 @@ object TranslationHelper {
 
     /**
      * Closes the translator and releases resources.
+     * Thread-safe.
      */
-    fun close() {
-        translator?.close()
-        translator = null
-        currentTargetLanguage = null
+    suspend fun close() {
+        mutex.withLock {
+            translator?.close()
+            translator = null
+            currentTargetLanguage = null
+        }
     }
 
     /**
