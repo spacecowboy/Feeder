@@ -444,21 +444,27 @@ class ArticleViewModel(
                     TranslationEngine.OPENAI -> {
                         val titleResult = openAIApi.translate(title, targetLanguage)
                         val contentResult = openAIApi.translate(content, targetLanguage)
-                        
+
                         when {
                             titleResult is OpenAIApi.TranslationResult.NotConfigured ||
-                            contentResult is OpenAIApi.TranslationResult.NotConfigured -> {
+                                    contentResult is OpenAIApi.TranslationResult.NotConfigured -> {
                                 throw IllegalStateException("AI settings not configured")
                             }
                             titleResult is OpenAIApi.TranslationResult.Error -> {
-                                throw IllegalStateException((titleResult as OpenAIApi.TranslationResult.Error).message)
-                                (titleResult.translatedText to
-                                contentResult.translatedText)
+                                throw IllegalStateException(titleResult.message)
+                            }
+                            contentResult is OpenAIApi.TranslationResult.Error -> {
+                                throw IllegalStateException(contentResult.message)
+                            }
+
+                            else -> {
+                                val titleText = (titleResult as OpenAIApi.TranslationResult.Success).translatedText
+                                val contentText = (contentResult as OpenAIApi.TranslationResult.Success).translatedText
+                                titleText to contentText
                             }
                         }
                     }
                     TranslationEngine.EXTERNAL_APP -> {
-                        // External app translation - set special state that triggers intent in UI
                         translationState.value = TranslationState.ExternalAppRequested(
                             title = title,
                             content = content,
