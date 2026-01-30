@@ -43,6 +43,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.Slider
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -86,7 +87,9 @@ import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
+import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.archmodel.TranslationEngine
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -215,6 +218,12 @@ fun SettingsScreen(
                     intent = openGithubIssues(),
                 )
             },
+            readArticleAlpha = viewState.readArticleAlpha,
+            onReadArticleAlphaChange = settingsViewModel::setReadArticleAlpha,
+            translationEngine = viewState.translationEngine.asOption(),
+            onTranslationEngineChange = { settingsViewModel.setTranslationEngine(it.engine) },
+            targetLanguage = viewState.targetLanguage.asOption(),
+            onTargetLanguageChange = { settingsViewModel.setTargetLanguage(it.language) },
             modifier = Modifier.padding(padding),
         )
     }
@@ -287,6 +296,12 @@ private fun SettingsScreenPreview() {
             onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
             onSendFeedback = {},
+            readArticleAlpha = 0.6f,
+            onReadArticleAlphaChange = {},
+            translationEngine = TranslationEngineOption(TranslationEngine.ML_KIT, "ML Kit"),
+            onTranslationEngineChange = {},
+            targetLanguage = TargetLanguageOption(TargetLanguage.SYSTEM, "System Default"),
+            onTargetLanguageChange = {},
             modifier = Modifier,
         )
     }
@@ -355,6 +370,12 @@ fun SettingsList(
     currentFontSelection: FontSelection,
     onTextSettings: () -> Unit,
     onSendFeedback: () -> Unit,
+    readArticleAlpha: Float,
+    onReadArticleAlphaChange: (Float) -> Unit,
+    translationEngine: TranslationEngineOption,
+    onTranslationEngineChange: (TranslationEngineOption) -> Unit,
+    targetLanguage: TargetLanguageOption,
+    onTargetLanguageChange: (TargetLanguageOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -641,6 +662,14 @@ fun SettingsList(
                 checked = showTitleUnreadCount,
                 onCheckedChange = onShowTitleUnreadCountChange,
             )
+
+            SliderSetting(
+                title = stringResource(id = R.string.read_article_opacity),
+                value = readArticleAlpha,
+                onValueChange = onReadArticleAlphaChange,
+                valueRange = 0.1f..1f,
+                steps = 17, // 5% increments: (1.0 - 0.1) / 0.05 = 18 intervals -> 17 steps
+            )
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -714,6 +743,43 @@ fun SettingsList(
                 checked = useDetectLanguage,
                 onCheckedChange = onUseDetectLanguageChange,
                 description = stringResource(id = R.string.description_for_read_aloud),
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.translation_settings,
+        ) {
+            val translationEngineOptions = remember {
+                ImmutableHolder(
+                    TranslationEngine.entries.map { it }
+                )
+            }
+            val targetLanguageOptions = remember {
+                ImmutableHolder(
+                    TargetLanguage.entries.map { it }
+                )
+            }
+
+            MenuSetting(
+                title = stringResource(id = R.string.translation_source),
+                currentValue = translationEngine,
+                values = ImmutableHolder(
+                    TranslationEngine.entries.map { it.asOption() }
+                ),
+                onSelection = onTranslationEngineChange,
+                modifier = Modifier.width(dimens.maxContentWidth),
+            )
+
+            MenuSetting(
+                title = stringResource(id = R.string.target_language),
+                currentValue = targetLanguage,
+                values = ImmutableHolder(
+                    TargetLanguage.entries.map { it.asOption() }
+                ),
+                onSelection = onTargetLanguageChange,
+                modifier = Modifier.width(dimens.maxContentWidth),
             )
         }
 
@@ -1426,3 +1492,61 @@ fun SwipeAsRead.asSwipeAsReadOption() =
         swipeAsRead = this,
         name = stringResource(id = stringId),
     )
+
+@Composable
+fun SliderSetting(
+    title: String,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+    modifier: Modifier = Modifier,
+) {
+    val dimens = LocalDimens.current
+    Column(
+        modifier = modifier
+            .width(dimens.maxContentWidth)
+            .padding(vertical = 8.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = valueRange,
+            steps = steps,
+        )
+    }
+}
+
+@Composable
+fun TranslationEngine.asOption() =
+    TranslationEngineOption(
+        engine = this,
+        name = stringResource(id = stringRes),
+    )
+
+@Immutable
+data class TranslationEngineOption(
+    val engine: TranslationEngine,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun TargetLanguage.asOption() =
+    TargetLanguageOption(
+        language = this,
+        name = stringResource(id = stringRes),
+    )
+
+@Immutable
+data class TargetLanguageOption(
+    val language: TargetLanguage,
+    val name: String,
+) {
+    override fun toString() = name
+}

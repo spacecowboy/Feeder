@@ -1273,6 +1273,7 @@ fun FeedListContent(
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
+                        readArticleAlpha = viewState.readArticleAlpha,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)
                             if (viewState.filter.onlyUnread) {
@@ -1489,6 +1490,7 @@ fun FeedGridContent(
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
+                        readArticleAlpha = viewState.readArticleAlpha,
                         onMarkAboveAsRead = {
                             markBeforeAsRead(previewItem.cursor)
                             if (viewState.filter.onlyUnread) {

@@ -9,6 +9,7 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.http.takeFrom
@@ -42,6 +43,18 @@ class OpenAIApi(
         data class Error(
             override val content: String,
         ) : SummaryResult
+    }
+
+    sealed interface TranslationResult {
+        data class Success(
+            val translatedText: String,
+        ) : TranslationResult
+
+        data class Error(
+            val message: String,
+        ) : TranslationResult
+
+        data object NotConfigured : TranslationResult
     }
 
     sealed interface ModelsResult {
@@ -122,6 +135,74 @@ class OpenAIApi(
             )
         } catch (e: Exception) {
             return SummaryResult.Error(content = e.message ?: e.cause?.message ?: "")
+        }
+    }
+
+    /**
+     * Translates text to the specified target language using OpenAI.
+     * Preserves all HTML tags and formatting in the translation.
+     */
+    suspend fun translate(text: String, targetLanguage: TargetLanguage): TranslationResult {
+        val settings = openAISettings
+        if (!settings.isValid) {
+            return TranslationResult.NotConfigured
+        }
+
+        return try {
+            val response = openAI.chatCompletion(
+                request = translationRequest(text, targetLanguage),
+                requestOptions = null,
+            )
+            val translatedText = response.choices
+                .firstOrNull()
+                ?.message
+                ?.content ?: throw IllegalStateException("Translation response is null")
+            
+            TranslationResult.Success(translatedText = translatedText)
+        } catch (e: Exception) {
+            TranslationResult.Error(message = e.message ?: e.cause?.message ?: "Translation failed")
+        }
+    }
+
+    private fun translationRequest(text: String, targetLanguage: TargetLanguage): ChatCompletionRequest {
+        val targetLangName = targetLanguage.getDisplayName()
+        return ChatCompletionRequest(
+            model = ModelId(id = openAISettings.modelId),
+            messages = listOf(
+                ChatMessage(
+                    role = ChatRole.System,
+                    messageContent = TextContent(
+                        listOf(
+                            "You are a professional translator.",
+                            "Translate the following text to $targetLangName.",
+                            "Strictly preserve all HTML tags, formatting, and structure.",
+                            "Do not output markdown. Output raw translated text with the original HTML tags intact.",
+                            "Do not add any explanations or notes. Only output the translation.",
+                        ).joinToString(separator = " ")
+                    ),
+                ),
+                ChatMessage(
+                    role = ChatRole.User,
+                    messageContent = TextContent(text),
+                ),
+            ),
+            responseFormat = ChatResponseFormat.Text,
+        )
+    }
+
+    private fun TargetLanguage.getDisplayName(): String {
+        return when (this) {
+            TargetLanguage.SYSTEM -> java.util.Locale.getDefault().displayLanguage
+            TargetLanguage.ENGLISH -> "English"
+            TargetLanguage.CHINESE -> "Chinese"
+            TargetLanguage.JAPANESE -> "Japanese"
+            TargetLanguage.KOREAN -> "Korean"
+            TargetLanguage.FRENCH -> "French"
+            TargetLanguage.GERMAN -> "German"
+            TargetLanguage.SPANISH -> "Spanish"
+            TargetLanguage.RUSSIAN -> "Russian"
+            TargetLanguage.PORTUGUESE -> "Portuguese"
+            TargetLanguage.ARABIC -> "Arabic"
         }
     }
 

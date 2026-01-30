@@ -263,6 +263,9 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
 
+    // ML Kit Translation
+    implementation("com.google.mlkit:translate:17.0.3")
+
     // Markdown
     implementation(libs.jetbrains.markdown)
 

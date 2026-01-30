@@ -15,7 +15,9 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
+import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.archmodel.TranslationEngine
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
@@ -158,6 +160,18 @@ class SettingsViewModel(
         repository.setOpenDrawerOnFab(value)
     }
 
+    fun setReadArticleAlpha(value: Float) {
+        repository.setReadArticleAlpha(value)
+    }
+
+    fun setTranslationEngine(value: TranslationEngine) {
+        repository.setTranslationEngine(value)
+    }
+
+    fun setTargetLanguage(value: TargetLanguage) {
+        repository.setTargetLanguage(value)
+    }
+
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
             is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
@@ -231,7 +245,11 @@ class SettingsViewModel(
                 repository.openAISettings,
                 openAIModelsState,
                 repository.isOpenDrawerOnFab,
+
                 repository.font,
+                repository.readArticleAlpha,
+                repository.translationEngine,
+                repository.targetLanguage,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -267,7 +285,11 @@ class SettingsViewModel(
                             modelsResult = params[27] as OpenAIModelsState,
                         ),
                     isOpenDrawerOnFab = params[28] as Boolean,
+
                     font = params[29] as FontSelection,
+                    readArticleAlpha = params[30] as Float,
+                    translationEngine = params[31] as TranslationEngine,
+                    targetLanguage = params[32] as TargetLanguage,
                 )
             }.collect {
                 _viewState.value = it
@@ -327,7 +349,11 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
+
     val font: FontSelection = SystemDefault,
+    val readArticleAlpha: Float = 0.6f,
+    val translationEngine: TranslationEngine = TranslationEngine.ML_KIT,
+    val targetLanguage: TargetLanguage = TargetLanguage.SYSTEM,
 )
 
 data class UIFeedSettings(

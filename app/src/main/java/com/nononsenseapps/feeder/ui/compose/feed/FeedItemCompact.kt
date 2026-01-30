@@ -28,6 +28,7 @@ import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
 import coil3.size.Size
+import androidx.compose.ui.draw.alpha
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -59,6 +60,7 @@ fun FeedItemCompact(
     maxLines: Int,
     showOnlyTitle: Boolean,
     showReadingTime: Boolean,
+    readArticleAlpha: Float,
     modifier: Modifier = Modifier,
     imageWidth: Dp = 64.dp,
 ) {
@@ -114,6 +116,12 @@ fun FeedItemCompact(
                                     val px = imageWidth.toPx()
                                     Size(px.roundToInt(), (px * 1.5).roundToInt())
                                 }
+                            val alpha =
+                                if (item.unread) {
+                                    1f
+                                } else {
+                                    readArticleAlpha
+                                }
                             AsyncImage(
                                 model =
                                     ImageRequest
@@ -134,7 +142,8 @@ fun FeedItemCompact(
                                 modifier =
                                     Modifier
                                         .width(imageWidth)
-                                        .fillMaxHeight(),
+                                        .fillMaxHeight()
+                                        .alpha(alpha),
                             )
                         }
                     }
@@ -216,6 +225,7 @@ private fun PreviewRead() {
             maxLines = 5,
             showOnlyTitle = false,
             showReadingTime = true,
+            readArticleAlpha = 0.6f,
             imageWidth = 64.dp,
         )
     }
@@ -254,6 +264,7 @@ private fun PreviewUnread() {
             maxLines = 5,
             showOnlyTitle = false,
             showReadingTime = true,
+            readArticleAlpha = 0.6f,
             imageWidth = 64.dp,
         )
     }
@@ -295,6 +306,7 @@ private fun PreviewWithImage() {
                 maxLines = 5,
                 showOnlyTitle = false,
                 showReadingTime = true,
+                readArticleAlpha = 0.6f,
                 imageWidth = 64.dp,
             )
         }

@@ -489,11 +489,46 @@ class SettingsStore(
     }
 
     private val _openDrawerOnFab = MutableStateFlow(sp.getBoolean(PREF_OPEN_DRAWER_ON_FAB, false))
-    val openDrawerOnFab = _openDrawerOnFab.asStateFlow()
+    val openDrawerOnFab: StateFlow<Boolean> = _openDrawerOnFab.asStateFlow()
+
+    private val _readArticleAlpha = MutableStateFlow(sp.getFloat(PREF_READ_ARTICLE_ALPHA, 0.6f))
+    val readArticleAlpha: StateFlow<Float> = _readArticleAlpha.asStateFlow()
 
     fun setOpenDrawerOnFab(value: Boolean) {
         _openDrawerOnFab.value = value
         sp.edit().putBoolean(PREF_OPEN_DRAWER_ON_FAB, value).apply()
+    }
+
+    fun setReadArticleAlpha(value: Float) {
+        val safeValue = value.coerceIn(0.1f, 1.0f)
+        _readArticleAlpha.value = safeValue
+        sp.edit().putFloat(PREF_READ_ARTICLE_ALPHA, safeValue).apply()
+    }
+
+    private val _translationEngine =
+        MutableStateFlow(
+            translationEngineFromString(
+                sp.getStringNonNull(PREF_TRANSLATION_ENGINE, TranslationEngine.ML_KIT.name),
+            ),
+        )
+    val translationEngine: StateFlow<TranslationEngine> = _translationEngine.asStateFlow()
+
+    fun setTranslationEngine(value: TranslationEngine) {
+        _translationEngine.value = value
+        sp.edit().putString(PREF_TRANSLATION_ENGINE, value.name).apply()
+    }
+
+    private val _targetLanguage =
+        MutableStateFlow(
+            targetLanguageFromString(
+                sp.getStringNonNull(PREF_TARGET_LANGUAGE, TargetLanguage.SYSTEM.name),
+            ),
+        )
+    val targetLanguage: StateFlow<TargetLanguage> = _targetLanguage.asStateFlow()
+
+    fun setTargetLanguage(value: TargetLanguage) {
+        _targetLanguage.value = value
+        sp.edit().putString(PREF_TARGET_LANGUAGE, value.name).apply()
     }
 
     fun getAllSettings(): Map<String, String> {
@@ -591,6 +626,9 @@ const val PREF_LIST_SHOW_ONLY_TITLES = "prefs_list_show_only_titles"
 const val PREF_LIST_SHOW_READING_TIME = "pref_show_reading_time"
 
 const val PREF_OPEN_DRAWER_ON_FAB = "pref_open_drawer_on_fab"
+const val PREF_READ_ARTICLE_ALPHA = "pref_read_article_alpha"
+const val PREF_TRANSLATION_ENGINE = "pref_translation_engine"
+const val PREF_TARGET_LANGUAGE = "pref_target_language"
 
 /**
  * Read Aloud Settings
@@ -812,6 +850,20 @@ fun syncFrequencyFromString(value: String) =
             it.minutes == value.toLongOrNull()
         }
         ?: SyncFrequency.MANUAL
+
+fun translationEngineFromString(value: String): TranslationEngine =
+    try {
+        TranslationEngine.valueOf(value.uppercase())
+    } catch (_: Exception) {
+        TranslationEngine.ML_KIT
+    }
+
+fun targetLanguageFromString(value: String): TargetLanguage =
+    try {
+        TargetLanguage.valueOf(value.uppercase())
+    } catch (_: Exception) {
+        TargetLanguage.SYSTEM
+    }
 
 data class PrefsFeedListFilter(
     override val saved: Boolean,

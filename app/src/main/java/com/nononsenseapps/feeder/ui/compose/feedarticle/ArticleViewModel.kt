@@ -10,7 +10,9 @@ import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.archmodel.TargetLanguage
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
+import com.nononsenseapps.feeder.archmodel.TranslationEngine
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFile
@@ -36,6 +38,7 @@ import com.nononsenseapps.feeder.openai.isValid
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
+import com.nononsenseapps.feeder.util.TranslationHelper
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,6 +116,8 @@ class ArticleViewModel(
     private val toolbarVisible: MutableStateFlow<Boolean> =
         MutableStateFlow(state["toolbarMenuVisible"] ?: false)
 
+    private val translationState: MutableStateFlow<TranslationState> = MutableStateFlow(TranslationState.Idle)
+
     private val openAiSummary: MutableStateFlow<OpenAISummaryState> = MutableStateFlow(OpenAISummaryState.Empty)
 
     val viewState: StateFlow<ArticleScreenViewState> =
@@ -127,6 +132,7 @@ class ArticleViewModel(
             ttsStateHolder.availableLanguages,
             repository.openAISettings,
             openAiSummary,
+            translationState,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -141,6 +147,7 @@ class ArticleViewModel(
 
             val showSummarize = (params[8] as OpenAISettings).isValid && !article?.link.isNullOrEmpty()
             val openAiSummary = (params[9] as OpenAISummaryState)
+            val translationState = (params[10] as TranslationState)
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -169,6 +176,7 @@ class ArticleViewModel(
                 image = article?.image,
                 showSummarize = showSummarize,
                 openAiSummary = openAiSummary,
+                translationState = translationState,
                 articleContent = articleContent,
             )
         }.stateIn(
@@ -411,6 +419,72 @@ class ArticleViewModel(
         }
     }
 
+    fun translate() {
+        if (translationState.value is TranslationState.Loading) return
+        if (translationState.value is TranslationState.Translated) {
+            // Already translated, toggle back to original
+            translationState.value = TranslationState.Idle
+            return
+        }
+
+        viewModelScope.launch {
+            translationState.value = TranslationState.Loading
+            try {
+                val title = articleFlow.value?.title ?: ""
+                val content = loadArticleContent()
+                val translationEngine = repository.translationEngine.value
+                val targetLanguage = repository.targetLanguage.value
+
+                val (translatedTitle, translatedContent) = when (translationEngine) {
+                    TranslationEngine.ML_KIT -> {
+                        val tTitle = TranslationHelper.translate(title, targetLanguage)
+                        val tContent = TranslationHelper.translate(content, targetLanguage)
+                        tTitle to tContent
+                    }
+                    TranslationEngine.OPENAI -> {
+                        val titleResult = openAIApi.translate(title, targetLanguage)
+                        val contentResult = openAIApi.translate(content, targetLanguage)
+                        
+                        when {
+                            titleResult is OpenAIApi.TranslationResult.NotConfigured ||
+                            contentResult is OpenAIApi.TranslationResult.NotConfigured -> {
+                                throw IllegalStateException("AI settings not configured")
+                            }
+                            titleResult is OpenAIApi.TranslationResult.Error -> {
+                                throw IllegalStateException((titleResult as OpenAIApi.TranslationResult.Error).message)
+                            }
+                            contentResult is OpenAIApi.TranslationResult.Error -> {
+                                throw IllegalStateException((contentResult as OpenAIApi.TranslationResult.Error).message)
+                            }
+                            else -> {
+                                (titleResult as OpenAIApi.TranslationResult.Success).translatedText to
+                                (contentResult as OpenAIApi.TranslationResult.Success).translatedText
+                            }
+                        }
+                    }
+                    TranslationEngine.EXTERNAL_APP -> {
+                        // External app translation is handled by launching an intent
+                        // For now, just return the original text with a note
+                        throw IllegalStateException("External app translation requires launching an external app")
+                    }
+                }
+
+                translationState.value = TranslationState.Translated(
+                    originalTitle = title,
+                    translatedTitle = translatedTitle,
+                    translatedContent = translatedContent,
+                )
+            } catch (e: Exception) {
+                logDebug(LOG_TAG, "Translation failed", e)
+                translationState.value = TranslationState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun dismissTranslation() {
+        translationState.value = TranslationState.Idle
+    }
+
     private suspend fun loadArticleContent(): String {
         val viewState = viewState.value
         val blobFile = blobFullFile(viewState.articleId, filePathProvider.fullArticleDir)
@@ -468,6 +542,7 @@ private data class ArticleState(
     override val image: ThumbnailImage? = null,
     override val showSummarize: Boolean = false,
     override val openAiSummary: OpenAISummaryState = OpenAISummaryState.Empty,
+    override val translationState: TranslationState = TranslationState.Idle,
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -495,7 +570,22 @@ interface ArticleScreenViewState {
     val image: ThumbnailImage?
     val showSummarize: Boolean
     val openAiSummary: OpenAISummaryState
+    val translationState: TranslationState
     val articleContent: LinearArticle
+}
+
+sealed interface TranslationState {
+    data object Idle : TranslationState
+    data object Loading : TranslationState
+    data class Translated(
+        val originalTitle: String,
+        val translatedTitle: String,
+        val translatedContent: String,
+    ) : TranslationState
+    data class Error(val message: String) : TranslationState
+
+    val isShowingTranslation: Boolean
+        get() = this is Translated
 }
 
 sealed interface OpenAISummaryState {

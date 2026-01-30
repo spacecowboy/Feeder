@@ -80,6 +80,7 @@ fun SwipeableFeedItemPreview(
     maxLines: Int,
     showOnlyTitle: Boolean,
     showReadingTime: Boolean,
+    readArticleAlpha: Float,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onToggleBookmark: () -> Unit,
@@ -271,6 +272,7 @@ fun SwipeableFeedItemPreview(
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
                     showReadingTime = showReadingTime,
+                    readArticleAlpha = readArticleAlpha,
                     modifier =
                         Modifier.offset {
                             try {
@@ -292,6 +294,7 @@ fun SwipeableFeedItemPreview(
                             bookmarkIndicator = bookmarkIndicator,
                             maxLines = maxLines,
                             showReadingTime = showReadingTime,
+                            readArticleAlpha = readArticleAlpha,
                         ),
                     modifier =
                         Modifier.offset {
@@ -329,6 +332,7 @@ fun SwipeableFeedItemPreview(
                     maxLines = maxLines,
                     showOnlyTitle = showOnlyTitle,
                     showReadingTime = showReadingTime,
+                    readArticleAlpha = readArticleAlpha,
                     modifier =
                         Modifier.offset {
                             try {

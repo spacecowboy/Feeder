@@ -68,6 +68,7 @@ data class FeedItemState(
     val dropDownMenuExpanded: Boolean = false,
     val showReadingTime: Boolean = false,
     val maxLines: Int = 2,
+    val readArticleAlpha: Float = 0.6f,
 )
 
 private val iconSize = 24.dp
@@ -106,6 +107,8 @@ fun FeedItemCompactCard(
                     FeedItemThumbnail(
                         imageUrl = imageUrl,
                         sizePx = sizePx,
+                        readArticleAlpha = state.readArticleAlpha,
+                        isRead = !state.item.unread,
                     )
                 }
                 Box(
@@ -169,7 +172,7 @@ private fun FeedItemTitle(
             when {
                 !state.showThumbnail -> LocalContentColor.current
                 state.item.unread -> Color.White
-                else -> Color.White.copy(alpha = 0.74f)
+                else -> Color.White.copy(alpha = state.readArticleAlpha)
             }
         CompositionLocalProvider(LocalContentColor provides textColor) {
             FeedItemText(
@@ -192,6 +195,8 @@ private fun FeedItemTitle(
 private fun FeedItemThumbnail(
     imageUrl: String?,
     sizePx: Size,
+    readArticleAlpha: Float,
+    isRead: Boolean,
 ) {
     if (imageUrl != null) {
         AsyncImage(
@@ -217,7 +222,7 @@ private fun FeedItemThumbnail(
                     .clip(MaterialTheme.shapes.medium)
                     .fillMaxWidth()
                     .aspectRatio(16.0f / 9.0f)
-                    .alpha(0.74f),
+                    .alpha(if (isRead) readArticleAlpha else 1f),
         )
     }
 }

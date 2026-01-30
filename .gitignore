@@ -15,3 +15,12 @@ app/creds.b64
 keystore.b64
 devenv.local
 keystore
+
+*.apk
+*.aab
+
+*.jks
+*.keystore
+
+.DS_Store
+Thumbs.db

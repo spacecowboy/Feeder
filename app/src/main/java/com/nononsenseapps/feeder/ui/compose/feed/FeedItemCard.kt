@@ -82,10 +82,13 @@ fun FeedItemCard(
     maxLines: Int,
     showOnlyTitle: Boolean,
     showReadingTime: Boolean,
+    readArticleAlpha: Float,
     modifier: Modifier = Modifier,
 ) {
+    val alpha = if (item.unread) 1f else readArticleAlpha
+
     ElevatedCard(
-        modifier = modifier,
+        modifier = modifier.alpha(alpha),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -107,12 +110,6 @@ fun FeedItemCard(
                                 with(LocalDensity.current) {
                                     val pxWidth = maxWidth.roundToPx()
                                     Size(pxWidth, (pxWidth * 9) / 16)
-                                }
-                            val alpha =
-                                if (item.unread) {
-                                    1f
-                                } else {
-                                    0.74f
                                 }
                             AsyncImage(
                                 model =
@@ -138,7 +135,6 @@ fun FeedItemCard(
                                         .fillMaxWidth()
                                         .aspectRatio(16.0f / 9.0f)
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .alpha(alpha)
                                         .safeSemantics {
                                             testTag = "card_image"
                                         },
@@ -408,6 +404,7 @@ private fun Preview() {
             maxLines = 2,
             showOnlyTitle = false,
             showReadingTime = true,
+            readArticleAlpha = 0.6f,
         )
     }
 }
@@ -448,6 +445,7 @@ private fun PreviewWithImageUnread() {
                 maxLines = 2,
                 showOnlyTitle = false,
                 showReadingTime = true,
+                readArticleAlpha = 0.6f,
             )
         }
     }
@@ -489,6 +487,7 @@ private fun PreviewWithImageRead() {
                 maxLines = 2,
                 showOnlyTitle = false,
                 showReadingTime = true,
+                readArticleAlpha = 0.6f,
             )
         }
     }

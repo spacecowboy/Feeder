@@ -256,6 +256,18 @@ class Repository(
 
     fun setShowThumbnails(value: Boolean) = settingsStore.setShowThumbnails(value)
 
+    val readArticleAlpha = settingsStore.readArticleAlpha
+
+    fun setReadArticleAlpha(value: Float) = settingsStore.setReadArticleAlpha(value)
+
+    val translationEngine = settingsStore.translationEngine
+
+    fun setTranslationEngine(value: TranslationEngine) = settingsStore.setTranslationEngine(value)
+
+    val targetLanguage = settingsStore.targetLanguage
+
+    fun setTargetLanguage(value: TargetLanguage) = settingsStore.setTargetLanguage(value)
+
     val useDetectLanguage = settingsStore.useDetectLanguage
 
     fun setUseDetectLanguage(value: Boolean) = settingsStore.setUseDetectLanguage(value)

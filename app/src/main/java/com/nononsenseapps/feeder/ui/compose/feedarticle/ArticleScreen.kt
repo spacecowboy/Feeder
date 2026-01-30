@@ -25,7 +25,10 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,13 +39,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -137,6 +145,8 @@ fun ArticleScreen(
         onSummarize = {
             viewModel.summarize()
         },
+        onTranslate = viewModel::translate,
+        onDismissTranslation = viewModel::dismissTranslation,
     )
 }
 
@@ -161,6 +171,8 @@ fun ArticleScreen(
     articleListState: LazyListState,
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
+    onTranslate: () -> Unit,
+    onDismissTranslation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -255,6 +267,28 @@ fun ArticleScreen(
                                     },
                                     text = {
                                         Text(stringResource(id = R.string.share))
+                                    },
+                                )
+
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onTranslate()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Translate,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(
+                                            if (viewState.translationState.isShowingTranslation) {
+                                                R.string.show_original
+                                            } else {
+                                                R.string.translate_article
+                                            }
+                                        ))
                                     },
                                 )
 
@@ -381,6 +415,28 @@ fun ArticleScreen(
                             up = focusTopBar
                         },
             )
+
+            // Translation Loading Indicator
+            if (viewState.translationState is TranslationState.Loading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            // Translation Error Dialog
+            if (viewState.translationState is TranslationState.Error) {
+                val errorState = viewState.translationState as TranslationState.Error
+                AlertDialog(
+                    onDismissRequest = onDismissTranslation,
+                    confirmButton = {
+                        TextButton(onClick = onDismissTranslation) {
+                            Text(stringResource(android.R.string.ok))
+                        }
+                    },
+                    title = { Text(stringResource(R.string.translation_failed)) },
+                    text = { Text(errorState.message) }
+                )
+            }
         }
     }
 }
@@ -447,21 +503,33 @@ fun ArticleContent(
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
                 TextToDisplay.CONTENT -> {
-                    linearArticleContent(
-                        articleContent = viewState.articleContent,
-                        onLinkClick = { link, index ->
-                            if (index != null) {
-                                coroutineScope.launch {
-                                    articleListState.animateScrollToItem(offsetCounter + index)
+                    // If we have translated content, display it instead of original
+                    val translatedState = viewState.translationState
+                    if (translatedState is TranslationState.Translated) {
+                        item {
+                            Text(
+                                text = translatedState.translatedContent,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    } else {
+                        linearArticleContent(
+                            articleContent = viewState.articleContent,
+                            onLinkClick = { link, index ->
+                                if (index != null) {
+                                    coroutineScope.launch {
+                                        articleListState.animateScrollToItem(offsetCounter + index)
+                                    }
+                                } else {
+                                    activityLauncher.openLink(
+                                        link = link,
+                                        toolbarColor = toolbarColor,
+                                    )
                                 }
-                            } else {
-                                activityLauncher.openLink(
-                                    link = link,
-                                    toolbarColor = toolbarColor,
-                                )
-                            }
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
 
                 TextToDisplay.LOADING_FULLTEXT -> {
