@@ -449,11 +449,11 @@ fun SettingsList(
                 }
             },
             currentValue = blockListValue,
-            onAddItem = onBlockListAdd,
-            onRemoveItem = onBlockListRemove,
             showToggle = true,
             toggleValue = applyBlocklistToSummaries,
             toggleLabel = stringResource(id = R.string.apply_blocklist_to_summaries),
+            onAddItem = onBlockListAdd,
+            onRemoveItem = onBlockListRemove,
             onToggleChange = onApplyBlocklistToSummariesChange,
         )
 
@@ -1009,14 +1009,14 @@ fun ListDialogSetting(
     title: String,
     dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
-    onAddItem: (String) -> Unit,
-    onRemoveItem: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit = {},
     showToggle: Boolean = false,
     toggleValue: Boolean = false,
     toggleLabel: String = "",
+    icon: @Composable () -> Unit = {},
+    onAddItem: (String) -> Unit,
+    onRemoveItem: (String) -> Unit,
     onToggleChange: (Boolean) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -1056,14 +1056,14 @@ fun ListDialogSetting(
             EditableListDialog(
                 title = dialogTitle,
                 items = currentValue,
-                onDismiss = {
-                    expanded = false
-                },
-                onAddItem = onAddItem,
-                onRemoveItem = onRemoveItem,
                 showToggle = showToggle,
                 toggleValue = toggleValue,
                 toggleLabel = toggleLabel,
+                onDismiss = {
+                    expanded = false
+                },
+                onRemoveItem = onRemoveItem,
+                onAddItem = onAddItem,
                 onToggleChange = onToggleChange,
             )
         }

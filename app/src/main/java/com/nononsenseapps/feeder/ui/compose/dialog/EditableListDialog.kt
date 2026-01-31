@@ -50,14 +50,14 @@ import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 fun EditableListDialog(
     title: @Composable () -> Unit,
     items: ImmutableHolder<List<String>>,
-    onDismiss: () -> Unit,
-    onRemoveItem: (String) -> Unit,
-    onAddItem: (String) -> Unit,
-    modifier: Modifier = Modifier,
     showToggle: Boolean = false,
     toggleValue: Boolean = false,
     toggleLabel: String = "",
+    onDismiss: () -> Unit,
+    onRemoveItem: (String) -> Unit,
+    onAddItem: (String) -> Unit,
     onToggleChange: (Boolean) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     var newValue by rememberSaveable {
         mutableStateOf("")
