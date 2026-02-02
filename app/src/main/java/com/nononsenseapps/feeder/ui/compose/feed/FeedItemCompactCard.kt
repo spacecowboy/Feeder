@@ -87,6 +87,7 @@ fun FeedItemCompactCard(
             modifier =
                 Modifier
                     .requiredHeightIn(min = minimumTouchSize)
+                    .alpha(if (!state.item.unread) 0.75f else 1.0f)
                     .fillMaxWidth(),
         ) {
             if (state.showThumbnail) {
@@ -168,8 +169,7 @@ private fun FeedItemTitle(
         val textColor =
             when {
                 !state.showThumbnail -> LocalContentColor.current
-                state.item.unread -> Color.White
-                else -> Color.White.copy(alpha = 0.74f)
+                else -> Color.White
             }
         CompositionLocalProvider(LocalContentColor provides textColor) {
             FeedItemText(
