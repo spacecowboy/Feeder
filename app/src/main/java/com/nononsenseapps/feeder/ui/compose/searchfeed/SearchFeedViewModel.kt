@@ -55,7 +55,13 @@ class SearchFeedViewModel(
             initialSiteMetaData
                 .onRight { metaData ->
                     metaData.alternateFeedLinks.forEach {
+                        val channelId = YOUTUBE_CHANNELID_REGEX.find(it.link.toString())?.groupValues?.getOrNull(1)
                         emit(Either.Right(it.link))
+                        if (channelId != null) {
+                            emit(Either.Right(URL("https://www.youtube.com/feeds/videos.xml?playlist_id=UULF$channelId")))
+                            emit(Either.Right(URL("https://www.youtube.com/feeds/videos.xml?playlist_id=UUSH$channelId")))
+                            emit(Either.Right(URL("https://www.youtube.com/feeds/videos.xml?playlist_id=UULV$channelId")))
+                        }
                     }
                     if (metaData.alternateFeedLinks.isEmpty()) {
                         emit(Either.Left(NoAlternateFeeds(initialUrl.toString())))
@@ -104,6 +110,7 @@ class SearchFeedViewModel(
 
     companion object {
         const val LOG_TAG = "FEEDER_SearchFeed"
+        val YOUTUBE_CHANNELID_REGEX = Regex("^https?://www\\.youtube\\.com/feeds/videos\\.xml\\?channel_id=UC([-_a-zA-Z0-9]{22})")
     }
 
     suspend fun suggestionsFor(query: String): List<SearchResult> {
