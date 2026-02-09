@@ -283,4 +283,5 @@
     <string name="feed_search_suggestions_header">Förslag</string>
     <string name="time_out_placeholder">Tidsgräns för OpenAI-anrop</string>
     <string name="summarize_on_open">Sammanfatta vid öppning</string>
+    <string name="openai_settings_info">Kompatibel med många AI-leverantörer, men inte alla</string>
 </resources>

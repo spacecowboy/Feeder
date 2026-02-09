@@ -275,4 +275,7 @@
     <string name="time_out_placeholder">หมดเวลาคำขอสำหรับ OpenAI</string>
     <string name="azure_api_version">เวอร์ชั่น Azure API</string>
     <string name="text">ข้อความ</string>
+    <string name="feed_search_suggestions_header">คำแนะนำ</string>
+    <string name="summarize_on_open">สรุปความเมื่อเปิด</string>
+    <string name="openai_settings_info">รองรับกับผู้ให้บริการ AI หลากหลาย, แต่ไม่ใช่ทั้งหมด</string>
 </resources>

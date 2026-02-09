@@ -354,7 +354,8 @@ class RssLocalSync(
                     if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
                         val siteUrl =
                             try {
-                                URL(feed.home_page_url)
+                                val url = URL(feed.home_page_url)
+                                URL(url.protocol, url.host, url.port, "")
                             } catch (e: Throwable) {
                                 logDebug(LOG_TAG, "Bad site url: ${feed.home_page_url}", e)
                                 null

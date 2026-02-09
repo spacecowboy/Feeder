@@ -163,6 +163,13 @@
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
+    <!-- Used by some external apps -->
+    <provider
+      android:name=".contentprovider.RSSContentProvider"
+      android:authorities="${applicationId}.rssprovider"
+      android:exported="true"
+      android:readPermission="${applicationId}.permission.read" />
+
     <!-- Service for background jobs -->
     <service
       android:name=".background.FeederJobService"

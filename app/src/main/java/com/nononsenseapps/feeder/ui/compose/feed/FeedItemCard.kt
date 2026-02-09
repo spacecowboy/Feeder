@@ -91,7 +91,8 @@ fun FeedItemCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier =
                 Modifier
-                    .requiredHeightIn(min = minimumTouchSize),
+                    .requiredHeightIn(min = minimumTouchSize)
+                    .alpha(if (!item.unread) 0.75f else 1.0f),
         ) {
             if (showThumbnail) {
                 item.image?.let { image ->
@@ -107,12 +108,6 @@ fun FeedItemCard(
                                 with(LocalDensity.current) {
                                     val pxWidth = maxWidth.roundToPx()
                                     Size(pxWidth, (pxWidth * 9) / 16)
-                                }
-                            val alpha =
-                                if (item.unread) {
-                                    1f
-                                } else {
-                                    0.74f
                                 }
                             AsyncImage(
                                 model =
@@ -138,7 +133,6 @@ fun FeedItemCard(
                                         .fillMaxWidth()
                                         .aspectRatio(16.0f / 9.0f)
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .alpha(alpha)
                                         .safeSemantics {
                                             testTag = "card_image"
                                         },

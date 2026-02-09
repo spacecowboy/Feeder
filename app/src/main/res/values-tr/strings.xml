@@ -217,7 +217,7 @@
     <string name="max_lines">Maksimum satır</string>
     <string name="time_out">Zaman aşımı (saniye)</string>
     <string name="time_out_validation_error">Zaman aşımı 30 ile 600 saniye arasında olmalıdır</string>
-    <string name="time_out_placeholder">OpenAI istekleri için zaman aşımı</string>
+    <string name="time_out_placeholder">YZ istekleri için zaman aşımı</string>
     <string name="filter_noun">Filtre</string>
     <string name="recently_read_adjective">Yakın zamanda okunan</string>
     <string name="read_adjective">Okundu</string>
@@ -253,7 +253,7 @@
     <string name="skip_duplicate_articles">Yinelenen makaleleri atla</string>
     <string name="skip_duplicate_articles_desc">Bağlantıları veya başlıkları mevcut makalelerle aynı olan makaleler yok sayılır</string>
     <string name="summarize">Özetle</string>
-    <string name="openai_settings">OpenAI entegrasyonu</string>
+    <string name="openai_settings">YZ entegrasyonu</string>
     <string name="api_key">API anahtarı</string>
     <string name="model_id">Model Kimliği</string>
     <string name="azure_api_version">Azure API sürümü</string>
@@ -284,4 +284,5 @@
     <string name="something_went_wrong">Bir şeyler ters gitti</string>
     <string name="summarize_on_open">Açıldığında özetle</string>
     <string name="feed_search_suggestions_header">Öneriler</string>
+    <string name="openai_settings_info">Bir çok YZ sağlayıcısı ile uyumlu, fakat hepsi ile değil</string>
 </resources>

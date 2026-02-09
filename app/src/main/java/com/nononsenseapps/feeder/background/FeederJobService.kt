@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.base.DIAwareJobService
+import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
@@ -66,6 +67,11 @@ class FeederJobService : DIAwareJobService() {
                 false
             }
         }
+    }
+
+    override fun onNetworkChanged(params: JobParameters) {
+        // Nothing to do, this is only called if the new network still matches the job's network requirements.
+        logDebug(LOG_TAG, "Network changed for job id: ${params.jobId}")
     }
 
     override fun onStopJob(params: JobParameters): Boolean {

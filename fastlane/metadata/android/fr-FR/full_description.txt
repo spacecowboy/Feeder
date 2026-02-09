@@ -2,7 +2,7 @@
 
 <p>Avec Feeder vous pouvez lire les dernières actualités et publications de vos sites préférés.</p>
 
-<p>Feeder ne se synchronise PAS avec les services distants habituels. Aucune création de comptes n'est nécessaire.</p>
+<p>Feeder ne se synchronise PAS avec les services distants habituels. Aucune création de compte n'est nécessaire.</p>
 
 <p>Feeder est gratuit et fonctionne localement sur votre appareil. Vos données restent 100% privées.</p>
 
