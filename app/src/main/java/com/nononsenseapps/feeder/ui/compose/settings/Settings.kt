@@ -1009,14 +1009,14 @@ fun ListDialogSetting(
     title: String,
     dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
+    onAddItem: (String) -> Unit,
+    onRemoveItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
     showToggle: Boolean = false,
     toggleValue: Boolean = false,
     toggleLabel: String = "",
     icon: @Composable () -> Unit = {},
-    onAddItem: (String) -> Unit,
-    onRemoveItem: (String) -> Unit,
     onToggleChange: (Boolean) -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
