@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.util.Log
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
@@ -33,7 +34,9 @@ import com.nononsenseapps.feeder.model.html.HtmlLinearizer
 import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.isValid
+import com.nononsenseapps.feeder.ui.compose.text.htmlStringToAnnotatedString
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
+import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.logDebug
@@ -330,7 +333,7 @@ class ArticleViewModel(
             val textToRead =
                 when (readFullText) {
                     false ->
-                        Either.catching(
+                        Either.catching<TSSError, List<AnnotatedString>>(
                             onCatch = {
                                 when (it) {
                                     is FileNotFoundException -> TTSFileNotFound
@@ -347,7 +350,7 @@ class ArticleViewModel(
                         }
 
                     true ->
-                        Either.catching(
+                        Either.catching<TSSError, List<AnnotatedString>>(
                             onCatch = {
                                 when (it) {
                                     is FileNotFoundException -> TTSFileNotFound
@@ -398,18 +401,40 @@ class ArticleViewModel(
             try {
                 openAiSummary.value = OpenAISummaryState.Loading
                 val content = loadArticleContent()
+                val summaryResult = openAIApi.summarize(content)
+                val annotatedStrings = convertSummaryToAnnotatedStrings(summaryResult)
                 openAiSummary.value =
                     OpenAISummaryState.Result(
-                        value = openAIApi.summarize(content),
+                        value = summaryResult,
+                        annotatedStrings = annotatedStrings,
                     )
             } catch (e: Exception) {
+                val errorResult = OpenAIApi.SummaryResult.Error(content = e.message ?: "Unknown error")
+                val annotatedStrings = convertSummaryToAnnotatedStrings(errorResult)
                 openAiSummary.value =
                     OpenAISummaryState.Result(
-                        value = OpenAIApi.SummaryResult.Error(content = e.message ?: "Unknown error"),
+                        value = errorResult,
+                        annotatedStrings = annotatedStrings,
                     )
             }
         }
     }
+
+    private suspend fun convertSummaryToAnnotatedStrings(summaryResult: OpenAIApi.SummaryResult): List<AnnotatedString> =
+        withContext(Dispatchers.Default) {
+            return@withContext when (summaryResult) {
+                is OpenAIApi.SummaryResult.Success -> {
+                    val markdownConverter = MarkdownToHtmlConverter()
+                    val htmlContent = markdownConverter.convertToHtml(summaryResult.content)
+                    htmlStringToAnnotatedString(htmlContent)
+                }
+                is OpenAIApi.SummaryResult.Error -> {
+                    // For error messages, create a simple AnnotatedString directly
+                    // without going through markdown/HTML conversion
+                    listOf(AnnotatedString(summaryResult.content))
+                }
+            }
+        }
 
     private suspend fun loadArticleContent(): String {
         val viewState = viewState.value
@@ -505,6 +530,7 @@ sealed interface OpenAISummaryState {
 
     data class Result(
         val value: OpenAIApi.SummaryResult,
+        val annotatedStrings: List<AnnotatedString>,
     ) : OpenAISummaryState
 }
 
