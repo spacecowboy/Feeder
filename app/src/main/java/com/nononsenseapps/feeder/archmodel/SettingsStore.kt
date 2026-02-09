@@ -441,6 +441,17 @@ class SettingsStore(
         }
     }
 
+    private val _applyBlocklistToSummaries =
+        MutableStateFlow(
+            sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false),
+        )
+    val applyBlocklistToSummaries: StateFlow<Boolean> = _applyBlocklistToSummaries.asStateFlow()
+
+    fun setApplyBlocklistToSummaries(value: Boolean) {
+        _applyBlocklistToSummaries.value = value
+        sp.edit().putBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, value).apply()
+    }
+
     private val _syncFrequency by lazy {
         MutableStateFlow(
             syncFrequencyFromString(sp.getStringNonNull(PREF_SYNC_FREQ, "60")),
@@ -548,6 +559,11 @@ const val PREF_SHOW_FAB = "pref_show_fab"
 const val PREF_FEED_ITEM_STYLE = "pref_feed_item_style"
 
 const val PREF_SWIPE_AS_READ = "pref_swipe_as_read"
+
+/**
+ * Block list settings
+ */
+const val PREF_BLOCKLIST_APPLY_TO_SUMMARIES = "pref_blocklist_apply_to_summaries"
 
 /**
  * Sync settings

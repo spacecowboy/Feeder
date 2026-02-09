@@ -9,6 +9,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
@@ -28,6 +29,7 @@ class BlocklistUpdateJob(
     override val di: DI by closestDI(context)
 
     private val blocklistDao: BlocklistDao by instance()
+    private val settingsStore: SettingsStore by instance()
 
     override val jobId: Int = params.jobId
 
@@ -36,11 +38,12 @@ class BlocklistUpdateJob(
 
         val onlyNew = params.extras.getBoolean(ARG_ONLY_NEW, false)
         val feedId = params.extras.getLong(ARG_FEED_ID, ID_UNSET)
+        val applyToSummaries = settingsStore.applyBlocklistToSummaries.value
 
         when {
-            feedId != ID_UNSET -> blocklistDao.setItemBlockStatusForNewInFeed(feedId, Instant.now())
-            onlyNew -> blocklistDao.setItemBlockStatusWhereNull(Instant.now())
-            else -> blocklistDao.setItemBlockStatus(Instant.now())
+            feedId != ID_UNSET -> blocklistDao.setItemBlockStatusForNewInFeed(feedId, Instant.now(), applyToSummaries)
+            onlyNew -> blocklistDao.setItemBlockStatusWhereNull(Instant.now(), applyToSummaries)
+            else -> blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries)
         }
 
         logDebug(LOG_TAG, "Work done!")

@@ -48,6 +48,7 @@ class SettingsStoreTest : DIAware {
         every { sp.getString(PREF_SORT, null) } returns null
         every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns null
         every { sp.getString(PREF_SYNC_FREQ, "60") } returns null
+        every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns false
         // Incorrect value by design
         every {
             sp.getString(
@@ -389,5 +390,38 @@ class SettingsStoreTest : DIAware {
         }
 
         assertEquals(true, store.showTitleUnreadCount.value)
+    }
+
+    @Test
+    fun applyBlocklistToSummariesDefaultsToFalse() {
+        every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns false
+
+        assertEquals(false, store.applyBlocklistToSummaries.value)
+    }
+
+    @Test
+    fun applyBlocklistToSummariesSetToTrue() {
+        store.setApplyBlocklistToSummaries(true)
+
+        verify {
+            sp.edit().putBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, true).apply()
+        }
+
+        assertEquals(true, store.applyBlocklistToSummaries.value)
+    }
+
+    @Test
+    fun applyBlocklistToSummariesSetToFalse() {
+        every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns true
+        clearMocks(sp, answers = false)
+        every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns true
+
+        store.setApplyBlocklistToSummaries(false)
+
+        verify {
+            sp.edit().putBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false).apply()
+        }
+
+        assertEquals(false, store.applyBlocklistToSummaries.value)
     }
 }
