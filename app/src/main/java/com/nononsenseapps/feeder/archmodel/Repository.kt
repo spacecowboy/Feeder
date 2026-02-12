@@ -397,8 +397,7 @@ class Repository(
         combine(
             currentWidgetFeedAndTag,
             feedListFilter,
-            search,
-        ) { feedAndTag, feedListFilter, search ->
+        ) { feedAndTag, feedListFilter ->
             val (feedId, tag) = feedAndTag
             FeedListArgs(
                 feedId = feedId,
@@ -406,40 +405,7 @@ class Repository(
                 minReadTime = Instant.EPOCH,
                 newestFirst = true,
                 filter = feedListFilter,
-                search = search,
-            )
-        }.flatMapLatest {
-            feedItemStore.getPagedFeedItemsRaw(
-                feedId = it.feedId,
-                tag = it.tag,
-                minReadTime = it.minReadTime,
-                newestFirst = it.newestFirst,
-                filter = it.filter,
-                search = it.search,
-            )
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getWidgetFeedListItems(): Flow<PagingData<FeedListItem>> =
-        combine(
-            currentFeedAndTag,
-            minReadTime,
-            currentSorting,
-            feedListFilter,
-            search,
-        ) { feedAndTag, minReadTime, currentSorting, feedListFilter, search ->
-            val (feedId, tag) = feedAndTag
-            FeedListArgs(
-                feedId = feedId,
-                tag = tag,
-                minReadTime =
-                    when (feedId) {
-                        ID_SAVED_ARTICLES -> Instant.EPOCH
-                        else -> minReadTime
-                    },
-                newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
-                filter = feedListFilter,
-                search = search,
+                search = "",
             )
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
