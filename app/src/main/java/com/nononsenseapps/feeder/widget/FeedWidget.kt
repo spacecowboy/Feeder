@@ -40,7 +40,6 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.filter
 import androidx.paging.map
 import coil3.imageLoader
 import coil3.request.ImageRequest
@@ -75,7 +74,7 @@ data class FeedWidgetItem(
     val feedTitle: String,
     val unread: Boolean,
     val pubDate: String,
-    val image: Bitmap,
+    val image: Bitmap?,
     val link: String?,
     val bookmarked: Boolean,
     val feedImageUrl: URL?,
@@ -84,7 +83,7 @@ data class FeedWidgetItem(
     val wordCount: Int,
 )
 
-private fun FeedListItem.toWidgetItem(bitmap: Bitmap) =
+private fun FeedListItem.toWidgetItem(bitmap: Bitmap?) =
     FeedWidgetItem(
         id,
         title,
@@ -127,12 +126,13 @@ private class WidgetStateDataStore(
             ImageRequest
                 .Builder(context)
                 .data(url)
+                .size(200, 200)
                 .scale(Scale.FIT)
                 .precision(Precision.INEXACT)
                 .allowHardware(false)
                 .build()
 
-        (imageLoader.execute(request) as? SuccessResult)?.image?.toBitmap(200, 200)
+        (imageLoader.execute(request) as? SuccessResult)?.image?.toBitmap(200, 200, Bitmap.Config.RGB_565)
     }
 
     private val repository: Repository by app.di.instance()
@@ -147,10 +147,7 @@ private class WidgetStateDataStore(
                         pagingData
                             .map { listItem ->
                                 val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                                Pair(listItem, bitmap)
-                            }.filter { it.second != null }
-                            .map {
-                                it.first.toWidgetItem(it.second!!)
+                                listItem.toWidgetItem(bitmap)
                             }
                     },
             ) { syncWorkerRunning, feedWidgetItems ->
@@ -274,7 +271,9 @@ class FeedWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetCard(item: FeedWidgetItem) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(ImageProvider(item.image), contentDescription = null)
+            item.image?.let {
+                Image(ImageProvider(it), contentDescription = null)
+            }
             Column {
                 Text(
                     text = item.title,

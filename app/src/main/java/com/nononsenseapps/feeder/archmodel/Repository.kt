@@ -397,8 +397,7 @@ class Repository(
         combine(
             currentWidgetFeedAndTag,
             feedListFilter,
-            search,
-        ) { feedAndTag, feedListFilter, search ->
+        ) { feedAndTag, feedListFilter ->
             val (feedId, tag) = feedAndTag
             FeedListArgs(
                 feedId = feedId,
@@ -406,7 +405,7 @@ class Repository(
                 minReadTime = Instant.EPOCH,
                 newestFirst = true,
                 filter = feedListFilter,
-                search = search,
+                search = "",
             )
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
