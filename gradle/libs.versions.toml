@@ -11,7 +11,7 @@ compileSdk = "36"
 okhttp = "5.1.0"
 okio = "3.16.2"
 # END Unison
-ktlint-gradle = "13.1.0"
+ktlint-gradle = "14.0.1"
 ktlint-compose = "0.4.24"
 kodein = "7.28.0"
 coroutines = "1.10.2"
