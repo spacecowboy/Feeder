@@ -8,7 +8,7 @@ androidPlugin = "8.11.1"
 # And SDK version is highly coupled to androidPlugin too
 compileSdk = "36"
 # BEGIN These should be upgraded in unison. See https://square.github.io/okhttp/changelogs/changelog_4x/
-okhttp = "5.1.0"
+okhttp = "5.3.2"
 okio = "3.16.2"
 # END Unison
 ktlint-gradle = "13.1.0"
