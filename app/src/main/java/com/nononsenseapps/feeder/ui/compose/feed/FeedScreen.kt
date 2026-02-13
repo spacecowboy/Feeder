@@ -388,12 +388,6 @@ fun FeedScreen(
                     }
                 }
             },
-            markBeforeAsRead = { cursor ->
-                viewModel.markBeforeAsRead(cursor)
-            },
-            markAfterAsRead = { cursor ->
-                viewModel.markAfterAsRead(cursor)
-            },
             onOpenFeedItem = { itemId ->
                 viewModel.openArticle(
                     itemId = itemId,
@@ -474,8 +468,6 @@ fun FeedScreen(
     drawerState: DrawerState,
     markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
-    markBeforeAsRead: (FeedItemCursor) -> Unit,
-    markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
     onOpenFeedItemInReader: (Long) -> Unit,
     onOpenFeedItemInCustomTab: (Long) -> Unit,
@@ -930,8 +922,6 @@ fun FeedScreen(
                     onAddFeed = onAddFeed,
                     markAsUnread = markAsUnread,
                     markAsReadOnSwipe = markAsReadOnSwipe,
-                    markBeforeAsRead = markBeforeAsRead,
-                    markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
                     onOpenFeedItemInReader = onOpenFeedItemInReader,
                     onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
@@ -957,8 +947,6 @@ fun FeedScreen(
                     onAddFeed = onAddFeed,
                     markAsUnread = markAsUnread,
                     markAsReadOnSwipe = markAsReadOnSwipe,
-                    markBeforeAsRead = markBeforeAsRead,
-                    markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
                     onOpenFeedItemInReader = onOpenFeedItemInReader,
                     onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
@@ -1184,8 +1172,6 @@ fun FeedListContent(
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
-    markBeforeAsRead: (FeedItemCursor) -> Unit,
-    markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
     onOpenFeedItemInReader: (Long) -> Unit,
     onOpenFeedItemInCustomTab: (Long) -> Unit,
@@ -1310,17 +1296,6 @@ fun FeedListContent(
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
-                        onMarkAboveAsRead = {
-                            markBeforeAsRead(previewItem.cursor)
-                            if (viewState.filter.onlyUnread) {
-                                coroutineScope.launch {
-                                    listState.scrollToItem(0)
-                                }
-                            }
-                        },
-                        onMarkBelowAsRead = {
-                            markAfterAsRead(previewItem.cursor)
-                        },
                         onToggleBookmark = {
                             onSetBookmark(previewItem.id, !previewItem.bookmarked)
                         },
@@ -1433,8 +1408,6 @@ fun FeedGridContent(
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
     markAsReadOnSwipe: (id: Long, unread: Boolean, saved: Boolean) -> Unit,
-    markBeforeAsRead: (FeedItemCursor) -> Unit,
-    markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
     onOpenFeedItemInReader: (Long) -> Unit,
     onOpenFeedItemInCustomTab: (Long) -> Unit,
@@ -1538,17 +1511,6 @@ fun FeedGridContent(
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
-                        onMarkAboveAsRead = {
-                            markBeforeAsRead(previewItem.cursor)
-                            if (viewState.filter.onlyUnread) {
-                                coroutineScope.launch {
-                                    gridState.scrollToItem(0)
-                                }
-                            }
-                        },
-                        onMarkBelowAsRead = {
-                            markAfterAsRead(previewItem.cursor)
-                        },
                         onToggleBookmark = {
                             onSetBookmark(previewItem.id, !previewItem.bookmarked)
                         },

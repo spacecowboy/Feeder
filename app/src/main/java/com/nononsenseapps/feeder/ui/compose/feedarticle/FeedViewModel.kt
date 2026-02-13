@@ -120,18 +120,6 @@ class FeedViewModel(
             repository.markAsReadAndNotified(itemId = itemId, readTimeBeforeMinReadTime = true)
         }
 
-    fun markBeforeAsRead(cursor: FeedItemCursor) =
-        applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markBeforeAsRead(cursor, feedId, feedTag)
-        }
-
-    fun markAfterAsRead(cursor: FeedItemCursor) =
-        applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markAfterAsRead(cursor, feedId, feedTag)
-        }
-
     fun setBookmarked(
         itemId: Long,
         bookmarked: Boolean,

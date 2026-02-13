@@ -56,10 +56,6 @@ sealed interface FeedItemEvent {
 
     data object OpenInBrowser : FeedItemEvent
 
-    data object MarkAboveAsRead : FeedItemEvent
-
-    data object MarkBelowAsRead : FeedItemEvent
-
     data object ShareItem : FeedItemEvent
 
     data object ToggleBookmarked : FeedItemEvent
@@ -184,8 +180,6 @@ private fun FeedItemTitle(
                 onOpenFeedItemInReader = { onEvent(FeedItemEvent.OpenInReader) },
                 onOpenFeedItemInCustomTab = { onEvent(FeedItemEvent.OpenInCustomTab) },
                 onOpenFeedItemInBrowser = { onEvent(FeedItemEvent.OpenInBrowser) },
-                onMarkAboveAsRead = { onEvent(FeedItemEvent.MarkAboveAsRead) },
-                onMarkBelowAsRead = { onEvent(FeedItemEvent.MarkBelowAsRead) },
                 onShareItem = { onEvent(FeedItemEvent.ShareItem) },
                 onToggleBookmark = { onEvent(FeedItemEvent.ToggleBookmarked) },
                 dropDownMenuExpanded = state.dropDownMenuExpanded,
