@@ -92,6 +92,9 @@
   <string name="open_in_webview">Web view</string>
   <string name="open_in_default_browser">Default browser</string>
   <string name="open_in_custom_tab">Custom tab</string>
+  <string name="open_article_in_reader">Open in reader</string>
+  <string name="open_article_in_default_browser">Open in default browser</string>
+  <string name="open_article_in_custom_tab">Open in custom tab</string>
   <string name="use_app_default">Use app default</string>
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>

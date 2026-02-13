@@ -49,6 +49,13 @@ import java.net.URL
 import java.time.Instant
 
 sealed interface FeedItemEvent {
+
+    data object OpenInReader : FeedItemEvent
+
+    data object OpenInCustomTab : FeedItemEvent
+
+    data object OpenInBrowser : FeedItemEvent
+
     data object MarkAboveAsRead : FeedItemEvent
 
     data object MarkBelowAsRead : FeedItemEvent
@@ -174,6 +181,9 @@ private fun FeedItemTitle(
         CompositionLocalProvider(LocalContentColor provides textColor) {
             FeedItemText(
                 item = state.item,
+                onOpenFeedItemInReader = { onEvent(FeedItemEvent.OpenInReader) },
+                onOpenFeedItemInCustomTab = { onEvent(FeedItemEvent.OpenInCustomTab) },
+                onOpenFeedItemInBrowser = { onEvent(FeedItemEvent.OpenInBrowser) },
                 onMarkAboveAsRead = { onEvent(FeedItemEvent.MarkAboveAsRead) },
                 onMarkBelowAsRead = { onEvent(FeedItemEvent.MarkBelowAsRead) },
                 onShareItem = { onEvent(FeedItemEvent.ShareItem) },
