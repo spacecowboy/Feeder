@@ -49,7 +49,6 @@ import java.net.URL
 import java.time.Instant
 
 sealed interface FeedItemEvent {
-
     data object OpenInReader : FeedItemEvent
 
     data object OpenInCustomTab : FeedItemEvent

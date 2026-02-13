@@ -111,7 +111,6 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.FeedType
-import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
@@ -409,7 +408,6 @@ fun FeedScreen(
                         ArticleDestination.navigate(navController, itemId)
                     },
                 )
-
             },
             onOpenFeedItemInCustomTab = { itemId ->
                 viewModel.openArticleInCustomTab(
@@ -1325,7 +1323,7 @@ fun FeedListContent(
                         onOpenFeedItemInCustomTab = {
                             onOpenFeedItemInCustomTab(previewItem.id)
                         },
-                        onOpenFeedItemInBrowser =  {
+                        onOpenFeedItemInBrowser = {
                             onOpenFeedItemInBrowser(previewItem.id)
                         },
                         modifier =
@@ -1540,7 +1538,7 @@ fun FeedGridContent(
                         onOpenFeedItemInCustomTab = {
                             onOpenFeedItemInCustomTab(previewItem.id)
                         },
-                        onOpenFeedItemInBrowser =  {
+                        onOpenFeedItemInBrowser = {
                             onOpenFeedItemInBrowser(previewItem.id)
                         },
                         modifier =

@@ -17,7 +17,6 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
-import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
