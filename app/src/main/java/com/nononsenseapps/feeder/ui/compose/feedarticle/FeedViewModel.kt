@@ -17,7 +17,6 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
-import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -120,18 +119,6 @@ class FeedViewModel(
             repository.markAsReadAndNotified(itemId = itemId, readTimeBeforeMinReadTime = true)
         }
 
-    fun markBeforeAsRead(cursor: FeedItemCursor) =
-        applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markBeforeAsRead(cursor, feedId, feedTag)
-        }
-
-    fun markAfterAsRead(cursor: FeedItemCursor) =
-        applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markAfterAsRead(cursor, feedId, feedTag)
-        }
-
     fun setBookmarked(
         itemId: Long,
         bookmarked: Boolean,
@@ -214,21 +201,49 @@ class FeedViewModel(
         navigateToArticle: () -> Unit,
     ) = viewModelScope.launch {
         val itemOpener = repository.getArticleOpener(itemId = itemId)
-        val articleLink = repository.getLink(itemId)
         when {
-            ItemOpener.CUSTOM_TAB == itemOpener && articleLink != null -> {
-                openInCustomTab(articleLink)
+            ItemOpener.CUSTOM_TAB == itemOpener -> {
+                openArticleInCustomTab(itemId, openInCustomTab)
             }
 
-            ItemOpener.DEFAULT_BROWSER == itemOpener && articleLink != null -> {
-                openInBrowser(articleLink)
+            ItemOpener.DEFAULT_BROWSER == itemOpener -> {
+                openArticleInBrowser(itemId, openInBrowser)
             }
 
             else -> {
-                setCurrentArticle(itemId)
-                navigateToArticle()
+                openArticleInReader(itemId, navigateToArticle)
             }
         }
+    }
+
+    fun openArticleInCustomTab(
+        itemId: Long,
+        openInCustomTab: (String) -> Unit,
+    ) = viewModelScope.launch {
+        val articleLink = repository.getLink(itemId)
+        if (articleLink != null) {
+            openInCustomTab(articleLink)
+        }
+        markAsRead(itemId)
+    }
+
+    fun openArticleInBrowser(
+        itemId: Long,
+        openInBrowser: (String) -> Unit,
+    ) = viewModelScope.launch {
+        val articleLink = repository.getLink(itemId)
+        if (articleLink != null) {
+            openInBrowser(articleLink)
+        }
+        markAsRead(itemId)
+    }
+
+    fun openArticleInReader(
+        itemId: Long,
+        navigateToArticle: () -> Unit,
+    ) {
+        setCurrentArticle(itemId)
+        navigateToArticle()
         markAsRead(itemId)
     }
 

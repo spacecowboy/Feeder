@@ -72,8 +72,9 @@ import java.time.Instant
 fun FeedItemCard(
     item: FeedListItem,
     showThumbnail: Boolean,
-    onMarkAboveAsRead: () -> Unit,
-    onMarkBelowAsRead: () -> Unit,
+    onOpenFeedItemInReader: () -> Unit,
+    onOpenFeedItemInCustomTab: () -> Unit,
+    onOpenFeedItemInBrowser: () -> Unit,
     onShareItem: () -> Unit,
     onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
@@ -156,8 +157,9 @@ fun FeedItemCard(
                 )
                 FeedItemText(
                     item = item,
-                    onMarkAboveAsRead = onMarkAboveAsRead,
-                    onMarkBelowAsRead = onMarkBelowAsRead,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onShareItem = onShareItem,
                     onToggleBookmark = onToggleBookmark,
                     dropDownMenuExpanded = dropDownMenuExpanded,
@@ -174,8 +176,9 @@ fun FeedItemCard(
 @Composable
 fun RowScope.FeedItemText(
     item: FeedListItem,
-    onMarkAboveAsRead: () -> Unit,
-    onMarkBelowAsRead: () -> Unit,
+    onOpenFeedItemInReader: () -> Unit,
+    onOpenFeedItemInCustomTab: () -> Unit,
+    onOpenFeedItemInBrowser: () -> Unit,
     onShareItem: () -> Unit,
     onToggleBookmark: () -> Unit,
     dropDownMenuExpanded: Boolean,
@@ -261,6 +264,39 @@ fun RowScope.FeedItemText(
                 DropdownMenuItem(
                     onClick = {
                         onDismissDropdown()
+                        onOpenFeedItemInReader()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_reader),
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
+                        onOpenFeedItemInCustomTab()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_custom_tab),
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
+                        onOpenFeedItemInBrowser()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_default_browser),
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
                         onToggleBookmark()
                     },
                     text = {
@@ -272,28 +308,6 @@ fun RowScope.FeedItemText(
                                         false -> R.string.save_article
                                     },
                                 ),
-                        )
-                    },
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        onDismissDropdown()
-                        onMarkAboveAsRead()
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.mark_items_above_as_read),
-                        )
-                    },
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        onDismissDropdown()
-                        onMarkBelowAsRead()
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.mark_items_below_as_read),
                         )
                     },
                 )
@@ -392,8 +406,9 @@ private fun Preview() {
                     wordCount = 588,
                 ),
             showThumbnail = true,
-            onMarkAboveAsRead = {},
-            onMarkBelowAsRead = {},
+            onOpenFeedItemInReader = {},
+            onOpenFeedItemInCustomTab = {},
+            onOpenFeedItemInBrowser = {},
             onShareItem = {},
             onToggleBookmark = {},
             dropDownMenuExpanded = false,
@@ -432,8 +447,9 @@ private fun PreviewWithImageUnread() {
                         wordCount = 939,
                     ),
                 showThumbnail = true,
-                onMarkAboveAsRead = {},
-                onMarkBelowAsRead = {},
+                onOpenFeedItemInReader = {},
+                onOpenFeedItemInCustomTab = {},
+                onOpenFeedItemInBrowser = {},
                 onShareItem = {},
                 onToggleBookmark = {},
                 dropDownMenuExpanded = false,
@@ -473,8 +489,9 @@ private fun PreviewWithImageRead() {
                         wordCount = 910,
                     ),
                 showThumbnail = true,
-                onMarkAboveAsRead = {},
-                onMarkBelowAsRead = {},
+                onOpenFeedItemInReader = {},
+                onOpenFeedItemInCustomTab = {},
+                onOpenFeedItemInBrowser = {},
                 onShareItem = {},
                 onToggleBookmark = {},
                 dropDownMenuExpanded = false,
