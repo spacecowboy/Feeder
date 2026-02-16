@@ -214,28 +214,34 @@ class FeedViewModel(
         navigateToArticle: () -> Unit,
     ) = viewModelScope.launch {
         val itemOpener = repository.getArticleOpener(itemId = itemId)
+        val articleLink = repository.getLink(itemId)
         when {
-            ItemOpener.CUSTOM_TAB == itemOpener -> {
-                openArticleInCustomTab(itemId, openInCustomTab)
+            ItemOpener.CUSTOM_TAB == itemOpener && articleLink != null -> {
+                openInCustomTab(articleLink)
             }
 
-            ItemOpener.DEFAULT_BROWSER == itemOpener -> {
-                openArticleInBrowser(itemId, openInBrowser)
+            ItemOpener.DEFAULT_BROWSER == itemOpener && articleLink != null -> {
+                openInBrowser(articleLink)
             }
 
             else -> {
-                openArticleInReader(itemId, navigateToArticle)
+                setCurrentArticle(itemId)
+                navigateToArticle()
             }
         }
+        markAsRead(itemId)
     }
 
     fun openArticleInCustomTab(
         itemId: Long,
         openInCustomTab: (String) -> Unit,
+        onNoArticleLink: () -> Unit,
     ) = viewModelScope.launch {
         val articleLink = repository.getLink(itemId)
         if (articleLink != null) {
             openInCustomTab(articleLink)
+        } else {
+            onNoArticleLink()
         }
         markAsRead(itemId)
     }
@@ -243,10 +249,13 @@ class FeedViewModel(
     fun openArticleInBrowser(
         itemId: Long,
         openInBrowser: (String) -> Unit,
+        onNoArticleLink: () -> Unit,
     ) = viewModelScope.launch {
         val articleLink = repository.getLink(itemId)
         if (articleLink != null) {
             openInBrowser(articleLink)
+        } else {
+            onNoArticleLink()
         }
         markAsRead(itemId)
     }

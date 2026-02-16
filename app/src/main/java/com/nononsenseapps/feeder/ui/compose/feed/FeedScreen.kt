@@ -422,6 +422,11 @@ fun FeedScreen(
                     openInCustomTab = { articleLink ->
                         activityLauncher.openLinkInCustomTab(articleLink, toolbarColor)
                     },
+                    onNoArticleLink = {
+                        coroutineScope.launch {
+                            toastMaker.makeToast(R.string.no_article_link_custom_tab)
+                        }
+                    },
                 )
             },
             onOpenFeedItemInBrowser = { itemId ->
@@ -429,6 +434,11 @@ fun FeedScreen(
                     itemId = itemId,
                     openInBrowser = { articleLink ->
                         activityLauncher.openLinkInBrowser(articleLink)
+                    },
+                    onNoArticleLink = {
+                        coroutineScope.launch {
+                            toastMaker.makeToast(R.string.no_article_link_browser)
+                        }
                     },
                 )
             },
