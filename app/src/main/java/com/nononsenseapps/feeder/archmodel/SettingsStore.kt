@@ -79,6 +79,30 @@ class SettingsStore(
             false
         }
 
+    private val _currentWidgetFeedAndTag =
+        MutableStateFlow(
+            sp.getLong(PREF_LAST_WIDGET_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_WIDGET_FEED_TAG, null) ?: ""),
+        )
+    val currentWidgetFeedAndTag = _currentWidgetFeedAndTag.asStateFlow()
+
+    /**
+     * Returns true if the parameters were different from current state
+     */
+    fun setCurrentWidgetFeedAndTag(
+        feedId: Long,
+        tag: String,
+    ): Boolean =
+        if (_currentWidgetFeedAndTag.value.first != feedId ||
+            _currentWidgetFeedAndTag.value.second != tag
+        ) {
+            _currentWidgetFeedAndTag.value = feedId to tag
+            sp.edit().putLong(PREF_LAST_WIDGET_FEED_ID, feedId).apply()
+            sp.edit().putString(PREF_LAST_WIDGET_FEED_TAG, tag).apply()
+            true
+        } else {
+            false
+        }
+
     private val _currentArticleId =
         MutableStateFlow(
             sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET),
@@ -532,6 +556,8 @@ const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
  */
 const val PREF_LAST_FEED_TAG = "pref_last_feed_tag"
 const val PREF_LAST_FEED_ID = "pref_last_feed_id"
+const val PREF_LAST_WIDGET_FEED_TAG = "pref_widget_last_feed_tag"
+const val PREF_LAST_WIDGET_FEED_ID = "pref_widget_last_feed_id"
 const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
 const val PREF_IS_ARTICLE_OPEN = "pref_is_article_open"
 
