@@ -408,6 +408,40 @@ fun FeedScreen(
                     },
                 )
             },
+            onOpenFeedItemInReader = { itemId ->
+                viewModel.openArticleInReader(
+                    itemId = itemId,
+                    navigateToArticle = {
+                        ArticleDestination.navigate(navController, itemId)
+                    },
+                )
+            },
+            onOpenFeedItemInCustomTab = { itemId ->
+                viewModel.openArticleInCustomTab(
+                    itemId = itemId,
+                    openInCustomTab = { articleLink ->
+                        activityLauncher.openLinkInCustomTab(articleLink, toolbarColor)
+                    },
+                    onNoArticleLink = {
+                        coroutineScope.launch {
+                            toastMaker.makeToast(R.string.no_article_link_custom_tab)
+                        }
+                    },
+                )
+            },
+            onOpenFeedItemInBrowser = { itemId ->
+                viewModel.openArticleInBrowser(
+                    itemId = itemId,
+                    openInBrowser = { articleLink ->
+                        activityLauncher.openLinkInBrowser(articleLink)
+                    },
+                    onNoArticleLink = {
+                        coroutineScope.launch {
+                            toastMaker.makeToast(R.string.no_article_link_browser)
+                        }
+                    },
+                )
+            },
             onSetBookmark = { itemId, value ->
                 viewModel.setBookmarked(itemId, value)
             },
@@ -452,6 +486,9 @@ fun FeedScreen(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
+    onOpenFeedItemInReader: (Long) -> Unit,
+    onOpenFeedItemInCustomTab: (Long) -> Unit,
+    onOpenFeedItemInBrowser: (Long) -> Unit,
     onSetBookmark: (Long, Boolean) -> Unit,
     onShowFilterMenu: (Boolean) -> Unit,
     filterCallback: FeedListFilterCallback,
@@ -905,6 +942,9 @@ fun FeedScreen(
                     markBeforeAsRead = markBeforeAsRead,
                     markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onSetBookmark = onSetBookmark,
                     gridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
@@ -929,6 +969,9 @@ fun FeedScreen(
                     markBeforeAsRead = markBeforeAsRead,
                     markAfterAsRead = markAfterAsRead,
                     onItemClick = onOpenFeedItem,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onSetBookmark = onSetBookmark,
                     listState = feedListState,
                     pagedFeedItems = pagedFeedItems,
@@ -1153,6 +1196,9 @@ fun FeedListContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
+    onOpenFeedItemInReader: (Long) -> Unit,
+    onOpenFeedItemInCustomTab: (Long) -> Unit,
+    onOpenFeedItemInBrowser: (Long) -> Unit,
     onSetBookmark: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -1304,8 +1350,17 @@ fun FeedListContent(
                                 intent = intent,
                             )
                         },
-                        {
+                        onItemClick = {
                             onItemClick(previewItem.id)
+                        },
+                        onOpenFeedItemInReader = {
+                            onOpenFeedItemInReader(previewItem.id)
+                        },
+                        onOpenFeedItemInCustomTab = {
+                            onOpenFeedItemInCustomTab(previewItem.id)
+                        },
+                        onOpenFeedItemInBrowser = {
+                            onOpenFeedItemInBrowser(previewItem.id)
                         },
                         modifier =
                             Modifier
@@ -1390,6 +1445,9 @@ fun FeedGridContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
+    onOpenFeedItemInReader: (Long) -> Unit,
+    onOpenFeedItemInCustomTab: (Long) -> Unit,
+    onOpenFeedItemInBrowser: (Long) -> Unit,
     onSetBookmark: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -1520,8 +1578,17 @@ fun FeedGridContent(
                                 intent = intent,
                             )
                         },
-                        {
+                        onItemClick = {
                             onItemClick(previewItem.id)
+                        },
+                        onOpenFeedItemInReader = {
+                            onOpenFeedItemInReader(previewItem.id)
+                        },
+                        onOpenFeedItemInCustomTab = {
+                            onOpenFeedItemInCustomTab(previewItem.id)
+                        },
+                        onOpenFeedItemInBrowser = {
+                            onOpenFeedItemInBrowser(previewItem.id)
                         },
                         modifier =
                             if (viewState.markAsReadOnScroll && previewItem.unread) {

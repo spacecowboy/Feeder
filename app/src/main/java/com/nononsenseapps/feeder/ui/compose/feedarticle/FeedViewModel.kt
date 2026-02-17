@@ -232,6 +232,43 @@ class FeedViewModel(
         markAsRead(itemId)
     }
 
+    fun openArticleInCustomTab(
+        itemId: Long,
+        openInCustomTab: (String) -> Unit,
+        onNoArticleLink: () -> Unit,
+    ) = viewModelScope.launch {
+        val articleLink = repository.getLink(itemId)
+        if (articleLink != null) {
+            openInCustomTab(articleLink)
+        } else {
+            onNoArticleLink()
+        }
+        markAsRead(itemId)
+    }
+
+    fun openArticleInBrowser(
+        itemId: Long,
+        openInBrowser: (String) -> Unit,
+        onNoArticleLink: () -> Unit,
+    ) = viewModelScope.launch {
+        val articleLink = repository.getLink(itemId)
+        if (articleLink != null) {
+            openInBrowser(articleLink)
+        } else {
+            onNoArticleLink()
+        }
+        markAsRead(itemId)
+    }
+
+    fun openArticleInReader(
+        itemId: Long,
+        navigateToArticle: () -> Unit,
+    ) {
+        setCurrentArticle(itemId)
+        navigateToArticle()
+        markAsRead(itemId)
+    }
+
     val viewState: StateFlow<FeedScreenViewState> =
         combine(
             // 0

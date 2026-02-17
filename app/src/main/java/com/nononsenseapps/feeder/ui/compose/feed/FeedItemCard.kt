@@ -72,6 +72,9 @@ import java.time.Instant
 fun FeedItemCard(
     item: FeedListItem,
     showThumbnail: Boolean,
+    onOpenFeedItemInReader: () -> Unit,
+    onOpenFeedItemInCustomTab: () -> Unit,
+    onOpenFeedItemInBrowser: () -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
@@ -156,6 +159,9 @@ fun FeedItemCard(
                 )
                 FeedItemText(
                     item = item,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
@@ -174,6 +180,9 @@ fun FeedItemCard(
 @Composable
 fun RowScope.FeedItemText(
     item: FeedListItem,
+    onOpenFeedItemInReader: () -> Unit,
+    onOpenFeedItemInCustomTab: () -> Unit,
+    onOpenFeedItemInBrowser: () -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
@@ -258,6 +267,39 @@ fun RowScope.FeedItemText(
                 onDismissRequest = onDismissDropdown,
                 modifier = Modifier.onKeyEventLikeEscape(onDismissDropdown),
             ) {
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
+                        onOpenFeedItemInReader()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_reader),
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
+                        onOpenFeedItemInCustomTab()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_custom_tab),
+                        )
+                    },
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDismissDropdown()
+                        onOpenFeedItemInBrowser()
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.open_article_in_default_browser),
+                        )
+                    },
+                )
                 DropdownMenuItem(
                     onClick = {
                         onDismissDropdown()
@@ -392,6 +434,9 @@ private fun Preview() {
                     wordCount = 588,
                 ),
             showThumbnail = true,
+            onOpenFeedItemInReader = {},
+            onOpenFeedItemInCustomTab = {},
+            onOpenFeedItemInBrowser = {},
             onMarkAboveAsRead = {},
             onMarkBelowAsRead = {},
             onShareItem = {},
@@ -432,6 +477,9 @@ private fun PreviewWithImageUnread() {
                         wordCount = 939,
                     ),
                 showThumbnail = true,
+                onOpenFeedItemInReader = {},
+                onOpenFeedItemInCustomTab = {},
+                onOpenFeedItemInBrowser = {},
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
@@ -473,6 +521,9 @@ private fun PreviewWithImageRead() {
                         wordCount = 910,
                     ),
                 showThumbnail = true,
+                onOpenFeedItemInReader = {},
+                onOpenFeedItemInCustomTab = {},
+                onOpenFeedItemInBrowser = {},
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},

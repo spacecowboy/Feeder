@@ -85,6 +85,9 @@ fun SwipeableFeedItemPreview(
     onToggleBookmark: () -> Unit,
     onShareItem: () -> Unit,
     onItemClick: () -> Unit,
+    onOpenFeedItemInReader: () -> Unit,
+    onOpenFeedItemInCustomTab: () -> Unit,
+    onOpenFeedItemInBrowser: () -> Unit,
     modifier: Modifier = Modifier,
     swipeEnabled: Boolean = true,
 ) {
@@ -136,6 +139,9 @@ fun SwipeableFeedItemPreview(
     }
 
     val toggleReadStatusLabel = stringResource(R.string.toggle_read_status)
+    val openFeedItemInReaderLabel = stringResource(R.string.open_article_in_reader)
+    val openFeedItemInCustomTabLabel = stringResource(R.string.open_article_in_custom_tab)
+    val openFeedItemInBrowserLabel = stringResource(R.string.open_article_in_default_browser)
     val saveArticleLabel = stringResource(R.string.save_article)
     val unSaveArticleLabel = stringResource(R.string.unsave_article)
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
@@ -179,6 +185,18 @@ fun SwipeableFeedItemPreview(
                                 coroutineScope.launch {
                                     onSwipe(item.unread)
                                 }
+                                true
+                            },
+                            CustomAccessibilityAction(openFeedItemInReaderLabel) {
+                                onOpenFeedItemInReader()
+                                true
+                            },
+                            CustomAccessibilityAction(openFeedItemInCustomTabLabel) {
+                                onOpenFeedItemInCustomTab()
+                                true
+                            },
+                            CustomAccessibilityAction(openFeedItemInBrowserLabel) {
+                                onOpenFeedItemInBrowser()
                                 true
                             },
                             CustomAccessibilityAction(
@@ -261,6 +279,9 @@ fun SwipeableFeedItemPreview(
                 FeedItemCard(
                     item = item,
                     showThumbnail = showThumbnail && !compactLandscape,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
@@ -306,6 +327,9 @@ fun SwipeableFeedItemPreview(
                             FeedItemEvent.DismissDropdown -> {
                                 dropDownMenuExpanded = false
                             }
+                            FeedItemEvent.OpenInReader -> onOpenFeedItemInReader()
+                            FeedItemEvent.OpenInCustomTab -> onOpenFeedItemInCustomTab()
+                            FeedItemEvent.OpenInBrowser -> onOpenFeedItemInBrowser()
                             FeedItemEvent.MarkAboveAsRead -> onMarkAboveAsRead()
                             FeedItemEvent.MarkBelowAsRead -> onMarkBelowAsRead()
                             FeedItemEvent.ShareItem -> onShareItem()
@@ -319,6 +343,9 @@ fun SwipeableFeedItemPreview(
                 FeedItemCompact(
                     item = item,
                     showThumbnail = showThumbnail,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
@@ -348,6 +375,9 @@ fun SwipeableFeedItemPreview(
             FeedItemStyle.SUPER_COMPACT -> {
                 FeedItemSuperCompact(
                     item = item,
+                    onOpenFeedItemInReader = onOpenFeedItemInReader,
+                    onOpenFeedItemInCustomTab = onOpenFeedItemInCustomTab,
+                    onOpenFeedItemInBrowser = onOpenFeedItemInBrowser,
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
