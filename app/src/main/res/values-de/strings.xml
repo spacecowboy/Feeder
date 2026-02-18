@@ -68,7 +68,7 @@
     <string name="open_in_reader">Feedreader</string>
     <string name="open_in_webview">Webansicht</string>
     <string name="open_in_default_browser">Standardbrowser</string>
-    <string name="open_in_custom_tab">Benutzerdefinierte Registerkarte</string>
+    <string name="open_in_custom_tab">In‑App‑Browser (Custom Tab)</string>
     <string name="open_item_by_default_with">Nachrichten standardmäßig öffnen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
     <string name="reader_settings">Feedreader</string>
@@ -96,7 +96,7 @@
     <string name="battery_optimization">Akkuoptimierung</string>
     <string name="battery_optimization_disabled">Aus</string>
     <string name="battery_optimization_enabled">Ein</string>
-    <string name="preload_custom_tab">Standardregisterkarte vorladen</string>
+    <string name="preload_custom_tab">In‑App‑Browser (Custom Tab) vorladen</string>
     <string name="failed_to_parse">%1$s konnte nicht analysiert werden</string>
     <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
     <string name="failed_to_fetch_full_article">Vollständiger Artikel konnte nicht abgerufen werden</string>
@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Beim Öffnen zusammenfassen</string>
     <string name="feed_search_suggestions_header">Vorschläge</string>
     <string name="openai_settings_info">Mit vielen KI-Anbietern kompatibel, jedoch nicht mit allen</string>
+    <string name="apply_blocklist_to_summaries">Auf Zusammenfassungen anwenden</string>
+    <string name="open_article_in_reader">Im Reader öffnen</string>
+    <string name="open_article_in_default_browser">Im Standardbrowser öffnen</string>
+    <string name="open_article_in_custom_tab">Im In‑App‑Browser öffnen</string>
+    <string name="no_article_link_browser">Artikel kann im Browser nicht geöffnet werden</string>
+    <string name="no_article_link_custom_tab">Artikel kann nicht im In‑App‑Browser geöffnet werden</string>
 </resources>
