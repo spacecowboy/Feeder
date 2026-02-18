@@ -129,7 +129,7 @@
     <string name="feed_item_style_compact">紧凑</string>
     <string name="feed_item_style_card">卡片</string>
     <string name="feed_item_style">文章样式</string>
-    <string name="dark_theme_preference_black">黑色（AMOLED）</string>
+    <string name="dark_theme_preference_black">黑色</string>
     <string name="dark_theme_preference_dark">深色</string>
     <string name="dark_theme_preference">夜间主题偏好</string>
     <string name="generate_extra_unique_ids">生成附加的唯一 ID</string>
