@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Resumir al abrir</string>
     <string name="feed_search_suggestions_header">Sugerencias</string>
     <string name="openai_settings_info">Compatible con muchos proveedores IA, pero no todos</string>
+    <string name="open_article_in_reader">Abrir en el lector</string>
+    <string name="open_article_in_default_browser">Abrir en el navegador predeterminado</string>
+    <string name="open_article_in_custom_tab">Abrir en una pestaña personalizada</string>
+    <string name="no_article_link_browser">No se pudo abrir el artículo en el navegador</string>
+    <string name="no_article_link_custom_tab">No se pudo abrir el artículo en una pestaña personalizada</string>
+    <string name="apply_blocklist_to_summaries">Aplicar a los resúmenes</string>
 </resources>

@@ -62,7 +62,7 @@
     <string name="notification_channel_description">Oznámení se zobrazují pouze pro nepřečtené články v nastavených kanálech</string>
     <string name="open_in_webview">Ve vloženém prohlížeči</string>
     <string name="open_in_default_browser">Ve výchozím prohlížeči</string>
-    <string name="open_in_custom_tab">V přizpůsobené kartě</string>
+    <string name="open_in_custom_tab">Ve vlastní kartě</string>
     <string name="open_item_by_default_with">Ve výchozím nastavení otevírat články</string>
     <string name="open_links_with">Otevírat odkazy</string>
     <string name="reader_settings">Volby čtení</string>
@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Shrnout při otevření</string>
     <string name="feed_search_suggestions_header">Návrhy</string>
     <string name="openai_settings_info">Kompatibilní s mnoha AI poskytovateli (ale ne se všemi)</string>
+    <string name="apply_blocklist_to_summaries">Použít na souhrny</string>
+    <string name="open_article_in_reader">Otevřít ve čtečce</string>
+    <string name="open_article_in_default_browser">Otevřít ve výchozím prohlížeči</string>
+    <string name="open_article_in_custom_tab">Otevřít ve vlastní kartě</string>
+    <string name="no_article_link_browser">Nepodařilo se otevřít článek v prohlížeči</string>
+    <string name="no_article_link_custom_tab">Nepodařilo se otevřít článek ve vlastní kartě</string>
 </resources>

@@ -99,7 +99,7 @@
     <string name="export_saved_articles">Ekspordi salvestatud artiklid</string>
     <string name="view_debug_log">Vaata veaotsingu logi</string>
     <string name="share">Jaga</string>
-    <string name="no_such_feed">Ühtegi sellist uudisvoogu ei leidu. Katseta, kas HTTPS toimib.</string>
+    <string name="no_such_feed">Ühtegi sellist uudisvoogu ei leidu. Kas prooviksid HTTPS-i toimimist?</string>
     <string name="nothing_to_display">Pole mitte midagi näidata!</string>
     <string name="indicator_for_mark_as_read">Loetuks märkimise tunnus</string>
     <string name="may_result_data_charges">Võivad lisanduda mobiilse andmeside kulud.</string>
@@ -284,4 +284,10 @@
     <string name="open_drawer_on_fab">Näita uudisvooge peale seda, kui oled kõik märkinud loetuks</string>
     <string name="on">Sees</string>
     <string name="off">Väljas</string>
+    <string name="apply_blocklist_to_summaries">Kasuta kokkuvõtete jaoks</string>
+    <string name="open_article_in_reader">Ava lugejas</string>
+    <string name="open_article_in_default_browser">Ava vaikimisi veebibrauseris</string>
+    <string name="open_article_in_custom_tab">Ava kohendatud vahekaardil</string>
+    <string name="no_article_link_browser">Artikli avamine veebibrauseris ei õnnestu</string>
+    <string name="no_article_link_custom_tab">Artikli avamine kohendatud vahekaardil ei õnnestu</string>
 </resources>

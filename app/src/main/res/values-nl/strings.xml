@@ -257,7 +257,7 @@
     <string name="off">Inactief</string>
     <string name="show_message">Toon bericht</string>
     <string name="summarize">Vat samen</string>
-    <string name="openai_settings">OpenAI integratie</string>
+    <string name="openai_settings">AI integratie</string>
     <string name="api_key">API sleutel</string>
     <string name="model_id">Model Id</string>
     <string name="azure_api_version">Azure API versie</string>
@@ -266,7 +266,7 @@
     <string name="azure_deployment_id">Azure deployment id</string>
     <string name="time_out">Time-out (seconden)</string>
     <string name="time_out_validation_error">De time-out moet tussen 30 en 600 seconden liggen</string>
-    <string name="time_out_placeholder">Time-out voor OpenAI verzoeken</string>
+    <string name="time_out_placeholder">Time-out voor AI verzoeken</string>
     <string name="search_verb">Zoeken</string>
     <string name="cancel_search">Annuleer zoeken</string>
     <string name="text">Tekst</string>
@@ -282,4 +282,6 @@
     <string name="could_not_remove_font">Lettertype kon niet worden verwijderd</string>
     <string name="something_went_wrong">Er is iets misgegaan</string>
     <string name="summarize_on_open">Samenvatting</string>
+    <string name="feed_search_suggestions_header">Suggesties</string>
+    <string name="openai_settings_info">Compatibel met veel AI-providers, maar niet met alle</string>
 </resources>
