@@ -253,7 +253,7 @@
     <string name="model_id">Identyfikator modelu</string>
     <string name="azure_api_version">Wersja Azure API</string>
     <string name="azure_deployment_id">Identyfikator wdrożenia Azure</string>
-    <string name="summarize">Streść</string>
+    <string name="summarize">Podsumuj</string>
     <string name="openai_settings">Integracja z AI</string>
     <string name="api_key">Klucz API</string>
     <string name="unable_to_load_models">Nie udało się załadować modeli.</string>
@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Podsumowuj przy otwieraniu</string>
     <string name="feed_search_suggestions_header">Sugestie</string>
     <string name="openai_settings_info">Kompatybilne z wieloma dostawcami AI, ale nie ze wszystkimi</string>
+    <string name="apply_blocklist_to_summaries">Zastosuj do podsumowań</string>
+    <string name="open_article_in_reader">Otwórz w czytniku</string>
+    <string name="open_article_in_default_browser">Otwórz w domyślnej przeglądarce</string>
+    <string name="open_article_in_custom_tab">Otwórz w niestandardowej karcie</string>
+    <string name="no_article_link_browser">Nie udało się otworzyć artykułu w przeglądarce</string>
+    <string name="no_article_link_custom_tab">Nie udało się otworzyć artykułu w niestandardowej karcie</string>
 </resources>
