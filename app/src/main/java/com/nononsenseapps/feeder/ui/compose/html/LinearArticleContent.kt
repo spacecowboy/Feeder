@@ -149,6 +149,36 @@ fun LazyListScope.linearArticleContent(
 }
 
 @Composable
+fun ColumnArticleContent(
+    articleContent: LinearArticle,
+    onLinkClick: (url: String, index: Int?) -> Unit,
+) {
+    articleContent.elements.forEach { element ->
+        ProvideTextStyle(
+            MaterialTheme.typography.bodyLarge.merge(
+                TextStyle(color = MaterialTheme.colorScheme.onBackground),
+            ),
+        ) {
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                LinearElementContent(
+                    linearElement = element,
+                    idToIndex = articleContent.idToIndex,
+                    allowHorizontalScroll = true,
+                    onLinkClick = onLinkClick,
+                    modifier =
+                        Modifier
+                            .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
+                            .fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun LinearElementContent(
     linearElement: LinearElement,
     allowHorizontalScroll: Boolean,

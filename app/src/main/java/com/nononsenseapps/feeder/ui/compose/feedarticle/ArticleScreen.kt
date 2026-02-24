@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.feedarticle
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,9 +15,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -61,7 +60,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
-import com.nononsenseapps.feeder.ui.compose.html.linearArticleContent
+import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
@@ -71,7 +70,6 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.unicodeWrap
-import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 import java.time.ZoneId
@@ -88,7 +86,7 @@ fun ArticleScreen(
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    val articleListState = rememberLazyListState()
+    val articleScrollState = rememberScrollState()
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -132,7 +130,7 @@ fun ArticleScreen(
         onToggleBookmark = {
             viewModel.setBookmarked(!viewState.isBookmarked)
         },
-        articleListState = articleListState,
+        articleScrollState = articleScrollState,
         onNavigateUp = onNavigateUp,
         onSummarize = {
             viewModel.summarize()
@@ -158,7 +156,7 @@ fun ArticleScreen(
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onToggleBookmark: () -> Unit,
-    articleListState: LazyListState,
+    articleScrollState: ScrollState,
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
     modifier: Modifier = Modifier,
@@ -371,7 +369,7 @@ fun ArticleScreen(
             ArticleContent(
                 viewState = viewState,
                 screenType = ScreenType.SINGLE,
-                articleListState = articleListState,
+                articleScrollState = articleScrollState,
                 onFeedTitleClick = onFeedTitleClick,
                 modifier =
                     Modifier
@@ -390,7 +388,7 @@ fun ArticleContent(
     viewState: ArticleScreenViewState,
     screenType: ScreenType,
     onFeedTitleClick: () -> Unit,
-    articleListState: LazyListState,
+    articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
@@ -416,7 +414,9 @@ fun ArticleContent(
                 viewState.author == null && viewState.pubDate != null ->
                     stringResource(
                         R.string.on_date,
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(dateTimeFormat),
+                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
+                            dateTimeFormat,
+                        ),
                     )
 
                 viewState.author != null && viewState.pubDate != null ->
@@ -425,7 +425,9 @@ fun ArticleContent(
                         // Must wrap author in unicode marks to ensure it formats
                         // correctly in RTL
                         context.unicodeWrap(viewState.author ?: ""),
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(dateTimeFormat),
+                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
+                            dateTimeFormat,
+                        ),
                     )
 
                 else -> null
@@ -433,63 +435,49 @@ fun ArticleContent(
         image = viewState.image,
         isFeedText = viewState.textToDisplay == TextToDisplay.CONTENT,
         modifier = modifier,
-        articleListState = articleListState,
+        articleScrollState = articleScrollState,
     ) { indexOffset ->
         var offsetCounter = indexOffset
 
         if (viewState.openAiSummary !is OpenAISummaryState.Empty) {
             offsetCounter++
-            item {
-                SummarySection(viewState.openAiSummary)
-            }
+            SummarySection(viewState.openAiSummary)
         }
         // Can take a composition or two before viewstate is set to its actual values
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
                 TextToDisplay.CONTENT -> {
-                    linearArticleContent(
+                    ColumnArticleContent(
                         articleContent = viewState.articleContent,
                         onLinkClick = { link, index ->
-                            if (index != null) {
-                                coroutineScope.launch {
-                                    articleListState.animateScrollToItem(offsetCounter + index)
-                                }
-                            } else {
-                                activityLauncher.openLink(
-                                    link = link,
-                                    toolbarColor = toolbarColor,
-                                )
-                            }
+                            // TODO: Implement position-based scrolling for anchor links
+                            // For now, just open external links
+                            activityLauncher.openLink(
+                                link = link,
+                                toolbarColor = toolbarColor,
+                            )
                         },
                     )
                 }
 
                 TextToDisplay.LOADING_FULLTEXT -> {
-                    LoadingItem()
+                    Text(text = stringResource(id = R.string.fetching_full_article))
                 }
 
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
-                    item {
-                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
-                    }
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
                 }
 
                 TextToDisplay.FAILED_MISSING_BODY -> {
-                    item {
-                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_body))
-                    }
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_body))
                 }
 
                 TextToDisplay.FAILED_MISSING_LINK -> {
-                    item {
-                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_link))
-                    }
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_link))
                 }
 
                 TextToDisplay.FAILED_NOT_HTML -> {
-                    item {
-                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
-                    }
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
                 }
             }
         }
@@ -507,6 +495,7 @@ private fun SummarySection(summary: OpenAISummaryState) {
                 LinearProgressIndicator(
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 )
+
             is OpenAISummaryState.Result ->
                 Text(
                     modifier = Modifier.padding(8.dp),
@@ -516,11 +505,11 @@ private fun SummarySection(summary: OpenAISummaryState) {
     }
 }
 
-@Suppress("FunctionName")
-private fun LazyListScope.LoadingItem() {
-    item {
-        Text(text = stringResource(id = R.string.fetching_full_article))
-    }
-}
+// @Suppress("FunctionName")
+// private fun LazyListScope.LoadingItem() {
+//    item {
+//        Text(text = stringResource(id = R.string.fetching_full_article))
+//    }
+// }
 
 private const val LOG_TAG = "FEEDER_ARTICLESCREEN"
