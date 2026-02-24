@@ -70,6 +70,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.unicodeWrap
+import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 import java.time.ZoneId
@@ -397,6 +398,9 @@ fun ArticleContent(
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
     val coroutineScope = rememberCoroutineScope()
 
+    // Track Y positions of article elements by index for anchor link scrolling
+    val elementPositions = remember { mutableMapOf<Int, Float>() }
+
     ReaderView(
         screenType = screenType,
         wordCount = viewState.wordCount,
@@ -450,12 +454,24 @@ fun ArticleContent(
                     ColumnArticleContent(
                         articleContent = viewState.articleContent,
                         onLinkClick = { link, index ->
-                            // TODO: Implement position-based scrolling for anchor links
-                            // For now, just open external links
-                            activityLauncher.openLink(
-                                link = link,
-                                toolbarColor = toolbarColor,
-                            )
+                            if (index != null && elementPositions.containsKey(index)) {
+                                // Anchor link - scroll to the element position
+                                val yPosition = elementPositions[index]
+                                if (yPosition != null) {
+                                    coroutineScope.launch {
+                                        articleScrollState.animateScrollTo(yPosition.toInt())
+                                    }
+                                }
+                            } else {
+                                // External link - open in browser/custom tab
+                                activityLauncher.openLink(
+                                    link = link,
+                                    toolbarColor = toolbarColor,
+                                )
+                            }
+                        },
+                        onElementPositioned = { index, yPosition ->
+                            elementPositions[offsetCounter + index] = yPosition
                         },
                     )
                 }
