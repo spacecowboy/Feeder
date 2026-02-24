@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Riepilogo all\'apertura</string>
     <string name="feed_search_suggestions_header">Suggerimenti</string>
     <string name="openai_settings_info">Compatibile con svariati fornitori di IA, ma non con tutti</string>
+    <string name="apply_blocklist_to_summaries">Applica ai riassunti</string>
+    <string name="open_article_in_reader">Apri nel lettore</string>
+    <string name="open_article_in_default_browser">Apri nel browser predefinito</string>
+    <string name="open_article_in_custom_tab">Apri in scheda personalizzata</string>
+    <string name="no_article_link_browser">Impossibile aprire l\'articolo nel browser</string>
+    <string name="no_article_link_custom_tab">Impossibile aprire l\'articolo nella scheda personalizzata</string>
 </resources>
