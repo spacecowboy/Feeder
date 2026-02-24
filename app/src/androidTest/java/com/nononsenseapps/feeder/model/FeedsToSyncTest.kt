@@ -56,7 +56,8 @@ class FeedsToSyncTest : DIAware {
     @Test
     fun doesNotReturnFreshFeed() =
         runBlocking {
-            val now = Instant.now()
+            // Truncate to milliseconds to match database precision
+            val now = Instant.ofEpochMilli(Instant.now().toEpochMilli())
             val feed = withFeed(lastSync = now.minusMinutes(1))
 
             // when
@@ -88,7 +89,8 @@ class FeedsToSyncTest : DIAware {
     @Test
     fun doesNotReturnAllFreshFeeds() =
         runBlocking {
-            val now = Instant.now()
+            // Truncate to milliseconds to match database precision
+            val now = Instant.ofEpochMilli(Instant.now().toEpochMilli())
             val items =
                 listOf(
                     withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1)),
@@ -122,7 +124,8 @@ class FeedsToSyncTest : DIAware {
     @Test
     fun doesNotReturnTaggedFreshFeeds() =
         runBlocking {
-            val now = Instant.now()
+            // Truncate to milliseconds to match database precision
+            val now = Instant.ofEpochMilli(Instant.now().toEpochMilli())
             val items =
                 listOf(
                     withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),

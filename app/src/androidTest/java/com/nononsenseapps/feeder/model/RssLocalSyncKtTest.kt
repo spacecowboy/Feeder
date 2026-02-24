@@ -89,7 +89,13 @@ class RssLocalSyncKtTest : DIAware {
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
-        bind<SharedPreferences>() with singleton { getApplicationContext<FeederApplication>().getSharedPreferences("test", Context.MODE_PRIVATE) }
+        bind<SharedPreferences>() with
+            singleton {
+                getApplicationContext<FeederApplication>().getSharedPreferences(
+                    "test",
+                    Context.MODE_PRIVATE,
+                )
+            }
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
         bind<Repository>() with singleton { Repository(di) }
         bind<FilePathProvider>() with
@@ -329,7 +335,8 @@ class RssLocalSyncKtTest : DIAware {
                     cowboyJson,
                 )
 
-            val fourteenMinsAgo = Instant.now().minusMinutes(14)
+            // Truncate to milliseconds to match database precision
+            val fourteenMinsAgo = Instant.ofEpochMilli(Instant.now().minusMinutes(14).toEpochMilli())
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
                 testDb.db.feedDao().getFeed(cowboyJsonId)!!.let { feed ->
