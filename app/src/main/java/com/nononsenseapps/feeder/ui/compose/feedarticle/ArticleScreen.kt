@@ -520,12 +520,3 @@ private fun SummarySection(summary: OpenAISummaryState) {
         }
     }
 }
-
-// @Suppress("FunctionName")
-// private fun LazyListScope.LoadingItem() {
-//    item {
-//        Text(text = stringResource(id = R.string.fetching_full_article))
-//    }
-// }
-
-private const val LOG_TAG = "FEEDER_ARTICLESCREEN"
