@@ -283,4 +283,11 @@
     <string name="time_out_placeholder">Timeout for AI-anmodninger</string>
     <string name="feed_search_suggestions_header">Forslag</string>
     <string name="summarize_on_open">Opsummer ved åbning</string>
+    <string name="apply_blocklist_to_summaries">Anvend på resuméer</string>
+    <string name="open_article_in_reader">Åbn i læser</string>
+    <string name="open_article_in_default_browser">Åbn i standardbrowser</string>
+    <string name="open_article_in_custom_tab">Åbn i brugerdefineret fane</string>
+    <string name="no_article_link_browser">Kan ikke åbne artikel i browser</string>
+    <string name="no_article_link_custom_tab">Kan ikke åbne artikel i brugerdefineret fane</string>
+    <string name="openai_settings_info">Kompatibel med mange AI-udbydere, men ikke alle</string>
 </resources>
