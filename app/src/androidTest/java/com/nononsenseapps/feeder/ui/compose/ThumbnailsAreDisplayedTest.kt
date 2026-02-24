@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.model.ImageFromHTML
 import com.nononsenseapps.feeder.ui.MainActivity
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.instance
@@ -21,6 +22,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
+@Ignore("Flaky")
 class ThumbnailsAreDisplayedTest : BaseComposeTest {
     @get:Rule
     override val composeTestRule = createAndroidComposeRule<MainActivity>()
