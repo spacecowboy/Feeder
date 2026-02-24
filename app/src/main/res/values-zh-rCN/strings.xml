@@ -284,4 +284,10 @@
     <string name="summarize_on_open">打开时总结</string>
     <string name="feed_search_suggestions_header">建议</string>
     <string name="openai_settings_info">兼容众多 AI 提供者，但非全部</string>
+    <string name="open_article_in_default_browser">在默认浏览器中打开</string>
+    <string name="open_article_in_reader">在阅读器中打开</string>
+    <string name="open_article_in_custom_tab">在自定义标签页中打开</string>
+    <string name="no_article_link_browser">无法在浏览器中打开文章</string>
+    <string name="no_article_link_custom_tab">无法在自定义标签页中打开文章</string>
+    <string name="apply_blocklist_to_summaries">应用于摘要</string>
 </resources>
