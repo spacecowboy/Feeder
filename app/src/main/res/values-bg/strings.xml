@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Обобщение при отваряне</string>
     <string name="feed_search_suggestions_header">Предложения</string>
     <string name="openai_settings_info">Съвместим с много доставчици на AI, но не с всички</string>
+    <string name="apply_blocklist_to_summaries">Приложи към резюмета</string>
+    <string name="open_article_in_reader">Отваряне в четец</string>
+    <string name="open_article_in_default_browser">Отваряне в браузъра по подразбиране</string>
+    <string name="open_article_in_custom_tab">Отваряне в персонализиран раздел</string>
+    <string name="no_article_link_browser">Не мога да отворя статията в браузъра</string>
+    <string name="no_article_link_custom_tab">Не може да се отвори статията в персонализиран раздел</string>
 </resources>
