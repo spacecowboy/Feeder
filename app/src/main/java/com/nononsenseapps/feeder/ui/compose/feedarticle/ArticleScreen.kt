@@ -470,7 +470,7 @@ fun ArticleContent(
                                 )
                             }
                         },
-                        onElementPositioned = { index, yPosition ->
+                        onElementPosition = { index, yPosition ->
                             elementPositions[offsetCounter + index] = yPosition
                         },
                     )

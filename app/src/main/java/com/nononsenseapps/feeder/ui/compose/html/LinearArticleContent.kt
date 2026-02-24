@@ -154,7 +154,8 @@ fun LazyListScope.linearArticleContent(
 fun ColumnArticleContent(
     articleContent: LinearArticle,
     onLinkClick: (url: String, index: Int?) -> Unit,
-    onElementPositioned: (index: Int, yPosition: Float) -> Unit = { _, _ -> },
+    modifier: Modifier = Modifier,
+    onElementPosition: (index: Int, yPosition: Float) -> Unit = { _, _ -> },
 ) {
     articleContent.elements.forEachIndexed { index, element ->
         ProvideTextStyle(
@@ -167,7 +168,7 @@ fun ColumnArticleContent(
                     Modifier
                         .fillMaxWidth()
                         .onGloballyPositioned { coordinates ->
-                            onElementPositioned(index, coordinates.positionInRoot().y)
+                            onElementPosition(index, coordinates.positionInRoot().y)
                         },
                 contentAlignment = Alignment.Center,
             ) {
