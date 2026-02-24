@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Összegzés megnyitáskor</string>
     <string name="feed_search_suggestions_header">Javaslatok</string>
     <string name="openai_settings_info">Sok MI-szolgáltatóval kompatibilis, de nem mindegyikkel</string>
+    <string name="apply_blocklist_to_summaries">Érvényesítés az összefoglalókra</string>
+    <string name="open_article_in_reader">Megnyitás az olvasóban</string>
+    <string name="open_article_in_default_browser">Megnyitás az alapértelmezett böngészőben</string>
+    <string name="open_article_in_custom_tab">Megnyitás egyéni lapon</string>
+    <string name="no_article_link_browser">A cikk nem nyitható meg a böngészőben</string>
+    <string name="no_article_link_custom_tab">A cikk nem nyitható meg egyéni lapon</string>
 </resources>
