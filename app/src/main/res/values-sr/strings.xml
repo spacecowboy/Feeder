@@ -284,4 +284,10 @@
     <string name="summarize_on_open">Резимирај приликом отварања</string>
     <string name="feed_search_suggestions_header">Предлози</string>
     <string name="openai_settings_info">Компатибилно са многим пружаоцима AI услуге, али не са свима</string>
+    <string name="apply_blocklist_to_summaries">Примени на резимее</string>
+    <string name="open_article_in_reader">Отвори у читачу</string>
+    <string name="open_article_in_default_browser">Отвори у подразумеваном прегледачу</string>
+    <string name="open_article_in_custom_tab">Отвори у произвољној картици</string>
+    <string name="no_article_link_browser">Чланак није могао да се отвори у прегледачу</string>
+    <string name="no_article_link_custom_tab">Чланак није могао да се отвори у произвољној картици</string>
 </resources>
