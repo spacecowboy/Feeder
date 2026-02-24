@@ -266,9 +266,6 @@ dependencies {
     // Markdown
     implementation(libs.jetbrains.markdown)
 
-    // Only for debug
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-8")
-
     // Tests
     testImplementation(libs.bundles.kotlin)
     testImplementation(libs.bundles.test)

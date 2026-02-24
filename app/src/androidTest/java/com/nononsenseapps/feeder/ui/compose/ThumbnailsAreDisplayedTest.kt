@@ -39,8 +39,8 @@ class ThumbnailsAreDisplayedTest : BaseComposeTest {
             val feedId =
                 repository.saveFeed(
                     Feed(
-                        title = "Ampersands are & the worst",
-                        url = URL("https://example.com/ampersands"),
+                        title = "Thumbnails are displayed",
+                        url = URL("https://example.com/thumbnailsaredisplay"),
                     ),
                 )
 
@@ -53,8 +53,13 @@ class ThumbnailsAreDisplayedTest : BaseComposeTest {
                         plainTitle = "Item with image",
                         plainSnippet = "Snippet with image",
                         feedId = feedId,
-                        pubDate = ZonedDateTime.now(ZoneOffset.UTC),
-                        primarySortTime = Instant.now(),
+                        // Truncate to milliseconds to match database precision
+                        pubDate =
+                            ZonedDateTime.ofInstant(
+                                Instant.ofEpochMilli(Instant.now().toEpochMilli()),
+                                ZoneOffset.UTC,
+                            ),
+                        primarySortTime = Instant.ofEpochMilli(Instant.now().toEpochMilli()),
                         thumbnailImage =
                             ImageFromHTML(
                                 url = "https://img.anime2you.de/2023/12/jujutsu-kaisen-6.jpg",
