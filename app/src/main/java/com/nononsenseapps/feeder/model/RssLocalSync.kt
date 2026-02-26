@@ -325,7 +325,8 @@ class RssLocalSync(
                                     ) ?: FeedItem(firstSyncedTime = downloadTime)
 
                                 // If new item, see if duplicates exist
-                                if (feedItemSql.id != ID_UNSET || !feedSql.skipDuplicates ||
+                                if (feedItemSql.id != ID_UNSET ||
+                                    !feedSql.skipDuplicates ||
                                     !repository.duplicateStoryExists(
                                         id = feedItemSql.id,
                                         title = item.title ?: "",
