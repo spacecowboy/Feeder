@@ -351,7 +351,11 @@ fun FeedScreen(
             },
             onExportSavedArticles = {
                 try {
-                    savedArticleExporter.launch("feeder-saved-articles-${LocalDate.now()}-${LocalTime.now().toSecondOfDay()}.txt")
+                    savedArticleExporter.launch(
+                        "feeder-saved-articles-${LocalDate.now()}-${
+                            LocalTime.now().toSecondOfDay()
+                        }.txt",
+                    )
                 } catch (_: Exception) {
                     // ActivityNotFoundException in particular
                     coroutineScope.launch {
@@ -554,7 +558,10 @@ fun FeedScreen(
                                         searchCallback("")
                                     },
                                 ) {
-                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel_search))
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.cancel_search),
+                                    )
                                 }
                             },
                             modifier =
@@ -1085,7 +1092,12 @@ fun FeedScreen(
                         ) {
                             title
                         } else {
-                            title + " ${stringResource(id = R.string.title_unread_count, viewState.feedScreenTitle.unreadCount)}"
+                            title + " ${
+                                stringResource(
+                                    id = R.string.title_unread_count,
+                                    viewState.feedScreenTitle.unreadCount,
+                                )
+                            }"
                         }
                     } ?: "",
                 navigationIcon = {
