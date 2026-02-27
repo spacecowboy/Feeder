@@ -1376,8 +1376,14 @@ fun FeedListContent(
                         },
                         modifier =
                             Modifier
-                                .animateItem(fadeInSpec = null, fadeOutSpec = null)
-                                .safeSemantics {
+                                .then(
+                                    // Disable item animations during refresh to prevent scroll position issues
+                                    if (!viewState.currentlySyncing) {
+                                        Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    } else {
+                                        Modifier
+                                    },
+                                ).safeSemantics {
                                     collectionItemInfo =
                                         CollectionItemInfo(
                                             rowIndex = itemIndex,
@@ -1622,9 +1628,23 @@ fun FeedGridContent(
                                                 }
                                             }
                                         }
-                                    }.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    }.then(
+                                        // Disable item animations during refresh to prevent scroll position issues
+                                        if (!viewState.currentlySyncing) {
+                                            Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                        } else {
+                                            Modifier
+                                        },
+                                    )
                             } else {
-                                Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                Modifier.then(
+                                    // Disable item animations during refresh to prevent scroll position issues
+                                    if (!viewState.currentlySyncing) {
+                                        Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                    } else {
+                                        Modifier
+                                    },
+                                )
                             },
                         swipeEnabled = !gridState.isScrollInProgress,
                     )
