@@ -26,6 +26,23 @@ fun htmlToAnnotatedString(
             )
         } ?: emptyList()
 
+/**
+ * Returns "plain text" with annotations for TTS from HTML string
+ */
+fun htmlStringToAnnotatedString(
+    html: String,
+    baseUrl: String = "",
+): List<AnnotatedString> =
+    Jsoup
+        .parse(html)
+        ?.body()
+        ?.let { body ->
+            formatBody(
+                element = body,
+                baseUrl = baseUrl,
+            )
+        } ?: emptyList()
+
 private fun formatBody(
     element: Element,
     baseUrl: String,
@@ -153,24 +170,30 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     }
 
                     "strong", "b" -> {
-                        appendTextChildren(
-                            element.childNodes(),
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                baseUrl = baseUrl,
+                            )
+                        }
                     }
 
                     "i", "em", "cite", "dfn" -> {
-                        appendTextChildren(
-                            element.childNodes(),
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                baseUrl = baseUrl,
+                            )
+                        }
                     }
 
                     "tt" -> {
-                        appendTextChildren(
-                            element.childNodes(),
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                baseUrl = baseUrl,
+                            )
+                        }
                     }
 
                     "u" -> {
@@ -219,11 +242,13 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     "code" -> {
                         emitParagraph()
                         // TODO some TTS annotation?
-                        appendTextChildren(
-                            element.childNodes(),
-                            preFormatted = preFormatted,
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                preFormatted = preFormatted,
+                                baseUrl = baseUrl,
+                            )
+                        }
                         emitParagraph()
                     }
 

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -511,12 +512,19 @@ private fun SummarySection(summary: OpenAISummaryState) {
                 LinearProgressIndicator(
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 )
-
-            is OpenAISummaryState.Result ->
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = summary.value.content,
-                )
+            is OpenAISummaryState.Result -> {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    summary.annotatedStrings.forEachIndexed { index, annotatedString ->
+                        Text(
+                            text = annotatedString,
+                            modifier =
+                                Modifier.padding(
+                                    bottom = if (index < summary.annotatedStrings.size - 1) 8.dp else 0.dp,
+                                ),
+                        )
+                    }
+                }
+            }
         }
     }
 }
