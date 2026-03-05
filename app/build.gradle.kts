@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.parcelize)
@@ -72,7 +71,7 @@ android {
     sourceSets {
         // To test Room we need to include the schema dir in resources
         named("androidTest") {
-            assets.srcDir("$projectDir/schemas")
+            assets.directories.add("$projectDir/schemas")
         }
     }
 
@@ -171,7 +170,6 @@ android {
         compose = true
         buildConfig = true
         aidl = false
-        renderScript = false
         resValues = false
         shaders = false
     }
