@@ -20,6 +20,8 @@ class MainActivityTest {
                 MainActivity::class.java,
             )
         launchActivity<MainActivity>(intent).use { scenario ->
+            // Ensure activity is fully resumed before checking state
+            scenario.moveToState(Lifecycle.State.RESUMED)
             assertEquals(Lifecycle.State.RESUMED, scenario.state)
         }
     }

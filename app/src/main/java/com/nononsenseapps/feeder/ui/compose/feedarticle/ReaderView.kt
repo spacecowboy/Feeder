@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.util.Log
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.indication
@@ -9,18 +10,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Surface
@@ -72,8 +71,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
-import my.nanihadesuka.compose.LazyColumnScrollbar
-import my.nanihadesuka.compose.ScrollbarSettings
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -97,8 +94,8 @@ fun ReaderView(
     image: ThumbnailImage?,
     isFeedText: Boolean,
     modifier: Modifier = Modifier,
-    articleListState: LazyListState = rememberLazyListState(),
-    articleBody: LazyListScope.(indexOffset: Int) -> Unit,
+    articleScrollState: ScrollState = rememberScrollState(),
+    articleBody: @Composable (indexOffset: Int) -> Unit,
 ) {
     val dimens = LocalDimens.current
 
@@ -108,271 +105,257 @@ fun ReaderView(
         }
 
     SelectionContainer {
-        LazyColumnScrollbar(
-            state = articleListState,
-            settings =
-                ScrollbarSettings.Default.copy(
-                    thumbUnselectedColor = MaterialTheme.colorScheme.outlineVariant,
-                ),
-        ) {
-            LazyColumn(
-                state = articleListState,
-                contentPadding =
-                    PaddingValues(
-                        // Interferes with scrollbar
-//                    bottom = 92.dp,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .verticalScroll(articleScrollState)
+                    .padding(
                         start =
                             when (screenType) {
                                 ScreenType.DUAL -> 0.dp // List items have enough padding
                                 ScreenType.SINGLE -> dimens.margin
                             },
                         end = dimens.margin,
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier =
-                    modifier
-                        .fillMaxWidth()
-                        .focusGroup()
-                        .safeSemantics {
-                            testTag = "readerColumn"
-                        },
-            ) {
-                var offsetCounter = 1
-                item {
-                    val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier =
-                            Modifier
-                                .width(dimens.maxReaderWidth)
-                                .semantics(mergeDescendants = true) {
-                                    try {
-                                        customActions =
-                                            listOf(
-                                                // TODO enclosure?
-                                                CustomAccessibilityAction(goToFeedLabel) {
-                                                    onFeedTitleClick()
-                                                    true
-                                                },
-                                            )
-                                    } catch (e: Exception) {
-                                        // Observed nullpointer exception when setting customActions
-                                        // No clue why it could be null
-                                        Log.e("FeederReaderScreen", "Exception in semantics", e)
-                                    }
-                                },
-                    ) {
-                        if (articleTitle.isNotBlank()) {
-                            WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
-                                val interactionSource = remember { MutableInteractionSource() }
-                                Text(
-                                    text = articleTitle,
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    modifier =
-                                        Modifier
-                                            .indication(interactionSource, LocalIndication.current)
-                                            .focusableInNonTouchMode(interactionSource = interactionSource)
-                                            .width(dimens.maxReaderWidth),
-                                )
-                            }
-                        }
-                        ProvideScaledText(
-                            style =
-                                MaterialTheme.typography.titleMedium.merge(
-                                    LinkTextStyle(),
-                                ),
-                        ) {
-                            WithBidiDeterminedLayoutDirection(paragraph = feedTitle) {
-                                Text(
-                                    text = feedTitle,
-                                    modifier =
-                                        Modifier
-                                            .width(dimens.maxReaderWidth)
-                                            .clearAndSetSemantics {
-                                                contentDescription = feedTitle
-                                            }.clickable {
+                    ).focusGroup()
+                    .safeSemantics {
+                        testTag = "readerColumn"
+                    },
+        ) {
+            var offsetCounter = 1
+            run {
+                val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier =
+                        Modifier
+                            .width(dimens.maxReaderWidth)
+                            .semantics(mergeDescendants = true) {
+                                try {
+                                    customActions =
+                                        listOf(
+                                            // TODO enclosure?
+                                            CustomAccessibilityAction(goToFeedLabel) {
                                                 onFeedTitleClick()
+                                                true
                                             },
-                                )
-                            }
-                        }
-                        if (authorDate != null) {
-                            ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
-                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                    WithBidiDeterminedLayoutDirection(paragraph = authorDate) {
-                                        val interactionSource = remember { MutableInteractionSource() }
-                                        Text(
-                                            text = authorDate,
-                                            modifier =
-                                                Modifier
-                                                    .width(dimens.maxReaderWidth)
-                                                    .indication(interactionSource, LocalIndication.current)
-                                                    .focusableInNonTouchMode(interactionSource = interactionSource),
                                         )
-                                    }
+                                } catch (e: Exception) {
+                                    // Observed nullpointer exception when setting customActions
+                                    // No clue why it could be null
+                                    Log.e("FeederReaderScreen", "Exception in semantics", e)
                                 }
-                            }
-                        }
-                        if (readTimeSecs > 0) {
-                            ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
-                                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.width(dimens.maxReaderWidth),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Timelapse,
-                                            contentDescription = null,
-                                        )
-                                        val seconds = "%02d".format(readTimeSecs % 60)
-                                        val readTimeText =
-                                            pluralStringResource(
-                                                id = R.plurals.n_minutes,
-                                                count = readTimeSecs / 60,
-                                            ).format(
-                                                "${readTimeSecs / 60}:$seconds",
-                                            )
-                                        WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
-                                            val interactionSource =
-                                                remember { MutableInteractionSource() }
-                                            Text(
-                                                text = readTimeText,
-                                                modifier =
-                                                    Modifier
-                                                        .weight(1f)
-                                                        .indication(
-                                                            interactionSource,
-                                                            LocalIndication.current,
-                                                        ).focusableInNonTouchMode(interactionSource = interactionSource),
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (enclosure.present) {
-                    offsetCounter++
-                    item {
-                        // Image will be shown in block below
-                        if (!enclosure.isImage) {
-                            val openLabel =
-                                if (enclosure.name.isBlank()) {
-                                    stringResource(R.string.open_enclosed_media)
-                                } else {
-                                    stringResource(R.string.open_enclosed_media_file, enclosure.name)
-                                }
-                            ProvideScaledText(
-                                style =
-                                    MaterialTheme.typography.bodyLarge.merge(
-                                        LinkTextStyle(),
-                                    ),
-                            ) {
-                                Text(
-                                    text = openLabel,
-                                    modifier =
-                                        Modifier
-                                            .width(dimens.maxReaderWidth)
-                                            .clickable {
-                                                onEnclosureClick()
-                                            }.clearAndSetSemantics {
-                                                try {
-                                                    customActions =
-                                                        listOf(
-                                                            CustomAccessibilityAction(openLabel) {
-                                                                onEnclosureClick()
-                                                                true
-                                                            },
-                                                        )
-                                                } catch (e: Exception) {
-                                                    // Observed nullpointer exception when setting customActions
-                                                    // No clue why it could be null
-                                                    Log.e(
-                                                        LOG_TAG,
-                                                        "Exception in semantics",
-                                                        e,
-                                                    )
-                                                }
-                                            },
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Don't show image for full text articles since it's typically inside the full article
-                if (isFeedText && image?.fromBody == false) {
-                    val imageWidth: Int =
-                        if (image.width?.let { it < 640 } == true) {
-                            // Zero or too small, do not show
-                            -1
-                        } else if (image.width != null) {
-                            image.width ?: Int.MAX_VALUE
-                        } else {
-                            // Enclosures do not have a known width. This will be constrained below.
-                            Int.MAX_VALUE
-                        }
-
-                    if (imageWidth > 0) {
-                        offsetCounter++
-                        item {
-                            BoxWithConstraints(
-                                contentAlignment = Alignment.Center,
+                            },
+                ) {
+                    if (articleTitle.isNotBlank()) {
+                        WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
+                            val interactionSource = remember { MutableInteractionSource() }
+                            Text(
+                                text = articleTitle,
+                                style = MaterialTheme.typography.headlineLarge,
                                 modifier =
                                     Modifier
-                                        .clip(RectangleShape)
+                                        .indication(interactionSource, LocalIndication.current)
+                                        .focusableInNonTouchMode(interactionSource = interactionSource)
                                         .width(dimens.maxReaderWidth),
-                            ) {
-                                WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) {
-                                    val maxImageWidth by rememberMaxImageWidth()
-                                    val pixelDensity = LocalDensity.current.density
-                                    val contentScale =
-                                        remember(pixelDensity) {
-                                            RestrainedCropScaling(pixelDensity)
-                                        }
-                                    AsyncImage(
-                                        model =
-                                            ImageRequest
-                                                .Builder(LocalContext.current)
-                                                .data(image.url)
-                                                .scale(Scale.FIT)
-                                                .size(imageWidth.coerceAtMost(maxImageWidth))
-                                                .precision(Precision.INEXACT)
-                                                .build(),
-                                        contentDescription = enclosure.name,
-                                        placeholder =
-                                            rememberTintedVectorPainter(
-                                                Icons.Outlined.Terrain,
-                                            ),
-                                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                        contentScale = contentScale,
-                                        alignment = Alignment.Center,
+                            )
+                        }
+                    }
+                    ProvideScaledText(
+                        style =
+                            MaterialTheme.typography.titleMedium.merge(
+                                LinkTextStyle(),
+                            ),
+                    ) {
+                        WithBidiDeterminedLayoutDirection(paragraph = feedTitle) {
+                            Text(
+                                text = feedTitle,
+                                modifier =
+                                    Modifier
+                                        .width(dimens.maxReaderWidth)
+                                        .clearAndSetSemantics {
+                                            contentDescription = feedTitle
+                                        }.clickable {
+                                            onFeedTitleClick()
+                                        },
+                            )
+                        }
+                    }
+                    if (authorDate != null) {
+                        ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                WithBidiDeterminedLayoutDirection(paragraph = authorDate) {
+                                    val interactionSource = remember { MutableInteractionSource() }
+                                    Text(
+                                        text = authorDate,
                                         modifier =
                                             Modifier
-                                                .fillMaxWidth()
-                                                .run {
-                                                    dimens.imageAspectRatioInReader?.let { ratio ->
-                                                        aspectRatio(ratio)
-                                                    } ?: this
-                                                },
+                                                .width(dimens.maxReaderWidth)
+                                                .indication(interactionSource, LocalIndication.current)
+                                                .focusableInNonTouchMode(interactionSource = interactionSource),
                                     )
                                 }
                             }
                         }
                     }
-                }
-
-                articleBody(offsetCounter)
-
-                // Using spacer instead of content padding because padding interferes with scrollbar
-                item {
-                    Spacer(modifier = Modifier.height(92.dp))
+                    if (readTimeSecs > 0) {
+                        ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.width(dimens.maxReaderWidth),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Timelapse,
+                                        contentDescription = null,
+                                    )
+                                    val seconds = "%02d".format(readTimeSecs % 60)
+                                    val readTimeText =
+                                        pluralStringResource(
+                                            id = R.plurals.n_minutes,
+                                            count = readTimeSecs / 60,
+                                        ).format(
+                                            "${readTimeSecs / 60}:$seconds",
+                                        )
+                                    WithBidiDeterminedLayoutDirection(paragraph = readTimeText) {
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
+                                        Text(
+                                            text = readTimeText,
+                                            modifier =
+                                                Modifier
+                                                    .weight(1f)
+                                                    .indication(
+                                                        interactionSource,
+                                                        LocalIndication.current,
+                                                    ).focusableInNonTouchMode(interactionSource = interactionSource),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            if (enclosure.present) {
+                offsetCounter++
+                run {
+                    // Image will be shown in block below
+                    if (!enclosure.isImage) {
+                        val openLabel =
+                            if (enclosure.name.isBlank()) {
+                                stringResource(R.string.open_enclosed_media)
+                            } else {
+                                stringResource(R.string.open_enclosed_media_file, enclosure.name)
+                            }
+                        ProvideScaledText(
+                            style =
+                                MaterialTheme.typography.bodyLarge.merge(
+                                    LinkTextStyle(),
+                                ),
+                        ) {
+                            Text(
+                                text = openLabel,
+                                modifier =
+                                    Modifier
+                                        .width(dimens.maxReaderWidth)
+                                        .clickable {
+                                            onEnclosureClick()
+                                        }.clearAndSetSemantics {
+                                            try {
+                                                customActions =
+                                                    listOf(
+                                                        CustomAccessibilityAction(openLabel) {
+                                                            onEnclosureClick()
+                                                            true
+                                                        },
+                                                    )
+                                            } catch (e: Exception) {
+                                                // Observed nullpointer exception when setting customActions
+                                                // No clue why it could be null
+                                                Log.e(
+                                                    LOG_TAG,
+                                                    "Exception in semantics",
+                                                    e,
+                                                )
+                                            }
+                                        },
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Don't show image for full text articles since it's typically inside the full article
+            if (isFeedText && image?.fromBody == false) {
+                val imageWidth: Int =
+                    if (image.width?.let { it < 640 } == true) {
+                        // Zero or too small, do not show
+                        -1
+                    } else if (image.width != null) {
+                        image.width ?: Int.MAX_VALUE
+                    } else {
+                        // Enclosures do not have a known width. This will be constrained below.
+                        Int.MAX_VALUE
+                    }
+
+                if (imageWidth > 0) {
+                    offsetCounter++
+                    run {
+                        BoxWithConstraints(
+                            contentAlignment = Alignment.Center,
+                            modifier =
+                                Modifier
+                                    .clip(RectangleShape)
+                                    .width(dimens.maxReaderWidth),
+                        ) {
+                            WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) {
+                                val maxImageWidth by rememberMaxImageWidth()
+                                val pixelDensity = LocalDensity.current.density
+                                val contentScale =
+                                    remember(pixelDensity) {
+                                        RestrainedCropScaling(pixelDensity)
+                                    }
+                                AsyncImage(
+                                    model =
+                                        ImageRequest
+                                            .Builder(LocalContext.current)
+                                            .data(image.url)
+                                            .scale(Scale.FIT)
+                                            .size(imageWidth.coerceAtMost(maxImageWidth))
+                                            .precision(Precision.INEXACT)
+                                            .build(),
+                                    contentDescription = enclosure.name,
+                                    placeholder =
+                                        rememberTintedVectorPainter(
+                                            Icons.Outlined.Terrain,
+                                        ),
+                                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                    contentScale = contentScale,
+                                    alignment = Alignment.Center,
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .run {
+                                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                                    aspectRatio(ratio)
+                                                } ?: this
+                                            },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            articleBody(offsetCounter)
+
+            // Bottom spacing
+            Spacer(modifier = Modifier.height(92.dp))
         }
     }
 }

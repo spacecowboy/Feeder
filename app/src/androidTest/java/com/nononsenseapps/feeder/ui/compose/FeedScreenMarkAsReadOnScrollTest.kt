@@ -47,8 +47,8 @@ class FeedScreenMarkAsReadOnScrollTest : BaseComposeTest {
                 val feedId =
                     repository.saveFeed(
                         Feed(
-                            title = "Ampersands are & the worst",
-                            url = URL("https://example.com/ampersands"),
+                            title = "Scrolling and marking",
+                            url = URL("https://example.com/scrollingmarkasread"),
                         ),
                     )
 

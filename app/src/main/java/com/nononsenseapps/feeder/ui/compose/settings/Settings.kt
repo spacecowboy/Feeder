@@ -158,6 +158,8 @@ fun SettingsScreen(
             feedItemStyleValue = viewState.feedItemStyle,
             onFeedItemStyleChange = settingsViewModel::setFeedItemStyle,
             blockListValue = ImmutableHolder(viewState.blockList.sorted()),
+            applyBlocklistToSummaries = viewState.applyBlocklistToSummaries,
+            onApplyBlocklistToSummariesChange = settingsViewModel::setApplyBlocklistToSummaries,
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChange = settingsViewModel::setSwipeAsRead,
             syncOnStartupValue = viewState.syncOnResume,
@@ -237,6 +239,8 @@ private fun SettingsScreenPreview() {
             feedItemStyleValue = FeedItemStyle.CARD,
             onFeedItemStyleChange = {},
             blockListValue = ImmutableHolder(emptyList()),
+            applyBlocklistToSummaries = false,
+            onApplyBlocklistToSummariesChange = {},
             swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
             onSwipeAsReadOptionChange = {},
             syncOnStartupValue = true,
@@ -305,6 +309,8 @@ fun SettingsList(
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChange: (FeedItemStyle) -> Unit,
     blockListValue: ImmutableHolder<List<String>>,
+    applyBlocklistToSummaries: Boolean,
+    onApplyBlocklistToSummariesChange: (Boolean) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChange: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
@@ -443,8 +449,12 @@ fun SettingsList(
                 }
             },
             currentValue = blockListValue,
+            showToggle = true,
+            toggleValue = applyBlocklistToSummaries,
+            toggleLabel = stringResource(id = R.string.apply_blocklist_to_summaries),
             onAddItem = onBlockListAdd,
             onRemoveItem = onBlockListRemove,
+            onToggleChange = onApplyBlocklistToSummariesChange,
         )
 
         NotificationsSetting(
@@ -1002,7 +1012,11 @@ fun ListDialogSetting(
     onAddItem: (String) -> Unit,
     onRemoveItem: (String) -> Unit,
     modifier: Modifier = Modifier,
+    showToggle: Boolean = false,
+    toggleValue: Boolean = false,
+    toggleLabel: String = "",
     icon: @Composable () -> Unit = {},
+    onToggleChange: (Boolean) -> Unit = {},
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -1042,11 +1056,15 @@ fun ListDialogSetting(
             EditableListDialog(
                 title = dialogTitle,
                 items = currentValue,
+                showToggle = showToggle,
+                toggleValue = toggleValue,
+                toggleLabel = toggleLabel,
                 onDismiss = {
                     expanded = false
                 },
-                onAddItem = onAddItem,
                 onRemoveItem = onRemoveItem,
+                onAddItem = onAddItem,
+                onToggleChange = onToggleChange,
             )
         }
     }

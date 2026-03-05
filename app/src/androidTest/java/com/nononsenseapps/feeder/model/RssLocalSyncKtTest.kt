@@ -89,7 +89,13 @@ class RssLocalSyncKtTest : DIAware {
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
-        bind<SharedPreferences>() with singleton { getApplicationContext<FeederApplication>().getSharedPreferences("test", Context.MODE_PRIVATE) }
+        bind<SharedPreferences>() with
+            singleton {
+                getApplicationContext<FeederApplication>().getSharedPreferences(
+                    "test",
+                    Context.MODE_PRIVATE,
+                )
+            }
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
         bind<Repository>() with singleton { Repository(di) }
         bind<FilePathProvider>() with
@@ -116,6 +122,7 @@ class RssLocalSyncKtTest : DIAware {
     @Before
     fun setup() {
         server.start()
+        settingsStore.setCurrentArticle(ID_UNSET)
     }
 
     private suspend fun insertFeed(
@@ -329,7 +336,8 @@ class RssLocalSyncKtTest : DIAware {
                     cowboyJson,
                 )
 
-            val fourteenMinsAgo = Instant.now().minusMinutes(14)
+            // Truncate to milliseconds to match database precision
+            val fourteenMinsAgo = Instant.ofEpochMilli(Instant.now().minusMinutes(14).toEpochMilli())
             runBlocking {
                 rssLocalSync.syncFeeds(feedId = cowboyJsonId, forceNetwork = true)
                 testDb.db.feedDao().getFeed(cowboyJsonId)!!.let { feed ->
@@ -758,6 +766,65 @@ class RssLocalSyncKtTest : DIAware {
                     it.guid in expectedGuids
                 }
             }
+        }
+
+    @Test
+    fun currentlySelectedArticleIsNotDeleted(): Unit =
+        runBlocking {
+            settingsStore.setMaxCountPerFeed(1)
+
+            val atomUrl = server.url("/atom.xml").toUrl()
+            val cowboyAtomId = insertFeed("cowboyAtom", atomUrl, cowboyAtom, isJson = false, skipDuplicates = true)
+
+            rssLocalSync.syncFeeds(feedId = cowboyAtomId)
+
+            assertEquals(
+                "All items from first feed should be present",
+                15,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
+                    .size,
+            )
+
+            // Get an article that would normally be deleted and set it as currently selected
+            val items =
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
+
+            // Select an article that would be deleted
+            val selectedArticle =
+                items.firstOrNull { it.link == "https://cowboyprogrammer.org/2014/04/are-ipads-retarding-us/" }
+            assertNotNull(
+                "Could not find the specified article: ${items.firstOrNull { it.link?.contains("retard") ?: false }}",
+                selectedArticle,
+            )
+            val selectedArticleId = selectedArticle!!.id
+            settingsStore.setCurrentArticle(selectedArticleId)
+
+            // Delete items by syncing again with smaller feed
+            responses[atomUrl] =
+                MockResponse().apply {
+                    setResponseCode(200)
+                    setHeader("Content-Type", "application/xml")
+                    setBody(cowboyDeletedMiddleAtom)
+                }
+
+            rssLocalSync.syncFeeds(feedId = cowboyAtomId, debugReallyForceNetwork = true)
+
+            val itemsAfterSync =
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(cowboyAtomId)
+
+            assertTrue("Selected article should not have been deleted") {
+                itemsAfterSync.any { it.id == selectedArticleId }
+            }
+
+            // Verify the selected article is still in the database
+            val selectedArticleFromDb = testDb.db.feedItemDao().loadFeedItem(selectedArticleId)
+            assertNotNull("Selected article should still exist in database", selectedArticleFromDb)
         }
 
     private fun fooRss(itemsCount: Int = 1): String {

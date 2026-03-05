@@ -263,11 +263,13 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
 
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+    implementation(libs.glance.preview)
+    implementation(libs.glance.appwidget.preview)
+
     // Markdown
     implementation(libs.jetbrains.markdown)
-
-    // Only for debug
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:3.0-alpha-8")
 
     // Tests
     testImplementation(libs.bundles.kotlin)

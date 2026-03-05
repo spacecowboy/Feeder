@@ -99,6 +99,8 @@ class Repository(
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
 
+    val currentWidgetFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentWidgetFeedAndTag
+
     fun getUnreadCount(
         feedId: Long,
         tag: String = "",
@@ -130,6 +132,13 @@ class Repository(
         if (settingsStore.setCurrentFeedAndTag(feedId, tag)) {
             setMinReadTime(Instant.now())
         }
+    }
+
+    fun setCurrentWidgetFeedAndTag(
+        feedId: Long,
+        tag: String,
+    ) {
+        settingsStore.setCurrentWidgetFeedAndTag(feedId, tag)
     }
 
     val isArticleOpen: StateFlow<Boolean> = settingsStore.isArticleOpen
@@ -210,6 +219,13 @@ class Repository(
 
     suspend fun removeBlocklistPattern(pattern: String) {
         settingsStore.removeBlocklistPattern(pattern)
+        runOnceBlocklistUpdate(di)
+    }
+
+    val applyBlocklistToSummaries: StateFlow<Boolean> = settingsStore.applyBlocklistToSummaries
+
+    suspend fun setApplyBlocklistToSummaries(value: Boolean) {
+        settingsStore.setApplyBlocklistToSummaries(value)
         runOnceBlocklistUpdate(di)
     }
 
@@ -371,6 +387,32 @@ class Repository(
                 newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
                 filter = feedListFilter,
                 search = search,
+            )
+        }.flatMapLatest {
+            feedItemStore.getPagedFeedItemsRaw(
+                feedId = it.feedId,
+                tag = it.tag,
+                minReadTime = it.minReadTime,
+                newestFirst = it.newestFirst,
+                filter = it.filter,
+                search = it.search,
+            )
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentWidgetFeedListItems(): Flow<PagingData<FeedListItem>> =
+        combine(
+            currentWidgetFeedAndTag,
+            feedListFilter,
+        ) { feedAndTag, feedListFilter ->
+            val (feedId, tag) = feedAndTag
+            FeedListArgs(
+                feedId = feedId,
+                tag = tag,
+                minReadTime = Instant.EPOCH,
+                newestFirst = true,
+                filter = feedListFilter,
+                search = "",
             )
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(

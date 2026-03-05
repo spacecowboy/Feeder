@@ -138,7 +138,11 @@ class OPMLTest : DIAware {
             val actual = settingsStore.getAllSettings()
 
             ALL_SETTINGS_WITH_VALUES.toList().forEachIndexed { index, (key, expected) ->
-                assertEquals("$index: Setting $key, expected $expected but was ${actual[key]}", expected, actual[key].toString())
+                assertEquals(
+                    "$index: Setting $key, expected $expected but was ${actual[key]}",
+                    expected,
+                    actual[key].toString(),
+                )
             }
 
             val actualBlocked = settingsStore.blockListPreference.first()
@@ -619,8 +623,8 @@ class OPMLTest : DIAware {
             feedStore
                 .saveFeed(
                     Feed(
-                        title = "Ampersands are & the worst",
-                        url = URL("https://example.com/ampersands"),
+                        title = "ExportThenImport",
+                        url = URL("https://example.com/exportthenimport"),
                     ),
                 ).also { feedIds.add(it) }
             feedStore
