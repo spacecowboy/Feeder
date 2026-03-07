@@ -290,4 +290,6 @@
     <string name="no_article_link_browser">Kan ikke åbne artikel i browser</string>
     <string name="no_article_link_custom_tab">Kan ikke åbne artikel i brugerdefineret fane</string>
     <string name="openai_settings_info">Kompatibel med mange AI-udbydere, men ikke alle</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Opfrisker</string>
 </resources>
