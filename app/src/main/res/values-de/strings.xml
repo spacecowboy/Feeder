@@ -290,4 +290,5 @@
     <string name="open_article_in_custom_tab">Im In‑App‑Browser öffnen</string>
     <string name="no_article_link_browser">Artikel kann im Browser nicht geöffnet werden</string>
     <string name="no_article_link_custom_tab">Artikel kann nicht im In‑App‑Browser geöffnet werden</string>
+    <string name="widget_title">Feeder</string>
 </resources>
