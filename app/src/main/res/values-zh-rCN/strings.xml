@@ -290,4 +290,6 @@
     <string name="no_article_link_browser">无法在浏览器中打开文章</string>
     <string name="no_article_link_custom_tab">无法在自定义标签页中打开文章</string>
     <string name="apply_blocklist_to_summaries">应用于摘要</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">刷新中</string>
 </resources>
