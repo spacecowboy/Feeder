@@ -290,4 +290,6 @@
     <string name="open_article_in_custom_tab">Ouvrir dans un onglet personnalisé</string>
     <string name="no_article_link_browser">Impossible d\'ouvrir l\'article dans le navigateur</string>
     <string name="no_article_link_custom_tab">Impossible d\'ouvrir l\'article dans un onglet personnalisé</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Actualisation</string>
 </resources>
