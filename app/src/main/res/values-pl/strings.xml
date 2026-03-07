@@ -149,7 +149,7 @@
     <string name="or_open_device_sync_link">Alternatywnie otwórz link na swoim urządzeniu.</string>
     <string name="qr_code">Kod QR</string>
     <string name="leave_sync_chain">Opuść łańcuch synchronizacji</string>
-    <string name="feeder_device_sync_code">Kod synchronizacji urządzenia Feeder</string>
+    <string name="feeder_device_sync_code">Kod synchronizacji urządzenia z Feederem</string>
     <string name="scan_or_enter_code">Zeskanuj lub wprowadź kod synchronizacji</string>
     <string name="sync_code">Kod synchronizacji</string>
     <string name="secret_key">Klucz tajny</string>
@@ -290,4 +290,6 @@
     <string name="open_article_in_custom_tab">Otwórz w niestandardowej karcie</string>
     <string name="no_article_link_browser">Nie udało się otworzyć artykułu w przeglądarce</string>
     <string name="no_article_link_custom_tab">Nie udało się otworzyć artykułu w niestandardowej karcie</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Odświeżanie</string>
 </resources>
