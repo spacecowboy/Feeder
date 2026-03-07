@@ -290,4 +290,6 @@
     <string name="open_article_in_custom_tab">Megnyitás egyéni lapon</string>
     <string name="no_article_link_browser">A cikk nem nyitható meg a böngészőben</string>
     <string name="no_article_link_custom_tab">A cikk nem nyitható meg egyéni lapon</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Frissítés</string>
 </resources>
