@@ -290,4 +290,6 @@
     <string name="open_article_in_custom_tab">Apri in scheda personalizzata</string>
     <string name="no_article_link_browser">Impossibile aprire l\'articolo nel browser</string>
     <string name="no_article_link_custom_tab">Impossibile aprire l\'articolo nella scheda personalizzata</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Aggiornamento</string>
 </resources>
