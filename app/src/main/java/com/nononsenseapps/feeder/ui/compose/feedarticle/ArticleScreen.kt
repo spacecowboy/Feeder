@@ -4,14 +4,15 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,9 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.clickable
-import com.nononsenseapps.feeder.ui.MainActivityViewModel
-import com.nononsenseapps.feeder.ui.ScrollDirection
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -66,6 +64,8 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.ui.MainActivityViewModel
+import com.nononsenseapps.feeder.ui.ScrollDirection
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
@@ -90,6 +90,7 @@ fun ArticleScreen(
     onNavigateToFeed: (Long) -> Unit,
     viewModel: ArticleViewModel,
     mainActivityViewModel: MainActivityViewModel,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
     val di = LocalDI.current
@@ -175,6 +176,7 @@ fun ArticleScreen(
         onSummarize = {
             viewModel.summarize()
         },
+        modifier = modifier,
         isPagingMode = isPagingMode,
         isAnimatedPaging = isAnimatedPaging,
     )
@@ -201,9 +203,9 @@ fun ArticleScreen(
     articleScrollState: ScrollState,
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
+    modifier: Modifier = Modifier,
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
-    modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
