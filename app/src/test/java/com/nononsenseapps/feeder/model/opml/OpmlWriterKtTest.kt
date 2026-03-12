@@ -140,6 +140,8 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_font" value="bundled/roboto_flex"/>
               <feeder:setting key="pref_show_reading_time" value="false"/>
               <feeder:setting key="pref_open_drawer_on_fab" value="true"/>
+              <feeder:setting key="pref_paging_mode" value="true"/>
+              <feeder:setting key="pref_animated_paging" value="true"/>
               <feeder:setting key="pref_show_title_unread_count" value="true"/>
               <feeder:setting key="pref_max_item_count_per_feed" value="200"/>
               <feeder:setting key="pref_openai_key" value="test-api-key"/>
@@ -188,6 +190,8 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_FONT -> "bundled/roboto_flex"
                         UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
                         UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
+                        UserSettings.SETTING_PAGING_MODE -> "true"
+                        UserSettings.SETTING_ANIMATED_PAGING -> "true"
                         UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
                         UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
                         UserSettings.SETTING_OPENAI_KEY -> "test-api-key"

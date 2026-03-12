@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -12,6 +13,7 @@ import androidx.core.util.Consumer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.background.runOnceSyncChainGetUpdates
 import com.nononsenseapps.feeder.background.schedulePeriodicOrphanedFilesCleanup
@@ -32,6 +34,7 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
+    private val repository: Repository by instance()
 
     override fun onStart() {
         super.onStart()
@@ -47,6 +50,25 @@ class MainActivity : DIAwareComponentActivity() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
         maybeRequestSync()
+    }
+
+    override fun onKeyDown(
+        keyCode: Int,
+        event: KeyEvent?,
+    ): Boolean {
+        if (mainActivityViewModel.isPagingMode.value && repository.isArticleOpen.value) {
+            when (keyCode) {
+                KeyEvent.KEYCODE_VOLUME_UP -> {
+                    mainActivityViewModel.emitScrollCommand(ScrollDirection.UP)
+                    return true
+                }
+                KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                    mainActivityViewModel.emitScrollCommand(ScrollDirection.DOWN)
+                    return true
+                }
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun maybeRequestSync() =
@@ -86,18 +108,18 @@ class MainActivity : DIAwareComponentActivity() {
         val navDrawerListState = rememberLazyListState()
 
         NavHost(navController, startDestination = FeedDestination.route) {
-            FeedDestination.register(this, navController, navDrawerListState)
-            ArticleDestination.register(this, navController, navDrawerListState)
+            FeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
+            ArticleDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
             // Feed editing
-            EditFeedDestination.register(this, navController, navDrawerListState)
-            SearchFeedDestination.register(this, navController, navDrawerListState)
-            AddFeedDestination.register(this, navController, navDrawerListState)
+            EditFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
+            SearchFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
+            AddFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
             // Settings
-            SettingsDestination.register(this, navController, navDrawerListState)
+            SettingsDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
             // Sync settings
-            SyncScreenDestination.register(this, navController, navDrawerListState)
+            SyncScreenDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
             // Add Fonts
-            TextSettingsDestination.register(this, navController, navDrawerListState)
+            TextSettingsDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
         }
 
         DisposableEffect(navController) {

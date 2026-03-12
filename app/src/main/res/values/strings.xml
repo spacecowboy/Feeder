@@ -256,6 +256,10 @@
   <string name="no_url">No URL</string>
   <string name="add_anyway">Add anyway</string>
   <string name="open_browser_in_split_screen">Open browser in split screen</string>
+  <string name="pref_paging_mode_title">Paging Mode</string>
+  <string name="pref_paging_mode_description">Navigate articles by \"turning pages\" instead of continuous scrolling. Optimized for e-ink devices.</string>
+  <string name="pref_animated_paging_title">Animated Paging</string>
+  <string name="pref_animated_paging_description">Briefly animate page turns. May cause ghosting on some e-ink devices.</string>
   <string name="show_reading_time">Show estimated reading time</string>
   <string name="zero_words">%1$s words</string>
   <string name="one_word">%1$s word</string>
