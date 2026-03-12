@@ -440,6 +440,10 @@ class FeedViewModel(
         repository.setFeedListFilterRead(value)
     }
 
+    override fun setUnread(value: Boolean) {
+        repository.setFeedListFilterUnread(value)
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_FeedVM"
     }
@@ -533,6 +537,8 @@ interface FeedListFilterCallback {
     fun setRecentlyRead(value: Boolean)
 
     fun setRead(value: Boolean)
+
+    fun setUnread(value: Boolean)
 }
 
 val FeedListFilter.onlyUnread: Boolean
