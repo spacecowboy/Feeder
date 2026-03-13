@@ -284,4 +284,12 @@
     <string name="feed_search_suggestions_header">Пропозиції</string>
     <string name="summarize_on_open">Підсумувати при відкритті</string>
     <string name="openai_settings_info">Сумісний з багатьма постачальниками ШІ, але не з усіма</string>
+    <string name="open_article_in_reader">Відкрити в читачці</string>
+    <string name="open_article_in_default_browser">Відкрити в типовому браузері</string>
+    <string name="open_article_in_custom_tab">Відкрити у власній вкладці</string>
+    <string name="no_article_link_browser">Неможливо відкрити статтю в браузері</string>
+    <string name="no_article_link_custom_tab">Неможливо відкрити статтю у власній вкладці</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Оновлення</string>
+    <string name="apply_blocklist_to_summaries">Застосувати до підсумків</string>
 </resources>
