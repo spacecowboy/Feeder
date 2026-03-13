@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -159,63 +161,71 @@ fun ListOfFeedsAndTags(
                 },
         ) { itemIndex ->
             val item = feedsAndTags[itemIndex]
-            when (item?.contentType) {
-                null -> {
-                    Placeholder()
+            val showFeedsDivider = itemIndex == 2 && item?.contentType?.isFeedListItem == true
+
+            Column {
+                if (showFeedsDivider) {
+                    HorizontalDivider(modifier = Modifier.fillMaxWidth())
                 }
 
-                ContentType.AllFeeds -> {
-                    AllFeeds(
-                        unreadCount = item.unreadCount,
-                        title = stringResource(id = R.string.all_feeds),
-                        onItemClick = {
-                            onItemClick(item)
-                        },
-                    )
-                }
+                when (item?.contentType) {
+                    null -> {
+                        Placeholder()
+                    }
 
-                ContentType.SavedArticles -> {
-                    SavedArticles(
-                        unreadCount = item.unreadCount,
-                        title = stringResource(id = R.string.saved_articles),
-                        onItemClick = {
-                            onItemClick(item)
-                        },
-                    )
-                }
+                    ContentType.AllFeeds -> {
+                        AllFeeds(
+                            unreadCount = item.unreadCount,
+                            title = stringResource(id = R.string.all_feeds),
+                            onItemClick = {
+                                onItemClick(item)
+                            },
+                        )
+                    }
 
-                ContentType.Tag -> {
-                    ExpandableTag(
-                        expanded = item.expanded,
-                        onToggleExpansion = onToggleTagExpansion,
-                        unreadCount = item.unreadCount,
-                        title = item.tag,
-                        onItemClick = {
-                            onItemClick(item)
-                        },
-                    )
-                }
+                    ContentType.SavedArticles -> {
+                        SavedArticles(
+                            unreadCount = item.unreadCount,
+                            title = stringResource(id = R.string.saved_articles),
+                            onItemClick = {
+                                onItemClick(item)
+                            },
+                        )
+                    }
 
-                ContentType.ChildFeed -> {
-                    ChildFeed(
-                        unreadCount = item.unreadCount,
-                        title = item.displayTitle,
-                        imageUrl = item.imageUrl?.toString(),
-                        onItemClick = {
-                            onItemClick(item)
-                        },
-                    )
-                }
+                    ContentType.Tag -> {
+                        ExpandableTag(
+                            expanded = item.expanded,
+                            onToggleExpansion = onToggleTagExpansion,
+                            unreadCount = item.unreadCount,
+                            title = item.tag,
+                            onItemClick = {
+                                onItemClick(item)
+                            },
+                        )
+                    }
 
-                ContentType.TopLevelFeed -> {
-                    TopLevelFeed(
-                        unreadCount = item.unreadCount,
-                        title = item.displayTitle,
-                        imageUrl = item.imageUrl?.toString(),
-                        onItemClick = {
-                            onItemClick(item)
-                        },
-                    )
+                    ContentType.ChildFeed -> {
+                        ChildFeed(
+                            unreadCount = item.unreadCount,
+                            title = item.displayTitle,
+                            imageUrl = item.imageUrl?.toString(),
+                            onItemClick = {
+                                onItemClick(item)
+                            },
+                        )
+                    }
+
+                    ContentType.TopLevelFeed -> {
+                        TopLevelFeed(
+                            unreadCount = item.unreadCount,
+                            title = item.displayTitle,
+                            imageUrl = item.imageUrl?.toString(),
+                            onItemClick = {
+                                onItemClick(item)
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -244,6 +254,19 @@ enum class ContentType {
     ChildFeed,
     TopLevelFeed,
 }
+
+private val ContentType.isFeedListItem: Boolean
+    get() =
+        when (this) {
+            ContentType.Tag,
+            ContentType.ChildFeed,
+            ContentType.TopLevelFeed,
+            -> true
+
+            ContentType.AllFeeds,
+            ContentType.SavedArticles,
+            -> false
+        }
 
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
