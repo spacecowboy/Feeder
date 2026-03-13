@@ -211,6 +211,10 @@ fun SettingsScreen(
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             onTextSettings = onNavigateToTextSettingsScreen,
             currentFontSelection = viewState.font,
+            isPagingMode = viewState.isPagingMode,
+            onIsPagingModeChange = settingsViewModel::setIsPagingMode,
+            isAnimatedPaging = viewState.isAnimatedPaging,
+            onIsAnimatedPagingChange = settingsViewModel::setIsAnimatedPaging,
             onSendFeedback = {
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = true,
@@ -290,6 +294,10 @@ private fun SettingsScreenPreview() {
             onOpenDrawerOnFab = {},
             onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
+            isPagingMode = false,
+            onIsPagingModeChange = {},
+            isAnimatedPaging = false,
+            onIsAnimatedPagingChange = {},
             onSendFeedback = {},
             modifier = Modifier,
         )
@@ -359,6 +367,10 @@ fun SettingsList(
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
+    isPagingMode: Boolean,
+    onIsPagingModeChange: (Boolean) -> Unit,
+    isAnimatedPaging: Boolean,
+    onIsAnimatedPagingChange: (Boolean) -> Unit,
     onTextSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     modifier: Modifier = Modifier,
@@ -698,6 +710,22 @@ fun SettingsList(
                     title = stringResource(id = R.string.open_browser_in_split_screen),
                     checked = isOpenAdjacent,
                     onCheckedChange = onOpenAdjacent,
+                )
+            }
+
+            SwitchSetting(
+                title = stringResource(id = R.string.pref_paging_mode_title),
+                checked = isPagingMode,
+                onCheckedChange = onIsPagingModeChange,
+                description = stringResource(id = R.string.pref_paging_mode_description),
+            )
+
+            if (isPagingMode) {
+                SwitchSetting(
+                    title = stringResource(id = R.string.pref_animated_paging_title),
+                    checked = isAnimatedPaging,
+                    onCheckedChange = onIsAnimatedPagingChange,
+                    description = stringResource(id = R.string.pref_animated_paging_description),
                 )
             }
         }

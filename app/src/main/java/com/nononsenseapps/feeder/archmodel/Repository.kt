@@ -826,6 +826,18 @@ class Repository(
         settingsStore.setOpenAdjacent(value)
     }
 
+    val isPagingMode: StateFlow<Boolean> = settingsStore.isPagingMode
+
+    fun setIsPagingMode(value: Boolean) {
+        settingsStore.setIsPagingMode(value)
+    }
+
+    val isAnimatedPaging: StateFlow<Boolean> = settingsStore.isAnimatedPaging
+
+    fun setIsAnimatedPaging(value: Boolean) {
+        settingsStore.setIsAnimatedPaging(value)
+    }
+
     val showReadingTime: StateFlow<Boolean> = settingsStore.showReadingTime
 
     fun setShowReadingTime(value: Boolean) {

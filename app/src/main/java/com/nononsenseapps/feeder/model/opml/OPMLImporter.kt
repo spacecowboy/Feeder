@@ -94,6 +94,8 @@ open class OPMLImporter(
             UserSettings.SETTINGS_FILTER_READ -> settingsStore.setFeedListFilterRead(value.toBoolean())
             UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> settingsStore.setShowOnlyTitles(value.toBoolean())
             UserSettings.SETTING_OPEN_ADJACENT -> settingsStore.setOpenAdjacent(value.toBoolean())
+            UserSettings.SETTING_PAGING_MODE -> settingsStore.setIsPagingMode(value.toBoolean())
+            UserSettings.SETTING_ANIMATED_PAGING -> settingsStore.setIsAnimatedPaging(value.toBoolean())
             UserSettings.SETTING_FONT ->
                 settingsStore.setFont(
                     com.nononsenseapps.feeder.ui.compose.settings.getFontSelectionFromPath(
