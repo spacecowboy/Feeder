@@ -73,6 +73,17 @@ class FeedItemStore(
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
     }
 
+    fun getWidgetFeedListItems(
+        feedId: Long,
+        tag: String,
+    ): Flow<List<FeedListItem>> =
+        when {
+            feedId == ID_SAVED_ARTICLES -> dao.widgetPreviewsSaved()
+            feedId > ID_UNSET -> dao.widgetPreviewsByFeed(feedId)
+            tag.isNotEmpty() -> dao.widgetPreviewsByTag(tag)
+            else -> dao.widgetPreviewsAllFeeds()
+        }.map { list -> list.map { it.toFeedListItem() } }
+
     fun getPagedFeedItemsRaw(
         feedId: Long,
         tag: String,

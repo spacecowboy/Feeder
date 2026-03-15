@@ -162,6 +162,57 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
+          AND block_time IS NULL
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
+        LIMIT 50
+        """,
+    )
+    fun widgetPreviewsByFeed(feedId: Long): Flow<List<PreviewItem>>
+
+    @Query(
+        """
+        SELECT $PREVIEW_COLUMNS
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag
+          AND block_time IS NULL
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
+        LIMIT 50
+        """,
+    )
+    fun widgetPreviewsByTag(tag: String): Flow<List<PreviewItem>>
+
+    @Query(
+        """
+        SELECT $PREVIEW_COLUMNS
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE block_time IS NULL
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
+        LIMIT 50
+        """,
+    )
+    fun widgetPreviewsAllFeeds(): Flow<List<PreviewItem>>
+
+    @Query(
+        """
+        SELECT $PREVIEW_COLUMNS
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1
+          AND block_time IS NULL
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
+        LIMIT 50
+        """,
+    )
+    fun widgetPreviewsSaved(): Flow<List<PreviewItem>>
+
+    @Query(
+        """
+        SELECT $PREVIEW_COLUMNS
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND block_time is null

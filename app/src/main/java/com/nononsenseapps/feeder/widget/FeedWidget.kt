@@ -5,10 +5,11 @@ import android.graphics.Bitmap
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -22,7 +23,6 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -37,9 +37,6 @@ import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.paging.PagingData
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.map
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
@@ -56,15 +53,12 @@ import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
-import java.io.File
 import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
-import kotlin.getValue
 
 data class FeedWidgetItem(
     val id: Long,
@@ -103,7 +97,7 @@ sealed class WidgetState {
     data object Syncing : WidgetState()
 
     data class Ready(
-        val items: PagingData<FeedWidgetItem>,
+        val items: List<FeedWidgetItem>,
     ) : WidgetState()
 }
 
@@ -115,12 +109,12 @@ object FeederWidgetGlanceColorScheme {
         )
 }
 
-private class WidgetStateDataStore(
-    private val context: Context,
-) : DataStore<WidgetState> {
-    private val app = (context.applicationContext as FeederApplication)
-    private val imageLoader = app.imageLoader
-    private val loadImageBitmap: suspend (String) -> Bitmap? = { url ->
+private fun buildWidgetStateFlow(
+    app: FeederApplication,
+    context: Context,
+): Flow<WidgetState> {
+    val imageLoader = app.imageLoader
+    val loadImageBitmap: suspend (String) -> Bitmap? = { url ->
         val request =
             ImageRequest
                 .Builder(context)
@@ -134,53 +128,41 @@ private class WidgetStateDataStore(
         (imageLoader.execute(request) as? SuccessResult)?.image?.toBitmap(200, 200, Bitmap.Config.RGB_565)
     }
 
-    private val repository: Repository by app.di.instance()
+    val repository: Repository by app.di.instance()
 
-    override val data: Flow<WidgetState>
-        get() =
-            combine(
-                repository.syncWorkerRunning,
-                repository
-                    .getCurrentWidgetFeedListItems()
-                    .map { pagingData ->
-                        pagingData
-                            .map { listItem ->
-                                val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                                listItem.toWidgetItem(bitmap)
-                            }
-                    },
-            ) { syncWorkerRunning, feedWidgetItems ->
-                if (syncWorkerRunning) {
-                    WidgetState.Syncing
-                } else {
-                    WidgetState.Ready(feedWidgetItems)
+    return combine(
+        repository.syncWorkerRunning,
+        repository
+            .getCurrentWidgetFeedListItems()
+            .map { listItems ->
+                buildList {
+                    for (listItem in listItems) {
+                        val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
+                        add(listItem.toWidgetItem(bitmap))
+                    }
                 }
-            }
-
-    override suspend fun updateData(transform: suspend (t: WidgetState) -> WidgetState): WidgetState = throw NotImplementedError("Widget does not need to update its own data")
+            },
+    ) { syncWorkerRunning, items ->
+        if (syncWorkerRunning) {
+            WidgetState.Syncing
+        } else {
+            WidgetState.Ready(items)
+        }
+    }
 }
 
 class FeedWidget : GlanceAppWidget() {
-    override val stateDefinition: GlanceStateDefinition<WidgetState>
-        get() =
-            object : GlanceStateDefinition<WidgetState> {
-                override suspend fun getDataStore(
-                    context: Context,
-                    fileKey: String,
-                ): DataStore<WidgetState> = WidgetStateDataStore(context)
-
-                override fun getLocation(
-                    context: Context,
-                    fileKey: String,
-                ): File = throw NotImplementedError("Widget does not provide a concrete state file location")
-            }
+    override val stateDefinition: GlanceStateDefinition<*>? = null
 
     override suspend fun provideGlance(
         context: Context,
         id: GlanceId,
     ) {
+        val app = context.applicationContext as FeederApplication
+        val widgetStateFlow = buildWidgetStateFlow(app, context)
+
         provideContent {
-            val app = (context.applicationContext as FeederApplication)
+            val widgetState by widgetStateFlow.collectAsState(initial = WidgetState.Syncing)
             val coroutineScope = rememberCoroutineScope()
             val runSync = {
                 val rssLocalSync by app.di.instance<RssLocalSync>()
@@ -189,7 +171,7 @@ class FeedWidget : GlanceAppWidget() {
             }
             GlanceTheme(colors = FeederWidgetGlanceColorScheme.colors) {
                 WidgetContent(
-                    widgetState = currentState(),
+                    widgetState = widgetState,
                     runSync = runSync,
                 )
             }
@@ -211,10 +193,7 @@ class FeedWidget : GlanceAppWidget() {
             FeederTitleBar(runSync)
             when (widgetState) {
                 is WidgetState.Syncing -> WidgetSyncingContent()
-                is WidgetState.Ready -> {
-                    val pagingItems = flowOf(widgetState.items).collectAsLazyPagingItems()
-                    WidgetReadyContent(pagingItems.itemSnapshotList.items)
-                }
+                is WidgetState.Ready -> WidgetReadyContent(widgetState.items)
             }
         }
     }
