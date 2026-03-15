@@ -19,7 +19,6 @@ import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.components.TitleBar
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -30,8 +29,8 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
-import androidx.glance.layout.width
 import androidx.glance.material3.ColorProviders
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.state.GlanceStateDefinition
@@ -212,35 +211,55 @@ class FeedWidget : GlanceAppWidget() {
             FeederTitleBar(runSync)
             when (widgetState) {
                 is WidgetState.Syncing -> WidgetSyncingContent()
-                is WidgetState.Ready -> WidgetReadyContent(widgetState.items)
+                is WidgetState.Ready -> {
+                    val pagingItems = flowOf(widgetState.items).collectAsLazyPagingItems()
+                    WidgetReadyContent(pagingItems.itemSnapshotList.items)
+                }
             }
         }
     }
 
     @Composable
     private fun FeederTitleBar(runSync: () -> Unit) {
-        TitleBar(
-            startIcon = ImageProvider(R.drawable.ic_stat_f),
-            title = LocalContext.current.getString(R.string.widget_title),
-            modifier = GlanceModifier.clickable(onClick = actionStartActivity(MainActivity::class.java)),
-            actions = {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth().padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(
+                modifier =
+                    GlanceModifier
+                        .clickable(onClick = actionStartActivity(MainActivity::class.java)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Image(
-                    provider = ImageProvider(R.drawable.ic_stat_sync),
+                    provider = ImageProvider(R.drawable.ic_stat_f),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
-                    modifier = GlanceModifier.clickable(runSync),
                 )
-
-                Spacer(modifier = GlanceModifier.width(8.dp))
-
-                Image(
-                    provider = ImageProvider(R.drawable.ic_settings),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
-                    modifier = GlanceModifier.clickable(actionStartActivity(FeedWidgetSettingsActivity::class.java)),
+                Text(
+                    text = LocalContext.current.getString(R.string.widget_title),
+                    style = TextStyle(color = GlanceTheme.colors.onSurface),
                 )
-            },
-        )
+            }
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
+            Image(
+                provider = ImageProvider(R.drawable.ic_stat_sync),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                modifier = GlanceModifier.padding(8.dp).clickable(runSync),
+            )
+
+            Image(
+                provider = ImageProvider(R.drawable.ic_settings),
+                contentDescription = "",
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                modifier =
+                    GlanceModifier
+                        .padding(start = 12.dp, end = 12.dp)
+                        .clickable(actionStartActivity(FeedWidgetSettingsActivity::class.java)),
+            )
+        }
     }
 
     @Composable
@@ -254,59 +273,69 @@ class FeedWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun WidgetReadyContent(data: PagingData<FeedWidgetItem>) {
-        val items = flowOf(data).collectAsLazyPagingItems()
+    private fun WidgetReadyContent(items: List<FeedWidgetItem>) {
         LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
             items(
-                count = items.itemCount,
-                itemId = { items[it]?.id ?: 0 },
+                count = items.size,
+                itemId = { items[it].id },
             ) { index ->
-                items[index]?.let {
-                    WidgetCard(it)
-                }
+                WidgetCard(items[index])
             }
         }
     }
 
     @Composable
     private fun WidgetCard(item: FeedWidgetItem) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            item.image?.let {
-                Image(ImageProvider(it), contentDescription = null)
-            }
-            Column {
-                Text(
-                    text = item.title,
-                    maxLines = 1,
-                    style =
-                        TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = GlanceTheme.colors.onSurface,
-                        ),
-                )
-                Text(
-                    text = item.snippet,
-                    maxLines = 1,
-                    style =
-                        TextStyle(
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.sp,
-                            color = GlanceTheme.colors.secondary,
-                        ),
-                )
+        Column(modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp)) {
+            Row(
+                modifier =
+                    GlanceModifier
+                        .fillMaxWidth()
+                        .background(GlanceTheme.colors.surfaceVariant)
+                        .padding(8.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                item.image?.let {
+                    Image(ImageProvider(it), contentDescription = null)
+                }
+                Column(modifier = GlanceModifier.padding(start = 8.dp)) {
+                    Text(
+                        text = item.title,
+                        maxLines = 2,
+                        style =
+                            TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = GlanceTheme.colors.onSurface,
+                            ),
+                    )
+                    Text(
+                        text = item.snippet,
+                        maxLines = 2,
+                        style =
+                            TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                color = GlanceTheme.colors.secondary,
+                            ),
+                    )
+                }
             }
         }
     }
 
     @Composable
     @OptIn(ExperimentalGlancePreviewApi::class)
-    @androidx.glance.preview.Preview(200, 200)
-    private fun PreviewWidgetContent() {
+    @androidx.glance.preview.Preview(400, 500)
+    internal fun PreviewWidgetContent() {
+        val iconBitmap =
+            Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888).also {
+                android.graphics.Canvas(it).drawColor(android.graphics.Color.rgb(80, 120, 200))
+            }
         val previewItems =
             listOf(
                 FeedWidgetItem(
-                    title = "title",
+                    title = "title which is very long because we have to get enough of the clicks baited in donchaknow",
                     snippet =
                         "snippet which is quite long as you might expect from a snipper of a story. " +
                             "It keeps going and going and going and going and going and going and going and going " +
@@ -316,7 +345,7 @@ class FeedWidget : GlanceAppWidget() {
                     feedTitle = "Super Duper Feed One two three hup di too dasf",
                     pubDate = "Jun 9, 2021",
                     unread = false,
-                    image = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888),
+                    image = iconBitmap,
                     link = null,
                     id = ID_UNSET,
                     bookmarked = false,
@@ -325,7 +354,33 @@ class FeedWidget : GlanceAppWidget() {
                     rawPubDate = null,
                     wordCount = 900,
                 ),
+                FeedWidgetItem(
+                    title = "Second article with a more reasonable title",
+                    snippet = "A shorter snippet that gets to the point quickly.",
+                    feedTitle = "Another Feed",
+                    pubDate = "Jun 10, 2021",
+                    unread = true,
+                    image = null,
+                    link = null,
+                    id = ID_UNSET + 1,
+                    bookmarked = false,
+                    feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
+                    wordCount = 200,
+                ),
             )
-        WidgetContent(WidgetState.Ready(PagingData.from(previewItems)), {})
+        GlanceTheme(colors = ColorProviders(light = darkColorScheme(), dark = darkColorScheme())) {
+            Column(
+                modifier =
+                    GlanceModifier
+                        .fillMaxHeight()
+                        .background(GlanceTheme.colors.background)
+                        .padding(4.dp),
+            ) {
+                FeederTitleBar({})
+                WidgetReadyContent(previewItems)
+            }
+        }
     }
 }
