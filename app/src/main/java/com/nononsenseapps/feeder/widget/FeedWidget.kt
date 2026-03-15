@@ -283,8 +283,14 @@ class FeedWidget : GlanceAppWidget() {
                         .padding(8.dp),
                 verticalAlignment = Alignment.Top,
             ) {
+                val contentColor =
+                    if (item.unread) GlanceTheme.colors.onSurface else GlanceTheme.colors.onSurfaceVariant
                 item.image?.let {
-                    Image(ImageProvider(it), contentDescription = null)
+                    Image(
+                        provider = ImageProvider(it),
+                        contentDescription = null,
+                        colorFilter = if (item.unread) null else ColorFilter.tint(contentColor),
+                    )
                 }
                 Column(modifier = GlanceModifier.padding(start = 8.dp)) {
                     Text(
@@ -294,7 +300,7 @@ class FeedWidget : GlanceAppWidget() {
                             TextStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
-                                color = GlanceTheme.colors.onSurface,
+                                color = contentColor,
                             ),
                     )
                     Text(
@@ -304,7 +310,7 @@ class FeedWidget : GlanceAppWidget() {
                             TextStyle(
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 12.sp,
-                                color = GlanceTheme.colors.secondary,
+                                color = contentColor,
                             ),
                     )
                 }
@@ -332,7 +338,7 @@ class FeedWidget : GlanceAppWidget() {
                             "going and going and going and going and going and going and going and going and snowing",
                     feedTitle = "Super Duper Feed One two three hup di too dasf",
                     pubDate = "Jun 9, 2021",
-                    unread = false,
+                    unread = true,
                     image = iconBitmap,
                     link = null,
                     id = ID_UNSET,
@@ -349,6 +355,21 @@ class FeedWidget : GlanceAppWidget() {
                     pubDate = "Jun 10, 2021",
                     unread = true,
                     image = null,
+                    link = null,
+                    id = ID_UNSET + 1,
+                    bookmarked = false,
+                    feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
+                    wordCount = 200,
+                ),
+                FeedWidgetItem(
+                    title = "This item is read",
+                    snippet = "A shorter snippet that gets to the point quickly.",
+                    feedTitle = "Another Feed",
+                    pubDate = "Jun 10, 2021",
+                    unread = false,
+                    image = iconBitmap,
                     link = null,
                     id = ID_UNSET + 1,
                     bookmarked = false,
