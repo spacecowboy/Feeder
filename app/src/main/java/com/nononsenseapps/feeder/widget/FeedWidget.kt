@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.widget
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -19,6 +21,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
@@ -51,6 +54,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -270,6 +274,11 @@ class FeedWidget : GlanceAppWidget() {
                 modifier =
                     GlanceModifier
                         .fillMaxWidth()
+                        .clickable(
+                            actionStartActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse("$DEEP_LINK_BASE_URI/article/${item.id}")),
+                            ),
+                        )
                         .background(GlanceTheme.colors.surfaceVariant)
                         .padding(8.dp),
                 verticalAlignment = Alignment.Top,
