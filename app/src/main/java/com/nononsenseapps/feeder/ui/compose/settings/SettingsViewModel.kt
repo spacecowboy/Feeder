@@ -100,6 +100,10 @@ class SettingsViewModel(
         repository.setLinkOpener(value)
     }
 
+    fun setItemInReaderOpener(value: LinkOpener) {
+        repository.setItemInReaderOpener(value)
+    }
+
     fun setSyncFrequency(value: SyncFrequency) =
         applicationCoroutineScope.launch {
             repository.setSyncFrequency(value)
@@ -248,6 +252,7 @@ class SettingsViewModel(
                 repository.font,
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
+                repository.itemInReaderOpener,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -287,6 +292,7 @@ class SettingsViewModel(
                     font = params[30] as FontSelection,
                     isPagingMode = params[31] as Boolean,
                     isAnimatedPaging = params[32] as Boolean,
+                    itemInReaderOpener = params[33] as LinkOpener,
                 )
             }.collect {
                 _viewState.value = it
@@ -350,6 +356,7 @@ data class SettingsViewState(
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,
+    val itemInReaderOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
 )
 
 data class UIFeedSettings(

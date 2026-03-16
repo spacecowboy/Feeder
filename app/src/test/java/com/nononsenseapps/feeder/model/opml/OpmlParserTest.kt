@@ -66,6 +66,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_OPEN_ITEM_IN_READER_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
                         UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
@@ -115,6 +116,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setLoadImageOnlyOnWifi(true)
                 settingsStore.setShowThumbnails(false)
                 settingsStore.setItemOpener(ItemOpener.CUSTOM_TAB)
+                settingsStore.setItemInReaderOpener(LinkOpener.CUSTOM_TAB)
                 settingsStore.setTextScale(1.6f)
                 settingsStore.setIsMarkAsReadOnScroll(true)
                 settingsStore.setUseDetectLanguage(true)

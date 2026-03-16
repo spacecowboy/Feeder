@@ -333,6 +333,10 @@ class Repository(
 
     fun setLinkOpener(value: LinkOpener) = settingsStore.setLinkOpener(value)
 
+    val itemInReaderOpener = settingsStore.itemInReaderOpener
+
+    fun setItemInReaderOpener(value: LinkOpener) = settingsStore.setItemInReaderOpener(value)
+
     val syncFrequency = settingsStore.syncFrequency
 
     fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)

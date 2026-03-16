@@ -180,6 +180,8 @@ fun SettingsScreen(
             onItemOpenerChange = settingsViewModel::setItemOpener,
             currentLinkOpenerValue = viewState.linkOpener,
             onLinkOpenerChange = settingsViewModel::setLinkOpener,
+            currentItemInReaderOpenerValue = viewState.itemInReaderOpener,
+            onItemInReaderOpenerChange = settingsViewModel::setItemInReaderOpener,
             currentSyncFrequencyValue = viewState.syncFrequency,
             onSyncFrequencyChange = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
@@ -265,6 +267,8 @@ private fun SettingsScreenPreview() {
             onItemOpenerChange = {},
             currentLinkOpenerValue = LinkOpener.DEFAULT_BROWSER,
             onLinkOpenerChange = {},
+            currentItemInReaderOpenerValue = LinkOpener.DEFAULT_BROWSER,
+            onItemInReaderOpenerChange = {},
             currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
             onSyncFrequencyChange = {},
             batteryOptimizationIgnoredValue = false,
@@ -339,6 +343,8 @@ fun SettingsList(
     onItemOpenerChange: (ItemOpener) -> Unit,
     currentLinkOpenerValue: LinkOpener,
     onLinkOpenerChange: (LinkOpener) -> Unit,
+    currentItemInReaderOpenerValue: LinkOpener,
+    onItemInReaderOpenerChange: (LinkOpener) -> Unit,
     currentSyncFrequencyValue: SyncFrequency,
     onSyncFrequencyChange: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
@@ -697,6 +703,22 @@ fun SettingsList(
                     ),
                 onSelection = {
                     onLinkOpenerChange(it.linkOpener)
+                },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
+            )
+
+            MenuSetting(
+                title = stringResource(id = R.string.open_item_in_reader_with),
+                currentValue = currentItemInReaderOpenerValue.asLinkOpenerOption(),
+                values =
+                    immutableListHolderOf(
+                        LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
+                        LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption(),
+                    ),
+                onSelection = {
+                    onItemInReaderOpenerChange(it.linkOpener)
                 },
                 modifier =
                     Modifier

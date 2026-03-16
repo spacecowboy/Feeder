@@ -389,6 +389,30 @@ class SettingsStore(
             ).apply()
     }
 
+    private val _itemInReaderOpener =
+        MutableStateFlow(
+            linkOpenerFromString(
+                sp.getStringNonNull(
+                    PREF_OPEN_ITEM_IN_READER_WITH,
+                    PREF_VAL_OPEN_WITH_CUSTOM_TAB,
+                ),
+            ),
+        )
+    val itemInReaderOpener = _itemInReaderOpener.asStateFlow()
+
+    fun setItemInReaderOpener(value: LinkOpener) {
+        _itemInReaderOpener.value = value
+        sp
+            .edit()
+            .putString(
+                PREF_OPEN_ITEM_IN_READER_WITH,
+                when (value) {
+                    LinkOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                    LinkOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
+                },
+            ).apply()
+    }
+
     private val _openAdjacent = MutableStateFlow(sp.getBoolean(PREF_OPEN_ADJACENT, true))
     val openAdjacent = _openAdjacent.asStateFlow()
 
@@ -626,6 +650,7 @@ const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
  */
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
+const val PREF_OPEN_ITEM_IN_READER_WITH = "pref_open_item_in_reader_with"
 const val PREF_OPEN_ADJACENT = "pref_open_adjacent"
 
 const val PREF_PAGING_MODE = "pref_paging_mode"
@@ -695,6 +720,7 @@ enum class UserSettings(
     SETTING_IMG_SHOW_THUMBNAILS(key = PREF_IMG_SHOW_THUMBNAILS),
     SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
     SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
+    SETTING_OPEN_ITEM_IN_READER_WITH(key = PREF_OPEN_ITEM_IN_READER_WITH),
     SETTING_OPEN_ADJACENT(key = PREF_OPEN_ADJACENT),
     SETTING_PAGING_MODE(key = PREF_PAGING_MODE),
     SETTING_ANIMATED_PAGING(key = PREF_ANIMATED_PAGING),
