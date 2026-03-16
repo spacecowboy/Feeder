@@ -397,6 +397,22 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_OPEN_ADJACENT, value).apply()
     }
 
+    private val _isPagingMode = MutableStateFlow(sp.getBoolean(PREF_PAGING_MODE, false))
+    val isPagingMode = _isPagingMode.asStateFlow()
+
+    fun setIsPagingMode(value: Boolean) {
+        _isPagingMode.value = value
+        sp.edit().putBoolean(PREF_PAGING_MODE, value).apply()
+    }
+
+    private val _isAnimatedPaging = MutableStateFlow(sp.getBoolean(PREF_ANIMATED_PAGING, false))
+    val isAnimatedPaging = _isAnimatedPaging.asStateFlow()
+
+    fun setIsAnimatedPaging(value: Boolean) {
+        _isAnimatedPaging.value = value
+        sp.edit().putBoolean(PREF_ANIMATED_PAGING, value).apply()
+    }
+
     private val _showReadingTime = MutableStateFlow(sp.getBoolean(PREF_LIST_SHOW_READING_TIME, false))
     val showReadingTime = _showReadingTime.asStateFlow()
 
@@ -612,6 +628,9 @@ const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
 const val PREF_OPEN_ADJACENT = "pref_open_adjacent"
 
+const val PREF_PAGING_MODE = "pref_paging_mode"
+const val PREF_ANIMATED_PAGING = "pref_animated_paging"
+
 const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
@@ -677,6 +696,8 @@ enum class UserSettings(
     SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
     SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
     SETTING_OPEN_ADJACENT(key = PREF_OPEN_ADJACENT),
+    SETTING_PAGING_MODE(key = PREF_PAGING_MODE),
+    SETTING_ANIMATED_PAGING(key = PREF_ANIMATED_PAGING),
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,

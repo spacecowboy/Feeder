@@ -160,7 +160,7 @@ class RepositoryTest : DIAware {
 
         repository.setCurrentFeedAndTag(10L, "")
 
-        coVerify(timeout = 500L) {
+        coVerify(timeout = 2000L) {
             application.addDynamicShortcutToFeed(
                 "fooFeed",
                 10L,

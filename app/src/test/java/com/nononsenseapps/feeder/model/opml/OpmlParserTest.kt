@@ -80,6 +80,8 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_FONT -> "bundled/roboto_flex"
                         UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
                         UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
+                        UserSettings.SETTING_PAGING_MODE -> "true"
+                        UserSettings.SETTING_ANIMATED_PAGING -> "true"
                         UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
                         UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
                         UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
@@ -128,6 +130,8 @@ class OpmlParserTest : DIAware {
                 settingsStore.setFont(FontSelection.RobotoFlex)
                 settingsStore.setShowReadingTime(false)
                 settingsStore.setOpenDrawerOnFab(true)
+                settingsStore.setIsPagingMode(true)
+                settingsStore.setIsAnimatedPaging(true)
                 settingsStore.setShowTitleUnreadCount(true)
                 settingsStore.setMaxCountPerFeed(200)
                 settingsStore.openAiSettings

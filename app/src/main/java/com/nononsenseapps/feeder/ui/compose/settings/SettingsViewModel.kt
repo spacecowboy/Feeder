@@ -163,6 +163,14 @@ class SettingsViewModel(
         repository.setOpenDrawerOnFab(value)
     }
 
+    fun setIsPagingMode(value: Boolean) {
+        repository.setIsPagingMode(value)
+    }
+
+    fun setIsAnimatedPaging(value: Boolean) {
+        repository.setIsAnimatedPaging(value)
+    }
+
     fun onOpenAISettingsEvent(event: OpenAISettingsEvent) {
         when (event) {
             is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(event.settings)
@@ -238,6 +246,8 @@ class SettingsViewModel(
                 openAIModelsState,
                 repository.isOpenDrawerOnFab,
                 repository.font,
+                repository.isPagingMode,
+                repository.isAnimatedPaging,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -275,6 +285,8 @@ class SettingsViewModel(
                         ),
                     isOpenDrawerOnFab = params[29] as Boolean,
                     font = params[30] as FontSelection,
+                    isPagingMode = params[31] as Boolean,
+                    isAnimatedPaging = params[32] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -336,6 +348,8 @@ data class SettingsViewState(
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
     val font: FontSelection = SystemDefault,
+    val isPagingMode: Boolean = false,
+    val isAnimatedPaging: Boolean = false,
 )
 
 data class UIFeedSettings(

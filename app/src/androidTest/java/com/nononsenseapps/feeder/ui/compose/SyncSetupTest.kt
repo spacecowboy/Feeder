@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.ui.MainActivity
+import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.robots.feedScreen
@@ -13,6 +14,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.compose.withDI
+import org.kodein.di.instance
 
 @Ignore
 class SyncSetupTest : BaseComposeTest {
@@ -23,13 +25,14 @@ class SyncSetupTest : BaseComposeTest {
     fun setup() {
         composeTestRule.setContent {
             composeTestRule.activity.apply {
+                val mainActivityViewModel: MainActivityViewModel by di.instance(arg = this)
                 FeederTheme {
                     withDI {
                         val navController = rememberNavController()
                         val navDrawerListState = rememberLazyListState()
 
                         NavHost(navController, startDestination = SyncScreenDestination.route) {
-                            SyncScreenDestination.register(this, navController, navDrawerListState)
+                            SyncScreenDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
                         }
                     }
                 }

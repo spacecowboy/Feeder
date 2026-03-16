@@ -4,11 +4,16 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -59,6 +64,8 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.ui.MainActivityViewModel
+import com.nononsenseapps.feeder.ui.ScrollDirection
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
@@ -82,13 +89,45 @@ fun ArticleScreen(
     onNavigateUp: () -> Unit,
     onNavigateToFeed: (Long) -> Unit,
     viewModel: ArticleViewModel,
+    mainActivityViewModel: MainActivityViewModel,
+    modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onNavigateUp)
-    val activityLauncher: ActivityLauncher by LocalDI.current.instance()
+    val di = LocalDI.current
+    val activityLauncher: ActivityLauncher by di.instance()
 
+    val mavm = remember { mainActivityViewModel }
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val isPagingMode by mavm.isPagingMode.collectAsStateWithLifecycle()
+    val isAnimatedPaging by mavm.isAnimatedPaging.collectAsStateWithLifecycle()
 
     val articleScrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        mavm.scrollCommand.collect { direction ->
+            val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
+            when (direction) {
+                ScrollDirection.UP -> {
+                    val target = (articleScrollState.value - scrollAmount).coerceAtLeast(0)
+                    if (isAnimatedPaging) {
+                        articleScrollState.animateScrollTo(target)
+                    } else {
+                        articleScrollState.scrollTo(target)
+                    }
+                }
+
+                ScrollDirection.DOWN -> {
+                    val target = (articleScrollState.value + scrollAmount).coerceAtMost(articleScrollState.maxValue)
+                    if (isAnimatedPaging) {
+                        articleScrollState.animateScrollTo(target)
+                    } else {
+                        articleScrollState.scrollTo(target)
+                    }
+                }
+            }
+        }
+    }
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -137,6 +176,9 @@ fun ArticleScreen(
         onSummarize = {
             viewModel.summarize()
         },
+        modifier = modifier,
+        isPagingMode = isPagingMode,
+        isAnimatedPaging = isAnimatedPaging,
     )
 }
 
@@ -162,6 +204,8 @@ fun ArticleScreen(
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
     modifier: Modifier = Modifier,
+    isPagingMode: Boolean = false,
+    isAnimatedPaging: Boolean = false,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -368,6 +412,7 @@ fun ArticleScreen(
                 Modifier
                     .padding(padding),
         ) {
+            val coroutineScope = rememberCoroutineScope()
             ArticleContent(
                 viewState = viewState,
                 screenType = ScreenType.SINGLE,
@@ -381,6 +426,52 @@ fun ArticleScreen(
                             up = focusTopBar
                         },
             )
+
+            if (isPagingMode) {
+                Row(modifier = Modifier.matchParentSize()) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(0.2f)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                ) {
+                                    val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
+                                    val target = (articleScrollState.value - scrollAmount).coerceAtLeast(0)
+                                    coroutineScope.launch {
+                                        if (isAnimatedPaging) {
+                                            articleScrollState.animateScrollTo(target)
+                                        } else {
+                                            articleScrollState.scrollTo(target)
+                                        }
+                                    }
+                                },
+                    )
+                    Spacer(modifier = Modifier.weight(0.6f))
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxHeight()
+                                .weight(0.2f)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                ) {
+                                    val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
+                                    val target = (articleScrollState.value + scrollAmount).coerceAtMost(articleScrollState.maxValue)
+                                    coroutineScope.launch {
+                                        if (isAnimatedPaging) {
+                                            articleScrollState.animateScrollTo(target)
+                                        } else {
+                                            articleScrollState.scrollTo(target)
+                                        }
+                                    }
+                                },
+                    )
+                }
+            }
         }
     }
 }

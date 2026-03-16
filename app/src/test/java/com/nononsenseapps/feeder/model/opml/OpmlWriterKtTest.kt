@@ -129,6 +129,8 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_default_open_item_with" value="3"/>
               <feeder:setting key="pref_open_links_with" value="3"/>
               <feeder:setting key="pref_open_adjacent" value="true"/>
+              <feeder:setting key="pref_paging_mode" value="true"/>
+              <feeder:setting key="pref_animated_paging" value="true"/>
               <feeder:setting key="pref_body_text_scale" value="1.6"/>
               <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
               <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
@@ -173,7 +175,9 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
-                        UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_PAGING_MODE -> "true"
+                        UserSettings.SETTING_ANIMATED_PAGING -> "true"
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
                         UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
@@ -184,12 +188,12 @@ class OpmlWriterKtTest {
                         UserSettings.SETTINGS_FILTER_RECENTLY_READ -> "true"
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
-                        UserSettings.SETTING_OPEN_ADJACENT -> "true"
                         UserSettings.SETTING_FONT -> "bundled/roboto_flex"
                         UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
                         UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
                         UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
                         UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
+                        UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
                         UserSettings.SETTING_OPENAI_MODEL_ID -> "gpt-4o-mini"
                         UserSettings.SETTING_OPENAI_URL -> "https://api.openai.com"
