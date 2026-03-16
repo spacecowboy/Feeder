@@ -151,6 +151,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_openai_azure_version" value="2023-05-15"/>
               <feeder:setting key="pref_openai_azure_deployment_id" value="test-deployment"/>
               <feeder:setting key="pref_openai_request_timeout_seconds" value="45"/>
+              <feeder:setting key="pref_blocklist_apply_to_summaries" value="true"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -202,6 +203,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
+                        UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                     }
             }
     }
