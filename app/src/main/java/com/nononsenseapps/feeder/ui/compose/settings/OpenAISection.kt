@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -50,6 +52,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
@@ -79,50 +83,74 @@ fun OpenAISection(
                     modelsResult = state.modelsResult,
                 )
             }
-        AlertDialog(
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onEvent(OpenAISettingsEvent.UpdateSettings(current))
-                        onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
-                    },
-                    enabled = validationMessage == null,
-                ) {
-                    Text(text = stringResource(R.string.save))
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
-                }) {
-                    Text(text = stringResource(android.R.string.cancel))
-                }
-            },
+        Dialog(
             onDismissRequest = { onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false)) },
-            title = {
-                Text(text = stringResource(R.string.openai_settings))
-            },
-            text = {
-                OpenAISectionEdit(
-                    modifier = Modifier,
-                    state = state,
-                    current = current,
-                    provider = provider,
-                    validationMessage = validationMessage,
-                    onEvent = {
-                        if (it is OpenAISettingsEvent.UpdateSettings) {
-                            current = it.settings
-                        } else {
-                            onEvent(it)
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+        ) {
+            Surface(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.92f)
+                        .padding(24.dp)
+                        .imePadding(),
+                shape = MaterialTheme.shapes.extraLarge,
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.openai_settings),
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    OpenAISectionEdit(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = true),
+                        state = state,
+                        current = current,
+                        provider = provider,
+                        validationMessage = validationMessage,
+                        onEvent = {
+                            if (it is OpenAISettingsEvent.UpdateSettings) {
+                                current = it.settings
+                            } else {
+                                onEvent(it)
+                            }
+                        },
+                        onProviderChange = { selected ->
+                            provider = selected
+                            current = selected.applyTo(current)
+                        },
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        Button(
+                            onClick = {
+                                onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
+                            },
+                        ) {
+                            Text(text = stringResource(android.R.string.cancel))
                         }
-                    },
-                    onProviderChange = { selected ->
-                        provider = selected
-                        current = selected.applyTo(current)
-                    },
-                )
-            },
-        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Button(
+                            onClick = {
+                                onEvent(OpenAISettingsEvent.UpdateSettings(current))
+                                onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
+                            },
+                            enabled = validationMessage == null,
+                        ) {
+                            Text(text = stringResource(R.string.save))
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
