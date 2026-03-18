@@ -279,9 +279,10 @@
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">AI integration</string>
-  <string name="openai_settings_info">Compatible with many AI providers, but not all</string>
+  <string name="openai_settings_info">Compatible with OpenAI-style providers, plus DeepL for translation</string>
   <string name="api_key">API key</string>
   <string name="model_id">Model Id</string>
+  <string name="model_id_not_used_for_deepl">Model Id is not used for DeepL translation.</string>
   <string name="azure_api_version">Azure API version</string>
   <string name="touch_to_play_audio">Touch to play audio</string>
   <string name="title_unread_count" translatable="false">(%1$d)</string>
@@ -308,6 +309,19 @@
   <string name="could_not_add_font">Could not add font</string>
   <string name="could_not_remove_font">Could not remove font</string>
   <string name="something_went_wrong">Something went wrong</string>
+  <string name="translate_article">Translate article</string>
+  <string name="show_original_language">Show original (%1$s)</string>
+  <string name="original_article">original</string>
+  <string name="preferred_translation_language">Preferred translation language</string>
+  <string name="preferred_translation_language_description">Use a language name or code like Spanish, es, French, or fr-CA.</string>
+  <string name="translation_language_placeholder">For example: English or en</string>
+  <string name="translated_article_to">Translated to %1$s</string>
+  <string name="translating_article_to">Translating to %1$s…</string>
+  <string name="set_translation_language_first">Set a preferred translation language in AI settings</string>
+  <string name="translate_feed_cards_by_default">Translate feed cards by default</string>
+  <string name="translate_feed_cards_by_default_description">Automatically translate article titles and snippets in the feed list when possible.</string>
+  <string name="translate_articles_by_default">Translate articles by default</string>
+  <string name="translate_articles_by_default_description">Automatically open article reader content in translated mode when a cached or fresh translation is available.</string>
 
   <string name="widget_title">Feeder</string>
   <string name="widget_refreshing">Refreshing</string>

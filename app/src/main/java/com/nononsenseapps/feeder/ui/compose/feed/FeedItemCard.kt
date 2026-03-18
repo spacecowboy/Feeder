@@ -25,6 +25,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,14 +44,17 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.size.Precision
 import coil3.size.Scale
 import coil3.size.Size
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.MediaImage
+import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedCropScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
@@ -65,6 +70,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.logDebug
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 import java.net.URL
 import java.time.Instant
 
@@ -194,21 +201,31 @@ fun RowScope.FeedItemText(
     showReadingTime: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val repository: Repository by LocalDI.current.instance()
+    val translationManager: TranslationManager by LocalDI.current.instance()
+    val shouldTranslate by repository.translateFeedCardsByDefault.collectAsStateWithLifecycle()
+    val displayedItem by produceState(initialValue = item, item, shouldTranslate) {
+        value =
+            if (shouldTranslate) {
+                translationManager.translateFeedListItem(item)
+            } else {
+                item
+            }
+    }
     val snippetStyle = FeedListItemSnippetTextStyle()
     val joinedText =
-        remember(item, showOnlyTitle) {
+        remember(displayedItem, showOnlyTitle) {
             buildAnnotatedString {
-                if (item.title.isNotBlank()) {
-                    append(item.title)
-                    if (!showOnlyTitle && item.snippet.isNotBlank()) {
+                if (displayedItem.title.isNotBlank()) {
+                    append(displayedItem.title)
+                    if (!showOnlyTitle && displayedItem.snippet.isNotBlank()) {
                         withStyle(snippetStyle.toSpanStyle()) {
                             append('\n')
-                            append(item.snippet)
+                            append(displayedItem.snippet)
                         }
                     }
                 } else {
-                    // Heard of one feed which did not have titles. If so always include snippet
-                    append(item.snippet)
+                    append(displayedItem.snippet)
                 }
             }
         }
@@ -223,7 +240,7 @@ fun RowScope.FeedItemText(
             Text(
                 text = joinedText,
                 style = FeedListItemTitleTextStyle(),
-                fontWeight = titleFontWeight(item.unread),
+                fontWeight = titleFontWeight(displayedItem.unread),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = maxLines,
                 modifier =
@@ -237,12 +254,12 @@ fun RowScope.FeedItemText(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier =
                     Modifier
-                        .fillMaxWidth(),
+                .fillMaxWidth(),
             ) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    WithBidiDeterminedLayoutDirection(paragraph = item.feedTitle) {
+                    WithBidiDeterminedLayoutDirection(paragraph = displayedItem.feedTitle) {
                         Text(
-                            text = item.feedTitle,
+                            text = displayedItem.feedTitle,
                             style = FeedListItemFeedTitleStyle(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -251,9 +268,9 @@ fun RowScope.FeedItemText(
                                     .weight(1f),
                         )
                     }
-                    WithBidiDeterminedLayoutDirection(paragraph = item.pubDate) {
+                    WithBidiDeterminedLayoutDirection(paragraph = displayedItem.pubDate) {
                         Text(
-                            text = item.pubDate,
+                            text = displayedItem.pubDate,
                             style = FeedListItemDateStyle(),
                             maxLines = 1,
                             overflow = TextOverflow.Clip,
@@ -309,7 +326,7 @@ fun RowScope.FeedItemText(
                         Text(
                             text =
                                 stringResource(
-                                    when (item.bookmarked) {
+                                    when (displayedItem.bookmarked) {
                                         true -> R.string.unsave_article
                                         false -> R.string.save_article
                                     },
@@ -366,8 +383,8 @@ fun RowScope.FeedItemText(
         }
         if (showReadingTime) {
             val readTimeSecs =
-                remember(item.wordCount) {
-                    wordsToReadTimeSecs(item.wordCount)
+                remember(displayedItem.wordCount) {
+                    wordsToReadTimeSecs(displayedItem.wordCount)
                 }
             if (readTimeSecs > 0) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -378,8 +395,8 @@ fun RowScope.FeedItemText(
                                 "${readTimeSecs / 60}:$seconds",
                             )
                     val wordCountText =
-                        pluralStringResource(id = R.plurals.n_words, count = item.wordCount)
-                            .format(item.wordCount)
+                        pluralStringResource(id = R.plurals.n_words, count = displayedItem.wordCount)
+                            .format(displayedItem.wordCount)
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         modifier =

@@ -107,6 +107,8 @@ open class OPMLImporter(
             UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> settingsStore.setOpenDrawerOnFab(value.toBoolean())
             UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> settingsStore.setShowTitleUnreadCount(value.toBoolean())
             UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> settingsStore.setMaxCountPerFeed(value.toIntOrNull() ?: 100)
+            UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> settingsStore.setTranslateFeedCardsByDefault(value.toBoolean())
+            UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> settingsStore.setTranslateArticlesByDefault(value.toBoolean())
 
             // OpenAI related settings
             UserSettings.SETTING_OPENAI_KEY,
@@ -115,6 +117,7 @@ open class OPMLImporter(
             UserSettings.SETTING_OPENAI_AZURE_VERSION,
             UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID,
             UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS,
+            UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE,
             -> {
                 val current = settingsStore.openAiSettings.value
                 val newSettings =
@@ -125,6 +128,7 @@ open class OPMLImporter(
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> current.copy(azureApiVersion = value)
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> current.copy(azureDeploymentId = value)
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
+                        UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> current.copy(preferredTranslationLanguage = value)
                         else -> current
                     }
                 settingsStore.setOpenAiSettings(newSettings)

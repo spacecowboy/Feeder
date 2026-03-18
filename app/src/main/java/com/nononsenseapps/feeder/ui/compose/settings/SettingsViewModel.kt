@@ -163,6 +163,14 @@ class SettingsViewModel(
         repository.setOpenDrawerOnFab(value)
     }
 
+    fun setTranslateFeedCardsByDefault(value: Boolean) {
+        repository.setTranslateFeedCardsByDefault(value)
+    }
+
+    fun setTranslateArticlesByDefault(value: Boolean) {
+        repository.setTranslateArticlesByDefault(value)
+    }
+
     fun setIsPagingMode(value: Boolean) {
         repository.setIsPagingMode(value)
     }
@@ -245,6 +253,8 @@ class SettingsViewModel(
                 repository.openAISettings,
                 openAIModelsState,
                 repository.isOpenDrawerOnFab,
+                repository.translateFeedCardsByDefault,
+                repository.translateArticlesByDefault,
                 repository.font,
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
@@ -284,9 +294,11 @@ class SettingsViewModel(
                             modelsResult = params[28] as OpenAIModelsState,
                         ),
                     isOpenDrawerOnFab = params[29] as Boolean,
-                    font = params[30] as FontSelection,
-                    isPagingMode = params[31] as Boolean,
-                    isAnimatedPaging = params[32] as Boolean,
+                    translateFeedCardsByDefault = params[30] as Boolean,
+                    translateArticlesByDefault = params[31] as Boolean,
+                    font = params[32] as FontSelection,
+                    isPagingMode = params[33] as Boolean,
+                    isAnimatedPaging = params[34] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -347,6 +359,8 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
+    val translateFeedCardsByDefault: Boolean = false,
+    val translateArticlesByDefault: Boolean = false,
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,

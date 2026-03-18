@@ -6,6 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
@@ -29,16 +30,18 @@ import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.html.HtmlLinearizer
 import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
-import com.nononsenseapps.feeder.openai.isValid
-import com.nononsenseapps.feeder.ui.compose.text.htmlStringToAnnotatedString
+import com.nononsenseapps.feeder.openai.canSummarize
+import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
+import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,8 +70,9 @@ class ArticleViewModel(
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val openAIApi: OpenAIApi by instance()
+    private val toastMaker: ToastMaker by instance()
+    private val translationManager: TranslationManager by instance()
 
-    // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val itemId: Long =
@@ -104,25 +108,21 @@ class ArticleViewModel(
                 initialValue = LinearArticle(emptyList()),
             )
 
-    fun toggleFullText() {
-        // Using as general loading text
-        textToDisplay.update { TextToDisplay.LOADING_FULLTEXT }
-        displayFullTextOverride.value = displayFullTextOverride.value?.not() ?: articleFlow.value?.fullTextByDefault?.not() ?: true
-    }
+    private val toolbarVisible = MutableStateFlow(state["toolbarMenuVisible"] ?: false)
+    private val openAiSummary = MutableStateFlow<OpenAISummaryState>(OpenAISummaryState.Empty)
+    private val showTranslatedContent = MutableStateFlow(false)
+    private val translatedArticleContent = MutableStateFlow(LinearArticle(emptyList()))
+    private val articleTranslationState = MutableStateFlow<ArticleTranslationState>(ArticleTranslationState.Empty)
 
     private val isFullText: Boolean
         get() = displayFullTextOverride.value ?: articleFlow.value?.fullTextByDefault ?: false
-
-    private val toolbarVisible: MutableStateFlow<Boolean> =
-        MutableStateFlow(state["toolbarMenuVisible"] ?: false)
-
-    private val openAiSummary: MutableStateFlow<OpenAISummaryState> = MutableStateFlow(OpenAISummaryState.Empty)
 
     val viewState: StateFlow<ArticleScreenViewState> =
         combine(
             articleFlow,
             textToDisplay,
             articleContentFlow,
+            translatedArticleContent,
             toolbarVisible,
             repository.linkOpener,
             repository.useDetectLanguage,
@@ -130,20 +130,29 @@ class ArticleViewModel(
             ttsStateHolder.availableLanguages,
             repository.openAISettings,
             openAiSummary,
+            showTranslatedContent,
+            articleTranslationState,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
             val articleContent = params[2] as LinearArticle
-            val toolbarVisible = params[3] as Boolean
-            val linkOpener = params[4] as LinkOpener
-            val useDetectLanguage = params[5] as Boolean
-            val ttsState = params[6] as PlaybackStatus
+            val translatedArticleContent = params[3] as LinearArticle
+            val toolbarVisible = params[4] as Boolean
+            val linkOpener = params[5] as LinkOpener
+            val useDetectLanguage = params[6] as Boolean
+            val ttsState = params[7] as PlaybackStatus
 
             @Suppress("UNCHECKED_CAST")
-            val ttsLanguages = params[7] as List<Locale>
+            val ttsLanguages = params[8] as List<Locale>
 
-            val showSummarize = (params[8] as OpenAISettings).isValid && !article?.link.isNullOrEmpty()
-            val openAiSummary = (params[9] as OpenAISummaryState)
+            val aiSettings = params[9] as OpenAISettings
+            val openAiSummary = params[10] as OpenAISummaryState
+            val showTranslated = params[11] as Boolean
+            val translationState = params[12] as ArticleTranslationState
+            val currentTranslation =
+                (translationState as? ArticleTranslationState.Result)
+                    ?.takeIf { it.isFullText == isFullText }
+            val isShowingTranslated = showTranslated && currentTranslation != null
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -159,7 +168,7 @@ class ArticleViewModel(
                 pubDate = article?.pubDate,
                 author = article?.author,
                 enclosure = article?.enclosure ?: Enclosure(),
-                articleTitle = article?.title ?: "",
+                articleTitle = if (isShowingTranslated) currentTranslation?.translatedTitle ?: "" else article?.title ?: "",
                 showToolbarMenu = toolbarVisible,
                 feedDisplayTitle = article?.feedDisplayTitle ?: "",
                 isBookmarked = article?.bookmarked == true,
@@ -170,9 +179,13 @@ class ArticleViewModel(
                         article?.wordCount ?: 0
                     },
                 image = article?.image,
-                showSummarize = showSummarize,
+                showSummarize = aiSettings.canSummarize && !article?.link.isNullOrEmpty(),
                 openAiSummary = openAiSummary,
-                articleContent = articleContent,
+                showTranslate = aiSettings.canTranslate && !article?.link.isNullOrEmpty(),
+                isShowingTranslated = isShowingTranslated,
+                isTranslationLoading = translationState is ArticleTranslationState.Loading,
+                translationSourceLanguage = currentTranslation?.sourceLanguage ?: "",
+                articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -188,10 +201,26 @@ class ArticleViewModel(
                     val feed = repository.getFeed(feedId)
                     if (feed?.summarizeOnOpen == true) {
                         summarize()
-                        return@collect // Only summarize on first load
                     }
                 }
+
+                if (repository.translateArticlesByDefault.value && repository.openAISettings.value.canTranslate) {
+                    showTranslatedContent.value = true
+                    translateCurrentArticle()
+                } else {
+                    showTranslatedContent.value = false
+                    translatedArticleContent.value = LinearArticle(emptyList())
+                    articleTranslationState.value = ArticleTranslationState.Empty
+                }
             }
+        }
+    }
+
+    fun toggleFullText() {
+        textToDisplay.update { TextToDisplay.LOADING_FULLTEXT }
+        displayFullTextOverride.value = displayFullTextOverride.value?.not() ?: articleFlow.value?.fullTextByDefault?.not() ?: true
+        if (showTranslatedContent.value) {
+            translateCurrentArticle()
         }
     }
 
@@ -217,14 +246,12 @@ class ArticleViewModel(
                                         textToDisplay.update { TextToDisplay.CONTENT }
                                     }
                             } catch (e: Exception) {
-                                // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
                         } else {
                             Log.e(LOG_TAG, "No default file to parse. Attempting to fetch feed again")
-                            // Should not happen but keeping this as a fallback
                             runOnceRssSync(
                                 di = di,
                                 feedId = article.feedId,
@@ -245,12 +272,8 @@ class ArticleViewModel(
 
                     true -> {
                         if (!blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
-                            // If the fulltext file is missing, try to fetch it
                             when (retrieveFullText(article.id).leftOrNull()) {
-                                null -> {
-                                    // Success. Do nothing yet
-                                    null
-                                }
+                                null -> null
                                 is NoBody -> TextToDisplay.FAILED_MISSING_BODY
                                 is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
                                 is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
@@ -272,13 +295,11 @@ class ArticleViewModel(
                                         textToDisplay.update { TextToDisplay.CONTENT }
                                     }
                             } catch (e: Exception) {
-                                // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
                         } else {
-                            // Error text should already be set above
                             LinearArticle(elements = emptyList())
                         }
                     }
@@ -294,11 +315,9 @@ class ArticleViewModel(
         withContext(Dispatchers.IO) {
             logDebug(LOG_TAG, "loadFullTextThenDisplayIt($itemId)")
             if (blobFullFile(itemId, filePathProvider.fullArticleDir).isFile) {
-                logDebug(LOG_TAG, "Fulltext file exists")
                 return@withContext Either.Right(Unit)
             }
 
-            logDebug(LOG_TAG, "Fulltext file does not exist")
             val link = repository.getLink(itemId)
             return@withContext fullTextParser.parseFullArticleIfMissing(
                 object : FeedItemForFetching {
@@ -326,9 +345,7 @@ class ArticleViewModel(
 
     fun ttsPlay() {
         viewModelScope.launch(Dispatchers.IO) {
-            val article =
-                repository.getCurrentArticle()
-                    ?: return@launch
+            val article = repository.getCurrentArticle() ?: return@launch
             val readFullText = displayFullTextOverride.value ?: article.fullTextByDefault
             val textToRead =
                 when (readFullText) {
@@ -358,10 +375,7 @@ class ArticleViewModel(
                                 }
                             },
                         ) {
-                            blobFullInputStream(
-                                article.id,
-                                filePathProvider.fullArticleDir,
-                            ).use {
+                            blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
                                 htmlToAnnotatedString(
                                     inputStream = it,
                                     baseUrl = article.feedUrl.toString(),
@@ -370,7 +384,6 @@ class ArticleViewModel(
                         }
                 }
 
-            // TODO show error some message
             textToRead.onRight {
                 ttsStateHolder.tts(
                     textArray = it,
@@ -420,17 +433,69 @@ class ArticleViewModel(
         }
     }
 
+    fun translate() {
+        if (showTranslatedContent.value) {
+            showTranslatedContent.value = false
+            return
+        }
+        showTranslatedContent.value = true
+        translateCurrentArticle()
+    }
+
+    private fun translateCurrentArticle() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val targetLanguage =
+                    repository.openAISettings.value.preferredTranslationLanguage
+                        .ifBlank { Locale.getDefault().displayLanguage }
+
+                if (targetLanguage.isBlank()) {
+                    toastMaker.makeToast(R.string.set_translation_language_first)
+                    showTranslatedContent.value = false
+                    return@launch
+                }
+
+                articleTranslationState.value = ArticleTranslationState.Loading(targetLanguage = targetLanguage)
+                val article = articleFlow.value ?: return@launch
+                val fullText = isFullText
+                val html = loadArticleHtml(article, fullText)
+                val translation =
+                    translationManager.getOrTranslateArticle(
+                        itemId = article.id,
+                        title = article.title,
+                        html = html,
+                        isFullText = fullText,
+                    ) ?: return@launch
+
+                translatedArticleContent.value =
+                    HtmlLinearizer().linearize(
+                        translation.translatedHtml,
+                        article.feedUrl ?: "",
+                    )
+                articleTranslationState.value =
+                    ArticleTranslationState.Result(
+                        translatedTitle = translation.translatedTitle,
+                        sourceLanguage = translation.sourceLanguage,
+                        targetLanguage = targetLanguage,
+                        isFullText = fullText,
+                    )
+            } catch (e: Exception) {
+                showTranslatedContent.value = false
+                articleTranslationState.value = ArticleTranslationState.Empty
+                toastMaker.makeToast(e.message ?: "Translation failed")
+            }
+        }
+    }
+
     private suspend fun convertSummaryToAnnotatedStrings(summaryResult: OpenAIApi.SummaryResult): List<AnnotatedString> =
         withContext(Dispatchers.Default) {
             return@withContext when (summaryResult) {
                 is OpenAIApi.SummaryResult.Success -> {
                     val markdownConverter = MarkdownToHtmlConverter()
                     val htmlContent = markdownConverter.convertToHtml(summaryResult.content)
-                    htmlStringToAnnotatedString(htmlContent)
+                    htmlToAnnotatedString(htmlContent.byteInputStream(), "")
                 }
                 is OpenAIApi.SummaryResult.Error -> {
-                    // For error messages, create a simple AnnotatedString directly
-                    // without going through markdown/HTML conversion
                     listOf(AnnotatedString(summaryResult.content))
                 }
             }
@@ -459,11 +524,34 @@ class ArticleViewModel(
                     }
             }
 
-        val content =
-            Jsoup.parse(contentStream, null, viewState.articleFeedUrl ?: "")?.body()?.text()
-                ?: throw IllegalStateException("Cannot parse content")
-        return content
+        return Jsoup.parse(contentStream, null, viewState.articleFeedUrl ?: "")?.body()?.text()
+            ?: throw IllegalStateException("Cannot parse content")
     }
+
+    private suspend fun loadArticleHtml(
+        article: Article,
+        fullText: Boolean,
+    ): String =
+        withContext(Dispatchers.IO) {
+            when (fullText) {
+                false ->
+                    if (blobFile(article.id, filePathProvider.articleDir).isFile) {
+                        blobInputStream(article.id, filePathProvider.articleDir).bufferedReader().use { it.readText() }
+                    } else {
+                        article.snippet
+                    }
+
+                true -> {
+                    if (!blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
+                        val error = retrieveFullText(article.id).leftOrNull()
+                        if (error != null) {
+                            throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
+                        }
+                    }
+                    blobFullInputStream(article.id, filePathProvider.fullArticleDir).bufferedReader().use { it.readText() }
+                }
+            }
+        }
 
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"
@@ -493,6 +581,10 @@ private data class ArticleState(
     override val image: ThumbnailImage? = null,
     override val showSummarize: Boolean = false,
     override val openAiSummary: OpenAISummaryState = OpenAISummaryState.Empty,
+    override val showTranslate: Boolean = false,
+    override val isShowingTranslated: Boolean = false,
+    override val isTranslationLoading: Boolean = false,
+    override val translationSourceLanguage: String = "",
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -520,6 +612,10 @@ interface ArticleScreenViewState {
     val image: ThumbnailImage?
     val showSummarize: Boolean
     val openAiSummary: OpenAISummaryState
+    val showTranslate: Boolean
+    val isShowingTranslated: Boolean
+    val isTranslationLoading: Boolean
+    val translationSourceLanguage: String
     val articleContent: LinearArticle
 }
 
@@ -532,6 +628,21 @@ sealed interface OpenAISummaryState {
         val value: OpenAIApi.SummaryResult,
         val annotatedStrings: List<AnnotatedString>,
     ) : OpenAISummaryState
+}
+
+sealed interface ArticleTranslationState {
+    data object Empty : ArticleTranslationState
+
+    data class Loading(
+        val targetLanguage: String,
+    ) : ArticleTranslationState
+
+    data class Result(
+        val translatedTitle: String,
+        val sourceLanguage: String,
+        val targetLanguage: String,
+        val isFullText: Boolean,
+    ) : ArticleTranslationState
 }
 
 interface ArticleItemKeyHolder {

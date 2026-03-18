@@ -347,6 +347,14 @@ class Repository(
 
     fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
 
+    val translateFeedCardsByDefault = settingsStore.translateFeedCardsByDefault
+
+    fun setTranslateFeedCardsByDefault(value: Boolean) = settingsStore.setTranslateFeedCardsByDefault(value)
+
+    val translateArticlesByDefault = settingsStore.translateArticlesByDefault
+
+    fun setTranslateArticlesByDefault(value: Boolean) = settingsStore.setTranslateArticlesByDefault(value)
+
     val showTitleUnreadCount = settingsStore.showTitleUnreadCount
 
     fun setShowTitleUnreadCount(value: Boolean) = settingsStore.setShowTitleUnreadCount(value)

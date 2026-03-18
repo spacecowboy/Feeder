@@ -514,6 +514,7 @@ class SettingsStore(
                 azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, ""),
                 azureDeploymentId = sp.getStringNonNull(PREF_OPENAI_AZURE_DEPLOYMENT_ID, ""),
                 timeoutSeconds = sp.getInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, 30),
+                preferredTranslationLanguage = sp.getStringNonNull(PREF_OPENAI_TRANSLATION_LANGUAGE, ""),
             ),
         )
     val openAiSettings = _openAiSettings.asStateFlow()
@@ -528,7 +529,24 @@ class SettingsStore(
             .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
             .putString(PREF_OPENAI_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
             .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
+            .putString(PREF_OPENAI_TRANSLATION_LANGUAGE, value.preferredTranslationLanguage)
             .apply()
+    }
+
+    private val _translateFeedCardsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, false))
+    val translateFeedCardsByDefault = _translateFeedCardsByDefault.asStateFlow()
+
+    fun setTranslateFeedCardsByDefault(value: Boolean) {
+        _translateFeedCardsByDefault.value = value
+        sp.edit().putBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, value).apply()
+    }
+
+    private val _translateArticlesByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_ARTICLES_BY_DEFAULT, false))
+    val translateArticlesByDefault = _translateArticlesByDefault.asStateFlow()
+
+    fun setTranslateArticlesByDefault(value: Boolean) {
+        _translateArticlesByDefault.value = value
+        sp.edit().putBoolean(PREF_TRANSLATE_ARTICLES_BY_DEFAULT, value).apply()
     }
 
     private val _showTitleUnreadCount = MutableStateFlow(sp.getBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, false))
@@ -667,6 +685,9 @@ const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
+const val PREF_OPENAI_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
+const val PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
+const val PREF_TRANSLATE_ARTICLES_BY_DEFAULT = "pref_translate_articles_by_default"
 
 /**
  * Appearance settings
@@ -721,6 +742,9 @@ enum class UserSettings(
     SETTING_OPENAI_AZURE_VERSION(key = PREF_OPENAI_AZURE_VERSION),
     SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
     SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
+    SETTING_OPENAI_TRANSLATION_LANGUAGE(key = PREF_OPENAI_TRANSLATION_LANGUAGE),
+    SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT(key = PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT),
+    SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
     ;
 
     companion object {
@@ -804,6 +828,7 @@ data class OpenAISettings(
     val azureApiVersion: String = "",
     val azureDeploymentId: String = "",
     val key: String = "",
+    val preferredTranslationLanguage: String = "",
 )
 
 fun String.dropEnds(

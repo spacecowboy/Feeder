@@ -209,6 +209,10 @@ fun SettingsScreen(
             onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
+            translateFeedCardsByDefault = viewState.translateFeedCardsByDefault,
+            onTranslateFeedCardsByDefault = settingsViewModel::setTranslateFeedCardsByDefault,
+            translateArticlesByDefault = viewState.translateArticlesByDefault,
+            onTranslateArticlesByDefault = settingsViewModel::setTranslateArticlesByDefault,
             onTextSettings = onNavigateToTextSettingsScreen,
             currentFontSelection = viewState.font,
             isPagingMode = viewState.isPagingMode,
@@ -292,6 +296,10 @@ private fun SettingsScreenPreview() {
             onOpenAIEvent = {},
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
+            translateFeedCardsByDefault = false,
+            onTranslateFeedCardsByDefault = {},
+            translateArticlesByDefault = false,
+            onTranslateArticlesByDefault = {},
             onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
             isPagingMode = false,
@@ -366,6 +374,10 @@ fun SettingsList(
     onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
+    translateFeedCardsByDefault: Boolean,
+    onTranslateFeedCardsByDefault: (Boolean) -> Unit,
+    translateArticlesByDefault: Boolean,
+    onTranslateArticlesByDefault: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
     isPagingMode: Boolean,
     onIsPagingModeChange: (Boolean) -> Unit,
@@ -763,6 +775,20 @@ fun SettingsList(
             OpenAISection(
                 state = openAIState,
                 onEvent = onOpenAIEvent,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.translate_feed_cards_by_default),
+                checked = translateFeedCardsByDefault,
+                onCheckedChange = onTranslateFeedCardsByDefault,
+                description = stringResource(id = R.string.translate_feed_cards_by_default_description),
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.translate_articles_by_default),
+                checked = translateArticlesByDefault,
+                onCheckedChange = onTranslateArticlesByDefault,
+                description = stringResource(id = R.string.translate_articles_by_default_description),
             )
         }
 

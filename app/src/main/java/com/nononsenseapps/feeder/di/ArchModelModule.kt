@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
 import com.nononsenseapps.feeder.data.suggestions.SuggestedFeedRepository
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
+import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIClient
 import com.nononsenseapps.feeder.openai.OpenAIClientDefault
@@ -48,6 +49,7 @@ val archModelModule =
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+        bind<TranslationManager>() with singleton { TranslationManager(di) }
         bindFactory<OpenAISettings, OpenAIClient> { settings -> OpenAIClientDefault(settings) }
         bind<OpenAIApi>() with singleton { OpenAIApi(instance(), appLang = Locale.getDefault().getISO3Language(), factory()) }
         bind<SuggestedFeedRepository>() with

@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
+import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
@@ -206,6 +207,7 @@ fun OpenAISectionEdit(
             label = {
                 Text(stringResource(R.string.model_id))
             },
+            enabled = !current.isDeepL,
             keyboardOptions =
                 KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Ascii,
@@ -220,10 +222,15 @@ fun OpenAISectionEdit(
             onValueChange = {
                 onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
             },
+            supportingText = {
+                if (current.isDeepL) {
+                    Text(stringResource(R.string.model_id_not_used_for_deepl))
+                }
+            },
             trailingIcon = {
                 IconButton(
                     onClick = { modelsMenuExpanded = true },
-                    enabled = state.modelsResult is OpenAIModelsState.Success,
+                    enabled = !current.isDeepL && state.modelsResult is OpenAIModelsState.Success,
                 ) {
                     if (state.modelsResult is OpenAIModelsState.Loading) {
                         CircularProgressIndicator()
@@ -306,6 +313,33 @@ fun OpenAISectionEdit(
                 }
             },
             isError = !isTimeoutInputValid,
+        )
+
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = current.preferredTranslationLanguage,
+            placeholder = {
+                Text(stringResource(R.string.translation_language_placeholder))
+            },
+            label = {
+                Text(stringResource(R.string.preferred_translation_language))
+            },
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Next,
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                    },
+                ),
+            supportingText = {
+                Text(stringResource(R.string.preferred_translation_language_description))
+            },
+            onValueChange = {
+                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(preferredTranslationLanguage = it)))
+            },
         )
 
         TextField(
