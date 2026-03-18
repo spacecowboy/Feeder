@@ -345,43 +345,83 @@ class ArticleViewModel(
 
     fun ttsPlay() {
         viewModelScope.launch(Dispatchers.IO) {
-            val article = repository.getCurrentArticle() ?: return@launch
-            val readFullText = displayFullTextOverride.value ?: article.fullTextByDefault
+            val feedItem = repository.getCurrentArticle() ?: return@launch
+            val article = Article(feedItem)
+            val readFullText = displayFullTextOverride.value ?: feedItem.fullTextByDefault
             val textToRead =
-                when (readFullText) {
-                    false ->
-                        Either.catching<TSSError, List<AnnotatedString>>(
-                            onCatch = {
-                                when (it) {
-                                    is FileNotFoundException -> TTSFileNotFound
-                                    else -> TTSUnknownError
-                                }
-                            },
-                        ) {
-                            blobInputStream(article.id, filePathProvider.articleDir).use {
-                                htmlToAnnotatedString(
-                                    inputStream = it,
-                                    baseUrl = article.feedUrl.toString(),
-                                )
+                if (showTranslatedContent.value) {
+                    Either.catching<TSSError, List<AnnotatedString>>(
+                        onCatch = {
+                            when (it) {
+                                is FileNotFoundException -> TTSFileNotFound
+                                else -> TTSUnknownError
                             }
-                        }
+                        },
+                    ) {
+                        val translationState = articleTranslationState.value
+                        val translation =
+                            (translationState as? ArticleTranslationState.Result)
+                                ?.takeIf { it.isFullText == readFullText }
+                                ?: run {
+                                    translateCurrentArticle()
+                                    null
+                                }
 
-                    true ->
-                        Either.catching<TSSError, List<AnnotatedString>>(
-                            onCatch = {
-                                when (it) {
-                                    is FileNotFoundException -> TTSFileNotFound
-                                    else -> TTSUnknownError
+                        val html =
+                            if (translation != null) {
+                                loadArticleHtml(article, readFullText).let {
+                                    translationManager.getOrTranslateArticle(
+                                        itemId = article.id,
+                                        title = article.title,
+                                        html = it,
+                                        isFullText = readFullText,
+                                    )?.translatedHtml ?: it
                                 }
-                            },
-                        ) {
-                            blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
-                                htmlToAnnotatedString(
-                                    inputStream = it,
-                                    baseUrl = article.feedUrl.toString(),
-                                )
+                            } else {
+                                loadArticleHtml(article, readFullText)
                             }
-                        }
+
+                        htmlToAnnotatedString(
+                            inputStream = html.byteInputStream(),
+                            baseUrl = article.feedUrl.toString(),
+                        )
+                    }
+                } else {
+                    when (readFullText) {
+                        false ->
+                            Either.catching<TSSError, List<AnnotatedString>>(
+                                onCatch = {
+                                    when (it) {
+                                        is FileNotFoundException -> TTSFileNotFound
+                                        else -> TTSUnknownError
+                                    }
+                                },
+                            ) {
+                                blobInputStream(article.id, filePathProvider.articleDir).use {
+                                    htmlToAnnotatedString(
+                                        inputStream = it,
+                                        baseUrl = feedItem.feedUrl.toString(),
+                                    )
+                                }
+                            }
+
+                        true ->
+                            Either.catching<TSSError, List<AnnotatedString>>(
+                                onCatch = {
+                                    when (it) {
+                                        is FileNotFoundException -> TTSFileNotFound
+                                        else -> TTSUnknownError
+                                    }
+                                },
+                            ) {
+                                blobFullInputStream(article.id, filePathProvider.fullArticleDir).use {
+                                    htmlToAnnotatedString(
+                                        inputStream = it,
+                                        baseUrl = feedItem.feedUrl.toString(),
+                                    )
+                                }
+                            }
+                    }
                 }
 
             textToRead.onRight {
