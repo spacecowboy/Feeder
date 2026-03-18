@@ -55,6 +55,7 @@ import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.openai.isDeepL
+import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
@@ -174,6 +175,7 @@ private fun OpenAISectionEdit(
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
+    val isTranslationOnlyProvider = provider.isDeepL || provider.isGoogleTranslate
 
     LaunchedEffect(current) {
         latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
@@ -242,7 +244,7 @@ private fun OpenAISectionEdit(
             visualTransformation = VisualTransformationApiKey(),
         )
 
-        if (!provider.isDeepL) {
+        if (!isTranslationOnlyProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.modelId,
@@ -294,7 +296,7 @@ private fun OpenAISectionEdit(
             )
         }
 
-        if (!provider.isDeepL) {
+        if (!isTranslationOnlyProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.baseUrl,
@@ -322,7 +324,7 @@ private fun OpenAISectionEdit(
         } else {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = provider.baseUrl,
+                value = provider.endpoint,
                 label = {
                     Text(stringResource(R.string.translation_endpoint))
                 },
@@ -596,29 +598,41 @@ private enum class AIProviderPreset(
     val titleRes: Int,
     val descriptionRes: Int,
     val helpRes: Int,
-    val baseUrl: String,
     val isDeepL: Boolean,
+    val isGoogleTranslate: Boolean,
+    val endpoint: String,
 ) {
     OPENAI_COMPATIBLE(
         titleRes = R.string.provider_openai_compatible,
         descriptionRes = R.string.provider_openai_compatible_features,
         helpRes = R.string.provider_openai_compatible_help,
-        baseUrl = "",
         isDeepL = false,
+        isGoogleTranslate = false,
+        endpoint = "",
     ),
     AZURE_OPENAI(
         titleRes = R.string.provider_azure_openai,
         descriptionRes = R.string.provider_azure_openai_features,
         helpRes = R.string.provider_azure_openai_help,
-        baseUrl = "",
         isDeepL = false,
+        isGoogleTranslate = false,
+        endpoint = "",
     ),
     DEEPL(
         titleRes = R.string.provider_deepl,
         descriptionRes = R.string.provider_deepl_features,
         helpRes = R.string.provider_deepl_help,
-        baseUrl = "https://api.deepl.com",
         isDeepL = true,
+        isGoogleTranslate = false,
+        endpoint = "https://api.deepl.com/v2/translate",
+    ),
+    GOOGLE_TRANSLATE(
+        titleRes = R.string.provider_google_translate,
+        descriptionRes = R.string.provider_google_translate_features,
+        helpRes = R.string.provider_google_translate_help,
+        isDeepL = false,
+        isGoogleTranslate = true,
+        endpoint = "https://translation.googleapis.com/language/translate/v2",
     ),
     ;
 
@@ -641,6 +655,15 @@ private enum class AIProviderPreset(
                     baseUrl = inferDeepLBaseUrl(settings),
                     azureApiVersion = "",
                     azureDeploymentId = "",
+                    modelId = "",
+                )
+
+            GOOGLE_TRANSLATE ->
+                settings.copy(
+                    baseUrl = "https://translation.googleapis.com",
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                    modelId = "",
                 )
         }
 
@@ -648,6 +671,7 @@ private enum class AIProviderPreset(
         fun fromSettings(settings: OpenAISettings): AIProviderPreset =
             when {
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
+                settings.isGoogleTranslate -> GOOGLE_TRANSLATE
                 settings.isDeepL -> DEEPL
                 else -> OPENAI_COMPATIBLE
             }
