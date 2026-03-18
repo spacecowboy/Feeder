@@ -159,10 +159,10 @@ class OpenAIApi(
             return ModelsResult.MissingToken
         }
         if (settings.isDeepL) {
-            return ModelsResult.Success(ids = emptyList())
+            return verifyDeepLSettings(settings)
         }
         if (settings.isGoogleTranslate) {
-            return ModelsResult.Success(ids = emptyList())
+            return verifyGoogleTranslateSettings(settings)
         }
         if (settings.isPerplexity) {
             return ModelsResult.Success(ids = emptyList())
@@ -181,6 +181,92 @@ class OpenAIApi(
                 .sortedByDescending { it.created }
                 .map { it.id.id }
                 .let { ModelsResult.Success(ids = it) }
+        } catch (e: Exception) {
+            ModelsResult.Error(message = e.message ?: e.cause?.message)
+        }
+    }
+
+    private fun verifyDeepLSettings(settings: OpenAISettings): ModelsResult {
+        return try {
+            val response =
+                OkHttpClient.Builder()
+                    .callTimeout(settings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
+                    .build()
+                    .newCall(
+                        Request.Builder()
+                            .url(settings.toDeepLTranslateUrl())
+                            .header("Authorization", "DeepL-Auth-Key ${settings.key}")
+                            .header("Content-Type", "application/json")
+                            .post(
+                                json
+                                    .encodeToString(
+                                        DeepLTranslateRequest(
+                                            text = listOf("Hello"),
+                                            target_lang = "DE",
+                                        ),
+                                    ).toRequestBody("application/json".toMediaType()),
+                            ).build(),
+                    ).execute()
+
+            if (!response.isSuccessful) {
+                return ModelsResult.Error(
+                    message = "DeepL verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                )
+            }
+
+            val deeplResponse =
+                json.decodeFromString<DeepLTranslateResponse>(
+                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                )
+
+            if (deeplResponse.translations.isEmpty()) {
+                ModelsResult.Error(message = "DeepL verification failed: no translation was returned")
+            } else {
+                ModelsResult.Success(ids = emptyList())
+            }
+        } catch (e: Exception) {
+            ModelsResult.Error(message = e.message ?: e.cause?.message)
+        }
+    }
+
+    private fun verifyGoogleTranslateSettings(settings: OpenAISettings): ModelsResult {
+        return try {
+            val response =
+                OkHttpClient.Builder()
+                    .callTimeout(settings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
+                    .build()
+                    .newCall(
+                        Request.Builder()
+                            .url(settings.toGoogleTranslateUrl())
+                            .header("Content-Type", "application/json")
+                            .post(
+                                json
+                                    .encodeToString(
+                                        GoogleTranslateRequest(
+                                            q = listOf("Hello"),
+                                            target = "de",
+                                            format = "text",
+                                        ),
+                                    ).toRequestBody("application/json".toMediaType()),
+                            ).build(),
+                    ).execute()
+
+            if (!response.isSuccessful) {
+                return ModelsResult.Error(
+                    message = "Google Translate verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                )
+            }
+
+            val googleResponse =
+                json.decodeFromString<GoogleTranslateResponse>(
+                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                )
+
+            if (googleResponse.data.translations.isEmpty()) {
+                ModelsResult.Error(message = "Google Translate verification failed: no translation was returned")
+            } else {
+                ModelsResult.Success(ids = emptyList())
+            }
         } catch (e: Exception) {
             ModelsResult.Error(message = e.message ?: e.cause?.message)
         }
@@ -417,7 +503,7 @@ class OpenAIApi(
                                 listOf(
                                     "You are an assistant in an RSS reader app, summarizing article content.",
                                     "The app language is '$appLang'.",
-                                    "Provide summaries in the article's language if 99% recognizable; otherwise, use the app language.",
+                                    "Summarize in '${openAISettings.preferredTranslationLanguage.trim().ifBlank { appLang }}'.",
                                     "First line must be exactly: 'Lang: \"ISO code\"' with NO markdown formatting around the Lang line whatsoever.",
                                     "Keep summaries up to 100 words, 3 paragraphs, with up to 3 bullet points per paragraph.",
                                     "For readability use markdown formatting: **bold** for emphasis, *italics* for quotes, bullet points (-) for lists, # headers for sections, and > for block quotes.",
@@ -480,7 +566,7 @@ val OpenAISettings.isPerplexity: Boolean
     get() = baseUrl.contains("api.perplexity.ai", ignoreCase = true)
 
 val OpenAISettings.isDeepL: Boolean
-    get() = baseUrl.contains("deepl.com", ignoreCase = true) || key.endsWith(":fx")
+    get() = baseUrl.contains("deepl.com", ignoreCase = true)
 
 val OpenAISettings.isGoogleTranslate: Boolean
     get() = baseUrl.contains("translation.googleapis.com", ignoreCase = true)

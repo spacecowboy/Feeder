@@ -279,6 +279,7 @@
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">AI and translation</string>
+  <string name="api_settings_title">API</string>
   <string name="openai_settings_info">Choose a provider first. OpenAI or compatible and Azure OpenAI support summaries and translation, while DeepL and Google Cloud Translation are translation only.</string>
   <string name="api_key">API key</string>
   <string name="deepl_api_key">DeepL auth key</string>
@@ -286,6 +287,9 @@
   <string name="model_id_not_used_for_deepl">Model Id is not used for DeepL translation.</string>
   <string name="ai_provider">Provider</string>
   <string name="ai_not_configured">Not configured yet</string>
+  <string name="api_provider_summary">Provider: %1$s</string>
+  <string name="translation_only">Translation only</string>
+  <string name="translation_and_summaries">Translation and summaries</string>
   <string name="provider_openai_compatible">OpenAI or compatible</string>
   <string name="provider_openai_compatible_features">Used for summaries and translation</string>
   <string name="provider_openai_compatible_help">Use this for OpenAI or compatible chat APIs. Model Id is required.</string>

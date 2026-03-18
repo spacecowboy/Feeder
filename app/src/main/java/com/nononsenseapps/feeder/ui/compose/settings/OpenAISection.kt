@@ -45,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
@@ -73,12 +72,22 @@ fun OpenAISection(
     if (state.isEditMode) {
         var current by remember(state.settings) { mutableStateOf(state.settings) }
         var provider by remember(state.settings) { mutableStateOf(AIProviderPreset.fromSettings(state.settings)) }
+        val validationMessage =
+            remember(current, provider, state.modelsResult) {
+                current.validationMessage(
+                    provider = provider,
+                    modelsResult = state.modelsResult,
+                )
+            }
         AlertDialog(
             confirmButton = {
-                Button(onClick = {
-                    onEvent(OpenAISettingsEvent.UpdateSettings(current))
-                    onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
-                }) {
+                Button(
+                    onClick = {
+                        onEvent(OpenAISettingsEvent.UpdateSettings(current))
+                        onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
+                    },
+                    enabled = validationMessage == null,
+                ) {
                     Text(text = stringResource(R.string.save))
                 }
             },
@@ -99,6 +108,7 @@ fun OpenAISection(
                     state = state,
                     current = current,
                     provider = provider,
+                    validationMessage = validationMessage,
                     onEvent = {
                         if (it is OpenAISettingsEvent.UpdateSettings) {
                             current = it.settings
@@ -136,15 +146,14 @@ private fun OpenAISectionItem(
         ) { }
 
         val provider = remember(settings) { AIProviderPreset.fromSettings(settings) }
-        val transformedKey = remember(settings.key) { VisualTransformationApiKey().filter(AnnotatedString(settings.key)) }
         TitleAndSubtitle(
             title = {
-                Text(text = stringResource(provider.titleRes))
+                Text(text = stringResource(R.string.api_settings_title))
             },
             subtitle = {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = stringResource(provider.descriptionRes),
+                        text = stringResource(R.string.api_provider_summary, stringResource(provider.titleRes)),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Text(
@@ -152,7 +161,7 @@ private fun OpenAISectionItem(
                             if (settings.key.isBlank()) {
                                 stringResource(R.string.ai_not_configured)
                             } else {
-                                transformedKey.text.text
+                                stringResource(provider.previewSummaryRes)
                             },
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -169,6 +178,7 @@ private fun OpenAISectionEdit(
     state: OpenAISettingsState,
     current: OpenAISettings,
     provider: AIProviderPreset,
+    validationMessage: String?,
     onEvent: (OpenAISettingsEvent) -> Unit,
     onProviderChange: (AIProviderPreset) -> Unit,
     modifier: Modifier = Modifier,
@@ -200,6 +210,27 @@ private fun OpenAISectionEdit(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline,
         )
+
+        validationMessage?.let { message ->
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Warning,
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = message,
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
 
         ProviderField(
             provider = provider,
@@ -598,6 +629,7 @@ private enum class AIProviderPreset(
     val titleRes: Int,
     val descriptionRes: Int,
     val helpRes: Int,
+    val previewSummaryRes: Int,
     val isDeepL: Boolean,
     val isGoogleTranslate: Boolean,
     val endpoint: String,
@@ -606,6 +638,7 @@ private enum class AIProviderPreset(
         titleRes = R.string.provider_openai_compatible,
         descriptionRes = R.string.provider_openai_compatible_features,
         helpRes = R.string.provider_openai_compatible_help,
+        previewSummaryRes = R.string.translation_and_summaries,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
@@ -614,6 +647,7 @@ private enum class AIProviderPreset(
         titleRes = R.string.provider_azure_openai,
         descriptionRes = R.string.provider_azure_openai_features,
         helpRes = R.string.provider_azure_openai_help,
+        previewSummaryRes = R.string.translation_and_summaries,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
@@ -622,6 +656,7 @@ private enum class AIProviderPreset(
         titleRes = R.string.provider_deepl,
         descriptionRes = R.string.provider_deepl_features,
         helpRes = R.string.provider_deepl_help,
+        previewSummaryRes = R.string.translation_only,
         isDeepL = true,
         isGoogleTranslate = false,
         endpoint = "https://api.deepl.com/v2/translate",
@@ -630,6 +665,7 @@ private enum class AIProviderPreset(
         titleRes = R.string.provider_google_translate,
         descriptionRes = R.string.provider_google_translate_features,
         helpRes = R.string.provider_google_translate_help,
+        previewSummaryRes = R.string.translation_only,
         isDeepL = false,
         isGoogleTranslate = true,
         endpoint = "https://translation.googleapis.com/language/translate/v2",
@@ -726,4 +762,69 @@ private fun OpenAISectionEditPreview() {
             ),
         onEvent = { },
     )
+}
+
+private fun OpenAISettings.validationMessage(
+    provider: AIProviderPreset,
+    modelsResult: OpenAIModelsState,
+): String? {
+    if (key.isBlank()) {
+        return if (provider.isDeepL) {
+            "Enter a DeepL API key before saving."
+        } else {
+            "Enter an API key before saving."
+        }
+    }
+
+    val timeoutInput = timeoutSeconds.toString()
+    if (!isTimeoutInputValid(timeoutInput)) {
+        return "Timeout must be between 30 and 600 seconds."
+    }
+
+    if (preferredTranslationLanguage.isBlank()) {
+        return "Set a preferred translation language before saving."
+    }
+
+    return when (provider) {
+        AIProviderPreset.OPENAI_COMPATIBLE -> {
+            when {
+                modelId.isBlank() -> "Enter a model id before saving."
+                modelsResult is OpenAIModelsState.Loading -> "Verifying API settings..."
+                modelsResult is OpenAIModelsState.Error -> {
+                    modelsResult.message.ifBlank { "The API settings could not be verified." }
+                }
+                else -> null
+            }
+        }
+
+        AIProviderPreset.AZURE_OPENAI -> {
+            when {
+                modelId.isBlank() -> "Enter a model id before saving."
+                baseUrl.isBlank() -> "Enter your Azure endpoint before saving."
+                azureDeploymentId.isBlank() -> "Enter your Azure deployment id before saving."
+                azureApiVersion.isBlank() -> "Enter your Azure API version before saving."
+                modelsResult is OpenAIModelsState.Loading -> "Verifying Azure OpenAI settings..."
+                modelsResult is OpenAIModelsState.Error -> {
+                    modelsResult.message.ifBlank { "The Azure OpenAI settings could not be verified." }
+                }
+                else -> null
+            }
+        }
+
+        AIProviderPreset.DEEPL -> {
+            when (modelsResult) {
+                is OpenAIModelsState.Loading -> "Verifying DeepL key..."
+                is OpenAIModelsState.Error -> modelsResult.message.ifBlank { "The DeepL key could not be verified." }
+                else -> null
+            }
+        }
+
+        AIProviderPreset.GOOGLE_TRANSLATE -> {
+            when (modelsResult) {
+                is OpenAIModelsState.Loading -> "Verifying Google Cloud Translation key..."
+                is OpenAIModelsState.Error -> modelsResult.message.ifBlank { "The Google Cloud Translation key could not be verified." }
+                else -> null
+            }
+        }
+    }
 }
