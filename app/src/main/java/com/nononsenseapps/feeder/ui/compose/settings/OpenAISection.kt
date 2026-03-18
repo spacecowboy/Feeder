@@ -71,6 +71,7 @@ fun OpenAISection(
 
     if (state.isEditMode) {
         var current by remember(state.settings) { mutableStateOf(state.settings) }
+        var provider by remember(state.settings) { mutableStateOf(AIProviderPreset.fromSettings(state.settings)) }
         AlertDialog(
             confirmButton = {
                 Button(onClick = {
@@ -96,12 +97,17 @@ fun OpenAISection(
                     modifier = Modifier,
                     state = state,
                     current = current,
+                    provider = provider,
                     onEvent = {
                         if (it is OpenAISettingsEvent.UpdateSettings) {
                             current = it.settings
                         } else {
                             onEvent(it)
                         }
+                    },
+                    onProviderChange = { selected ->
+                        provider = selected
+                        current = selected.applyTo(current)
                     },
                 )
             },
@@ -128,18 +134,28 @@ private fun OpenAISectionItem(
             contentAlignment = Alignment.Center,
         ) { }
 
+        val provider = remember(settings) { AIProviderPreset.fromSettings(settings) }
         val transformedKey = remember(settings.key) { VisualTransformationApiKey().filter(AnnotatedString(settings.key)) }
         TitleAndSubtitle(
             title = {
-                Text(
-                    text = stringResource(R.string.api_key),
-                )
+                Text(text = stringResource(provider.titleRes))
             },
             subtitle = {
-                Text(
-                    text = transformedKey.text,
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = stringResource(provider.descriptionRes),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Text(
+                        text =
+                            if (settings.key.isBlank()) {
+                                stringResource(R.string.ai_not_configured)
+                            } else {
+                                transformedKey.text.text
+                            },
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             },
         )
     }
@@ -148,18 +164,23 @@ private fun OpenAISectionItem(
 fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
 
 @Composable
-fun OpenAISectionEdit(
+private fun OpenAISectionEdit(
     state: OpenAISettingsState,
     current: OpenAISettings,
+    provider: AIProviderPreset,
     onEvent: (OpenAISettingsEvent) -> Unit,
+    onProviderChange: (AIProviderPreset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
+    val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
+
     LaunchedEffect(current) {
         latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
+    var providerMenuExpanded by remember { mutableStateOf(false) }
     var timeoutString by remember { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
@@ -176,13 +197,33 @@ fun OpenAISectionEdit(
             text = stringResource(R.string.openai_settings_info),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(bottom = 3.dp),
         )
+
+        ProviderField(
+            provider = provider,
+            expanded = providerMenuExpanded,
+            onExpandedChange = { providerMenuExpanded = it },
+            onSelect = { selected ->
+                providerMenuExpanded = false
+                onProviderChange(selected)
+            },
+        )
+
+        FeatureSummaryCard(provider = provider)
+
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = current.key,
             label = {
-                Text(stringResource(R.string.api_key))
+                Text(
+                    stringResource(
+                        if (provider.isDeepL) {
+                            R.string.deepl_api_key
+                        } else {
+                            R.string.api_key
+                        },
+                    ),
+                )
             },
             keyboardOptions =
                 KeyboardOptions.Default.copy(
@@ -201,119 +242,95 @@ fun OpenAISectionEdit(
             visualTransformation = VisualTransformationApiKey(),
         )
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = current.modelId,
-            label = {
-                Text(stringResource(R.string.model_id))
-            },
-            enabled = !current.isDeepL,
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Next,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                ),
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
-            },
-            supportingText = {
-                if (current.isDeepL) {
-                    Text(stringResource(R.string.model_id_not_used_for_deepl))
-                }
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = { modelsMenuExpanded = true },
-                    enabled = !current.isDeepL && state.modelsResult is OpenAIModelsState.Success,
-                ) {
-                    if (state.modelsResult is OpenAIModelsState.Loading) {
-                        CircularProgressIndicator()
-                    } else {
-                        Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
-                        if (state.modelsResult is OpenAIModelsState.Success) {
-                            OpenAIModelsDropdown(
-                                menuExpanded = modelsMenuExpanded,
-                                state = state.modelsResult,
-                                onValueChange = {
-                                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
-                                },
-                                onDismissRequest = { modelsMenuExpanded = false },
-                            )
+        if (!provider.isDeepL) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = current.modelId,
+                label = {
+                    Text(stringResource(R.string.model_id))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                        },
+                    ),
+                onValueChange = {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = { modelsMenuExpanded = true },
+                        enabled = state.modelsResult is OpenAIModelsState.Success,
+                    ) {
+                        if (state.modelsResult is OpenAIModelsState.Loading) {
+                            CircularProgressIndicator()
+                        } else {
+                            Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
+                            if (state.modelsResult is OpenAIModelsState.Success) {
+                                OpenAIModelsDropdown(
+                                    menuExpanded = modelsMenuExpanded,
+                                    state = state.modelsResult,
+                                    onValueChange = {
+                                        onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
+                                    },
+                                    onDismissRequest = { modelsMenuExpanded = false },
+                                )
+                            }
                         }
                     }
-                }
-            },
-        )
+                },
+            )
 
-        OpenAIModelsStatus(
-            state = state.modelsResult,
-            showError = state.showModelsError,
-            onEvent = onEvent,
-        )
+            OpenAIModelsStatus(
+                state = state.modelsResult,
+                showError = state.showModelsError,
+                onEvent = onEvent,
+            )
+        }
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = current.baseUrl,
-            placeholder = {
-                Text(OpenAIHost.OpenAI.baseUrl)
-            },
-            label = {
-                Text(stringResource(R.string.url))
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Next,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                ),
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
-            },
-        )
-
-        TextField(
-            modifier =
-                Modifier.fillMaxWidth(),
-            value = timeoutString,
-            placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
-            label = {
-                Text(stringResource(R.string.time_out))
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                ),
-            supportingText = {
-                if (!isTimeoutInputValid) {
-                    Text(stringResource(R.string.time_out_validation_error))
-                }
-            },
-            onValueChange = { input ->
-                timeoutString = input
-                if (isTimeoutInputValid(timeoutString)) {
-                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
-                }
-            },
-            isError = !isTimeoutInputValid,
-        )
+        if (!provider.isDeepL) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = current.baseUrl,
+                placeholder = {
+                    Text(OpenAIHost.OpenAI.baseUrl)
+                },
+                label = {
+                    Text(stringResource(R.string.base_url_optional))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                        },
+                    ),
+                onValueChange = {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
+                },
+            )
+        } else {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = provider.baseUrl,
+                label = {
+                    Text(stringResource(R.string.translation_endpoint))
+                },
+                readOnly = true,
+                enabled = false,
+                onValueChange = {},
+            )
+        }
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
@@ -344,50 +361,147 @@ fun OpenAISectionEdit(
 
         TextField(
             modifier = Modifier.fillMaxWidth(),
-            value = current.azureDeploymentId,
+            value = timeoutString,
+            placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
             label = {
-                Text(stringResource(R.string.azure_deployment_id))
+                Text(stringResource(R.string.time_out))
             },
             keyboardOptions =
                 KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Next,
+                    keyboardType = KeyboardType.Number,
+                    imeAction = if (showAzureFields) ImeAction.Next else ImeAction.Done,
                 ),
             keyboardActions =
                 KeyboardActions(
                     onNext = {
                         focusManager.moveFocus(focusDirection = FocusDirection.Down)
                     },
-                ),
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureDeploymentId = it)))
-            },
-        )
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = current.azureApiVersion,
-            placeholder = {
-                Text("2024-02-15-preview")
-            },
-            label = {
-                Text(stringResource(R.string.azure_api_version))
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Done,
-                ),
-            keyboardActions =
-                KeyboardActions(
                     onDone = {
                         keyboardController?.hide()
                     },
                 ),
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureApiVersion = it)))
+            supportingText = {
+                if (!isTimeoutInputValid) {
+                    Text(stringResource(R.string.time_out_validation_error))
+                }
+            },
+            onValueChange = { input ->
+                timeoutString = input
+                if (isTimeoutInputValid(timeoutString)) {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
+                }
+            },
+            isError = !isTimeoutInputValid,
+        )
+
+        if (showAzureFields) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = current.azureDeploymentId,
+                label = {
+                    Text(stringResource(R.string.azure_deployment_id))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                        },
+                    ),
+                onValueChange = {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureDeploymentId = it)))
+                },
+            )
+
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = current.azureApiVersion,
+                placeholder = {
+                    Text("2024-02-15-preview")
+                },
+                label = {
+                    Text(stringResource(R.string.azure_api_version))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        },
+                    ),
+                onValueChange = {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(azureApiVersion = it)))
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProviderField(
+    provider: AIProviderPreset,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onSelect: (AIProviderPreset) -> Unit,
+) {
+    Box {
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = stringResource(provider.titleRes),
+            label = {
+                Text(stringResource(R.string.ai_provider))
+            },
+            readOnly = true,
+            onValueChange = {},
+            trailingIcon = {
+                IconButton(onClick = { onExpandedChange(true) }) {
+                    Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.ai_provider))
+                }
             },
         )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+        ) {
+            AIProviderPreset.entries.forEach { preset ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(preset.titleRes)) },
+                    onClick = {
+                        onSelect(preset)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeatureSummaryCard(provider: AIProviderPreset) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = stringResource(provider.descriptionRes),
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Text(
+                text = stringResource(provider.helpRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+            )
+        }
     }
 }
 
@@ -478,6 +592,78 @@ private fun OpenAIModelsStatus(
     }
 }
 
+private enum class AIProviderPreset(
+    val titleRes: Int,
+    val descriptionRes: Int,
+    val helpRes: Int,
+    val baseUrl: String,
+    val isDeepL: Boolean,
+) {
+    OPENAI_COMPATIBLE(
+        titleRes = R.string.provider_openai_compatible,
+        descriptionRes = R.string.provider_openai_compatible_features,
+        helpRes = R.string.provider_openai_compatible_help,
+        baseUrl = "",
+        isDeepL = false,
+    ),
+    AZURE_OPENAI(
+        titleRes = R.string.provider_azure_openai,
+        descriptionRes = R.string.provider_azure_openai_features,
+        helpRes = R.string.provider_azure_openai_help,
+        baseUrl = "",
+        isDeepL = false,
+    ),
+    DEEPL(
+        titleRes = R.string.provider_deepl,
+        descriptionRes = R.string.provider_deepl_features,
+        helpRes = R.string.provider_deepl_help,
+        baseUrl = "https://api.deepl.com",
+        isDeepL = true,
+    ),
+    ;
+
+    fun applyTo(settings: OpenAISettings): OpenAISettings =
+        when (this) {
+            OPENAI_COMPATIBLE ->
+                settings.copy(
+                    baseUrl = "",
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                )
+
+            AZURE_OPENAI ->
+                settings.copy(
+                    baseUrl = inferAzureBaseUrl(settings),
+                )
+
+            DEEPL ->
+                settings.copy(
+                    baseUrl = inferDeepLBaseUrl(settings),
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                )
+        }
+
+    companion object {
+        fun fromSettings(settings: OpenAISettings): AIProviderPreset =
+            when {
+                settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
+                settings.isDeepL -> DEEPL
+                else -> OPENAI_COMPATIBLE
+            }
+
+        private fun inferAzureBaseUrl(settings: OpenAISettings): String =
+            settings.baseUrl.takeIf { it.contains("openai.azure.com", ignoreCase = true) }.orEmpty()
+
+        private fun inferDeepLBaseUrl(settings: OpenAISettings): String =
+            when {
+                settings.baseUrl.contains("api-free.deepl.com", ignoreCase = true) -> "https://api-free.deepl.com"
+                settings.key.endsWith(":fx") -> "https://api-free.deepl.com"
+                else -> "https://api.deepl.com"
+            }
+    }
+}
+
 @Preview("tablet", device = Devices.PIXEL_C)
 @Preview("phone", device = Devices.PIXEL_7)
 @Composable
@@ -508,57 +694,11 @@ private fun OpenAISectionEditPreview() {
             OpenAISettingsState(
                 settings =
                     OpenAISettings(
-                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                        key = "",
                         modelId = "gpt-4o-mini",
                     ),
                 modelsResult = OpenAIModelsState.None,
                 isEditMode = true,
-            ),
-        onEvent = { },
-    )
-}
-
-@Preview("tablet", device = Devices.PIXEL_C)
-@Preview("phone", device = Devices.PIXEL_7)
-@Composable
-private fun OpenAISectionErrorCollapsedPreview() {
-    OpenAISection(
-        state =
-            OpenAISettingsState(
-                settings =
-                    OpenAISettings(
-                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                        modelId = "gpt-4o-mini",
-                    ),
-                modelsResult =
-                    OpenAIModelsState.Error(
-                        message = "A sample error message",
-                    ),
-                isEditMode = true,
-                showModelsError = false,
-            ),
-        onEvent = { },
-    )
-}
-
-@Preview("tablet", device = Devices.PIXEL_C)
-@Preview("phone", device = Devices.PIXEL_7)
-@Composable
-private fun OpenAISectionErrorExpandedPreview() {
-    OpenAISection(
-        state =
-            OpenAISettingsState(
-                settings =
-                    OpenAISettings(
-                        key = "sk-test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                        modelId = "gpt-4o-mini",
-                    ),
-                modelsResult =
-                    OpenAIModelsState.Error(
-                        message = "A sample error message",
-                    ),
-                isEditMode = true,
-                showModelsError = true,
             ),
         onEvent = { },
     )

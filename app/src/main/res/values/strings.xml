@@ -278,11 +278,25 @@
   <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
-  <string name="openai_settings">AI integration</string>
-  <string name="openai_settings_info">Compatible with OpenAI-style providers, plus DeepL for translation</string>
+  <string name="openai_settings">AI and translation</string>
+  <string name="openai_settings_info">Choose a provider first. OpenAI-compatible and Azure OpenAI support summaries and translation, while DeepL is translation only.</string>
   <string name="api_key">API key</string>
+  <string name="deepl_api_key">DeepL auth key</string>
   <string name="model_id">Model Id</string>
   <string name="model_id_not_used_for_deepl">Model Id is not used for DeepL translation.</string>
+  <string name="ai_provider">Provider</string>
+  <string name="ai_not_configured">Not configured yet</string>
+  <string name="provider_openai_compatible">OpenAI-compatible</string>
+  <string name="provider_openai_compatible_features">Used for summaries and translation</string>
+  <string name="provider_openai_compatible_help">Use this for OpenAI or compatible chat APIs. Model Id is required.</string>
+  <string name="provider_azure_openai">Azure OpenAI</string>
+  <string name="provider_azure_openai_features">Used for summaries and translation</string>
+  <string name="provider_azure_openai_help">Use this for Azure OpenAI. Enter your Azure endpoint, deployment id, API version, and model id.</string>
+  <string name="provider_deepl">DeepL</string>
+  <string name="provider_deepl_features">Used for translation only</string>
+  <string name="provider_deepl_help">Use your DeepL API key. Free and Pro endpoints are detected automatically when possible. Summaries stay unavailable with this provider.</string>
+  <string name="base_url_optional">Base URL (optional)</string>
+  <string name="translation_endpoint">Translation endpoint</string>
   <string name="azure_api_version">Azure API version</string>
   <string name="touch_to_play_audio">Touch to play audio</string>
   <string name="title_unread_count" translatable="false">(%1$d)</string>
