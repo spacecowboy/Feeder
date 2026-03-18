@@ -87,6 +87,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -777,19 +778,19 @@ fun SettingsList(
                 onEvent = onOpenAIEvent,
             )
 
-            SwitchSetting(
-                title = stringResource(id = R.string.translate_feed_cards_by_default),
-                checked = translateFeedCardsByDefault,
-                onCheckedChange = onTranslateFeedCardsByDefault,
-                description = stringResource(id = R.string.translate_feed_cards_by_default_description),
-            )
+            if (openAIState.settings.canTranslate) {
+                SwitchSetting(
+                    title = stringResource(id = R.string.translate_feed_cards_by_default),
+                    checked = translateFeedCardsByDefault,
+                    onCheckedChange = onTranslateFeedCardsByDefault,
+                )
 
-            SwitchSetting(
-                title = stringResource(id = R.string.translate_articles_by_default),
-                checked = translateArticlesByDefault,
-                onCheckedChange = onTranslateArticlesByDefault,
-                description = stringResource(id = R.string.translate_articles_by_default_description),
-            )
+                SwitchSetting(
+                    title = stringResource(id = R.string.translate_articles_by_default),
+                    checked = translateArticlesByDefault,
+                    onCheckedChange = onTranslateArticlesByDefault,
+                )
+            }
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))

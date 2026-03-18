@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -329,6 +330,12 @@ fun ArticleScreen(
                                         onClick = {
                                             onShowToolbarMenu(false)
                                             onTranslate()
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.Translate,
+                                                contentDescription = null,
+                                            )
                                         },
                                         text = {
                                             Text(
