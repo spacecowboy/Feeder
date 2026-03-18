@@ -280,7 +280,7 @@
   <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">AI and translation</string>
   <string name="api_settings_title">API</string>
-  <string name="openai_settings_info">Choose a provider first. OpenAI or compatible and Azure OpenAI support summaries and translation, while DeepL and Google Cloud Translation are translation only.</string>
+  <string name="openai_settings_info">Choose a provider first.</string>
   <string name="api_key">API key</string>
   <string name="deepl_api_key">DeepL auth key</string>
   <string name="model_id">Model Id</string>

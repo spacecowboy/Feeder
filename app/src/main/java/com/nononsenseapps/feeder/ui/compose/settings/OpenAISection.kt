@@ -521,20 +521,11 @@ private fun FeatureSummaryCard(provider: AIProviderPreset) {
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
+        Text(
+            text = stringResource(provider.descriptionRes),
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = stringResource(provider.descriptionRes),
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                text = stringResource(provider.helpRes),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
+            style = MaterialTheme.typography.titleSmall,
+        )
     }
 }
 
