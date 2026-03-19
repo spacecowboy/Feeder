@@ -215,21 +215,15 @@ private fun OpenAISectionItem(
                 Text(text = title)
             },
             subtitle = {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = stringResource(R.string.api_provider_summary, stringResource(provider.titleRes)),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                    Text(
-                        text =
-                            if (sanitizedSettings.key.isBlank()) {
-                                stringResource(R.string.ai_not_configured)
-                            } else {
-                                stringResource(provider.previewSummaryRes)
-                            },
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+                Text(
+                    text =
+                        if (sanitizedSettings.key.isBlank()) {
+                            stringResource(R.string.ai_not_configured)
+                        } else {
+                            stringResource(R.string.api_provider_summary, stringResource(provider.titleRes))
+                        },
+                    style = MaterialTheme.typography.bodySmall,
+                )
             },
         )
     }
@@ -438,7 +432,7 @@ private fun OpenAISectionEdit(
             )
         }
 
-        if (section == OpenAISectionType.Translation) {
+        if (section == OpenAISectionType.Translation && hasProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = preferredTranslationLanguage,
@@ -687,7 +681,6 @@ private fun OpenAIModelsStatus(
 
 private enum class AIProviderPreset(
     val titleRes: Int,
-    val previewSummaryRes: Int,
     val supportsSummary: Boolean,
     val supportsTranslation: Boolean,
     val isDeepL: Boolean,
@@ -696,7 +689,6 @@ private enum class AIProviderPreset(
 ) {
     NONE(
         titleRes = R.string.provider_none,
-        previewSummaryRes = R.string.ai_not_configured,
         supportsSummary = true,
         supportsTranslation = true,
         isDeepL = false,
@@ -705,7 +697,6 @@ private enum class AIProviderPreset(
     ),
     OPENAI_COMPATIBLE(
         titleRes = R.string.provider_openai_compatible,
-        previewSummaryRes = R.string.translation_and_summaries,
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
@@ -714,7 +705,6 @@ private enum class AIProviderPreset(
     ),
     AZURE_OPENAI(
         titleRes = R.string.provider_azure_openai,
-        previewSummaryRes = R.string.translation_and_summaries,
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
@@ -723,7 +713,6 @@ private enum class AIProviderPreset(
     ),
     DEEPL(
         titleRes = R.string.provider_deepl,
-        previewSummaryRes = R.string.translation_only,
         supportsSummary = false,
         supportsTranslation = true,
         isDeepL = true,
@@ -732,7 +721,6 @@ private enum class AIProviderPreset(
     ),
     GOOGLE_TRANSLATE(
         titleRes = R.string.provider_google_translate,
-        previewSummaryRes = R.string.translation_only,
         supportsSummary = false,
         supportsTranslation = true,
         isDeepL = false,
@@ -933,9 +921,18 @@ private fun OpenAIModelsState.matches(settings: OpenAISettings): Boolean =
     }
 
 private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAISettings =
-    when {
-        this != OpenAISectionType.Translation -> settings
-        settings.isBlankConfiguration -> settings
-        settings.isDeepL || settings.isGoogleTranslate -> settings
-        else -> OpenAISettings()
+    when (this) {
+        OpenAISectionType.Summary ->
+            when {
+                settings.isBlankConfiguration -> settings
+                settings.isDeepL || settings.isGoogleTranslate -> OpenAISettings()
+                else -> settings
+            }
+
+        OpenAISectionType.Translation ->
+            when {
+                settings.isBlankConfiguration -> settings
+                settings.isDeepL || settings.isGoogleTranslate -> settings
+                else -> OpenAISettings()
+            }
     }

@@ -279,6 +279,7 @@
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">AI and translation</string>
+  <string name="openai_settings_info">Compatible with many AI providers, but not all</string>
   <string name="summary_api_settings">Summary API</string>
   <string name="summary_api_settings_info">Used for article summaries.</string>
   <string name="translation_api_settings">Translation API</string>
@@ -287,10 +288,8 @@
   <string name="deepl_api_key">DeepL auth key</string>
   <string name="model_id">Model Id</string>
   <string name="ai_provider">Provider</string>
-  <string name="ai_not_configured">Not configured yet</string>
+  <string name="ai_not_configured">Not configured</string>
   <string name="api_provider_summary">Provider: %1$s</string>
-  <string name="translation_only">Translation only</string>
-  <string name="translation_and_summaries">Translation and summaries</string>
   <string name="provider_none">None</string>
   <string name="provider_openai_compatible">OpenAI or compatible</string>
   <string name="provider_azure_openai">Azure OpenAI</string>
