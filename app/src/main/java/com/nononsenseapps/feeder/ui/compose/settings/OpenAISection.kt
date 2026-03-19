@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.settings
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -76,11 +78,13 @@ fun OpenAISection(
     if (state.isEditMode) {
         var current by remember(state.settings) { mutableStateOf(state.settings) }
         var provider by remember(state.settings) { mutableStateOf(AIProviderPreset.fromSettings(state.settings)) }
+        val context = LocalContext.current
         val validationMessage =
-            remember(current, provider, state.modelsResult) {
+            remember(current, provider, state.modelsResult, context) {
                 current.validationMessage(
                     provider = provider,
                     modelsResult = state.modelsResult,
+                    context = context,
                 )
             }
         Dialog(
@@ -647,7 +651,6 @@ private fun OpenAIModelsStatus(
 private enum class AIProviderPreset(
     val titleRes: Int,
     val descriptionRes: Int,
-    val helpRes: Int,
     val previewSummaryRes: Int,
     val isDeepL: Boolean,
     val isGoogleTranslate: Boolean,
@@ -656,7 +659,6 @@ private enum class AIProviderPreset(
     OPENAI_COMPATIBLE(
         titleRes = R.string.provider_openai_compatible,
         descriptionRes = R.string.provider_openai_compatible_features,
-        helpRes = R.string.provider_openai_compatible_help,
         previewSummaryRes = R.string.translation_and_summaries,
         isDeepL = false,
         isGoogleTranslate = false,
@@ -665,7 +667,6 @@ private enum class AIProviderPreset(
     AZURE_OPENAI(
         titleRes = R.string.provider_azure_openai,
         descriptionRes = R.string.provider_azure_openai_features,
-        helpRes = R.string.provider_azure_openai_help,
         previewSummaryRes = R.string.translation_and_summaries,
         isDeepL = false,
         isGoogleTranslate = false,
@@ -674,7 +675,6 @@ private enum class AIProviderPreset(
     DEEPL(
         titleRes = R.string.provider_deepl,
         descriptionRes = R.string.provider_deepl_features,
-        helpRes = R.string.provider_deepl_help,
         previewSummaryRes = R.string.translation_only,
         isDeepL = true,
         isGoogleTranslate = false,
@@ -683,7 +683,6 @@ private enum class AIProviderPreset(
     GOOGLE_TRANSLATE(
         titleRes = R.string.provider_google_translate,
         descriptionRes = R.string.provider_google_translate_features,
-        helpRes = R.string.provider_google_translate_help,
         previewSummaryRes = R.string.translation_only,
         isDeepL = false,
         isGoogleTranslate = true,
@@ -786,31 +785,32 @@ private fun OpenAISectionEditPreview() {
 private fun OpenAISettings.validationMessage(
     provider: AIProviderPreset,
     modelsResult: OpenAIModelsState,
+    context: Context,
 ): String? {
     if (key.isBlank()) {
         return if (provider.isDeepL) {
-            "Enter a DeepL API key before saving."
+            context.getString(R.string.enter_deepl_api_key_before_saving)
         } else {
-            "Enter an API key before saving."
+            context.getString(R.string.enter_api_key_before_saving)
         }
     }
 
     val timeoutInput = timeoutSeconds.toString()
     if (!isTimeoutInputValid(timeoutInput)) {
-        return "Timeout must be between 30 and 600 seconds."
+        return context.getString(R.string.time_out_validation_error)
     }
 
     if (preferredTranslationLanguage.isBlank()) {
-        return "Set a preferred translation language before saving."
+        return context.getString(R.string.set_preferred_translation_language_before_saving)
     }
 
     return when (provider) {
         AIProviderPreset.OPENAI_COMPATIBLE -> {
             when {
-                modelId.isBlank() -> "Enter a model id before saving."
-                modelsResult is OpenAIModelsState.Loading -> "Verifying API settings..."
+                modelId.isBlank() -> context.getString(R.string.enter_model_id_before_saving)
+                modelsResult is OpenAIModelsState.Loading -> context.getString(R.string.verifying_api_settings)
                 modelsResult is OpenAIModelsState.Error -> {
-                    modelsResult.message.ifBlank { "The API settings could not be verified." }
+                    modelsResult.message.ifBlank { context.getString(R.string.api_settings_could_not_be_verified) }
                 }
                 else -> null
             }
@@ -818,13 +818,13 @@ private fun OpenAISettings.validationMessage(
 
         AIProviderPreset.AZURE_OPENAI -> {
             when {
-                modelId.isBlank() -> "Enter a model id before saving."
-                baseUrl.isBlank() -> "Enter your Azure endpoint before saving."
-                azureDeploymentId.isBlank() -> "Enter your Azure deployment id before saving."
-                azureApiVersion.isBlank() -> "Enter your Azure API version before saving."
-                modelsResult is OpenAIModelsState.Loading -> "Verifying Azure OpenAI settings..."
+                modelId.isBlank() -> context.getString(R.string.enter_model_id_before_saving)
+                baseUrl.isBlank() -> context.getString(R.string.enter_azure_endpoint_before_saving)
+                azureDeploymentId.isBlank() -> context.getString(R.string.enter_azure_deployment_id_before_saving)
+                azureApiVersion.isBlank() -> context.getString(R.string.enter_azure_api_version_before_saving)
+                modelsResult is OpenAIModelsState.Loading -> context.getString(R.string.verifying_azure_openai_settings)
                 modelsResult is OpenAIModelsState.Error -> {
-                    modelsResult.message.ifBlank { "The Azure OpenAI settings could not be verified." }
+                    modelsResult.message.ifBlank { context.getString(R.string.azure_openai_settings_could_not_be_verified) }
                 }
                 else -> null
             }
@@ -832,16 +832,17 @@ private fun OpenAISettings.validationMessage(
 
         AIProviderPreset.DEEPL -> {
             when (modelsResult) {
-                is OpenAIModelsState.Loading -> "Verifying DeepL key..."
-                is OpenAIModelsState.Error -> modelsResult.message.ifBlank { "The DeepL key could not be verified." }
+                is OpenAIModelsState.Loading -> context.getString(R.string.verifying_deepl_key)
+                is OpenAIModelsState.Error -> modelsResult.message.ifBlank { context.getString(R.string.deepl_key_could_not_be_verified) }
                 else -> null
             }
         }
 
         AIProviderPreset.GOOGLE_TRANSLATE -> {
             when (modelsResult) {
-                is OpenAIModelsState.Loading -> "Verifying Google Cloud Translation key..."
-                is OpenAIModelsState.Error -> modelsResult.message.ifBlank { "The Google Cloud Translation key could not be verified." }
+                is OpenAIModelsState.Loading -> context.getString(R.string.verifying_google_cloud_translation_key)
+                is OpenAIModelsState.Error ->
+                    modelsResult.message.ifBlank { context.getString(R.string.google_cloud_translation_key_could_not_be_verified) }
                 else -> null
             }
         }

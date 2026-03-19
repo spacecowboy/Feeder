@@ -154,6 +154,11 @@ class OpenAIApi(
     private val openAI: OpenAIClient
         get() = openAIClientFactory(openAISettings)
 
+    private fun okHttpClient(timeoutSeconds: Int): OkHttpClient =
+        OkHttpClient.Builder()
+            .callTimeout(timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
+            .build()
+
     suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
         if (settings.key.isEmpty()) {
             return ModelsResult.MissingToken
@@ -188,42 +193,40 @@ class OpenAIApi(
 
     private fun verifyDeepLSettings(settings: OpenAISettings): ModelsResult {
         return try {
-            val response =
-                OkHttpClient.Builder()
-                    .callTimeout(settings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
-                    .build()
-                    .newCall(
-                        Request.Builder()
-                            .url(settings.toDeepLTranslateUrl())
-                            .header("Authorization", "DeepL-Auth-Key ${settings.key}")
-                            .header("Content-Type", "application/json")
-                            .post(
-                                json
-                                    .encodeToString(
-                                        DeepLTranslateRequest(
-                                            text = listOf("Hello"),
-                                            target_lang = "DE",
-                                        ),
-                                    ).toRequestBody("application/json".toMediaType()),
-                            ).build(),
-                    ).execute()
+            okHttpClient(settings.timeoutSeconds)
+                .newCall(
+                    Request.Builder()
+                        .url(settings.toDeepLTranslateUrl())
+                        .header("Authorization", "DeepL-Auth-Key ${settings.key}")
+                        .header("Content-Type", "application/json")
+                        .post(
+                            json
+                                .encodeToString(
+                                    DeepLTranslateRequest(
+                                        text = listOf("Hello"),
+                                        target_lang = "DE",
+                                    ),
+                                ).toRequestBody("application/json".toMediaType()),
+                        ).build(),
+                ).execute()
+                .use { response ->
+                    if (!response.isSuccessful) {
+                        return ModelsResult.Error(
+                            message = "DeepL verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                        )
+                    }
 
-            if (!response.isSuccessful) {
-                return ModelsResult.Error(
-                    message = "DeepL verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
-                )
-            }
+                    val deeplResponse =
+                        json.decodeFromString<DeepLTranslateResponse>(
+                            response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                        )
 
-            val deeplResponse =
-                json.decodeFromString<DeepLTranslateResponse>(
-                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
-                )
-
-            if (deeplResponse.translations.isEmpty()) {
-                ModelsResult.Error(message = "DeepL verification failed: no translation was returned")
-            } else {
-                ModelsResult.Success(ids = emptyList())
-            }
+                    if (deeplResponse.translations.isEmpty()) {
+                        ModelsResult.Error(message = "DeepL verification failed: no translation was returned")
+                    } else {
+                        ModelsResult.Success(ids = emptyList())
+                    }
+                }
         } catch (e: Exception) {
             ModelsResult.Error(message = e.message ?: e.cause?.message)
         }
@@ -231,42 +234,40 @@ class OpenAIApi(
 
     private fun verifyGoogleTranslateSettings(settings: OpenAISettings): ModelsResult {
         return try {
-            val response =
-                OkHttpClient.Builder()
-                    .callTimeout(settings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
-                    .build()
-                    .newCall(
-                        Request.Builder()
-                            .url(settings.toGoogleTranslateUrl())
-                            .header("Content-Type", "application/json")
-                            .post(
-                                json
-                                    .encodeToString(
-                                        GoogleTranslateRequest(
-                                            q = listOf("Hello"),
-                                            target = "de",
-                                            format = "text",
-                                        ),
-                                    ).toRequestBody("application/json".toMediaType()),
-                            ).build(),
-                    ).execute()
+            okHttpClient(settings.timeoutSeconds)
+                .newCall(
+                    Request.Builder()
+                        .url(settings.toGoogleTranslateUrl())
+                        .header("Content-Type", "application/json")
+                        .post(
+                            json
+                                .encodeToString(
+                                    GoogleTranslateRequest(
+                                        q = listOf("Hello"),
+                                        target = "de",
+                                        format = "text",
+                                    ),
+                                ).toRequestBody("application/json".toMediaType()),
+                        ).build(),
+                ).execute()
+                .use { response ->
+                    if (!response.isSuccessful) {
+                        return ModelsResult.Error(
+                            message = "Google Translate verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                        )
+                    }
 
-            if (!response.isSuccessful) {
-                return ModelsResult.Error(
-                    message = "Google Translate verification failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
-                )
-            }
+                    val googleResponse =
+                        json.decodeFromString<GoogleTranslateResponse>(
+                            response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                        )
 
-            val googleResponse =
-                json.decodeFromString<GoogleTranslateResponse>(
-                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
-                )
-
-            if (googleResponse.data.translations.isEmpty()) {
-                ModelsResult.Error(message = "Google Translate verification failed: no translation was returned")
-            } else {
-                ModelsResult.Success(ids = emptyList())
-            }
+                    if (googleResponse.data.translations.isEmpty()) {
+                        ModelsResult.Error(message = "Google Translate verification failed: no translation was returned")
+                    } else {
+                        ModelsResult.Success(ids = emptyList())
+                    }
+                }
         } catch (e: Exception) {
             ModelsResult.Error(message = e.message ?: e.cause?.message)
         }
@@ -358,52 +359,50 @@ class OpenAIApi(
         preserveHtml: Boolean,
     ): TranslationResult {
         return try {
-            val response =
-                OkHttpClient.Builder()
-                    .callTimeout(openAISettings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
-                    .build()
-                    .newCall(
-                        Request.Builder()
-                            .url(openAISettings.toDeepLTranslateUrl())
-                            .header("Authorization", "DeepL-Auth-Key ${openAISettings.key}")
-                            .header("Content-Type", "application/json")
-                            .post(
-                                json
-                                    .encodeToString(
-                                        DeepLTranslateRequest(
-                                            text = listOf(content),
-                                            target_lang = targetLanguage.toDeepLTargetLanguageCode(),
-                                            tag_handling = if (preserveHtml) "html" else "",
-                                        ),
-                                    ).toRequestBody("application/json".toMediaType()),
-                            ).build(),
-                    ).execute()
+            okHttpClient(openAISettings.timeoutSeconds)
+                .newCall(
+                    Request.Builder()
+                        .url(openAISettings.toDeepLTranslateUrl())
+                        .header("Authorization", "DeepL-Auth-Key ${openAISettings.key}")
+                        .header("Content-Type", "application/json")
+                        .post(
+                            json
+                                .encodeToString(
+                                    DeepLTranslateRequest(
+                                        text = listOf(content),
+                                        target_lang = targetLanguage.toDeepLTargetLanguageCode(),
+                                        tag_handling = if (preserveHtml) "html" else "",
+                                    ),
+                                ).toRequestBody("application/json".toMediaType()),
+                        ).build(),
+                ).execute()
+                .use { response ->
+                    if (!response.isSuccessful) {
+                        return TranslationResult.Error(
+                            content = "DeepL request failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                        )
+                    }
 
-            if (!response.isSuccessful) {
-                return TranslationResult.Error(
-                    content = "DeepL request failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
-                )
-            }
+                    val deeplResponse =
+                        json.decodeFromString<DeepLTranslateResponse>(
+                            response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                        )
 
-            val deeplResponse =
-                json.decodeFromString<DeepLTranslateResponse>(
-                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
-                )
+                    val translation = deeplResponse.translations.firstOrNull()
+                        ?: throw IllegalStateException("DeepL returned no translations")
 
-            val translation = deeplResponse.translations.firstOrNull()
-                ?: throw IllegalStateException("DeepL returned no translations")
-
-            TranslationResult.Success(
-                id = "deepl",
-                model = "deepl",
-                content = translation.text,
-                created = 0L,
-                promptTokens = 0,
-                completeTokens = 0,
-                totalTokens = 0,
-                detectedLanguage = translation.detected_source_language,
-                targetLanguage = targetLanguage.toDeepLTargetLanguageCode(),
-            )
+                    TranslationResult.Success(
+                        id = "deepl",
+                        model = "deepl",
+                        content = translation.text,
+                        created = 0L,
+                        promptTokens = 0,
+                        completeTokens = 0,
+                        totalTokens = 0,
+                        detectedLanguage = translation.detected_source_language,
+                        targetLanguage = targetLanguage.toDeepLTargetLanguageCode(),
+                    )
+                }
         } catch (e: Exception) {
             TranslationResult.Error(content = e.message ?: e.cause?.message ?: "")
         }
@@ -415,51 +414,49 @@ class OpenAIApi(
         preserveHtml: Boolean,
     ): TranslationResult {
         return try {
-            val response =
-                OkHttpClient.Builder()
-                    .callTimeout(openAISettings.timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
-                    .build()
-                    .newCall(
-                        Request.Builder()
-                            .url(openAISettings.toGoogleTranslateUrl())
-                            .header("Content-Type", "application/json")
-                            .post(
-                                json
-                                    .encodeToString(
-                                        GoogleTranslateRequest(
-                                            q = listOf(content),
-                                            target = targetLanguage.toGoogleTargetLanguageCode(),
-                                            format = if (preserveHtml) "html" else "text",
-                                        ),
-                                    ).toRequestBody("application/json".toMediaType()),
-                            ).build(),
-                    ).execute()
+            okHttpClient(openAISettings.timeoutSeconds)
+                .newCall(
+                    Request.Builder()
+                        .url(openAISettings.toGoogleTranslateUrl())
+                        .header("Content-Type", "application/json")
+                        .post(
+                            json
+                                .encodeToString(
+                                    GoogleTranslateRequest(
+                                        q = listOf(content),
+                                        target = targetLanguage.toGoogleTargetLanguageCode(),
+                                        format = if (preserveHtml) "html" else "text",
+                                    ),
+                                ).toRequestBody("application/json".toMediaType()),
+                        ).build(),
+                ).execute()
+                .use { response ->
+                    if (!response.isSuccessful) {
+                        return TranslationResult.Error(
+                            content = "Google Translate request failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
+                        )
+                    }
 
-            if (!response.isSuccessful) {
-                return TranslationResult.Error(
-                    content = "Google Translate request failed: HTTP ${response.code}${response.message.takeIf { it.isNotBlank() }?.let { " $it" } ?: ""}",
-                )
-            }
+                    val googleResponse =
+                        json.decodeFromString<GoogleTranslateResponse>(
+                            response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                        )
 
-            val googleResponse =
-                json.decodeFromString<GoogleTranslateResponse>(
-                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
-                )
+                    val translation = googleResponse.data.translations.firstOrNull()
+                        ?: throw IllegalStateException("Google Translate returned no translations")
 
-            val translation = googleResponse.data.translations.firstOrNull()
-                ?: throw IllegalStateException("Google Translate returned no translations")
-
-            TranslationResult.Success(
-                id = "google",
-                model = "google-translate",
-                content = translation.translatedText,
-                created = 0L,
-                promptTokens = 0,
-                completeTokens = 0,
-                totalTokens = 0,
-                detectedLanguage = translation.detectedSourceLanguage.orEmpty(),
-                targetLanguage = targetLanguage.toGoogleTargetLanguageCode(),
-            )
+                    TranslationResult.Success(
+                        id = "google",
+                        model = "google-translate",
+                        content = translation.translatedText,
+                        created = 0L,
+                        promptTokens = 0,
+                        completeTokens = 0,
+                        totalTokens = 0,
+                        detectedLanguage = translation.detectedSourceLanguage.orEmpty(),
+                        targetLanguage = targetLanguage.toGoogleTargetLanguageCode(),
+                    )
+                }
         } catch (e: Exception) {
             TranslationResult.Error(content = e.message ?: e.cause?.message ?: "")
         }

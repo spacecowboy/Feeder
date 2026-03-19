@@ -505,7 +505,7 @@ class ArticleViewModel(
                     return@launch
                 }
 
-                articleTranslationState.value = ArticleTranslationState.Loading(targetLanguage = targetLanguage)
+                articleTranslationState.value = ArticleTranslationState.Loading
                 val article = articleFlow.value ?: return@launch
                 val fullText = isFullText
                 val html = loadArticleHtml(article, fullText)
@@ -526,7 +526,6 @@ class ArticleViewModel(
                     ArticleTranslationState.Result(
                         translatedTitle = translation.translatedTitle,
                         sourceLanguage = translation.sourceLanguage,
-                        targetLanguage = targetLanguage,
                         isFullText = fullText,
                     )
             } catch (e: Exception) {
@@ -685,14 +684,11 @@ sealed interface OpenAISummaryState {
 sealed interface ArticleTranslationState {
     data object Empty : ArticleTranslationState
 
-    data class Loading(
-        val targetLanguage: String,
-    ) : ArticleTranslationState
+    data object Loading : ArticleTranslationState
 
     data class Result(
         val translatedTitle: String,
         val sourceLanguage: String,
-        val targetLanguage: String,
         val isFullText: Boolean,
     ) : ArticleTranslationState
 }

@@ -59,9 +59,14 @@ class FeedViewModel(
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
+    private val cachedCurrentFeedListItems =
+        repository
+            .getCurrentFeedListItems()
+            .cachedIn(viewModelScope)
+
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
         combine(
-            repository.getCurrentFeedListItems(),
+            cachedCurrentFeedListItems,
             repository.translateFeedCardsByDefault,
         ) { pagingData, shouldTranslate ->
             if (shouldTranslate) {
@@ -69,7 +74,7 @@ class FeedViewModel(
             } else {
                 pagingData
             }
-        }.cachedIn(viewModelScope)
+        }
 
     val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
         repository

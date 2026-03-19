@@ -62,7 +62,6 @@ class TranslationManager(
                 item.id,
                 settings,
                 cache.copy(
-                    sourceLanguage = cache.sourceLanguage,
                     titleHash = titleHash,
                     translatedTitle = translatedTitle,
                     snippetHash = snippetHash,
