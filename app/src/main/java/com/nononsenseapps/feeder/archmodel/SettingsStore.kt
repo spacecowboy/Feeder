@@ -514,7 +514,6 @@ class SettingsStore(
                 azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, ""),
                 azureDeploymentId = sp.getStringNonNull(PREF_OPENAI_AZURE_DEPLOYMENT_ID, ""),
                 timeoutSeconds = sp.getInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, 30),
-                preferredTranslationLanguage = sp.getStringNonNull(PREF_OPENAI_TRANSLATION_LANGUAGE, ""),
             ),
         )
     val openAiSettings = _openAiSettings.asStateFlow()
@@ -529,8 +528,44 @@ class SettingsStore(
             .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
             .putString(PREF_OPENAI_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
             .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
-            .putString(PREF_OPENAI_TRANSLATION_LANGUAGE, value.preferredTranslationLanguage)
             .apply()
+    }
+
+    private val _translationOpenAiSettings =
+        MutableStateFlow(
+            OpenAISettings(
+                key = sp.getStringNonNull(PREF_TRANSLATION_API_KEY, ""),
+                modelId = sp.getStringNonNull(PREF_TRANSLATION_API_MODEL_ID, ""),
+                baseUrl = sp.getStringNonNull(PREF_TRANSLATION_API_URL, ""),
+                azureApiVersion = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_VERSION, ""),
+                azureDeploymentId = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, ""),
+                timeoutSeconds = sp.getInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, 30),
+            ),
+        )
+    val translationOpenAiSettings = _translationOpenAiSettings.asStateFlow()
+
+    fun setTranslationOpenAiSettings(value: OpenAISettings) {
+        _translationOpenAiSettings.value = value
+        sp
+            .edit()
+            .putString(PREF_TRANSLATION_API_KEY, value.key)
+            .putString(PREF_TRANSLATION_API_MODEL_ID, value.modelId)
+            .putString(PREF_TRANSLATION_API_URL, value.baseUrl)
+            .putString(PREF_TRANSLATION_API_AZURE_VERSION, value.azureApiVersion)
+            .putString(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
+            .putInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
+            .apply()
+    }
+
+    private val _preferredTranslationLanguage =
+        MutableStateFlow(
+            sp.getStringNonNull(PREF_OPENAI_TRANSLATION_LANGUAGE, ""),
+        )
+    val preferredTranslationLanguage = _preferredTranslationLanguage.asStateFlow()
+
+    fun setPreferredTranslationLanguage(value: String) {
+        _preferredTranslationLanguage.value = value
+        sp.edit().putString(PREF_OPENAI_TRANSLATION_LANGUAGE, value).apply()
     }
 
     private val _translateFeedCardsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, false))
@@ -686,6 +721,12 @@ const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
 const val PREF_OPENAI_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
+const val PREF_TRANSLATION_API_KEY = "pref_translation_api_key"
+const val PREF_TRANSLATION_API_MODEL_ID = "pref_translation_api_model_id"
+const val PREF_TRANSLATION_API_URL = "pref_translation_api_url"
+const val PREF_TRANSLATION_API_AZURE_VERSION = "pref_translation_api_azure_version"
+const val PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID = "pref_translation_api_azure_deployment_id"
+const val PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS = "pref_translation_api_request_timeout_seconds"
 const val PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
 const val PREF_TRANSLATE_ARTICLES_BY_DEFAULT = "pref_translate_articles_by_default"
 
@@ -743,6 +784,12 @@ enum class UserSettings(
     SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
     SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
     SETTING_OPENAI_TRANSLATION_LANGUAGE(key = PREF_OPENAI_TRANSLATION_LANGUAGE),
+    SETTING_TRANSLATION_API_KEY(key = PREF_TRANSLATION_API_KEY),
+    SETTING_TRANSLATION_API_MODEL_ID(key = PREF_TRANSLATION_API_MODEL_ID),
+    SETTING_TRANSLATION_API_URL(key = PREF_TRANSLATION_API_URL),
+    SETTING_TRANSLATION_API_AZURE_VERSION(key = PREF_TRANSLATION_API_AZURE_VERSION),
+    SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID(key = PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID),
+    SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS(key = PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS),
     SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT(key = PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT),
     SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
     ;
@@ -828,7 +875,6 @@ data class OpenAISettings(
     val azureApiVersion: String = "",
     val azureDeploymentId: String = "",
     val key: String = "",
-    val preferredTranslationLanguage: String = "",
 )
 
 fun String.dropEnds(

@@ -347,6 +347,14 @@ class Repository(
 
     fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
 
+    val translationOpenAISettings = settingsStore.translationOpenAiSettings
+
+    fun setTranslationOpenAiSettings(value: OpenAISettings) = settingsStore.setTranslationOpenAiSettings(value)
+
+    val preferredTranslationLanguage = settingsStore.preferredTranslationLanguage
+
+    fun setPreferredTranslationLanguage(value: String) = settingsStore.setPreferredTranslationLanguage(value)
+
     val translateFeedCardsByDefault = settingsStore.translateFeedCardsByDefault
 
     fun setTranslateFeedCardsByDefault(value: Boolean) = settingsStore.setTranslateFeedCardsByDefault(value)

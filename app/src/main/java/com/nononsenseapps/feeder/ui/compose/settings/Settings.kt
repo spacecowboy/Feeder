@@ -87,7 +87,6 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
-import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -206,8 +205,13 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
-            openAIState = viewState.openAIState,
-            onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
+            summaryAIState = viewState.summaryAIState,
+            onSummaryAIEvent = settingsViewModel::onSummaryOpenAISettingsEvent,
+            translationAIState = viewState.translationAIState,
+            onTranslationAIEvent = settingsViewModel::onTranslationOpenAISettingsEvent,
+            preferredTranslationLanguage = viewState.preferredTranslationLanguage,
+            onPreferredTranslationLanguageChange = settingsViewModel::setPreferredTranslationLanguage,
+            canTranslate = viewState.canTranslate,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
             translateFeedCardsByDefault = viewState.translateFeedCardsByDefault,
@@ -293,8 +297,13 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
-            openAIState = OpenAISettingsState(),
-            onOpenAIEvent = {},
+            summaryAIState = OpenAISettingsState(),
+            onSummaryAIEvent = {},
+            translationAIState = OpenAISettingsState(),
+            onTranslationAIEvent = {},
+            preferredTranslationLanguage = "",
+            onPreferredTranslationLanguageChange = {},
+            canTranslate = false,
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
             translateFeedCardsByDefault = false,
@@ -371,8 +380,13 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
-    openAIState: OpenAISettingsState,
-    onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
+    summaryAIState: OpenAISettingsState,
+    onSummaryAIEvent: (OpenAISettingsEvent) -> Unit,
+    translationAIState: OpenAISettingsState,
+    onTranslationAIEvent: (OpenAISettingsEvent) -> Unit,
+    preferredTranslationLanguage: String,
+    onPreferredTranslationLanguageChange: (String) -> Unit,
+    canTranslate: Boolean,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
     translateFeedCardsByDefault: Boolean,
@@ -774,11 +788,24 @@ fun SettingsList(
             title = R.string.openai_settings,
         ) {
             OpenAISection(
-                state = openAIState,
-                onEvent = onOpenAIEvent,
+                title = stringResource(R.string.summary_api_settings),
+                info = stringResource(R.string.summary_api_settings_info),
+                state = summaryAIState,
+                onEvent = onSummaryAIEvent,
+                section = OpenAISectionType.Summary,
             )
 
-            if (openAIState.settings.canTranslate) {
+            OpenAISection(
+                title = stringResource(R.string.translation_api_settings),
+                info = stringResource(R.string.translation_api_settings_info),
+                state = translationAIState,
+                onEvent = onTranslationAIEvent,
+                section = OpenAISectionType.Translation,
+                preferredTranslationLanguage = preferredTranslationLanguage,
+                onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
+            )
+
+            if (canTranslate) {
                 SwitchSetting(
                     title = stringResource(id = R.string.translate_feed_cards_by_default),
                     checked = translateFeedCardsByDefault,

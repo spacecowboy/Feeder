@@ -207,6 +207,7 @@ fun RowScope.FeedItemText(
                         }
                     }
                 } else {
+                    // Heard of one feed which did not have titles. If so always include snippet
                     append(item.snippet)
                 }
             }

@@ -117,7 +117,6 @@ open class OPMLImporter(
             UserSettings.SETTING_OPENAI_AZURE_VERSION,
             UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID,
             UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS,
-            UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE,
             -> {
                 val current = settingsStore.openAiSettings.value
                 val newSettings =
@@ -128,10 +127,33 @@ open class OPMLImporter(
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> current.copy(azureApiVersion = value)
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> current.copy(azureDeploymentId = value)
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
-                        UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> current.copy(preferredTranslationLanguage = value)
                         else -> current
                     }
                 settingsStore.setOpenAiSettings(newSettings)
+            }
+
+            UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE ->
+                settingsStore.setPreferredTranslationLanguage(value)
+
+            UserSettings.SETTING_TRANSLATION_API_KEY,
+            UserSettings.SETTING_TRANSLATION_API_MODEL_ID,
+            UserSettings.SETTING_TRANSLATION_API_URL,
+            UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION,
+            UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID,
+            UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS,
+            -> {
+                val current = settingsStore.translationOpenAiSettings.value
+                val newSettings =
+                    when (UserSettings.fromKey(key)) {
+                        UserSettings.SETTING_TRANSLATION_API_KEY -> current.copy(key = value)
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> current.copy(modelId = value)
+                        UserSettings.SETTING_TRANSLATION_API_URL -> current.copy(baseUrl = value)
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> current.copy(azureApiVersion = value)
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> current.copy(azureDeploymentId = value)
+                        UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
+                        else -> current
+                    }
+                settingsStore.setTranslationOpenAiSettings(newSettings)
             }
         }
     }

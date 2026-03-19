@@ -51,7 +51,7 @@ val archModelModule =
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
         bind<TranslationManager>() with singleton { TranslationManager(di) }
         bindFactory<OpenAISettings, OpenAIClient> { settings -> OpenAIClientDefault(settings) }
-        bind<OpenAIApi>() with singleton { OpenAIApi(instance(), appLang = Locale.getDefault().getISO3Language(), factory()) }
+        bind<OpenAIApi>() with singleton { OpenAIApi(appLang = Locale.getDefault().getISO3Language(), factory()) }
         bind<SuggestedFeedRepository>() with
             singleton {
                 SuggestedFeedRepository(

@@ -8,7 +8,6 @@ import com.aallam.openai.api.chat.TextContent
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
-import com.nononsenseapps.feeder.archmodel.Repository
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.http.takeFrom
@@ -22,7 +21,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
 
 class OpenAIApi(
-    private val repository: Repository,
     private val appLang: String,
     private val openAIClientFactory: (OpenAISettings) -> OpenAIClient,
 ) {
@@ -145,14 +143,8 @@ class OpenAIApi(
     }
 
     companion object {
-        private val LANG_REGEX = Regex("^Lang: \"?([a-zA-Z]+)\"?$")
+        private val LANG_REGEX = Regex("^Lang: \"?([a-zA-Z_-]+)\"?$")
     }
-
-    private val openAISettings: OpenAISettings
-        get() = repository.openAISettings.value
-
-    private val openAI: OpenAIClient
-        get() = openAIClientFactory(openAISettings)
 
     private fun okHttpClient(timeoutSeconds: Int): OkHttpClient =
         OkHttpClient.Builder()
@@ -273,14 +265,17 @@ class OpenAIApi(
         }
     }
 
-    suspend fun summarize(content: String): SummaryResult {
-        if (openAISettings.isDeepL || openAISettings.isGoogleTranslate) {
+    suspend fun summarize(
+        content: String,
+        settings: OpenAISettings,
+    ): SummaryResult {
+        if (settings.isDeepL || settings.isGoogleTranslate) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
         try {
             val response =
-                openAI.chatCompletion(
-                    request = summaryRequest(content),
+                openAIClientFactory(settings).chatCompletion(
+                    request = summaryRequest(content, settings),
                     requestOptions = null,
                 )
             val summaryResponse: SummaryResponse =
@@ -297,7 +292,7 @@ class OpenAIApi(
                 created = response.created,
                 promptTokens = response.usage?.promptTokens ?: 0,
                 completeTokens = response.usage?.completionTokens ?: 0,
-                totalTokens = response.usage?.completionTokens ?: 0,
+                totalTokens = response.usage?.totalTokens ?: 0,
                 detectedLanguage = summaryResponse.lang,
             )
         } catch (e: Exception) {
@@ -308,17 +303,20 @@ class OpenAIApi(
     suspend fun translate(
         content: String,
         targetLanguage: String,
+        settings: OpenAISettings,
         preserveHtml: Boolean = false,
     ): TranslationResult {
-        if (openAISettings.isDeepL) {
+        if (settings.isDeepL) {
             return translateWithDeepL(
+                settings = settings,
                 content = content,
                 targetLanguage = targetLanguage,
                 preserveHtml = preserveHtml,
             )
         }
-        if (openAISettings.isGoogleTranslate) {
+        if (settings.isGoogleTranslate) {
             return translateWithGoogle(
+                settings = settings,
                 content = content,
                 targetLanguage = targetLanguage,
                 preserveHtml = preserveHtml,
@@ -326,8 +324,8 @@ class OpenAIApi(
         }
         try {
             val response =
-                openAI.chatCompletion(
-                    request = translationRequest(content, targetLanguage, preserveHtml),
+                openAIClientFactory(settings).chatCompletion(
+                    request = translationRequest(content, targetLanguage, settings, preserveHtml),
                     requestOptions = null,
                 )
             val translationResponse: TranslationResponse =
@@ -344,7 +342,7 @@ class OpenAIApi(
                 created = response.created,
                 promptTokens = response.usage?.promptTokens ?: 0,
                 completeTokens = response.usage?.completionTokens ?: 0,
-                totalTokens = response.usage?.completionTokens ?: 0,
+                totalTokens = response.usage?.totalTokens ?: 0,
                 detectedLanguage = translationResponse.lang,
                 targetLanguage = translationResponse.targetLang,
             )
@@ -354,16 +352,17 @@ class OpenAIApi(
     }
 
     private fun translateWithDeepL(
+        settings: OpenAISettings,
         content: String,
         targetLanguage: String,
         preserveHtml: Boolean,
     ): TranslationResult {
         return try {
-            okHttpClient(openAISettings.timeoutSeconds)
+            okHttpClient(settings.timeoutSeconds)
                 .newCall(
                     Request.Builder()
-                        .url(openAISettings.toDeepLTranslateUrl())
-                        .header("Authorization", "DeepL-Auth-Key ${openAISettings.key}")
+                        .url(settings.toDeepLTranslateUrl())
+                        .header("Authorization", "DeepL-Auth-Key ${settings.key}")
                         .header("Content-Type", "application/json")
                         .post(
                             json
@@ -371,7 +370,7 @@ class OpenAIApi(
                                     DeepLTranslateRequest(
                                         text = listOf(content),
                                         target_lang = targetLanguage.toDeepLTargetLanguageCode(),
-                                        tag_handling = if (preserveHtml) "html" else "",
+                                        tag_handling = if (preserveHtml) "html" else null,
                                     ),
                                 ).toRequestBody("application/json".toMediaType()),
                         ).build(),
@@ -409,15 +408,16 @@ class OpenAIApi(
     }
 
     private fun translateWithGoogle(
+        settings: OpenAISettings,
         content: String,
         targetLanguage: String,
         preserveHtml: Boolean,
     ): TranslationResult {
         return try {
-            okHttpClient(openAISettings.timeoutSeconds)
+            okHttpClient(settings.timeoutSeconds)
                 .newCall(
                     Request.Builder()
-                        .url(openAISettings.toGoogleTranslateUrl())
+                        .url(settings.toGoogleTranslateUrl())
                         .header("Content-Type", "application/json")
                         .post(
                             json
@@ -488,9 +488,12 @@ class OpenAIApi(
         )
     }
 
-    private fun summaryRequest(content: String): ChatCompletionRequest =
+    private fun summaryRequest(
+        content: String,
+        settings: OpenAISettings,
+    ): ChatCompletionRequest =
         ChatCompletionRequest(
-            model = ModelId(id = openAISettings.modelId),
+            model = ModelId(id = settings.modelId),
             messages =
                 listOf(
                     ChatMessage(
@@ -500,7 +503,7 @@ class OpenAIApi(
                                 listOf(
                                     "You are an assistant in an RSS reader app, summarizing article content.",
                                     "The app language is '$appLang'.",
-                                    "Summarize in '${openAISettings.preferredTranslationLanguage.trim().ifBlank { appLang }}'.",
+                                    "Provide summaries in the article's language if 99% recognizable; otherwise, use the app language.",
                                     "First line must be exactly: 'Lang: \"ISO code\"' with NO markdown formatting around the Lang line whatsoever.",
                                     "Keep summaries up to 100 words, 3 paragraphs, with up to 3 bullet points per paragraph.",
                                     "For readability use markdown formatting: **bold** for emphasis, *italics* for quotes, bullet points (-) for lists, # headers for sections, and > for block quotes.",
@@ -521,10 +524,11 @@ class OpenAIApi(
     private fun translationRequest(
         content: String,
         targetLanguage: String,
+        settings: OpenAISettings,
         preserveHtml: Boolean,
     ): ChatCompletionRequest =
         ChatCompletionRequest(
-            model = ModelId(id = openAISettings.modelId),
+            model = ModelId(id = settings.modelId),
             messages =
                 listOf(
                     ChatMessage(
@@ -584,6 +588,17 @@ val OpenAISettings.canSummarize: Boolean
 val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
+val OpenAISettings.canUseAsTranslationApi: Boolean
+    get() = canTranslate && (isDeepL || isGoogleTranslate)
+
+val OpenAISettings.isBlankConfiguration: Boolean
+    get() =
+        key.isBlank() &&
+            modelId.isBlank() &&
+            baseUrl.isBlank() &&
+            azureApiVersion.isBlank() &&
+            azureDeploymentId.isBlank()
+
 fun OpenAISettings.toOpenAIHost(withAzureDeploymentId: Boolean): OpenAIHost =
     baseUrl.let { baseUrl ->
         if (baseUrl.isEmpty()) {
@@ -609,25 +624,15 @@ fun OpenAISettings.toOpenAIHost(withAzureDeploymentId: Boolean): OpenAIHost =
 
 fun OpenAISettings.toDeepLTranslateUrl(): String =
     URLBuilder()
-        .takeFrom(
-            when {
-                baseUrl.isNotBlank() -> baseUrl
-                key.endsWith(":fx") -> "https://api-free.deepl.com"
-                else -> "https://api.deepl.com"
-            },
-        ).also {
+        .takeFrom(normalizedDeepLBaseUrl())
+        .also {
             it.appendPathSegments("v2", "translate")
         }.buildString()
 
 fun OpenAISettings.toGoogleTranslateUrl(): String =
     URLBuilder()
-        .takeFrom(
-            if (baseUrl.isNotBlank()) {
-                baseUrl
-            } else {
-                "https://translation.googleapis.com"
-            },
-        ).also {
+        .takeFrom(normalizedGoogleTranslateBaseUrl())
+        .also {
             it.appendPathSegments("language", "translate", "v2")
             it.parameters.append("key", key)
         }.buildString()
@@ -716,3 +721,27 @@ private fun String.toGoogleTargetLanguageCode(): String =
                 else -> normalized.lowercase().replace('_', '-')
             }
         }
+
+private fun OpenAISettings.normalizedDeepLBaseUrl(): String {
+    val normalizedBaseUrl = baseUrl.trim().trimEnd('/').removeSuffix("/v2/translate")
+    val defaultBaseUrl =
+        if (key.endsWith(":fx")) {
+            "https://api-free.deepl.com"
+        } else {
+            "https://api.deepl.com"
+        }
+
+    return when {
+        normalizedBaseUrl.isBlank() -> defaultBaseUrl
+        normalizedBaseUrl.equals("https://api.deepl.com", ignoreCase = true) -> defaultBaseUrl
+        normalizedBaseUrl.equals("https://api-free.deepl.com", ignoreCase = true) -> defaultBaseUrl
+        else -> normalizedBaseUrl
+    }
+}
+
+private fun OpenAISettings.normalizedGoogleTranslateBaseUrl(): String =
+    baseUrl
+        .trim()
+        .trimEnd('/')
+        .removeSuffix("/language/translate/v2")
+        .ifBlank { "https://translation.googleapis.com" }

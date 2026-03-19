@@ -37,6 +37,7 @@ import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canSummarize
 import com.nononsenseapps.feeder.openai.canTranslate
+import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
@@ -113,6 +114,7 @@ class ArticleViewModel(
     private val showTranslatedContent = MutableStateFlow(false)
     private val translatedArticleContent = MutableStateFlow(LinearArticle(emptyList()))
     private val articleTranslationState = MutableStateFlow<ArticleTranslationState>(ArticleTranslationState.Empty)
+    private var handledInitialOpenActions = false
 
     private val isFullText: Boolean
         get() = displayFullTextOverride.value ?: articleFlow.value?.fullTextByDefault ?: false
@@ -129,6 +131,8 @@ class ArticleViewModel(
             ttsStateHolder.ttsState,
             ttsStateHolder.availableLanguages,
             repository.openAISettings,
+            repository.translationOpenAISettings,
+            repository.preferredTranslationLanguage,
             openAiSummary,
             showTranslatedContent,
             articleTranslationState,
@@ -145,14 +149,20 @@ class ArticleViewModel(
             @Suppress("UNCHECKED_CAST")
             val ttsLanguages = params[8] as List<Locale>
 
-            val aiSettings = params[9] as OpenAISettings
-            val openAiSummary = params[10] as OpenAISummaryState
-            val showTranslated = params[11] as Boolean
-            val translationState = params[12] as ArticleTranslationState
+            val summarySettings = params[9] as OpenAISettings
+            val translationSettings = params[10] as OpenAISettings
+            val preferredTranslationLanguage = (params[11] as String).trim()
+            val openAiSummary = params[12] as OpenAISummaryState
+            val showTranslated = params[13] as Boolean
+            val translationState = params[14] as ArticleTranslationState
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
             val isShowingTranslated = showTranslated && currentTranslation != null
+            val canRequestTranslation =
+                translationSettings.canUseAsTranslationApi &&
+                    preferredTranslationLanguage.isNotBlank() &&
+                    !article?.link.isNullOrEmpty()
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -179,9 +189,9 @@ class ArticleViewModel(
                         article?.wordCount ?: 0
                     },
                 image = article?.image,
-                showSummarize = aiSettings.canSummarize && !article?.link.isNullOrEmpty(),
+                showSummarize = summarySettings.canSummarize && !article?.link.isNullOrEmpty(),
                 openAiSummary = openAiSummary,
-                showTranslate = aiSettings.canTranslate && !article?.link.isNullOrEmpty(),
+                showTranslate = canRequestTranslation || isShowingTranslated,
                 isShowingTranslated = isShowingTranslated,
                 isTranslationLoading = translationState is ArticleTranslationState.Loading,
                 translationSourceLanguage = currentTranslation?.sourceLanguage ?: "",
@@ -196,21 +206,20 @@ class ArticleViewModel(
     init {
         viewModelScope.launch {
             articleFlow.collect { article ->
-                val feedId = article?.item?.feedId
-                if (feedId != null) {
-                    val feed = repository.getFeed(feedId)
-                    if (feed?.summarizeOnOpen == true) {
-                        summarize()
-                    }
+                val feedId = article?.item?.feedId ?: return@collect
+                if (handledInitialOpenActions) {
+                    return@collect
+                }
+                handledInitialOpenActions = true
+
+                val feed = repository.getFeed(feedId)
+                if (feed?.summarizeOnOpen == true && repository.openAISettings.value.canSummarize) {
+                    summarize()
                 }
 
-                if (repository.translateArticlesByDefault.value && repository.openAISettings.value.canTranslate) {
+                if (repository.translateArticlesByDefault.value && canTranslateArticles()) {
                     showTranslatedContent.value = true
                     translateCurrentArticle()
-                } else {
-                    showTranslatedContent.value = false
-                    translatedArticleContent.value = LinearArticle(emptyList())
-                    articleTranslationState.value = ArticleTranslationState.Empty
                 }
             }
         }
@@ -380,12 +389,14 @@ class ArticleViewModel(
                         val html =
                             if (translation != null) {
                                 loadArticleHtml(article, readFullText).let {
-                                    translationManager.getOrTranslateArticle(
-                                        itemId = article.id,
-                                        title = article.title,
-                                        html = it,
-                                        isFullText = readFullText,
-                                    )?.translatedHtml ?: it
+                                    runCatching {
+                                        translationManager.getOrTranslateArticle(
+                                            itemId = article.id,
+                                            title = article.title,
+                                            html = it,
+                                            isFullText = readFullText,
+                                        )?.translatedHtml
+                                    }.getOrNull() ?: it
                                 }
                             } else {
                                 loadArticleHtml(article, readFullText)
@@ -464,7 +475,7 @@ class ArticleViewModel(
             try {
                 openAiSummary.value = OpenAISummaryState.Loading
                 val content = loadArticleContent()
-                val summaryResult = openAIApi.summarize(content)
+                val summaryResult = openAIApi.summarize(content, repository.openAISettings.value)
                 val annotatedStrings = convertSummaryToAnnotatedStrings(summaryResult)
                 openAiSummary.value =
                     OpenAISummaryState.Result(
@@ -495,19 +506,21 @@ class ArticleViewModel(
     private fun translateCurrentArticle() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val targetLanguage =
-                    repository.openAISettings.value.preferredTranslationLanguage
-                        .ifBlank { Locale.getDefault().displayLanguage }
-
+                val targetLanguage = repository.preferredTranslationLanguage.value.trim()
                 if (targetLanguage.isBlank()) {
                     toastMaker.makeToast(R.string.set_translation_language_first)
-                    showTranslatedContent.value = false
+                    clearTranslatedContent()
+                    return@launch
+                }
+
+                val article = articleFlow.value ?: return@launch
+                val fullText = isFullText
+                if (!repository.translationOpenAISettings.value.canUseAsTranslationApi) {
+                    clearTranslatedContent()
                     return@launch
                 }
 
                 articleTranslationState.value = ArticleTranslationState.Loading
-                val article = articleFlow.value ?: return@launch
-                val fullText = isFullText
                 val html = loadArticleHtml(article, fullText)
                 val translation =
                     translationManager.getOrTranslateArticle(
@@ -515,7 +528,10 @@ class ArticleViewModel(
                         title = article.title,
                         html = html,
                         isFullText = fullText,
-                    ) ?: return@launch
+                    ) ?: run {
+                        clearTranslatedContent()
+                        return@launch
+                    }
 
                 translatedArticleContent.value =
                     HtmlLinearizer().linearize(
@@ -529,8 +545,7 @@ class ArticleViewModel(
                         isFullText = fullText,
                     )
             } catch (e: Exception) {
-                showTranslatedContent.value = false
-                articleTranslationState.value = ArticleTranslationState.Empty
+                clearTranslatedContent()
                 toastMaker.makeToast(e.message ?: "Translation failed")
             }
         }
@@ -603,6 +618,15 @@ class ArticleViewModel(
                 }
             }
         }
+
+    private fun canTranslateArticles(): Boolean =
+        repository.translationOpenAISettings.value.canUseAsTranslationApi && repository.preferredTranslationLanguage.value.trim().isNotBlank()
+
+    private fun clearTranslatedContent() {
+        showTranslatedContent.value = false
+        translatedArticleContent.value = LinearArticle(emptyList())
+        articleTranslationState.value = ArticleTranslationState.Empty
+    }
 
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"

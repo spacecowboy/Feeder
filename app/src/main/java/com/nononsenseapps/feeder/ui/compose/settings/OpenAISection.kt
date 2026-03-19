@@ -59,29 +59,46 @@ import androidx.compose.ui.window.DialogProperties
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
+import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
+enum class OpenAISectionType {
+    Summary,
+    Translation,
+}
+
 @Composable
 fun OpenAISection(
+    title: String,
+    info: String,
     state: OpenAISettingsState,
     onEvent: (OpenAISettingsEvent) -> Unit,
+    section: OpenAISectionType,
+    preferredTranslationLanguage: String = "",
+    onPreferredTranslationLanguageChange: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val sanitizedSettings = remember(section, state.settings) { section.sanitizeSettings(state.settings) }
+
     OpenAISectionItem(
-        settings = state.settings,
+        title = title,
+        section = section,
+        settings = sanitizedSettings,
         onEvent = onEvent,
         modifier = modifier,
     )
 
     if (state.isEditMode) {
-        var current by remember(state.settings) { mutableStateOf(state.settings) }
-        var provider by remember(state.settings) { mutableStateOf(AIProviderPreset.fromSettings(state.settings)) }
+        var current by remember(section, state.settings) { mutableStateOf(sanitizedSettings) }
+        var currentPreferredTranslationLanguage by remember(preferredTranslationLanguage) { mutableStateOf(preferredTranslationLanguage) }
+        var provider by remember(section, state.settings) { mutableStateOf(AIProviderPreset.fromSettings(sanitizedSettings)) }
         val context = LocalContext.current
         val validationMessage =
-            remember(current, provider, state.modelsResult, context) {
+            remember(current, provider, state.modelsResult, context, section) {
                 current.validationMessage(
+                    section = section,
                     provider = provider,
                     modelsResult = state.modelsResult,
                     context = context,
@@ -104,19 +121,18 @@ fun OpenAISection(
                     modifier = Modifier.padding(24.dp),
                 ) {
                     Text(
-                        text = stringResource(R.string.openai_settings),
+                        text = title,
                         style = MaterialTheme.typography.headlineSmall,
                     )
                     Spacer(modifier = Modifier.size(16.dp))
                     OpenAISectionEdit(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .weight(1f, fill = true),
+                        info = info,
                         state = state,
                         current = current,
                         provider = provider,
+                        section = section,
                         validationMessage = validationMessage,
+                        preferredTranslationLanguage = currentPreferredTranslationLanguage,
                         onEvent = {
                             if (it is OpenAISettingsEvent.UpdateSettings) {
                                 current = it.settings
@@ -128,6 +144,11 @@ fun OpenAISection(
                             provider = selected
                             current = selected.applyTo(current)
                         },
+                        onPreferredTranslationLanguageChange = { currentPreferredTranslationLanguage = it },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = true),
                     )
                     Spacer(modifier = Modifier.size(16.dp))
                     Row(
@@ -145,6 +166,9 @@ fun OpenAISection(
                         Button(
                             onClick = {
                                 onEvent(OpenAISettingsEvent.UpdateSettings(current))
+                                if (section == OpenAISectionType.Translation) {
+                                    onPreferredTranslationLanguageChange(currentPreferredTranslationLanguage)
+                                }
                                 onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
                             },
                             enabled = validationMessage == null,
@@ -160,10 +184,15 @@ fun OpenAISection(
 
 @Composable
 private fun OpenAISectionItem(
+    title: String,
+    section: OpenAISectionType,
     settings: OpenAISettings,
     onEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val sanitizedSettings = remember(section, settings) { section.sanitizeSettings(settings) }
+    val provider = remember(sanitizedSettings) { AIProviderPreset.fromSettings(sanitizedSettings) }
+
     Row(
         modifier =
             modifier
@@ -177,10 +206,9 @@ private fun OpenAISectionItem(
             contentAlignment = Alignment.Center,
         ) { }
 
-        val provider = remember(settings) { AIProviderPreset.fromSettings(settings) }
         TitleAndSubtitle(
             title = {
-                Text(text = stringResource(R.string.api_settings_title))
+                Text(text = title)
             },
             subtitle = {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -190,7 +218,7 @@ private fun OpenAISectionItem(
                     )
                     Text(
                         text =
-                            if (settings.key.isBlank()) {
+                            if (sanitizedSettings.key.isBlank()) {
                                 stringResource(R.string.ai_not_configured)
                             } else {
                                 stringResource(provider.previewSummaryRes)
@@ -207,25 +235,36 @@ fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && i
 
 @Composable
 private fun OpenAISectionEdit(
+    info: String,
     state: OpenAISettingsState,
     current: OpenAISettings,
     provider: AIProviderPreset,
+    section: OpenAISectionType,
     validationMessage: String?,
+    preferredTranslationLanguage: String,
     onEvent: (OpenAISettingsEvent) -> Unit,
     onProviderChange: (AIProviderPreset) -> Unit,
+    onPreferredTranslationLanguageChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
+    val hasProvider = provider != AIProviderPreset.NONE
     val isTranslationOnlyProvider = provider.isDeepL || provider.isGoogleTranslate
+    val matchingModelsResult =
+        remember(current, state.modelsResult) {
+            state.modelsResult.takeIf { it.matches(current) } ?: OpenAIModelsState.None
+        }
 
-    LaunchedEffect(current) {
-        latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
+    LaunchedEffect(current, provider) {
+        if (provider != AIProviderPreset.NONE) {
+            latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
+        }
     }
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
-    var timeoutString by remember { mutableStateOf(current.timeoutSeconds.toString()) }
+    var timeoutString by remember(current.timeoutSeconds) { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
             isTimeoutInputValid(timeoutString)
@@ -238,7 +277,7 @@ private fun OpenAISectionEdit(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
-            text = stringResource(R.string.openai_settings_info),
+            text = info,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline,
         )
@@ -265,6 +304,7 @@ private fun OpenAISectionEdit(
         }
 
         ProviderField(
+            section = section,
             provider = provider,
             expanded = providerMenuExpanded,
             onExpandedChange = { providerMenuExpanded = it },
@@ -274,40 +314,40 @@ private fun OpenAISectionEdit(
             },
         )
 
-        FeatureSummaryCard(provider = provider)
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = current.key,
-            label = {
-                Text(
-                    stringResource(
-                        if (provider.isDeepL) {
-                            R.string.deepl_api_key
-                        } else {
-                            R.string.api_key
+        if (hasProvider) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = current.key,
+                label = {
+                    Text(
+                        stringResource(
+                            if (provider.isDeepL) {
+                                R.string.deepl_api_key
+                            } else {
+                                R.string.api_key
+                            },
+                        ),
+                    )
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
                         },
                     ),
-                )
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Next,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                ),
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(key = it)))
-            },
-            visualTransformation = VisualTransformationApiKey(),
-        )
+                onValueChange = {
+                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(key = it)))
+                },
+                visualTransformation = VisualTransformationApiKey(),
+            )
+        }
 
-        if (!isTranslationOnlyProvider) {
+        if (hasProvider && !isTranslationOnlyProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.modelId,
@@ -331,16 +371,16 @@ private fun OpenAISectionEdit(
                 trailingIcon = {
                     IconButton(
                         onClick = { modelsMenuExpanded = true },
-                        enabled = state.modelsResult is OpenAIModelsState.Success,
+                        enabled = matchingModelsResult is OpenAIModelsState.Success,
                     ) {
-                        if (state.modelsResult is OpenAIModelsState.Loading) {
+                        if (matchingModelsResult is OpenAIModelsState.Loading) {
                             CircularProgressIndicator()
                         } else {
                             Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
-                            if (state.modelsResult is OpenAIModelsState.Success) {
+                            if (matchingModelsResult is OpenAIModelsState.Success) {
                                 OpenAIModelsDropdown(
                                     menuExpanded = modelsMenuExpanded,
-                                    state = state.modelsResult,
+                                    state = matchingModelsResult,
                                     onValueChange = {
                                         onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
                                     },
@@ -353,13 +393,13 @@ private fun OpenAISectionEdit(
             )
 
             OpenAIModelsStatus(
-                state = state.modelsResult,
+                state = matchingModelsResult,
                 showError = state.showModelsError,
                 onEvent = onEvent,
             )
         }
 
-        if (!isTranslationOnlyProvider) {
+        if (hasProvider && !isTranslationOnlyProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.baseUrl,
@@ -384,7 +424,7 @@ private fun OpenAISectionEdit(
                     onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
                 },
             )
-        } else {
+        } else if (hasProvider) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = provider.endpoint,
@@ -397,69 +437,75 @@ private fun OpenAISectionEdit(
             )
         }
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = current.preferredTranslationLanguage,
-            placeholder = {
-                Text(stringResource(R.string.translation_language_placeholder))
-            },
-            label = {
-                Text(stringResource(R.string.preferred_translation_language))
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                ),
-            supportingText = {
-                Text(stringResource(R.string.preferred_translation_language_description))
-            },
-            onValueChange = {
-                onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(preferredTranslationLanguage = it)))
-            },
-        )
+        if (section == OpenAISectionType.Translation) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = preferredTranslationLanguage,
+                placeholder = {
+                    Text(stringResource(R.string.translation_language_placeholder))
+                },
+                label = {
+                    Text(stringResource(R.string.preferred_translation_language))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                        },
+                    ),
+                supportingText = {
+                    Text(stringResource(R.string.preferred_translation_language_description))
+                },
+                onValueChange = onPreferredTranslationLanguageChange,
+            )
+        }
 
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = timeoutString,
-            placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
-            label = {
-                Text(stringResource(R.string.time_out))
-            },
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = if (showAzureFields) ImeAction.Next else ImeAction.Done,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                    },
-                    onDone = {
-                        keyboardController?.hide()
-                    },
-                ),
-            supportingText = {
-                if (!isTimeoutInputValid) {
-                    Text(stringResource(R.string.time_out_validation_error))
-                }
-            },
-            onValueChange = { input ->
-                timeoutString = input
-                if (isTimeoutInputValid(timeoutString)) {
-                    onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
-                }
-            },
-            isError = !isTimeoutInputValid,
-        )
+        if (hasProvider) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = timeoutString,
+                placeholder = { Text(text = stringResource(R.string.time_out_placeholder)) },
+                label = {
+                    Text(stringResource(R.string.time_out))
+                },
+                keyboardOptions =
+                    KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction =
+                            when {
+                                showAzureFields -> ImeAction.Next
+                                else -> ImeAction.Done
+                            },
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                        },
+                        onDone = {
+                            keyboardController?.hide()
+                        },
+                    ),
+                supportingText = {
+                    if (!isTimeoutInputValid) {
+                        Text(stringResource(R.string.time_out_validation_error))
+                    }
+                },
+                onValueChange = { input ->
+                    timeoutString = input
+                    if (isTimeoutInputValid(timeoutString)) {
+                        onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(timeoutSeconds = timeoutString.toInt())))
+                    }
+                },
+                isError = !isTimeoutInputValid,
+            )
+        }
 
-        if (showAzureFields) {
+        if (hasProvider && showAzureFields) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.azureDeploymentId,
@@ -512,11 +558,14 @@ private fun OpenAISectionEdit(
 
 @Composable
 private fun ProviderField(
+    section: OpenAISectionType,
     provider: AIProviderPreset,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onSelect: (AIProviderPreset) -> Unit,
 ) {
+    val availableProviders = remember(section) { AIProviderPreset.availableFor(section) }
+
     Box {
         TextField(
             modifier = Modifier.fillMaxWidth(),
@@ -536,7 +585,7 @@ private fun ProviderField(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
         ) {
-            AIProviderPreset.entries.forEach { preset ->
+            availableProviders.forEach { preset ->
                 DropdownMenuItem(
                     text = { Text(stringResource(preset.titleRes)) },
                     onClick = {
@@ -545,19 +594,6 @@ private fun ProviderField(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun FeatureSummaryCard(provider: AIProviderPreset) {
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(provider.descriptionRes),
-            modifier = Modifier.padding(12.dp),
-            style = MaterialTheme.typography.titleSmall,
-        )
     }
 }
 
@@ -643,47 +679,61 @@ private fun OpenAIModelsStatus(
             }
         }
 
-        OpenAIModelsState.Loading -> {}
+        is OpenAIModelsState.Loading -> {}
         OpenAIModelsState.None -> {}
     }
 }
 
 private enum class AIProviderPreset(
     val titleRes: Int,
-    val descriptionRes: Int,
     val previewSummaryRes: Int,
+    val supportsSummary: Boolean,
+    val supportsTranslation: Boolean,
     val isDeepL: Boolean,
     val isGoogleTranslate: Boolean,
     val endpoint: String,
 ) {
+    NONE(
+        titleRes = R.string.provider_none,
+        previewSummaryRes = R.string.ai_not_configured,
+        supportsSummary = true,
+        supportsTranslation = true,
+        isDeepL = false,
+        isGoogleTranslate = false,
+        endpoint = "",
+    ),
     OPENAI_COMPATIBLE(
         titleRes = R.string.provider_openai_compatible,
-        descriptionRes = R.string.provider_openai_compatible_features,
         previewSummaryRes = R.string.translation_and_summaries,
+        supportsSummary = true,
+        supportsTranslation = false,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
     ),
     AZURE_OPENAI(
         titleRes = R.string.provider_azure_openai,
-        descriptionRes = R.string.provider_azure_openai_features,
         previewSummaryRes = R.string.translation_and_summaries,
+        supportsSummary = true,
+        supportsTranslation = false,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
     ),
     DEEPL(
         titleRes = R.string.provider_deepl,
-        descriptionRes = R.string.provider_deepl_features,
         previewSummaryRes = R.string.translation_only,
+        supportsSummary = false,
+        supportsTranslation = true,
         isDeepL = true,
         isGoogleTranslate = false,
         endpoint = "https://api.deepl.com/v2/translate",
     ),
     GOOGLE_TRANSLATE(
         titleRes = R.string.provider_google_translate,
-        descriptionRes = R.string.provider_google_translate_features,
         previewSummaryRes = R.string.translation_only,
+        supportsSummary = false,
+        supportsTranslation = true,
         isDeepL = false,
         isGoogleTranslate = true,
         endpoint = "https://translation.googleapis.com/language/translate/v2",
@@ -692,6 +742,15 @@ private enum class AIProviderPreset(
 
     fun applyTo(settings: OpenAISettings): OpenAISettings =
         when (this) {
+            NONE ->
+                settings.copy(
+                    key = "",
+                    modelId = "",
+                    baseUrl = "",
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                )
+
             OPENAI_COMPATIBLE ->
                 settings.copy(
                     baseUrl = "",
@@ -722,8 +781,17 @@ private enum class AIProviderPreset(
         }
 
     companion object {
+        fun availableFor(section: OpenAISectionType): List<AIProviderPreset> =
+            entries.filter { preset ->
+                when (section) {
+                    OpenAISectionType.Summary -> preset.supportsSummary
+                    OpenAISectionType.Translation -> preset.supportsTranslation
+                }
+            }
+
         fun fromSettings(settings: OpenAISettings): AIProviderPreset =
             when {
+                settings.isBlankConfiguration -> NONE
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
                 settings.isGoogleTranslate -> GOOGLE_TRANSLATE
                 settings.isDeepL -> DEEPL
@@ -745,9 +813,11 @@ private enum class AIProviderPreset(
 @Preview("tablet", device = Devices.PIXEL_C)
 @Preview("phone", device = Devices.PIXEL_7)
 @Composable
-private fun OpenAISectionReadPreview() {
+private fun SummaryOpenAISectionReadPreview() {
     Surface {
         OpenAISection(
+            title = "Summary API",
+            info = "Used for summaries.",
             state =
                 OpenAISettingsState(
                     settings =
@@ -759,6 +829,7 @@ private fun OpenAISectionReadPreview() {
                     isEditMode = false,
                 ),
             onEvent = { },
+            section = OpenAISectionType.Summary,
         )
     }
 }
@@ -766,27 +837,36 @@ private fun OpenAISectionReadPreview() {
 @Preview("tablet", device = Devices.PIXEL_C)
 @Preview("phone", device = Devices.PIXEL_7)
 @Composable
-private fun OpenAISectionEditPreview() {
+private fun TranslationOpenAISectionEditPreview() {
     OpenAISection(
+        title = "Translation API",
+        info = "Used for translation.",
         state =
             OpenAISettingsState(
-                settings =
-                    OpenAISettings(
-                        key = "",
-                        modelId = "gpt-4o-mini",
-                    ),
+                settings = OpenAISettings(),
                 modelsResult = OpenAIModelsState.None,
                 isEditMode = true,
             ),
         onEvent = { },
+        section = OpenAISectionType.Translation,
+        preferredTranslationLanguage = "English",
     )
 }
 
 private fun OpenAISettings.validationMessage(
+    section: OpenAISectionType,
     provider: AIProviderPreset,
     modelsResult: OpenAIModelsState,
     context: Context,
 ): String? {
+    if (provider == AIProviderPreset.NONE) {
+        return null
+    }
+
+    if (section == OpenAISectionType.Translation && isBlankConfiguration) {
+        return null
+    }
+
     if (key.isBlank()) {
         return if (provider.isDeepL) {
             context.getString(R.string.enter_deepl_api_key_before_saving)
@@ -800,15 +880,13 @@ private fun OpenAISettings.validationMessage(
         return context.getString(R.string.time_out_validation_error)
     }
 
-    if (preferredTranslationLanguage.isBlank()) {
-        return context.getString(R.string.set_preferred_translation_language_before_saving)
-    }
-
     return when (provider) {
+        AIProviderPreset.NONE -> null
         AIProviderPreset.OPENAI_COMPATIBLE -> {
             when {
                 modelId.isBlank() -> context.getString(R.string.enter_model_id_before_saving)
-                modelsResult is OpenAIModelsState.Loading -> context.getString(R.string.verifying_api_settings)
+                modelsResult == OpenAIModelsState.None || modelsResult is OpenAIModelsState.Loading ->
+                    context.getString(R.string.verifying_api_settings)
                 modelsResult is OpenAIModelsState.Error -> {
                     modelsResult.message.ifBlank { context.getString(R.string.api_settings_could_not_be_verified) }
                 }
@@ -822,7 +900,8 @@ private fun OpenAISettings.validationMessage(
                 baseUrl.isBlank() -> context.getString(R.string.enter_azure_endpoint_before_saving)
                 azureDeploymentId.isBlank() -> context.getString(R.string.enter_azure_deployment_id_before_saving)
                 azureApiVersion.isBlank() -> context.getString(R.string.enter_azure_api_version_before_saving)
-                modelsResult is OpenAIModelsState.Loading -> context.getString(R.string.verifying_azure_openai_settings)
+                modelsResult == OpenAIModelsState.None || modelsResult is OpenAIModelsState.Loading ->
+                    context.getString(R.string.verifying_azure_openai_settings)
                 modelsResult is OpenAIModelsState.Error -> {
                     modelsResult.message.ifBlank { context.getString(R.string.azure_openai_settings_could_not_be_verified) }
                 }
@@ -832,7 +911,7 @@ private fun OpenAISettings.validationMessage(
 
         AIProviderPreset.DEEPL -> {
             when (modelsResult) {
-                is OpenAIModelsState.Loading -> context.getString(R.string.verifying_deepl_key)
+                OpenAIModelsState.None, is OpenAIModelsState.Loading -> context.getString(R.string.verifying_deepl_key)
                 is OpenAIModelsState.Error -> modelsResult.message.ifBlank { context.getString(R.string.deepl_key_could_not_be_verified) }
                 else -> null
             }
@@ -840,7 +919,7 @@ private fun OpenAISettings.validationMessage(
 
         AIProviderPreset.GOOGLE_TRANSLATE -> {
             when (modelsResult) {
-                is OpenAIModelsState.Loading -> context.getString(R.string.verifying_google_cloud_translation_key)
+                OpenAIModelsState.None, is OpenAIModelsState.Loading -> context.getString(R.string.verifying_google_cloud_translation_key)
                 is OpenAIModelsState.Error ->
                     modelsResult.message.ifBlank { context.getString(R.string.google_cloud_translation_key_could_not_be_verified) }
                 else -> null
@@ -848,3 +927,19 @@ private fun OpenAISettings.validationMessage(
         }
     }
 }
+
+private fun OpenAIModelsState.matches(settings: OpenAISettings): Boolean =
+    when (this) {
+        is OpenAIModelsState.Error -> this.settings == settings
+        is OpenAIModelsState.Loading -> this.settings == settings
+        OpenAIModelsState.None -> false
+        is OpenAIModelsState.Success -> this.settings == settings
+    }
+
+private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAISettings =
+    when {
+        this != OpenAISectionType.Translation -> settings
+        settings.isBlankConfiguration -> settings
+        settings.isDeepL || settings.isGoogleTranslate -> settings
+        else -> OpenAISettings()
+    }

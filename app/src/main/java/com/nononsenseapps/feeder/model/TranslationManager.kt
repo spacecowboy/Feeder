@@ -2,8 +2,10 @@ package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canTranslate
+import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
@@ -30,13 +32,13 @@ class TranslationManager(
 
     suspend fun translateFeedListItem(item: FeedListItem): FeedListItem =
         withContext(Dispatchers.IO) {
-            val settings = repository.openAISettings.value
-            val targetLanguage = settings.preferredTranslationLanguage.trim()
+            val settings = translationSettings()
+            val targetLanguage = repository.preferredTranslationLanguage.value.trim()
             if (!settings.canTranslate || targetLanguage.isBlank()) {
                 return@withContext item
             }
 
-            val cache = loadCache(item.id, settings)
+            val cache = loadCache(item.id, settings, targetLanguage)
             val titleHash = sha256(item.title)
             val snippetHash = sha256(item.snippet)
 
@@ -46,7 +48,11 @@ class TranslationManager(
                 } else if (cache.titleHash == titleHash && !cache.translatedTitle.isNullOrBlank()) {
                     cache.translatedTitle
                 } else {
-                    openAIApi.translate(item.title, targetLanguage).content.ifBlank { item.title }
+                    translateOrNull(
+                        content = item.title,
+                        targetLanguage = targetLanguage,
+                        settings = settings,
+                    )?.content.orEmpty()
                 }
 
             val translatedSnippet =
@@ -55,23 +61,30 @@ class TranslationManager(
                 } else if (cache.snippetHash == snippetHash && !cache.translatedSnippet.isNullOrBlank()) {
                     cache.translatedSnippet
                 } else {
-                    openAIApi.translate(item.snippet, targetLanguage).content.ifBlank { item.snippet }
+                    translateOrNull(
+                        content = item.snippet,
+                        targetLanguage = targetLanguage,
+                        settings = settings,
+                    )?.content.orEmpty()
                 }
 
-            saveCache(
-                item.id,
-                settings,
-                cache.copy(
-                    titleHash = titleHash,
-                    translatedTitle = translatedTitle,
-                    snippetHash = snippetHash,
-                    translatedSnippet = translatedSnippet,
-                ),
-            )
+            if (translatedTitle.isNotBlank() || translatedSnippet.isNotBlank()) {
+                saveCache(
+                    item.id,
+                    settings,
+                    targetLanguage,
+                    cache.copy(
+                        titleHash = titleHash,
+                        translatedTitle = translatedTitle.takeIf { it.isNotBlank() } ?: cache.translatedTitle,
+                        snippetHash = snippetHash,
+                        translatedSnippet = translatedSnippet.takeIf { it.isNotBlank() } ?: cache.translatedSnippet,
+                    ),
+                )
+            }
 
             item.copy(
-                title = translatedTitle,
-                snippet = translatedSnippet,
+                title = translatedTitle.ifBlank { item.title },
+                snippet = translatedSnippet.ifBlank { item.snippet },
             )
         }
 
@@ -82,13 +95,13 @@ class TranslationManager(
         isFullText: Boolean,
     ): ArticleTranslation? =
         withContext(Dispatchers.IO) {
-            val settings = repository.openAISettings.value
-            val targetLanguage = settings.preferredTranslationLanguage.trim()
+            val settings = translationSettings()
+            val targetLanguage = repository.preferredTranslationLanguage.value.trim()
             if (!settings.canTranslate || targetLanguage.isBlank() || html.isBlank()) {
                 return@withContext null
             }
 
-            val cache = loadCache(itemId, settings)
+            val cache = loadCache(itemId, settings, targetLanguage)
             val titleHash = sha256(title)
             val htmlHash = sha256(html)
 
@@ -112,8 +125,19 @@ class TranslationManager(
                 )
             }
 
-            val translatedTitleResult = openAIApi.translate(title, targetLanguage)
-            val translatedHtmlResult = openAIApi.translate(html, targetLanguage, preserveHtml = true)
+            val translatedTitleResult =
+                translateOrThrow(
+                    content = title,
+                    targetLanguage = targetLanguage,
+                    settings = settings,
+                )
+            val translatedHtmlResult =
+                translateOrThrow(
+                    content = html,
+                    targetLanguage = targetLanguage,
+                    settings = settings,
+                    preserveHtml = true,
+                )
             val sourceLanguage =
                 translatedHtmlResult.detectedLanguageOrBlank()
                     .ifBlank { translatedTitleResult.detectedLanguageOrBlank() }
@@ -129,7 +153,7 @@ class TranslationManager(
                     translatedFullArticleHtml = if (isFullText) translatedHtmlResult.content.ifBlank { html } else cache.translatedFullArticleHtml,
                 )
 
-            saveCache(itemId, settings, updatedCache)
+            saveCache(itemId, settings, targetLanguage, updatedCache)
 
             ArticleTranslation(
                 translatedTitle = updatedCache.translatedTitle ?: title,
@@ -146,8 +170,9 @@ class TranslationManager(
     private fun loadCache(
         itemId: Long,
         settings: OpenAISettings,
+        targetLanguage: String,
     ): CachedTranslations =
-        cacheFile(itemId, settings)
+        cacheFile(itemId, settings, targetLanguage)
             .takeIf(File::isFile)
             ?.readText()
             ?.let { runCatching { json.decodeFromString<CachedTranslations>(it) }.getOrNull() }
@@ -156,9 +181,10 @@ class TranslationManager(
     private fun saveCache(
         itemId: Long,
         settings: OpenAISettings,
+        targetLanguage: String,
         cache: CachedTranslations,
     ) {
-        val file = cacheFile(itemId, settings)
+        val file = cacheFile(itemId, settings, targetLanguage)
         file.parentFile?.mkdirs()
         file.writeText(json.encodeToString(CachedTranslations.serializer(), cache))
     }
@@ -166,6 +192,7 @@ class TranslationManager(
     private fun cacheFile(
         itemId: Long,
         settings: OpenAISettings,
+        targetLanguage: String,
     ): File {
         val provider =
             when {
@@ -173,15 +200,17 @@ class TranslationManager(
                 settings.isGoogleTranslate -> "google"
                 else -> "openai"
             }
-        val targetLanguage =
-            settings.preferredTranslationLanguage
-                .trim()
-                .lowercase()
-                .replace(Regex("[^a-z0-9._-]+"), "_")
-                .ifBlank { "default" }
         return filePathProvider.cacheDir
             .resolve("translations")
-            .resolve("$itemId.$provider.$targetLanguage.json")
+            .resolve(
+                "$itemId.$provider.${
+                    targetLanguage
+                        .trim()
+                        .lowercase()
+                        .replace(Regex("[^a-z0-9._-]+"), "_")
+                        .ifBlank { "default" }
+                }.json",
+            )
     }
 
     private fun sha256(value: String): String =
@@ -189,6 +218,48 @@ class TranslationManager(
             .getInstance("SHA-256")
             .digest(value.toByteArray())
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
+
+    private fun translationSettings(): OpenAISettings =
+        repository.translationOpenAISettings.value.takeIf { it.canUseAsTranslationApi } ?: OpenAISettings()
+
+    private suspend fun translateOrNull(
+        content: String,
+        targetLanguage: String,
+        settings: OpenAISettings,
+        preserveHtml: Boolean = false,
+    ): TranslationResult.Success? =
+        when (
+            val result =
+                openAIApi.translate(
+                    content = content,
+                    targetLanguage = targetLanguage,
+                    settings = settings,
+                    preserveHtml = preserveHtml,
+                )
+        ) {
+            is TranslationResult.Success -> result.takeIf { it.content.isNotBlank() }
+            is TranslationResult.Error -> null
+        }
+
+    private suspend fun translateOrThrow(
+        content: String,
+        targetLanguage: String,
+        settings: OpenAISettings,
+        preserveHtml: Boolean = false,
+    ): TranslationResult.Success =
+        when (
+            val result =
+                openAIApi.translate(
+                    content = content,
+                    targetLanguage = targetLanguage,
+                    settings = settings,
+                    preserveHtml = preserveHtml,
+                )
+        ) {
+            is TranslationResult.Success -> result.takeIf { it.content.isNotBlank() }
+                ?: throw IllegalStateException("Translation failed")
+            is TranslationResult.Error -> throw IllegalStateException(result.content.ifBlank { "Translation failed" })
+        }
 }
 
 data class ArticleTranslation(

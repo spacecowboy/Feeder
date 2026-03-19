@@ -68,7 +68,10 @@ class FeedViewModel(
         combine(
             cachedCurrentFeedListItems,
             repository.translateFeedCardsByDefault,
-        ) { pagingData, shouldTranslate ->
+            repository.openAISettings,
+            repository.translationOpenAISettings,
+            repository.preferredTranslationLanguage,
+        ) { pagingData, shouldTranslate, _, _, _ ->
             if (shouldTranslate) {
                 pagingData.map { translationManager.translateFeedListItem(it) }
             } else {
