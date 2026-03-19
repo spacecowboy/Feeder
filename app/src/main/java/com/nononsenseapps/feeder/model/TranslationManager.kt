@@ -68,17 +68,40 @@ class TranslationManager(
                     )?.content.orEmpty()
                 }
 
-            if (translatedTitle.isNotBlank() || translatedSnippet.isNotBlank()) {
+            val updatedCache =
+                cache.copy(
+                    titleHash =
+                        when {
+                            item.title.isBlank() -> null
+                            translatedTitle.isNotBlank() -> titleHash
+                            else -> cache.titleHash
+                        },
+                    translatedTitle =
+                        when {
+                            item.title.isBlank() -> null
+                            translatedTitle.isNotBlank() -> translatedTitle
+                            else -> cache.translatedTitle
+                        },
+                    snippetHash =
+                        when {
+                            item.snippet.isBlank() -> null
+                            translatedSnippet.isNotBlank() -> snippetHash
+                            else -> cache.snippetHash
+                        },
+                    translatedSnippet =
+                        when {
+                            item.snippet.isBlank() -> null
+                            translatedSnippet.isNotBlank() -> translatedSnippet
+                            else -> cache.translatedSnippet
+                        },
+                )
+
+            if (updatedCache != cache) {
                 saveCache(
                     item.id,
                     settings,
                     targetLanguage,
-                    cache.copy(
-                        titleHash = titleHash,
-                        translatedTitle = translatedTitle.takeIf { it.isNotBlank() } ?: cache.translatedTitle,
-                        snippetHash = snippetHash,
-                        translatedSnippet = translatedSnippet.takeIf { it.isNotBlank() } ?: cache.translatedSnippet,
-                    ),
+                    updatedCache,
                 )
             }
 
