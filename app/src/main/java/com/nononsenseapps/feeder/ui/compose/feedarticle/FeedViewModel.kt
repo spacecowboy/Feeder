@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.FeedType
@@ -24,6 +25,7 @@ import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
+import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
@@ -52,14 +54,22 @@ class FeedViewModel(
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
     private val filePathProvider: FilePathProvider by instance()
+    private val translationManager: TranslationManager by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
-        repository
-            .getCurrentFeedListItems()
-            .cachedIn(viewModelScope)
+        combine(
+            repository.getCurrentFeedListItems(),
+            repository.translateFeedCardsByDefault,
+        ) { pagingData, shouldTranslate ->
+            if (shouldTranslate) {
+                pagingData.map { translationManager.translateFeedListItem(it) }
+            } else {
+                pagingData
+            }
+        }.cachedIn(viewModelScope)
 
     val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
         repository

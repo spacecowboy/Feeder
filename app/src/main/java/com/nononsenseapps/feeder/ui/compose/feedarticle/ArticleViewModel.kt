@@ -246,12 +246,14 @@ class ArticleViewModel(
                                         textToDisplay.update { TextToDisplay.CONTENT }
                                     }
                             } catch (e: Exception) {
+                                // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
                         } else {
                             Log.e(LOG_TAG, "No default file to parse. Attempting to fetch feed again")
+                            // Should not happen but keeping this as a fallback
                             runOnceRssSync(
                                 di = di,
                                 feedId = article.feedId,
@@ -272,8 +274,12 @@ class ArticleViewModel(
 
                     true -> {
                         if (!blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
+                            // If the fulltext file is missing, try to fetch it
                             when (retrieveFullText(article.id).leftOrNull()) {
-                                null -> null
+                                null -> {
+                                    // Success. Do nothing yet
+                                    null
+                                }
                                 is NoBody -> TextToDisplay.FAILED_MISSING_BODY
                                 is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
                                 is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
@@ -295,11 +301,13 @@ class ArticleViewModel(
                                         textToDisplay.update { TextToDisplay.CONTENT }
                                     }
                             } catch (e: Exception) {
+                                // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
                         } else {
+                            // Error text should already be set above
                             LinearArticle(elements = emptyList())
                         }
                     }
@@ -315,9 +323,11 @@ class ArticleViewModel(
         withContext(Dispatchers.IO) {
             logDebug(LOG_TAG, "loadFullTextThenDisplayIt($itemId)")
             if (blobFullFile(itemId, filePathProvider.fullArticleDir).isFile) {
+                logDebug(LOG_TAG, "Fulltext file exists")
                 return@withContext Either.Right(Unit)
             }
 
+            logDebug(LOG_TAG, "Fulltext file does not exist")
             val link = repository.getLink(itemId)
             return@withContext fullTextParser.parseFullArticleIfMissing(
                 object : FeedItemForFetching {
@@ -536,6 +546,8 @@ class ArticleViewModel(
                     htmlToAnnotatedString(htmlContent.byteInputStream(), "")
                 }
                 is OpenAIApi.SummaryResult.Error -> {
+                    // For error messages, create a simple AnnotatedString directly
+                    // without going through markdown/HTML conversion
                     listOf(AnnotatedString(summaryResult.content))
                 }
             }
