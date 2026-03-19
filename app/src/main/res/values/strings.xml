@@ -279,8 +279,6 @@
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
   <string name="openai_settings">AI and translation</string>
-  <string name="api_settings_title">API</string>
-  <string name="openai_settings_info">Choose a provider first.</string>
   <string name="summary_api_settings">Summary API</string>
   <string name="summary_api_settings_info">Used for article summaries.</string>
   <string name="translation_api_settings">Translation API</string>
@@ -311,7 +309,6 @@
   <string name="show_message">Show message</string>
   <string name="enter_api_key_before_saving">Enter an API key before saving.</string>
   <string name="enter_deepl_api_key_before_saving">Enter a DeepL API key before saving.</string>
-  <string name="set_preferred_translation_language_before_saving">Set a preferred translation language before saving.</string>
   <string name="enter_model_id_before_saving">Enter a model id before saving.</string>
   <string name="verifying_api_settings">Verifying API settings...</string>
   <string name="api_settings_could_not_be_verified">The API settings could not be verified.</string>

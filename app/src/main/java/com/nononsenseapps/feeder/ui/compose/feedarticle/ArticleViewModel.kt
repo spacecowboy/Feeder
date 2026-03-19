@@ -30,13 +30,13 @@ import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.html.HtmlLinearizer
 import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canSummarize
-import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
@@ -377,34 +377,9 @@ class ArticleViewModel(
                             }
                         },
                     ) {
-                        val translationState = articleTranslationState.value
-                        val translation =
-                            (translationState as? ArticleTranslationState.Result)
-                                ?.takeIf { it.isFullText == readFullText }
-                                ?: run {
-                                    translateCurrentArticle()
-                                    null
-                                }
-
-                        val html =
-                            if (translation != null) {
-                                loadArticleHtml(article, readFullText).let {
-                                    runCatching {
-                                        translationManager.getOrTranslateArticle(
-                                            itemId = article.id,
-                                            title = article.title,
-                                            html = it,
-                                            isFullText = readFullText,
-                                        )?.translatedHtml
-                                    }.getOrNull() ?: it
-                                }
-                            } else {
-                                loadArticleHtml(article, readFullText)
-                            }
-
                         htmlToAnnotatedString(
-                            inputStream = html.byteInputStream(),
-                            baseUrl = article.feedUrl.toString(),
+                            inputStream = loadTranslatedArticle(article, readFullText).translatedHtml.byteInputStream(),
+                            baseUrl = feedItem.feedUrl.toString(),
                         )
                     }
                 } else {
@@ -521,17 +496,7 @@ class ArticleViewModel(
                 }
 
                 articleTranslationState.value = ArticleTranslationState.Loading
-                val html = loadArticleHtml(article, fullText)
-                val translation =
-                    translationManager.getOrTranslateArticle(
-                        itemId = article.id,
-                        title = article.title,
-                        html = html,
-                        isFullText = fullText,
-                    ) ?: run {
-                        clearTranslatedContent()
-                        return@launch
-                    }
+                val translation = loadTranslatedArticle(article, fullText)
 
                 translatedArticleContent.value =
                     HtmlLinearizer().linearize(
@@ -550,6 +515,17 @@ class ArticleViewModel(
             }
         }
     }
+
+    private suspend fun loadTranslatedArticle(
+        article: Article,
+        fullText: Boolean,
+    ): ArticleTranslation =
+        translationManager.getOrTranslateArticle(
+            itemId = article.id,
+            title = article.title,
+            html = loadArticleHtml(article, fullText),
+            isFullText = fullText,
+        ) ?: throw IllegalStateException("Translation failed")
 
     private suspend fun convertSummaryToAnnotatedStrings(summaryResult: OpenAIApi.SummaryResult): List<AnnotatedString> =
         withContext(Dispatchers.Default) {

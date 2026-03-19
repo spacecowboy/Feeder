@@ -95,12 +95,15 @@ fun OpenAISection(
         var currentPreferredTranslationLanguage by remember(preferredTranslationLanguage) { mutableStateOf(preferredTranslationLanguage) }
         var provider by remember(section, state.settings) { mutableStateOf(AIProviderPreset.fromSettings(sanitizedSettings)) }
         val context = LocalContext.current
+        val matchingModelsResult =
+            remember(current, state.modelsResult) {
+                state.modelsResult.takeIf { it.matches(current) } ?: OpenAIModelsState.None
+            }
         val validationMessage =
-            remember(current, provider, state.modelsResult, context, section) {
+            remember(current, provider, matchingModelsResult, context) {
                 current.validationMessage(
-                    section = section,
                     provider = provider,
-                    modelsResult = state.modelsResult,
+                    modelsResult = matchingModelsResult,
                     context = context,
                 )
             }
@@ -127,12 +130,13 @@ fun OpenAISection(
                     Spacer(modifier = Modifier.size(16.dp))
                     OpenAISectionEdit(
                         info = info,
-                        state = state,
+                        modelsResult = matchingModelsResult,
                         current = current,
                         provider = provider,
                         section = section,
                         validationMessage = validationMessage,
                         preferredTranslationLanguage = currentPreferredTranslationLanguage,
+                        showModelsError = state.showModelsError,
                         onEvent = {
                             if (it is OpenAISettingsEvent.UpdateSettings) {
                                 current = it.settings
@@ -236,12 +240,13 @@ fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && i
 @Composable
 private fun OpenAISectionEdit(
     info: String,
-    state: OpenAISettingsState,
+    modelsResult: OpenAIModelsState,
     current: OpenAISettings,
     provider: AIProviderPreset,
     section: OpenAISectionType,
     validationMessage: String?,
     preferredTranslationLanguage: String,
+    showModelsError: Boolean,
     onEvent: (OpenAISettingsEvent) -> Unit,
     onProviderChange: (AIProviderPreset) -> Unit,
     onPreferredTranslationLanguageChange: (String) -> Unit,
@@ -251,10 +256,6 @@ private fun OpenAISectionEdit(
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
     val hasProvider = provider != AIProviderPreset.NONE
     val isTranslationOnlyProvider = provider.isDeepL || provider.isGoogleTranslate
-    val matchingModelsResult =
-        remember(current, state.modelsResult) {
-            state.modelsResult.takeIf { it.matches(current) } ?: OpenAIModelsState.None
-        }
 
     LaunchedEffect(current, provider) {
         if (provider != AIProviderPreset.NONE) {
@@ -371,16 +372,16 @@ private fun OpenAISectionEdit(
                 trailingIcon = {
                     IconButton(
                         onClick = { modelsMenuExpanded = true },
-                        enabled = matchingModelsResult is OpenAIModelsState.Success,
+                        enabled = modelsResult is OpenAIModelsState.Success,
                     ) {
-                        if (matchingModelsResult is OpenAIModelsState.Loading) {
+                        if (modelsResult is OpenAIModelsState.Loading) {
                             CircularProgressIndicator()
                         } else {
                             Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.list_of_available_models))
-                            if (matchingModelsResult is OpenAIModelsState.Success) {
+                            if (modelsResult is OpenAIModelsState.Success) {
                                 OpenAIModelsDropdown(
                                     menuExpanded = modelsMenuExpanded,
-                                    state = matchingModelsResult,
+                                    state = modelsResult,
                                     onValueChange = {
                                         onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(modelId = it)))
                                     },
@@ -393,8 +394,8 @@ private fun OpenAISectionEdit(
             )
 
             OpenAIModelsStatus(
-                state = matchingModelsResult,
-                showError = state.showModelsError,
+                state = modelsResult,
+                showError = showModelsError,
                 onEvent = onEvent,
             )
         }
@@ -854,16 +855,11 @@ private fun TranslationOpenAISectionEditPreview() {
 }
 
 private fun OpenAISettings.validationMessage(
-    section: OpenAISectionType,
     provider: AIProviderPreset,
     modelsResult: OpenAIModelsState,
     context: Context,
 ): String? {
     if (provider == AIProviderPreset.NONE) {
-        return null
-    }
-
-    if (section == OpenAISectionType.Translation && isBlankConfiguration) {
         return null
     }
 
