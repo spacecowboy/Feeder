@@ -290,4 +290,10 @@
     <string name="no_article_link_browser">No se pudo abrir el artículo en el navegador</string>
     <string name="no_article_link_custom_tab">No se pudo abrir el artículo en una pestaña personalizada</string>
     <string name="apply_blocklist_to_summaries">Aplicar a los resúmenes</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Actualizar</string>
+    <string name="pref_paging_mode_title">Modo de paginación</string>
+    <string name="pref_animated_paging_title">Paginación animada</string>
+    <string name="pref_paging_mode_description">Navega por artículos \"pasando páginas\" en lugar de scrolling continuo. Optimizado para dispositivos e-ink.</string>
+    <string name="pref_animated_paging_description">Anima brevemente el paso de páginas. Puede causar ghosting en algunos dispositivos e-ink.</string>
 </resources>
