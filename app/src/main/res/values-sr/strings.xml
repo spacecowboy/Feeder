@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Чланак није могао да се отвори у произвољној картици</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Освежава се</string>
+    <string name="pref_paging_mode_title">Режим страница</string>
+    <string name="pref_paging_mode_description">Кретање по чланцима „окретањем страница” уместо континуалним скроловањем. Оптимизовано за e-ink уређаје.</string>
+    <string name="pref_animated_paging_title">Анимирано страничење</string>
+    <string name="pref_animated_paging_description">Накратко се анимирају окретања страница. На неким e-ink уређајима може да изазове духове.</string>
 </resources>
