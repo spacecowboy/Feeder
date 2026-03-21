@@ -292,4 +292,8 @@
     <string name="apply_blocklist_to_summaries">应用于摘要</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">刷新中</string>
+    <string name="pref_paging_mode_title">分页模式</string>
+    <string name="pref_paging_mode_description">通过“翻页”而非持续滚动来浏览文章。为 e-ink 设备优化。</string>
+    <string name="pref_animated_paging_title">翻页动画</string>
+    <string name="pref_animated_paging_description">短暂显示翻页动画。可能在一些 e-ink 设备上造成残影。</string>
 </resources>
