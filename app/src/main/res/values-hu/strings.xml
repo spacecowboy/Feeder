@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">A cikk nem nyitható meg egyéni lapon</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Frissítés</string>
+    <string name="pref_paging_mode_title">Lapozási mód</string>
+    <string name="pref_paging_mode_description">A cikkek böngészése „oldalanként” a folyamatos görgetés helyett. E-ink eszközökhöz optimalizálva.</string>
+    <string name="pref_animated_paging_title">Animált lapozás</string>
+    <string name="pref_animated_paging_description">Rövid animáció a lapozásnál. Néhány e-ink eszközön előfordulhat szellemkép.</string>
 </resources>
