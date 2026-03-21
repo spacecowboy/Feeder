@@ -290,4 +290,6 @@
     <string name="open_article_in_custom_tab">Ava kohendatud vahekaardil</string>
     <string name="no_article_link_browser">Artikli avamine veebibrauseris ei õnnestu</string>
     <string name="no_article_link_custom_tab">Artikli avamine kohendatud vahekaardil ei õnnestu</string>
+    <string name="widget_title">Feeder</string>
+    <string name="widget_refreshing">Andmed on uuendamisel</string>
 </resources>
