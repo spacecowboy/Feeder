@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Nepodařilo se otevřít článek ve vlastní kartě</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Obnovování</string>
+    <string name="pref_paging_mode_title">Režim stránkování</string>
+    <string name="pref_paging_mode_description">Navigovat se po článcích „otáčením stránek“ namísto průběžného posouvání. Optimalizováno pro zařízení s technologií e-ink.</string>
+    <string name="pref_animated_paging_title">Animované otáčení stránek</string>
+    <string name="pref_animated_paging_description">Animovat otáčení stránek. Na některých e-ink zařízeních může způsobit ghosting.</string>
 </resources>
