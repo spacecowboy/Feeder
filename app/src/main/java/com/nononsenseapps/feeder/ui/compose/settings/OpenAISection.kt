@@ -84,7 +84,6 @@ fun OpenAISection(
 
     OpenAISectionItem(
         title = title,
-        section = section,
         settings = sanitizedSettings,
         onEvent = onEvent,
         modifier = modifier,
@@ -189,13 +188,11 @@ fun OpenAISection(
 @Composable
 private fun OpenAISectionItem(
     title: String,
-    section: OpenAISectionType,
     settings: OpenAISettings,
     onEvent: (OpenAISettingsEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val sanitizedSettings = remember(section, settings) { section.sanitizeSettings(settings) }
-    val provider = remember(sanitizedSettings) { AIProviderPreset.fromSettings(sanitizedSettings) }
+    val provider = remember(settings) { AIProviderPreset.fromSettings(settings) }
 
     Row(
         modifier =
@@ -217,7 +214,7 @@ private fun OpenAISectionItem(
             subtitle = {
                 Text(
                     text =
-                        if (sanitizedSettings.key.isBlank()) {
+                        if (settings.key.isBlank()) {
                             stringResource(R.string.ai_not_configured)
                         } else {
                             stringResource(R.string.api_provider_summary, stringResource(provider.titleRes))

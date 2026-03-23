@@ -9,13 +9,7 @@ import com.aallam.openai.api.core.RequestOptions
 import com.aallam.openai.api.model.Model
 import com.aallam.openai.api.model.ModelId
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
-import com.nononsenseapps.feeder.archmodel.Repository
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,22 +25,12 @@ class OpenAIClientMock(
 }
 
 class OpenAIApiTest {
-    @MockK
-    private lateinit var repository: Repository
-
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this)
-
-        every { repository.openAISettings } returns MutableStateFlow(OpenAISettings())
-    }
-
     @Test
     fun testSummaryResponseLangNoQuotes() =
         runTest {
             val chatCompletion = createResponse("Lang: eng\n\nMy summary")
             val api = createApi(response = chatCompletion)
-            val actual = api.summarize("My content")
+            val actual = api.summarize("My content", OpenAISettings(key = "test", modelId = "test-model-id"))
             val expected = createResult("My summary", "eng")
             assertEquals(expected, actual)
         }
@@ -56,12 +40,12 @@ class OpenAIApiTest {
         runTest {
             val chatCompletion = createResponse("Lang: \"FR\"\nMy summary")
             val api = createApi(response = chatCompletion)
-            val actual = api.summarize("My content")
+            val actual = api.summarize("My content", OpenAISettings(key = "test", modelId = "test-model-id"))
             val expected = createResult("My summary", "FR")
             assertEquals(expected, actual)
         }
 
-    private fun createApi(response: ChatCompletion) = OpenAIApi(repository, "lang", { OpenAIClientMock(response) })
+    private fun createApi(response: ChatCompletion) = OpenAIApi("lang") { OpenAIClientMock(response) }
 
     private fun createResponse(message: String) =
         ChatCompletion(

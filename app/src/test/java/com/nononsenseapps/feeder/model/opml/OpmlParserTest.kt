@@ -90,6 +90,15 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
+                        UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> "French"
+                        UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
+                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://translation.googleapis.com"
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-06-01"
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
+                        UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
+                        UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> "true"
+                        UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
                     },
             )
         }
@@ -99,7 +108,9 @@ class OpmlParserTest : DIAware {
     fun handlesAllSettings(): Unit =
         runBlocking {
             every { settingsStore.openAiSettings } returns MutableStateFlow(OpenAISettings())
+            every { settingsStore.translationOpenAiSettings } returns MutableStateFlow(OpenAISettings())
             every { settingsStore.setOpenAiSettings(any()) } just Runs
+            every { settingsStore.setTranslationOpenAiSettings(any()) } just Runs
             setAllSettings()
             verify {
                 settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
@@ -136,6 +147,11 @@ class OpmlParserTest : DIAware {
                 settingsStore.setMaxCountPerFeed(200)
                 settingsStore.openAiSettings
                 settingsStore.setOpenAiSettings(any())
+                settingsStore.setPreferredTranslationLanguage("French")
+                settingsStore.translationOpenAiSettings
+                settingsStore.setTranslationOpenAiSettings(any())
+                settingsStore.setTranslateFeedCardsByDefault(true)
+                settingsStore.setTranslateArticlesByDefault(true)
 //                settingsStore.setOpenAiSettings(
 //                    OpenAISettings(
 //                        modelId = "gpt-4o-mini",

@@ -260,11 +260,10 @@ class ArticleViewModel(
                     }
 
                 val sourceLanguage =
-                    translationManager.detectArticleAlreadyInTargetLanguage(
-                        itemId = request.article.id,
-                        title = request.article.title,
+                    detectArticleAlreadyInPreferredLanguage(
+                        article = request.article,
+                        fullText = request.isFullText,
                         html = html,
-                        isFullText = request.isFullText,
                     )
 
                 if (sourceLanguage != null) {
@@ -551,11 +550,10 @@ class ArticleViewModel(
 
                 val html = loadArticleHtml(article, fullText)
                 val sourceLanguage =
-                    translationManager.detectArticleAlreadyInTargetLanguage(
-                        itemId = article.id,
-                        title = article.title,
+                    detectArticleAlreadyInPreferredLanguage(
+                        article = article,
+                        fullText = fullText,
                         html = html,
-                        isFullText = fullText,
                     )
                 if (sourceLanguage != null) {
                     setAlreadyInPreferredLanguage(
@@ -646,27 +644,38 @@ class ArticleViewModel(
             ?: throw IllegalStateException("Cannot parse content")
     }
 
+    private suspend fun detectArticleAlreadyInPreferredLanguage(
+        article: Article,
+        fullText: Boolean,
+        html: String,
+    ): String? =
+        translationManager.detectArticleAlreadyInTargetLanguage(
+            itemId = article.id,
+            title = article.title,
+            html = html,
+            isFullText = fullText,
+        )
+
     private suspend fun loadArticleHtml(
         article: Article,
         fullText: Boolean,
     ): String =
         withContext(Dispatchers.IO) {
             when (fullText) {
-                false ->
-                    if (blobFile(article.id, filePathProvider.articleDir).isFile) {
-                        blobInputStream(article.id, filePathProvider.articleDir).bufferedReader().use { it.readText() }
-                    } else {
-                        article.snippet
-                    }
+                false -> readArticleBlobIfPresent(article.id) ?: article.snippet
 
                 true -> {
-                    if (!blobFullFile(article.id, filePathProvider.fullArticleDir).isFile) {
-                        val error = retrieveFullText(article.id).leftOrNull()
-                        if (error != null) {
-                            throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
-                        }
+                    val cachedHtml = readFullArticleBlobIfPresent(article.id)
+                    if (cachedHtml != null) {
+                        return@withContext cachedHtml
                     }
-                    blobFullInputStream(article.id, filePathProvider.fullArticleDir).bufferedReader().use { it.readText() }
+
+                    val error = retrieveFullText(article.id).leftOrNull()
+                    if (error != null) {
+                        throw IllegalStateException("Cannot load article: ${error.description}", error.throwable)
+                    }
+                    readFullArticleBlobIfPresent(article.id)
+                        ?: throw IllegalStateException("Cannot load article")
                 }
             }
         }
@@ -677,25 +686,28 @@ class ArticleViewModel(
     ): String? =
         withContext(Dispatchers.IO) {
             when (fullText) {
-                false ->
-                    when {
-                        blobFile(article.id, filePathProvider.articleDir).isFile ->
-                            blobInputStream(article.id, filePathProvider.articleDir).bufferedReader().use { it.readText() }
-
-                        article.snippet.isNotBlank() -> article.snippet
-                        else -> null
-                    }
-
-                true ->
-                    blobFullFile(article.id, filePathProvider.fullArticleDir)
-                        .takeIf { it.isFile }
-                        ?.let {
-                            blobFullInputStream(article.id, filePathProvider.fullArticleDir).bufferedReader().use { reader ->
-                                reader.readText()
-                            }
-                        }
+                false -> readArticleBlobIfPresent(article.id) ?: article.snippet.takeIf(String::isNotBlank)
+                true -> readFullArticleBlobIfPresent(article.id)
             }
         }
+
+    private fun readArticleBlobIfPresent(itemId: Long): String? =
+        blobFile(itemId, filePathProvider.articleDir)
+            .takeIf { it.isFile }
+            ?.let {
+                blobInputStream(itemId, filePathProvider.articleDir).bufferedReader().use { reader ->
+                    reader.readText()
+                }
+            }
+
+    private fun readFullArticleBlobIfPresent(itemId: Long): String? =
+        blobFullFile(itemId, filePathProvider.fullArticleDir)
+            .takeIf { it.isFile }
+            ?.let {
+                blobFullInputStream(itemId, filePathProvider.fullArticleDir).bufferedReader().use { reader ->
+                    reader.readText()
+                }
+            }
 
     private fun canTranslateArticles(): Boolean =
         repository.translationOpenAISettings.value.canUseAsTranslationApi && repository.preferredTranslationLanguage.value.trim().isNotBlank()

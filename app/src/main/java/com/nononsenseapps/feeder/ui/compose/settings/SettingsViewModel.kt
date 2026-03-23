@@ -181,33 +181,23 @@ class SettingsViewModel(
     }
 
     fun onSummaryOpenAISettingsEvent(event: OpenAISettingsEvent) {
-        when (event) {
-            is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(summaryOpenAIModelsState, event.settings)
-            is OpenAISettingsEvent.UpdateSettings -> repository.setOpenAiSettings(event.settings)
-            is OpenAISettingsEvent.SwitchEditMode -> {
-                val current = _viewState.value.summaryAIState
-                _viewState.value = _viewState.value.copy(summaryAIState = current.copy(isEditMode = event.enabled))
-            }
-            is OpenAISettingsEvent.ShowModelsError -> {
-                val current = _viewState.value.summaryAIState
-                _viewState.value = _viewState.value.copy(summaryAIState = current.copy(showModelsError = event.show))
-            }
-        }
+        handleOpenAISettingsEvent(
+            event = event,
+            modelsState = summaryOpenAIModelsState,
+            currentState = { _viewState.value.summaryAIState },
+            updateState = { updatedState -> _viewState.value = _viewState.value.copy(summaryAIState = updatedState) },
+            saveSettings = repository::setOpenAiSettings,
+        )
     }
 
     fun onTranslationOpenAISettingsEvent(event: OpenAISettingsEvent) {
-        when (event) {
-            is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(translationOpenAIModelsState, event.settings)
-            is OpenAISettingsEvent.UpdateSettings -> repository.setTranslationOpenAiSettings(event.settings)
-            is OpenAISettingsEvent.SwitchEditMode -> {
-                val current = _viewState.value.translationAIState
-                _viewState.value = _viewState.value.copy(translationAIState = current.copy(isEditMode = event.enabled))
-            }
-            is OpenAISettingsEvent.ShowModelsError -> {
-                val current = _viewState.value.translationAIState
-                _viewState.value = _viewState.value.copy(translationAIState = current.copy(showModelsError = event.show))
-            }
-        }
+        handleOpenAISettingsEvent(
+            event = event,
+            modelsState = translationOpenAIModelsState,
+            currentState = { _viewState.value.translationAIState },
+            updateState = { updatedState -> _viewState.value = _viewState.value.copy(translationAIState = updatedState) },
+            saveSettings = repository::setTranslationOpenAiSettings,
+        )
     }
 
     fun setPreferredTranslationLanguage(value: String) {
@@ -353,6 +343,27 @@ class SettingsViewModel(
                         OpenAIApi.ModelsResult.AzureDeploymentIdRequired -> OpenAIModelsState.None
                     }
                 }
+        }
+    }
+
+    private fun handleOpenAISettingsEvent(
+        event: OpenAISettingsEvent,
+        modelsState: MutableStateFlow<OpenAIModelsState>,
+        currentState: () -> OpenAISettingsState,
+        updateState: (OpenAISettingsState) -> Unit,
+        saveSettings: (OpenAISettings) -> Unit,
+    ) {
+        when (event) {
+            is OpenAISettingsEvent.LoadModels -> loadOpenAIModels(modelsState, event.settings)
+            is OpenAISettingsEvent.UpdateSettings -> saveSettings(event.settings)
+            is OpenAISettingsEvent.SwitchEditMode -> {
+                val current = currentState()
+                updateState(current.copy(isEditMode = event.enabled))
+            }
+            is OpenAISettingsEvent.ShowModelsError -> {
+                val current = currentState()
+                updateState(current.copy(showModelsError = event.show))
+            }
         }
     }
 

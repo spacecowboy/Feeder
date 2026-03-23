@@ -63,12 +63,10 @@ class FeedViewModel(
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
-    private val cachedCurrentFeedListItems =
+    val currentFeedListItems: Flow<PagingData<FeedListItem>> =
         repository
             .getCurrentFeedListItems()
             .cachedIn(viewModelScope)
-
-    val currentFeedListItems: Flow<PagingData<FeedListItem>> = cachedCurrentFeedListItems
 
     private val translatedFeedCardEntries = MutableStateFlow<Map<FeedCardSource, FeedCardTranslationEntry>>(emptyMap())
     val translatedFeedCards: StateFlow<Map<FeedCardSource, FeedListItem>> =
@@ -190,10 +188,10 @@ class FeedViewModel(
                 repository.translationOpenAISettings,
                 repository.preferredTranslationLanguage,
             ) { shouldTranslate, settings, targetLanguage ->
-                FeedCardTranslationConfig(
+                feedCardTranslationConfig(
                     enabled = shouldTranslate,
                     settings = settings,
-                    targetLanguage = targetLanguage.trim(),
+                    targetLanguage = targetLanguage,
                 )
             }.distinctUntilChanged()
                 .collect {
@@ -237,16 +235,14 @@ class FeedViewModel(
             try {
                 val cached = translationManager.getCachedTranslatedFeedListItem(item, config.settings, config.targetLanguage)
                 if (cached.hasCachedTranslation) {
-                    translatedFeedCardEntries.update { current ->
-                        current
-                            .filterKeys { it.itemId != source.itemId } + (
-                            source to
-                                FeedCardTranslationEntry(
-                                    item = cached.item,
-                                    isComplete = cached.isFullyCached,
-                                )
-                            )
-                    }
+                    updateTranslatedFeedCard(
+                        source = source,
+                        entry =
+                            FeedCardTranslationEntry(
+                                item = cached.item,
+                                isComplete = cached.isFullyCached,
+                            ),
+                    )
                 }
 
                 if (cached.isFullyCached) {
@@ -268,16 +264,14 @@ class FeedViewModel(
                     }
 
                 if (displayItem != null && currentFeedCardTranslationConfig() == config) {
-                    translatedFeedCardEntries.update { current ->
-                        current
-                            .filterKeys { it.itemId != source.itemId } + (
-                            source to
-                                FeedCardTranslationEntry(
-                                    item = displayItem,
-                                    isComplete = updatedCached.isFullyCached,
-                                )
-                            )
-                    }
+                    updateTranslatedFeedCard(
+                        source = source,
+                        entry =
+                            FeedCardTranslationEntry(
+                                item = displayItem,
+                                isComplete = updatedCached.isFullyCached,
+                            ),
+                    )
                 }
             } finally {
                 inFlightFeedCardTranslations.remove(request)
@@ -286,13 +280,32 @@ class FeedViewModel(
     }
 
     private fun currentFeedCardTranslationConfig(): FeedCardTranslationConfig? {
-        val settings = repository.translationOpenAISettings.value
-        val targetLanguage = repository.preferredTranslationLanguage.value.trim()
-        return FeedCardTranslationConfig(
+        return feedCardTranslationConfig(
             enabled = repository.translateFeedCardsByDefault.value,
+            settings = repository.translationOpenAISettings.value,
+            targetLanguage = repository.preferredTranslationLanguage.value,
+        ).takeIf(FeedCardTranslationConfig::isActive)
+    }
+
+    private fun feedCardTranslationConfig(
+        enabled: Boolean,
+        settings: OpenAISettings,
+        targetLanguage: String,
+    ): FeedCardTranslationConfig =
+        FeedCardTranslationConfig(
+            enabled = enabled,
             settings = settings,
-            targetLanguage = targetLanguage,
-        ).takeIf { it.enabled && it.settings.canUseAsTranslationApi && it.targetLanguage.isNotBlank() }
+            targetLanguage = targetLanguage.trim(),
+        )
+
+    private fun updateTranslatedFeedCard(
+        source: FeedCardSource,
+        entry: FeedCardTranslationEntry,
+    ) {
+        translatedFeedCardEntries.update { current ->
+            current
+                .filterKeys { it.itemId != source.itemId } + (source to entry)
+        }
     }
 
     private val filterMenuVisible: MutableStateFlow<Boolean> =
@@ -569,9 +582,6 @@ class FeedViewModel(
         repository.setFeedListFilterRead(value)
     }
 
-    companion object {
-        private const val LOG_TAG = "FEEDER_FeedVM"
-    }
 }
 
 @Immutable
@@ -644,6 +654,9 @@ private data class FeedCardTranslationConfig(
     val settings: OpenAISettings,
     val targetLanguage: String,
 )
+
+private fun FeedCardTranslationConfig.isActive(): Boolean =
+    enabled && settings.canUseAsTranslationApi && targetLanguage.isNotBlank()
 
 private data class FeedCardTranslationRequest(
     val itemId: Long,
