@@ -150,15 +150,6 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_openai_azure_version" value="2023-05-15"/>
               <feeder:setting key="pref_openai_azure_deployment_id" value="test-deployment"/>
               <feeder:setting key="pref_openai_request_timeout_seconds" value="45"/>
-              <feeder:setting key="pref_openai_translation_language" value="English"/>
-              <feeder:setting key="pref_translation_api_key" value="translation-api-key"/>
-              <feeder:setting key="pref_translation_api_model_id" value="gpt-4.1-mini"/>
-              <feeder:setting key="pref_translation_api_url" value="https://translation.example.com"/>
-              <feeder:setting key="pref_translation_api_azure_version" value="2024-02-15-preview"/>
-              <feeder:setting key="pref_translation_api_azure_deployment_id" value="translation-deployment"/>
-              <feeder:setting key="pref_translation_api_request_timeout_seconds" value="60"/>
-              <feeder:setting key="pref_translate_feed_cards_by_default" value="true"/>
-              <feeder:setting key="pref_translate_articles_by_default" value="true"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -209,15 +200,6 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
-                        UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> "English"
-                        UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
-                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "gpt-4.1-mini"
-                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://translation.example.com"
-                        UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-02-15-preview"
-                        UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
-                        UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "60"
-                        UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> "true"
-                        UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
                     }
             }
     }

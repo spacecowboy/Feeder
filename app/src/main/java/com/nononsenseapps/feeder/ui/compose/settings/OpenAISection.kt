@@ -698,7 +698,7 @@ private enum class AIProviderPreset(
     OPENAI_COMPATIBLE(
         titleRes = R.string.provider_openai_compatible,
         supportsSummary = true,
-        supportsTranslation = true,
+        supportsTranslation = false,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
@@ -706,7 +706,7 @@ private enum class AIProviderPreset(
     AZURE_OPENAI(
         titleRes = R.string.provider_azure_openai,
         supportsSummary = true,
-        supportsTranslation = true,
+        supportsTranslation = false,
         isDeepL = false,
         isGoogleTranslate = false,
         endpoint = "",
@@ -932,6 +932,7 @@ private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAI
         OpenAISectionType.Translation ->
             when {
                 settings.isBlankConfiguration -> settings
-                else -> settings
+                settings.isDeepL || settings.isGoogleTranslate -> settings
+                else -> OpenAISettings()
             }
     }

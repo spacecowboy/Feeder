@@ -589,7 +589,7 @@ val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
 val OpenAISettings.canUseAsTranslationApi: Boolean
-    get() = canTranslate
+    get() = canTranslate && (isDeepL || isGoogleTranslate)
 
 val OpenAISettings.isBlankConfiguration: Boolean
     get() =
