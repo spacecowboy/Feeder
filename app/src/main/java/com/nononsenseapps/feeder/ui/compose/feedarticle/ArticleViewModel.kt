@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -158,6 +159,9 @@ class ArticleViewModel(
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
+            val alreadyInPreferredLanguage =
+                (translationState as? ArticleTranslationState.AlreadyInPreferredLanguage)
+                    ?.takeIf { it.isFullText == isFullText }
             val isShowingTranslated = showTranslated && currentTranslation != null
             val canRequestTranslation =
                 translationSettings.canUseAsTranslationApi &&
@@ -191,10 +195,10 @@ class ArticleViewModel(
                 image = article?.image,
                 showSummarize = summarySettings.canSummarize && !article?.link.isNullOrEmpty(),
                 openAiSummary = openAiSummary,
-                showTranslate = canRequestTranslation || isShowingTranslated,
+                showTranslate = isShowingTranslated || (canRequestTranslation && alreadyInPreferredLanguage == null),
                 isShowingTranslated = isShowingTranslated,
                 isTranslationLoading = translationState is ArticleTranslationState.Loading,
-                translationSourceLanguage = currentTranslation?.sourceLanguage ?: "",
+                translationSourceLanguage = currentTranslation?.sourceLanguage ?: alreadyInPreferredLanguage?.sourceLanguage.orEmpty(),
                 articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
         }.stateIn(
@@ -220,6 +224,56 @@ class ArticleViewModel(
                 if (repository.translateArticlesByDefault.value && canTranslateArticles()) {
                     showTranslatedContent.value = true
                     translateCurrentArticle()
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(
+                articleFlow,
+                displayFullTextOverride,
+                repository.translationOpenAISettings,
+                repository.preferredTranslationLanguage,
+            ) { article, fullTextOverride, settings, targetLanguage ->
+                val currentArticle = article ?: return@combine null
+                val fullText = fullTextOverride ?: currentArticle.fullTextByDefault
+                if (!settings.canUseAsTranslationApi || targetLanguage.trim().isBlank() || currentArticle.link.isNullOrBlank()) {
+                    return@combine null
+                }
+                ArticleLanguageCheck(
+                    article = currentArticle,
+                    isFullText = fullText,
+                )
+            }.collectLatest { request ->
+                if (request == null) {
+                    clearAlreadyInPreferredLanguageState()
+                    return@collectLatest
+                }
+
+                val html =
+                    loadArticleHtmlForLanguageDetection(
+                        article = request.article,
+                        fullText = request.isFullText,
+                    ) ?: run {
+                        clearAlreadyInPreferredLanguageState(request.isFullText)
+                        return@collectLatest
+                    }
+
+                val sourceLanguage =
+                    translationManager.detectArticleAlreadyInTargetLanguage(
+                        itemId = request.article.id,
+                        title = request.article.title,
+                        html = html,
+                        isFullText = request.isFullText,
+                    )
+
+                if (sourceLanguage != null) {
+                    setAlreadyInPreferredLanguage(
+                        sourceLanguage = sourceLanguage,
+                        isFullText = request.isFullText,
+                    )
+                } else {
+                    clearAlreadyInPreferredLanguageState(request.isFullText)
                 }
             }
         }
@@ -495,8 +549,30 @@ class ArticleViewModel(
                     return@launch
                 }
 
+                val html = loadArticleHtml(article, fullText)
+                val sourceLanguage =
+                    translationManager.detectArticleAlreadyInTargetLanguage(
+                        itemId = article.id,
+                        title = article.title,
+                        html = html,
+                        isFullText = fullText,
+                    )
+                if (sourceLanguage != null) {
+                    setAlreadyInPreferredLanguage(
+                        sourceLanguage = sourceLanguage,
+                        isFullText = fullText,
+                    )
+                    return@launch
+                }
+
                 articleTranslationState.value = ArticleTranslationState.Loading
-                val translation = loadTranslatedArticle(article, fullText)
+                val translation =
+                    translationManager.getOrTranslateArticle(
+                        itemId = article.id,
+                        title = article.title,
+                        html = html,
+                        isFullText = fullText,
+                    ) ?: throw IllegalStateException("Translation failed")
 
                 translatedArticleContent.value =
                     HtmlLinearizer().linearize(
@@ -595,8 +671,54 @@ class ArticleViewModel(
             }
         }
 
+    private suspend fun loadArticleHtmlForLanguageDetection(
+        article: Article,
+        fullText: Boolean,
+    ): String? =
+        withContext(Dispatchers.IO) {
+            when (fullText) {
+                false ->
+                    when {
+                        blobFile(article.id, filePathProvider.articleDir).isFile ->
+                            blobInputStream(article.id, filePathProvider.articleDir).bufferedReader().use { it.readText() }
+
+                        article.snippet.isNotBlank() -> article.snippet
+                        else -> null
+                    }
+
+                true ->
+                    blobFullFile(article.id, filePathProvider.fullArticleDir)
+                        .takeIf { it.isFile }
+                        ?.let {
+                            blobFullInputStream(article.id, filePathProvider.fullArticleDir).bufferedReader().use { reader ->
+                                reader.readText()
+                            }
+                        }
+            }
+        }
+
     private fun canTranslateArticles(): Boolean =
         repository.translationOpenAISettings.value.canUseAsTranslationApi && repository.preferredTranslationLanguage.value.trim().isNotBlank()
+
+    private fun setAlreadyInPreferredLanguage(
+        sourceLanguage: String,
+        isFullText: Boolean,
+    ) {
+        showTranslatedContent.value = false
+        translatedArticleContent.value = LinearArticle(emptyList())
+        articleTranslationState.value =
+            ArticleTranslationState.AlreadyInPreferredLanguage(
+                sourceLanguage = sourceLanguage,
+                isFullText = isFullText,
+            )
+    }
+
+    private fun clearAlreadyInPreferredLanguageState(isFullText: Boolean? = null) {
+        val currentState = articleTranslationState.value as? ArticleTranslationState.AlreadyInPreferredLanguage ?: return
+        if (isFullText == null || currentState.isFullText == isFullText) {
+            articleTranslationState.value = ArticleTranslationState.Empty
+        }
+    }
 
     private fun clearTranslatedContent() {
         showTranslatedContent.value = false
@@ -686,12 +808,22 @@ sealed interface ArticleTranslationState {
 
     data object Loading : ArticleTranslationState
 
+    data class AlreadyInPreferredLanguage(
+        val sourceLanguage: String,
+        val isFullText: Boolean,
+    ) : ArticleTranslationState
+
     data class Result(
         val translatedTitle: String,
         val sourceLanguage: String,
         val isFullText: Boolean,
     ) : ArticleTranslationState
 }
+
+private data class ArticleLanguageCheck(
+    val article: Article,
+    val isFullText: Boolean,
+)
 
 interface ArticleItemKeyHolder {
     fun getAndIncrementKey(): Any

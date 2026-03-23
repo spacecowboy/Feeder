@@ -5,11 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.FeedType
 import com.nononsenseapps.feeder.archmodel.ItemOpener
+import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ScreenTitle
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
@@ -26,6 +26,7 @@ import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TranslationManager
+import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
@@ -36,7 +37,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -45,6 +48,7 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.FileNotFoundException
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class FeedViewModel(
     di: DI,
@@ -64,19 +68,20 @@ class FeedViewModel(
             .getCurrentFeedListItems()
             .cachedIn(viewModelScope)
 
-    val currentFeedListItems: Flow<PagingData<FeedListItem>> =
-        combine(
-            cachedCurrentFeedListItems,
-            repository.translateFeedCardsByDefault,
-            repository.translationOpenAISettings,
-            repository.preferredTranslationLanguage,
-        ) { pagingData, shouldTranslate, _, _ ->
-            if (shouldTranslate) {
-                pagingData.map { translationManager.translateFeedListItem(it) }
-            } else {
-                pagingData
-            }
-        }
+    val currentFeedListItems: Flow<PagingData<FeedListItem>> = cachedCurrentFeedListItems
+
+    private val translatedFeedCardEntries = MutableStateFlow<Map<FeedCardSource, FeedCardTranslationEntry>>(emptyMap())
+    val translatedFeedCards: StateFlow<Map<FeedCardSource, FeedListItem>> =
+        translatedFeedCardEntries
+            .map { entries -> entries.mapValues { it.value.item } }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                emptyMap(),
+            )
+    private val _feedCardTranslationGeneration = MutableStateFlow(0)
+    val feedCardTranslationGeneration = _feedCardTranslationGeneration.asStateFlow()
+    private val inFlightFeedCardTranslations = ConcurrentHashMap.newKeySet<FeedCardTranslationRequest>()
 
     val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
         repository
@@ -178,9 +183,116 @@ class FeedViewModel(
     private val toolbarVisible: MutableStateFlow<Boolean> =
         MutableStateFlow(state["toolbarMenuVisible"] ?: false)
 
+    init {
+        viewModelScope.launch {
+            combine(
+                repository.translateFeedCardsByDefault,
+                repository.translationOpenAISettings,
+                repository.preferredTranslationLanguage,
+            ) { shouldTranslate, settings, targetLanguage ->
+                FeedCardTranslationConfig(
+                    enabled = shouldTranslate,
+                    settings = settings,
+                    targetLanguage = targetLanguage.trim(),
+                )
+            }.distinctUntilChanged()
+                .collect {
+                    inFlightFeedCardTranslations.clear()
+                    translatedFeedCardEntries.value = emptyMap()
+                    _feedCardTranslationGeneration.update { it + 1 }
+                }
+        }
+    }
+
     fun setToolbarMenuVisible(visible: Boolean) {
         state["toolbarMenuVisible"] = visible
         toolbarVisible.update { visible }
+    }
+
+    fun translateFeedCardIfNeeded(item: FeedListItem) {
+        if (item.id == ID_UNSET) {
+            return
+        }
+
+        val config = currentFeedCardTranslationConfig() ?: return
+        val source = FeedCardSource.from(item)
+        val existingEntry = translatedFeedCardEntries.value[source]
+        if (existingEntry?.isComplete == true) {
+            return
+        }
+
+        val request =
+            FeedCardTranslationRequest(
+                itemId = item.id,
+                sourceTitle = item.title,
+                sourceSnippet = item.snippet,
+                settings = config.settings,
+                targetLanguage = config.targetLanguage,
+            )
+        if (!inFlightFeedCardTranslations.add(request)) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val cached = translationManager.getCachedTranslatedFeedListItem(item, config.settings, config.targetLanguage)
+                if (cached.hasCachedTranslation) {
+                    translatedFeedCardEntries.update { current ->
+                        current
+                            .filterKeys { it.itemId != source.itemId } + (
+                            source to
+                                FeedCardTranslationEntry(
+                                    item = cached.item,
+                                    isComplete = cached.isFullyCached,
+                                )
+                            )
+                    }
+                }
+
+                if (cached.isFullyCached) {
+                    return@launch
+                }
+
+                val translatedItem = translationManager.translateFeedListItem(item)
+                val updatedCached =
+                    translationManager.getCachedTranslatedFeedListItem(
+                        item = item,
+                        settings = config.settings,
+                        targetLanguage = config.targetLanguage,
+                    )
+                val displayItem =
+                    when {
+                        updatedCached.hasCachedTranslation -> updatedCached.item
+                        translatedItem != item -> translatedItem
+                        else -> null
+                    }
+
+                if (displayItem != null && currentFeedCardTranslationConfig() == config) {
+                    translatedFeedCardEntries.update { current ->
+                        current
+                            .filterKeys { it.itemId != source.itemId } + (
+                            source to
+                                FeedCardTranslationEntry(
+                                    item = displayItem,
+                                    isComplete = updatedCached.isFullyCached,
+                                )
+                            )
+                    }
+                }
+            } finally {
+                inFlightFeedCardTranslations.remove(request)
+            }
+        }
+    }
+
+    private fun currentFeedCardTranslationConfig(): FeedCardTranslationConfig? {
+        val settings = repository.translationOpenAISettings.value
+        val targetLanguage = repository.preferredTranslationLanguage.value.trim()
+        return FeedCardTranslationConfig(
+            enabled = repository.translateFeedCardsByDefault.value,
+            settings = settings,
+            targetLanguage = targetLanguage,
+        ).takeIf { it.enabled && it.settings.canUseAsTranslationApi && it.targetLanguage.isNotBlank() }
     }
 
     private val filterMenuVisible: MutableStateFlow<Boolean> =
@@ -525,6 +637,40 @@ interface FeedScreenViewState {
     val search: String
     val showTitleUnreadCount: Boolean
     val isOpenDrawerOnFab: Boolean
+}
+
+private data class FeedCardTranslationConfig(
+    val enabled: Boolean,
+    val settings: OpenAISettings,
+    val targetLanguage: String,
+)
+
+private data class FeedCardTranslationRequest(
+    val itemId: Long,
+    val sourceTitle: String,
+    val sourceSnippet: String,
+    val settings: OpenAISettings,
+    val targetLanguage: String,
+)
+
+private data class FeedCardTranslationEntry(
+    val item: FeedListItem,
+    val isComplete: Boolean,
+)
+
+data class FeedCardSource(
+    val itemId: Long,
+    val title: String,
+    val snippet: String,
+) {
+    companion object {
+        fun from(item: FeedListItem): FeedCardSource =
+            FeedCardSource(
+                itemId = item.id,
+                title = item.title,
+                snippet = item.snippet,
+            )
+    }
 }
 
 @Immutable
