@@ -53,7 +53,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -104,7 +103,6 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -1238,15 +1236,12 @@ fun FeedListContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
-    val isInitialLoad = pagedFeedItems.itemCount == 0 && pagedFeedItems.loadState.refresh is LoadState.Loading
-    val showEmptyState = pagedFeedItems.itemCount == 0 && !isInitialLoad
-    val showFeedItems = pagedFeedItems.itemCount > 0
 
     Box(modifier = modifier) {
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
-            visible = showEmptyState,
+            visible = !viewState.haveVisibleFeedItems,
         ) {
             // Keeping the Box behind so the scrollability doesn't override clickable
             // Separate box because scrollable will ignore max size.
@@ -1274,7 +1269,7 @@ fun FeedListContent(
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
-            visible = showFeedItems,
+            visible = viewState.haveVisibleFeedItems,
         ) {
             LazyColumn(
                 state = listState,
@@ -1477,19 +1472,6 @@ fun FeedListContent(
                 }
             }
         }
-
-        AnimatedVisibility(
-            enter = fadeIn(),
-            exit = fadeOut(),
-            visible = isInitialLoad,
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-        }
     }
 }
 
@@ -1517,15 +1499,12 @@ fun FeedGridContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val activityLauncher: ActivityLauncher by LocalDI.current.instance()
-    val isInitialLoad = pagedFeedItems.itemCount == 0 && pagedFeedItems.loadState.refresh is LoadState.Loading
-    val showEmptyState = pagedFeedItems.itemCount == 0 && !isInitialLoad
-    val showFeedItems = pagedFeedItems.itemCount > 0
 
     Box(modifier = modifier) {
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
-            visible = showEmptyState,
+            visible = !viewState.haveVisibleFeedItems,
         ) {
             // Keeping the Box behind so the scrollability doesn't override clickable
             // Separate box because scrollable will ignore max size.
@@ -1553,7 +1532,7 @@ fun FeedGridContent(
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
-            visible = showFeedItems,
+            visible = viewState.haveVisibleFeedItems,
         ) {
             LazyVerticalStaggeredGrid(
                 state = gridState,
@@ -1701,19 +1680,6 @@ fun FeedGridContent(
                         swipeEnabled = !gridState.isScrollInProgress,
                     )
                 }
-            }
-        }
-
-        AnimatedVisibility(
-            enter = fadeIn(),
-            exit = fadeOut(),
-            visible = isInitialLoad,
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
             }
         }
     }

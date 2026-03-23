@@ -38,13 +38,6 @@ class OpenAIApi(
     )
 
     @Serializable
-    data class TranslationResponse(
-        val lang: String,
-        val targetLang: String,
-        val content: String,
-    )
-
-    @Serializable
     private data class DeepLTranslateRequest(
         val text: List<String>,
         val target_lang: String,
@@ -291,33 +284,7 @@ class OpenAIApi(
                 preserveHtml = preserveHtml,
             )
         }
-        try {
-            val response =
-                openAIClientFactory(settings).chatCompletion(
-                    request = translationRequest(content, targetLanguage, settings, preserveHtml),
-                    requestOptions = null,
-                )
-            val translationResponse: TranslationResponse =
-                parseTranslationResponse(
-                    response.choices
-                        .firstOrNull()
-                        ?.message
-                        ?.content ?: throw IllegalStateException("Response content is null"),
-                )
-            return TranslationResult.Success(
-                id = response.id,
-                model = response.model.id,
-                content = translationResponse.content,
-                created = response.created,
-                promptTokens = response.usage?.promptTokens ?: 0,
-                completeTokens = response.usage?.completionTokens ?: 0,
-                totalTokens = response.usage?.totalTokens ?: 0,
-                detectedLanguage = translationResponse.lang,
-                targetLanguage = translationResponse.targetLang,
-            )
-        } catch (e: Exception) {
-            return TranslationResult.Error(content = e.message ?: e.cause?.message ?: "")
-        }
+        return TranslationResult.Error(content = "Translation is not supported for this provider")
     }
 
     private fun translateWithDeepL(
@@ -398,23 +365,6 @@ class OpenAIApi(
         )
     }
 
-    private fun parseTranslationResponse(content: String): TranslationResponse {
-        val lines = content.lineSequence().toList()
-        val detectedLanguage = LANG_REGEX.find(lines.getOrNull(0) ?: "")?.groupValues?.getOrNull(1) ?: ""
-        val targetLanguage = LANG_REGEX.find(lines.getOrNull(1) ?: "")?.groupValues?.getOrNull(1) ?: ""
-        val translatedContent =
-            lines
-                .drop(2)
-                .joinToString(separator = "\n")
-                .trim()
-                .ifBlank { content.trim() }
-        return TranslationResponse(
-            lang = detectedLanguage,
-            targetLang = targetLanguage,
-            content = translatedContent,
-        )
-    }
-
     private fun summaryRequest(
         content: String,
         settings: OpenAISettings,
@@ -443,44 +393,6 @@ class OpenAIApi(
                     ChatMessage(
                         role = ChatRole.User,
                         messageContent = TextContent("Summarize:\n\n$content"),
-                    ),
-                ),
-            responseFormat = ChatResponseFormat.Text,
-        )
-
-    private fun translationRequest(
-        content: String,
-        targetLanguage: String,
-        settings: OpenAISettings,
-        preserveHtml: Boolean,
-    ): ChatCompletionRequest =
-        ChatCompletionRequest(
-            model = ModelId(id = settings.modelId),
-            messages =
-                listOf(
-                    ChatMessage(
-                        role = ChatRole.System,
-                        messageContent =
-                            TextContent(
-                                listOf(
-                                    "You are an assistant in an RSS reader app, translating article content.",
-                                    "The app language is '$appLang'.",
-                                    "Translate the article into '$targetLanguage'.",
-                                    "First line must be exactly: 'Lang: \"ISO code\"' for the detected source language.",
-                                    "Second line must be exactly: 'Lang: \"ISO code\"' for the translation target language.",
-                                    "Do not use markdown formatting on either Lang line.",
-                                    if (preserveHtml) {
-                                        "The content is HTML. Preserve all HTML tags, attributes, links, and element order. Translate only the human-readable text while returning valid HTML."
-                                    } else {
-                                        "Preserve structure, paragraph breaks, bullet lists, emphasis, and quoted text."
-                                    },
-                                    "Output only the translated content after the two Lang lines.",
-                                ).joinToString(separator = " "),
-                            ),
-                    ),
-                    ChatMessage(
-                        role = ChatRole.User,
-                        messageContent = TextContent("Translate:\n\n$content"),
                     ),
                 ),
             responseFormat = ChatResponseFormat.Text,
