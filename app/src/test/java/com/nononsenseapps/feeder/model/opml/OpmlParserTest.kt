@@ -90,6 +90,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_OPENAI_AZURE_VERSION -> "2023-05-15"
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
+                        UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                         UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
@@ -162,6 +163,7 @@ class OpmlParserTest : DIAware {
 //                        key = "test-api-key",
 //                    )
 //                )
+                settingsStore.setApplyBlocklistToSummaries(true)
             }
 
             confirmVerified(settingsStore)

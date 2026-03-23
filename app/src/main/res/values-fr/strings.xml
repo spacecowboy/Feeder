@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Impossible d\'ouvrir l\'article dans un onglet personnalisé</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Actualisation</string>
+    <string name="pref_paging_mode_title">Mode Page</string>
+    <string name="pref_paging_mode_description">Naviguer dans la liste des articles en \"tournant les pages\" au lieu de scroller de manière continu. Optimisé pour les appareils à encre électronique (e-ink).</string>
+    <string name="pref_animated_paging_title">Animation des pages</string>
+    <string name="pref_animated_paging_description">Animer brièvement le changement de page. Peut créer un effet de ghosting sur certains appareils e-ink.</string>
 </resources>

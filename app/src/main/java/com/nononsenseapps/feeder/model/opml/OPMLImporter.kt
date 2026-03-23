@@ -155,6 +155,7 @@ open class OPMLImporter(
                     }
                 settingsStore.setTranslationOpenAiSettings(newSettings)
             }
+            UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> settingsStore.setApplyBlocklistToSummaries(value.toBoolean())
         }
     }
 

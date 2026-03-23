@@ -282,4 +282,9 @@
     <string name="could_not_add_font">Nu a putut fi adăugat font-ul</string>
     <string name="could_not_remove_font">Nu a putut fi șters fontul</string>
     <string name="something_went_wrong">Ceva nu a mers bine</string>
+    <string name="feed_search_suggestions_header">Sugestii</string>
+    <string name="apply_blocklist_to_summaries">Aplică la rezumate</string>
+    <string name="open_article_in_reader">Deschideți in cititor</string>
+    <string name="widget_title">Feeder</string>
+    <string name="openai_settings_info">Compatibil cu mulți furnizori IA, dar nu toți</string>
 </resources>
