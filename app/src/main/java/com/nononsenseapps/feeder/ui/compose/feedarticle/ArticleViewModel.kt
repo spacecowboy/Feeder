@@ -156,17 +156,15 @@ class ArticleViewModel(
             val openAiSummary = params[12] as OpenAISummaryState
             val showTranslated = params[13] as Boolean
             val translationState = params[14] as ArticleTranslationState
+            val translationConfig = ArticleTranslationConfig.from(translationSettings, preferredTranslationLanguage)
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
-                    ?.takeIf { it.isFullText == isFullText }
+                    ?.takeIf { it.isFullText == isFullText && it.config == translationConfig }
             val alreadyInPreferredLanguage =
                 (translationState as? ArticleTranslationState.AlreadyInPreferredLanguage)
-                    ?.takeIf { it.isFullText == isFullText }
+                    ?.takeIf { it.isFullText == isFullText && it.config == translationConfig }
             val isShowingTranslated = showTranslated && currentTranslation != null
-            val canRequestTranslation =
-                translationSettings.canUseAsTranslationApi &&
-                    preferredTranslationLanguage.isNotBlank() &&
-                    !article?.link.isNullOrEmpty()
+            val canRequestTranslation = translationConfig != null && !article?.link.isNullOrEmpty()
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -237,12 +235,14 @@ class ArticleViewModel(
             ) { article, fullTextOverride, settings, targetLanguage ->
                 val currentArticle = article ?: return@combine null
                 val fullText = fullTextOverride ?: currentArticle.fullTextByDefault
-                if (!settings.canUseAsTranslationApi || targetLanguage.trim().isBlank() || currentArticle.link.isNullOrBlank()) {
+                val config = ArticleTranslationConfig.from(settings, targetLanguage.trim())
+                if (config == null || currentArticle.link.isNullOrBlank()) {
                     return@combine null
                 }
                 ArticleLanguageCheck(
                     article = currentArticle,
                     isFullText = fullText,
+                    config = config,
                 )
             }.collectLatest { request ->
                 if (request == null) {
@@ -265,12 +265,15 @@ class ArticleViewModel(
                         title = request.article.title,
                         html = html,
                         isFullText = request.isFullText,
+                        settings = request.config.settings,
+                        targetLanguage = request.config.targetLanguage,
                     )
 
                 if (sourceLanguage != null) {
                     setAlreadyInPreferredLanguage(
                         sourceLanguage = sourceLanguage,
                         isFullText = request.isFullText,
+                        config = request.config,
                     )
                 } else {
                     clearAlreadyInPreferredLanguageState(request.isFullText)
@@ -422,7 +425,7 @@ class ArticleViewModel(
             val article = Article(feedItem)
             val readFullText = displayFullTextOverride.value ?: feedItem.fullTextByDefault
             val textToRead =
-                if (showTranslatedContent.value) {
+                if (isShowingCurrentTranslation()) {
                     Either.catching<TSSError, List<AnnotatedString>>(
                         onCatch = {
                             when (it) {
@@ -524,7 +527,7 @@ class ArticleViewModel(
     }
 
     fun translate() {
-        if (showTranslatedContent.value) {
+        if (isShowingCurrentTranslation()) {
             showTranslatedContent.value = false
             return
         }
@@ -535,20 +538,16 @@ class ArticleViewModel(
     private fun translateCurrentArticle() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val targetLanguage = repository.preferredTranslationLanguage.value.trim()
-                if (targetLanguage.isBlank()) {
-                    toastMaker.makeToast(R.string.set_translation_language_first)
+                val config = currentArticleTranslationConfig()
+                if (config == null) {
+                    if (repository.preferredTranslationLanguage.value.trim().isBlank()) {
+                        toastMaker.makeToast(R.string.set_translation_language_first)
+                    }
                     clearTranslatedContent()
                     return@launch
                 }
-
                 val article = articleFlow.value ?: return@launch
                 val fullText = isFullText
-                if (!repository.translationOpenAISettings.value.canUseAsTranslationApi) {
-                    clearTranslatedContent()
-                    return@launch
-                }
-
                 val html = loadArticleHtml(article, fullText)
                 val sourceLanguage =
                     translationManager.detectArticleAlreadyInTargetLanguage(
@@ -556,11 +555,17 @@ class ArticleViewModel(
                         title = article.title,
                         html = html,
                         isFullText = fullText,
+                        settings = config.settings,
+                        targetLanguage = config.targetLanguage,
                     )
                 if (sourceLanguage != null) {
+                    if (currentArticleTranslationConfig() != config) {
+                        return@launch
+                    }
                     setAlreadyInPreferredLanguage(
                         sourceLanguage = sourceLanguage,
                         isFullText = fullText,
+                        config = config,
                     )
                     return@launch
                 }
@@ -572,6 +577,8 @@ class ArticleViewModel(
                         title = article.title,
                         html = html,
                         isFullText = fullText,
+                        settings = config.settings,
+                        targetLanguage = config.targetLanguage,
                     ) ?: throw IllegalStateException("Translation failed")
 
                 translatedArticleContent.value =
@@ -579,11 +586,15 @@ class ArticleViewModel(
                         translation.translatedHtml,
                         article.feedUrl ?: "",
                     )
+                if (currentArticleTranslationConfig() != config) {
+                    return@launch
+                }
                 articleTranslationState.value =
                     ArticleTranslationState.Result(
                         translatedTitle = translation.translatedTitle,
                         sourceLanguage = translation.sourceLanguage,
                         isFullText = fullText,
+                        config = config,
                     )
             } catch (e: Exception) {
                 clearTranslatedContent()
@@ -595,13 +606,19 @@ class ArticleViewModel(
     private suspend fun loadTranslatedArticle(
         article: Article,
         fullText: Boolean,
-    ): ArticleTranslation =
-        translationManager.getOrTranslateArticle(
+    ): ArticleTranslation {
+        val config =
+            currentArticleTranslationConfig()
+                ?: throw IllegalStateException("Translation failed")
+        return translationManager.getOrTranslateArticle(
             itemId = article.id,
             title = article.title,
             html = loadArticleHtml(article, fullText),
             isFullText = fullText,
+            settings = config.settings,
+            targetLanguage = config.targetLanguage,
         ) ?: throw IllegalStateException("Translation failed")
+    }
 
     private suspend fun convertSummaryToAnnotatedStrings(summaryResult: OpenAIApi.SummaryResult): List<AnnotatedString> =
         withContext(Dispatchers.Default) {
@@ -697,12 +714,26 @@ class ArticleViewModel(
             }
         }
 
-    private fun canTranslateArticles(): Boolean =
-        repository.translationOpenAISettings.value.canUseAsTranslationApi && repository.preferredTranslationLanguage.value.trim().isNotBlank()
+    private fun currentArticleTranslationConfig(): ArticleTranslationConfig? =
+        ArticleTranslationConfig.from(
+            settings = repository.translationOpenAISettings.value,
+            targetLanguage = repository.preferredTranslationLanguage.value.trim(),
+        )
+
+    private fun canTranslateArticles(): Boolean = currentArticleTranslationConfig() != null
+
+    private fun isShowingCurrentTranslation(): Boolean {
+        val config = currentArticleTranslationConfig() ?: return false
+        val translationState = articleTranslationState.value as? ArticleTranslationState.Result ?: return false
+        return showTranslatedContent.value &&
+            translationState.isFullText == isFullText &&
+            translationState.config == config
+    }
 
     private fun setAlreadyInPreferredLanguage(
         sourceLanguage: String,
         isFullText: Boolean,
+        config: ArticleTranslationConfig,
     ) {
         showTranslatedContent.value = false
         translatedArticleContent.value = LinearArticle(emptyList())
@@ -710,6 +741,7 @@ class ArticleViewModel(
             ArticleTranslationState.AlreadyInPreferredLanguage(
                 sourceLanguage = sourceLanguage,
                 isFullText = isFullText,
+                config = config,
             )
     }
 
@@ -811,18 +843,37 @@ sealed interface ArticleTranslationState {
     data class AlreadyInPreferredLanguage(
         val sourceLanguage: String,
         val isFullText: Boolean,
+        val config: ArticleTranslationConfig,
     ) : ArticleTranslationState
 
     data class Result(
         val translatedTitle: String,
         val sourceLanguage: String,
         val isFullText: Boolean,
+        val config: ArticleTranslationConfig,
     ) : ArticleTranslationState
+}
+
+data class ArticleTranslationConfig(
+    val settings: OpenAISettings,
+    val targetLanguage: String,
+) {
+    companion object {
+        fun from(
+            settings: OpenAISettings,
+            targetLanguage: String,
+        ): ArticleTranslationConfig? =
+            ArticleTranslationConfig(
+                settings = settings,
+                targetLanguage = targetLanguage,
+            ).takeIf { it.settings.canUseAsTranslationApi && it.targetLanguage.isNotBlank() }
+    }
 }
 
 private data class ArticleLanguageCheck(
     val article: Article,
     val isFullText: Boolean,
+    val config: ArticleTranslationConfig,
 )
 
 interface ArticleItemKeyHolder {

@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.CachedFeedListItemTranslation
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
@@ -236,48 +237,24 @@ class FeedViewModel(
         viewModelScope.launch {
             try {
                 val cached = translationManager.getCachedTranslatedFeedListItem(item, config.settings, config.targetLanguage)
-                if (cached.hasCachedTranslation) {
-                    translatedFeedCardEntries.update { current ->
-                        current
-                            .filterKeys { it.itemId != source.itemId } + (
-                            source to
-                                FeedCardTranslationEntry(
-                                    item = cached.item,
-                                    isComplete = cached.isFullyCached,
-                                )
-                            )
-                    }
+                if (currentFeedCardTranslationConfig() != config) {
+                    return@launch
                 }
+                updateTranslatedFeedCard(source, cached)
 
                 if (cached.isFullyCached) {
                     return@launch
                 }
 
-                val translatedItem = translationManager.translateFeedListItem(item)
-                val updatedCached =
-                    translationManager.getCachedTranslatedFeedListItem(
+                val translatedResult =
+                    translationManager.translateFeedListItem(
                         item = item,
                         settings = config.settings,
                         targetLanguage = config.targetLanguage,
                     )
-                val displayItem =
-                    when {
-                        updatedCached.hasCachedTranslation -> updatedCached.item
-                        translatedItem != item -> translatedItem
-                        else -> null
-                    }
 
-                if (displayItem != null && currentFeedCardTranslationConfig() == config) {
-                    translatedFeedCardEntries.update { current ->
-                        current
-                            .filterKeys { it.itemId != source.itemId } + (
-                            source to
-                                FeedCardTranslationEntry(
-                                    item = displayItem,
-                                    isComplete = updatedCached.isFullyCached,
-                                )
-                            )
-                    }
+                if (currentFeedCardTranslationConfig() == config) {
+                    updateTranslatedFeedCard(source, translatedResult)
                 }
             } finally {
                 inFlightFeedCardTranslations.remove(request)
@@ -293,6 +270,26 @@ class FeedViewModel(
             settings = settings,
             targetLanguage = targetLanguage,
         ).takeIf { it.enabled && it.settings.canUseAsTranslationApi && it.targetLanguage.isNotBlank() }
+    }
+
+    private fun updateTranslatedFeedCard(
+        source: FeedCardSource,
+        translation: CachedFeedListItemTranslation,
+    ) {
+        if (!translation.hasCachedTranslation) {
+            return
+        }
+
+        translatedFeedCardEntries.update { current ->
+            current
+                .filterKeys { it.itemId != source.itemId } + (
+                source to
+                    FeedCardTranslationEntry(
+                        item = translation.item,
+                        isComplete = translation.isFullyCached,
+                    )
+                )
+        }
     }
 
     private val filterMenuVisible: MutableStateFlow<Boolean> =
