@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Impossibile aprire l\'articolo nella scheda personalizzata</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Aggiornamento</string>
+    <string name="pref_paging_mode_title">Modalità a pagine</string>
+    <string name="pref_paging_mode_description">Naviga gli articoli \"voltando pagina\" invece dello scorrimento continuo. Ottimizzata per dispositivi e-ink.</string>
+    <string name="pref_animated_paging_title">Cambio pagina animato</string>
+    <string name="pref_animated_paging_description">Anima brevemente il passaggio tra le pagine. Potrebbe causare effetto ghosting su alcuni dispositivi e-ink.</string>
 </resources>
