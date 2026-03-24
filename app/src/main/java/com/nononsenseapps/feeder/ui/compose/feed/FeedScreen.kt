@@ -123,9 +123,9 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedCardSource
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
+import com.nononsenseapps.feeder.ui.compose.feedarticle.TranslatedFeedCards
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnreadAndSaved
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
@@ -174,7 +174,6 @@ fun FeedScreen(
     val toastMaker: ToastMaker by instance()
     val viewState: FeedScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val translatedFeedCards by viewModel.translatedFeedCards.collectAsStateWithLifecycle()
-    val feedCardTranslationGeneration by viewModel.feedCardTranslationGeneration.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
     val pagedNavDrawerItems = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
 
@@ -460,7 +459,6 @@ fun FeedScreen(
             feedGridState = feedGridState,
             pagedFeedItems = pagedFeedItems,
             translatedFeedCards = translatedFeedCards,
-            feedCardTranslationGeneration = feedCardTranslationGeneration,
             onTranslateFeedCard = viewModel::translateFeedCardIfNeeded,
         )
     }
@@ -507,8 +505,7 @@ fun FeedScreen(
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    translatedFeedCards: Map<FeedCardSource, FeedListItem>,
-    feedCardTranslationGeneration: Int,
+    translatedFeedCards: TranslatedFeedCards,
     onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -965,7 +962,6 @@ fun FeedScreen(
                     gridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
                     translatedFeedCards = translatedFeedCards,
-                    feedCardTranslationGeneration = feedCardTranslationGeneration,
                     onTranslateFeedCard = onTranslateFeedCard,
                     modifier = innerModifier,
                 )
@@ -995,7 +991,6 @@ fun FeedScreen(
                     listState = feedListState,
                     pagedFeedItems = pagedFeedItems,
                     translatedFeedCards = translatedFeedCards,
-                    feedCardTranslationGeneration = feedCardTranslationGeneration,
                     onTranslateFeedCard = onTranslateFeedCard,
                     modifier = innerModifier,
                 )
@@ -1229,8 +1224,7 @@ fun FeedListContent(
     onSetBookmark: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    translatedFeedCards: Map<FeedCardSource, FeedListItem>,
-    feedCardTranslationGeneration: Int,
+    translatedFeedCards: TranslatedFeedCards,
     onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -1315,12 +1309,12 @@ fun FeedListContent(
                     contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
                     val loadedItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
-                    val previewItem = mergeTranslatedFeedCard(loadedItem, translatedFeedCards)
+                    val previewItem = translatedFeedCards.merge(loadedItem)
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
 
-                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, feedCardTranslationGeneration) {
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation) {
                         onTranslateFeedCard(loadedItem)
                     }
 
@@ -1492,8 +1486,7 @@ fun FeedGridContent(
     onSetBookmark: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    translatedFeedCards: Map<FeedCardSource, FeedListItem>,
-    feedCardTranslationGeneration: Int,
+    translatedFeedCards: TranslatedFeedCards,
     onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -1557,12 +1550,12 @@ fun FeedGridContent(
                     contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
                     val loadedItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
-                    val previewItem = mergeTranslatedFeedCard(loadedItem, translatedFeedCards)
+                    val previewItem = translatedFeedCards.merge(loadedItem)
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
 
-                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, feedCardTranslationGeneration) {
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation) {
                         onTranslateFeedCard(loadedItem)
                     }
 
@@ -1740,17 +1733,6 @@ private val PLACEHOLDER_ITEM =
         rawPubDate = null,
         wordCount = 0,
     )
-
-private fun mergeTranslatedFeedCard(
-    item: FeedListItem,
-    translatedFeedCards: Map<FeedCardSource, FeedListItem>,
-): FeedListItem =
-    translatedFeedCards[FeedCardSource.from(item)]?.let { translatedItem ->
-        item.copy(
-            title = translatedItem.title.ifBlank { item.title },
-            snippet = translatedItem.snippet.ifBlank { item.snippet },
-        )
-    } ?: item
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

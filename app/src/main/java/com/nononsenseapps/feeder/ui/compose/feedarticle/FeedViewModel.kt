@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -69,16 +68,18 @@ class FeedViewModel(
             .cachedIn(viewModelScope)
 
     private val translatedFeedCardEntries = MutableStateFlow<Map<FeedCardSource, FeedCardTranslationEntry>>(emptyMap())
-    val translatedFeedCards: StateFlow<Map<FeedCardSource, FeedListItem>> =
-        translatedFeedCardEntries
-            .map { entries -> entries.mapValues { it.value.item } }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                emptyMap(),
+    private val feedCardTranslationGeneration = MutableStateFlow(0)
+    val translatedFeedCards: StateFlow<TranslatedFeedCards> =
+        combine(translatedFeedCardEntries, feedCardTranslationGeneration) { entries, generation ->
+            TranslatedFeedCards(
+                generation = generation,
+                items = entries.mapValues { it.value.item },
             )
-    private val _feedCardTranslationGeneration = MutableStateFlow(0)
-    val feedCardTranslationGeneration = _feedCardTranslationGeneration.asStateFlow()
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            TranslatedFeedCards(),
+        )
     private val inFlightFeedCardTranslations = ConcurrentHashMap.newKeySet<FeedCardTranslationRequest>()
 
     val pagedNavDrawerItems: Flow<PagingData<FeedUnreadCount>> =
@@ -197,7 +198,7 @@ class FeedViewModel(
                 .collect {
                     inFlightFeedCardTranslations.clear()
                     translatedFeedCardEntries.value = emptyMap()
-                    _feedCardTranslationGeneration.update { it + 1 }
+                    feedCardTranslationGeneration.update { it + 1 }
                 }
         }
     }
@@ -655,6 +656,20 @@ private data class FeedCardTranslationConfig(
     val targetLanguage: String,
 )
 
+@Immutable
+class TranslatedFeedCards internal constructor(
+    val generation: Int = 0,
+    private val items: Map<FeedCardSource, FeedListItem> = emptyMap(),
+) {
+    fun merge(item: FeedListItem): FeedListItem =
+        items[FeedCardSource.from(item)]?.let { translatedItem ->
+            item.copy(
+                title = translatedItem.title.ifBlank { item.title },
+                snippet = translatedItem.snippet.ifBlank { item.snippet },
+            )
+        } ?: item
+}
+
 private fun FeedCardTranslationConfig.isActive(): Boolean =
     enabled && settings.canUseAsTranslationApi && targetLanguage.isNotBlank()
 
@@ -671,7 +686,7 @@ private data class FeedCardTranslationEntry(
     val isComplete: Boolean,
 )
 
-data class FeedCardSource(
+internal data class FeedCardSource(
     val itemId: Long,
     val title: String,
     val snippet: String,

@@ -153,16 +153,6 @@ class OpmlParserTest : DIAware {
                 settingsStore.setTranslationOpenAiSettings(any())
                 settingsStore.setTranslateFeedCardsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
-//                settingsStore.setOpenAiSettings(
-//                    OpenAISettings(
-//                        modelId = "gpt-4o-mini",
-//                        baseUrl = "https://api.openai.com",
-//                        timeoutSeconds = 45,
-//                        azureApiVersion = "2023-05-15",
-//                        azureDeploymentId = "test-deployment",
-//                        key = "test-api-key",
-//                    )
-//                )
                 settingsStore.setApplyBlocklistToSummaries(true)
             }
 
