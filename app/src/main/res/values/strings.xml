@@ -344,7 +344,7 @@
   <string name="preferred_translation_language_description">Use a language name or code like Spanish, es, French, or fr-CA.</string>
   <string name="translation_language_placeholder">For example: English or en</string>
   <string name="set_translation_language_first">Set a preferred translation language in AI settings</string>
-  <string name="translate_feed_cards_by_default">Translate article previews by default</string>
+  <string name="translate_feed_cards_by_default">Translate article previews</string>
   <string name="translate_articles_by_default">Translate articles by default</string>
 
   <string name="widget_title">Feeder</string>
