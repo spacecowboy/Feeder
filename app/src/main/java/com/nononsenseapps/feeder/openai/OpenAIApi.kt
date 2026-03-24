@@ -41,7 +41,6 @@ class OpenAIApi(
     private data class DeepLTranslateRequest(
         val text: List<String>,
         val target_lang: String,
-        val source_lang: String? = null,
         val tag_handling: String? = null,
         val split_sentences: String = "nonewlines",
         val preserve_formatting: Boolean = true,
@@ -104,15 +103,8 @@ class OpenAIApi(
         val content: String
 
         data class Success(
-            val id: String,
-            val created: Long,
-            val model: String,
             override val content: String,
-            val promptTokens: Int,
-            val completeTokens: Int,
-            val totalTokens: Int,
             val detectedLanguage: String,
-            val targetLanguage: String,
         ) : TranslationResult
 
         data class Error(
@@ -311,11 +303,8 @@ class OpenAIApi(
         }.fold(
             onSuccess = { translation ->
                 staticTranslationSuccess(
-                    id = "deepl",
-                    model = "deepl",
                     content = translation.text,
                     detectedLanguage = translation.detected_source_language,
-                    targetLanguage = targetLanguageCode,
                 )
             },
             onFailure = { TranslationResult.Error(content = it.messageOrCause().orEmpty()) },
@@ -345,11 +334,8 @@ class OpenAIApi(
         }.fold(
             onSuccess = { translation ->
                 staticTranslationSuccess(
-                    id = "google",
-                    model = "google-translate",
                     content = translation.translatedText,
                     detectedLanguage = translation.detectedSourceLanguage.orEmpty(),
-                    targetLanguage = targetLanguageCode,
                 )
             },
             onFailure = { TranslationResult.Error(content = it.messageOrCause().orEmpty()) },
@@ -432,22 +418,12 @@ class OpenAIApi(
     }
 
     private fun staticTranslationSuccess(
-        id: String,
-        model: String,
         content: String,
         detectedLanguage: String,
-        targetLanguage: String,
     ): TranslationResult.Success =
         TranslationResult.Success(
-            id = id,
-            model = model,
             content = content,
-            created = 0L,
-            promptTokens = 0,
-            completeTokens = 0,
-            totalTokens = 0,
             detectedLanguage = detectedLanguage,
-            targetLanguage = targetLanguage,
         )
 
     private fun httpFailure(

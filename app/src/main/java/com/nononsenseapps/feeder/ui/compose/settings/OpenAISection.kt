@@ -226,7 +226,8 @@ private fun OpenAISectionItem(
     }
 }
 
-fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
+private fun isTimeoutInputValid(input: String): Boolean =
+    input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
 
 @Composable
 private fun OpenAISectionEdit(
@@ -631,7 +632,7 @@ private fun OpenAIModelsStatus(
         }
 
         is OpenAIModelsState.Error -> {
-            val hasError by remember(state.message) { mutableStateOf(state.message.isNotEmpty()) }
+            val hasError = state.message.isNotEmpty()
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onEvent(OpenAISettingsEvent.ShowModelsError(show = !showError)) },

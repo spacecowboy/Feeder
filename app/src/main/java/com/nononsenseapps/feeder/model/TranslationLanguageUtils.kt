@@ -9,7 +9,7 @@ import java.util.Locale
 private const val MAX_LANGUAGE_DETECTION_TEXT_LENGTH = 4000
 private const val MIN_LANGUAGE_DETECTION_LETTERS = 20
 
-internal data class ComparableTranslationLanguage(
+private data class ComparableTranslationLanguage(
     val language: String,
     val region: String? = null,
 )
