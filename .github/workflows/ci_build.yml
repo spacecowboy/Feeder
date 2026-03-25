@@ -126,7 +126,7 @@ jobs:
         run: ./gradlew testFdroidDebug
 
   fdroid-apk:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -173,7 +173,7 @@ jobs:
           path: app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
 
   play-apk:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -220,7 +220,7 @@ jobs:
           path: app/build/outputs/apk/play/release/app-play-release.apk
 
   play-bundle:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
