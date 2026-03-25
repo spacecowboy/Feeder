@@ -166,7 +166,7 @@ jobs:
         run: ./gradlew assembleFdroidRelease
 
       - name: save fdroid apk
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: fdroid-apk
           retention-days: 1
@@ -213,7 +213,7 @@ jobs:
         run: ./gradlew assemblePlayRelease
 
       - name: save play apk
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: play-apk
           retention-days: 1
@@ -260,7 +260,7 @@ jobs:
         run: ./gradlew bundlePlayRelease
 
       - name: save bundle
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: bundle
           retention-days: 1
@@ -348,7 +348,7 @@ jobs:
           KEYALIAS: ${{ secrets.KEYALIAS }}
 
       - name: copy bundle
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: bundle
           path: app/build/outputs/
@@ -400,7 +400,7 @@ jobs:
           KEYALIAS: ${{ secrets.KEYALIAS }}
 
       - name: copy bundle
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: bundle
           path: app/build/outputs/
@@ -433,12 +433,12 @@ jobs:
         run: mkdir -p build && ci/latest-changelog.py CHANGELOG.md > build/release_notes.md
 
       - name: copy fdroid apk
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: fdroid-apk
 
       - name: copy play apk
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: play-apk
 
