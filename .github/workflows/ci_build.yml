@@ -17,7 +17,7 @@ jobs:
       contents: read
     steps:
       - name: perform the checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -45,7 +45,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -77,7 +77,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -105,7 +105,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -133,7 +133,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -180,7 +180,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -227,7 +227,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -327,7 +327,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -379,7 +379,7 @@ jobs:
       contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -423,7 +423,7 @@ jobs:
       contents: write
     steps:
       - name: perform the checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: "recursive"
           fetch-depth: 0
