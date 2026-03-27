@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Artikli avamine kohendatud vahekaardil ei õnnestu</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Andmed on uuendamisel</string>
+    <string name="pref_paging_mode_title">Lehekülgedeks jagamine</string>
+    <string name="pref_animated_paging_title">Animeeritud lehekülgedeks jagamine</string>
+    <string name="pref_paging_mode_description">Tavalise kerimise asemel liigu artiklite vahel nii, et see tundub „lehtede pööramisena“. Sobib e-tindi seadmetele.</string>
+    <string name="pref_animated_paging_description">Korraks animeeri lehe pööramisi. Võib mõnedes e-tindi seadmetes tekitada varjutamise efekti.</string>
 </resources>
