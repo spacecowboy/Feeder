@@ -286,7 +286,7 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed =
     ParsedFeed(
         title = title,
         home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
-        feed_url = feedLink,
+        feed_url = feedLink?.let { relativeLinkIntoAbsolute(url, it) } ?: url.toString(),
         description = description,
         user_comment = "",
         next_url = "",
