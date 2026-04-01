@@ -271,9 +271,9 @@ fun ArticleScreen(
                                         LinkOpener.DEFAULT_BROWSER -> R.string.open_article_in_default_browser
                                         else -> R.string.open_article_in_custom_tab
                                     },
-                                )
+                                ),
                             )
-                        }
+                        },
                     ) {
                         IconButton(
                             onClick = {
@@ -281,16 +281,17 @@ fun ArticleScreen(
                                     LinkOpener.DEFAULT_BROWSER -> onOpenInBrowser()
                                     else -> onOpenInCustomTab()
                                 }
-                            }
+                            },
                         ) {
                             Icon(
                                 Icons.Default.OpenInBrowser,
-                                contentDescription = stringResource(
-                                    when (viewState.itemInReaderOpener) {
-                                        LinkOpener.DEFAULT_BROWSER -> R.string.open_article_in_default_browser
-                                        else -> R.string.open_article_in_custom_tab
-                                    },
-                                ),
+                                contentDescription =
+                                    stringResource(
+                                        when (viewState.itemInReaderOpener) {
+                                            LinkOpener.DEFAULT_BROWSER -> R.string.open_article_in_default_browser
+                                            else -> R.string.open_article_in_custom_tab
+                                        },
+                                    ),
                             )
                         }
                     }
