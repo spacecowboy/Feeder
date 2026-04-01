@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Nie udało się otworzyć artykułu w niestandardowej karcie</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Odświeżanie</string>
+    <string name="pref_paging_mode_title">Tryb przewracania stron</string>
+    <string name="pref_paging_mode_description">Przeglądaj artykuły przez „przewracanie stron” zamiast ciągłego przewijania. Przystosowane do urządzeń z e-papierem</string>
+    <string name="pref_animated_paging_title">Animowane przewracanie stron</string>
+    <string name="pref_animated_paging_description">Krótko animuj przewracanie stron. Może powodować efekt ghostingu na niektórych urządzeniach z e-papierem</string>
 </resources>

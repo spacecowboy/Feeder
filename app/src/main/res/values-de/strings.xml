@@ -292,4 +292,8 @@
     <string name="no_article_link_custom_tab">Artikel kann nicht im In‑App‑Browser geöffnet werden</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Aktualisierung</string>
+    <string name="pref_paging_mode_title">Seitenmodus</string>
+    <string name="pref_paging_mode_description">Navigiere durch die Artikel mit „Seiten umblättern“, anstatt endlos zu scrollen. Optimiert für E-Papier-Geräte.</string>
+    <string name="pref_animated_paging_title">Animiertes Umblättern</string>
+    <string name="pref_animated_paging_description">Seitenwechsel kurz animieren. Kann auf einigen E-Papier-Geräte zu Geisterbildern führen.</string>
 </resources>
