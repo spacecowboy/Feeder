@@ -286,8 +286,7 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed =
     ParsedFeed(
         title = title,
         home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
-        // Keep original URL to maintain authentication data and/or tokens in query params
-        feed_url = url.toString(),
+        feed_url = feedLink,
         description = description,
         user_comment = "",
         next_url = "",
