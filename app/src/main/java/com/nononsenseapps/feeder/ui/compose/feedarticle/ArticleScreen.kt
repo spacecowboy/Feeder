@@ -141,7 +141,10 @@ fun ArticleScreen(
                     Intent.createChooser(
                         Intent(Intent.ACTION_SEND).apply {
                             if (viewState.articleLink != null) {
-                                putExtra(Intent.EXTRA_TEXT, viewState.articleLink)
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    com.nononsenseapps.feeder.util.stripTrackingParameters(viewState.articleLink),
+                                )
                             }
                             putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
                             type = "text/plain"

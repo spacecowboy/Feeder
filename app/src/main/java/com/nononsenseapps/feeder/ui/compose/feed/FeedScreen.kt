@@ -1350,7 +1350,10 @@ fun FeedListContent(
                                 Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
                                         if (previewItem.link != null) {
-                                            putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                com.nononsenseapps.feeder.util.stripTrackingParameters(previewItem.link),
+                                            )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                         type = "text/plain"
@@ -1584,7 +1587,10 @@ fun FeedGridContent(
                                 Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
                                         if (previewItem.link != null) {
-                                            putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                com.nononsenseapps.feeder.util.stripTrackingParameters(previewItem.link),
+                                            )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                         type = "text/plain"
