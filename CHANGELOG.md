@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.19.0] - 2026-04-03
+
+### 🚀 Features
+- Paging functionality with volume buttons or tap on sides (#1062) by @jprichter in [#1062](https://github.com/spacecowboy/feeder/pull/1062) 
+
+### 🐛 Bug Fixes & Minor Changes
+- Fixed widget not showing any content (#1066) by @MatthewTighe in [#1066](https://github.com/spacecowboy/feeder/pull/1066) 
+- Added divider after 'All feeds' and 'Saved articles' in the NavDrawer.  (#1065) by @JaredTweed in [#1065](https://github.com/spacecowboy/feeder/pull/1065) 
+- Added 'Apply blocklist to summary' to opml import/export (#1073) by @xn-7492 in [#1073](https://github.com/spacecowboy/feeder/pull/1073) 
+
+### 🌐 Translations
+- Updated Spanish translation using Weblate by @jesusFx in [commit](https://github.com/spacecowboy/feeder/commit/23452acf915cf1a569eb3242d6f722bd75a955d3)
+- Updated Italian translation using Weblate by @Wiccio in [commit](https://github.com/spacecowboy/feeder/commit/ec494b3930c2007ce9f78c8484a9694459d1ad76)
+- Updated Estonian translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/7a5c2c207c6a87783cc07d0435525283926485fa)
+- Updated Ukrainian translation using Weblate by @andmizyk in [commit](https://github.com/spacecowboy/feeder/commit/bba9405eec2468ea9bbe82cb99cab78d10a47374)
+- Updated Bulgarian translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/0091b4ba81b0240b447d653dc96881da9606af32)
+- Updated German translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/f1a622cd2436d2bb22775ebd2c5671e473171498)
+- Updated Chinese (Simplified Han script) translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/921ba1ba52cd84cab658ef169cb2b3f6a761095d)
+- Updated Hungarian translation using Weblate by @ghostofsparta222 in [commit](https://github.com/spacecowboy/feeder/commit/a2319b16a319b27d7491b3ccfc8200be2ee9a6ed)
+- Updated French translation using Weblate by @Matth7878 in [commit](https://github.com/spacecowboy/feeder/commit/959584cb0552f67f4a5c9e1e68bd31cd733d27a8)
+- Updated Polish translation using Weblate by @Aga-C in [commit](https://github.com/spacecowboy/feeder/commit/ba82e61ec0b7d027185723f0badbce8193badd51)
+- Updated Czech translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/6da6fcff568977890d89d2b093b8df718c333f48)
+- Updated Serbian translation using Weblate by @eevan78 in [commit](https://github.com/spacecowboy/feeder/commit/83582d9785ea08f12ab85c062e27ddec26b973c0)
+- Updated Romanian translation using Weblate by @dutudev in [#1053](https://github.com/spacecowboy/feeder/pull/1053) 
+
+### ❤️  New Contributors
+* @dutudev made their first contribution in [#1053](https://github.com/spacecowboy/feeder/pull/1053)
+* @jprichter made their first contribution in [#1062](https://github.com/spacecowboy/feeder/pull/1062)
+* @liutikas made their first contribution in [#1051](https://github.com/spacecowboy/feeder/pull/1051)
+
 ## [2.18.0] - 2026-03-07
 
 ### 🚀 Features
@@ -608,10 +638,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded Android Gradle Plugin by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/77ee1febc64cdf621d61630b530226c29336a285)
 
 ### 🌐 Translations
-- Translated using Weblate (Dutch) by @fincentxyz in [#365](https://github.com/spacecowboy/feeder/pull/365) 
+- Translated using Weblate (Dutch) in [#365](https://github.com/spacecowboy/feeder/pull/365) 
 
-### ❤️  New Contributors
-* @fincentxyz made their first contribution in [#365](https://github.com/spacecowboy/feeder/pull/365)
 
 ## [2.6.31] - 2024-08-20
 
@@ -4752,6 +4780,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.19.0]: https://github.com/spacecowboy/feeder/compare/2.18.0..2.19.0
 [2.18.0]: https://github.com/spacecowboy/feeder/compare/2.17.0..2.18.0
 [2.17.0]: https://github.com/spacecowboy/feeder/compare/2.16.1..2.17.0
 [2.16.1]: https://github.com/spacecowboy/feeder/compare/2.16.0..2.16.1
