@@ -149,6 +149,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
+import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1352,7 +1353,7 @@ fun FeedListContent(
                                         if (previewItem.link != null) {
                                             putExtra(
                                                 Intent.EXTRA_TEXT,
-                                                com.nononsenseapps.feeder.util.stripTrackingParameters(previewItem.link),
+                                                stripTrackingParameters(previewItem.link),
                                             )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
@@ -1589,7 +1590,7 @@ fun FeedGridContent(
                                         if (previewItem.link != null) {
                                             putExtra(
                                                 Intent.EXTRA_TEXT,
-                                                com.nononsenseapps.feeder.util.stripTrackingParameters(previewItem.link),
+                                                stripTrackingParameters(previewItem.link),
                                             )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
