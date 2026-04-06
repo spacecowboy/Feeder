@@ -11,8 +11,8 @@ import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
 import io.ktor.http.takeFrom
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -55,29 +55,6 @@ class OpenAIApi(
     @Serializable
     private data class DeepLTranslateResponse(
         val translations: List<DeepLTranslation>,
-    )
-
-    @Serializable
-    private data class GoogleTranslateRequest(
-        val q: List<String>,
-        val target: String,
-        val format: String? = null,
-    )
-
-    @Serializable
-    private data class GoogleTranslation(
-        val translatedText: String,
-        val detectedSourceLanguage: String? = null,
-    )
-
-    @Serializable
-    private data class GoogleTranslateData(
-        val translations: List<GoogleTranslation>,
-    )
-
-    @Serializable
-    private data class GoogleTranslateResponse(
-        val data: GoogleTranslateData,
     )
 
     sealed interface SummaryResult {
@@ -144,9 +121,6 @@ class OpenAIApi(
         if (settings.isDeepL) {
             return verifyDeepLSettings(settings)
         }
-        if (settings.isGoogleTranslate) {
-            return verifyGoogleTranslateSettings(settings)
-        }
         if (settings.isPerplexity) {
             return ModelsResult.Success(ids = emptyList())
         }
@@ -194,36 +168,11 @@ class OpenAIApi(
         )
     }
 
-    private fun verifyGoogleTranslateSettings(settings: OpenAISettings): ModelsResult {
-        return runCatching {
-            postJson<GoogleTranslateRequest, GoogleTranslateResponse>(
-                settings = settings,
-                url = settings.toGoogleTranslateUrl(),
-                requestBody =
-                    GoogleTranslateRequest(
-                        q = listOf("Hello"),
-                        target = "de",
-                        format = "text",
-                    ),
-                failurePrefix = "Google Translate verification failed",
-            )
-        }.fold(
-            onSuccess = { response ->
-                if (response.data.translations.isEmpty()) {
-                    ModelsResult.Error(message = "Google Translate verification failed: no translation was returned")
-                } else {
-                    ModelsResult.Success(ids = emptyList())
-                }
-            },
-            onFailure = { ModelsResult.Error(message = it.messageOrCause()) },
-        )
-    }
-
     suspend fun summarize(
         content: String,
         settings: OpenAISettings,
     ): SummaryResult {
-        if (settings.isDeepL || settings.isGoogleTranslate) {
+        if (settings.isDeepL) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
         try {
@@ -268,14 +217,6 @@ class OpenAIApi(
                 preserveHtml = preserveHtml,
             )
         }
-        if (settings.isGoogleTranslate) {
-            return translateWithGoogle(
-                settings = settings,
-                content = content,
-                targetLanguage = targetLanguage,
-                preserveHtml = preserveHtml,
-            )
-        }
         return TranslationResult.Error(content = "Translation is not supported for this provider")
     }
 
@@ -305,37 +246,6 @@ class OpenAIApi(
                 staticTranslationSuccess(
                     content = translation.text,
                     detectedLanguage = translation.detected_source_language,
-                )
-            },
-            onFailure = { TranslationResult.Error(content = it.messageOrCause().orEmpty()) },
-        )
-    }
-
-    private fun translateWithGoogle(
-        settings: OpenAISettings,
-        content: String,
-        targetLanguage: String,
-        preserveHtml: Boolean,
-    ): TranslationResult {
-        val targetLanguageCode = targetLanguage.toGoogleTargetLanguageCode()
-        return runCatching {
-            postJson<GoogleTranslateRequest, GoogleTranslateResponse>(
-                settings = settings,
-                url = settings.toGoogleTranslateUrl(),
-                requestBody =
-                    GoogleTranslateRequest(
-                        q = listOf(content),
-                        target = targetLanguageCode,
-                        format = if (preserveHtml) "html" else "text",
-                    ),
-                failurePrefix = "Google Translate request failed",
-            ).data.translations.firstOrNull()
-                ?: throw IllegalStateException("Google Translate returned no translations")
-        }.fold(
-            onSuccess = { translation ->
-                staticTranslationSuccess(
-                    content = translation.translatedText,
-                    detectedLanguage = translation.detectedSourceLanguage.orEmpty(),
                 )
             },
             onFailure = { TranslationResult.Error(content = it.messageOrCause().orEmpty()) },
@@ -412,7 +322,7 @@ class OpenAIApi(
                 }
 
                 json.decodeFromString<ResponseBodyT>(
-                    response.body?.string() ?: throw IllegalStateException("Response content is null"),
+                    response.body.string(),
                 )
             }
     }
@@ -446,12 +356,9 @@ val OpenAISettings.isPerplexity: Boolean
 val OpenAISettings.isDeepL: Boolean
     get() = baseUrl.contains("deepl.com", ignoreCase = true)
 
-val OpenAISettings.isGoogleTranslate: Boolean
-    get() = baseUrl.contains("translation.googleapis.com", ignoreCase = true)
-
 val OpenAISettings.isValid: Boolean
     get() =
-        if (isDeepL || isGoogleTranslate) {
+        if (isDeepL) {
             key.isNotEmpty()
         } else {
             modelId.isNotEmpty() &&
@@ -460,13 +367,13 @@ val OpenAISettings.isValid: Boolean
         }
 
 val OpenAISettings.canSummarize: Boolean
-    get() = isValid && !isDeepL && !isGoogleTranslate
+    get() = isValid && !isDeepL
 
 val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
 val OpenAISettings.canUseAsTranslationApi: Boolean
-    get() = canTranslate && (isDeepL || isGoogleTranslate)
+    get() = canTranslate && isDeepL
 
 val OpenAISettings.isBlankConfiguration: Boolean
     get() =
@@ -504,14 +411,6 @@ fun OpenAISettings.toDeepLTranslateUrl(): String =
         .takeFrom(normalizedDeepLBaseUrl())
         .also {
             it.appendPathSegments("v2", "translate")
-        }.buildString()
-
-fun OpenAISettings.toGoogleTranslateUrl(): String =
-    URLBuilder()
-        .takeFrom(normalizedGoogleTranslateBaseUrl())
-        .also {
-            it.appendPathSegments("language", "translate", "v2")
-            it.parameters.append("key", key)
         }.buildString()
 
 fun OpenAIHost.toUrl(): URLBuilder =
@@ -562,43 +461,6 @@ private fun String.toDeepLTargetLanguageCode(): String =
             }
         }
 
-private fun String.toGoogleTargetLanguageCode(): String =
-    trim()
-        .uppercase()
-        .replace('-', '_')
-        .let { normalized ->
-            when (normalized) {
-                "ENGLISH", "EN", "EN_US", "EN_GB", "ENGLISH_US", "ENGLISH_GB", "AMERICAN_ENGLISH", "BRITISH_ENGLISH" -> "en"
-                "GERMAN", "DE" -> "de"
-                "FRENCH", "FR" -> "fr"
-                "SPANISH", "ES" -> "es"
-                "PORTUGUESE", "PT", "PT_BR", "PT_PT", "PORTUGUESE_BR", "PORTUGUESE_PT", "BRAZILIAN_PORTUGUESE", "EUROPEAN_PORTUGUESE" -> "pt"
-                "ITALIAN", "IT" -> "it"
-                "DUTCH", "NL" -> "nl"
-                "POLISH", "PL" -> "pl"
-                "RUSSIAN", "RU" -> "ru"
-                "JAPANESE", "JA" -> "ja"
-                "CHINESE", "ZH", "ZH_CN", "ZH_TW" -> "zh"
-                "CZECH", "CS" -> "cs"
-                "DANISH", "DA" -> "da"
-                "GREEK", "EL" -> "el"
-                "FINNISH", "FI" -> "fi"
-                "HUNGARIAN", "HU" -> "hu"
-                "INDONESIAN", "ID" -> "id"
-                "KOREAN", "KO" -> "ko"
-                "LITHUANIAN", "LT" -> "lt"
-                "LATVIAN", "LV" -> "lv"
-                "NORWEGIAN", "NB", "NORWEGIAN_BOKMAL", "NO" -> "no"
-                "ROMANIAN", "RO" -> "ro"
-                "SLOVAK", "SK" -> "sk"
-                "SLOVENIAN", "SL" -> "sl"
-                "SWEDISH", "SV" -> "sv"
-                "TURKISH", "TR" -> "tr"
-                "UKRAINIAN", "UK" -> "uk"
-                else -> normalized.lowercase().replace('_', '-')
-            }
-        }
-
 private fun OpenAISettings.normalizedDeepLBaseUrl(): String {
     val normalizedBaseUrl = baseUrl.trim().trimEnd('/').removeSuffix("/v2/translate")
     val defaultBaseUrl =
@@ -615,10 +477,3 @@ private fun OpenAISettings.normalizedDeepLBaseUrl(): String {
         else -> normalizedBaseUrl
     }
 }
-
-private fun OpenAISettings.normalizedGoogleTranslateBaseUrl(): String =
-    baseUrl
-        .trim()
-        .trimEnd('/')
-        .removeSuffix("/language/translate/v2")
-        .ifBlank { "https://translation.googleapis.com" }

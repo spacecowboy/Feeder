@@ -8,18 +8,6 @@ import kotlin.test.assertTrue
 
 class TranslationLanguageUtilsKtTest {
     private val deepLSettings = OpenAISettings(baseUrl = "https://api.deepl.com")
-    private val googleSettings = OpenAISettings(baseUrl = "https://translation.googleapis.com")
-
-    @Test
-    fun googleTreatsRegionalEnglishAsSameLanguage() {
-        assertTrue(
-            detectedLanguageMatchesTranslationTarget(
-                detectedLanguage = "en-US",
-                targetLanguage = "English",
-                settings = googleSettings,
-            ),
-        )
-    }
 
     @Test
     fun deepLAllowsGenericEnglishToMatchRegionalVariant() {

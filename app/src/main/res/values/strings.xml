@@ -294,7 +294,6 @@
   <string name="provider_openai_compatible">OpenAI or compatible</string>
   <string name="provider_azure_openai">Azure OpenAI</string>
   <string name="provider_deepl">DeepL</string>
-  <string name="provider_google_translate">Google Cloud Translation</string>
   <string name="base_url_optional">Base URL (optional)</string>
   <string name="translation_endpoint">Translation endpoint</string>
   <string name="azure_api_version">Azure API version</string>
@@ -318,8 +317,6 @@
   <string name="azure_openai_settings_could_not_be_verified">The Azure OpenAI settings could not be verified.</string>
   <string name="verifying_deepl_key">Verifying DeepL key...</string>
   <string name="deepl_key_could_not_be_verified">The DeepL key could not be verified.</string>
-  <string name="verifying_google_cloud_translation_key">Verifying Google Cloud Translation key...</string>
-  <string name="google_cloud_translation_key_could_not_be_verified">The Google Cloud Translation key could not be verified.</string>
   <string name="open_drawer_on_fab">Show feeds after marking all as read</string>
   <string name="on">On</string>
   <string name="off">Off</string>

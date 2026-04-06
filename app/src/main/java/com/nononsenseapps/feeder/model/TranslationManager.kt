@@ -8,7 +8,6 @@ import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
-import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
@@ -369,7 +368,6 @@ class TranslationManager(
         val provider =
             when {
                 settings.isDeepL -> "deepl"
-                settings.isGoogleTranslate -> "google"
                 else -> "openai"
             }
         return filePathProvider.cacheDir

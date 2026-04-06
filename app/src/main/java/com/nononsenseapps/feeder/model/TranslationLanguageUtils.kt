@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.openai.isDeepL
-import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import org.jsoup.Jsoup
 import java.util.Locale
 
@@ -75,62 +74,10 @@ private fun String.asComparableTranslationTarget(settings: OpenAISettings): Comp
     }
 
     return when {
-        settings.isGoogleTranslate -> normalized.asGoogleComparableTranslationTarget()
         settings.isDeepL -> normalized.asDeepLComparableTranslationTarget()
         else -> normalized.asGenericComparableTranslationTarget()
     }
 }
-
-private fun String.asGoogleComparableTranslationTarget(): ComparableTranslationLanguage? =
-    when (this) {
-        "ENGLISH",
-        "EN",
-        "EN_US",
-        "EN_GB",
-        "ENGLISH_US",
-        "ENGLISH_GB",
-        "ENGLISH_UK",
-        "AMERICAN_ENGLISH",
-        "BRITISH_ENGLISH",
-        -> ComparableTranslationLanguage(language = "en")
-
-        "GERMAN", "DE" -> ComparableTranslationLanguage(language = "de")
-        "FRENCH", "FR" -> ComparableTranslationLanguage(language = "fr")
-        "SPANISH", "ES" -> ComparableTranslationLanguage(language = "es")
-        "PORTUGUESE",
-        "PT",
-        "PT_BR",
-        "PT_PT",
-        "PORTUGUESE_BR",
-        "PORTUGUESE_PT",
-        "BRAZILIAN_PORTUGUESE",
-        "EUROPEAN_PORTUGUESE",
-        -> ComparableTranslationLanguage(language = "pt")
-
-        "ITALIAN", "IT" -> ComparableTranslationLanguage(language = "it")
-        "DUTCH", "NL" -> ComparableTranslationLanguage(language = "nl")
-        "POLISH", "PL" -> ComparableTranslationLanguage(language = "pl")
-        "RUSSIAN", "RU" -> ComparableTranslationLanguage(language = "ru")
-        "JAPANESE", "JA" -> ComparableTranslationLanguage(language = "ja")
-        "CHINESE", "ZH", "ZH_CN", "ZH_TW" -> ComparableTranslationLanguage(language = "zh")
-        "CZECH", "CS" -> ComparableTranslationLanguage(language = "cs")
-        "DANISH", "DA" -> ComparableTranslationLanguage(language = "da")
-        "GREEK", "EL" -> ComparableTranslationLanguage(language = "el")
-        "FINNISH", "FI" -> ComparableTranslationLanguage(language = "fi")
-        "HUNGARIAN", "HU" -> ComparableTranslationLanguage(language = "hu")
-        "INDONESIAN", "ID" -> ComparableTranslationLanguage(language = "id")
-        "KOREAN", "KO" -> ComparableTranslationLanguage(language = "ko")
-        "LITHUANIAN", "LT" -> ComparableTranslationLanguage(language = "lt")
-        "LATVIAN", "LV" -> ComparableTranslationLanguage(language = "lv")
-        "NORWEGIAN", "NB", "NORWEGIAN_BOKMAL", "NO" -> ComparableTranslationLanguage(language = "no")
-        "ROMANIAN", "RO" -> ComparableTranslationLanguage(language = "ro")
-        "SLOVAK", "SK" -> ComparableTranslationLanguage(language = "sk")
-        "SLOVENIAN", "SL" -> ComparableTranslationLanguage(language = "sl")
-        "SWEDISH", "SV" -> ComparableTranslationLanguage(language = "sv")
-        "TURKISH", "TR" -> ComparableTranslationLanguage(language = "tr")
-        "UKRAINIAN", "UK" -> ComparableTranslationLanguage(language = "uk")
-        else -> asFallbackComparableTranslationTarget(preserveRegion = false)
-    }
 
 private fun String.asDeepLComparableTranslationTarget(): ComparableTranslationLanguage? =
     when (this) {

@@ -61,7 +61,6 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
-import com.nononsenseapps.feeder.openai.isGoogleTranslate
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 enum class OpenAISectionType {
@@ -247,7 +246,7 @@ private fun OpenAISectionEdit(
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
     val hasProvider = provider != AIProviderPreset.NONE
-    val isTranslationOnlyProvider = provider.isDeepL || provider.isGoogleTranslate
+    val isTranslationOnlyProvider = provider.isDeepL
 
     LaunchedEffect(current, provider) {
         if (provider != AIProviderPreset.NONE) {
@@ -682,7 +681,6 @@ private enum class AIProviderPreset(
     val supportsSummary: Boolean,
     val supportsTranslation: Boolean,
     val isDeepL: Boolean,
-    val isGoogleTranslate: Boolean,
     val endpoint: String,
 ) {
     NONE(
@@ -690,7 +688,6 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = true,
         isDeepL = false,
-        isGoogleTranslate = false,
         endpoint = "",
     ),
     OPENAI_COMPATIBLE(
@@ -698,7 +695,6 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
-        isGoogleTranslate = false,
         endpoint = "",
     ),
     AZURE_OPENAI(
@@ -706,7 +702,6 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
-        isGoogleTranslate = false,
         endpoint = "",
     ),
     DEEPL(
@@ -714,16 +709,7 @@ private enum class AIProviderPreset(
         supportsSummary = false,
         supportsTranslation = true,
         isDeepL = true,
-        isGoogleTranslate = false,
         endpoint = "https://api.deepl.com/v2/translate",
-    ),
-    GOOGLE_TRANSLATE(
-        titleRes = R.string.provider_google_translate,
-        supportsSummary = false,
-        supportsTranslation = true,
-        isDeepL = false,
-        isGoogleTranslate = true,
-        endpoint = "https://translation.googleapis.com/language/translate/v2",
     ),
     ;
 
@@ -757,14 +743,6 @@ private enum class AIProviderPreset(
                     azureDeploymentId = "",
                     modelId = "",
                 )
-
-            GOOGLE_TRANSLATE ->
-                settings.copy(
-                    baseUrl = "https://translation.googleapis.com",
-                    azureApiVersion = "",
-                    azureDeploymentId = "",
-                    modelId = "",
-                )
         }
 
     companion object {
@@ -780,7 +758,6 @@ private enum class AIProviderPreset(
             when {
                 settings.isBlankConfiguration -> NONE
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
-                settings.isGoogleTranslate -> GOOGLE_TRANSLATE
                 settings.isDeepL -> DEEPL
                 else -> OPENAI_COMPATIBLE
             }
@@ -898,15 +875,6 @@ private fun OpenAISettings.validationMessage(
                 else -> null
             }
         }
-
-        AIProviderPreset.GOOGLE_TRANSLATE -> {
-            when (modelsResult) {
-                OpenAIModelsState.None, is OpenAIModelsState.Loading -> context.getString(R.string.verifying_google_cloud_translation_key)
-                is OpenAIModelsState.Error ->
-                    modelsResult.message.ifBlank { context.getString(R.string.google_cloud_translation_key_could_not_be_verified) }
-                else -> null
-            }
-        }
     }
 }
 
@@ -923,14 +891,14 @@ private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAI
         OpenAISectionType.Summary ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isGoogleTranslate -> OpenAISettings()
+                settings.isDeepL -> OpenAISettings()
                 else -> settings
             }
 
         OpenAISectionType.Translation ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isGoogleTranslate -> settings
+                settings.isDeepL -> settings
                 else -> OpenAISettings()
             }
     }
