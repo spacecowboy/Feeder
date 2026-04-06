@@ -7,6 +7,13 @@ current_default="$(git describe --tags --abbrev=0 "${TARGET}")"
 echo >&2 -n "Current version [${current_default}]"
 
 NEXT_VERSION="$(git cliff --bumped-version)"
+if git tag --list | grep -qx "${NEXT_VERSION}"; then
+  SUFFIX=1
+  while git tag --list | grep -qx "${NEXT_VERSION}-${SUFFIX}"; do
+    SUFFIX=$(( SUFFIX + 1 ))
+  done
+  NEXT_VERSION="${NEXT_VERSION}-${SUFFIX}"
+fi
 echo >&2 -n "Next version [${NEXT_VERSION}]. Press any key to continue..."
 read -r
 
