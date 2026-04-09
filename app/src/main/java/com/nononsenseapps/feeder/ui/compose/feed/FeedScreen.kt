@@ -149,8 +149,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.isCompactDevice
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
-import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.logDebug
+import com.nononsenseapps.feeder.util.stripTrackingParameters
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI

@@ -141,10 +141,11 @@ fun ArticleScreen(
                 val intent =
                     Intent.createChooser(
                         Intent(Intent.ACTION_SEND).apply {
-                            if (viewState.articleLink != null) {
+                            val articleLink = viewState.articleLink
+                            if (articleLink != null) {
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    stripTrackingParameters(viewState.articleLink),
+                                    stripTrackingParameters(articleLink),
                                 )
                             }
                             putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
