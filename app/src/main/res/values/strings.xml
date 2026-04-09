@@ -315,7 +315,7 @@
   <string name="enter_azure_api_version_before_saving">Enter your Azure API version before saving.</string>
   <string name="verifying_azure_openai_settings">Verifying Azure OpenAI settings...</string>
   <string name="azure_openai_settings_could_not_be_verified">The Azure OpenAI settings could not be verified.</string>
-  <string name="verifying_deepl_key">Verifying DeepL key...</string>
+  <string name="verifying_deepl_key">Verifying DeepL key…</string>
   <string name="deepl_key_could_not_be_verified">The DeepL key could not be verified.</string>
   <string name="open_drawer_on_fab">Show feeds after marking all as read</string>
   <string name="on">On</string>
