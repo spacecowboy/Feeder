@@ -225,8 +225,7 @@ private fun OpenAISectionItem(
     }
 }
 
-private fun isTimeoutInputValid(input: String): Boolean =
-    input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
+private fun isTimeoutInputValid(input: String): Boolean = input.trim().isNotEmpty() && input.toIntOrNull()?.takeIf { it in 30..600 } != null
 
 @Composable
 private fun OpenAISectionEdit(
@@ -762,8 +761,7 @@ private enum class AIProviderPreset(
                 else -> OPENAI_COMPATIBLE
             }
 
-        private fun inferAzureBaseUrl(settings: OpenAISettings): String =
-            settings.baseUrl.takeIf { it.contains("openai.azure.com", ignoreCase = true) }.orEmpty()
+        private fun inferAzureBaseUrl(settings: OpenAISettings): String = settings.baseUrl.takeIf { it.contains("openai.azure.com", ignoreCase = true) }.orEmpty()
 
         private fun inferDeepLBaseUrl(settings: OpenAISettings): String =
             when {

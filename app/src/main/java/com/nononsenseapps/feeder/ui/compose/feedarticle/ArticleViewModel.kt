@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
 import com.nononsenseapps.feeder.model.LocaleOverride
@@ -30,7 +31,6 @@ import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
-import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.model.UnsupportedContentType
 import com.nononsenseapps.feeder.model.html.HtmlLinearizer
@@ -48,8 +48,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -710,7 +710,10 @@ class ArticleViewModel(
             }
 
     private fun canTranslateArticles(): Boolean =
-        repository.translationOpenAISettings.value.canUseAsTranslationApi && repository.preferredTranslationLanguage.value.trim().isNotBlank()
+        repository.translationOpenAISettings.value.canUseAsTranslationApi &&
+            repository.preferredTranslationLanguage.value
+                .trim()
+                .isNotBlank()
 
     private fun setAlreadyInPreferredLanguage(
         sourceLanguage: String,

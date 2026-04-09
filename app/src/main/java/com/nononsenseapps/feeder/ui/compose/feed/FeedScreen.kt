@@ -1314,7 +1314,7 @@ fun FeedListContent(
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
 
-                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation) {
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
                         onTranslateFeedCard(loadedItem)
                     }
 
@@ -1555,7 +1555,7 @@ fun FeedGridContent(
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
 
-                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation) {
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
                         onTranslateFeedCard(loadedItem)
                     }
 

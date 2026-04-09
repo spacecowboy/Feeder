@@ -17,16 +17,17 @@ internal fun prepareTextForLanguageDetection(
     content: String,
     preserveHtml: Boolean,
 ): String =
-    (if (preserveHtml) {
-        Jsoup.parse(content).text()
-    } else {
-        content
-    }).replace(Regex("\\s+"), " ")
+    (
+        if (preserveHtml) {
+            Jsoup.parse(content).text()
+        } else {
+            content
+        }
+    ).replace(Regex("\\s+"), " ")
         .trim()
         .take(MAX_LANGUAGE_DETECTION_TEXT_LENGTH)
 
-internal fun hasEnoughTextForLanguageDetection(content: String): Boolean =
-    content.count(Char::isLetter) >= MIN_LANGUAGE_DETECTION_LETTERS
+internal fun hasEnoughTextForLanguageDetection(content: String): Boolean = content.count(Char::isLetter) >= MIN_LANGUAGE_DETECTION_LETTERS
 
 internal fun detectedLanguageMatchesTranslationTarget(
     detectedLanguage: String,
@@ -123,8 +124,7 @@ private fun String.asDeepLComparableTranslationTarget(): ComparableTranslationLa
         else -> asFallbackComparableTranslationTarget(preserveRegion = true)
     }
 
-private fun String.asGenericComparableTranslationTarget(): ComparableTranslationLanguage? =
-    asDeepLComparableTranslationTarget() ?: asFallbackComparableTranslationTarget(preserveRegion = true)
+private fun String.asGenericComparableTranslationTarget(): ComparableTranslationLanguage? = asDeepLComparableTranslationTarget() ?: asFallbackComparableTranslationTarget(preserveRegion = true)
 
 private fun String.asFallbackComparableTranslationTarget(preserveRegion: Boolean): ComparableTranslationLanguage? {
     val normalized = lowercase(Locale.ROOT).replace('_', '-')

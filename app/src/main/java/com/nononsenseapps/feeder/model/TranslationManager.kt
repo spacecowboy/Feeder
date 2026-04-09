@@ -3,8 +3,8 @@ package com.nononsenseapps.feeder.model
 import android.app.Application
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
-import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.OpenAIApi
+import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
@@ -13,8 +13,8 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -29,7 +29,11 @@ class TranslationManager(
     private val repository: Repository by instance()
     private val openAIApi: OpenAIApi by instance()
     private val filePathProvider: FilePathProvider by instance()
-    private val json = Json { ignoreUnknownKeys = true; prettyPrint = false }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            prettyPrint = false
+        }
 
     suspend fun getCachedTranslatedFeedListItem(
         item: FeedListItem,
@@ -161,7 +165,9 @@ class TranslationManager(
                     ""
                 }
             val sourceLanguage =
-                translatedSnippetResult?.detectedLanguageOrBlank().orEmpty()
+                translatedSnippetResult
+                    ?.detectedLanguageOrBlank()
+                    .orEmpty()
                     .ifBlank { translatedTitleResult?.detectedLanguageOrBlank().orEmpty() }
                     .ifBlank { cachedSourceLanguage }
 
@@ -294,7 +300,9 @@ class TranslationManager(
                     ""
                 }
             val sourceLanguage =
-                translatedHtmlResult?.detectedLanguageOrBlank().orEmpty()
+                translatedHtmlResult
+                    ?.detectedLanguageOrBlank()
+                    .orEmpty()
                     .ifBlank { translatedTitleResult?.detectedLanguageOrBlank().orEmpty() }
                     .ifBlank { cachedSourceLanguage }
 
@@ -389,8 +397,7 @@ class TranslationManager(
             .digest(value.toByteArray())
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
 
-    private fun translationSettings(): OpenAISettings =
-        repository.translationOpenAISettings.value.takeIf { it.canUseAsTranslationApi } ?: OpenAISettings()
+    private fun translationSettings(): OpenAISettings = repository.translationOpenAISettings.value.takeIf { it.canUseAsTranslationApi } ?: OpenAISettings()
 
     private suspend fun translateOrNull(
         content: String,
@@ -426,8 +433,9 @@ class TranslationManager(
                     preserveHtml = preserveHtml,
                 )
         ) {
-            is TranslationResult.Success -> result.takeIf { it.content.isNotBlank() }
-                ?: throw IllegalStateException("Translation failed")
+            is TranslationResult.Success ->
+                result.takeIf { it.content.isNotBlank() }
+                    ?: throw IllegalStateException("Translation failed")
             is TranslationResult.Error -> throw IllegalStateException(result.content.ifBlank { "Translation failed" })
         }
 

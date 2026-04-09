@@ -280,13 +280,12 @@ class FeedViewModel(
         }
     }
 
-    private fun currentFeedCardTranslationConfig(): FeedCardTranslationConfig? {
-        return feedCardTranslationConfig(
+    private fun currentFeedCardTranslationConfig(): FeedCardTranslationConfig? =
+        feedCardTranslationConfig(
             enabled = repository.translateFeedCardsByDefault.value,
             settings = repository.translationOpenAISettings.value,
             targetLanguage = repository.preferredTranslationLanguage.value,
         ).takeIf(FeedCardTranslationConfig::isActive)
-    }
 
     private fun feedCardTranslationConfig(
         enabled: Boolean,
@@ -582,7 +581,6 @@ class FeedViewModel(
     override fun setRead(value: Boolean) {
         repository.setFeedListFilterRead(value)
     }
-
 }
 
 @Immutable
@@ -670,8 +668,7 @@ class TranslatedFeedCards internal constructor(
         } ?: item
 }
 
-private fun FeedCardTranslationConfig.isActive(): Boolean =
-    enabled && settings.canUseAsTranslationApi && targetLanguage.isNotBlank()
+private fun FeedCardTranslationConfig.isActive(): Boolean = enabled && settings.canUseAsTranslationApi && targetLanguage.isNotBlank()
 
 private data class FeedCardTranslationRequest(
     val itemId: Long,

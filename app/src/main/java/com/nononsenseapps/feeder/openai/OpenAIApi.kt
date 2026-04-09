@@ -110,7 +110,8 @@ class OpenAIApi(
     }
 
     private fun okHttpClient(timeoutSeconds: Int): OkHttpClient =
-        OkHttpClient.Builder()
+        OkHttpClient
+            .Builder()
             .callTimeout(timeoutSeconds.coerceIn(30, 600).toLong(), TimeUnit.SECONDS)
             .build()
 
@@ -143,8 +144,8 @@ class OpenAIApi(
         }
     }
 
-    private fun verifyDeepLSettings(settings: OpenAISettings): ModelsResult {
-        return runCatching {
+    private fun verifyDeepLSettings(settings: OpenAISettings): ModelsResult =
+        runCatching {
             postJson<DeepLTranslateRequest, DeepLTranslateResponse>(
                 settings = settings,
                 url = settings.toDeepLTranslateUrl(),
@@ -166,7 +167,6 @@ class OpenAIApi(
             },
             onFailure = { ModelsResult.Error(message = it.messageOrCause()) },
         )
-    }
 
     suspend fun summarize(
         content: String,
@@ -302,7 +302,8 @@ class OpenAIApi(
         headers: Map<String, String> = emptyMap(),
     ): ResponseBodyT {
         val request =
-            Request.Builder()
+            Request
+                .Builder()
                 .url(url)
                 .apply {
                     header("Content-Type", "application/json")
