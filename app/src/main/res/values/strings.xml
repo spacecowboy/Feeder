@@ -308,7 +308,7 @@
   <string name="enter_api_key_before_saving">Enter an API key before saving.</string>
   <string name="enter_deepl_api_key_before_saving">Enter a DeepL API key before saving.</string>
   <string name="enter_model_id_before_saving">Enter a model id before saving.</string>
-  <string name="verifying_api_settings">Verifying API settings...</string>
+  <string name="verifying_api_settings">Verifying API settings…</string>
   <string name="api_settings_could_not_be_verified">The API settings could not be verified.</string>
   <string name="enter_azure_endpoint_before_saving">Enter your Azure endpoint before saving.</string>
   <string name="enter_azure_deployment_id_before_saving">Enter your Azure deployment id before saving.</string>
