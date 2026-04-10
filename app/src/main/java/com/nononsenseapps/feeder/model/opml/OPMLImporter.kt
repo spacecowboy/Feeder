@@ -132,7 +132,7 @@ open class OPMLImporter(
                 settingsStore.setOpenAiSettings(newSettings)
             }
 
-            UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE ->
+            UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE ->
                 settingsStore.setPreferredTranslationLanguage(value)
 
             UserSettings.SETTING_TRANSLATION_API_KEY,
@@ -142,7 +142,7 @@ open class OPMLImporter(
             UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID,
             UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS,
             -> {
-                val current = settingsStore.translationOpenAiSettings.value
+                val current = settingsStore.translationApiSettings.value
                 val newSettings =
                     when (UserSettings.fromKey(key)) {
                         UserSettings.SETTING_TRANSLATION_API_KEY -> current.copy(key = value)
@@ -153,7 +153,7 @@ open class OPMLImporter(
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
                         else -> current
                     }
-                settingsStore.setTranslationOpenAiSettings(newSettings)
+                settingsStore.setTranslationApiSettings(newSettings)
             }
             UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> settingsStore.setApplyBlocklistToSummaries(value.toBoolean())
         }

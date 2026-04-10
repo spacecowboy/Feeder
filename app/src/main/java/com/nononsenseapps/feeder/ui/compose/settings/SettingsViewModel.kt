@@ -190,13 +190,13 @@ class SettingsViewModel(
         )
     }
 
-    fun onTranslationOpenAISettingsEvent(event: OpenAISettingsEvent) {
+    fun onTranslationApiSettingsEvent(event: TranslationApiSettingsEvent) {
         handleOpenAISettingsEvent(
             event = event,
-            modelsState = translationOpenAIModelsState,
-            currentState = { _viewState.value.translationAIState },
-            updateState = { updatedState -> _viewState.value = _viewState.value.copy(translationAIState = updatedState) },
-            saveSettings = repository::setTranslationOpenAiSettings,
+            modelsState = translationApiModelsState,
+            currentState = { _viewState.value.translationApiState },
+            updateState = { updatedState -> _viewState.value = _viewState.value.copy(translationApiState = updatedState) },
+            saveSettings = repository::setTranslationApiSettings,
         )
     }
 
@@ -205,7 +205,7 @@ class SettingsViewModel(
     }
 
     private val summaryOpenAIModelsState = MutableStateFlow<OpenAIModelsState>(OpenAIModelsState.None)
-    private val translationOpenAIModelsState = MutableStateFlow<OpenAIModelsState>(OpenAIModelsState.None)
+    private val translationApiModelsState = MutableStateFlow<TranslationApiModelsState>(OpenAIModelsState.None)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
@@ -263,9 +263,9 @@ class SettingsViewModel(
                 repository.showTitleUnreadCount,
                 repository.openAISettings,
                 summaryOpenAIModelsState,
-                repository.translationOpenAISettings,
+                repository.translationApiSettings,
                 repository.preferredTranslationLanguage,
-                translationOpenAIModelsState,
+                translationApiModelsState,
                 repository.isOpenDrawerOnFab,
                 repository.translateFeedCardsByDefault,
                 repository.translateArticlesByDefault,
@@ -307,8 +307,8 @@ class SettingsViewModel(
                             settings = params[27] as OpenAISettings,
                             modelsResult = params[28] as OpenAIModelsState,
                         ),
-                    translationAIState =
-                        _viewState.value.translationAIState.copy(
+                    translationApiState =
+                        _viewState.value.translationApiState.copy(
                             settings = params[29] as OpenAISettings,
                             modelsResult = params[31] as OpenAIModelsState,
                         ),
@@ -401,7 +401,7 @@ data class SettingsViewState(
     val showOnlyTitle: Boolean = false,
     val isOpenAdjacent: Boolean = true,
     val summaryAIState: OpenAISettingsState = OpenAISettingsState(),
-    val translationAIState: OpenAISettingsState = OpenAISettingsState(),
+    val translationApiState: TranslationApiSettingsState = TranslationApiSettingsState(),
     val preferredTranslationLanguage: String = "",
     val canTranslate: Boolean = false,
     val showReadingTime: Boolean = false,
@@ -462,3 +462,9 @@ sealed interface OpenAISettingsEvent {
         val show: Boolean,
     ) : OpenAISettingsEvent
 }
+
+typealias TranslationApiSettingsState = OpenAISettingsState
+
+typealias TranslationApiModelsState = OpenAIModelsState
+
+typealias TranslationApiSettingsEvent = OpenAISettingsEvent

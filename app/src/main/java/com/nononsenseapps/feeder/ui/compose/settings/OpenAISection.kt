@@ -185,6 +185,28 @@ fun OpenAISection(
 }
 
 @Composable
+fun TranslationApiSection(
+    title: String,
+    info: String,
+    state: TranslationApiSettingsState,
+    onEvent: (TranslationApiSettingsEvent) -> Unit,
+    preferredTranslationLanguage: String = "",
+    onPreferredTranslationLanguageChange: (String) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    OpenAISection(
+        title = title,
+        info = info,
+        state = state,
+        onEvent = onEvent,
+        section = OpenAISectionType.Translation,
+        preferredTranslationLanguage = preferredTranslationLanguage,
+        onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun OpenAISectionItem(
     title: String,
     settings: OpenAISettings,
@@ -799,18 +821,17 @@ private fun SummaryOpenAISectionReadPreview() {
 @Preview("tablet", device = Devices.PIXEL_C)
 @Preview("phone", device = Devices.PIXEL_7)
 @Composable
-private fun TranslationOpenAISectionEditPreview() {
-    OpenAISection(
+private fun TranslationApiSectionEditPreview() {
+    TranslationApiSection(
         title = "Translation API",
         info = "Used for translation.",
         state =
-            OpenAISettingsState(
+            TranslationApiSettingsState(
                 settings = OpenAISettings(),
                 modelsResult = OpenAIModelsState.None,
                 isEditMode = true,
             ),
         onEvent = { },
-        section = OpenAISectionType.Translation,
         preferredTranslationLanguage = "English",
     )
 }

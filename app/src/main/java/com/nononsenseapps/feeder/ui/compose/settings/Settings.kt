@@ -207,8 +207,8 @@ fun SettingsScreen(
             },
             summaryAIState = viewState.summaryAIState,
             onSummaryAIEvent = settingsViewModel::onSummaryOpenAISettingsEvent,
-            translationAIState = viewState.translationAIState,
-            onTranslationAIEvent = settingsViewModel::onTranslationOpenAISettingsEvent,
+            translationApiState = viewState.translationApiState,
+            onTranslationApiEvent = settingsViewModel::onTranslationApiSettingsEvent,
             preferredTranslationLanguage = viewState.preferredTranslationLanguage,
             onPreferredTranslationLanguageChange = settingsViewModel::setPreferredTranslationLanguage,
             canTranslate = viewState.canTranslate,
@@ -299,8 +299,8 @@ private fun SettingsScreenPreview() {
             onStartActivity = {},
             summaryAIState = OpenAISettingsState(),
             onSummaryAIEvent = {},
-            translationAIState = OpenAISettingsState(),
-            onTranslationAIEvent = {},
+            translationApiState = TranslationApiSettingsState(),
+            onTranslationApiEvent = {},
             preferredTranslationLanguage = "",
             onPreferredTranslationLanguageChange = {},
             canTranslate = false,
@@ -382,8 +382,8 @@ fun SettingsList(
     onStartActivity: (intent: Intent) -> Unit,
     summaryAIState: OpenAISettingsState,
     onSummaryAIEvent: (OpenAISettingsEvent) -> Unit,
-    translationAIState: OpenAISettingsState,
-    onTranslationAIEvent: (OpenAISettingsEvent) -> Unit,
+    translationApiState: TranslationApiSettingsState,
+    onTranslationApiEvent: (TranslationApiSettingsEvent) -> Unit,
     preferredTranslationLanguage: String,
     onPreferredTranslationLanguageChange: (String) -> Unit,
     canTranslate: Boolean,
@@ -795,12 +795,11 @@ fun SettingsList(
                 section = OpenAISectionType.Summary,
             )
 
-            OpenAISection(
+            TranslationApiSection(
                 title = stringResource(R.string.translation_api_settings),
                 info = stringResource(R.string.translation_api_settings_info),
-                state = translationAIState,
-                onEvent = onTranslationAIEvent,
-                section = OpenAISectionType.Translation,
+                state = translationApiState,
+                onEvent = onTranslationApiEvent,
                 preferredTranslationLanguage = preferredTranslationLanguage,
                 onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
             )

@@ -347,9 +347,9 @@ class Repository(
 
     fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
 
-    val translationOpenAISettings = settingsStore.translationOpenAiSettings
+    val translationApiSettings = settingsStore.translationApiSettings
 
-    fun setTranslationOpenAiSettings(value: OpenAISettings) = settingsStore.setTranslationOpenAiSettings(value)
+    fun setTranslationApiSettings(value: TranslationApiSettings) = settingsStore.setTranslationApiSettings(value)
 
     val preferredTranslationLanguage = settingsStore.preferredTranslationLanguage
 

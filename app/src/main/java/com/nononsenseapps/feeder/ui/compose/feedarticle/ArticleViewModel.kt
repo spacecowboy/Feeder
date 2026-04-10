@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
+import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFile
@@ -132,7 +133,7 @@ class ArticleViewModel(
             ttsStateHolder.ttsState,
             ttsStateHolder.availableLanguages,
             repository.openAISettings,
-            repository.translationOpenAISettings,
+            repository.translationApiSettings,
             repository.preferredTranslationLanguage,
             openAiSummary,
             showTranslatedContent,
@@ -151,7 +152,7 @@ class ArticleViewModel(
             val ttsLanguages = params[8] as List<Locale>
 
             val summarySettings = params[9] as OpenAISettings
-            val translationSettings = params[10] as OpenAISettings
+            val translationSettings = params[10] as TranslationApiSettings
             val preferredTranslationLanguage = (params[11] as String).trim()
             val openAiSummary = params[12] as OpenAISummaryState
             val showTranslated = params[13] as Boolean
@@ -232,7 +233,7 @@ class ArticleViewModel(
             combine(
                 articleFlow,
                 displayFullTextOverride,
-                repository.translationOpenAISettings,
+                repository.translationApiSettings,
                 repository.preferredTranslationLanguage,
             ) { article, fullTextOverride, settings, targetLanguage ->
                 val currentArticle = article ?: return@combine null
@@ -543,7 +544,7 @@ class ArticleViewModel(
 
                 val article = articleFlow.value ?: return@launch
                 val fullText = isFullText
-                if (!repository.translationOpenAISettings.value.canUseAsTranslationApi) {
+                if (!repository.translationApiSettings.value.canUseAsTranslationApi) {
                     clearTranslatedContent()
                     return@launch
                 }
@@ -710,7 +711,7 @@ class ArticleViewModel(
             }
 
     private fun canTranslateArticles(): Boolean =
-        repository.translationOpenAISettings.value.canUseAsTranslationApi &&
+        repository.translationApiSettings.value.canUseAsTranslationApi &&
             repository.preferredTranslationLanguage.value
                 .trim()
                 .isNotBlank()

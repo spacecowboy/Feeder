@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.model
 import android.app.Application
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.canTranslate
@@ -37,7 +38,7 @@ class TranslationManager(
 
     suspend fun getCachedTranslatedFeedListItem(
         item: FeedListItem,
-        settings: OpenAISettings,
+        settings: TranslationApiSettings,
         targetLanguage: String,
     ): CachedFeedListItemTranslation =
         withContext(Dispatchers.IO) {
@@ -397,12 +398,12 @@ class TranslationManager(
             .digest(value.toByteArray())
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
 
-    private fun translationSettings(): OpenAISettings = repository.translationOpenAISettings.value.takeIf { it.canUseAsTranslationApi } ?: OpenAISettings()
+    private fun translationSettings(): TranslationApiSettings = repository.translationApiSettings.value.takeIf { it.canUseAsTranslationApi } ?: TranslationApiSettings()
 
     private suspend fun translateOrNull(
         content: String,
         targetLanguage: String,
-        settings: OpenAISettings,
+        settings: TranslationApiSettings,
         preserveHtml: Boolean = false,
     ): TranslationResult.Success? =
         when (

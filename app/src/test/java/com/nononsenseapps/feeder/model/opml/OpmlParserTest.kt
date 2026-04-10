@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
 import com.nononsenseapps.feeder.archmodel.UserSettings
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
@@ -91,7 +92,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
-                        UserSettings.SETTING_OPENAI_TRANSLATION_LANGUAGE -> "French"
+                        UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
                         UserSettings.SETTING_TRANSLATION_API_URL -> "https://translation.googleapis.com"
@@ -109,9 +110,9 @@ class OpmlParserTest : DIAware {
     fun handlesAllSettings(): Unit =
         runBlocking {
             every { settingsStore.openAiSettings } returns MutableStateFlow(OpenAISettings())
-            every { settingsStore.translationOpenAiSettings } returns MutableStateFlow(OpenAISettings())
+            every { settingsStore.translationApiSettings } returns MutableStateFlow(TranslationApiSettings())
             every { settingsStore.setOpenAiSettings(any()) } just Runs
-            every { settingsStore.setTranslationOpenAiSettings(any()) } just Runs
+            every { settingsStore.setTranslationApiSettings(any()) } just Runs
             setAllSettings()
             verify {
                 settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
@@ -149,8 +150,8 @@ class OpmlParserTest : DIAware {
                 settingsStore.openAiSettings
                 settingsStore.setOpenAiSettings(any())
                 settingsStore.setPreferredTranslationLanguage("French")
-                settingsStore.translationOpenAiSettings
-                settingsStore.setTranslationOpenAiSettings(any())
+                settingsStore.translationApiSettings
+                settingsStore.setTranslationApiSettings(any())
                 settingsStore.setTranslateFeedCardsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)

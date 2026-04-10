@@ -186,7 +186,7 @@ class FeedViewModel(
         viewModelScope.launch {
             combine(
                 repository.translateFeedCardsByDefault,
-                repository.translationOpenAISettings,
+                repository.translationApiSettings,
                 repository.preferredTranslationLanguage,
             ) { shouldTranslate, settings, targetLanguage ->
                 feedCardTranslationConfig(
@@ -283,7 +283,7 @@ class FeedViewModel(
     private fun currentFeedCardTranslationConfig(): FeedCardTranslationConfig? =
         feedCardTranslationConfig(
             enabled = repository.translateFeedCardsByDefault.value,
-            settings = repository.translationOpenAISettings.value,
+            settings = repository.translationApiSettings.value,
             targetLanguage = repository.preferredTranslationLanguage.value,
         ).takeIf(FeedCardTranslationConfig::isActive)
 

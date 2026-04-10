@@ -531,7 +531,7 @@ class SettingsStore(
             .apply()
     }
 
-    private val _translationOpenAiSettings =
+    private val _translationApiSettings =
         MutableStateFlow(
             OpenAISettings(
                 key = sp.getStringNonNull(PREF_TRANSLATION_API_KEY, ""),
@@ -542,10 +542,10 @@ class SettingsStore(
                 timeoutSeconds = sp.getInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, 30),
             ),
         )
-    val translationOpenAiSettings = _translationOpenAiSettings.asStateFlow()
+    val translationApiSettings = _translationApiSettings.asStateFlow()
 
-    fun setTranslationOpenAiSettings(value: OpenAISettings) {
-        _translationOpenAiSettings.value = value
+    fun setTranslationApiSettings(value: TranslationApiSettings) {
+        _translationApiSettings.value = value
         sp
             .edit()
             .putString(PREF_TRANSLATION_API_KEY, value.key)
@@ -559,13 +559,13 @@ class SettingsStore(
 
     private val _preferredTranslationLanguage =
         MutableStateFlow(
-            sp.getStringNonNull(PREF_OPENAI_TRANSLATION_LANGUAGE, ""),
+            sp.getStringNonNull(PREF_PREFERRED_TRANSLATION_LANGUAGE, ""),
         )
     val preferredTranslationLanguage = _preferredTranslationLanguage.asStateFlow()
 
     fun setPreferredTranslationLanguage(value: String) {
         _preferredTranslationLanguage.value = value
-        sp.edit().putString(PREF_OPENAI_TRANSLATION_LANGUAGE, value).apply()
+        sp.edit().putString(PREF_PREFERRED_TRANSLATION_LANGUAGE, value).apply()
     }
 
     private val _translateFeedCardsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, false))
@@ -720,7 +720,9 @@ const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
-const val PREF_OPENAI_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
+
+// Keep the legacy persisted key name for preference and OPML compatibility.
+const val PREF_PREFERRED_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
 const val PREF_TRANSLATION_API_KEY = "pref_translation_api_key"
 const val PREF_TRANSLATION_API_MODEL_ID = "pref_translation_api_model_id"
 const val PREF_TRANSLATION_API_URL = "pref_translation_api_url"
@@ -784,7 +786,7 @@ enum class UserSettings(
     SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
     SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
     SETTING_BLOCKLIST_APPLY_TO_SUMMARIES(key = PREF_BLOCKLIST_APPLY_TO_SUMMARIES),
-    SETTING_OPENAI_TRANSLATION_LANGUAGE(key = PREF_OPENAI_TRANSLATION_LANGUAGE),
+    SETTING_PREFERRED_TRANSLATION_LANGUAGE(key = PREF_PREFERRED_TRANSLATION_LANGUAGE),
     SETTING_TRANSLATION_API_KEY(key = PREF_TRANSLATION_API_KEY),
     SETTING_TRANSLATION_API_MODEL_ID(key = PREF_TRANSLATION_API_MODEL_ID),
     SETTING_TRANSLATION_API_URL(key = PREF_TRANSLATION_API_URL),
@@ -877,6 +879,8 @@ data class OpenAISettings(
     val azureDeploymentId: String = "",
     val key: String = "",
 )
+
+typealias TranslationApiSettings = OpenAISettings
 
 fun String.dropEnds(
     starting: Int,
