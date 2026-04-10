@@ -150,6 +150,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
+import com.nononsenseapps.feeder.util.stripTrackingParameters
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -1350,7 +1351,10 @@ fun FeedListContent(
                                 Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
                                         if (previewItem.link != null) {
-                                            putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                stripTrackingParameters(previewItem.link),
+                                            )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                         type = "text/plain"
@@ -1584,7 +1588,10 @@ fun FeedGridContent(
                                 Intent.createChooser(
                                     Intent(Intent.ACTION_SEND).apply {
                                         if (previewItem.link != null) {
-                                            putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                stripTrackingParameters(previewItem.link),
+                                            )
                                         }
                                         putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                         type = "text/plain"

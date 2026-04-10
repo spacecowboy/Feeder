@@ -77,6 +77,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
+import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.unicodeWrap
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -140,8 +141,12 @@ fun ArticleScreen(
                 val intent =
                     Intent.createChooser(
                         Intent(Intent.ACTION_SEND).apply {
-                            if (viewState.articleLink != null) {
-                                putExtra(Intent.EXTRA_TEXT, viewState.articleLink)
+                            val articleLink = viewState.articleLink
+                            if (articleLink != null) {
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    stripTrackingParameters(articleLink),
+                                )
                             }
                             putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
                             type = "text/plain"
