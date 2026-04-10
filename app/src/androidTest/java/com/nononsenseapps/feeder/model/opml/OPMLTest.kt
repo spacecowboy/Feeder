@@ -785,7 +785,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "sv"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "test-translation-api-key"
-                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "gpt-4.1-mini"
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> ""
                         UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-02-01"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
@@ -872,7 +872,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_blocklist_apply_to_summaries" value="true"/>
           <feeder:setting key="pref_openai_translation_language" value="sv"/>
           <feeder:setting key="pref_translation_api_key" value="test-translation-api-key"/>
-          <feeder:setting key="pref_translation_api_model_id" value="gpt-4.1-mini"/>
+          <feeder:setting key="pref_translation_api_model_id" value=""/>
           <feeder:setting key="pref_translation_api_url" value="https://api.deepl.com"/>
           <feeder:setting key="pref_translation_api_azure_version" value="2024-02-01"/>
           <feeder:setting key="pref_translation_api_azure_deployment_id" value="translation-deployment"/>

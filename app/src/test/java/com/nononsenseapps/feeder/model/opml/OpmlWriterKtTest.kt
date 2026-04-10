@@ -153,7 +153,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_blocklist_apply_to_summaries" value="true"/>
               <feeder:setting key="pref_openai_translation_language" value="French"/>
               <feeder:setting key="pref_translation_api_key" value="translation-api-key"/>
-              <feeder:setting key="pref_translation_api_model_id" value="translation-model-id"/>
+              <feeder:setting key="pref_translation_api_model_id" value=""/>
               <feeder:setting key="pref_translation_api_url" value="https://api.deepl.com"/>
               <feeder:setting key="pref_translation_api_azure_version" value="2024-06-01"/>
               <feeder:setting key="pref_translation_api_azure_deployment_id" value="translation-deployment"/>
@@ -213,7 +213,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
-                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> ""
                         UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-06-01"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"

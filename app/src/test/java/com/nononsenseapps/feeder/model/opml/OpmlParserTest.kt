@@ -94,7 +94,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
-                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> ""
                         UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-06-01"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
