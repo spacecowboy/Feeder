@@ -786,11 +786,11 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "sv"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "test-translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "gpt-4.1-mini"
-                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.example.com/translate"
+                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-02-01"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
-                        UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> "true"
+                        UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "false"
                     }
             }
@@ -873,7 +873,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_openai_translation_language" value="sv"/>
           <feeder:setting key="pref_translation_api_key" value="test-translation-api-key"/>
           <feeder:setting key="pref_translation_api_model_id" value="gpt-4.1-mini"/>
-          <feeder:setting key="pref_translation_api_url" value="https://api.example.com/translate"/>
+          <feeder:setting key="pref_translation_api_url" value="https://api.deepl.com"/>
           <feeder:setting key="pref_translation_api_azure_version" value="2024-02-01"/>
           <feeder:setting key="pref_translation_api_azure_deployment_id" value="translation-deployment"/>
           <feeder:setting key="pref_translation_api_request_timeout_seconds" value="90"/>

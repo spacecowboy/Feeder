@@ -164,8 +164,8 @@ class SettingsViewModel(
         repository.setOpenDrawerOnFab(value)
     }
 
-    fun setTranslateFeedCardsByDefault(value: Boolean) {
-        repository.setTranslateFeedCardsByDefault(value)
+    fun setTranslateArticlePreviewsByDefault(value: Boolean) {
+        repository.setTranslateArticlePreviewsByDefault(value)
     }
 
     fun setTranslateArticlesByDefault(value: Boolean) {
@@ -267,7 +267,7 @@ class SettingsViewModel(
                 repository.preferredTranslationLanguage,
                 translationApiModelsState,
                 repository.isOpenDrawerOnFab,
-                repository.translateFeedCardsByDefault,
+                repository.translateArticlePreviewsByDefault,
                 repository.translateArticlesByDefault,
                 repository.font,
                 repository.isPagingMode,
@@ -315,7 +315,7 @@ class SettingsViewModel(
                     preferredTranslationLanguage = params[30] as String,
                     canTranslate = (params[29] as OpenAISettings).canUseAsTranslationApi && (params[30] as String).trim().isNotBlank(),
                     isOpenDrawerOnFab = params[32] as Boolean,
-                    translateFeedCardsByDefault = params[33] as Boolean,
+                    translateArticlePreviewsByDefault = params[33] as Boolean,
                     translateArticlesByDefault = params[34] as Boolean,
                     font = params[35] as FontSelection,
                     isPagingMode = params[36] as Boolean,
@@ -407,7 +407,7 @@ data class SettingsViewState(
     val showReadingTime: Boolean = false,
     val showTitleUnreadCount: Boolean = false,
     val isOpenDrawerOnFab: Boolean = false,
-    val translateFeedCardsByDefault: Boolean = false,
+    val translateArticlePreviewsByDefault: Boolean = false,
     val translateArticlesByDefault: Boolean = false,
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,

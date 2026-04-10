@@ -107,7 +107,7 @@ open class OPMLImporter(
             UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> settingsStore.setOpenDrawerOnFab(value.toBoolean())
             UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> settingsStore.setShowTitleUnreadCount(value.toBoolean())
             UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> settingsStore.setMaxCountPerFeed(value.toIntOrNull() ?: 100)
-            UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> settingsStore.setTranslateFeedCardsByDefault(value.toBoolean())
+            UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> settingsStore.setTranslateArticlePreviewsByDefault(value.toBoolean())
             UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> settingsStore.setTranslateArticlesByDefault(value.toBoolean())
 
             // OpenAI related settings

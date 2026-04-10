@@ -76,6 +76,7 @@ class ArticleViewModel(
     private val toastMaker: ToastMaker by instance()
     private val translationManager: TranslationManager by instance()
 
+    // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val itemId: Long =
@@ -183,7 +184,7 @@ class ArticleViewModel(
                 pubDate = article?.pubDate,
                 author = article?.author,
                 enclosure = article?.enclosure ?: Enclosure(),
-                articleTitle = if (isShowingTranslated) currentTranslation?.translatedTitle ?: "" else article?.title ?: "",
+                articleTitle = if (isShowingTranslated) currentTranslation.translatedTitle else article?.title ?: "",
                 showToolbarMenu = toolbarVisible,
                 feedDisplayTitle = article?.feedDisplayTitle ?: "",
                 isBookmarked = article?.bookmarked == true,
@@ -280,6 +281,7 @@ class ArticleViewModel(
     }
 
     fun toggleFullText() {
+        // Using as general loading text
         textToDisplay.update { TextToDisplay.LOADING_FULLTEXT }
         displayFullTextOverride.value = displayFullTextOverride.value?.not() ?: articleFlow.value?.fullTextByDefault?.not() ?: true
         if (showTranslatedContent.value) {
@@ -474,6 +476,7 @@ class ArticleViewModel(
                     }
                 }
 
+            // TODO show error some message
             textToRead.onRight {
                 ttsStateHolder.tts(
                     textArray = it,
@@ -641,8 +644,7 @@ class ArticleViewModel(
                     }
             }
 
-        return Jsoup.parse(contentStream, null, viewState.articleFeedUrl ?: "")?.body()?.text()
-            ?: throw IllegalStateException("Cannot parse content")
+        return Jsoup.parse(contentStream, null, viewState.articleFeedUrl ?: "").body().text()
     }
 
     private suspend fun detectArticleAlreadyInPreferredLanguage(

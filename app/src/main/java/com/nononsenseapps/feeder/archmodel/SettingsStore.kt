@@ -568,12 +568,12 @@ class SettingsStore(
         sp.edit().putString(PREF_PREFERRED_TRANSLATION_LANGUAGE, value).apply()
     }
 
-    private val _translateFeedCardsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, false))
-    val translateFeedCardsByDefault = _translateFeedCardsByDefault.asStateFlow()
+    private val _translateArticlePreviewsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT, false))
+    val translateArticlePreviewsByDefault = _translateArticlePreviewsByDefault.asStateFlow()
 
-    fun setTranslateFeedCardsByDefault(value: Boolean) {
-        _translateFeedCardsByDefault.value = value
-        sp.edit().putBoolean(PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT, value).apply()
+    fun setTranslateArticlePreviewsByDefault(value: Boolean) {
+        _translateArticlePreviewsByDefault.value = value
+        sp.edit().putBoolean(PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT, value).apply()
     }
 
     private val _translateArticlesByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_ARTICLES_BY_DEFAULT, false))
@@ -729,7 +729,9 @@ const val PREF_TRANSLATION_API_URL = "pref_translation_api_url"
 const val PREF_TRANSLATION_API_AZURE_VERSION = "pref_translation_api_azure_version"
 const val PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID = "pref_translation_api_azure_deployment_id"
 const val PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS = "pref_translation_api_request_timeout_seconds"
-const val PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
+
+// Keep the legacy persisted key name for preference and OPML compatibility.
+const val PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
 const val PREF_TRANSLATE_ARTICLES_BY_DEFAULT = "pref_translate_articles_by_default"
 
 /**
@@ -793,7 +795,7 @@ enum class UserSettings(
     SETTING_TRANSLATION_API_AZURE_VERSION(key = PREF_TRANSLATION_API_AZURE_VERSION),
     SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID(key = PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID),
     SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS(key = PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS),
-    SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT(key = PREF_TRANSLATE_FEED_CARDS_BY_DEFAULT),
+    SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT),
     SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
     ;
 

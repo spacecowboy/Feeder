@@ -214,8 +214,8 @@ fun SettingsScreen(
             canTranslate = viewState.canTranslate,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
-            translateFeedCardsByDefault = viewState.translateFeedCardsByDefault,
-            onTranslateFeedCardsByDefault = settingsViewModel::setTranslateFeedCardsByDefault,
+            translateArticlePreviewsByDefault = viewState.translateArticlePreviewsByDefault,
+            onTranslateArticlePreviewsByDefault = settingsViewModel::setTranslateArticlePreviewsByDefault,
             translateArticlesByDefault = viewState.translateArticlesByDefault,
             onTranslateArticlesByDefault = settingsViewModel::setTranslateArticlesByDefault,
             onTextSettings = onNavigateToTextSettingsScreen,
@@ -306,8 +306,8 @@ private fun SettingsScreenPreview() {
             canTranslate = false,
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
-            translateFeedCardsByDefault = false,
-            onTranslateFeedCardsByDefault = {},
+            translateArticlePreviewsByDefault = false,
+            onTranslateArticlePreviewsByDefault = {},
             translateArticlesByDefault = false,
             onTranslateArticlesByDefault = {},
             onTextSettings = {},
@@ -389,8 +389,8 @@ fun SettingsList(
     canTranslate: Boolean,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
-    translateFeedCardsByDefault: Boolean,
-    onTranslateFeedCardsByDefault: (Boolean) -> Unit,
+    translateArticlePreviewsByDefault: Boolean,
+    onTranslateArticlePreviewsByDefault: (Boolean) -> Unit,
     translateArticlesByDefault: Boolean,
     onTranslateArticlesByDefault: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
@@ -807,8 +807,8 @@ fun SettingsList(
             if (canTranslate) {
                 SwitchSetting(
                     title = stringResource(id = R.string.translate_feed_cards_by_default),
-                    checked = translateFeedCardsByDefault,
-                    onCheckedChange = onTranslateFeedCardsByDefault,
+                    checked = translateArticlePreviewsByDefault,
+                    onCheckedChange = onTranslateArticlePreviewsByDefault,
                 )
 
                 SwitchSetting(

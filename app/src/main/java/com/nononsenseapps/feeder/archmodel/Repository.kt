@@ -355,9 +355,9 @@ class Repository(
 
     fun setPreferredTranslationLanguage(value: String) = settingsStore.setPreferredTranslationLanguage(value)
 
-    val translateFeedCardsByDefault = settingsStore.translateFeedCardsByDefault
+    val translateArticlePreviewsByDefault = settingsStore.translateArticlePreviewsByDefault
 
-    fun setTranslateFeedCardsByDefault(value: Boolean) = settingsStore.setTranslateFeedCardsByDefault(value)
+    fun setTranslateArticlePreviewsByDefault(value: Boolean) = settingsStore.setTranslateArticlePreviewsByDefault(value)
 
     val translateArticlesByDefault = settingsStore.translateArticlesByDefault
 

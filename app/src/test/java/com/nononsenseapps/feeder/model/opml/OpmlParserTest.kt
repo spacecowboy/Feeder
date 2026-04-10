@@ -95,11 +95,11 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> "translation-model-id"
-                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://translation.googleapis.com"
+                        UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-06-01"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> "translation-deployment"
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
-                        UserSettings.SETTING_TRANSLATE_FEED_CARDS_BY_DEFAULT -> "true"
+                        UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
                     },
             )
@@ -152,7 +152,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setPreferredTranslationLanguage("French")
                 settingsStore.translationApiSettings
                 settingsStore.setTranslationApiSettings(any())
-                settingsStore.setTranslateFeedCardsByDefault(true)
+                settingsStore.setTranslateArticlePreviewsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)
             }
