@@ -76,7 +76,7 @@ class ArticleViewModel(
             ?: throw IllegalArgumentException("Missing itemId in savedState")
 
     val scrollPosition: Int get() =
-        state["scrollPosition"] ?:0
+        state["scrollPosition"] ?: 0
 
     private val articleFlow =
         repository
