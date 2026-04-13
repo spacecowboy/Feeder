@@ -75,6 +75,9 @@ class ArticleViewModel(
         state["itemId"]
             ?: throw IllegalArgumentException("Missing itemId in savedState")
 
+    val scrollPosition: Int get() =
+        state["scrollPosition"] ?:0
+
     private val articleFlow =
         repository
             .getArticleFlow(itemId)
@@ -108,6 +111,10 @@ class ArticleViewModel(
         // Using as general loading text
         textToDisplay.update { TextToDisplay.LOADING_FULLTEXT }
         displayFullTextOverride.value = displayFullTextOverride.value?.not() ?: articleFlow.value?.fullTextByDefault?.not() ?: true
+    }
+
+    fun saveScrollPosition(pos: Int) {
+        state["scrollPosition"] = pos
     }
 
     private val isFullText: Boolean

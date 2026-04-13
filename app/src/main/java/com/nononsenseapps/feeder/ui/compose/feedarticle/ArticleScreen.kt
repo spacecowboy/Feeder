@@ -60,6 +60,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.snapshotFlow
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -80,6 +81,7 @@ import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.unicodeWrap
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.debounce
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 import java.time.ZoneId
@@ -102,8 +104,14 @@ fun ArticleScreen(
     val isPagingMode by mavm.isPagingMode.collectAsStateWithLifecycle()
     val isAnimatedPaging by mavm.isAnimatedPaging.collectAsStateWithLifecycle()
 
-    val articleScrollState = rememberScrollState()
+    val articleScrollState = rememberScrollState(initial = viewModel.scrollPosition)
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(articleScrollState) {
+        snapshotFlow { articleScrollState.value }
+            .debounce(500)
+            .collect { viewModel.saveScrollPosition(it) }
+    }
 
     LaunchedEffect(Unit) {
         mavm.scrollCommand.collect { direction ->
