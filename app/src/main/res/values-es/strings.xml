@@ -4,7 +4,7 @@
     <string name="navigation_drawer_close">Cerrar menú de navegación</string>
     <string name="action_settings">Ajustes</string>
     <string name="add_feed">Añadir canal</string>
-    <string name="title_activity_edit_feed">Suscríbete al canal RSS</string>
+    <string name="title_activity_edit_feed">Suscríbete al canal</string>
     <string name="url">Dirección URL</string>
     <string name="tag">Etiqueta</string>
     <string name="add_feed_search_hint">Dirección del canal RSS</string>
@@ -15,11 +15,11 @@
     <string name="empty_feed_top">No hay nada que leer aquí. ¿Le gustaría…</string>
     <string name="empty_feed_open"><annotation style="link">Abrir</annotation> otro canal?</string>
     <string name="empty_feed_add"><annotation style="link">Añadir</annotation> más fuentes?</string>
-    <string name="search_feed_empty_hint">Escriba la dirección de un canal RSS</string>
+    <string name="search_feed_empty_hint">Introduce una dirección de canal</string>
     <string name="mark_as_read">Marcar como leído</string>
     <string name="mark_as_unread">Marcar como no leído</string>
     <string name="mark_all_as_read">Marcar todo como leído</string>
-    <string name="edit_feed">Editar canal RSS</string>
+    <string name="edit_feed">Editar canal</string>
     <string name="delete_feed">Borrar fuente</string>
     <string name="show_all_items">Mostrar todas las entradas</string>
     <string name="show_unread_items">Mostrar entradas no leídas</string>
