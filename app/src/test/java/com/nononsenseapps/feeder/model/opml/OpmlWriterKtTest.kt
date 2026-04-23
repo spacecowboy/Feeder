@@ -128,6 +128,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_img_show_thumbnails" value="false"/>
               <feeder:setting key="pref_default_open_item_with" value="3"/>
               <feeder:setting key="pref_open_links_with" value="3"/>
+              <feeder:setting key="pref_open_item_in_reader_with" value="3"/>
               <feeder:setting key="pref_open_adjacent" value="true"/>
               <feeder:setting key="pref_paging_mode" value="true"/>
               <feeder:setting key="pref_animated_paging" value="true"/>
@@ -195,6 +196,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> "true"
                         UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> "200"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_OPEN_ITEM_IN_READER_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_OPENAI_KEY -> "test-api-key"
                         UserSettings.SETTING_OPENAI_MODEL_ID -> "gpt-4o-mini"
                         UserSettings.SETTING_OPENAI_URL -> "https://api.openai.com"

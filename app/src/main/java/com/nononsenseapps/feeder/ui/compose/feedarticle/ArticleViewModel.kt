@@ -137,6 +137,7 @@ class ArticleViewModel(
             ttsStateHolder.availableLanguages,
             repository.openAISettings,
             openAiSummary,
+            repository.itemInReaderOpener,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -151,6 +152,7 @@ class ArticleViewModel(
 
             val showSummarize = (params[8] as OpenAISettings).isValid && !article?.link.isNullOrEmpty()
             val openAiSummary = (params[9] as OpenAISummaryState)
+            val itemInReaderOpener = params[10] as LinkOpener
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
@@ -163,6 +165,7 @@ class ArticleViewModel(
                 articleFeedId = article?.feedId ?: ID_UNSET,
                 textToDisplay = textToDisplay,
                 linkOpener = linkOpener,
+                itemInReaderOpener = itemInReaderOpener,
                 pubDate = article?.pubDate,
                 author = article?.author,
                 enclosure = article?.enclosure ?: Enclosure(),
@@ -488,6 +491,7 @@ private data class ArticleState(
     override val articleFeedId: Long = ID_UNSET,
     override val textToDisplay: TextToDisplay = TextToDisplay.CONTENT,
     override val linkOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
+    override val itemInReaderOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
     override val pubDate: ZonedDateTime? = null,
     override val author: String? = null,
     override val enclosure: Enclosure = Enclosure(),
@@ -515,6 +519,7 @@ interface ArticleScreenViewState {
     val articleFeedId: Long
     val textToDisplay: TextToDisplay
     val linkOpener: LinkOpener
+    val itemInReaderOpener: LinkOpener
     val pubDate: ZonedDateTime?
     val author: String?
     val enclosure: Enclosure

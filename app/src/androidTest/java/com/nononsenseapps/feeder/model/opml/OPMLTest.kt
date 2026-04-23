@@ -758,6 +758,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_OPEN_ITEM_IN_READER_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
                         UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
@@ -838,6 +839,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_img_show_thumbnails" value="false"/>
           <feeder:setting key="pref_default_open_item_with" value="3"/>
           <feeder:setting key="pref_open_links_with" value="3"/>
+          <feeder:setting key="pref_open_item_in_reader_with" value="3"/>
           <feeder:setting key="pref_open_adjacent" value="true"/>
           <feeder:setting key="pref_paging_mode" value="true"/>
           <feeder:setting key="pref_animated_paging" value="true"/>

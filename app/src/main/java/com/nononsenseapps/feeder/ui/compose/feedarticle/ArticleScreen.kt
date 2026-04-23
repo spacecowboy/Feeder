@@ -62,6 +62,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
@@ -172,6 +173,11 @@ fun ArticleScreen(
                 activityLauncher.openLinkInCustomTab(link, toolbarColor)
             }
         },
+        onOpenInBrowser = {
+            viewState.articleLink?.let { link ->
+                activityLauncher.openLinkInBrowser(link)
+            }
+        },
         onFeedTitleClick = {
             onNavigateToFeed(viewState.articleFeedId)
         },
@@ -205,6 +211,7 @@ fun ArticleScreen(
     onMarkAsUnread: () -> Unit,
     onShare: () -> Unit,
     onOpenInCustomTab: () -> Unit,
+    onOpenInBrowser: () -> Unit,
     onFeedTitleClick: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
     ttsOnPlay: () -> Unit,
@@ -269,13 +276,35 @@ fun ArticleScreen(
                         }
                     }
 
-                    PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_in_web_view)) }) {
+                    PlainTooltipBox(
+                        tooltip = {
+                            Text(
+                                stringResource(
+                                    when (viewState.itemInReaderOpener) {
+                                        LinkOpener.DEFAULT_BROWSER -> R.string.open_article_in_default_browser
+                                        else -> R.string.open_article_in_custom_tab
+                                    },
+                                ),
+                            )
+                        },
+                    ) {
                         IconButton(
-                            onClick = onOpenInCustomTab,
+                            onClick = {
+                                when (viewState.itemInReaderOpener) {
+                                    LinkOpener.DEFAULT_BROWSER -> onOpenInBrowser()
+                                    else -> onOpenInCustomTab()
+                                }
+                            },
                         ) {
                             Icon(
                                 Icons.Default.OpenInBrowser,
-                                contentDescription = stringResource(id = R.string.open_in_web_view),
+                                contentDescription =
+                                    stringResource(
+                                        when (viewState.itemInReaderOpener) {
+                                            LinkOpener.DEFAULT_BROWSER -> R.string.open_article_in_default_browser
+                                            else -> R.string.open_article_in_custom_tab
+                                        },
+                                    ),
                             )
                         }
                     }

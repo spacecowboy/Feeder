@@ -85,6 +85,10 @@ open class OPMLImporter(
                 settingsStore.setLinkOpener(
                     linkOpenerFromString(value),
                 )
+            UserSettings.SETTING_OPEN_ITEM_IN_READER_WITH ->
+                settingsStore.setItemInReaderOpener(
+                    linkOpenerFromString(value),
+                )
             UserSettings.SETTING_TEXT_SCALE -> settingsStore.setTextScale(value.toFloatOrNull() ?: 1.0f)
             UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> settingsStore.setIsMarkAsReadOnScroll(value.toBoolean())
             UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> settingsStore.setUseDetectLanguage(value.toBoolean())

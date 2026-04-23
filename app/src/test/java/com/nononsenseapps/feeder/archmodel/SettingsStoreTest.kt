@@ -320,6 +320,17 @@ class SettingsStoreTest : DIAware {
         assertEquals(LinkOpener.DEFAULT_BROWSER, store.linkOpener.value)
     }
 
+    @Test
+    fun itemInReaderOpener() {
+        store.setItemInReaderOpener(LinkOpener.DEFAULT_BROWSER)
+
+        verify {
+            sp.edit().putString(PREF_OPEN_ITEM_IN_READER_WITH, PREF_VAL_OPEN_WITH_BROWSER).apply()
+        }
+
+        assertEquals(LinkOpener.DEFAULT_BROWSER, store.itemInReaderOpener.value)
+    }
+
     @Ignore("scheduling of jobs is not mocked")
     @Test
     fun syncFrequency() {
