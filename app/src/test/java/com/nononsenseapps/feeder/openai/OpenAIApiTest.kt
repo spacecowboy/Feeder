@@ -9,15 +9,13 @@ import com.aallam.openai.api.core.RequestOptions
 import com.aallam.openai.api.model.Model
 import com.aallam.openai.api.model.ModelId
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
-import com.nononsenseapps.feeder.archmodel.Repository
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class OpenAIClientMock(
     private val chatCompletion: ChatCompletion,
@@ -31,22 +29,12 @@ class OpenAIClientMock(
 }
 
 class OpenAIApiTest {
-    @MockK
-    private lateinit var repository: Repository
-
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this)
-
-        every { repository.openAISettings } returns MutableStateFlow(OpenAISettings())
-    }
-
     @Test
     fun testSummaryResponseLangNoQuotes() =
         runTest {
             val chatCompletion = createResponse("Lang: eng\n\nMy summary")
             val api = createApi(response = chatCompletion)
-            val actual = api.summarize("My content")
+            val actual = api.summarize("My content", OpenAISettings(key = "test", modelId = "test-model-id"))
             val expected = createResult("My summary", "eng")
             assertEquals(expected, actual)
         }
@@ -56,12 +44,96 @@ class OpenAIApiTest {
         runTest {
             val chatCompletion = createResponse("Lang: \"FR\"\nMy summary")
             val api = createApi(response = chatCompletion)
-            val actual = api.summarize("My content")
+            val actual = api.summarize("My content", OpenAISettings(key = "test", modelId = "test-model-id"))
             val expected = createResult("My summary", "FR")
             assertEquals(expected, actual)
         }
 
-    private fun createApi(response: ChatCompletion) = OpenAIApi(repository, "lang", { OpenAIClientMock(response) })
+    @Test
+    fun deepLVerificationUsesAuthorizationHeader() =
+        runTest {
+            MockWebServer().use { server ->
+                server.enqueue(
+                    MockResponse()
+                        .addHeader("Content-Type", "application/json")
+                        .setBody("""{"translations":[{"detected_source_language":"EN","text":"Hallo"}]}"""),
+                )
+
+                val result =
+                    createTranslationApi().listModelIds(
+                        OpenAISettings(
+                            baseUrl = server.url("/api.deepl.com").toString(),
+                            key = "deep-key",
+                        ),
+                    )
+
+                assertEquals(OpenAIApi.ModelsResult.Success(ids = emptyList()), result)
+
+                val request = server.takeRequest()
+                assertEquals("/api.deepl.com/v2/translate", request.path)
+                assertEquals("DeepL-Auth-Key deep-key", request.getHeader("Authorization"))
+                assertTrue(request.body.readUtf8().contains("\"target_lang\":\"DE\""))
+            }
+        }
+
+    @Test
+    fun deepLTranslateUsesHtmlTagHandling() =
+        runTest {
+            MockWebServer().use { server ->
+                server.enqueue(
+                    MockResponse()
+                        .addHeader("Content-Type", "application/json")
+                        .setBody("""{"translations":[{"detected_source_language":"EN","text":"<p>Hallo</p>"}]}"""),
+                )
+
+                val result =
+                    createTranslationApi().translate(
+                        content = "<p>Hello</p>",
+                        targetLanguage = "DE",
+                        settings =
+                            OpenAISettings(
+                                baseUrl = server.url("/api.deepl.com").toString(),
+                                key = "deep-key",
+                            ),
+                        preserveHtml = true,
+                    )
+
+                assertIs<OpenAIApi.TranslationResult.Success>(result)
+                val request = server.takeRequest()
+                assertEquals("DeepL-Auth-Key deep-key", request.getHeader("Authorization"))
+                assertTrue(request.body.readUtf8().contains("\"tag_handling\":\"html\""))
+            }
+        }
+
+    @Test
+    fun deepLReturnsProviderSpecificHttpFailure() =
+        runTest {
+            MockWebServer().use { server ->
+                server.enqueue(
+                    MockResponse()
+                        .setStatus("HTTP/1.1 403 Forbidden")
+                        .setBody("""{"error":"denied"}"""),
+                )
+
+                val result =
+                    createTranslationApi().translate(
+                        content = "Hello",
+                        targetLanguage = "DE",
+                        settings =
+                            OpenAISettings(
+                                baseUrl = server.url("/api.deepl.com").toString(),
+                                key = "deep-key",
+                            ),
+                    )
+
+                val error = assertIs<OpenAIApi.TranslationResult.Error>(result)
+                assertTrue(error.content.startsWith("DeepL request failed: HTTP 403"))
+            }
+        }
+
+    private fun createApi(response: ChatCompletion) = OpenAIApi("lang") { OpenAIClientMock(response) }
+
+    private fun createTranslationApi() = OpenAIApi("en") { error("OpenAI client should not be used for DeepL translation") }
 
     private fun createResponse(message: String) =
         ChatCompletion(

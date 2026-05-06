@@ -125,6 +125,7 @@ import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
+import com.nononsenseapps.feeder.ui.compose.feedarticle.TranslatedFeedCards
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnreadAndSaved
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
@@ -173,6 +174,7 @@ fun FeedScreen(
 ) {
     val toastMaker: ToastMaker by instance()
     val viewState: FeedScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val translatedFeedCards by viewModel.translatedFeedCards.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
     val pagedNavDrawerItems = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
 
@@ -457,6 +459,8 @@ fun FeedScreen(
             feedListState = feedListState,
             feedGridState = feedGridState,
             pagedFeedItems = pagedFeedItems,
+            translatedFeedCards = translatedFeedCards,
+            onTranslateFeedCard = viewModel::translateFeedCardIfNeeded,
         )
     }
 }
@@ -502,6 +506,8 @@ fun FeedScreen(
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
+    translatedFeedCards: TranslatedFeedCards,
+    onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -956,6 +962,8 @@ fun FeedScreen(
                     onSetBookmark = onSetBookmark,
                     gridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
+                    translatedFeedCards = translatedFeedCards,
+                    onTranslateFeedCard = onTranslateFeedCard,
                     modifier = innerModifier,
                 )
 
@@ -983,6 +991,8 @@ fun FeedScreen(
                     onSetBookmark = onSetBookmark,
                     listState = feedListState,
                     pagedFeedItems = pagedFeedItems,
+                    translatedFeedCards = translatedFeedCards,
+                    onTranslateFeedCard = onTranslateFeedCard,
                     modifier = innerModifier,
                 )
         }
@@ -1215,6 +1225,8 @@ fun FeedListContent(
     onSetBookmark: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
+    translatedFeedCards: TranslatedFeedCards,
+    onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -1297,10 +1309,15 @@ fun FeedListContent(
                     key = pagedFeedItems.itemKey { it.id },
                     contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
-                    val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
+                    val loadedItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
+                    val previewItem = translatedFeedCards.merge(loadedItem)
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
+
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
+                        onTranslateFeedCard(loadedItem)
+                    }
 
                     // Gets executed when only unread items are being shown
                     // Marks items which have been visible as read when they scroll off screen
@@ -1473,6 +1490,8 @@ fun FeedGridContent(
     onSetBookmark: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
+    translatedFeedCards: TranslatedFeedCards,
+    onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -1534,10 +1553,15 @@ fun FeedGridContent(
                     key = pagedFeedItems.itemKey { it.id },
                     contentType = pagedFeedItems.itemContentType { it.contentType(viewState.feedItemStyle) },
                 ) { itemIndex ->
-                    val previewItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
+                    val loadedItem = pagedFeedItems[itemIndex] ?: PLACEHOLDER_ITEM
+                    val previewItem = translatedFeedCards.merge(loadedItem)
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
+
+                    LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
+                        onTranslateFeedCard(loadedItem)
+                    }
 
                     // Gets executed when only unread items are being shown
                     // Marks items which have been visible as read when they scroll off screen

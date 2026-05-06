@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -189,6 +190,9 @@ fun ArticleScreen(
         onSummarize = {
             viewModel.summarize()
         },
+        onTranslate = {
+            viewModel.translate()
+        },
         modifier = modifier,
         isPagingMode = isPagingMode,
         isAnimatedPaging = isAnimatedPaging,
@@ -216,6 +220,7 @@ fun ArticleScreen(
     articleScrollState: ScrollState,
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
+    onTranslate: () -> Unit,
     modifier: Modifier = Modifier,
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
@@ -329,6 +334,35 @@ fun ArticleScreen(
                                         },
                                         text = {
                                             Text(stringResource(id = R.string.summarize))
+                                        },
+                                    )
+                                }
+
+                                if (viewState.showTranslate) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            onShowToolbarMenu(false)
+                                            onTranslate()
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Default.Translate,
+                                                contentDescription = null,
+                                            )
+                                        },
+                                        text = {
+                                            Text(
+                                                stringResource(
+                                                    if (viewState.isShowingTranslated) {
+                                                        R.string.show_original_language
+                                                    } else {
+                                                        R.string.translate_article
+                                                    },
+                                                    viewState.translationSourceLanguage.ifBlank {
+                                                        stringResource(R.string.original_article)
+                                                    },
+                                                ),
+                                            )
                                         },
                                     )
                                 }
@@ -547,6 +581,13 @@ fun ArticleContent(
         articleScrollState = articleScrollState,
     ) { indexOffset ->
         var offsetCounter = indexOffset
+
+        if (viewState.isTranslationLoading) {
+            offsetCounter++
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         if (viewState.openAiSummary !is OpenAISummaryState.Empty) {
             offsetCounter++

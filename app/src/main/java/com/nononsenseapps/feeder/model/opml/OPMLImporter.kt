@@ -107,6 +107,8 @@ open class OPMLImporter(
             UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> settingsStore.setOpenDrawerOnFab(value.toBoolean())
             UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> settingsStore.setShowTitleUnreadCount(value.toBoolean())
             UserSettings.SETTING_MAX_ITEM_COUNT_PER_FEED -> settingsStore.setMaxCountPerFeed(value.toIntOrNull() ?: 100)
+            UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> settingsStore.setTranslateArticlePreviewsByDefault(value.toBoolean())
+            UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> settingsStore.setTranslateArticlesByDefault(value.toBoolean())
 
             // OpenAI related settings
             UserSettings.SETTING_OPENAI_KEY,
@@ -128,6 +130,30 @@ open class OPMLImporter(
                         else -> current
                     }
                 settingsStore.setOpenAiSettings(newSettings)
+            }
+
+            UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE ->
+                settingsStore.setPreferredTranslationLanguage(value)
+
+            UserSettings.SETTING_TRANSLATION_API_KEY,
+            UserSettings.SETTING_TRANSLATION_API_MODEL_ID,
+            UserSettings.SETTING_TRANSLATION_API_URL,
+            UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION,
+            UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID,
+            UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS,
+            -> {
+                val current = settingsStore.translationApiSettings.value
+                val newSettings =
+                    when (UserSettings.fromKey(key)) {
+                        UserSettings.SETTING_TRANSLATION_API_KEY -> current.copy(key = value)
+                        UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> current.copy(modelId = value)
+                        UserSettings.SETTING_TRANSLATION_API_URL -> current.copy(baseUrl = value)
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> current.copy(azureApiVersion = value)
+                        UserSettings.SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID -> current.copy(azureDeploymentId = value)
+                        UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> current.copy(timeoutSeconds = value.toIntOrNull() ?: 30)
+                        else -> current
+                    }
+                settingsStore.setTranslationApiSettings(newSettings)
             }
             UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> settingsStore.setApplyBlocklistToSummaries(value.toBoolean())
         }
