@@ -77,9 +77,19 @@ class TranslationManager(
         }
 
     suspend fun translateFeedListItem(item: FeedListItem): FeedListItem =
+        translateFeedListItem(
+            item = item,
+            settings = translationSettings(),
+            targetLanguage = repository.preferredTranslationLanguage.value,
+        )
+
+    suspend fun translateFeedListItem(
+        item: FeedListItem,
+        settings: TranslationApiSettings,
+        targetLanguage: String,
+    ): FeedListItem =
         withContext(Dispatchers.IO) {
-            val settings = translationSettings()
-            val targetLanguage = repository.preferredTranslationLanguage.value.trim()
+            val targetLanguage = targetLanguage.trim()
             if (!settings.canTranslate || targetLanguage.isBlank()) {
                 return@withContext item
             }

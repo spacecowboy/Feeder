@@ -250,7 +250,12 @@ class FeedViewModel(
                     return@launch
                 }
 
-                val translatedItem = translationManager.translateFeedListItem(item)
+                val translatedItem =
+                    translationManager.translateFeedListItem(
+                        item = item,
+                        settings = config.settings,
+                        targetLanguage = config.targetLanguage,
+                    )
                 val updatedCached =
                     translationManager.getCachedTranslatedFeedListItem(
                         item = item,

@@ -62,6 +62,7 @@ import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import kotlinx.coroutines.delay
 
 enum class OpenAISectionType {
     Summary,
@@ -271,6 +272,7 @@ private fun OpenAISectionEdit(
 
     LaunchedEffect(current, provider) {
         if (provider != AIProviderPreset.NONE) {
+            delay(750)
             latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
         }
     }
