@@ -205,10 +205,19 @@ fun SettingsScreen(
             onStartActivity = { intent ->
                 activityLauncher.startActivity(false, intent)
             },
-            openAIState = viewState.openAIState,
-            onOpenAIEvent = settingsViewModel::onOpenAISettingsEvent,
+            summaryAIState = viewState.summaryAIState,
+            onSummaryAIEvent = settingsViewModel::onSummaryOpenAISettingsEvent,
+            translationApiState = viewState.translationApiState,
+            onTranslationApiEvent = settingsViewModel::onTranslationApiSettingsEvent,
+            preferredTranslationLanguage = viewState.preferredTranslationLanguage,
+            onPreferredTranslationLanguageChange = settingsViewModel::setPreferredTranslationLanguage,
+            canTranslate = viewState.canTranslate,
             isOpenDrawerOnFab = viewState.isOpenDrawerOnFab,
             onOpenDrawerOnFab = settingsViewModel::setOpenDrawerOnFab,
+            translateArticlePreviewsByDefault = viewState.translateArticlePreviewsByDefault,
+            onTranslateArticlePreviewsByDefault = settingsViewModel::setTranslateArticlePreviewsByDefault,
+            translateArticlesByDefault = viewState.translateArticlesByDefault,
+            onTranslateArticlesByDefault = settingsViewModel::setTranslateArticlesByDefault,
             onTextSettings = onNavigateToTextSettingsScreen,
             currentFontSelection = viewState.font,
             isPagingMode = viewState.isPagingMode,
@@ -288,10 +297,19 @@ private fun SettingsScreenPreview() {
             showTitleUnreadCount = false,
             onShowTitleUnreadCountChange = {},
             onStartActivity = {},
-            openAIState = OpenAISettingsState(),
-            onOpenAIEvent = {},
+            summaryAIState = OpenAISettingsState(),
+            onSummaryAIEvent = {},
+            translationApiState = TranslationApiSettingsState(),
+            onTranslationApiEvent = {},
+            preferredTranslationLanguage = "",
+            onPreferredTranslationLanguageChange = {},
+            canTranslate = false,
             isOpenDrawerOnFab = false,
             onOpenDrawerOnFab = {},
+            translateArticlePreviewsByDefault = false,
+            onTranslateArticlePreviewsByDefault = {},
+            translateArticlesByDefault = false,
+            onTranslateArticlesByDefault = {},
             onTextSettings = {},
             currentFontSelection = FontSelection.SystemDefault,
             isPagingMode = false,
@@ -362,10 +380,19 @@ fun SettingsList(
     showTitleUnreadCount: Boolean,
     onShowTitleUnreadCountChange: (Boolean) -> Unit,
     onStartActivity: (intent: Intent) -> Unit,
-    openAIState: OpenAISettingsState,
-    onOpenAIEvent: (OpenAISettingsEvent) -> Unit,
+    summaryAIState: OpenAISettingsState,
+    onSummaryAIEvent: (OpenAISettingsEvent) -> Unit,
+    translationApiState: TranslationApiSettingsState,
+    onTranslationApiEvent: (TranslationApiSettingsEvent) -> Unit,
+    preferredTranslationLanguage: String,
+    onPreferredTranslationLanguageChange: (String) -> Unit,
+    canTranslate: Boolean,
     isOpenDrawerOnFab: Boolean,
     onOpenDrawerOnFab: (Boolean) -> Unit,
+    translateArticlePreviewsByDefault: Boolean,
+    onTranslateArticlePreviewsByDefault: (Boolean) -> Unit,
+    translateArticlesByDefault: Boolean,
+    onTranslateArticlesByDefault: (Boolean) -> Unit,
     currentFontSelection: FontSelection,
     isPagingMode: Boolean,
     onIsPagingModeChange: (Boolean) -> Unit,
@@ -761,9 +788,35 @@ fun SettingsList(
             title = R.string.openai_settings,
         ) {
             OpenAISection(
-                state = openAIState,
-                onEvent = onOpenAIEvent,
+                title = stringResource(R.string.summary_api_settings),
+                info = stringResource(R.string.summary_api_settings_info),
+                state = summaryAIState,
+                onEvent = onSummaryAIEvent,
+                section = OpenAISectionType.Summary,
             )
+
+            TranslationApiSection(
+                title = stringResource(R.string.translation_api_settings),
+                info = stringResource(R.string.translation_api_settings_info),
+                state = translationApiState,
+                onEvent = onTranslationApiEvent,
+                preferredTranslationLanguage = preferredTranslationLanguage,
+                onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
+            )
+
+            if (canTranslate) {
+                SwitchSetting(
+                    title = stringResource(id = R.string.translate_feed_cards_by_default),
+                    checked = translateArticlePreviewsByDefault,
+                    onCheckedChange = onTranslateArticlePreviewsByDefault,
+                )
+
+                SwitchSetting(
+                    title = stringResource(id = R.string.translate_articles_by_default),
+                    checked = translateArticlesByDefault,
+                    onCheckedChange = onTranslateArticlesByDefault,
+                )
+            }
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))

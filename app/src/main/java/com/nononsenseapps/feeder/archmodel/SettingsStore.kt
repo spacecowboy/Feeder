@@ -531,6 +531,59 @@ class SettingsStore(
             .apply()
     }
 
+    private val _translationApiSettings =
+        MutableStateFlow(
+            OpenAISettings(
+                key = sp.getStringNonNull(PREF_TRANSLATION_API_KEY, ""),
+                modelId = sp.getStringNonNull(PREF_TRANSLATION_API_MODEL_ID, ""),
+                baseUrl = sp.getStringNonNull(PREF_TRANSLATION_API_URL, ""),
+                azureApiVersion = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_VERSION, ""),
+                azureDeploymentId = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, ""),
+                timeoutSeconds = sp.getInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, 30),
+            ),
+        )
+    val translationApiSettings = _translationApiSettings.asStateFlow()
+
+    fun setTranslationApiSettings(value: TranslationApiSettings) {
+        _translationApiSettings.value = value
+        sp
+            .edit()
+            .putString(PREF_TRANSLATION_API_KEY, value.key)
+            .putString(PREF_TRANSLATION_API_MODEL_ID, value.modelId)
+            .putString(PREF_TRANSLATION_API_URL, value.baseUrl)
+            .putString(PREF_TRANSLATION_API_AZURE_VERSION, value.azureApiVersion)
+            .putString(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
+            .putInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
+            .apply()
+    }
+
+    private val _preferredTranslationLanguage =
+        MutableStateFlow(
+            sp.getStringNonNull(PREF_PREFERRED_TRANSLATION_LANGUAGE, ""),
+        )
+    val preferredTranslationLanguage = _preferredTranslationLanguage.asStateFlow()
+
+    fun setPreferredTranslationLanguage(value: String) {
+        _preferredTranslationLanguage.value = value
+        sp.edit().putString(PREF_PREFERRED_TRANSLATION_LANGUAGE, value).apply()
+    }
+
+    private val _translateArticlePreviewsByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT, false))
+    val translateArticlePreviewsByDefault = _translateArticlePreviewsByDefault.asStateFlow()
+
+    fun setTranslateArticlePreviewsByDefault(value: Boolean) {
+        _translateArticlePreviewsByDefault.value = value
+        sp.edit().putBoolean(PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT, value).apply()
+    }
+
+    private val _translateArticlesByDefault = MutableStateFlow(sp.getBoolean(PREF_TRANSLATE_ARTICLES_BY_DEFAULT, false))
+    val translateArticlesByDefault = _translateArticlesByDefault.asStateFlow()
+
+    fun setTranslateArticlesByDefault(value: Boolean) {
+        _translateArticlesByDefault.value = value
+        sp.edit().putBoolean(PREF_TRANSLATE_ARTICLES_BY_DEFAULT, value).apply()
+    }
+
     private val _showTitleUnreadCount = MutableStateFlow(sp.getBoolean(PREF_SHOW_TITLE_UNREAD_COUNT, false))
     val showTitleUnreadCount = _showTitleUnreadCount.asStateFlow()
 
@@ -668,6 +721,19 @@ const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
 
+// Keep the legacy persisted key name for preference and OPML compatibility.
+const val PREF_PREFERRED_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
+const val PREF_TRANSLATION_API_KEY = "pref_translation_api_key"
+const val PREF_TRANSLATION_API_MODEL_ID = "pref_translation_api_model_id"
+const val PREF_TRANSLATION_API_URL = "pref_translation_api_url"
+const val PREF_TRANSLATION_API_AZURE_VERSION = "pref_translation_api_azure_version"
+const val PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID = "pref_translation_api_azure_deployment_id"
+const val PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS = "pref_translation_api_request_timeout_seconds"
+
+// Keep the legacy persisted key name for preference and OPML compatibility.
+const val PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
+const val PREF_TRANSLATE_ARTICLES_BY_DEFAULT = "pref_translate_articles_by_default"
+
 /**
  * Appearance settings
  */
@@ -722,6 +788,15 @@ enum class UserSettings(
     SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
     SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
     SETTING_BLOCKLIST_APPLY_TO_SUMMARIES(key = PREF_BLOCKLIST_APPLY_TO_SUMMARIES),
+    SETTING_PREFERRED_TRANSLATION_LANGUAGE(key = PREF_PREFERRED_TRANSLATION_LANGUAGE),
+    SETTING_TRANSLATION_API_KEY(key = PREF_TRANSLATION_API_KEY),
+    SETTING_TRANSLATION_API_MODEL_ID(key = PREF_TRANSLATION_API_MODEL_ID),
+    SETTING_TRANSLATION_API_URL(key = PREF_TRANSLATION_API_URL),
+    SETTING_TRANSLATION_API_AZURE_VERSION(key = PREF_TRANSLATION_API_AZURE_VERSION),
+    SETTING_TRANSLATION_API_AZURE_DEPLOYMENT_ID(key = PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID),
+    SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS(key = PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS),
+    SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT),
+    SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
     ;
 
     companion object {
@@ -806,6 +881,8 @@ data class OpenAISettings(
     val azureDeploymentId: String = "",
     val key: String = "",
 )
+
+typealias TranslationApiSettings = OpenAISettings
 
 fun String.dropEnds(
     starting: Int,
