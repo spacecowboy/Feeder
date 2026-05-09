@@ -40,6 +40,7 @@ class OpmlWriterKtTest {
                         fullTextByDefault = true,
                         openArticlesWith = "reader",
                         alternateId = true,
+                        fetchOgImages = false,
                     )
 
                 result.add(feed)
@@ -72,6 +73,7 @@ class OpmlWriterKtTest {
                         fullTextByDefault = true,
                         openArticlesWith = "reader",
                         alternateId = true,
+                        fetchOgImages = false,
                     )
 
                 result.add(feed)
@@ -92,7 +94,7 @@ class OpmlWriterKtTest {
           </head>
           <body>
             <outline title="quoted &quot;tag&quot;" text="quoted &quot;tag&quot;">
-              <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" title="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" text="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
+              <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" text="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
             </outline>
           </body>
         </opml>
@@ -109,7 +111,7 @@ class OpmlWriterKtTest {
           </head>
           <body>
             <outline title="news" text="news">
-              <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" title="customTitle" text="customTitle" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
+              <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="customTitle" text="customTitle" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
             </outline>
             <feeder:settings>
               <feeder:setting key="pref_added_feeder_news" value="true"/>

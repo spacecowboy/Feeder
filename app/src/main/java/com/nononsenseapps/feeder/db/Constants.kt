@@ -54,6 +54,7 @@ const val COL_SKIP_DUPLICATES = "skip_duplicates"
 const val COL_BLOCK_TIME = "block_time"
 const val COL_RETRY_AFTER = "retry_after"
 const val COL_SUMMARIZE_ON_OPEN = "summarize_on_open"
+const val COL_FETCH_OG_IMAGES = "fetch_og_images"
 
 // year 5000
 val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

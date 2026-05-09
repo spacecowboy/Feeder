@@ -46,6 +46,8 @@ private const val ATTR_IMAGE_URL = "imageUrl"
 
 private const val ATTR_OPEN_ARTICLES_WITH = "openArticlesWith"
 
+private const val ATTR_FETCH_OG_IMAGES = "fetchOgImages"
+
 private const val TAG_BLOCKED = "blocked"
 
 @Suppress("NAME_SHADOWING")
@@ -291,6 +293,11 @@ class OpmlPullParser(
                                 OPML_FEEDER_NAMESPACE,
                                 ATTR_OPEN_ARTICLES_WITH,
                             ) ?: feed.openArticlesWith,
+                        fetchOgImages =
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_FETCH_OG_IMAGES)
+                                ?.toBoolean()
+                                ?: feed.fetchOgImages,
                         imageUrl =
                             parser
                                 .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)

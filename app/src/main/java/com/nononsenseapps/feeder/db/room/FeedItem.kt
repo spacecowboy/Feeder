@@ -32,6 +32,7 @@ import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.model.ParsedArticle
 import com.nononsenseapps.feeder.model.ParsedFeed
 import com.nononsenseapps.feeder.model.ThumbnailImage
+import com.nononsenseapps.feeder.model.ThumbnailImagePolicy
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import java.net.URI
@@ -154,7 +155,11 @@ data class FeedItem
             this.title = this.plainTitle
             this.plainSnippet = summary
 
-            this.thumbnailImage = entry.image
+            this.thumbnailImage =
+                ThumbnailImagePolicy.applyParsedEntryImage(
+                    current = this.thumbnailImage,
+                    incoming = entry.image,
+                )
             val firstEnclosure = entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()
