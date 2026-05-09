@@ -102,6 +102,7 @@ data class EncryptedFeed(
     val fullTextByDefault: Boolean = false,
     val openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
     val alternateId: Boolean = false,
+    val fetchOgImages: Boolean = false,
     val whenModified: Instant = Instant.EPOCH,
 )
 
@@ -115,6 +116,7 @@ fun Feed.toEncryptedFeed(): EncryptedFeed =
         fullTextByDefault = fullTextByDefault,
         openArticlesWith = openArticlesWith,
         alternateId = alternateId,
+        fetchOgImages = fetchOgImages,
         whenModified = whenModified,
     )
 
@@ -128,5 +130,6 @@ fun EncryptedFeed.updateFeedCopy(feed: Feed): Feed =
         fullTextByDefault = fullTextByDefault,
         openArticlesWith = openArticlesWith,
         alternateId = alternateId,
+        fetchOgImages = fetchOgImages,
         whenModified = whenModified,
     )

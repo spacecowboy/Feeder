@@ -502,6 +502,13 @@ fun ColumnScope.RightContent(
         icon = null,
     )
     SwitchSetting(
+        title = stringResource(id = R.string.fetch_og_images),
+        checked = viewState.fetchOgImages,
+        { viewState.fetchOgImages = it },
+        description = stringResource(id = R.string.fetch_og_images_desc),
+        icon = null,
+    )
+    SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
         checked = viewState.notify,
         { viewState.notify = it },
@@ -577,6 +584,7 @@ interface EditFeedScreenState {
     var articleOpener: String
     var alternateId: Boolean
     var summarizeOnOpen: Boolean
+    var fetchOgImages: Boolean
     val isOkToSave: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
@@ -610,6 +618,7 @@ private class ScreenState(
     override var articleOpener: String by mutableStateOf("")
     override var alternateId: Boolean by mutableStateOf(false)
     override var summarizeOnOpen: Boolean by mutableStateOf(false)
+    override var fetchOgImages: Boolean by mutableStateOf(false)
 }
 
 @Preview("Edit Feed Phone")

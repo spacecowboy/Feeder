@@ -278,6 +278,8 @@
   <string name="skip_duplicate_articles_desc">Articles with links or titles identical to existing articles are ignored</string>
   <string name="summarize">Summarize</string>
   <string name="summarize_on_open">Summarize on open</string>
+  <string name="fetch_og_images">Enhance thumbnails from article metadata</string>
+  <string name="fetch_og_images_desc">Try to improve missing or low-quality thumbnails for this feed</string>
   <string name="openai_settings">AI and translation</string>
   <string name="openai_settings_info">Compatible with many AI providers, but not all</string>
   <string name="summary_api_settings">Summary API</string>

@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_ALTERNATE_ID
 import com.nononsenseapps.feeder.db.COL_CURRENTLY_SYNCING
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
+import com.nononsenseapps.feeder.db.COL_FETCH_OG_IMAGES
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -61,6 +62,7 @@ data class Feed
         // Time when feed is allowed to be synced again earliest, based on retry-after response header
         @ColumnInfo(name = COL_RETRY_AFTER) var retryAfter: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_SUMMARIZE_ON_OPEN) var summarizeOnOpen: Boolean = false,
+        @ColumnInfo(name = COL_FETCH_OG_IMAGES) var fetchOgImages: Boolean = false,
     ) {
         constructor() : this(id = ID_UNSET)
 

@@ -23,6 +23,16 @@ data class LinearArticle(
                 }
             }.flatten()
             .toMap()
+
+    val imageUrls: Set<String> by lazy {
+        buildSet {
+            elements.forEach { element ->
+                element.collectImageUrls(this)
+            }
+        }
+    }
+
+    fun containsImageUrl(url: String): Boolean = url in imageUrls
 }
 
 /**
@@ -40,6 +50,24 @@ fun LinearElement.ids(): Set<String> =
         is LinearTable -> ids
         is LinearVideo -> ids
     }
+
+private fun LinearElement.collectImageUrls(target: MutableSet<String>) {
+    when (this) {
+        is LinearAudio,
+        is LinearText,
+        is LinearVideo,
+        -> Unit
+        is LinearImage -> sources.mapTo(target) { it.imgUri }
+        is LinearBlockQuote -> content.forEach { it.collectImageUrls(target) }
+        is LinearListItem -> content.forEach { it.collectImageUrls(target) }
+        is LinearTable ->
+            cells.values
+                .filterNot { it.isFiller }
+                .forEach { cell ->
+                    cell.content.forEach { it.collectImageUrls(target) }
+                }
+    }
+}
 
 /**
  * Represents a list of items, ordered or unordered
