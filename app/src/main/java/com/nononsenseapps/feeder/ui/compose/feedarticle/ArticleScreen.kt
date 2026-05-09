@@ -539,6 +539,7 @@ fun ArticleContent(
 
     // Track Y positions of article elements by index for anchor link scrolling
     val elementPositions = remember { mutableMapOf<Int, Float>() }
+    val contentImageUrls = remember(viewState.articleContent) { viewState.articleContent.imageUrls }
 
     ReaderView(
         screenType = screenType,
@@ -576,7 +577,8 @@ fun ArticleContent(
                 else -> null
             },
         image = viewState.image,
-        isFeedText = viewState.textToDisplay == TextToDisplay.CONTENT,
+        showHeaderImage = viewState.textToDisplay == TextToDisplay.CONTENT,
+        contentImageUrls = contentImageUrls,
         modifier = modifier,
         articleScrollState = articleScrollState,
     ) { indexOffset ->
