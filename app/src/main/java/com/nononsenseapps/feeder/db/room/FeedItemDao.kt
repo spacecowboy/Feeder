@@ -370,6 +370,9 @@ interface FeedItemDao {
         bookmarked: Boolean,
     )
 
+    @Query("UPDATE feed_items SET bookmarked = 1 WHERE link IN (:links)")
+    suspend fun setBookmarkedByLinks(links: List<String>): Int
+
     @Query("SELECT link FROM feed_items WHERE bookmarked = 1 order by link")
     suspend fun getLinksOfBookmarks(): List<String>
 
