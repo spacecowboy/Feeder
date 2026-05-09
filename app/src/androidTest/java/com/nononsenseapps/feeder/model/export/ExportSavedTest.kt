@@ -132,4 +132,28 @@ class ExportSavedTest : DIAware {
             ),
         )
     }
+
+    @SmallTest
+    @Test
+    fun testImportSavedArticles() {
+        runBlocking {
+            val itemId = insertTestData()
+            path!!.writeText(
+                """
+                https://example.com/ampersands
+                https://example.com/not-in-db
+
+                https://example.com/ampersands
+                """.trimIndent(),
+            )
+            Assert.assertFalse(db.feedItemDao().loadFeedItem(itemId)!!.bookmarked)
+            assertTrue {
+                importSavedArticles(
+                    di,
+                    path!!.toUri(),
+                ).isRight()
+            }
+            assertTrue(db.feedItemDao().loadFeedItem(itemId)!!.bookmarked)
+        }
+    }
 }
