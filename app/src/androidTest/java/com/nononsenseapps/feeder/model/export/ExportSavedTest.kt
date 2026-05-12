@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
 import com.nononsenseapps.feeder.util.ToastMaker
@@ -109,7 +110,36 @@ class ExportSavedTest : DIAware {
             assertEquals(SAVED_ARTICLES_EXPORT_FORMAT, result.format)
             assertEquals(SAVED_ARTICLES_EXPORT_VERSION, result.version)
             assertEquals(
-                listOf(SavedArticleExportItem("https://example.com/ampersands/1")),
+                listOf(
+                    SavedArticleExportItem(
+                        link = "https://example.com/ampersands/1",
+                        guid = "guid anime2you",
+                        title = "Item with image",
+                        snippet = "Snippet with image",
+                        pubDate = "2026-05-12T08:30Z",
+                        primarySortTime = "2026-05-12T08:29:30Z",
+                        readTime = "2026-05-12T08:31:00Z",
+                        author = "Example Author",
+                        thumbnailImage =
+                            MediaImage(
+                                url = "https://example.com/ampersands/image.png",
+                                width = 640,
+                                height = 320,
+                            ),
+                        enclosureLink = "https://example.com/ampersands/podcast.mp3",
+                        enclosureType = "audio/mpeg",
+                        wordCount = 42,
+                        wordCountFull = 420,
+                        feed =
+                            SavedArticleFeedExportItem(
+                                url = "https://example.com/ampersands",
+                                title = "Ampersands are & the worst",
+                                customTitle = "Ampersands",
+                                tag = "Characters",
+                                fullTextByDefault = true,
+                            ),
+                    ),
+                ),
                 result.articles,
             )
         }
@@ -120,7 +150,10 @@ class ExportSavedTest : DIAware {
             db.feedDao().insertFeed(
                 Feed(
                     title = "Ampersands are & the worst",
+                    customTitle = "Ampersands",
                     url = URL("https://example.com/ampersands"),
+                    tag = "Characters",
+                    fullTextByDefault = true,
                 ),
             )
 
@@ -129,11 +162,22 @@ class ExportSavedTest : DIAware {
                 guid = "guid anime2you",
                 plainTitle = "Item with image",
                 plainSnippet = "Snippet with image",
+                thumbnailImage =
+                    MediaImage(
+                        url = "https://example.com/ampersands/image.png",
+                        width = 640,
+                        height = 320,
+                    ),
+                enclosureLink = "https://example.com/ampersands/podcast.mp3",
+                enclosureType = "audio/mpeg",
+                author = "Example Author",
                 feedId = feedId,
                 link = "https://example.com/ampersands/1",
-                pubDate = ZonedDateTime.now(ZoneOffset.UTC),
-                primarySortTime = Instant.now(),
-                thumbnailImage = null,
+                pubDate = ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC),
+                primarySortTime = Instant.parse("2026-05-12T08:29:30Z"),
+                readTime = Instant.parse("2026-05-12T08:31:00Z"),
+                wordCount = 42,
+                wordCountFull = 420,
             ),
         )
     }

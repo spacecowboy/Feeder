@@ -5,6 +5,8 @@ import android.net.Uri
 import android.util.Log
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
@@ -55,8 +57,8 @@ suspend fun exportSavedArticles(
                                 version = SAVED_ARTICLES_EXPORT_VERSION,
                                 articles =
                                     feedItemDao
-                                        .getLinksOfBookmarks()
-                                        .map(::SavedArticleExportItem),
+                                        .getBookmarkedItemsForExport()
+                                        .mapNotNull(FeedItemWithFeed::toSavedArticleExportItem),
                             )
                         bw.write(savedArticlesJson.encodeToString(export))
                     }
@@ -75,7 +77,56 @@ data class SavedArticlesExport(
 @Serializable
 data class SavedArticleExportItem(
     val link: String,
+    val guid: String,
+    val title: String,
+    val snippet: String,
+    val pubDate: String?,
+    val primarySortTime: String,
+    val readTime: String?,
+    val author: String?,
+    val thumbnailImage: ThumbnailImage?,
+    val enclosureLink: String?,
+    val enclosureType: String?,
+    val wordCount: Int,
+    val wordCountFull: Int,
+    val feed: SavedArticleFeedExportItem,
 )
+
+@Serializable
+data class SavedArticleFeedExportItem(
+    val url: String,
+    val title: String,
+    val customTitle: String,
+    val tag: String,
+    val fullTextByDefault: Boolean,
+)
+
+private fun FeedItemWithFeed.toSavedArticleExportItem(): SavedArticleExportItem? {
+    val articleLink = link ?: return null
+    return SavedArticleExportItem(
+        link = articleLink,
+        guid = guid,
+        title = plainTitle,
+        snippet = plainSnippet,
+        pubDate = pubDate?.toString(),
+        primarySortTime = primarySortTime.toString(),
+        readTime = readTime?.toString(),
+        author = author,
+        thumbnailImage = thumbnailImage,
+        enclosureLink = enclosureLink,
+        enclosureType = enclosureType,
+        wordCount = wordCount,
+        wordCountFull = wordCountFull,
+        feed =
+            SavedArticleFeedExportItem(
+                url = feedUrl.toString(),
+                title = feedTitle,
+                customTitle = feedCustomTitle,
+                tag = tag,
+                fullTextByDefault = fullTextByDefault,
+            ),
+    )
+}
 
 sealed class SavedArticlesExportError {
     abstract val throwable: Throwable?
