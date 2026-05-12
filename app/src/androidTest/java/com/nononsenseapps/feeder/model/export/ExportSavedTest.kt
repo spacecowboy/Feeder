@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
 import com.nononsenseapps.feeder.util.ToastMaker
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -103,10 +104,14 @@ class ExportSavedTest : DIAware {
                 ).isRight()
             }
 
-            val result = path!!.readLines()
+            val result = Json.decodeFromString(SavedArticlesExport.serializer(), path!!.readText())
 
-            assertEquals(1, result.size)
-            assertEquals("https://example.com/ampersands/1", result.first())
+            assertEquals(SAVED_ARTICLES_EXPORT_FORMAT, result.format)
+            assertEquals(SAVED_ARTICLES_EXPORT_VERSION, result.version)
+            assertEquals(
+                listOf(SavedArticleExportItem("https://example.com/ampersands/1")),
+                result.articles,
+            )
         }
     }
 

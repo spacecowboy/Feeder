@@ -182,7 +182,7 @@ fun FeedScreen(
     val di = LocalDI.current
     val savedArticleExporter =
         rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("text/plain"),
+            ActivityResultContracts.CreateDocument("application/json"),
         ) { uri ->
             if (uri != null) {
                 val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -387,7 +387,7 @@ fun FeedScreen(
                     savedArticleExporter.launch(
                         "feeder-saved-articles-${LocalDate.now()}-${
                             LocalTime.now().toSecondOfDay()
-                        }.txt",
+                        }.json",
                     )
                 } catch (_: Exception) {
                     // ActivityNotFoundException in particular

@@ -10,12 +10,22 @@ import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.direct
 import org.kodein.di.instance
 import kotlin.system.measureTimeMillis
 
 private const val LOG_TAG = "FEEDER_SAVEDARTEXPORT"
+const val SAVED_ARTICLES_EXPORT_FORMAT = "feeder-saved-articles"
+const val SAVED_ARTICLES_EXPORT_VERSION = 1
+
+private val savedArticlesJson =
+    Json {
+        prettyPrint = true
+    }
 
 suspend fun exportSavedArticles(
     di: DI,
@@ -39,17 +49,33 @@ suspend fun exportSavedArticles(
                     val contentResolver: ContentResolver by di.instance()
                     val feedItemDao: FeedItemDao by di.instance()
                     contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { bw ->
-                        feedItemDao
-                            .getLinksOfBookmarks()
-                            .forEach { link ->
-                                bw.write(link)
-                                bw.newLine()
-                            }
+                        val export =
+                            SavedArticlesExport(
+                                format = SAVED_ARTICLES_EXPORT_FORMAT,
+                                version = SAVED_ARTICLES_EXPORT_VERSION,
+                                articles =
+                                    feedItemDao
+                                        .getLinksOfBookmarks()
+                                        .map(::SavedArticleExportItem),
+                            )
+                        bw.write(savedArticlesJson.encodeToString(export))
                     }
                 }
             logDebug(LOG_TAG, "Exported saved articles in $time ms on ${Thread.currentThread().name}")
         }
     }
+
+@Serializable
+data class SavedArticlesExport(
+    val format: String,
+    val version: Int,
+    val articles: List<SavedArticleExportItem>,
+)
+
+@Serializable
+data class SavedArticleExportItem(
+    val link: String,
+)
 
 sealed class SavedArticlesExportError {
     abstract val throwable: Throwable?
