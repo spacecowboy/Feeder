@@ -92,7 +92,8 @@ fun ReaderView(
     feedTitle: String,
     authorDate: String?,
     image: ThumbnailImage?,
-    isFeedText: Boolean,
+    showHeaderImage: Boolean,
+    contentImageUrls: Set<String>,
     modifier: Modifier = Modifier,
     articleScrollState: ScrollState = rememberScrollState(),
     articleBody: @Composable (indexOffset: Int) -> Unit,
@@ -290,8 +291,7 @@ fun ReaderView(
                 }
             }
 
-            // Don't show image for full text articles since it's typically inside the full article
-            if (isFeedText && image?.fromBody == false) {
+            if (image != null && shouldShowHeaderImage(showHeaderImage, image, contentImageUrls)) {
                 val imageWidth: Int =
                     if (image.width?.let { it < 640 } == true) {
                         // Zero or too small, do not show
@@ -375,11 +375,18 @@ private fun ReaderPreview() {
                 feedTitle = "Feed Title is here",
                 authorDate = "2018-01-02",
                 image = MediaImage("https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png"),
-                isFeedText = true,
+                showHeaderImage = true,
+                contentImageUrls = emptySet(),
             ) {}
         }
     }
 }
+
+internal fun shouldShowHeaderImage(
+    showHeaderImage: Boolean,
+    image: ThumbnailImage?,
+    contentImageUrls: Set<String>,
+): Boolean = showHeaderImage && image?.fromBody == false && image.url !in contentImageUrls
 
 fun wordsToReadTimeSecs(words: Int): Int = (words * 60 / 220.0).roundToInt()
 

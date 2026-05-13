@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
+import com.nononsenseapps.feeder.util.fetchOgImage
 import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.left
 import com.nononsenseapps.feeder.util.logDebug
@@ -336,6 +337,15 @@ class RssLocalSync(
                                     feedItemSql.updateFromParsedEntry(item, guid, feed)
                                     feedItemSql.feedId = feedSql.id
 
+                                    if (feedSql.fetchOgImages) {
+                                        feedItemSql.thumbnailImage =
+                                            resolveThumbnailImage(
+                                                current = feedItemSql.thumbnailImage,
+                                                articleUrl = item.url,
+                                                hasFeedImage = item.hasFeedImage,
+                                            )
+                                    }
+
                                     if (feedItemSql.guid in alreadyReadGuids) {
                                         // TODO get read time from sync service
                                         feedItemSql.readTime = feedItemSql.readTime ?: Instant.now()
@@ -494,6 +504,31 @@ class RssLocalSync(
                     repository.syncLoadFeeds(retryAfter = Instant.now())
                 }
         }
+
+    /**
+     * Final thumbnail priority policy:
+     * 1) Keep feed-provided thumbnail (media/enclosure/etc) when it's not body-derived.
+     * 2) Otherwise try og:image from article <head>.
+     * 3) If no og:image found, keep current value (body fallback or null).
+     */
+    private suspend fun resolveThumbnailImage(
+        current: ThumbnailImage?,
+        articleUrl: String?,
+        hasFeedImage: Boolean,
+    ): ThumbnailImage? {
+        val url = articleUrl?.trim()?.takeIf { it.isNotEmpty() } ?: return current
+        if (!ThumbnailImagePolicy.shouldFetchOgImage(current, url, hasFeedImage)) return current
+
+        val ogImage =
+            try {
+                okHttpClient.fetchOgImage(url)
+            } catch (e: Exception) {
+                logDebug(LOG_TAG, "Failed to fetch og:image for $url", e)
+                null
+            }
+
+        return ThumbnailImagePolicy.applyOgImage(current, ogImage)
+    }
 
     companion object {
         private const val LOG_TAG = "FEEDER_RssLocalSync"

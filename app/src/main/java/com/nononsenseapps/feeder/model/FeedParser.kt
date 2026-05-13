@@ -313,6 +313,7 @@ private fun FeederGoItem.asParsedArticle() =
         author = author?.asParsedAuthor(),
         tags = categories,
         attachments = enclosures?.map { it.asParsedEnclosure() },
+        hasFeedImage = thumbnail?.fromBody == false,
     )
 
 private fun GoEnclosure.asParsedEnclosure() =

@@ -816,19 +816,19 @@ private val sampleFile: List<String> =
         </title>
       </head>
       <body>
-        <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage.png" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://example.com/0/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;3&quot;" text="custom &quot;3&quot;" type="rss" xmlUrl="http://example.com/3/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;6&quot;" text="custom &quot;6&quot;" type="rss" xmlUrl="http://example.com/6/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;9&quot;" text="custom &quot;9&quot;" type="rss" xmlUrl="http://example.com/9/rss.xml"/>
+        <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage.png" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://example.com/0/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;3&quot;" text="custom &quot;3&quot;" type="rss" xmlUrl="http://example.com/3/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;6&quot;" text="custom &quot;6&quot;" type="rss" xmlUrl="http://example.com/6/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;9&quot;" text="custom &quot;9&quot;" type="rss" xmlUrl="http://example.com/9/rss.xml"/>
         <outline title="tag1" text="tag1">
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;1&quot;" text="custom &quot;1&quot;" type="rss" xmlUrl="http://example.com/1/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;4&quot;" text="custom &quot;4&quot;" type="rss" xmlUrl="http://example.com/4/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;7&quot;" text="custom &quot;7&quot;" type="rss" xmlUrl="http://example.com/7/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;1&quot;" text="custom &quot;1&quot;" type="rss" xmlUrl="http://example.com/1/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;4&quot;" text="custom &quot;4&quot;" type="rss" xmlUrl="http://example.com/4/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;7&quot;" text="custom &quot;7&quot;" type="rss" xmlUrl="http://example.com/7/rss.xml"/>
         </outline>
         <outline title="tag2" text="tag2">
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;2&quot;" text="custom &quot;2&quot;" type="rss" xmlUrl="http://example.com/2/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;5&quot;" text="custom &quot;5&quot;" type="rss" xmlUrl="http://example.com/5/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://example.com/8/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;2&quot;" text="custom &quot;2&quot;" type="rss" xmlUrl="http://example.com/2/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;5&quot;" text="custom &quot;5&quot;" type="rss" xmlUrl="http://example.com/5/rss.xml"/>
+          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://example.com/8/rss.xml"/>
         </outline>
         <feeder:settings>
           <feeder:setting key="pref_added_feeder_news" value="true"/>

@@ -45,6 +45,7 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/AppThemeDayNoActionBar"
+    android:memtagMode="async"
     android:usesCleartextTraffic="true">
 
     <meta-data

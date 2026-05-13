@@ -241,6 +241,7 @@ abstract class BodyTag(
             fullTextByDefault = feed.fullTextByDefault
             openArticlesWith = feed.openArticlesWith
             alternateId = feed.alternateId
+            fetchOgImages = feed.fetchOgImages
         }
 }
 
@@ -295,6 +296,11 @@ class Outline : BodyTag("outline") {
         get() = attributes["feeder:alternateId"]!!.toBoolean()
         set(value) {
             attributes["feeder:alternateId"] = value.toString()
+        }
+    var fetchOgImages: Boolean
+        get() = attributes["feeder:fetchOgImages"]!!.toBoolean()
+        set(value) {
+            attributes["feeder:fetchOgImages"] = value.toString()
         }
 }
 

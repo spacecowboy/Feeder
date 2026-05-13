@@ -47,6 +47,7 @@ class EditFeedScreenViewModel(
     override var articleOpener: String by mutableSavedStateOf(state, "")
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var summarizeOnOpen: Boolean by mutableSavedStateOf(state, false)
+    override var fetchOgImages: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
 
     override var feedImage: String by mutableStateOf("")
@@ -112,6 +113,9 @@ class EditFeedScreenViewModel(
             if (!state.contains("summarizeOnOpen")) {
                 summarizeOnOpen = feed.summarizeOnOpen
             }
+            if (!state.contains("fetchOgImages")) {
+                fetchOgImages = feed.fetchOgImages
+            }
 
             repository.allTags
                 .collect { value ->
@@ -138,6 +142,7 @@ class EditFeedScreenViewModel(
                     openArticlesWith = articleOpener,
                     alternateId = alternateId,
                     summarizeOnOpen = summarizeOnOpen,
+                    fetchOgImages = fetchOgImages,
                 )
 
             // No point in doing anything unless they actually differ
