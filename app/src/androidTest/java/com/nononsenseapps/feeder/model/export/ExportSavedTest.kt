@@ -40,6 +40,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
@@ -160,26 +161,88 @@ class ExportSavedTest : DIAware {
     }
 
     private suspend fun insertTestData(): Long {
+        val (itemId, _) = insertTestDataWithFeed()
+        return itemId
+    }
+
+    private suspend fun insertTestDataWithFeed(): Pair<Long, Long> {
         val article = savedArticleExportItem()
         val feedId = insertTestFeed()
-        return db.feedItemDao().insertFeedItem(
-            FeedItem(
-                guid = article.guid,
-                plainTitle = article.title,
-                plainSnippet = article.snippet,
-                thumbnailImage = article.thumbnailImage,
-                enclosureLink = article.enclosureLink,
-                enclosureType = article.enclosureType,
-                author = article.author,
+        val itemId =
+            db.feedItemDao().insertFeedItem(
+                FeedItem(
+                    guid = article.guid,
+                    plainTitle = article.title,
+                    plainSnippet = article.snippet,
+                    thumbnailImage = article.thumbnailImage,
+                    enclosureLink = article.enclosureLink,
+                    enclosureType = article.enclosureType,
+                    author = article.author,
+                    feedId = feedId,
+                    link = article.link,
+                    pubDate = ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC),
+                    primarySortTime = Instant.parse("2026-05-12T08:29:30Z"),
+                    readTime = Instant.parse("2026-05-12T08:31:00Z"),
+                    wordCount = article.wordCount,
+                    wordCountFull = article.wordCountFull,
+                ),
+            )
+        return itemId to feedId
+    }
+
+    private fun assertSavedArticleRestored(
+        article: SavedArticleExportItem,
+        imported: FeedItem,
+        feedId: Long,
+    ) {
+        assertTrue(imported.bookmarked)
+        assertEquals(article.title, imported.plainTitle)
+        assertEquals(article.snippet, imported.plainSnippet)
+        assertEquals(article.thumbnailImage, imported.thumbnailImage)
+        assertEquals(article.enclosureLink, imported.enclosureLink)
+        assertEquals(article.enclosureType, imported.enclosureType)
+        assertEquals(article.author, imported.author)
+        assertEquals(article.link, imported.link)
+        assertEquals(ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC), imported.pubDate)
+        assertEquals(Instant.parse(article.primarySortTime), imported.primarySortTime)
+        assertEquals(Instant.parse(article.readTime!!), imported.readTime)
+        assertEquals(article.wordCount, imported.wordCount)
+        assertEquals(article.wordCountFull, imported.wordCountFull)
+        assertEquals(feedId, imported.feedId)
+    }
+
+    @SmallTest
+    @Test
+    fun testExportThenImportSavedArticlesRestoresMissingArticle() {
+        runBlocking {
+            val article = savedArticleExportItem()
+            val (itemId, feedId) = insertTestDataWithFeed()
+            db.feedItemDao().setBookmarked(itemId, true)
+
+            assertTrue {
+                exportSavedArticles(
+                    di,
+                    path!!.toUri(),
+                ).isRight()
+            }
+
+            db.feedItemDao().deleteFeedItems(listOf(itemId))
+            Assert.assertNull(db.feedItemDao().loadFeedItem(article.guid, feedId))
+
+            assertTrue {
+                importSavedArticles(
+                    di,
+                    path!!.toUri(),
+                ).isRight()
+            }
+
+            val imported = assertNotNull(db.feedItemDao().loadFeedItem(article.guid, feedId))
+            assertSavedArticleRestored(
+                article = article,
+                imported = imported,
                 feedId = feedId,
-                link = article.link,
-                pubDate = ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC),
-                primarySortTime = Instant.parse("2026-05-12T08:29:30Z"),
-                readTime = Instant.parse("2026-05-12T08:31:00Z"),
-                wordCount = article.wordCount,
-                wordCountFull = article.wordCountFull,
-            ),
-        )
+            )
+        }
     }
 
     @SmallTest
@@ -231,21 +294,12 @@ class ExportSavedTest : DIAware {
                 ).isRight()
             }
 
-            val imported = db.feedItemDao().loadFeedItem(article.guid, feedId)!!
-            assertTrue(imported.bookmarked)
-            assertEquals(article.title, imported.plainTitle)
-            assertEquals(article.snippet, imported.plainSnippet)
-            assertEquals(article.thumbnailImage, imported.thumbnailImage)
-            assertEquals(article.enclosureLink, imported.enclosureLink)
-            assertEquals(article.enclosureType, imported.enclosureType)
-            assertEquals(article.author, imported.author)
-            assertEquals(article.link, imported.link)
-            assertEquals(ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC), imported.pubDate)
-            assertEquals(Instant.parse(article.primarySortTime), imported.primarySortTime)
-            assertEquals(Instant.parse(article.readTime!!), imported.readTime)
-            assertEquals(article.wordCount, imported.wordCount)
-            assertEquals(article.wordCountFull, imported.wordCountFull)
-            assertEquals(feedId, imported.feedId)
+            val imported = assertNotNull(db.feedItemDao().loadFeedItem(article.guid, feedId))
+            assertSavedArticleRestored(
+                article = article,
+                imported = imported,
+                feedId = feedId,
+            )
         }
     }
 }
