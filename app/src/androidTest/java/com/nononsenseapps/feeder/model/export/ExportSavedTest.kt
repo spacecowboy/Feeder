@@ -110,74 +110,74 @@ class ExportSavedTest : DIAware {
             assertEquals(SAVED_ARTICLES_EXPORT_FORMAT, result.format)
             assertEquals(SAVED_ARTICLES_EXPORT_VERSION, result.version)
             assertEquals(
-                listOf(
-                    SavedArticleExportItem(
-                        link = "https://example.com/ampersands/1",
-                        guid = "guid anime2you",
-                        title = "Item with image",
-                        snippet = "Snippet with image",
-                        pubDate = "2026-05-12T08:30Z",
-                        primarySortTime = "2026-05-12T08:29:30Z",
-                        readTime = "2026-05-12T08:31:00Z",
-                        author = "Example Author",
-                        thumbnailImage =
-                            MediaImage(
-                                url = "https://example.com/ampersands/image.png",
-                                width = 640,
-                                height = 320,
-                            ),
-                        enclosureLink = "https://example.com/ampersands/podcast.mp3",
-                        enclosureType = "audio/mpeg",
-                        wordCount = 42,
-                        wordCountFull = 420,
-                        feed =
-                            SavedArticleFeedExportItem(
-                                url = "https://example.com/ampersands",
-                                title = "Ampersands are & the worst",
-                                customTitle = "Ampersands",
-                                tag = "Characters",
-                                fullTextByDefault = true,
-                            ),
-                    ),
-                ),
+                listOf(savedArticleExportItem()),
                 result.articles,
             )
         }
     }
 
-    private suspend fun insertTestData(): Long {
-        val feedId =
-            db.feedDao().insertFeed(
-                Feed(
+    private fun savedArticleExportItem(): SavedArticleExportItem =
+        SavedArticleExportItem(
+            link = "https://example.com/ampersands/1",
+            guid = "guid anime2you",
+            title = "Item with image",
+            snippet = "Snippet with image",
+            pubDate = "2026-05-12T08:30Z",
+            primarySortTime = "2026-05-12T08:29:30Z",
+            readTime = "2026-05-12T08:31:00Z",
+            author = "Example Author",
+            thumbnailImage =
+                MediaImage(
+                    url = "https://example.com/ampersands/image.png",
+                    width = 640,
+                    height = 320,
+                ),
+            enclosureLink = "https://example.com/ampersands/podcast.mp3",
+            enclosureType = "audio/mpeg",
+            wordCount = 42,
+            wordCountFull = 420,
+            feed =
+                SavedArticleFeedExportItem(
+                    url = "https://example.com/ampersands",
                     title = "Ampersands are & the worst",
                     customTitle = "Ampersands",
-                    url = URL("https://example.com/ampersands"),
                     tag = "Characters",
                     fullTextByDefault = true,
                 ),
-            )
+        )
 
+    private suspend fun insertTestFeed(): Long {
+        val article = savedArticleExportItem()
+        return db.feedDao().insertFeed(
+            Feed(
+                title = article.feed.title,
+                customTitle = article.feed.customTitle,
+                url = URL(article.feed.url),
+                tag = article.feed.tag,
+                fullTextByDefault = article.feed.fullTextByDefault,
+            ),
+        )
+    }
+
+    private suspend fun insertTestData(): Long {
+        val article = savedArticleExportItem()
+        val feedId = insertTestFeed()
         return db.feedItemDao().insertFeedItem(
             FeedItem(
-                guid = "guid anime2you",
-                plainTitle = "Item with image",
-                plainSnippet = "Snippet with image",
-                thumbnailImage =
-                    MediaImage(
-                        url = "https://example.com/ampersands/image.png",
-                        width = 640,
-                        height = 320,
-                    ),
-                enclosureLink = "https://example.com/ampersands/podcast.mp3",
-                enclosureType = "audio/mpeg",
-                author = "Example Author",
+                guid = article.guid,
+                plainTitle = article.title,
+                plainSnippet = article.snippet,
+                thumbnailImage = article.thumbnailImage,
+                enclosureLink = article.enclosureLink,
+                enclosureType = article.enclosureType,
+                author = article.author,
                 feedId = feedId,
-                link = "https://example.com/ampersands/1",
+                link = article.link,
                 pubDate = ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC),
                 primarySortTime = Instant.parse("2026-05-12T08:29:30Z"),
                 readTime = Instant.parse("2026-05-12T08:31:00Z"),
-                wordCount = 42,
-                wordCountFull = 420,
+                wordCount = article.wordCount,
+                wordCountFull = article.wordCountFull,
             ),
         )
     }
@@ -189,10 +189,10 @@ class ExportSavedTest : DIAware {
             val itemId = insertTestData()
             path!!.writeText(
                 """
-                https://example.com/ampersands
+                https://example.com/ampersands/1
                 https://example.com/not-in-db
 
-                https://example.com/ampersands
+                https://example.com/ampersands/1
                 """.trimIndent(),
             )
             Assert.assertFalse(db.feedItemDao().loadFeedItem(itemId)!!.bookmarked)
@@ -203,6 +203,49 @@ class ExportSavedTest : DIAware {
                 ).isRight()
             }
             assertTrue(db.feedItemDao().loadFeedItem(itemId)!!.bookmarked)
+        }
+    }
+
+    @SmallTest
+    @Test
+    fun testImportSavedArticlesExportRestoresMissingArticle() {
+        runBlocking {
+            val article = savedArticleExportItem()
+            val feedId = insertTestFeed()
+            path!!.writeText(
+                Json.encodeToString(
+                    SavedArticlesExport.serializer(),
+                    SavedArticlesExport(
+                        format = SAVED_ARTICLES_EXPORT_FORMAT,
+                        version = SAVED_ARTICLES_EXPORT_VERSION,
+                        articles = listOf(article),
+                    ),
+                ),
+            )
+
+            Assert.assertNull(db.feedItemDao().loadFeedItem(article.guid, feedId))
+            assertTrue {
+                importSavedArticles(
+                    di,
+                    path!!.toUri(),
+                ).isRight()
+            }
+
+            val imported = db.feedItemDao().loadFeedItem(article.guid, feedId)!!
+            assertTrue(imported.bookmarked)
+            assertEquals(article.title, imported.plainTitle)
+            assertEquals(article.snippet, imported.plainSnippet)
+            assertEquals(article.thumbnailImage, imported.thumbnailImage)
+            assertEquals(article.enclosureLink, imported.enclosureLink)
+            assertEquals(article.enclosureType, imported.enclosureType)
+            assertEquals(article.author, imported.author)
+            assertEquals(article.link, imported.link)
+            assertEquals(ZonedDateTime.of(2026, 5, 12, 8, 30, 0, 0, ZoneOffset.UTC), imported.pubDate)
+            assertEquals(Instant.parse(article.primarySortTime), imported.primarySortTime)
+            assertEquals(Instant.parse(article.readTime!!), imported.readTime)
+            assertEquals(article.wordCount, imported.wordCount)
+            assertEquals(article.wordCountFull, imported.wordCountFull)
+            assertEquals(feedId, imported.feedId)
         }
     }
 }

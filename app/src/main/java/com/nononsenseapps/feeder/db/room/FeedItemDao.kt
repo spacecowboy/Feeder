@@ -79,6 +79,9 @@ interface FeedItemDao {
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
 
+    @Query("SELECT * FROM feed_items WHERE link IS :link ORDER BY id LIMIT 1")
+    suspend fun loadFeedItemByLink(link: String): FeedItem?
+
     @Query(
         """
         SELECT $FEED_ITEM_COLUMNS_WITH_FEED
