@@ -78,14 +78,12 @@ class SyncRestClient(
         }
     }
 
-    private suspend fun <A> safeBlock(block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Either<ErrorResponse, A>)?): Either<ErrorResponse, A> {
-        if (block != null) {
-            repository.getSyncRemote().let { syncRemote ->
-                if (syncRemote.hasSyncChain()) {
-                    feederSync?.let { feederSync ->
-                        secretKey?.let { secretKey ->
-                            return block(syncRemote, feederSync, secretKey)
-                        }
+    private suspend fun <A> safeBlock(block: suspend (SyncRemote, FeederSync, SecretKeys) -> Either<ErrorResponse, A>): Either<ErrorResponse, A> {
+        repository.getSyncRemote().let { syncRemote ->
+            if (syncRemote.hasSyncChain()) {
+                feederSync?.let { feederSync ->
+                    secretKey?.let { secretKey ->
+                        return block(syncRemote, feederSync, secretKey)
                     }
                 }
             }
@@ -269,7 +267,7 @@ class SyncRestClient(
             )
         }
 
-    internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>): Either<ErrorResponse, SendReadMarkResponse> =
+    private suspend fun sendReadMarksBatch(feedItems: List<FeedItemForReadMark>): Either<ErrorResponse, SendReadMarkResponse> =
         try {
             safeBlock { syncRemote, feederSync, secretKey ->
                 logDebug(LOG_TAG, "markAsRead: ${feedItems.size} items")
@@ -326,7 +324,7 @@ class SyncRestClient(
                         .asSequence()
                         .chunked(100)
                         .forEach { feedItems ->
-                            markAsRead(feedItems)
+                            sendReadMarksBatch(feedItems)
                         }
                 }
                 Either.Right(Unit)

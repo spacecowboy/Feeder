@@ -12,7 +12,6 @@ import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -111,21 +110,6 @@ class SyncRemoteStoreTest : DIAware {
     }
 
     @Test
-    fun getNextFeedItemWithoutSyncedReadMark() {
-        coEvery { readStatusDao.getNextFeedItemWithoutSyncedReadMark() } returns emptyFlow()
-
-        val result =
-            runBlocking {
-                store.getNextFeedItemWithoutSyncedReadMark().toList()
-            }
-
-        assertEquals(emptyList(), result)
-
-        coVerify { readStatusDao.getNextFeedItemWithoutSyncedReadMark() }
-        confirmVerified(readStatusDao)
-    }
-
-    @Test
     fun setSynced() {
         coEvery { readStatusDao.insert(any()) } returns 10L
 
@@ -152,14 +136,14 @@ class SyncRemoteStoreTest : DIAware {
     }
 
     @Test
-    fun deleteReadStatusSyncs() {
-        coEvery { readStatusDao.deleteReadStatusSyncs(any()) } returns 50
+    fun deleteAppliedRemoteReadMarks() {
+        coEvery { remoteReadMarkDao.deleteByIds(any()) } returns 50
 
         runBlocking {
-            store.deleteReadStatusSyncs(listOf(5L, 12L))
+            store.deleteAppliedRemoteReadMarks(listOf(5L, 12L))
         }
 
-        coVerify { readStatusDao.deleteReadStatusSyncs(listOf(5L, 12L)) }
-        confirmVerified(readStatusDao)
+        coVerify { remoteReadMarkDao.deleteByIds(listOf(5L, 12L)) }
+        confirmVerified(remoteReadMarkDao)
     }
 }
