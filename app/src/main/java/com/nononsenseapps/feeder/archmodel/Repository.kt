@@ -719,7 +719,7 @@ class Repository(
         for (itemId in itemIds) {
             syncRemoteStore.setSynced(itemId)
         }
-        syncRemoteStore.deleteReadStatusSyncs(toBeApplied.map { it.id })
+        syncRemoteStore.deleteAppliedRemoteReadMarks(toBeApplied.map { it.id })
         // Remove stale marks for items that are already read so they don't override a
         // deliberate "mark as unread" on the next sync.
         syncRemoteStore.deleteRemoteReadMarksForReadItems()

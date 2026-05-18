@@ -349,12 +349,6 @@ interface FeedItemDao {
         readTime: Instant = Instant.now(),
     )
 
-    @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE id IS :id")
-    suspend fun markAsRead(
-        id: Long,
-        readTime: Instant = Instant.now(),
-    )
-
     @Query("UPDATE feed_items SET read_time = null WHERE id IS :id")
     suspend fun markAsUnread(id: Long)
 

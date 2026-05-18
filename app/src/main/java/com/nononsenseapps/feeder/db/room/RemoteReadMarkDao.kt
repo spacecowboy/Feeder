@@ -28,6 +28,18 @@ interface RemoteReadMarkDao {
     suspend fun deleteStaleRemoteReadMarks(oldestTimestamp: Instant): Int
 
     /**
+     * Deletes a set of remote read marks by their primary key ids.
+     * Used after the marks have been successfully applied locally.
+     */
+    @Query(
+        """
+            DELETE FROM remote_read_mark
+            WHERE id in (:ids)
+        """,
+    )
+    suspend fun deleteByIds(ids: List<Long>): Int
+
+    /**
      * Deletes remote read marks for items that have already been marked as read locally.
      * This prevents stale marks from re-applying a read status after the user has
      * explicitly marked an item as unread.
