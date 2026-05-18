@@ -11,6 +11,7 @@ import android.view.translation.TranslationRequestValue
 import android.view.translation.TranslationResponse
 import android.view.translation.TranslationResponseValue
 import android.view.translation.TranslationSpec
+import androidx.annotation.RequiresApi
 import com.nononsenseapps.feeder.model.detectLocaleFromText
 import com.nononsenseapps.feeder.model.hasEnoughTextForLanguageDetection
 import com.nononsenseapps.feeder.model.prepareTextForLanguageDetection
@@ -80,6 +81,7 @@ class BergamotTranslator(
             }
         }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private suspend fun translateHtml(
         html: String,
         sourceLang: String,
@@ -125,6 +127,7 @@ class BergamotTranslator(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private suspend fun translatePlainText(
         content: String,
         sourceLang: String,
@@ -147,6 +150,7 @@ class BergamotTranslator(
             is LocalTranslationResult.Error -> TranslationResult.Error(result.message)
         }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private suspend fun translateTextValues(
         content: List<String>,
         sourceLang: String,
