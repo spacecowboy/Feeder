@@ -59,6 +59,9 @@ import androidx.compose.ui.window.DialogProperties
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
+import com.nononsenseapps.feeder.openai.BERGAMOT_PROVIDER_URL
+import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
+import com.nononsenseapps.feeder.openai.isBergamot
 import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
@@ -215,6 +218,7 @@ private fun OpenAISectionItem(
     modifier: Modifier = Modifier,
 ) {
     val provider = remember(settings) { AIProviderPreset.fromSettings(settings) }
+    val configured = remember(settings) { settings.key.isNotBlank() || settings.canUseAsTranslationApi }
 
     Row(
         modifier =
@@ -236,7 +240,7 @@ private fun OpenAISectionItem(
             subtitle = {
                 Text(
                     text =
-                        if (settings.key.isBlank()) {
+                        if (!configured) {
                             stringResource(R.string.ai_not_configured)
                         } else {
                             stringResource(R.string.api_provider_summary, stringResource(provider.titleRes))
@@ -268,10 +272,11 @@ private fun OpenAISectionEdit(
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
     val hasProvider = provider != AIProviderPreset.NONE
-    val isTranslationOnlyProvider = provider.isDeepL
+    val isTranslationOnlyProvider = provider.isTranslationOnly
+    val needsApiKey = provider.needsApiKey
 
     LaunchedEffect(current, provider) {
-        if (provider != AIProviderPreset.NONE) {
+        if (provider != AIProviderPreset.NONE && provider != AIProviderPreset.BERGAMOT) {
             delay(750)
             latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
         }
@@ -329,7 +334,7 @@ private fun OpenAISectionEdit(
             },
         )
 
-        if (hasProvider) {
+        if (hasProvider && needsApiKey) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = current.key,
@@ -479,7 +484,7 @@ private fun OpenAISectionEdit(
             )
         }
 
-        if (hasProvider) {
+        if (hasProvider && provider != AIProviderPreset.BERGAMOT) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = timeoutString,
@@ -704,6 +709,8 @@ private enum class AIProviderPreset(
     val supportsSummary: Boolean,
     val supportsTranslation: Boolean,
     val isDeepL: Boolean,
+    val isTranslationOnly: Boolean,
+    val needsApiKey: Boolean,
     val endpoint: String,
 ) {
     NONE(
@@ -711,6 +718,8 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = true,
         isDeepL = false,
+        isTranslationOnly = false,
+        needsApiKey = false,
         endpoint = "",
     ),
     OPENAI_COMPATIBLE(
@@ -718,6 +727,8 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
+        isTranslationOnly = false,
+        needsApiKey = true,
         endpoint = "",
     ),
     AZURE_OPENAI(
@@ -725,6 +736,8 @@ private enum class AIProviderPreset(
         supportsSummary = true,
         supportsTranslation = false,
         isDeepL = false,
+        isTranslationOnly = false,
+        needsApiKey = true,
         endpoint = "",
     ),
     DEEPL(
@@ -732,7 +745,18 @@ private enum class AIProviderPreset(
         supportsSummary = false,
         supportsTranslation = true,
         isDeepL = true,
+        isTranslationOnly = true,
+        needsApiKey = true,
         endpoint = "https://api.deepl.com/v2/translate",
+    ),
+    BERGAMOT(
+        titleRes = R.string.provider_bergamot,
+        supportsSummary = false,
+        supportsTranslation = true,
+        isDeepL = false,
+        isTranslationOnly = true,
+        needsApiKey = false,
+        endpoint = "Local Firefox Translations / Bergamot",
     ),
     ;
 
@@ -766,6 +790,15 @@ private enum class AIProviderPreset(
                     azureDeploymentId = "",
                     modelId = "",
                 )
+
+            BERGAMOT ->
+                settings.copy(
+                    key = "",
+                    modelId = "",
+                    baseUrl = BERGAMOT_PROVIDER_URL,
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                )
         }
 
     companion object {
@@ -781,6 +814,7 @@ private enum class AIProviderPreset(
             when {
                 settings.isBlankConfiguration -> NONE
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
+                settings.isBergamot -> BERGAMOT
                 settings.isDeepL -> DEEPL
                 else -> OPENAI_COMPATIBLE
             }
@@ -847,7 +881,7 @@ private fun OpenAISettings.validationMessage(
         return null
     }
 
-    if (key.isBlank()) {
+    if (provider.needsApiKey && key.isBlank()) {
         return if (provider.isDeepL) {
             context.getString(R.string.enter_deepl_api_key_before_saving)
         } else {
@@ -896,6 +930,8 @@ private fun OpenAISettings.validationMessage(
                 else -> null
             }
         }
+
+        AIProviderPreset.BERGAMOT -> null
     }
 }
 
@@ -912,14 +948,14 @@ private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAI
         OpenAISectionType.Summary ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL -> OpenAISettings()
+                settings.isDeepL || settings.isBergamot -> OpenAISettings()
                 else -> settings
             }
 
         OpenAISectionType.Translation ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL -> settings
+                settings.isDeepL || settings.isBergamot -> settings
                 else -> OpenAISettings()
             }
     }

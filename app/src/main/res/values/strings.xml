@@ -296,6 +296,7 @@
   <string name="provider_openai_compatible">OpenAI or compatible</string>
   <string name="provider_azure_openai">Azure OpenAI</string>
   <string name="provider_deepl">DeepL</string>
+  <string name="provider_bergamot">Local</string>
   <string name="base_url_optional">Base URL (optional)</string>
   <string name="translation_endpoint">Translation endpoint</string>
   <string name="azure_api_version">Azure API version</string>
