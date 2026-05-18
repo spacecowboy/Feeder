@@ -52,13 +52,9 @@ class SyncRemoteStore(
         readStatusDao.deleteAll()
     }
 
-    suspend fun deleteReadStatusSyncs(ids: List<Long>) {
-        readStatusDao.deleteReadStatusSyncs(ids)
+    suspend fun deleteAppliedRemoteReadMarks(ids: List<Long>) {
+        remoteReadMarkDao.deleteByIds(ids)
     }
-
-    fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?> = readStatusDao.getNextFeedItemWithoutSyncedReadMark()
-
-    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> = readStatusDao.getFlowOfFeedItemsWithoutSyncedReadMark()
 
     suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> = readStatusDao.getFeedItemsWithoutSyncedReadMark()
 
@@ -95,6 +91,10 @@ class SyncRemoteStore(
     suspend fun deleteStaleRemoteReadMarks(now: Instant) {
         // 7 days ago
         remoteReadMarkDao.deleteStaleRemoteReadMarks(now.minus(7, ChronoUnit.DAYS))
+    }
+
+    suspend fun deleteRemoteReadMarksForReadItems() {
+        remoteReadMarkDao.deleteRemoteReadMarksForReadItems()
     }
 
     suspend fun getRemoteReadMarksReadyToBeApplied() = remoteReadMarkDao.getRemoteReadMarksReadyToBeApplied()

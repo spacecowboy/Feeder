@@ -427,7 +427,25 @@ class RepositoryTest : DIAware {
             feedItemStore.markAsRead(listOf(2L, 4L))
             syncRemoteStore.setSynced(2L)
             syncRemoteStore.setSynced(4L)
-            syncRemoteStore.deleteReadStatusSyncs(listOf(1L, 3L))
+            syncRemoteStore.deleteAppliedRemoteReadMarks(listOf(1L, 3L))
+            syncRemoteStore.deleteRemoteReadMarksForReadItems()
+        }
+        confirmVerified(feedItemStore, syncRemoteStore)
+    }
+
+    @Test
+    fun applyRemoteReadMarksCleansUpStaleMarksEvenWhenNothingToApply() {
+        coEvery { syncRemoteStore.getRemoteReadMarksReadyToBeApplied() } returns emptyList()
+
+        runBlocking {
+            repository.applyRemoteReadMarks()
+        }
+
+        coVerify {
+            syncRemoteStore.getRemoteReadMarksReadyToBeApplied()
+            feedItemStore.markAsRead(emptyList())
+            syncRemoteStore.deleteAppliedRemoteReadMarks(emptyList())
+            syncRemoteStore.deleteRemoteReadMarksForReadItems()
         }
         confirmVerified(feedItemStore, syncRemoteStore)
     }
