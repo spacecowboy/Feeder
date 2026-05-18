@@ -165,8 +165,10 @@ class BergamotTranslator(
                     TranslationSpec.DATA_FORMAT_TEXT,
                     TranslationSpec.DATA_FORMAT_TEXT,
                 ).firstOrNull { capability ->
-                    capability.sourceSpec.locale.language.equals(sourceLang, ignoreCase = true) &&
-                        capability.targetSpec.locale.language.equals(targetLang, ignoreCase = true)
+                    capability.sourceSpec.locale.language
+                        .equals(sourceLang, ignoreCase = true) &&
+                        capability.targetSpec.locale.language
+                            .equals(targetLang, ignoreCase = true)
                 }
 
         when (capability?.state) {
