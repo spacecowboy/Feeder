@@ -49,6 +49,9 @@
 # Charset detection
 -keep class com.ibm.icu.** { *; }
 
+# For WorkManager - InputMerger subclasses are instantiated by name via reflection
+-keep class * extends androidx.work.InputMerger { <init>(); }
+
 # For Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
 -keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
