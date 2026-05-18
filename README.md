@@ -35,11 +35,11 @@ If you want to translate Feeder into your native language the easiest way is to 
 
 Clone the project:
 
-    git clone --recursive https://github.com/spacecowboy/Feeder.git
+    git clone https://github.com/spacecowboy/Feeder.git
 
 Then build and install the app to your phone which is connected via USB:
 
-    ./gradlew installDebug
+    ./gradlew installFdroidDebug
 
 ### Features
 
