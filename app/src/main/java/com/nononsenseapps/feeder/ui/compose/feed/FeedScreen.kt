@@ -342,6 +342,7 @@ fun FeedScreen(
                             "text/x-opml",
                             "application/xml",
                             // This is the mimetype the file actually gets when exported
+                            "application/json",
                             "application/octet-stream",
                             // But just in case a file isn't named right etc, accept all
                             "*/*",
