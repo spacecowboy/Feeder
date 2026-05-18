@@ -97,6 +97,10 @@ class SyncRemoteStore(
         remoteReadMarkDao.deleteStaleRemoteReadMarks(now.minus(7, ChronoUnit.DAYS))
     }
 
+    suspend fun deleteRemoteReadMarksForReadItems() {
+        remoteReadMarkDao.deleteRemoteReadMarksForReadItems()
+    }
+
     suspend fun getRemoteReadMarksReadyToBeApplied() = remoteReadMarkDao.getRemoteReadMarksReadyToBeApplied()
 
     suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL) = remoteReadMarkDao.getGuidsWhichAreSyncedAsReadInFeed(feedUrl = feedUrl)

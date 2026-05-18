@@ -366,6 +366,11 @@ class RssLocalSync(
                             .use {
                                 it.write(text)
                             }
+                        // If this item was pre-marked as read from a remote read-mark (alreadyReadGuids),
+                        // immediately set it as synced so it won't be echoed back to the server.
+                        if (feedItem.guid in alreadyReadGuids) {
+                            repository.setSynced(feedItem.id)
+                        }
                     }
                     // Try to look for image if not done before
                     if (feedSql.imageUrl == null && feedSql.siteFetched == Instant.EPOCH) {
