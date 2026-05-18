@@ -21,7 +21,9 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
+import com.nononsenseapps.feeder.db.room.RemoteReadMark
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkDao
+import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.Feeds.Companion.RSS_WITH_DUPLICATE_GUIDS
@@ -825,6 +827,91 @@ class RssLocalSyncKtTest : DIAware {
             // Verify the selected article is still in the database
             val selectedArticleFromDb = testDb.db.feedItemDao().loadFeedItem(selectedArticleId)
             assertNotNull("Selected article should still exist in database", selectedArticleFromDb)
+        }
+
+    @Test
+    fun remoteReadMarkIsAppliedToNewItemAndMarkedAsSynced() =
+        runBlocking {
+            val feedUrl = server.url("/feed.json").toUrl()
+            val feedId = insertFeed("cowboyjson", feedUrl, cowboyJson)
+
+            val itemGuid = "https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/"
+
+            // SyncRemote must exist as FK parent for RemoteReadMark
+            testDb.db.syncRemoteDao().insert(SyncRemote(id = 1L, deviceName = "TestDevice", secretKey = ""))
+            testDb.db.remoteReadMarkDao().insert(
+                RemoteReadMark(
+                    sync_remote = 1L,
+                    feedUrl = feedUrl,
+                    guid = itemGuid,
+                    timestamp = Instant.now(),
+                ),
+            )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            val feedItems = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+            val item = feedItems.find { it.guid == itemGuid }
+            assertNotNull("Item should have been fetched from feed", item)
+            assertNotNull("Item should be marked as read via remote read-mark", item!!.readTime)
+
+            // With the fix: item must be in read_status_synced so it is not re-sent to server
+            val unsyncedReadItems = testDb.db.readStatusSyncedDao().getFeedItemsWithoutSyncedReadMark()
+            assertTrue(
+                "Item applied via remote read-mark must not appear as unsynced (would cause read echo back to server)",
+                unsyncedReadItems.none { it.id == item.id },
+            )
+        }
+
+    @Test
+    fun applyRemoteReadMarksCleansStaleEntriesForAlreadyReadItems() =
+        runBlocking {
+            val feedUrl = server.url("/feed.json").toUrl()
+            val feedId = insertFeed("cowboyjson", feedUrl, cowboyJson)
+
+            val itemGuid = "https://cowboyprogrammer.org/2018/03/fixed-vs-variable-interest-rates/"
+
+            testDb.db.syncRemoteDao().insert(SyncRemote(id = 1L, deviceName = "TestDevice", secretKey = ""))
+            testDb.db.remoteReadMarkDao().insert(
+                RemoteReadMark(
+                    sync_remote = 1L,
+                    feedUrl = feedUrl,
+                    guid = itemGuid,
+                    timestamp = Instant.now(),
+                ),
+            )
+
+            // First sync: item is fetched and marked as read via alreadyReadGuids
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            // Verify the mark still exists after syncFeeds (it was applied but not yet cleaned by applyRemoteReadMarks above)
+            // Now call applyRemoteReadMarks explicitly — this should clean up the stale entry
+            val repository: Repository by instance()
+            repository.applyRemoteReadMarks()
+
+            val remainingGuids = testDb.db.remoteReadMarkDao().getGuidsWhichAreSyncedAsReadInFeed(feedUrl)
+            assertTrue(
+                "Stale remote_read_mark entry should be cleaned up after applyRemoteReadMarks for already-read item",
+                remainingGuids.isEmpty(),
+            )
+        }
+
+    @Test
+    fun itemsNotInRemoteReadMarkAreNotMarkedAsRead() =
+        runBlocking {
+            val feedUrl = server.url("/feed.json").toUrl()
+            val feedId = insertFeed("cowboyjson", feedUrl, cowboyJson)
+
+            // No remote read marks inserted
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            val feedItems = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+            assertEquals("Feed should have 10 items", 10, feedItems.size)
+            assertTrue(
+                "No items should be marked as read when there are no remote read marks",
+                feedItems.all { it.readTime == null },
+            )
         }
 
     private fun fooRss(itemsCount: Int = 1): String {

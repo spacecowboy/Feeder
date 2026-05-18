@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.sync
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.crypto.SecretKeys
@@ -396,6 +397,8 @@ class SyncRestClient(
 
                             if (readMarkContent == null) {
                                 Log.e(LOG_TAG, "Failed to decrypt readMark content")
+                                // Advance the timestamp so the same corrupt mark is not retried indefinitely.
+                                repository.updateSyncRemoteMessageTimestamp(readMark.timestamp)
                                 continue
                             }
 
@@ -608,6 +611,19 @@ class SyncRestClient(
             // this device has been removed from the chain from another device
             leave()
         }
+    }
+
+    /**
+     * Test-only helper that bypasses the normal [initialize] flow and directly sets the
+     * underlying [FeederSync] client and encryption key.
+     */
+    @VisibleForTesting
+    internal fun initForTesting(
+        feederSync: FeederSync,
+        secretKey: SecretKeys,
+    ) {
+        this.feederSync = feederSync
+        this.secretKey = secretKey
     }
 
     companion object {
