@@ -18,7 +18,7 @@ cd Feeder
 Build and install to a connected Android device:
 
 ```
-./gradlew installDebug
+./gradlew installFdroidDebug
 ```
 
 No API keys or special local configuration are required to build and run the app.

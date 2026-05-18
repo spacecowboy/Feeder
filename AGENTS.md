@@ -7,6 +7,14 @@ Source: <https://github.com/spacecowboy/Feeder>
 
 ---
 
+## Environment
+
+- **JDK 17** or newer is required (dictated by the Android Gradle plugin).
+- No API keys or secrets are needed to build. The OpenAI feature keys are entered by the user at runtime via the Settings UI.
+- No `local.properties` setup is required beyond the standard Android SDK path.
+
+---
+
 ## Architecture
 
 Feeder follows **MVVM** with a unidirectional data flow:
@@ -73,7 +81,7 @@ To add a new dependency:
 
 | Flavor | App ID | Notes |
 |---|---|---|
-| `free` | `com.nononsenseapps.feeder` | **Primary** — distributed via F-Droid. |
+| `fdroid` | `com.nononsenseapps.feeder` | **Primary** — distributed via F-Droid. |
 | `play` | `com.nononsenseapps.feeder.play` | Google Play. Identical code; only a donation-related string differs (Play Store policy). |
 
 ---
@@ -82,9 +90,10 @@ To add a new dependency:
 
 | Task | Command |
 |---|---|
-| Build & install to device | `./gradlew installDebug` |
+| Build & install to device | `./gradlew installFdroidDebug` |
 | Run all JVM tests | `./gradlew test` |
 | **Full test suite** (JVM + instrumented) | `./gradlew check connectedCheck` |
+| Run only database migration tests | `./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=com.nononsenseapps.feeder.db.room` |
 | Lint Kotlin style | `./gradlew ktlintCheck` |
 | Auto-format Kotlin style | `./gradlew ktlintFormat` |
 
@@ -111,6 +120,8 @@ There is no exception to this rule. Feeder has a long history of users upgrading
 
 Feeder uses **Conventional Commits** with **past-tense** descriptions. Past tense reads better in the auto-generated changelog.
 
+> **Note:** This intentionally deviates from the standard Conventional Commits spec, which uses imperative mood. If you write Conventional Commits elsewhere, you will default to imperative out of muscle memory — please don't.
+
 ```
 <type>: <past-tense description>
 
@@ -121,6 +132,12 @@ refactor: extracted feed parsing into separate class
 ```
 
 Common types: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`.
+
+---
+
+## Navigation
+
+The app uses the **Jetpack Compose Navigation** library (`androidx.navigation.compose`). A `NavHost` is set up in `MainActivity`, and each destination is defined in `ui/compose/navigation/NavigationDestinations.kt` using a `.register()` extension pattern that attaches the composable and its arguments to the nav graph.
 
 ---
 
