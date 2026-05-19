@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.util.findFirstImageInHtml
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrNull
 import okhttp3.internal.toLongOrDefault
+import java.net.URI
 import java.net.URL
 
 class FeederGoItem(
@@ -56,7 +57,18 @@ class FeederGoItem(
 
     val snippet: String by lazy { plainContent.take(200) }
 
-    val link: String? by lazy { goItem.link?.let { relativeLinkIntoAbsolute(feedBaseUrl, it) } }
+    val link: String? by lazy {
+        val rawLink =
+            goItem.link ?: goItem.guid?.takeIf { guid ->
+                try {
+                    val uri = URI(guid)
+                    uri.isAbsolute && (uri.scheme == "http" || uri.scheme == "https")
+                } catch (_: Exception) {
+                    false
+                }
+            }
+        rawLink?.let { relativeLinkIntoAbsolute(feedBaseUrl, it) }
+    }
 
     val updated: String?
         get() = goItem.updatedParsed
