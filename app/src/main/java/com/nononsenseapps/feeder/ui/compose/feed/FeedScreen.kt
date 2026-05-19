@@ -116,6 +116,7 @@ import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.export.exportSavedArticles
+import com.nononsenseapps.feeder.model.export.importSavedArticles
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
@@ -181,7 +182,7 @@ fun FeedScreen(
     val di = LocalDI.current
     val savedArticleExporter =
         rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("text/x-opml"),
+            ActivityResultContracts.CreateDocument("application/json"),
         ) { uri ->
             if (uri != null) {
                 val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -209,6 +210,17 @@ fun FeedScreen(
                 val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
                 applicationCoroutineScope.launch {
                     importOpml(di, uri)
+                }
+            }
+        }
+    val savedArticleImporter =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            if (uri != null) {
+                val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
+                applicationCoroutineScope.launch {
+                    importSavedArticles(di, uri)
                 }
             }
         }
@@ -330,6 +342,7 @@ fun FeedScreen(
                             "text/x-opml",
                             "application/xml",
                             // This is the mimetype the file actually gets when exported
+                            "application/json",
                             "application/octet-stream",
                             // But just in case a file isn't named right etc, accept all
                             "*/*",
@@ -352,12 +365,30 @@ fun FeedScreen(
                     }
                 }
             },
+            onImportSavedArticles = {
+                try {
+                    savedArticleImporter.launch(
+                        arrayOf(
+                            "text/plain",
+                            // This is the mimetype the file may get from older exports
+                            "application/octet-stream",
+                            // But just in case a file isn't named right etc, accept all
+                            "*/*",
+                        ),
+                    )
+                } catch (_: Exception) {
+                    // ActivityNotFoundException in particular
+                    coroutineScope.launch {
+                        toastMaker.makeToast(R.string.failed_to_import_saved_articles)
+                    }
+                }
+            },
             onExportSavedArticles = {
                 try {
                     savedArticleExporter.launch(
                         "feeder-saved-articles-${LocalDate.now()}-${
                             LocalTime.now().toSecondOfDay()
-                        }.txt",
+                        }.json",
                     )
                 } catch (_: Exception) {
                     // ActivityNotFoundException in particular
@@ -488,6 +519,7 @@ fun FeedScreen(
     onSettings: () -> Unit,
     onImport: () -> Unit,
     onExportOPML: () -> Unit,
+    onImportSavedArticles: () -> Unit,
     onExportSavedArticles: () -> Unit,
     drawerState: DrawerState,
     markAsUnread: (Long, Boolean) -> Unit,
@@ -878,6 +910,21 @@ fun FeedScreen(
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.export_feeds_to_opml))
+                                },
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onImportSavedArticles()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.ImportExport,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.import_saved_articles))
                                 },
                             )
                             DropdownMenuItem(
