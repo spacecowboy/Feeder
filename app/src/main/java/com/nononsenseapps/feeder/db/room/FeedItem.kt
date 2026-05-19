@@ -131,6 +131,7 @@ data class FeedItem
             entry: ParsedArticle,
             entryGuid: String,
             feed: ParsedFeed,
+            fallbackPubDate: ZonedDateTime = ZonedDateTime.now(),
         ) {
             val converter = HtmlToPlainTextConverter()
             // Be careful about nulls.
@@ -173,7 +174,7 @@ data class FeedItem
                     ZonedDateTime.parse(entry.date_published)
                 } catch (t: Throwable) {
                     // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: ZonedDateTime.now()
+                    this.pubDate ?: fallbackPubDate
                 }
             primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
         }

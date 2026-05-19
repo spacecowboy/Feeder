@@ -36,6 +36,8 @@ import org.kodein.di.instance
 import java.io.IOException
 import java.net.URL
 import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import kotlin.math.max
@@ -302,7 +304,7 @@ class RssLocalSync(
 
                     val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
 
-                    val feedItemSqls =
+                    val itemsWithGuids =
                         items
                             ?.map {
                                 val guid =
@@ -313,7 +315,21 @@ class RssLocalSync(
 
                                 it to guid
                             }?.reversed()
-                            ?.mapNotNull { (item, guid) ->
+                            ?: emptyList()
+
+                    val totalItems = itemsWithGuids.size
+
+                    val feedItemSqls =
+                        itemsWithGuids
+                            .mapIndexedNotNull { index, (item, guid) ->
+                                // Pre-generate a fallback pubDate for items without one.
+                                // Items are in reversed order here (oldest feed position first),
+                                // so higher indices = earlier in feed = more recent.
+                                // Subtract seconds so that each item gets a distinct timestamp.
+                                val fallbackPubDate =
+                                    ZonedDateTime
+                                        .ofInstant(downloadTime, ZoneOffset.UTC)
+                                        .minusSeconds((totalItems - 1 - index).toLong())
                                 // Always attempt to load existing items using both id schemes
                                 // Id is rewritten to preferred on update
                                 val feedItemSql =
@@ -334,7 +350,7 @@ class RssLocalSync(
                                         link = item.url,
                                     )
                                 ) {
-                                    feedItemSql.updateFromParsedEntry(item, guid, feed)
+                                    feedItemSql.updateFromParsedEntry(item, guid, feed, fallbackPubDate)
                                     feedItemSql.feedId = feedSql.id
 
                                     if (feedSql.fetchOgImages) {
