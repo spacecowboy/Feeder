@@ -575,18 +575,18 @@ class RssLocalSyncKtTest : DIAware {
             )
 
             assertNotEquals(
-                "Items should have distinct pubDates",
+                "Items without feed dates should each get a distinct generated pubDate",
                 items[0].pubDate,
                 items[1].pubDate,
             )
 
             assertTrue(
-                "The pubDate should be after 'before sync time'",
+                "The first item's generated pubDate should be after the sync started",
                 items[0].pubDate!!.toInstant() > beforeSyncTime,
             )
 
             // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
-            assertTrue("The pubDates' magnitude should match descending iteration order") {
+            assertTrue("Item appearing first in the feed (guid .../1) should have a more recent generated pubDate than item appearing second (guid .../2)") {
                 items[0].guid == "https://foo.bar/1" &&
                     items[1].guid == "https://foo.bar/2" &&
                     items[0].pubDate!! > items[1].pubDate!!

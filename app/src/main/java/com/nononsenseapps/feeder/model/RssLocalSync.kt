@@ -35,9 +35,9 @@ import org.kodein.di.DIAware
 import org.kodein.di.instance
 import java.io.IOException
 import java.net.URL
+import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import kotlin.math.max
@@ -314,6 +314,9 @@ class RssLocalSync(
                                     }
 
                                 it to guid
+                                // Feed convention: items are listed newest-first.
+                                // Reverse so we process oldest-first, giving items at higher
+                                // indices (earlier in the feed) a more recent fallback timestamp.
                             }?.reversed()
                             ?: emptyList()
 
@@ -322,14 +325,15 @@ class RssLocalSync(
                     val feedItemSqls =
                         itemsWithGuids
                             .mapIndexedNotNull { index, (item, guid) ->
-                                // Pre-generate a fallback pubDate for items without one.
-                                // Items are in reversed order here (oldest feed position first),
-                                // so higher indices = earlier in feed = more recent.
-                                // Subtract seconds so that each item gets a distinct timestamp.
-                                val fallbackPubDate =
-                                    ZonedDateTime
-                                        .ofInstant(downloadTime, ZoneOffset.UTC)
-                                        .minusSeconds((totalItems - 1 - index).toLong())
+                                // Each undated item in the feed gets a distinct fallback clock.
+                                // Items are in reversed feed order here (oldest position = index 0),
+                                // so higher indices correspond to items that appeared earlier in the feed
+                                // and should therefore be considered more recent.
+                                val fallbackClock =
+                                    Clock.fixed(
+                                        downloadTime.minusSeconds((totalItems - 1 - index).toLong()),
+                                        ZoneOffset.UTC,
+                                    )
                                 // Always attempt to load existing items using both id schemes
                                 // Id is rewritten to preferred on update
                                 val feedItemSql =
@@ -350,7 +354,7 @@ class RssLocalSync(
                                         link = item.url,
                                     )
                                 ) {
-                                    feedItemSql.updateFromParsedEntry(item, guid, feed, fallbackPubDate)
+                                    feedItemSql.updateFromParsedEntry(item, guid, feed, fallbackClock)
                                     feedItemSql.feedId = feedSql.id
 
                                     if (feedSql.fetchOgImages) {

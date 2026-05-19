@@ -36,6 +36,7 @@ import com.nononsenseapps.feeder.model.ThumbnailImagePolicy
 import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import java.net.URI
+import java.time.Clock
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -131,7 +132,7 @@ data class FeedItem
             entry: ParsedArticle,
             entryGuid: String,
             feed: ParsedFeed,
-            fallbackPubDate: ZonedDateTime = ZonedDateTime.now(),
+            clock: Clock = Clock.systemUTC(),
         ) {
             val converter = HtmlToPlainTextConverter()
             // Be careful about nulls.
@@ -174,7 +175,7 @@ data class FeedItem
                     ZonedDateTime.parse(entry.date_published)
                 } catch (t: Throwable) {
                     // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: fallbackPubDate
+                    this.pubDate ?: ZonedDateTime.now(clock)
                 }
             primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
         }
