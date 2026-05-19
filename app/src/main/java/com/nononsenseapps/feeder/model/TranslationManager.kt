@@ -4,13 +4,13 @@ import android.app.Application
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
-import com.nononsenseapps.feeder.bergamot.BergamotTranslator
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
-import com.nononsenseapps.feeder.openai.isBergamot
 import com.nononsenseapps.feeder.openai.isDeepL
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ class TranslationManager(
     private val application: Application by instance()
     private val repository: Repository by instance()
     private val openAIApi: OpenAIApi by instance()
-    private val bergamotTranslator: BergamotTranslator by instance()
+    private val localTranslator: LocalTranslator by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val json =
         Json {
@@ -389,7 +389,7 @@ class TranslationManager(
     ): File {
         val provider =
             when {
-                settings.isBergamot -> "bergamot"
+                settings.isLocalTranslation -> "local"
                 settings.isDeepL -> "deepl"
                 else -> "openai"
             }
@@ -460,8 +460,8 @@ class TranslationManager(
         settings: OpenAISettings,
         preserveHtml: Boolean,
     ): TranslationResult =
-        if (settings.isBergamot) {
-            bergamotTranslator.translate(
+        if (settings.isLocalTranslation) {
+            localTranslator.translate(
                 content = content,
                 targetLanguage = targetLanguage,
                 preserveHtml = preserveHtml,

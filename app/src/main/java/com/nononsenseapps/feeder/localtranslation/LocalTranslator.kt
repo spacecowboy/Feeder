@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.bergamot
+package com.nononsenseapps.feeder.localtranslation
 
 import android.app.Application
 import android.icu.util.ULocale
@@ -29,7 +29,7 @@ import org.kodein.di.instance
 import java.util.Locale
 import java.util.concurrent.Executor
 
-class BergamotTranslator(
+class LocalTranslator(
     override val di: DI,
 ) : DIAware {
     private val application: Application by instance()

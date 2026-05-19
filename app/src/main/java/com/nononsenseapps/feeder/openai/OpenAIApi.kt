@@ -116,7 +116,7 @@ class OpenAIApi(
             .build()
 
     suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
-        if (settings.isBergamot) {
+        if (settings.isLocalTranslation) {
             return ModelsResult.Success(ids = emptyList())
         }
         if (settings.key.isEmpty()) {
@@ -178,7 +178,7 @@ class OpenAIApi(
         if (settings.isDeepL) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
-        if (settings.isBergamot) {
+        if (settings.isLocalTranslation) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
         try {
@@ -223,8 +223,8 @@ class OpenAIApi(
                 preserveHtml = preserveHtml,
             )
         }
-        if (settings.isBergamot) {
-            return TranslationResult.Error(content = "Bergamot translation is not available")
+        if (settings.isLocalTranslation) {
+            return TranslationResult.Error(content = "Local translation is not available through this API")
         }
         return TranslationResult.Error(content = "Translation is not supported for this provider")
     }
@@ -366,12 +366,12 @@ val OpenAISettings.isPerplexity: Boolean
 val OpenAISettings.isDeepL: Boolean
     get() = baseUrl.contains("deepl.com", ignoreCase = true)
 
-val OpenAISettings.isBergamot: Boolean
-    get() = baseUrl == BERGAMOT_PROVIDER_URL
+val OpenAISettings.isLocalTranslation: Boolean
+    get() = baseUrl == LOCAL_TRANSLATION_PROVIDER_URL
 
 val OpenAISettings.isValid: Boolean
     get() =
-        if (isBergamot) {
+        if (isLocalTranslation) {
             true
         } else if (isDeepL) {
             key.isNotEmpty()
@@ -382,13 +382,13 @@ val OpenAISettings.isValid: Boolean
         }
 
 val OpenAISettings.canSummarize: Boolean
-    get() = isValid && !isDeepL && !isBergamot
+    get() = isValid && !isDeepL && !isLocalTranslation
 
 val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
 val OpenAISettings.canUseAsTranslationApi: Boolean
-    get() = canTranslate && (isDeepL || isBergamot)
+    get() = canTranslate && (isDeepL || isLocalTranslation)
 
 val OpenAISettings.isBlankConfiguration: Boolean
     get() =
@@ -493,4 +493,4 @@ private fun OpenAISettings.normalizedDeepLBaseUrl(): String {
     }
 }
 
-const val BERGAMOT_PROVIDER_URL = "bergamot://local"
+const val LOCAL_TRANSLATION_PROVIDER_URL = "local://translation"

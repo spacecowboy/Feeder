@@ -59,11 +59,11 @@ import androidx.compose.ui.window.DialogProperties
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
-import com.nononsenseapps.feeder.openai.BERGAMOT_PROVIDER_URL
+import com.nononsenseapps.feeder.openai.LOCAL_TRANSLATION_PROVIDER_URL
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
-import com.nononsenseapps.feeder.openai.isBergamot
 import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.delay
 
@@ -274,9 +274,10 @@ private fun OpenAISectionEdit(
     val hasProvider = provider != AIProviderPreset.NONE
     val isTranslationOnlyProvider = provider.isTranslationOnly
     val needsApiKey = provider.needsApiKey
+    val showsTranslationEndpoint = provider == AIProviderPreset.DEEPL
 
     LaunchedEffect(current, provider) {
-        if (provider != AIProviderPreset.NONE && provider != AIProviderPreset.BERGAMOT) {
+        if (provider != AIProviderPreset.NONE && provider != AIProviderPreset.LOCAL_TRANSLATION) {
             delay(750)
             latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
         }
@@ -444,7 +445,7 @@ private fun OpenAISectionEdit(
                     onEvent(OpenAISettingsEvent.UpdateSettings(current.copy(baseUrl = it)))
                 },
             )
-        } else if (hasProvider) {
+        } else if (showsTranslationEndpoint) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = provider.endpoint,
@@ -478,13 +479,19 @@ private fun OpenAISectionEdit(
                         },
                     ),
                 supportingText = {
-                    Text(stringResource(R.string.preferred_translation_language_description))
+                    Text(
+                        text =
+                            preferredTranslationLanguageDescription(
+                                provider = provider,
+                                preferredTranslationLanguage = preferredTranslationLanguage,
+                            ),
+                    )
                 },
                 onValueChange = onPreferredTranslationLanguageChange,
             )
         }
 
-        if (hasProvider && provider != AIProviderPreset.BERGAMOT) {
+        if (hasProvider && provider != AIProviderPreset.LOCAL_TRANSLATION) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = timeoutString,
@@ -575,6 +582,33 @@ private fun OpenAISectionEdit(
         }
     }
 }
+
+@Composable
+private fun preferredTranslationLanguageDescription(
+    provider: AIProviderPreset,
+    preferredTranslationLanguage: String,
+): String {
+    if (provider != AIProviderPreset.LOCAL_TRANSLATION) {
+        return stringResource(R.string.preferred_translation_language_description)
+    }
+
+    val targetLanguage =
+        preferredTranslationLanguage
+            .takeIf { it.isNotBlank() }
+            ?: stringResource(R.string.preferred_translation_language_fallback)
+
+    return stringResource(
+        id = localTranslationSetupInstructionsRes(),
+        targetLanguage,
+    )
+}
+
+private fun localTranslationSetupInstructionsRes(manufacturer: String = android.os.Build.MANUFACTURER): Int =
+    when {
+        manufacturer.equals("google", ignoreCase = true) -> R.string.local_translation_setup_pixel
+        manufacturer.equals("samsung", ignoreCase = true) -> R.string.local_translation_setup_samsung
+        else -> R.string.local_translation_setup_generic
+    }
 
 @Composable
 private fun ProviderField(
@@ -749,14 +783,14 @@ private enum class AIProviderPreset(
         needsApiKey = true,
         endpoint = "https://api.deepl.com/v2/translate",
     ),
-    BERGAMOT(
-        titleRes = R.string.provider_bergamot,
+    LOCAL_TRANSLATION(
+        titleRes = R.string.provider_local_translation,
         supportsSummary = false,
         supportsTranslation = true,
         isDeepL = false,
         isTranslationOnly = true,
         needsApiKey = false,
-        endpoint = "Local Firefox Translations / Bergamot",
+        endpoint = "",
     ),
     ;
 
@@ -791,11 +825,11 @@ private enum class AIProviderPreset(
                     modelId = "",
                 )
 
-            BERGAMOT ->
+            LOCAL_TRANSLATION ->
                 settings.copy(
                     key = "",
                     modelId = "",
-                    baseUrl = BERGAMOT_PROVIDER_URL,
+                    baseUrl = LOCAL_TRANSLATION_PROVIDER_URL,
                     azureApiVersion = "",
                     azureDeploymentId = "",
                 )
@@ -814,7 +848,7 @@ private enum class AIProviderPreset(
             when {
                 settings.isBlankConfiguration -> NONE
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
-                settings.isBergamot -> BERGAMOT
+                settings.isLocalTranslation -> LOCAL_TRANSLATION
                 settings.isDeepL -> DEEPL
                 else -> OPENAI_COMPATIBLE
             }
@@ -931,7 +965,7 @@ private fun OpenAISettings.validationMessage(
             }
         }
 
-        AIProviderPreset.BERGAMOT -> null
+        AIProviderPreset.LOCAL_TRANSLATION -> null
     }
 }
 
@@ -948,14 +982,14 @@ private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAI
         OpenAISectionType.Summary ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isBergamot -> OpenAISettings()
+                settings.isDeepL || settings.isLocalTranslation -> OpenAISettings()
                 else -> settings
             }
 
         OpenAISectionType.Translation ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isBergamot -> settings
+                settings.isDeepL || settings.isLocalTranslation -> settings
                 else -> OpenAISettings()
             }
     }

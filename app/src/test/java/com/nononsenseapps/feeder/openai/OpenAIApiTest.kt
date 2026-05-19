@@ -132,26 +132,26 @@ class OpenAIApiTest {
         }
 
     @Test
-    fun bergamotCanBeVerifiedWithoutApiKey() =
+    fun localTranslationCanBeVerifiedWithoutApiKey() =
         runTest {
             val result =
                 createTranslationApi().listModelIds(
-                    OpenAISettings(baseUrl = BERGAMOT_PROVIDER_URL),
+                    OpenAISettings(baseUrl = LOCAL_TRANSLATION_PROVIDER_URL),
                 )
 
             assertEquals(OpenAIApi.ModelsResult.Success(ids = emptyList()), result)
         }
 
     @Test
-    fun bergamotIsUsableAsTranslationApiWithoutApiKey() {
-        val settings = OpenAISettings(baseUrl = BERGAMOT_PROVIDER_URL)
+    fun localTranslationIsUsableAsTranslationApiWithoutApiKey() {
+        val settings = OpenAISettings(baseUrl = LOCAL_TRANSLATION_PROVIDER_URL)
 
         assertTrue(settings.canUseAsTranslationApi)
     }
 
     private fun createApi(response: ChatCompletion) = OpenAIApi("lang") { OpenAIClientMock(response) }
 
-    private fun createTranslationApi() = OpenAIApi("en") { error("OpenAI client should not be used for DeepL translation") }
+    private fun createTranslationApi() = OpenAIApi("en") { error("OpenAI client should not be used for translation-only providers") }
 
     private fun createResponse(message: String) =
         ChatCompletion(
