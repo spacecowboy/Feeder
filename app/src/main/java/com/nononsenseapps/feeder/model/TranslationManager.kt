@@ -4,11 +4,13 @@ import android.app.Application
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ class TranslationManager(
     private val application: Application by instance()
     private val repository: Repository by instance()
     private val openAIApi: OpenAIApi by instance()
+    private val localTranslator: LocalTranslator by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val json =
         Json {
@@ -386,6 +389,7 @@ class TranslationManager(
     ): File {
         val provider =
             when {
+                settings.isLocalTranslation -> "local"
                 settings.isDeepL -> "deepl"
                 else -> "openai"
             }
@@ -418,7 +422,7 @@ class TranslationManager(
     ): TranslationResult.Success? =
         when (
             val result =
-                openAIApi.translate(
+                translate(
                     content = content,
                     targetLanguage = targetLanguage,
                     settings = settings,
@@ -437,7 +441,7 @@ class TranslationManager(
     ): TranslationResult.Success =
         when (
             val result =
-                openAIApi.translate(
+                translate(
                     content = content,
                     targetLanguage = targetLanguage,
                     settings = settings,
@@ -448,6 +452,27 @@ class TranslationManager(
                 result.takeIf { it.content.isNotBlank() }
                     ?: throw IllegalStateException("Translation failed")
             is TranslationResult.Error -> throw IllegalStateException(result.content.ifBlank { "Translation failed" })
+        }
+
+    private suspend fun translate(
+        content: String,
+        targetLanguage: String,
+        settings: OpenAISettings,
+        preserveHtml: Boolean,
+    ): TranslationResult =
+        if (settings.isLocalTranslation) {
+            localTranslator.translate(
+                content = content,
+                targetLanguage = targetLanguage,
+                preserveHtml = preserveHtml,
+            )
+        } else {
+            openAIApi.translate(
+                content = content,
+                targetLanguage = targetLanguage,
+                settings = settings,
+                preserveHtml = preserveHtml,
+            )
         }
 
     private fun detectSourceLanguageIfAlreadyTargetLanguage(

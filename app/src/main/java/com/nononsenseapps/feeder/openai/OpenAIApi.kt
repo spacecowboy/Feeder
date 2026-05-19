@@ -116,6 +116,9 @@ class OpenAIApi(
             .build()
 
     suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
+        if (settings.isLocalTranslation) {
+            return ModelsResult.Success(ids = emptyList())
+        }
         if (settings.key.isEmpty()) {
             return ModelsResult.MissingToken
         }
@@ -175,6 +178,9 @@ class OpenAIApi(
         if (settings.isDeepL) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
+        if (settings.isLocalTranslation) {
+            return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
+        }
         try {
             val response =
                 openAIClientFactory(settings).chatCompletion(
@@ -216,6 +222,9 @@ class OpenAIApi(
                 targetLanguage = targetLanguage,
                 preserveHtml = preserveHtml,
             )
+        }
+        if (settings.isLocalTranslation) {
+            return TranslationResult.Error(content = "Local translation is not available through this API")
         }
         return TranslationResult.Error(content = "Translation is not supported for this provider")
     }
@@ -357,9 +366,14 @@ val OpenAISettings.isPerplexity: Boolean
 val OpenAISettings.isDeepL: Boolean
     get() = baseUrl.contains("deepl.com", ignoreCase = true)
 
+val OpenAISettings.isLocalTranslation: Boolean
+    get() = baseUrl == LOCAL_TRANSLATION_PROVIDER_URL
+
 val OpenAISettings.isValid: Boolean
     get() =
-        if (isDeepL) {
+        if (isLocalTranslation) {
+            true
+        } else if (isDeepL) {
             key.isNotEmpty()
         } else {
             modelId.isNotEmpty() &&
@@ -368,13 +382,13 @@ val OpenAISettings.isValid: Boolean
         }
 
 val OpenAISettings.canSummarize: Boolean
-    get() = isValid && !isDeepL
+    get() = isValid && !isDeepL && !isLocalTranslation
 
 val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
 val OpenAISettings.canUseAsTranslationApi: Boolean
-    get() = canTranslate && isDeepL
+    get() = canTranslate && (isDeepL || isLocalTranslation)
 
 val OpenAISettings.isBlankConfiguration: Boolean
     get() =
@@ -478,3 +492,5 @@ private fun OpenAISettings.normalizedDeepLBaseUrl(): String {
         else -> normalizedBaseUrl
     }
 }
+
+const val LOCAL_TRANSLATION_PROVIDER_URL = "local://translation"
