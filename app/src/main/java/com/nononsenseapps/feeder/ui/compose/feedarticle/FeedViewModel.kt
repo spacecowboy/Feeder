@@ -23,6 +23,7 @@ import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
@@ -62,6 +63,7 @@ class FeedViewModel(
     private val filePathProvider: FilePathProvider by instance()
     private val translationManager: TranslationManager by instance()
     private val bergamotModelManager: BergamotModelManager by instance()
+    private val localTranslator: LocalTranslator by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -255,7 +257,18 @@ class FeedViewModel(
                 }
 
                 if (config.settings.isLocalTranslation) {
-                    return@launch
+                    val text =
+                        listOf(item.title, item.snippet)
+                            .filter { it.isNotBlank() }
+                            .joinToString(separator = " ")
+                    if (!localTranslator.canTranslateWithoutBergamotDownload(
+                            content = text,
+                            targetLanguage = config.targetLanguage,
+                            preserveHtml = false,
+                        )
+                    ) {
+                        return@launch
+                    }
                 }
 
                 val translatedItem =
