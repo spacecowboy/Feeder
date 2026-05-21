@@ -625,9 +625,23 @@ class ArticleViewModel(
             return false
         }
 
+        val fullText = article.fullTextByDefault
+        val html = loadArticleHtml(article, fullText)
+
+        val hasCachedTranslation =
+            translationManager.hasCachedTranslatedArticle(
+                itemId = article.id,
+                title = article.title,
+                html = html,
+                isFullText = fullText,
+                settings = settings,
+                targetLanguage = targetLanguage,
+            )
+        if (hasCachedTranslation) {
+            return true
+        }
+
         return runCatching {
-            val fullText = article.fullTextByDefault
-            val html = loadArticleHtml(article, fullText)
             localTranslator.canTranslateWithoutBergamotDownload(
                 content = html,
                 targetLanguage = targetLanguage,
