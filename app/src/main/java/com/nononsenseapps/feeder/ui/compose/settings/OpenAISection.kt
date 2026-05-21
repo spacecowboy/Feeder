@@ -83,6 +83,8 @@ fun OpenAISection(
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
     localTranslationContent: @Composable () -> Unit = {},
+    onLocalTranslationContentSave: () -> Unit = {},
+    onLocalTranslationContentDismiss: () -> Unit = {},
 ) {
     val sanitizedSettings = remember(section, state.settings) { section.sanitizeSettings(state.settings) }
 
@@ -111,7 +113,10 @@ fun OpenAISection(
                 )
             }
         Dialog(
-            onDismissRequest = { onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false)) },
+            onDismissRequest = {
+                onLocalTranslationContentDismiss()
+                onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
+            },
             properties = DialogProperties(usePlatformDefaultWidth = false),
         ) {
             Surface(
@@ -165,6 +170,7 @@ fun OpenAISection(
                     ) {
                         Button(
                             onClick = {
+                                onLocalTranslationContentDismiss()
                                 onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
                             },
                         ) {
@@ -177,6 +183,7 @@ fun OpenAISection(
                                 if (section == OpenAISectionType.Translation) {
                                     onPreferredTranslationLanguageChange(currentPreferredTranslationLanguage)
                                 }
+                                onLocalTranslationContentSave()
                                 onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
                             },
                             enabled = validationMessage == null,
@@ -200,6 +207,8 @@ fun TranslationApiSection(
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
     localTranslationContent: @Composable () -> Unit = {},
+    onLocalTranslationContentSave: () -> Unit = {},
+    onLocalTranslationContentDismiss: () -> Unit = {},
 ) {
     OpenAISection(
         title = title,
@@ -211,6 +220,8 @@ fun TranslationApiSection(
         onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
         modifier = modifier,
         localTranslationContent = localTranslationContent,
+        onLocalTranslationContentSave = onLocalTranslationContentSave,
+        onLocalTranslationContentDismiss = onLocalTranslationContentDismiss,
     )
 }
 

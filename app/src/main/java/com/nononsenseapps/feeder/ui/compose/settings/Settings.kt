@@ -91,7 +91,6 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.localtranslation.LanguagePairInfo
-import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -258,9 +257,6 @@ fun SettingsScreen(
             onDeleteLanguagePair = { source, target ->
                 settingsViewModel.deleteLanguagePair(source, target)
             },
-            onDeleteAllLanguagePairs = {
-                settingsViewModel.deleteAllLanguagePairs()
-            },
             modifier = Modifier.padding(padding),
         )
     }
@@ -350,7 +346,6 @@ private fun SettingsScreenPreview() {
             onSendFeedback = {},
             downloadedLanguagePairs = emptyList(),
             onDeleteLanguagePair = { _, _ -> },
-            onDeleteAllLanguagePairs = {},
             modifier = Modifier,
         )
     }
@@ -436,7 +431,6 @@ fun SettingsList(
     onSendFeedback: () -> Unit,
     downloadedLanguagePairs: List<LanguagePairInfo>,
     onDeleteLanguagePair: (source: String, target: String) -> Unit,
-    onDeleteAllLanguagePairs: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -824,6 +818,14 @@ fun SettingsList(
         SettingsGroup(
             title = R.string.openai_settings,
         ) {
+            var pendingDeletedLanguagePairs by remember { mutableStateOf(emptySet<Pair<String, String>>()) }
+            val visibleDownloadedLanguagePairs =
+                remember(downloadedLanguagePairs, pendingDeletedLanguagePairs) {
+                    downloadedLanguagePairs.filterNot { pair ->
+                        pair.sourceLanguage to pair.targetLanguage in pendingDeletedLanguagePairs
+                    }
+                }
+
             OpenAISection(
                 title = stringResource(R.string.summary_api_settings),
                 info = stringResource(R.string.summary_api_settings_info),
@@ -839,15 +841,32 @@ fun SettingsList(
                 onEvent = onTranslationApiEvent,
                 preferredTranslationLanguage = preferredTranslationLanguage,
                 onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
-            ) {
-                if (canTranslate && translationApiState.settings.isLocalTranslation && downloadedLanguagePairs.isNotEmpty()) {
-                    DownloadedModelsSection(
-                        downloadedLanguagePairs = downloadedLanguagePairs,
-                        onDeletePair = onDeleteLanguagePair,
-                        onDeleteAll = onDeleteAllLanguagePairs,
-                    )
-                }
-            }
+                onLocalTranslationContentSave = {
+                    pendingDeletedLanguagePairs.forEach { (source, target) ->
+                        onDeleteLanguagePair(source, target)
+                    }
+                    pendingDeletedLanguagePairs = emptySet()
+                },
+                onLocalTranslationContentDismiss = {
+                    pendingDeletedLanguagePairs = emptySet()
+                },
+                localTranslationContent = {
+                    if (canTranslate && visibleDownloadedLanguagePairs.isNotEmpty()) {
+                        DownloadedModelsSection(
+                            downloadedLanguagePairs = visibleDownloadedLanguagePairs,
+                            onDeletePair = { source, target ->
+                                pendingDeletedLanguagePairs += source to target
+                            },
+                            onDeleteAll = {
+                                pendingDeletedLanguagePairs +=
+                                    visibleDownloadedLanguagePairs.map { pair ->
+                                        pair.sourceLanguage to pair.targetLanguage
+                                    }
+                            },
+                        )
+                    }
+                },
+            )
 
             if (canTranslate) {
                 SwitchSetting(
