@@ -54,16 +54,11 @@ class BergamotModelManager(
                 val source = normalizeLanguageCode(sourceLanguage)
                 val target = normalizeLanguageCode(targetLanguage)
                 try {
-                    _downloadProgress.value =
-                        BergamotModelDownloadProgress(
+                    val registry =
+                        loadRegistry(
                             sourceLanguage = source,
                             targetLanguage = target,
-                            fileName = REGISTRY_FILE_NAME,
-                            downloadedBytes = 0L,
-                            totalBytes = 0L,
                         )
-                    val registry =
-                        loadRegistry()
                             ?: return@withLock BergamotModelPreparation.Error(
                                 "Android system translation is unavailable, and Feeder has not downloaded the Bergamot model registry yet. Connect once to download app-provided offline model metadata.",
                             )
@@ -154,7 +149,11 @@ class BergamotModelManager(
 
     fun getRegistryEntries(): List<BergamotModelRegistryEntry> = loadRegistry(allowNetwork = false).orEmpty()
 
-    private fun loadRegistry(allowNetwork: Boolean = true): List<BergamotModelRegistryEntry>? {
+    private fun loadRegistry(
+        allowNetwork: Boolean = true,
+        sourceLanguage: String? = null,
+        targetLanguage: String? = null,
+    ): List<BergamotModelRegistryEntry>? {
         registryFile
             .takeIf(File::isFile)
             ?.readText()
@@ -162,6 +161,16 @@ class BergamotModelManager(
             ?.let { return it }
 
         if (allowNetwork) {
+            if (sourceLanguage != null && targetLanguage != null) {
+                _downloadProgress.value =
+                    BergamotModelDownloadProgress(
+                        sourceLanguage = sourceLanguage,
+                        targetLanguage = targetLanguage,
+                        fileName = REGISTRY_FILE_NAME,
+                        downloadedBytes = 0L,
+                        totalBytes = 0L,
+                    )
+            }
             fetchRegistry()?.let { return it }
         }
 

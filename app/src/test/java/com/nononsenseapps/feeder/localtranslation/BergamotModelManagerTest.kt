@@ -2,10 +2,13 @@ package com.nononsenseapps.feeder.localtranslation
 
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import okhttp3.OkHttpClient
@@ -61,6 +64,19 @@ class BergamotModelManagerTest {
                     .all { it.url?.startsWith("file:") == true },
             )
             assertEquals(BergamotLanguagePairStatus.Downloaded, manager.languagePairStatus("de", "en"))
+            assertNull(manager.downloadProgress.value)
+
+            val progressEvents = mutableListOf<BergamotModelDownloadProgress>()
+            val progressCollector =
+                backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    manager.downloadProgress.filterNotNull().toList(progressEvents)
+                }
+
+            val cachedPreparation = manager.prepare(sourceLanguage = "German", targetLanguage = "English")
+
+            progressCollector.cancel()
+            assertTrue(cachedPreparation is BergamotModelPreparation.Ready)
+            assertTrue(progressEvents.isEmpty())
             assertNull(manager.downloadProgress.value)
 
             manager.deleteLanguagePair("de", "en")
