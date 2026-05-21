@@ -118,6 +118,34 @@ class BergamotModelManager(
 
     fun storageLocation(): File = modelRoot
 
+    suspend fun getDownloadedLanguagePairs(): List<LanguagePairInfo> =
+        withContext(Dispatchers.IO) {
+            val registry = loadRegistry(allowNetwork = false) ?: return@withContext emptyList()
+            registry
+                .filter { entry ->
+                    val dir = pairDir(entry.from, entry.to)
+                    dir.isDirectory &&
+                        entry.files.values.all { file ->
+                            dir.resolve(file.name.sanitizedModelFileName()).isFile
+                        }
+                }.map { entry ->
+                    val dir = pairDir(entry.from, entry.to)
+                    val totalSize =
+                        if (dir.isDirectory) {
+                            dir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
+                        } else {
+                            0L
+                        }
+                    LanguagePairInfo(
+                        sourceLanguage = entry.from,
+                        targetLanguage = entry.to,
+                        sizeBytes = totalSize,
+                    )
+                }
+        }
+
+    fun getRegistryEntries(): List<BergamotModelRegistryEntry> = loadRegistry(allowNetwork = false).orEmpty()
+
     private fun loadRegistry(allowNetwork: Boolean = true): List<BergamotModelRegistryEntry>? {
         registryFile
             .takeIf(File::isFile)
@@ -308,7 +336,7 @@ class BergamotModelManager(
             localFile.isFile && file.matchesSha256(localFile)
         }
 
-    private fun pairDir(
+    fun pairDir(
         from: String,
         to: String,
     ): File = modelRoot.resolve("$from-$to")
@@ -453,4 +481,10 @@ data class BergamotModelFile(
     val expectedSha256Hash: String = "",
     val url: String? = null,
     val config: JsonElement? = null,
+)
+
+data class LanguagePairInfo(
+    val sourceLanguage: String,
+    val targetLanguage: String,
+    val sizeBytes: Long,
 )

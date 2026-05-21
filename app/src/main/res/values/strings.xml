@@ -355,6 +355,17 @@
   <string name="set_translation_language_first">Set a preferred translation language in AI settings</string>
   <string name="translate_feed_cards_by_default">Translate article previews</string>
   <string name="translate_articles_by_default">Translate articles by default</string>
+  <string name="downloaded_translation_models">Downloaded translation models</string>
+  <string name="downloaded_translation_models_desc">Mozilla/Bergamot models stored on-device for offline translation. Delete unused language pairs to free up space.</string>
+  <string name="delete_model_pair">Delete model</string>
+  <string name="delete_model_pair_desc">Delete the %1$s to %2$s translation model (%3$s)?</string>
+  <string name="delete_all_models">Delete all downloaded models</string>
+  <string name="delete_all_models_desc">Delete all %1$d downloaded translation model(s) (%2$s)?</string>
+  <string name="deleted_model_pair">Deleted %1$s to %2$s model</string>
+  <string name="deleted_all_models">Deleted all downloaded models</string>
+  <string name="no_downloaded_models">No translation models downloaded yet. Translation will download the needed model automatically.</string>
+  <string name="delete_button_text">Delete</string>
+  <string name="cancel">Cancel</string>
 
   <string name="widget_title">Feeder</string>
   <string name="widget_refreshing">Refreshing</string>
