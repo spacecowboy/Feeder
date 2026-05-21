@@ -84,13 +84,14 @@ class BergamotModelManagerTest {
                 .forEach { server.enqueue(MockResponse().setResponseCode(200).setBody(String(it))) }
 
             val manager = modelManager()
+            val progress = async { withTimeout(1_000L) { manager.downloadProgress.filterNotNull().first() } }
             val preparation = async(Dispatchers.IO) { manager.prepare(sourceLanguage = "de", targetLanguage = "en") }
-            val progress = withTimeout(1_000L) { manager.downloadProgress.filterNotNull().first() }
+            val emittedProgress = progress.await()
 
-            assertEquals("de", progress.sourceLanguage)
-            assertEquals("en", progress.targetLanguage)
-            assertTrue(progress.isIndeterminate)
-            assertEquals("registry.json", progress.fileName)
+            assertEquals("de", emittedProgress.sourceLanguage)
+            assertEquals("en", emittedProgress.targetLanguage)
+            assertTrue(emittedProgress.isIndeterminate)
+            assertEquals("registry.json", emittedProgress.fileName)
             assertTrue(preparation.await() is BergamotModelPreparation.Ready)
             assertNull(manager.downloadProgress.value)
         }

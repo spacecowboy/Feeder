@@ -171,7 +171,7 @@ class BergamotTranslatorWorker {
     /**
      * Instantiates a new translation worker with optional options object.
      * If this call succeeds, the WASM runtime is loaded and ready.
-     * 
+     *
      * Available options are:
      *   useNativeIntGemm: {true | false} defaults to false. If true, it will
      *                     attempt to link to the intgemm module available in
@@ -293,7 +293,7 @@ class BergamotTranslatorWorker {
      * async because the message passing interface we use expects async methods.
      * @param {{from:string, to:string}}
      * @return boolean
-     */ 
+     */
     hasTranslationModel({from,to}) {
         const key = JSON.stringify({from,to});
         return this.models.has(key);
@@ -313,7 +313,7 @@ class BergamotTranslatorWorker {
      *     [key:string]: string
      *   }
      * }} buffers
-     */ 
+     */
     loadTranslationModel({from, to}, buffers) {
         // This because service_bindings.cpp:prepareVocabsSmartMemories :(
         const uniqueVocabs = buffers.vocabs.filter((vocab, index, vocabs) => {
@@ -371,10 +371,10 @@ class BergamotTranslatorWorker {
      */
     freeTranslationModel({from, to}) {
         const key = JSON.stringify({from,to});
-        
+
         if (!this.models.has(key))
             return;
-        
+
         const model = this.models.get(key);
         this.models.delete(key);
 
@@ -421,7 +421,7 @@ class BergamotTranslatorWorker {
         const responses = models.length > 1
             ? this.service.translateViaPivoting(...translationModels, input, options)
             : this.service.translate(...translationModels, input, options);
-        
+
         input.delete();
         options.delete();
 

@@ -58,7 +58,7 @@ export class CancelledError extends Error {}
  * Wrapper around bergamot-translator loading and model management.
  */
  export class TranslatorBacking {
-    
+
     /**
      * @param {{
      *  cacheSize?: number,
@@ -92,7 +92,7 @@ export class CancelledError extends Error {}
          * @type {string?}
          */
         this.pivotLanguage = 'pivotLanguage' in this.options ? options.pivotLanguage : 'en';
-        
+
         /**
          * A map of language-pairs to a list of models you need for it.
          * @type {Map<{from:string,to:string}, Promise<{from:string,to:string}[]>>}
@@ -111,7 +111,7 @@ export class CancelledError extends Error {}
      * Loads a worker thread, and wraps it in a message passing proxy. I.e. it
      * exposes the entire interface of TranslationWorker here, and all calls
      * to it are async. Do note that you can only pass arguments that survive
-     * being copied into a message. 
+     * being copied into a message.
      * @return {Promise<{worker:Worker, exports:Proxy<TranslationWorker>}>}
      */
     async loadWorker() {
@@ -441,7 +441,7 @@ export class CancelledError extends Error {}
                 delete options['integrity'];
 
             // Start downloading the url, using the hex checksum to ask
-            // `fetch()` to verify the download using subresource integrity 
+            // `fetch()` to verify the download using subresource integrity
             const response = await fetch(url, options);
 
             // Finish downloading (or crash due to timeout)
@@ -555,7 +555,7 @@ export class BatchTranslator {
 
         /**
          * Maximum number of workers
-         * @type {number} 
+         * @type {number}
          */
         this.workerLimit = Math.max(options?.workers || 0, 1);
 
@@ -592,7 +592,7 @@ export class BatchTranslator {
 
         this.onerror = options?.onerror || (err => { throw err; });
     }
-    
+
     /**
      * Destructor that stops and cleans up.
      */
@@ -696,7 +696,7 @@ export class BatchTranslator {
                 // (Fetching models first because if we would do it between looking
                 // for a batch and making a new one, we end up with a race condition.)
                 const models = await this.backing.getModels(request);
-                
+
                 // Put the request and its callbacks into a fitting batch
                 this.enqueue({key, models, request, resolve, reject, priority});
 
@@ -808,7 +808,7 @@ export class BatchTranslator {
                 ...responses[i] // {target: {text: String}}
             });
         });
-        
+
         performance.measure('BergamotBatchTranslator', 'BergamotBatchTranslator.start');
     }
 }
@@ -873,7 +873,7 @@ export class LatencyOptimisedTranslator {
             this.worker = null;
         }
     }
-    
+
     /**
      * Sets `request` as the next translation to process. If there was already
      * a translation waiting to be processed, their promise is rejected with a
@@ -884,7 +884,7 @@ export class LatencyOptimisedTranslator {
     translate(request, options) {
         if (this.pending)
             this.pending.reject(new SupersededError());
-        
+
         return new Promise((accept, reject) => {
             const pending = {request, accept, reject, options};
 
@@ -900,7 +900,7 @@ export class LatencyOptimisedTranslator {
             this.notify();
         });
     }
-    
+
     notify() {
         setTimeout(async () => {
             if (!this.pending)
@@ -922,7 +922,7 @@ export class LatencyOptimisedTranslator {
 
                 // Mark the worker as occupied
                 worker.idle = false;
-                    
+
                 try {
                     const models = await this.backing.getModels(request)
 

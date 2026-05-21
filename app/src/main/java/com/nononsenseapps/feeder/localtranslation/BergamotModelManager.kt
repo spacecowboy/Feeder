@@ -54,6 +54,14 @@ class BergamotModelManager(
                 val source = normalizeLanguageCode(sourceLanguage)
                 val target = normalizeLanguageCode(targetLanguage)
                 try {
+                    _downloadProgress.value =
+                        BergamotModelDownloadProgress(
+                            sourceLanguage = source,
+                            targetLanguage = target,
+                            fileName = REGISTRY_FILE_NAME,
+                            downloadedBytes = 0L,
+                            totalBytes = 0L,
+                        )
                     val registry =
                         loadRegistry()
                             ?: return@withLock BergamotModelPreparation.Error(
