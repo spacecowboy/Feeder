@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.ScrollDirection
@@ -586,7 +587,9 @@ fun ArticleContent(
 
         if (viewState.isTranslationLoading) {
             offsetCounter++
-            LinearProgressIndicator(
+            viewState.translationModelDownloadProgress?.let { progress ->
+                TranslationModelDownloadProgress(progress)
+            } ?: LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -644,6 +647,58 @@ fun ArticleContent(
                     Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TranslationModelDownloadProgress(progress: BergamotModelDownloadProgress) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+        ) {
+            Text(
+                text =
+                    if (progress.isIndeterminate) {
+                        stringResource(
+                            R.string.preparing_offline_translation_model,
+                            progress.sourceLanguage,
+                            progress.targetLanguage,
+                        )
+                    } else {
+                        stringResource(
+                            R.string.downloading_offline_translation_model,
+                            progress.sourceLanguage,
+                            progress.targetLanguage,
+                            (progress.fraction * 100).toInt(),
+                        )
+                    },
+                style = MaterialTheme.typography.bodySmall,
+            )
+            if (progress.isIndeterminate) {
+                LinearProgressIndicator(
+                    modifier =
+                        Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth(),
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = { progress.fraction },
+                    modifier =
+                        Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth(),
+                )
+            }
+            Text(
+                text = stringResource(R.string.offline_translation_model_download_hint),
+                modifier = Modifier.padding(top = 8.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+            )
         }
     }
 }

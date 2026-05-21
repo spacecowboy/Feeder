@@ -22,6 +22,8 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
+import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
@@ -75,6 +77,7 @@ class ArticleViewModel(
     private val openAIApi: OpenAIApi by instance()
     private val toastMaker: ToastMaker by instance()
     private val translationManager: TranslationManager by instance()
+    private val bergamotModelManager: BergamotModelManager by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -146,6 +149,7 @@ class ArticleViewModel(
             openAiSummary,
             showTranslatedContent,
             articleTranslationState,
+            bergamotModelManager.downloadProgress,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -165,6 +169,7 @@ class ArticleViewModel(
             val openAiSummary = params[12] as OpenAISummaryState
             val showTranslated = params[13] as Boolean
             val translationState = params[14] as ArticleTranslationState
+            val translationDownloadProgress = params[15] as BergamotModelDownloadProgress?
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
@@ -207,6 +212,7 @@ class ArticleViewModel(
                 showTranslate = isShowingTranslated || (canRequestTranslation && alreadyInPreferredLanguage == null),
                 isShowingTranslated = isShowingTranslated,
                 isTranslationLoading = translationState is ArticleTranslationState.Loading,
+                translationModelDownloadProgress = translationDownloadProgress,
                 translationSourceLanguage = currentTranslation?.sourceLanguage ?: alreadyInPreferredLanguage?.sourceLanguage.orEmpty(),
                 articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
@@ -782,6 +788,7 @@ private data class ArticleState(
     override val showTranslate: Boolean = false,
     override val isShowingTranslated: Boolean = false,
     override val isTranslationLoading: Boolean = false,
+    override val translationModelDownloadProgress: BergamotModelDownloadProgress? = null,
     override val translationSourceLanguage: String = "",
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
@@ -813,6 +820,7 @@ interface ArticleScreenViewState {
     val showTranslate: Boolean
     val isShowingTranslated: Boolean
     val isTranslationLoading: Boolean
+    val translationModelDownloadProgress: BergamotModelDownloadProgress?
     val translationSourceLanguage: String
     val articleContent: LinearArticle
 }
