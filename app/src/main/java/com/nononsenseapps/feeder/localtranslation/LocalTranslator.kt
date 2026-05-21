@@ -99,6 +99,35 @@ class LocalTranslator(
             }
         }
 
+    suspend fun canTranslateWithoutBergamotDownload(
+        content: String,
+        targetLanguage: String,
+        sourceLangHint: String = "",
+        preserveHtml: Boolean = false,
+    ): Boolean =
+        withContext(Dispatchers.IO) {
+            val text = prepareTextForLanguageDetection(content, preserveHtml)
+            if (text.isBlank()) {
+                return@withContext true
+            }
+
+            val targetLang = normalizeLanguageCode(targetLanguage)
+            val sourceLang = sourceLangHint.ifBlank { detectSourceLanguage(text) }
+            if (sourceLang == targetLang) {
+                return@withContext true
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && hasAndroidSystemModel(sourceLang, targetLang)) {
+                return@withContext true
+            }
+
+            bergamotModelManager.languagePairStatus(
+                sourceLanguage = sourceLang,
+                targetLanguage = targetLang,
+                allowNetwork = false,
+            ) == BergamotLanguagePairStatus.Downloaded
+        }
+
     @RequiresApi(Build.VERSION_CODES.S)
     private suspend fun translateHtmlWithAndroidSystem(
         html: String,
@@ -405,6 +434,28 @@ class LocalTranslator(
         } finally {
             translator.destroy()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun hasAndroidSystemModel(
+        sourceLang: String,
+        targetLang: String,
+    ): Boolean {
+        val translationManager =
+            application.getSystemService(TranslationManager::class.java)
+                ?: return false
+
+        return translationManager
+            .getOnDeviceTranslationCapabilities(
+                TranslationSpec.DATA_FORMAT_TEXT,
+                TranslationSpec.DATA_FORMAT_TEXT,
+            ).any { capability ->
+                capability.state == TranslationCapability.STATE_ON_DEVICE &&
+                    capability.sourceSpec.locale.language
+                        .equals(sourceLang, ignoreCase = true) &&
+                    capability.targetSpec.locale.language
+                        .equals(targetLang, ignoreCase = true)
+            }
     }
 
     private fun collectTextNodes(node: Node): List<TextNode> =

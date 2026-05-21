@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
@@ -41,6 +42,7 @@ import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canSummarize
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
@@ -78,6 +80,7 @@ class ArticleViewModel(
     private val toastMaker: ToastMaker by instance()
     private val translationManager: TranslationManager by instance()
     private val bergamotModelManager: BergamotModelManager by instance()
+    private val localTranslator: LocalTranslator by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -236,7 +239,11 @@ class ArticleViewModel(
                     summarize()
                 }
 
-                if (repository.translateArticlesByDefault.value && canTranslateArticles()) {
+                if (
+                    repository.translateArticlesByDefault.value &&
+                    canTranslateArticles() &&
+                    canStartAutomaticArticleTranslation(article)
+                ) {
                     showTranslatedContent.value = true
                     translateCurrentArticle()
                 }
@@ -605,6 +612,28 @@ class ArticleViewModel(
                 toastMaker.makeToast(e.message ?: "Translation failed")
             }
         }
+    }
+
+    private suspend fun canStartAutomaticArticleTranslation(article: Article): Boolean {
+        val settings = repository.translationApiSettings.value
+        if (!settings.isLocalTranslation) {
+            return true
+        }
+
+        val targetLanguage = repository.preferredTranslationLanguage.value.trim()
+        if (targetLanguage.isBlank()) {
+            return false
+        }
+
+        return runCatching {
+            val fullText = article.fullTextByDefault
+            val html = loadArticleHtml(article, fullText)
+            localTranslator.canTranslateWithoutBergamotDownload(
+                content = html,
+                targetLanguage = targetLanguage,
+                preserveHtml = true,
+            )
+        }.getOrDefault(false)
     }
 
     private suspend fun loadTranslatedArticle(

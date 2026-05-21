@@ -225,7 +225,7 @@ class BergamotTranslatorWorker {
      */
     linkFallbackIntGemm(info) {
         const mapping = Object.entries(BergamotTranslatorWorker.GEMM_TO_FALLBACK_FUNCTIONS_MAP).map(([key, name]) => {
-            return [key, (...args) => Module['asm'][name](...args)]
+            return [key, (...args) => self.Module['asm'][name](...args)]
         });
 
         return Object.fromEntries(mapping);
@@ -240,29 +240,37 @@ class BergamotTranslatorWorker {
     loadModule() {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await self.fetch(new URL('./bergamot-translator-worker.wasm', self.location));
+                const wasmBuffer = this.options.wasmBinary || null;
 
-                Object.assign(Module, {
+                // Use self.Module to avoid var hoisting from inline Emscripten script
+                Object.assign(self.Module, {
                     instantiateWasm: (info, accept) => {
                         try {
-                            WebAssembly.instantiateStreaming(response, {
+                            const importObject = {
                                 ...info,
                                 'wasm_gemm': this.options.useNativeIntGemm
                                     ? this.linkNativeIntGemm(info)
                                     : this.linkFallbackIntGemm(info)
-                            }).then(({instance}) => accept(instance)).catch(reject);
+                            };
+                            if (wasmBuffer) {
+                                WebAssembly.instantiate(wasmBuffer, importObject)
+                                    .then(({instance}) => accept(instance)).catch(reject);
+                            } else {
+                                const response = this._wasmResponse;
+                                WebAssembly.instantiateStreaming(response, importObject)
+                                    .then(({instance}) => accept(instance)).catch(reject);
+                            }
                         } catch (err) {
                             reject(err);
                         }
                         return {};
                     },
                     onRuntimeInitialized: () => {
-                        resolve(Module);
+                        resolve(self.Module);
                     }
                 });
 
                 // Emscripten glue code. Webpack et al. should not mangle the `Module` property name!
-                self.Module = Module;
                 self.importScripts('bergamot-translator-worker.js');
             } catch (err) {
                 reject(err);

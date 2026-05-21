@@ -104,11 +104,12 @@ class BergamotModelManager(
     suspend fun languagePairStatus(
         sourceLanguage: String,
         targetLanguage: String,
+        allowNetwork: Boolean = true,
     ): BergamotLanguagePairStatus =
         withContext(Dispatchers.IO) {
             val source = normalizeLanguageCode(sourceLanguage)
             val target = normalizeLanguageCode(targetLanguage)
-            val registry = loadRegistry() ?: return@withContext BergamotLanguagePairStatus.RegistryMissing
+            val registry = loadRegistry(allowNetwork = allowNetwork) ?: return@withContext BergamotLanguagePairStatus.RegistryMissing
             val path = resolvePath(registry, source, target) ?: return@withContext BergamotLanguagePairStatus.Unavailable
             if (path.all(::isDownloaded)) {
                 BergamotLanguagePairStatus.Downloaded
@@ -259,7 +260,7 @@ class BergamotModelManager(
             if (!ready) {
                 return null
             }
-            downloadedFiles[part] = file.copy(url = localFile.toURI().toString())
+            downloadedFiles[part] = file.copy(url = "file://" + localFile.absolutePath)
         }
 
         val downloadedEntry = entry.copy(files = downloadedFiles)

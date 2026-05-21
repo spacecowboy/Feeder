@@ -104,7 +104,7 @@ export class CancelledError extends Error {}
          * call and that are unrecoverable.
          * @type {(error: Error)}
          */
-        this.onerror = this.options.onerror || (err => { throw err; });
+        this.onerror = this.options.onerror || (err => console.error('WASM Translation Worker error:', err));
     }
 
     /**
@@ -115,6 +115,7 @@ export class CancelledError extends Error {}
      * @return {Promise<{worker:Worker, exports:Proxy<TranslationWorker>}>}
      */
     async loadWorker() {
+        console.log("TranslatorBacking.loadWorker: loading worker scripts via XHR...");
 
         // Helper to load a file via XHR (fetch doesn't support file:// on Android WebView)
         const loadText = (url) => new Promise((resolve, reject) => {
@@ -138,6 +139,7 @@ export class CancelledError extends Error {}
             loadText(workerScriptUrl.href),
             loadText(emscriptenUrl.href)
         ]);
+        console.log("TranslatorBacking.loadWorker: loaded worker.js (" + workerScript.length + " bytes), emscripten (" + emscriptenScript.length + " bytes)");
 
         // Replace importScripts call with inline Emscripten script content.
         // Patch Emscripten's `var Module` declaration to use self.Module so it
@@ -157,12 +159,15 @@ export class CancelledError extends Error {}
             "self.importScripts('bergamot-translator-worker.js')",
             finalEmscripten
         );
+        console.log("TranslatorBacking.loadWorker: combined script (" + combinedScript.length + " bytes)");
 
         // Create Worker from Blob URL to avoid file:// Worker restrictions on Android WebView
         const blob = new Blob([combinedScript], { type: 'application/javascript' });
         const blobUrl = URL.createObjectURL(blob);
+        console.log("TranslatorBacking.loadWorker: creating Worker from blob URL...");
         const worker = new Worker(blobUrl);
         URL.revokeObjectURL(blobUrl);
+        console.log("TranslatorBacking.loadWorker: Worker created, setting up message listener...");
 
         /**
          * Incremental counter to derive request/response ids from.
@@ -213,12 +218,14 @@ export class CancelledError extends Error {}
 
         // Await initialisation. This will also nicely error out if the WASM
         // runtime fails to load.
+        console.log("TranslatorBacking.loadWorker: calling worker.initialize()...");
         const workerOptions = {...this.options};
         delete workerOptions.onerror;
 
         // Pre-fetch the WASM binary in the main thread since Workers can't
         // access file:// URLs via fetch() on Android WebView, and fetch() doesn't
         // support file:// at all. Use XMLHttpRequest instead.
+        console.log("TranslatorBacking.loadWorker: pre-fetching WASM via XHR...");
         const wasmUrl = new URL('./worker/bergamot-translator-worker.wasm', import.meta.url);
         const wasmBinary = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -235,8 +242,10 @@ export class CancelledError extends Error {}
             xhr.send();
         });
         workerOptions.wasmBinary = wasmBinary;
+        console.log("TranslatorBacking.loadWorker: WASM pre-fetched, " + wasmBinary.byteLength + " bytes");
 
         await call('initialize', workerOptions);
+        console.log("TranslatorBacking.loadWorker: worker initialized successfully");
 
         /**
          * Little wrapper around the message passing api of Worker to make it
@@ -590,7 +599,7 @@ export class BatchTranslator {
          */
         this.batchSize = Math.max(options?.batchSize || 8, 1);
 
-        this.onerror = options?.onerror || (err => { throw err; });
+        this.onerror = options?.onerror || (err => console.error('WASM Translation Worker error:', err));
     }
     
     /**
@@ -611,6 +620,7 @@ export class BatchTranslator {
      * hurt to call it multiple times. This function always returns immediately.
      */
     notify() {
+        console.log("BatchTranslator.notify() called, queue.length=" + this.queue.length + " workers.length=" + this.workers.length);
         setTimeout(async () => {
             // Is there work to be done?
             if (!this.queue.length)
@@ -646,6 +656,7 @@ export class BatchTranslator {
 
             // If no worker, that's the end of it.
             if (!worker) {
+                console.log("BatchTranslator.notify: no worker available, returning");
                 return;
             }
 
@@ -654,15 +665,18 @@ export class BatchTranslator {
             // at the beginning of this function and JavaScript is only
             // cooperatively parallel.
             const batch = this.queue.shift();
+            console.log("BatchTranslator.notify: processing batch id=" + batch.id + " requests.length=" + batch.requests.length);
 
             // Put this worker to work, marking as busy
             worker.idle = false;
             try {
                 await this.consumeBatch(batch, worker.exports);
             } catch (e) {
+                console.error("BatchTranslator.notify: consumeBatch failed:", e.message);
                 batch.requests.forEach(({reject}) => reject(e));
             }
             worker.idle = true;
+            console.log("BatchTranslator.notify: batch id=" + batch.id + " complete");
 
             // Is there more work to be done? Do another idleRequest
             if (this.queue.length)
@@ -774,20 +788,26 @@ export class BatchTranslator {
      * then reuse the worker otherwise you'll just clog up its message queue.
      */
     async consumeBatch(batch, worker) {
+        console.log("BatchTranslator.consumeBatch: batch id=" + batch.id + " models=" + JSON.stringify(batch.models.map(({from, to}) => ({from, to}))) + " requests.length=" + batch.requests.length);
         performance.mark('BergamotBatchTranslator.start');
 
         // Make sure the worker has all necessary models loaded. If not, tell it
         // first to load them.
         await Promise.all(batch.models.map(async ({from, to}) => {
+            console.log("BatchTranslator.consumeBatch: checking model " + from + "->" + to);
             if (!await worker.hasTranslationModel({from, to})) {
+                console.log("BatchTranslator.consumeBatch: loading model " + from + "->" + to);
                 const buffers = await this.backing.getTranslationModel({from, to});
+                console.log("BatchTranslator.consumeBatch: got buffers for " + from + "->" + to + " model=" + (buffers.model ? buffers.model.byteLength : 'null') + "B");
                 await worker.loadTranslationModel({from, to}, buffers);
+                console.log("BatchTranslator.consumeBatch: loaded model " + from + "->" + to + " into worker");
             }
         }));
 
         // Call the worker to translate. Only sending the actually necessary
         // parts of the batch to avoid trying to send things that don't survive
         // the message passing API between this thread and the worker thread.
+        console.log("BatchTranslator.consumeBatch: calling worker.translate()...");
         const responses = await worker.translate({
             models: batch.models.map(({from, to}) => ({from, to})),
             texts: batch.requests.map(({request: {text, html, qualityScores}}) => ({
@@ -796,6 +816,7 @@ export class BatchTranslator {
                 qualityScores: !!qualityScores
             }))
         });
+        console.log("BatchTranslator.consumeBatch: worker.translate() returned " + responses.length + " responses");
 
         // Responses are in! Connect them back to their requests and call their
         // callbacks.

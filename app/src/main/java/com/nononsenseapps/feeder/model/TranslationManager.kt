@@ -340,6 +340,38 @@ class TranslationManager(
             )
         }
 
+    suspend fun hasCachedTranslatedArticle(
+        itemId: Long,
+        title: String,
+        html: String,
+        isFullText: Boolean,
+        settings: TranslationApiSettings,
+        targetLanguage: String,
+    ): Boolean =
+        withContext(Dispatchers.IO) {
+            val targetLanguage = targetLanguage.trim()
+            if (!settings.canTranslate || targetLanguage.isBlank() || html.isBlank()) {
+                return@withContext false
+            }
+
+            val cache = loadCache(itemId, settings, targetLanguage)
+            val titleHash = sha256(title)
+            val htmlHash = sha256(html)
+            val cachedHtml =
+                if (isFullText) {
+                    cache.translatedFullArticleHtml.takeIf { cache.fullArticleHtmlHash == htmlHash }
+                } else {
+                    cache.translatedArticleHtml.takeIf { cache.articleHtmlHash == htmlHash }
+                }
+            val cachedTitle =
+                cache.translatedTitle.takeIf {
+                    cache.titleHash == titleHash &&
+                        !cache.translatedTitle.isNullOrBlank()
+                }
+
+            cachedHtml != null && cachedTitle != null
+        }
+
     suspend fun detectArticleAlreadyInTargetLanguage(
         itemId: Long,
         title: String,

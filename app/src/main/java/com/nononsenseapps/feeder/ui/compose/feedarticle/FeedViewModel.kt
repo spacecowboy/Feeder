@@ -29,6 +29,7 @@ import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
@@ -250,6 +251,10 @@ class FeedViewModel(
                 }
 
                 if (cached.isFullyCached) {
+                    return@launch
+                }
+
+                if (config.settings.isLocalTranslation) {
                     return@launch
                 }
 

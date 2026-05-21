@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.localtranslation
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -65,12 +66,23 @@ class BergamotWebTranslator(
         val registryJson = json.encodeToString(modelRegistry)
         initMutex.withLock {
             ensureWebView()
-            withTimeout(WEBVIEW_INIT_TIMEOUT_MS) { ready.await() }
+            try {
+                withTimeout(WEBVIEW_INIT_TIMEOUT_MS) { ready.await() }
+            } catch (e: Exception) {
+                destroyWebView()
+                throw e
+            }
             if (initializedRegistryJson != registryJson) {
                 evaluate("window.FeederBergamot.initialize($registryJson);")
                 initializedRegistryJson = registryJson
             }
         }
+    }
+
+    private fun destroyWebView() {
+        webView?.destroy()
+        webView = null
+        initializedRegistryJson = ""
     }
 
     private suspend fun translateBatch(
@@ -115,7 +127,16 @@ class BergamotWebTranslator(
                 settings.allowFileAccess = true
                 settings.allowFileAccessFromFileURLs = true
                 settings.allowUniversalAccessFromFileURLs = false
-                webChromeClient = WebChromeClient()
+                webChromeClient =
+                    object : WebChromeClient() {
+                        override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage): Boolean {
+                            android.util.Log.w(
+                                LOG_TAG,
+                                "WebView console [$consoleMessage]: ${consoleMessage.sourceId()}:${consoleMessage.lineNumber()} ${consoleMessage.message()}",
+                            )
+                            return true
+                        }
+                    }
                 webViewClient =
                     object : WebViewClient() {
                         override fun onReceivedError(
@@ -144,6 +165,7 @@ class BergamotWebTranslator(
 
         @JavascriptInterface
         fun onReady() {
+            Log.w(LOG_TAG, "BRIDGE onReady() called from JS!")
             ready.complete(Unit)
         }
 
@@ -160,6 +182,7 @@ class BergamotWebTranslator(
             id: Long,
             translatedTextJson: String,
         ) {
+            Log.w(LOG_TAG, "BRIDGE onTranslationBatchSuccess id=$id jsonLen=${translatedTextJson.length}")
             val translatedTexts =
                 runCatching {
                     json.decodeFromString<List<String>>(translatedTextJson)
@@ -175,11 +198,13 @@ class BergamotWebTranslator(
             id: Long,
             message: String,
         ) {
+            Log.w(LOG_TAG, "BRIDGE onTranslationError id=$id message=$message")
             pending.remove(id)?.complete(BergamotWebTranslationResult.Error(message))
         }
 
         @JavascriptInterface
         fun onLog(message: String) {
+            Log.w(LOG_TAG, "BRIDGE onLog from JS: $message")
             logDebug(LOG_TAG, message)
         }
     }
