@@ -556,7 +556,7 @@ class RssLocalSync(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_RssLocalSync"
+        private const val LOG_TAG = "FEEDER_RSS_LOCAL_SYNC"
     }
 }
 
