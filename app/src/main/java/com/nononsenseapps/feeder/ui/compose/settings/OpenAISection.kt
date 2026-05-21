@@ -79,9 +79,10 @@ fun OpenAISection(
     state: OpenAISettingsState,
     onEvent: (OpenAISettingsEvent) -> Unit,
     section: OpenAISectionType,
+    modifier: Modifier = Modifier,
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
 ) {
     val sanitizedSettings = remember(section, state.settings) { section.sanitizeSettings(state.settings) }
 
@@ -151,6 +152,7 @@ fun OpenAISection(
                             current = selected.applyTo(current)
                         },
                         onPreferredTranslationLanguageChange = { currentPreferredTranslationLanguage = it },
+                        localTranslationContent = localTranslationContent,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -194,9 +196,10 @@ fun TranslationApiSection(
     info: String,
     state: TranslationApiSettingsState,
     onEvent: (TranslationApiSettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
 ) {
     OpenAISection(
         title = title,
@@ -207,6 +210,7 @@ fun TranslationApiSection(
         preferredTranslationLanguage = preferredTranslationLanguage,
         onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
         modifier = modifier,
+        localTranslationContent = localTranslationContent,
     )
 }
 
@@ -268,6 +272,7 @@ private fun OpenAISectionEdit(
     onProviderChange: (AIProviderPreset) -> Unit,
     onPreferredTranslationLanguageChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
@@ -489,6 +494,10 @@ private fun OpenAISectionEdit(
                 },
                 onValueChange = onPreferredTranslationLanguageChange,
             )
+
+            if (provider == AIProviderPreset.LOCAL_TRANSLATION) {
+                localTranslationContent()
+            }
         }
 
         if (hasProvider && provider != AIProviderPreset.LOCAL_TRANSLATION) {

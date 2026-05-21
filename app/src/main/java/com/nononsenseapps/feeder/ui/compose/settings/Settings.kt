@@ -839,7 +839,15 @@ fun SettingsList(
                 onEvent = onTranslationApiEvent,
                 preferredTranslationLanguage = preferredTranslationLanguage,
                 onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
-            )
+            ) {
+                if (canTranslate && translationApiState.settings.isLocalTranslation && downloadedLanguagePairs.isNotEmpty()) {
+                    DownloadedModelsSection(
+                        downloadedLanguagePairs = downloadedLanguagePairs,
+                        onDeletePair = onDeleteLanguagePair,
+                        onDeleteAll = onDeleteAllLanguagePairs,
+                    )
+                }
+            }
 
             if (canTranslate) {
                 SwitchSetting(
@@ -852,14 +860,6 @@ fun SettingsList(
                     title = stringResource(id = R.string.translate_articles_by_default),
                     checked = translateArticlesByDefault,
                     onCheckedChange = onTranslateArticlesByDefault,
-                )
-            }
-
-            if (canTranslate && translationApiState.settings.isLocalTranslation && downloadedLanguagePairs.isNotEmpty()) {
-                DownloadedModelsSection(
-                    downloadedLanguagePairs = downloadedLanguagePairs,
-                    onDeletePair = onDeleteLanguagePair,
-                    onDeleteAll = onDeleteAllLanguagePairs,
                 )
             }
         }
@@ -1641,12 +1641,12 @@ private fun DownloadedModelsSection(
         )
     }
 
-    Column {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.downloaded_translation_models),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
         )
         Text(
             text = stringResource(R.string.downloaded_translation_models_desc),
@@ -1686,15 +1686,32 @@ private fun DownloadedModelsSection(
         }
 
         if (downloadedLanguagePairs.size > 1) {
-            Spacer(Modifier.height(8.dp))
-            TextButton(onClick = { showDeleteAllConfirm = true }) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(stringResource(R.string.delete_all_models))
+            val totalSize = downloadedLanguagePairs.sumOf { it.sizeBytes }
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.delete_all_models),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = formatFileSize(totalSize),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = { showDeleteAllConfirm = true }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.delete_all_models),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
