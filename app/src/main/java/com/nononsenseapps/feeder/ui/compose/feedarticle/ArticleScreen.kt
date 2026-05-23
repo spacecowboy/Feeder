@@ -69,6 +69,7 @@ import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.ScrollDirection
+import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressContent
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
@@ -656,50 +657,7 @@ private fun TranslationModelDownloadProgress(progress: BergamotModelDownloadProg
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-        ) {
-            Text(
-                text =
-                    if (progress.isIndeterminate) {
-                        stringResource(
-                            R.string.preparing_offline_translation_model,
-                            progress.sourceLanguage,
-                            progress.targetLanguage,
-                        )
-                    } else {
-                        stringResource(
-                            R.string.downloading_offline_translation_model,
-                            progress.sourceLanguage,
-                            progress.targetLanguage,
-                            (progress.fraction * 100).toInt(),
-                        )
-                    },
-                style = MaterialTheme.typography.bodySmall,
-            )
-            if (progress.isIndeterminate) {
-                LinearProgressIndicator(
-                    modifier =
-                        Modifier
-                            .padding(top = 8.dp)
-                            .fillMaxWidth(),
-                )
-            } else {
-                LinearProgressIndicator(
-                    progress = { progress.fraction },
-                    modifier =
-                        Modifier
-                            .padding(top = 8.dp)
-                            .fillMaxWidth(),
-                )
-            }
-            Text(
-                text = stringResource(R.string.offline_translation_model_download_hint),
-                modifier = Modifier.padding(top = 8.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
+        TranslationProgressContent(progress)
     }
 }
 
