@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.model.detectLocaleFromText
 import com.nononsenseapps.feeder.model.hasEnoughTextForLanguageDetection
 import com.nononsenseapps.feeder.model.prepareTextForLanguageDetection
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
+import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult.ErrorAction
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -168,7 +169,11 @@ class LocalTranslator(
                 )
             }
 
-            is LocalTranslationResult.Error -> TranslationResult.Error(translatedTexts.message)
+            is LocalTranslationResult.Error ->
+                TranslationResult.Error(
+                    content = translatedTexts.message,
+                    action = translatedTexts.action,
+                )
         }
     }
 
@@ -192,7 +197,11 @@ class LocalTranslator(
                     detectedLanguage = sourceLang,
                 )
 
-            is LocalTranslationResult.Error -> TranslationResult.Error(result.message)
+            is LocalTranslationResult.Error ->
+                TranslationResult.Error(
+                    content = result.message,
+                    action = result.action,
+                )
         }
 
     private suspend fun translateHtmlWithBergamot(
@@ -237,7 +246,11 @@ class LocalTranslator(
                 )
             }
 
-            is LocalTranslationResult.Error -> TranslationResult.Error(translatedTexts.message)
+            is LocalTranslationResult.Error ->
+                TranslationResult.Error(
+                    content = translatedTexts.message,
+                    action = translatedTexts.action,
+                )
         }
     }
 
@@ -261,7 +274,11 @@ class LocalTranslator(
                     detectedLanguage = sourceLang,
                 )
 
-            is LocalTranslationResult.Error -> TranslationResult.Error(result.message)
+            is LocalTranslationResult.Error ->
+                TranslationResult.Error(
+                    content = result.message,
+                    action = result.action,
+                )
         }
 
     private suspend fun translateTextValuesWithBergamot(
@@ -280,13 +297,14 @@ class LocalTranslator(
             when (preparation) {
                 is BergamotModelPreparation.Ready -> preparation.modelRegistry
                 is BergamotModelPreparation.Error ->
-                    return LocalTranslationResult.Error(
-                        if (preparation.message.startsWith("No app model")) {
-                            "Install $sourceLang -> $targetLang in system settings"
-                        } else {
-                            preparation.message
-                        },
-                    )
+                    return when (preparation.reason) {
+                        BergamotModelPreparation.ErrorReason.NoAppModel ->
+                            LocalTranslationResult.Error(
+                                message = systemSettingsRequiredMessage(sourceLang, targetLang),
+                                action = ErrorAction.OpenSystemTranslationSettings,
+                            )
+                        else -> LocalTranslationResult.Error(preparation.message)
+                    }
             }
 
         return try {
@@ -346,7 +364,8 @@ class LocalTranslator(
             TranslationCapability.STATE_ON_DEVICE -> Unit
             TranslationCapability.STATE_AVAILABLE_TO_DOWNLOAD -> {
                 return LocalTranslationResult.Error(
-                    "Install $sourceLang -> $targetLang in system settings",
+                    message = systemSettingsRequiredMessage(sourceLang, targetLang),
+                    action = ErrorAction.OpenSystemTranslationSettings,
                 )
             }
             TranslationCapability.STATE_DOWNLOADING ->
@@ -485,8 +504,14 @@ private sealed interface LocalTranslationResult {
 
     data class Error(
         val message: String,
+        val action: ErrorAction = ErrorAction.None,
     ) : LocalTranslationResult
 }
+
+private fun systemSettingsRequiredMessage(
+    sourceLang: String,
+    targetLang: String,
+): String = "Install $sourceLang -> $targetLang in system settings"
 
 private data class HtmlTextNodeTranslation(
     val textNode: TextNode,

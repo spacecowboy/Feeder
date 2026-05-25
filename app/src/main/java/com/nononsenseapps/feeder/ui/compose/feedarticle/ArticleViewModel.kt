@@ -33,6 +33,7 @@ import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
 import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.SystemTranslationSettingsRequiredException
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.TranslationManager
@@ -611,16 +612,16 @@ class ArticleViewModel(
                         sourceLanguage = translation.sourceLanguage,
                         isFullText = fullText,
                     )
+            } catch (e: SystemTranslationSettingsRequiredException) {
+                showTranslatedContent.value = false
+                translatedArticleContent.value = LinearArticle(emptyList())
+                articleTranslationState.value =
+                    ArticleTranslationState.SystemSettingsRequired(
+                        e.message ?: "Translation model required",
+                    )
             } catch (e: Exception) {
-                val message = e.message ?: "Translation failed"
-                if (message.isSystemTranslationSettingsMessage()) {
-                    showTranslatedContent.value = false
-                    translatedArticleContent.value = LinearArticle(emptyList())
-                    articleTranslationState.value = ArticleTranslationState.SystemSettingsRequired(message)
-                } else {
-                    clearTranslatedContent()
-                    toastMaker.makeToast(message)
-                }
+                clearTranslatedContent()
+                toastMaker.makeToast(e.message ?: "Translation failed")
             }
         }
     }
@@ -821,8 +822,6 @@ class ArticleViewModel(
         private const val LOG_TAG = "FEEDER_ArticleVM"
     }
 }
-
-private fun String.isSystemTranslationSettingsMessage(): Boolean = startsWith("Install ") && endsWith(" in system settings")
 
 private data class ArticleState(
     override val useDetectLanguage: Boolean = false,

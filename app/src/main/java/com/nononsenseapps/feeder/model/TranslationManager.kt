@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
 import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
+import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult.ErrorAction
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
@@ -527,7 +528,13 @@ class TranslationManager(
             is TranslationResult.Success ->
                 result.takeIf { it.content.isNotBlank() }
                     ?: throw IllegalStateException("Translation failed")
-            is TranslationResult.Error -> throw IllegalStateException(result.content.ifBlank { "Translation failed" })
+            is TranslationResult.Error -> {
+                val message = result.content.ifBlank { "Translation failed" }
+                if (result.action == ErrorAction.OpenSystemTranslationSettings) {
+                    throw SystemTranslationSettingsRequiredException(message)
+                }
+                throw IllegalStateException(message)
+            }
         }
 
     private suspend fun translate(
@@ -659,6 +666,10 @@ data class ArticleTranslation(
     val translatedHtml: String,
     val sourceLanguage: String,
 )
+
+class SystemTranslationSettingsRequiredException(
+    message: String,
+) : IllegalStateException(message)
 
 @Serializable
 private data class CachedTranslations(

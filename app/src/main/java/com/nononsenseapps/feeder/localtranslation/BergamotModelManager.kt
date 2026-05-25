@@ -60,13 +60,15 @@ class BergamotModelManager(
                             targetLanguage = target,
                         )
                             ?: return@withLock BergamotModelPreparation.Error(
-                                "Connect to download model list.",
+                                message = "Connect to download model list.",
+                                reason = BergamotModelPreparation.ErrorReason.RegistryMissing,
                             )
 
                     val path =
                         resolvePath(registry, source, target)
                             ?: return@withLock BergamotModelPreparation.Error(
-                                "No app model for $source -> $target.",
+                                message = "No app model for $source -> $target.",
+                                reason = BergamotModelPreparation.ErrorReason.NoAppModel,
                             )
 
                     val downloadState = ModelDownloadState.forPath(path)
@@ -77,7 +79,8 @@ class BergamotModelManager(
                                 entry = entry,
                                 downloadState = downloadState,
                             ) ?: return@withLock BergamotModelPreparation.Error(
-                                "Could not download ${entry.from} -> ${entry.to} model.",
+                                message = "Could not download ${entry.from} -> ${entry.to} model.",
+                                reason = BergamotModelPreparation.ErrorReason.DownloadFailed,
                             )
                         entries += downloaded
                     }
@@ -473,7 +476,14 @@ sealed interface BergamotModelPreparation {
 
     data class Error(
         val message: String,
+        val reason: ErrorReason,
     ) : BergamotModelPreparation
+
+    enum class ErrorReason {
+        RegistryMissing,
+        NoAppModel,
+        DownloadFailed,
+    }
 }
 
 enum class BergamotLanguagePairStatus {
