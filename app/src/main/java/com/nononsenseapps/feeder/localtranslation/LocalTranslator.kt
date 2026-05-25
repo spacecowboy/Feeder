@@ -280,7 +280,13 @@ class LocalTranslator(
             when (preparation) {
                 is BergamotModelPreparation.Ready -> preparation.modelRegistry
                 is BergamotModelPreparation.Error ->
-                    return LocalTranslationResult.Error(preparation.message)
+                    return LocalTranslationResult.Error(
+                        if (preparation.message.startsWith("No app model")) {
+                            "Install $sourceLang -> $targetLang in system settings"
+                        } else {
+                            preparation.message
+                        },
+                    )
             }
 
         return try {

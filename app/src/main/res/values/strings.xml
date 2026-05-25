@@ -4,6 +4,7 @@
   <string name="navigation_drawer_open">Open navigation drawer</string>
   <string name="navigation_drawer_close">Close navigation drawer</string>
   <string name="action_settings">Settings</string>
+  <string name="open_settings">Open settings</string>
   <string name="add_feed">Add feed</string>
   <string name="title_activity_edit_feed">Subscribe to feed</string>
   <string name="url">URL</string>

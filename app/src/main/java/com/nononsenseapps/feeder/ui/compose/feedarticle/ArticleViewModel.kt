@@ -217,6 +217,10 @@ class ArticleViewModel(
                 isTranslationLoading = translationState is ArticleTranslationState.Loading,
                 translationModelDownloadProgress = translationDownloadProgress,
                 translationSourceLanguage = currentTranslation?.sourceLanguage ?: alreadyInPreferredLanguage?.sourceLanguage.orEmpty(),
+                systemTranslationSettingsMessage =
+                    (translationState as? ArticleTranslationState.SystemSettingsRequired)
+                        ?.message
+                        .orEmpty(),
                 articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
         }.stateIn(
@@ -608,8 +612,15 @@ class ArticleViewModel(
                         isFullText = fullText,
                     )
             } catch (e: Exception) {
-                clearTranslatedContent()
-                toastMaker.makeToast(e.message ?: "Translation failed")
+                val message = e.message ?: "Translation failed"
+                if (message.isSystemTranslationSettingsMessage()) {
+                    showTranslatedContent.value = false
+                    translatedArticleContent.value = LinearArticle(emptyList())
+                    articleTranslationState.value = ArticleTranslationState.SystemSettingsRequired(message)
+                } else {
+                    clearTranslatedContent()
+                    toastMaker.makeToast(message)
+                }
             }
         }
     }
@@ -800,10 +811,18 @@ class ArticleViewModel(
         articleTranslationState.value = ArticleTranslationState.Empty
     }
 
+    fun dismissSystemTranslationSettingsPrompt() {
+        if (articleTranslationState.value is ArticleTranslationState.SystemSettingsRequired) {
+            articleTranslationState.value = ArticleTranslationState.Empty
+        }
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"
     }
 }
+
+private fun String.isSystemTranslationSettingsMessage(): Boolean = startsWith("Install ") && endsWith(" in system settings")
 
 private data class ArticleState(
     override val useDetectLanguage: Boolean = false,
@@ -833,6 +852,7 @@ private data class ArticleState(
     override val isTranslationLoading: Boolean = false,
     override val translationModelDownloadProgress: BergamotModelDownloadProgress? = null,
     override val translationSourceLanguage: String = "",
+    override val systemTranslationSettingsMessage: String = "",
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -865,6 +885,7 @@ interface ArticleScreenViewState {
     val isTranslationLoading: Boolean
     val translationModelDownloadProgress: BergamotModelDownloadProgress?
     val translationSourceLanguage: String
+    val systemTranslationSettingsMessage: String
     val articleContent: LinearArticle
 }
 
@@ -887,6 +908,10 @@ sealed interface ArticleTranslationState {
     data class AlreadyInPreferredLanguage(
         val sourceLanguage: String,
         val isFullText: Boolean,
+    ) : ArticleTranslationState
+
+    data class SystemSettingsRequired(
+        val message: String,
     ) : ArticleTranslationState
 
     data class Result(
