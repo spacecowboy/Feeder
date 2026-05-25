@@ -567,25 +567,41 @@ class TranslationManager(
         preserveHtml: Boolean = false,
     ): String? =
         runCatching {
-            val detectionText = prepareTextForLanguageDetection(content, preserveHtml)
-            if (!hasEnoughTextForLanguageDetection(detectionText)) {
+            val detectionSamples =
+                prepareTextSamplesForLanguageDetection(
+                    content = content,
+                    preserveHtml = preserveHtml,
+                ).filter(::hasEnoughTextForLanguageDetection)
+            if (detectionSamples.isEmpty()) {
                 return@runCatching null
             }
 
-            application
-                .detectLocaleFromText(
-                    text = detectionText,
-                    minConfidence = 95.0f,
-                ).firstOrNull()
-                ?.locale
-                ?.toLanguageTag()
-                ?.takeIf {
-                    detectedLanguageMatchesTranslationTarget(
-                        detectedLanguage = it,
-                        targetLanguage = targetLanguage,
-                        settings = settings,
-                    )
+            val detectedLanguages =
+                detectionSamples.map { sample ->
+                    val detectedLanguage =
+                        application
+                            .detectLocaleFromText(
+                                text = sample,
+                                minConfidence = 95.0f,
+                            ).firstOrNull()
+                            ?.locale
+                            ?.toLanguageTag()
+                            ?: return@runCatching null
+
+                    if (
+                        !detectedLanguageMatchesTranslationTarget(
+                            detectedLanguage = detectedLanguage,
+                            targetLanguage = targetLanguage,
+                            settings = settings,
+                        )
+                    ) {
+                        return@runCatching null
+                    }
+
+                    detectedLanguage
                 }
+
+            detectedLanguages.firstOrNull()
         }.getOrNull()
 
     private fun detectArticleAlreadyInTargetLanguage(

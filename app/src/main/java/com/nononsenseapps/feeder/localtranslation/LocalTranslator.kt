@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi
 import com.nononsenseapps.feeder.model.detectLocaleFromText
 import com.nononsenseapps.feeder.model.hasEnoughTextForLanguageDetection
 import com.nononsenseapps.feeder.model.prepareTextForLanguageDetection
+import com.nononsenseapps.feeder.model.prepareTextSamplesForLanguageDetection
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult.ErrorAction
 import kotlinx.coroutines.CompletableDeferred
@@ -53,7 +54,13 @@ class LocalTranslator(
             }
 
             val targetLang = normalizeLanguageCode(targetLanguage)
-            val sourceLang = sourceLangHint.ifBlank { detectSourceLanguage(text) }
+            val sourceLang =
+                sourceLangHint.ifBlank {
+                    detectSourceLanguage(
+                        content = content,
+                        preserveHtml = preserveHtml,
+                    )
+                }
 
             if (sourceLang == targetLang) {
                 return@withContext TranslationResult.Success(
@@ -111,7 +118,13 @@ class LocalTranslator(
             }
 
             val targetLang = normalizeLanguageCode(targetLanguage)
-            val sourceLang = sourceLangHint.ifBlank { detectSourceLanguage(text) }
+            val sourceLang =
+                sourceLangHint.ifBlank {
+                    detectSourceLanguage(
+                        content = content,
+                        preserveHtml = preserveHtml,
+                    )
+                }
             if (sourceLang == targetLang) {
                 return@withContext true
             }
@@ -478,17 +491,32 @@ class LocalTranslator(
             visit(node)
         }
 
-    private fun detectSourceLanguage(content: String): String =
+    private fun detectSourceLanguage(
+        content: String,
+        preserveHtml: Boolean,
+    ): String =
         runCatching {
-            application
-                .detectLocaleFromText(
-                    text = content.take(1000),
-                    minConfidence = 50.0f,
-                ).firstOrNull()
-                ?.locale
-                ?.language
-                ?: "en"
-        }.getOrDefault("en")
+            val detectedLanguages =
+                prepareTextSamplesForLanguageDetection(
+                    content = content,
+                    preserveHtml = preserveHtml,
+                ).filter(::hasEnoughTextForLanguageDetection)
+                    .mapNotNull { sample ->
+                        application
+                            .detectLocaleFromText(
+                                text = sample,
+                                minConfidence = 60.0f,
+                            ).firstOrNull()
+                            ?.locale
+                            ?.language
+                            ?.let(::normalizeLanguageCode)
+                            ?.takeIf { it != "und" }
+                    }
+
+            val languageCounts = detectedLanguages.groupingBy { it }.eachCount()
+            detectedLanguages.maxByOrNull { languageCounts.getValue(it) }
+                ?: "und"
+        }.getOrDefault("und")
 
     companion object {
         private const val ANDROID_TRANSLATOR_CREATION_TIMEOUT_MS = 5_000L
