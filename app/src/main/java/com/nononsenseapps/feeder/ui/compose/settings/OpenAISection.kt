@@ -611,49 +611,52 @@ private fun TranslationLanguageField(
             translationLanguageOption(preferredTranslationLanguage)
         }
 
-    Box {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = selectedLanguage?.label ?: preferredTranslationLanguage,
-            placeholder = {
-                Text(stringResource(R.string.translation_language_placeholder))
-            },
-            label = {
-                Text(stringResource(R.string.preferred_translation_language))
-            },
-            readOnly = true,
-            supportingText = {
-                Text(
-                    text =
-                        preferredTranslationLanguageDescription(
-                            provider = provider,
-                            selectedLanguage = selectedLanguage,
-                        ),
-                )
-            },
-            onValueChange = {},
-            trailingIcon = {
-                IconButton(onClick = { onExpandedChange(true) }) {
-                    Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.preferred_translation_language))
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = selectedLanguage?.label ?: preferredTranslationLanguage,
+                placeholder = {
+                    Text(stringResource(R.string.translation_language_placeholder))
+                },
+                label = {
+                    Text(stringResource(R.string.preferred_translation_language))
+                },
+                readOnly = true,
+                onValueChange = {},
+                trailingIcon = {
+                    IconButton(onClick = { onExpandedChange(true) }) {
+                        Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.preferred_translation_language))
+                    }
+                },
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+            ) {
+                languageOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(option.label)
+                        },
+                        onClick = {
+                            onPreferredTranslationLanguageChange(option.code)
+                            onExpandedChange(false)
+                        },
+                    )
                 }
-            },
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
-        ) {
-            languageOptions.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(option.label)
-                    },
-                    onClick = {
-                        onPreferredTranslationLanguageChange(option.code)
-                        onExpandedChange(false)
-                    },
-                )
             }
         }
+        Text(
+            modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
+            text =
+                preferredTranslationLanguageDescription(
+                    provider = provider,
+                    selectedLanguage = selectedLanguage,
+                ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 
