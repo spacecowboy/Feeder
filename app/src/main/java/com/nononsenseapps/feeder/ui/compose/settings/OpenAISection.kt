@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -66,6 +67,7 @@ import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 enum class OpenAISectionType {
     Summary,
@@ -301,6 +303,8 @@ private fun OpenAISectionEdit(
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
+    var translationLanguageMenuExpanded by remember { mutableStateOf(false) }
+    var showOnlyBergamotLanguages by remember { mutableStateOf(false) }
     var timeoutString by remember(current.timeoutSeconds) { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
@@ -475,38 +479,21 @@ private fun OpenAISectionEdit(
         }
 
         if (section == OpenAISectionType.Translation && hasProvider) {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = preferredTranslationLanguage,
-                placeholder = {
-                    Text(stringResource(R.string.translation_language_placeholder))
-                },
-                label = {
-                    Text(stringResource(R.string.preferred_translation_language))
-                },
-                keyboardOptions =
-                    KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next,
-                    ),
-                keyboardActions =
-                    KeyboardActions(
-                        onNext = {
-                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                        },
-                    ),
-                supportingText = {
-                    Text(
-                        text =
-                            preferredTranslationLanguageDescription(
-                                provider = provider,
-                                preferredTranslationLanguage = preferredTranslationLanguage,
-                            ),
-                    )
-                },
-                onValueChange = onPreferredTranslationLanguageChange,
+            TranslationLanguageField(
+                provider = provider,
+                preferredTranslationLanguage = preferredTranslationLanguage,
+                showOnlyBergamotLanguages = showOnlyBergamotLanguages,
+                expanded = translationLanguageMenuExpanded,
+                onExpandedChange = { translationLanguageMenuExpanded = it },
+                onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
             )
 
             if (provider == AIProviderPreset.LOCAL_TRANSLATION) {
+                BergamotLanguagesOnlySwitch(
+                    checked = showOnlyBergamotLanguages,
+                    onCheckedChange = { showOnlyBergamotLanguages = it },
+                )
+
                 localTranslationContent()
             }
         }
@@ -604,31 +591,237 @@ private fun OpenAISectionEdit(
 }
 
 @Composable
-private fun preferredTranslationLanguageDescription(
+private fun TranslationLanguageField(
     provider: AIProviderPreset,
     preferredTranslationLanguage: String,
+    showOnlyBergamotLanguages: Boolean,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onPreferredTranslationLanguageChange: (String) -> Unit,
+) {
+    val languageOptions =
+        remember(provider, showOnlyBergamotLanguages) {
+            translationLanguageOptions(
+                provider = provider,
+                showOnlyBergamotLanguages = showOnlyBergamotLanguages,
+            )
+        }
+    val selectedLanguage =
+        remember(preferredTranslationLanguage) {
+            translationLanguageOption(preferredTranslationLanguage)
+        }
+
+    Box {
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = selectedLanguage?.label ?: preferredTranslationLanguage,
+            placeholder = {
+                Text(stringResource(R.string.translation_language_placeholder))
+            },
+            label = {
+                Text(stringResource(R.string.preferred_translation_language))
+            },
+            readOnly = true,
+            supportingText = {
+                Text(
+                    text =
+                        preferredTranslationLanguageDescription(
+                            provider = provider,
+                            selectedLanguage = selectedLanguage,
+                        ),
+                )
+            },
+            onValueChange = {},
+            trailingIcon = {
+                IconButton(onClick = { onExpandedChange(true) }) {
+                    Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.preferred_translation_language))
+                }
+            },
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange(false) },
+        ) {
+            languageOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(option.label)
+                    },
+                    onClick = {
+                        onPreferredTranslationLanguageChange(option.code)
+                        onExpandedChange(false)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BergamotLanguagesOnlySwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onCheckedChange(!checked) }
+                .semantics { role = Role.Switch }
+                .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.show_only_bergamot_languages),
+            modifier = Modifier.weight(1f),
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Composable
+private fun preferredTranslationLanguageDescription(
+    provider: AIProviderPreset,
+    selectedLanguage: TranslationLanguageOption?,
 ): String {
     if (provider != AIProviderPreset.LOCAL_TRANSLATION) {
         return stringResource(R.string.preferred_translation_language_description)
     }
 
-    val targetLanguage =
-        preferredTranslationLanguage
-            .takeIf { it.isNotBlank() }
-            ?: stringResource(R.string.preferred_translation_language_fallback)
+    val systemSetup = stringResource(R.string.local_translation_setup_system)
+    val targetLanguage = selectedLanguage?.name ?: stringResource(R.string.preferred_translation_language_fallback)
+    val targetCode = selectedLanguage?.normalizedBergamotCode()
 
-    return stringResource(
-        id = localTranslationSetupInstructionsRes(),
-        targetLanguage,
-    )
+    return if (targetCode != null && targetCode in BERGAMOT_TARGET_LANGUAGE_CODES) {
+        systemSetup + " " + stringResource(R.string.local_translation_setup_bergamot, targetLanguage)
+    } else {
+        systemSetup
+    }
 }
 
-private fun localTranslationSetupInstructionsRes(manufacturer: String = android.os.Build.MANUFACTURER): Int =
-    when {
-        manufacturer.equals("google", ignoreCase = true) -> R.string.local_translation_setup_pixel
-        manufacturer.equals("samsung", ignoreCase = true) -> R.string.local_translation_setup_samsung
-        else -> R.string.local_translation_setup_generic
+private data class TranslationLanguageOption(
+    val code: String,
+    val name: String,
+) {
+    val label: String = "$name ($code)"
+
+    fun normalizedBergamotCode(): String =
+        when (code.lowercase(Locale.ROOT).substringBefore('-')) {
+            "nb", "nn" -> "nb"
+            else -> code.lowercase(Locale.ROOT).substringBefore('-')
+        }
+}
+
+private fun translationLanguageOptions(
+    provider: AIProviderPreset,
+    showOnlyBergamotLanguages: Boolean,
+): List<TranslationLanguageOption> {
+    val options =
+        if (provider == AIProviderPreset.DEEPL) {
+            deepLTargetLanguageOptions()
+        } else {
+            isoLanguageOptions()
+        }
+
+    return if (provider == AIProviderPreset.LOCAL_TRANSLATION && showOnlyBergamotLanguages) {
+        options.filter { it.normalizedBergamotCode() in BERGAMOT_TARGET_LANGUAGE_CODES }
+    } else {
+        options
     }
+}
+
+private fun translationLanguageOption(language: String): TranslationLanguageOption? {
+    val trimmed = language.trim().takeIf(String::isNotBlank) ?: return null
+    isoLanguageOptions()
+        .firstOrNull { option ->
+            option.code.equals(trimmed, ignoreCase = true) ||
+                option.name.equals(trimmed, ignoreCase = true)
+        }?.let { return it }
+
+    val exactLocale = Locale.forLanguageTag(trimmed)
+    val exactLanguage = exactLocale.language.takeIf { it.isNotBlank() && it != "und" }
+    if (exactLanguage != null) {
+        return TranslationLanguageOption(
+            code = trimmed,
+            name = exactLocale.getDisplayLanguage(Locale.getDefault()).takeIf(String::isNotBlank) ?: trimmed,
+        )
+    }
+    return null
+}
+
+private fun isoLanguageOptions(): List<TranslationLanguageOption> =
+    Locale
+        .getISOLanguages()
+        .mapNotNull { code ->
+            val locale = Locale.forLanguageTag(code)
+            val name = locale.getDisplayLanguage(Locale.getDefault()).takeIf(String::isNotBlank) ?: return@mapNotNull null
+            TranslationLanguageOption(
+                code = code,
+                name = name,
+            )
+        }.distinctBy { it.code.lowercase(Locale.ROOT) }
+        .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
+
+private fun deepLTargetLanguageOptions(): List<TranslationLanguageOption> =
+    listOf(
+        "BG",
+        "CS",
+        "DA",
+        "DE",
+        "EL",
+        "EN",
+        "EN-GB",
+        "EN-US",
+        "ES",
+        "ET",
+        "FI",
+        "FR",
+        "HU",
+        "ID",
+        "IT",
+        "JA",
+        "KO",
+        "LT",
+        "LV",
+        "NB",
+        "NL",
+        "PL",
+        "PT",
+        "PT-BR",
+        "PT-PT",
+        "RO",
+        "RU",
+        "SK",
+        "SL",
+        "SV",
+        "TR",
+        "UK",
+        "ZH",
+    ).map { code ->
+        val locale = Locale.forLanguageTag(code)
+        TranslationLanguageOption(
+            code = code,
+            name = locale.getDisplayName(Locale.getDefault()).takeIf(String::isNotBlank) ?: code,
+        )
+    }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
+
+private val BERGAMOT_TARGET_LANGUAGE_CODES =
+    setOf(
+        "bg",
+        "cs",
+        "de",
+        "en",
+        "es",
+        "et",
+        "fr",
+        "it",
+        "pt",
+        "ru",
+        "uk",
+    )
 
 @Composable
 private fun ProviderField(

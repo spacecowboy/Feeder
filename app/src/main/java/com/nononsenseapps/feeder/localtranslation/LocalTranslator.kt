@@ -77,7 +77,7 @@ class LocalTranslator(
                         )
                     }
                 } else {
-                    TranslationResult.Error("Android system on-device translation requires Android 12 or newer.")
+                    TranslationResult.Error("Requires Android 12+.")
                 }
 
             if (androidSystemResult is TranslationResult.Success) {
@@ -87,14 +87,12 @@ class LocalTranslator(
                     html = content,
                     sourceLang = sourceLang,
                     targetLang = targetLang,
-                    androidSystemError = androidSystemResult.content,
                 )
             } else {
                 translatePlainTextWithBergamot(
                     content = content,
                     sourceLang = sourceLang,
                     targetLang = targetLang,
-                    androidSystemError = androidSystemResult.content,
                 )
             }
         }
@@ -201,7 +199,6 @@ class LocalTranslator(
         html: String,
         sourceLang: String,
         targetLang: String,
-        androidSystemError: String,
     ): TranslationResult {
         val document = Jsoup.parseBodyFragment(html)
         val translationTargets =
@@ -227,7 +224,6 @@ class LocalTranslator(
                 sourceLang = sourceLang,
                 targetLang = targetLang,
                 preserveHtml = false,
-                androidSystemError = androidSystemError,
             )
 
         return when (translatedTexts) {
@@ -249,7 +245,6 @@ class LocalTranslator(
         content: String,
         sourceLang: String,
         targetLang: String,
-        androidSystemError: String,
     ): TranslationResult =
         when (
             val result =
@@ -258,7 +253,6 @@ class LocalTranslator(
                     sourceLang = sourceLang,
                     targetLang = targetLang,
                     preserveHtml = false,
-                    androidSystemError = androidSystemError,
                 )
         ) {
             is LocalTranslationResult.Success ->
@@ -275,7 +269,6 @@ class LocalTranslator(
         sourceLang: String,
         targetLang: String,
         preserveHtml: Boolean,
-        androidSystemError: String,
     ): LocalTranslationResult {
         val preparation =
             bergamotModelManager.prepare(
@@ -287,13 +280,7 @@ class LocalTranslator(
             when (preparation) {
                 is BergamotModelPreparation.Ready -> preparation.modelRegistry
                 is BergamotModelPreparation.Error ->
-                    return LocalTranslationResult.Error(
-                        listOf(
-                            "Android system translation unavailable: ${androidSystemError.ifBlank { "no on-device translator was available" }}",
-                            preparation.message,
-                            "App model storage: ${bergamotModelManager.storageLocation().absolutePath}",
-                        ).joinToString(separator = "\n"),
-                    )
+                    return LocalTranslationResult.Error(preparation.message)
             }
 
         return try {
@@ -308,21 +295,18 @@ class LocalTranslator(
                             modelRegistry = modelRegistry,
                         )
                     } ?: return LocalTranslationResult.Error(
-                        "Android system translation unavailable: ${androidSystemError.ifBlank { "no on-device translator was available" }}\n" +
-                            "Feeder's app-provided Bergamot translator timed out.",
+                        "Bergamot translation timed out.",
                     )
             ) {
                 is BergamotWebTranslationResult.Success -> LocalTranslationResult.Success(result.values)
                 is BergamotWebTranslationResult.Error ->
                     LocalTranslationResult.Error(
-                        "Android system translation unavailable: ${androidSystemError.ifBlank { "no on-device translator was available" }}\n" +
-                            "Feeder's app-provided Bergamot model failed: ${result.message}",
+                        result.message.ifBlank { "Bergamot translation failed" }.toLocalTranslationError(),
                     )
             }
         } catch (e: Exception) {
             LocalTranslationResult.Error(
-                "Android system translation unavailable: ${androidSystemError.ifBlank { "no on-device translator was available" }}\n" +
-                    "Feeder's app-provided Bergamot model failed: ${e.message ?: "unknown error"}",
+                (e.message ?: "Bergamot translation failed").toLocalTranslationError(),
             )
         }
     }
@@ -356,17 +340,17 @@ class LocalTranslator(
             TranslationCapability.STATE_ON_DEVICE -> Unit
             TranslationCapability.STATE_AVAILABLE_TO_DOWNLOAD -> {
                 return LocalTranslationResult.Error(
-                    "Install the $sourceLang → $targetLang translation model in device settings, then retry.",
+                    "Install $sourceLang -> $targetLang in system settings",
                 )
             }
             TranslationCapability.STATE_DOWNLOADING ->
                 return LocalTranslationResult.Error(
-                    "Local translation model for $sourceLang to $targetLang is still downloading. Retry after it finishes.",
+                    "$sourceLang -> $targetLang is still downloading",
                 )
             TranslationCapability.STATE_NOT_AVAILABLE ->
-                return LocalTranslationResult.Error("Local translation does not support $sourceLang to $targetLang on this device.")
+                return LocalTranslationResult.Error("Unsupported $sourceLang -> $targetLang")
             null ->
-                return LocalTranslationResult.Error("Local translation does not support $sourceLang to $targetLang on this device.")
+                return LocalTranslationResult.Error("Unsupported $sourceLang -> $targetLang")
         }
 
         val translationContext =
@@ -521,3 +505,12 @@ private data class HtmlTextNodeTranslation(
         }
     }
 }
+
+private fun String.toLocalTranslationError(): String =
+    lineSequence()
+        .firstOrNull(String::isNotBlank)
+        .orEmpty()
+        .take(MAX_LOCAL_TRANSLATION_ERROR_LENGTH)
+        .ifBlank { "Translation failed" }
+
+private const val MAX_LOCAL_TRANSLATION_ERROR_LENGTH = 80

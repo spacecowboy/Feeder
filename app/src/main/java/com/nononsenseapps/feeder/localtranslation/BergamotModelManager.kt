@@ -60,13 +60,13 @@ class BergamotModelManager(
                             targetLanguage = target,
                         )
                             ?: return@withLock BergamotModelPreparation.Error(
-                                "Android system translation is unavailable, and Feeder has not downloaded the Bergamot model registry yet. Connect once to download app-provided offline model metadata.",
+                                "Connect to download model list.",
                             )
 
                     val path =
                         resolvePath(registry, source, target)
                             ?: return@withLock BergamotModelPreparation.Error(
-                                "Android system translation is unavailable, and Feeder does not have an app-provided Bergamot model path for $source to $target.",
+                                "No app model for $source -> $target.",
                             )
 
                     val downloadState = ModelDownloadState.forPath(path)
@@ -77,7 +77,7 @@ class BergamotModelManager(
                                 entry = entry,
                                 downloadState = downloadState,
                             ) ?: return@withLock BergamotModelPreparation.Error(
-                                "Android system translation is unavailable, and Feeder could not download the app-provided Bergamot model for ${entry.from} to ${entry.to}.",
+                                "Could not download ${entry.from} -> ${entry.to} model.",
                             )
                         entries += downloaded
                     }
