@@ -657,7 +657,10 @@ private fun TranslationModelDownloadProgress(progress: BergamotModelDownloadProg
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        TranslationProgressContent(progress)
+        TranslationProgressContent(
+            progress = progress,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

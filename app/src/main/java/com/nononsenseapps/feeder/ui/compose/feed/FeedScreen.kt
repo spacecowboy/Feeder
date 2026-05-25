@@ -1755,7 +1755,10 @@ private fun TranslationModelDownloadProgress(
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
         tonalElevation = 3.dp,
     ) {
-        TranslationProgressContent(progress)
+        TranslationProgressContent(
+            progress = progress,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
