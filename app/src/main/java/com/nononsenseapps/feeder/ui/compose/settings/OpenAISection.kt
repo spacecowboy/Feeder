@@ -607,8 +607,11 @@ private fun TranslationLanguageField(
             )
         }
     val selectedLanguage =
-        remember(preferredTranslationLanguage) {
-            translationLanguageOption(preferredTranslationLanguage)
+        remember(provider, preferredTranslationLanguage) {
+            translationLanguageOption(
+                provider = provider,
+                language = preferredTranslationLanguage,
+            )
         }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -736,8 +739,19 @@ private fun translationLanguageOptions(
     }
 }
 
-private fun translationLanguageOption(language: String): TranslationLanguageOption? {
+private fun translationLanguageOption(
+    provider: AIProviderPreset,
+    language: String,
+): TranslationLanguageOption? {
     val trimmed = language.trim().takeIf(String::isNotBlank) ?: return null
+    if (provider == AIProviderPreset.DEEPL) {
+        deepLTargetLanguageOptions()
+            .firstOrNull { option ->
+                option.code.equals(trimmed, ignoreCase = true) ||
+                    option.name.equals(trimmed, ignoreCase = true)
+            }?.let { return it }
+    }
+
     isoLanguageOptions()
         .firstOrNull { option ->
             option.code.equals(trimmed, ignoreCase = true) ||
@@ -770,46 +784,128 @@ private fun isoLanguageOptions(): List<TranslationLanguageOption> =
 
 private fun deepLTargetLanguageOptions(): List<TranslationLanguageOption> =
     listOf(
-        "BG",
-        "CS",
-        "DA",
-        "DE",
-        "EL",
-        "EN",
-        "EN-GB",
-        "EN-US",
-        "ES",
-        "ET",
-        "FI",
-        "FR",
-        "HU",
-        "ID",
-        "IT",
-        "JA",
-        "KO",
-        "LT",
-        "LV",
-        "NB",
-        "NL",
-        "PL",
-        "PT",
-        "PT-BR",
-        "PT-PT",
-        "RO",
-        "RU",
-        "SK",
-        "SL",
-        "SV",
-        "TR",
-        "UK",
-        "ZH",
-    ).map { code ->
-        val locale = Locale.forLanguageTag(code)
-        TranslationLanguageOption(
-            code = code,
-            name = locale.getDisplayName(Locale.getDefault()).takeIf(String::isNotBlank) ?: code,
-        )
-    }.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
+        TranslationLanguageOption("ACE", "Acehnese"),
+        TranslationLanguageOption("AF", "Afrikaans"),
+        TranslationLanguageOption("AN", "Aragonese"),
+        TranslationLanguageOption("AR", "Arabic"),
+        TranslationLanguageOption("AS", "Assamese"),
+        TranslationLanguageOption("AY", "Aymara"),
+        TranslationLanguageOption("AZ", "Azerbaijani"),
+        TranslationLanguageOption("BA", "Bashkir"),
+        TranslationLanguageOption("BE", "Belarusian"),
+        TranslationLanguageOption("BG", "Bulgarian"),
+        TranslationLanguageOption("BHO", "Bhojpuri"),
+        TranslationLanguageOption("BN", "Bengali"),
+        TranslationLanguageOption("BR", "Breton"),
+        TranslationLanguageOption("BS", "Bosnian"),
+        TranslationLanguageOption("CA", "Catalan"),
+        TranslationLanguageOption("CEB", "Cebuano"),
+        TranslationLanguageOption("CKB", "Kurdish (Sorani)"),
+        TranslationLanguageOption("CS", "Czech"),
+        TranslationLanguageOption("CY", "Welsh"),
+        TranslationLanguageOption("DA", "Danish"),
+        TranslationLanguageOption("DE", "German"),
+        TranslationLanguageOption("EL", "Greek"),
+        TranslationLanguageOption("EN", "English"),
+        TranslationLanguageOption("EN-GB", "English (British)"),
+        TranslationLanguageOption("EN-US", "English (American)"),
+        TranslationLanguageOption("EO", "Esperanto"),
+        TranslationLanguageOption("ES", "Spanish"),
+        TranslationLanguageOption("ES-419", "Spanish (Latin American)"),
+        TranslationLanguageOption("ET", "Estonian"),
+        TranslationLanguageOption("EU", "Basque"),
+        TranslationLanguageOption("FA", "Persian"),
+        TranslationLanguageOption("FI", "Finnish"),
+        TranslationLanguageOption("FR", "French"),
+        TranslationLanguageOption("GA", "Irish"),
+        TranslationLanguageOption("GL", "Galician"),
+        TranslationLanguageOption("GN", "Guarani"),
+        TranslationLanguageOption("GOM", "Konkani"),
+        TranslationLanguageOption("GU", "Gujarati"),
+        TranslationLanguageOption("HA", "Hausa"),
+        TranslationLanguageOption("HE", "Hebrew"),
+        TranslationLanguageOption("HI", "Hindi"),
+        TranslationLanguageOption("HR", "Croatian"),
+        TranslationLanguageOption("HT", "Haitian Creole"),
+        TranslationLanguageOption("HU", "Hungarian"),
+        TranslationLanguageOption("HY", "Armenian"),
+        TranslationLanguageOption("ID", "Indonesian"),
+        TranslationLanguageOption("IG", "Igbo"),
+        TranslationLanguageOption("IS", "Icelandic"),
+        TranslationLanguageOption("IT", "Italian"),
+        TranslationLanguageOption("JA", "Japanese"),
+        TranslationLanguageOption("JV", "Javanese"),
+        TranslationLanguageOption("KA", "Georgian"),
+        TranslationLanguageOption("KK", "Kazakh"),
+        TranslationLanguageOption("KMR", "Kurdish (Kurmanji)"),
+        TranslationLanguageOption("KO", "Korean"),
+        TranslationLanguageOption("KY", "Kyrgyz"),
+        TranslationLanguageOption("LA", "Latin"),
+        TranslationLanguageOption("LB", "Luxembourgish"),
+        TranslationLanguageOption("LMO", "Lombard"),
+        TranslationLanguageOption("LN", "Lingala"),
+        TranslationLanguageOption("LT", "Lithuanian"),
+        TranslationLanguageOption("LV", "Latvian"),
+        TranslationLanguageOption("MAI", "Maithili"),
+        TranslationLanguageOption("MG", "Malagasy"),
+        TranslationLanguageOption("MI", "Maori"),
+        TranslationLanguageOption("MK", "Macedonian"),
+        TranslationLanguageOption("ML", "Malayalam"),
+        TranslationLanguageOption("MN", "Mongolian"),
+        TranslationLanguageOption("MR", "Marathi"),
+        TranslationLanguageOption("MS", "Malay"),
+        TranslationLanguageOption("MT", "Maltese"),
+        TranslationLanguageOption("MY", "Burmese"),
+        TranslationLanguageOption("NB", "Norwegian Bokmal"),
+        TranslationLanguageOption("NE", "Nepali"),
+        TranslationLanguageOption("NL", "Dutch"),
+        TranslationLanguageOption("OC", "Occitan"),
+        TranslationLanguageOption("OM", "Oromo"),
+        TranslationLanguageOption("PA", "Punjabi"),
+        TranslationLanguageOption("PAG", "Pangasinan"),
+        TranslationLanguageOption("PAM", "Kapampangan"),
+        TranslationLanguageOption("PL", "Polish"),
+        TranslationLanguageOption("PRS", "Dari"),
+        TranslationLanguageOption("PS", "Pashto"),
+        TranslationLanguageOption("PT", "Portuguese"),
+        TranslationLanguageOption("PT-BR", "Portuguese (Brazilian)"),
+        TranslationLanguageOption("PT-PT", "Portuguese (European)"),
+        TranslationLanguageOption("QU", "Quechua"),
+        TranslationLanguageOption("RO", "Romanian"),
+        TranslationLanguageOption("RU", "Russian"),
+        TranslationLanguageOption("SA", "Sanskrit"),
+        TranslationLanguageOption("SCN", "Sicilian"),
+        TranslationLanguageOption("SK", "Slovak"),
+        TranslationLanguageOption("SL", "Slovenian"),
+        TranslationLanguageOption("SQ", "Albanian"),
+        TranslationLanguageOption("SR", "Serbian"),
+        TranslationLanguageOption("ST", "Sesotho"),
+        TranslationLanguageOption("SU", "Sundanese"),
+        TranslationLanguageOption("SV", "Swedish"),
+        TranslationLanguageOption("SW", "Swahili"),
+        TranslationLanguageOption("TA", "Tamil"),
+        TranslationLanguageOption("TE", "Telugu"),
+        TranslationLanguageOption("TG", "Tajik"),
+        TranslationLanguageOption("TH", "Thai"),
+        TranslationLanguageOption("TK", "Turkmen"),
+        TranslationLanguageOption("TL", "Tagalog"),
+        TranslationLanguageOption("TN", "Tswana"),
+        TranslationLanguageOption("TR", "Turkish"),
+        TranslationLanguageOption("TS", "Tsonga"),
+        TranslationLanguageOption("TT", "Tatar"),
+        TranslationLanguageOption("UK", "Ukrainian"),
+        TranslationLanguageOption("UR", "Urdu"),
+        TranslationLanguageOption("UZ", "Uzbek"),
+        TranslationLanguageOption("VI", "Vietnamese"),
+        TranslationLanguageOption("WO", "Wolof"),
+        TranslationLanguageOption("XH", "Xhosa"),
+        TranslationLanguageOption("YI", "Yiddish"),
+        TranslationLanguageOption("YUE", "Cantonese"),
+        TranslationLanguageOption("ZH", "Chinese"),
+        TranslationLanguageOption("ZH-HANS", "Chinese (simplified)"),
+        TranslationLanguageOption("ZH-HANT", "Chinese (traditional)"),
+        TranslationLanguageOption("ZU", "Zulu"),
+    ).sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
 
 private val BERGAMOT_TARGET_LANGUAGE_CODES =
     setOf(
