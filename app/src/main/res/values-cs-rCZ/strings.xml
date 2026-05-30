@@ -296,4 +296,7 @@
     <string name="pref_paging_mode_description">Navigovat se po článcích „otáčením stránek“ namísto průběžného posouvání. Optimalizováno pro zařízení s technologií e-ink.</string>
     <string name="pref_animated_paging_title">Animované otáčení stránek</string>
     <string name="pref_animated_paging_description">Animovat otáčení stránek. Na některých e-ink zařízeních může způsobit ghosting.</string>
+    <string name="preferred_translation_language">Preferovaný jazyk překladu</string>
+    <string name="preferred_translation_language_description">Použijte název jazyka nebo kód, jako Spanish, es, French nebo fr-CA.</string>
+    <string name="translation_language_placeholder">Například: English nebo en</string>
 </resources>
