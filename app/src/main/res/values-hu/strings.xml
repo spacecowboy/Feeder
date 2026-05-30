@@ -335,4 +335,9 @@
     <string name="failed_to_import_saved_articles">Nem sikerült importálni a mentett cikkeket</string>
     <string name="fetch_og_images_desc">Hírcsatorna hiányzó vagy rossz minőségű bélyegképeinek javítása, ha lehetséges</string>
     <string name="import_saved_articles">Mentett cikkek importálása</string>
+    <string name="provider_local_translation">Helyi</string>
+    <string name="preferred_translation_language_fallback">az előnyben részesített nyelv</string>
+    <string name="local_translation_setup_pixel">Helyi fordításhoz a Pixel telefonokon nyissa meg az Android beállításait, majd a rendszer, élő fordítás, nyelvek menüpontot, és adja hozzá a(z) %1$s elemet az offline fordításhoz. A menük nevei Android-verziónként eltérőek lehetnek; telepítse a forrásnyelvet is, ha az Android kéri.</string>
+    <string name="local_translation_setup_samsung">Helyi fordításhoz a Samsung eszközökön nyissa meg az Android beállításait, majd a rendszer, általános kezelés, nyelvi csomagok menüpontot, és töltse le a(z) %1$s elemet az offline fordításhoz. Egyes Samsung verziók ezt a Samsung billentyűzet vagy a fordítás alatt helyezik el; telepítse a forrásnyelvet is, ha az Android kéri.</string>
+    <string name="local_translation_setup_generic">Helyi fordításhoz az eszközén nyissa meg az Android beállításait, és keresse meg az eszközön található vagy offline fordítási nyelvi csomagokat a rendszer, általános kezelés, nyelvek vagy fordítás menüpontok alatt. Töltse le a(z) %1$s elemet és az Ön által olvasásra használt forrásnyelveket.</string>
 </resources>
