@@ -10,13 +10,13 @@
     <string name="title">Název</string>
     <string name="save">Uložit</string>
     <string name="empty_feed_top">Nic ke čtení. Chtěli byste…</string>
-    <string name="empty_feed_open"><annotation style="link">Otevřít</annotation> jiný zdroj?</string>
-    <string name="empty_feed_add"><annotation style="link">Přidat</annotation> více zdrojů?</string>
-    <string name="search_feed_empty_hint">Zadat adresu zdroje</string>
+    <string name="empty_feed_open"><annotation style="link">Otevřít</annotation> jiný kanál?</string>
+    <string name="empty_feed_add"><annotation style="link">Přidat</annotation> více kanálů?</string>
+    <string name="search_feed_empty_hint">Zadejte adresu kanálu</string>
     <string name="mark_as_read">Označit jako přečtené</string>
     <string name="mark_as_unread">Označit jako nepřečtené</string>
     <string name="mark_all_as_read">Označit vše jako přečtené</string>
-    <string name="edit_feed">Upravit zdroj</string>
+    <string name="edit_feed">Upravit kanál</string>
     <string name="delete_feed">Odstranit kanál</string>
     <string name="show_all_items">Zobrazit všechny články</string>
     <string name="show_unread_items">Zobrazit nepřečtené články</string>
@@ -37,7 +37,7 @@
     <string name="no_such_feed">Kanál nebyl nalezen. Možná pomůže použít HTTPS\?</string>
     <string name="nothing_to_display">Nic k zobrazení!</string>
     <string name="title_activity_settings">Nastavení</string>
-    <string name="all_feeds">Všechny zdroje</string>
+    <string name="all_feeds">Všechny kanály</string>
     <string name="sync_option_manually">Ručně</string>
     <string name="sync_option_every_15min">Každých 15 minut</string>
     <string name="sync_option_every_30min">Každých 30 minut</string>
@@ -57,8 +57,8 @@
     <string name="on_startup">Po spuštění aplikace</string>
     <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
     <string name="include_mobile_hotspots">Zahrnout mobilní hotspoty</string>
-    <string name="updated_feeds">Aktualizované zdroje</string>
-    <string name="notification_channel_name">Nepřečtené zdroje</string>
+    <string name="updated_feeds">Aktualizované kanály</string>
+    <string name="notification_channel_name">Nepřečtené kanály</string>
     <string name="notification_channel_description">Oznámení se zobrazují pouze pro nepřečtené články v nastavených kanálech</string>
     <string name="open_in_webview">Ve vloženém prohlížeči</string>
     <string name="open_in_default_browser">Ve výchozím prohlížeči</string>
@@ -69,7 +69,7 @@
     <string name="open_link_in_web_view">Otevřít odkaz ve webovém prohlížeči</string>
     <string name="max_feed_items">Maximum článků v jednom kanálu</string>
     <string name="could_not_load_url">Nelze načíst URL</string>
-    <string name="theme_system">Dle systému</string>
+    <string name="theme_system">Podle systému</string>
     <string name="theme_automatic">Automaticky</string>
     <string name="theme_day">Denní</string>
     <string name="theme_night">Noční</string>
@@ -82,7 +82,7 @@
     <string name="touch_to_play_video">Klepnutím přehrajete video</string>
     <string name="open_feed">Otevřít kanál</string>
     <string name="mark_items_below_as_read">Označit níže uvedené články za přečtené</string>
-    <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
+    <string name="discovered_feeds_list">Seznam objevených kanálů</string>
     <string name="toggle_tag_expansion">Přepnout rozšíření štítku</string>
     <string name="battery_optimization">Optimalizace baterie</string>
     <string name="battery_optimization_disabled">Vypnuta</string>
@@ -139,7 +139,7 @@
     <string name="generate_extra_unique_ids">Generovat unikátní ID navíc</string>
     <string name="invalid_url">Neplatná URL</string>
     <string name="failed_to_import_OPML">Nepodařilo se importovat OPML</string>
-    <string name="dark_theme_preference">Upřednostňováný noční režim</string>
+    <string name="dark_theme_preference">Preferovaný tmavý motiv</string>
     <string name="add_new_device">Přidat nové zařízení</string>
     <string name="remove_device">Odebrat zařízení</string>
     <string name="devices_on_sync_chain">Zařízení v synchronizačním řetězu</string>
@@ -250,7 +250,7 @@
     <string name="feed_item_style_compact_card">Kompaktní karty</string>
     <string name="touch_to_play_audio">Dotykem přehrajete zvuk</string>
     <string name="show_title_unread_count">Zobrazit počet nepřečtených článků v nadpisu</string>
-    <string name="openai_settings">Integrace AI</string>
+    <string name="openai_settings">AI a překlady</string>
     <string name="model_id">Id modelu</string>
     <string name="azure_api_version">Verze API Azure</string>
     <string name="api_key">Klíč API</string>
@@ -299,4 +299,45 @@
     <string name="preferred_translation_language">Preferovaný jazyk překladu</string>
     <string name="preferred_translation_language_description">Použijte název jazyka nebo kód, jako Spanish, es, French nebo fr-CA.</string>
     <string name="translation_language_placeholder">Například: English nebo en</string>
+    <string name="import_saved_articles">Importovat uložené články</string>
+    <string name="failed_to_import_saved_articles">Nepodařilo se importovat uložené články</string>
+    <string name="fetch_og_images">Zlepšit kvalitu náhledů z metadat článků</string>
+    <string name="fetch_og_images_desc">Pokusit se zlepšit chybějící nebo nekvalitní náhledy v tomto kanále</string>
+    <string name="summary_api_settings">API souhrnů</string>
+    <string name="summary_api_settings_info">Použito pro souhrny článků.</string>
+    <string name="translation_api_settings">API překladů</string>
+    <string name="translation_api_settings_info">Použito pro překlad karet kanálů a článků.</string>
+    <string name="deepl_api_key">Autentifikační klíč DeepL</string>
+    <string name="ai_provider">Poskytovatel</string>
+    <string name="ai_not_configured">Nenastaveno</string>
+    <string name="api_provider_summary">Poskytovatel: %1$s</string>
+    <string name="provider_none">Žádný</string>
+    <string name="provider_openai_compatible">OpenAI nebo kompatibilní</string>
+    <string name="provider_azure_openai">Azure OpenAI</string>
+    <string name="provider_deepl">DeepL</string>
+    <string name="base_url_optional">Základní adresa (nepovinná)</string>
+    <string name="translation_endpoint">Koncový bod překladu</string>
+    <string name="enter_api_key_before_saving">Před uložením zadejte klíč API.</string>
+    <string name="enter_deepl_api_key_before_saving">Před uložením zadejte klíč API DeepL.</string>
+    <string name="enter_model_id_before_saving">Před uložením zadejte ID modelu.</string>
+    <string name="verifying_api_settings">Ověřování nastavení API…</string>
+    <string name="api_settings_could_not_be_verified">Nastavení API se nepodařilo ověřit.</string>
+    <string name="enter_azure_endpoint_before_saving">Před uložením zadejte koncový bod Azure.</string>
+    <string name="enter_azure_deployment_id_before_saving">Před uložením zadejte ID nasazení Azure.</string>
+    <string name="enter_azure_api_version_before_saving">Před uložením zadejte vaši verzi API Azure.</string>
+    <string name="verifying_azure_openai_settings">Ověřování nastavení Azure OpenAI…</string>
+    <string name="azure_openai_settings_could_not_be_verified">Nastavení Azure OpenAI se nepodařilo ověřit.</string>
+    <string name="verifying_deepl_key">Ověřování klíče DeepL…</string>
+    <string name="deepl_key_could_not_be_verified">Klíč DeepL se nepodařilo ověřit.</string>
+    <string name="translate_article">Přeložit článek</string>
+    <string name="show_original_language">Zobrazit původní (%1$s)</string>
+    <string name="original_article">původní</string>
+    <string name="set_translation_language_first">Nastavte preferovaný jazyk překladu v nastavení AI</string>
+    <string name="translate_feed_cards_by_default">Přeložit náhledy článků</string>
+    <string name="translate_articles_by_default">Ve výchozím nastavení překládat články</string>
+    <string name="provider_local_translation">Lokální</string>
+    <string name="preferred_translation_language_fallback">preferovaný jazyk</string>
+    <string name="local_translation_setup_pixel">Pro lokální překlad na telefonech Pixel otevřete nastavení systému, poté Systém, Živý překlad, Jazyky a přidejte si jazyk %1$s pro offline překlad. Názvy nabídek se mohou lišit napříč verzemi systému Android; pokud ho Android bude chtít, nainstalujte také zdrojový jazyk.</string>
+    <string name="local_translation_setup_samsung">Pro lokální překlad na zařízeních Samsung otevřete Nastavení, Obecná správa, Jazykové balíčky a stáhněte si jazyk %1$s. Některé verze Samsungů mají toto nastavení v Klávesnici Samsung nebo Překladu; pokud ho Android bude chtít, nainstalujte také zdrojový jazyk.</string>
+    <string name="local_translation_setup_generic">Pro lokální překlad na zařízeních otevřete Nastavení a hledejte místní nebo offline jazykové balíčky v kategoriích Systém, Obecná správa, Jazyky nebo Překlad. Stáhněte si jazyk %1$s a jazyky, které čtete.</string>
 </resources>
