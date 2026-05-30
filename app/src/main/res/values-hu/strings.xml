@@ -334,4 +334,5 @@
     <string name="translate_articles_by_default">Cikkek fordítása alapértelmezetten</string>
     <string name="failed_to_import_saved_articles">Nem sikerült importálni a mentett cikkeket</string>
     <string name="fetch_og_images_desc">Hírcsatorna hiányzó vagy rossz minőségű bélyegképeinek javítása, ha lehetséges</string>
+    <string name="import_saved_articles">Mentett cikkek importálása</string>
 </resources>
