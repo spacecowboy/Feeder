@@ -509,7 +509,7 @@ class SettingsStore(
         MutableStateFlow(
             OpenAISettings(
                 key = sp.getStringNonNull(PREF_OPENAI_KEY, ""),
-                modelId = sp.getStringNonNull(PREF_OPENAI_MODEL_ID, "gpt-4o-mini"),
+                modelId = sp.getStringNonNull(PREF_OPENAI_MODEL_ID, ""),
                 baseUrl = sp.getStringNonNull(PREF_OPENAI_URL, ""),
                 azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, ""),
                 azureDeploymentId = sp.getStringNonNull(PREF_OPENAI_AZURE_DEPLOYMENT_ID, ""),
