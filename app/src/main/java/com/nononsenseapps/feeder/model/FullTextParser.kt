@@ -160,7 +160,7 @@ class FullTextParser(
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
-        const val MAX_FULL_TEXT_BYTES = 5 * 1024 * 1024 // 5 MB
+        const val MAX_FULL_TEXT_BYTES = 1 * 1024 * 1024 // 1 MB
         const val MAX_ARTICLE_CONTENT_CHARS = 200 * 1024 // 200 KB of extracted HTML
     }
 }
