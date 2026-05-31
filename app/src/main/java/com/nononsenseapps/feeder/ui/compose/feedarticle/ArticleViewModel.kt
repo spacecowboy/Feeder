@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
+import com.nononsenseapps.feeder.model.FullTextTooLarge
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
@@ -356,6 +357,7 @@ class ArticleViewModel(
                                 is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
                                 is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
                                 is NotHTML -> TextToDisplay.FAILED_NOT_HTML
+                                is FullTextTooLarge -> TextToDisplay.FAILED_FULLTEXT_TOO_LARGE
                                 else -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
                             }?.let { errorText ->
                                 textToDisplay.update { errorText }

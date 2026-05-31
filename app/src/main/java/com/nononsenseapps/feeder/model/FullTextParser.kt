@@ -83,10 +83,19 @@ class FullTextParser(
                     ) {
                         val body = response.body ?: return@catching NoBody(url = url).left()
 
+                        val contentLength = body.contentLength()
+                        if (contentLength > MAX_FULL_TEXT_BYTES) {
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
+
                         val bytes =
                             body.use {
                                 it.bytes()
                             }
+
+                        if (bytes.size > MAX_FULL_TEXT_BYTES) {
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
 
                         val contentType =
                             body.contentType()
@@ -119,6 +128,12 @@ class FullTextParser(
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                         logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
                         val article = parseFullArticle(url, html)
+
+                        if (article != null && article.length > MAX_ARTICLE_CONTENT_CHARS) {
+                            Log.w(LOG_TAG, "Extracted article content too large (${article.length} chars) for $url, skipping")
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_ARTICLE_CONTENT_CHARS).left()
+                        }
+
                         logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                         withContext(Dispatchers.IO) {
                             article?.let { articleContent ->
@@ -145,6 +160,8 @@ class FullTextParser(
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
+        const val MAX_FULL_TEXT_BYTES = 5 * 1024 * 1024 // 5 MB
+        const val MAX_ARTICLE_CONTENT_CHARS = 200 * 1024 // 200 KB of extracted HTML
     }
 }
 

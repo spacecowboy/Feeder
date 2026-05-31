@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -465,6 +466,7 @@ fun ArticleScreen(
                 screenType = ScreenType.SINGLE,
                 articleScrollState = articleScrollState,
                 onFeedTitleClick = onFeedTitleClick,
+                onOpenInCustomTab = onOpenInCustomTab,
                 modifier =
                     Modifier
                         .focusGroup()
@@ -528,6 +530,7 @@ fun ArticleContent(
     viewState: ArticleScreenViewState,
     screenType: ScreenType,
     onFeedTitleClick: () -> Unit,
+    onOpenInCustomTab: () -> Unit,
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
@@ -642,6 +645,14 @@ fun ArticleContent(
 
                 TextToDisplay.FAILED_NOT_HTML -> {
                     Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
+                }
+
+                TextToDisplay.FAILED_FULLTEXT_TOO_LARGE -> {
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article_too_large))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onOpenInCustomTab) {
+                        Text(text = stringResource(id = R.string.open_in_web_view))
+                    }
                 }
             }
         }

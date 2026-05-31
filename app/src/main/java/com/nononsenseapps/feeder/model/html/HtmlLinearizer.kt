@@ -22,6 +22,8 @@ class HtmlLinearizer {
     private var idHolder: IdHolder = {
         linearTextBuilder.pushId(it)
     }
+    private var elementCount = 0
+    private var truncated = false
 
     fun linearize(
         html: String,
@@ -31,21 +33,35 @@ class HtmlLinearizer {
     fun linearize(
         inputStream: InputStream,
         baseUrl: String,
-    ): LinearArticle =
-        LinearArticle(
-            elements =
-                try {
-                    Jsoup
-                        .parse(inputStream, null, baseUrl)
-                        .body()
-                        .let { body ->
-                            linearizeBody(body, baseUrl)
-                        }
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "htmlFormattingFailed", e)
-                    emptyList()
-                },
-        )
+    ): LinearArticle {
+        val elements =
+            try {
+                Jsoup
+                    .parse(inputStream, null, baseUrl)
+                    .body()
+                    .let { body ->
+                        linearizeBody(body, baseUrl)
+                    }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "htmlFormattingFailed", e)
+                emptyList()
+            }
+
+        val finalElements =
+            if (truncated) {
+                elements +
+                    LinearText(
+                        ids = emptySet(),
+                        text = "\u2014 Article truncated (too large to fully display). Open in browser for the full content. \u2014",
+                        annotations = emptyList(),
+                        blockStyle = LinearTextBlockStyle.TEXT,
+                    )
+            } else {
+                elements
+            }
+
+        return LinearArticle(elements = finalElements)
+    }
 
     private fun linearizeBody(
         body: Element,
@@ -68,6 +84,7 @@ class HtmlLinearizer {
     ) {
         var node = nodes.firstOrNull()
         while (node != null) {
+            if (truncated) break
             when (node) {
                 is TextNode -> {
                     if (blockStyle.shouldSoftWrap) {
@@ -360,7 +377,7 @@ class HtmlLinearizer {
                                         acc
                                     } else {
                                         if (acc.isNotEmpty()) {
-                                            add(
+                                            addLimited(
                                                 LinearBlockQuote(
                                                     ids = ids,
                                                     cite = cite,
@@ -368,14 +385,14 @@ class HtmlLinearizer {
                                                 ),
                                             )
                                         }
-                                        add(
+                                        addLimited(
                                             item,
                                         )
                                         mutableListOf()
                                     }
                                 }.let {
                                     if (it.isNotEmpty()) {
-                                        add(
+                                        addLimited(
                                             LinearBlockQuote(
                                                 ids = ids,
                                                 cite = cite,
@@ -442,7 +459,7 @@ class HtmlLinearizer {
                                             it is LinearText && it.text.isNotBlank()
                                         } as? LinearText
 
-                                    add(
+                                    addLimited(
                                         LinearImage(
                                             ids = ids,
                                             sources = imageCandidates,
@@ -464,7 +481,7 @@ class HtmlLinearizer {
                                     val captionText: String? =
                                         stripHtml(element.attr("alt"))
                                             .takeIf { it.isNotBlank() }
-                                    add(
+                                    addLimited(
                                         LinearImage(
                                             ids = ids,
                                             sources = candidates,
@@ -513,7 +530,7 @@ class HtmlLinearizer {
                                         }
 
                                     if (item.isNotEmpty()) {
-                                        add(item)
+                                        addLimited(item)
                                     }
                                 }
                         }
@@ -575,7 +592,7 @@ class HtmlLinearizer {
                                     baseUrl = baseUrl,
                                 )
                             } else {
-                                add(
+                                addLimited(
                                     LinearTable.build(ids = ids, leftToRight = leftToRight) {
                                         rowSequence
                                             .forEach { row ->
@@ -632,7 +649,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearAudio(ids = element.allIds(), sources = sources))
+                                addLimited(LinearAudio(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -663,7 +680,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearVideo(ids = element.allIds(), sources = sources))
+                                addLimited(LinearVideo(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -686,7 +703,7 @@ class HtmlLinearizer {
         val width = element.attr("width").toIntOrNull()
         val height = element.attr("height").toIntOrNull()
         getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
-            add(
+            addLimited(
                 LinearVideo(
                     ids = element.allIds(),
                     sources =
@@ -728,9 +745,20 @@ class HtmlLinearizer {
         linearTextBuilder.append(c)
     }
 
+    private fun ListBuilderScope<LinearElement>.addLimited(element: LinearElement) {
+        if (truncated) return
+        elementCount++
+        if (elementCount > MAX_ELEMENTS) {
+            truncated = true
+            Log.w(LOG_TAG, "LinearArticle element cap ($MAX_ELEMENTS) reached, truncating")
+            return
+        }
+        add(element)
+    }
+
     internal fun ListBuilderScope<LinearElement>.finalizeAndAddCurrentElement(blockStyle: LinearTextBlockStyle) {
         if (linearTextBuilder.isNotEmpty()) {
-            add(linearTextBuilder.toLinearText(blockStyle = blockStyle))
+            addLimited(linearTextBuilder.toLinearText(blockStyle = blockStyle))
             linearTextBuilder.clearKeepingSpans()
         }
     }
@@ -957,7 +985,8 @@ class HtmlLinearizer {
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDERHtmlLinearizer"
+        const val MAX_ELEMENTS = 3_000
+        private const val LOG_TAG = "FEEDER_LINEARIZER"
         private val spaceRegex = Regex("\\s+")
     }
 }
