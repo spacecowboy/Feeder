@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.model.prepareTextForLanguageDetection
 import com.nononsenseapps.feeder.model.prepareTextSamplesForLanguageDetection
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult.ErrorAction
+import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -361,17 +362,27 @@ class LocalTranslator(
         val sourceSpec = TranslationSpec(ULocale.forLanguageTag(sourceLang), TranslationSpec.DATA_FORMAT_TEXT)
         val targetSpec = TranslationSpec(ULocale.forLanguageTag(targetLang), TranslationSpec.DATA_FORMAT_TEXT)
 
+        val capabilities =
+            translationManager.getOnDeviceTranslationCapabilities(
+                TranslationSpec.DATA_FORMAT_TEXT,
+                TranslationSpec.DATA_FORMAT_TEXT,
+            )
         val capability =
-            translationManager
-                .getOnDeviceTranslationCapabilities(
-                    TranslationSpec.DATA_FORMAT_TEXT,
-                    TranslationSpec.DATA_FORMAT_TEXT,
-                ).firstOrNull { capability ->
-                    capability.sourceSpec.locale.language
-                        .equals(sourceLang, ignoreCase = true) &&
-                        capability.targetSpec.locale.language
-                            .equals(targetLang, ignoreCase = true)
-                }
+            capabilities.firstOrNull { capability ->
+                capability.sourceSpec.locale.language
+                    .equals(sourceLang, ignoreCase = true) &&
+                    capability.targetSpec.locale.language
+                        .equals(targetLang, ignoreCase = true)
+            }
+
+        if (capability?.state != TranslationCapability.STATE_ON_DEVICE) {
+            logDebug(
+                LOG_TAG,
+                "System translation unavailable for $sourceLang -> $targetLang. " +
+                    "Match=${capability?.state.translationCapabilityStateName()}. " +
+                    "Capabilities=${capabilities.toDebugSummary()}",
+            )
+        }
 
         when (capability?.state) {
             TranslationCapability.STATE_ON_DEVICE -> Unit
@@ -519,6 +530,7 @@ class LocalTranslator(
         }.getOrDefault("und")
 
     companion object {
+        private const val LOG_TAG = "FEEDER_LOCAL_TRANSLATION"
         private const val ANDROID_TRANSLATOR_CREATION_TIMEOUT_MS = 5_000L
         private const val ANDROID_TRANSLATION_TIMEOUT_MS = 20_000L
         private const val TRANSLATION_TIMEOUT_MS = 5 * 60_000L
@@ -544,7 +556,26 @@ private fun systemSettingsRequiredMessage(
 private fun noBergamotModelMessage(
     sourceLang: String,
     targetLang: String,
-): String = "No Bergamot model for $sourceLang -> $targetLang. Install in system settings"
+): String = "No Bergamot model for $sourceLang -> $targetLang. Check system translation languages"
+
+private fun Int?.translationCapabilityStateName(): String =
+    when (this) {
+        TranslationCapability.STATE_ON_DEVICE -> "ON_DEVICE"
+        TranslationCapability.STATE_AVAILABLE_TO_DOWNLOAD -> "AVAILABLE_TO_DOWNLOAD"
+        TranslationCapability.STATE_DOWNLOADING -> "DOWNLOADING"
+        TranslationCapability.STATE_NOT_AVAILABLE -> "NOT_AVAILABLE"
+        else -> "NONE"
+    }
+
+private fun Collection<TranslationCapability>.toDebugSummary(): String =
+    joinToString(
+        separator = ", ",
+        limit = 20,
+        truncated = "... ($size total)",
+    ) { capability ->
+        "${capability.sourceSpec.locale.toLanguageTag()}->${capability.targetSpec.locale.toLanguageTag()}:" +
+            capability.state.translationCapabilityStateName()
+    }
 
 private data class HtmlTextNodeTranslation(
     val textNode: TextNode,
