@@ -18,13 +18,13 @@ fun htmlToAnnotatedString(
 ): List<AnnotatedString> =
     Jsoup
         .parse(inputStream, null, baseUrl)
-        ?.body()
-        ?.let { body ->
+        .body()
+        .let { body ->
             formatBody(
                 element = body,
                 baseUrl = baseUrl,
             )
-        } ?: emptyList()
+        }
 
 /**
  * Returns "plain text" with annotations for TTS from HTML string
@@ -35,13 +35,13 @@ fun htmlStringToAnnotatedString(
 ): List<AnnotatedString> =
     Jsoup
         .parse(html)
-        ?.body()
-        ?.let { body ->
+        .body()
+        .let { body ->
             formatBody(
                 element = body,
                 baseUrl = baseUrl,
             )
-        } ?: emptyList()
+        }
 
 private fun formatBody(
     element: Element,

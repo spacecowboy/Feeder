@@ -81,7 +81,7 @@ class FullTextParser(
                             FullTextDecodingFailure(url, t)
                         },
                     ) {
-                        val body = response.body ?: return@catching NoBody(url = url).left()
+                        val body = response.body
 
                         val bytes =
                             body.use {

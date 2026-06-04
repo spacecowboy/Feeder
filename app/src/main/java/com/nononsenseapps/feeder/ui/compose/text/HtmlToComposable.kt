@@ -9,9 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
+import com.nononsenseapps.feeder.model.html.isCollapsableWhiteSpaceCode
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.theme.TypographySettings
-import com.nononsenseapps.feeder.util.asUTF8Sequence
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import kotlin.math.roundToInt
@@ -68,19 +68,24 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
     builder: HtmlParser,
     stripLeading: Boolean,
 ) {
-    wholeText
-        .asUTF8Sequence()
-        .dropWhile {
-            stripLeading && isCollapsableWhiteSpace(it)
-        }.fold(false) { lastWasWhite, char ->
-            if (isCollapsableWhiteSpace(char)) {
-                if (!lastWasWhite) {
+    // Inline loop as an optimization to avoid String allocations
+    // Avoid allocating temporary strings at all cost during this iteration
+    // as it can become very memory intensive when parsing a large full text
+    // html document.
+    wholeText.codePoints()
+        .forEach { codePoint ->
+            // Want to drop collapsible whitespace.
+            if (stripLeading && isCollapsableWhiteSpaceCode(codePoint)) {
+                return@forEach
+            }
+
+            // All whitespace is added as regular space
+            if (isCollapsableWhiteSpaceCode(codePoint)) {
+                if (!builder.endsWithWhitespace) {
                     builder.append(' ')
                 }
-                true
             } else {
-                builder.append(char)
-                false
+                builder.appendCodePoint(codePoint)
             }
         }
 }
