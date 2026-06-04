@@ -13,9 +13,9 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Guardar</string>
     <string name="empty_feed_top">No hay nada que leer aquí. ¿Le gustaría…</string>
-    <string name="empty_feed_open"><annotation style="link">Abrir</annotation> otro canal?</string>
-    <string name="empty_feed_add"><annotation style="link">Añadir</annotation> más fuentes?</string>
-    <string name="search_feed_empty_hint">Introduce una dirección de canal</string>
+    <string name="empty_feed_open">¿<annotation style="link">abrir</annotation> otra fuente?</string>
+    <string name="empty_feed_add">¿<annotation style="link">Añadir</annotation> más fuentes?</string>
+    <string name="search_feed_empty_hint">Introduzca la dirección del feed</string>
     <string name="mark_as_read">Marcar como leído</string>
     <string name="mark_as_unread">Marcar como no leído</string>
     <string name="mark_all_as_read">Marcar todo como leído</string>
@@ -26,7 +26,7 @@
     <string name="new_items_available">Nuevas entradas disponibles</string>
     <string name="view">Ver</string>
     <string name="no_tag">Sin etiquetas</string>
-    <string name="notify_for_new_items">Notificar de entradas nuevas</string>
+    <string name="notify_for_new_items">Notificarme sobre nuevos artículos</string>
     <string name="dont_notify_for_new_items">Detener notificaciones</string>
     <string name="toggle_read_status">Cambiar el estado de lectura</string>
     <string name="open_link_in_browser">Abrir enlace en navegador</string>
@@ -35,8 +35,8 @@
     <string name="sync">Sincronizar</string>
     <string name="export_feeds_to_opml">Exportar fuentes a OPML</string>
     <string name="import_feeds_from_opml">Importar fuentes de OPML</string>
-    <string name="view_debug_log">Ver traza de depuración</string>
-    <string name="new_based_on_this">Nuevo basado en este</string>
+    <string name="view_debug_log">Ver registro de depuración</string>
+    <string name="new_based_on_this">Nuevo basado en esto</string>
     <string name="indicator_for_mark_as_read">Indicador para marcar como leído</string>
     <string name="share">Compartir</string>
     <string name="no_such_feed">No se pudo encontrar el canal. ¿Puedes probar con HTTPS\?</string>
@@ -54,12 +54,12 @@
     <string name="synchronization">Sincronización</string>
     <string name="only_on_wifi">Solo con WiFi</string>
     <string name="show_thumbnails">Mostrar miniaturas</string>
-    <string name="may_result_data_charges">Puede que se apliquen cargos por consumo de datos.</string>
+    <string name="may_result_data_charges">Puede generar cargos por usar datos móviles.</string>
     <string name="only_when_charging">Solo cuando se está cargando</string>
     <string name="image_loading">Cargando imagen</string>
     <string name="no_activity_for_link">No se encontró ninguna actividad con la que abrir el enlace</string>
     <string name="check_for_updates">Buscar nuevos artículos…</string>
-    <string name="on_startup">Al arrancar</string>
+    <string name="on_startup">Al iniciar la aplicación</string>
     <string name="show_fab">Mostrar botón flotante</string>
     <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
     <string name="updated_feeds">Fuentes actualizadas</string>
@@ -250,7 +250,7 @@
     <string name="feed_item_style_compact_card">Tarjeta compacta</string>
     <string name="touch_to_play_audio">Toca para reproducir el audio</string>
     <string name="show_title_unread_count">Mostrar número de artículos no leídos en el título</string>
-    <string name="openai_settings">Integración de IA</string>
+    <string name="openai_settings">IA y traducción</string>
     <string name="no_models_were_found">Sin modelos</string>
     <string name="summarize">Resumir</string>
     <string name="model_id">Identificación del modelo</string>
@@ -294,6 +294,43 @@
     <string name="widget_refreshing">Actualizar</string>
     <string name="pref_paging_mode_title">Modo de paginación</string>
     <string name="pref_animated_paging_title">Paginación animada</string>
-    <string name="pref_paging_mode_description">Navega por artículos \"pasando páginas\" en lugar de scrolling continuo. Optimizado para dispositivos e-ink.</string>
-    <string name="pref_animated_paging_description">Anima brevemente el paso de páginas. Puede causar ghosting en algunos dispositivos e-ink.</string>
+    <string name="pref_paging_mode_description">Navega por los artículos girando páginas en lugar de desplazándote continuamente. Optimizado para dispositivos de tinta electrónica.</string>
+    <string name="pref_animated_paging_description">Al animar el paso de página. Puede provocar un efecto fantasma en algunos dispositivos de tinta electrónica.</string>
+    <string name="fetch_og_images">Mejorar las miniaturas a partir de los metadatos de los artículos</string>
+    <string name="fetch_og_images_desc">Intenta mejorar las miniaturas que faltan o que son de baja calidad en este feed</string>
+    <string name="summary_api_settings">Resumen de la API</string>
+    <string name="summary_api_settings_info">Se utiliza para los resúmenes de artículos.</string>
+    <string name="translation_api_settings">API de traducción</string>
+    <string name="translation_api_settings_info">Se utiliza para traducir tarjetas de noticias y artículos.</string>
+    <string name="deepl_api_key">Clave de autenticación de DeepL</string>
+    <string name="ai_provider">Proveedor</string>
+    <string name="ai_not_configured">Sin configurar</string>
+    <string name="api_provider_summary">Proveedor: %1$s</string>
+    <string name="provider_none">Ninguno</string>
+    <string name="provider_openai_compatible">OpenAI o compatible</string>
+    <string name="provider_azure_openai">Azure OpenAI</string>
+    <string name="provider_deepl">DeepL</string>
+    <string name="base_url_optional">Enlace base (opcional)</string>
+    <string name="translation_endpoint">Punto final de la traducción</string>
+    <string name="enter_api_key_before_saving">Introduce una clave API antes de guardar.</string>
+    <string name="enter_deepl_api_key_before_saving">Introduce una clave API de DeepL antes de guardar.</string>
+    <string name="enter_model_id_before_saving">Introduce un modelo de identificador antes de guardar.</string>
+    <string name="verifying_api_settings">Comprobando la configuración de la API…</string>
+    <string name="api_settings_could_not_be_verified">No se ha podido verificar la configuración de la API.</string>
+    <string name="enter_azure_endpoint_before_saving">Introduce tu punto de conexión de Azure antes de guardar.</string>
+    <string name="enter_azure_deployment_id_before_saving">Introduce el id de tu implementación de Azure antes de guardar.</string>
+    <string name="enter_azure_api_version_before_saving">Introduce la versión de tu API de Azure antes de guardar.</string>
+    <string name="verifying_azure_openai_settings">Comprobando la configuración de Azure OpenAI…</string>
+    <string name="azure_openai_settings_could_not_be_verified">No se han podido verificar los ajustes de Azure OpenAI.</string>
+    <string name="verifying_deepl_key">Comprobando la clave de DeepL…</string>
+    <string name="deepl_key_could_not_be_verified">No se ha podido verificar la clave de DeepL.</string>
+    <string name="translate_article">Traducir el artículo</string>
+    <string name="show_original_language">Mostrar el original (%1$s)</string>
+    <string name="original_article">original</string>
+    <string name="preferred_translation_language">Idioma preferido para la traducción</string>
+    <string name="preferred_translation_language_description">Utiliza el nombre o el código del idioma, como «español», «es», «francés» o «fr-CA».</string>
+    <string name="translation_language_placeholder">Por ejemplo: Inglés o en</string>
+    <string name="set_translation_language_first">Establece un idioma de traducción preferido en la configuración de la IA</string>
+    <string name="translate_feed_cards_by_default">Traducir las vistas previas de los artículos</string>
+    <string name="translate_articles_by_default">Traducir artículos por defecto</string>
 </resources>
