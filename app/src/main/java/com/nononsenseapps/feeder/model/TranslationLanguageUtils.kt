@@ -17,6 +17,37 @@ internal fun prepareTextForLanguageDetection(
     content: String,
     preserveHtml: Boolean,
 ): String =
+    prepareFullTextForLanguageDetection(
+        content = content,
+        preserveHtml = preserveHtml,
+    ).take(MAX_LANGUAGE_DETECTION_TEXT_LENGTH)
+
+internal fun prepareTextSamplesForLanguageDetection(
+    content: String,
+    preserveHtml: Boolean,
+): List<String> {
+    val text =
+        prepareFullTextForLanguageDetection(
+            content = content,
+            preserveHtml = preserveHtml,
+        )
+    if (text.length <= MAX_LANGUAGE_DETECTION_TEXT_LENGTH) {
+        return listOf(text)
+    }
+
+    val middleStart = ((text.length - MAX_LANGUAGE_DETECTION_TEXT_LENGTH) / 2).coerceAtLeast(0)
+    val endStart = (text.length - MAX_LANGUAGE_DETECTION_TEXT_LENGTH).coerceAtLeast(0)
+    return listOf(
+        text.take(MAX_LANGUAGE_DETECTION_TEXT_LENGTH),
+        text.substring(middleStart, middleStart + MAX_LANGUAGE_DETECTION_TEXT_LENGTH),
+        text.substring(endStart),
+    ).distinct()
+}
+
+private fun prepareFullTextForLanguageDetection(
+    content: String,
+    preserveHtml: Boolean,
+): String =
     (
         if (preserveHtml) {
             Jsoup.parse(content).text()
@@ -25,7 +56,6 @@ internal fun prepareTextForLanguageDetection(
         }
     ).replace(Regex("\\s+"), " ")
         .trim()
-        .take(MAX_LANGUAGE_DETECTION_TEXT_LENGTH)
 
 internal fun hasEnoughTextForLanguageDetection(content: String): Boolean = content.count(Char::isLetter) >= MIN_LANGUAGE_DETECTION_LETTERS
 

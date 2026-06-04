@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
+import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,9 +68,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.ScrollDirection
+import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressContent
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.feed.PlainTooltipBox
 import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
@@ -193,6 +198,14 @@ fun ArticleScreen(
         onTranslate = {
             viewModel.translate()
         },
+        onOpenSystemTranslationSettings = {
+            activityLauncher.startActivity(
+                openAdjacentIfSuitable = false,
+                intent = Intent(Settings.ACTION_SETTINGS),
+            )
+            viewModel.dismissSystemTranslationSettingsPrompt()
+        },
+        onDismissSystemTranslationSettings = viewModel::dismissSystemTranslationSettingsPrompt,
         modifier = modifier,
         isPagingMode = isPagingMode,
         isAnimatedPaging = isAnimatedPaging,
@@ -221,6 +234,8 @@ fun ArticleScreen(
     onNavigateUp: () -> Unit,
     onSummarize: () -> Unit,
     onTranslate: () -> Unit,
+    onOpenSystemTranslationSettings: () -> Unit,
+    onDismissSystemTranslationSettings: () -> Unit,
     modifier: Modifier = Modifier,
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
@@ -521,6 +536,38 @@ fun ArticleScreen(
             }
         }
     }
+
+    if (viewState.systemTranslationSettingsMessage.isNotBlank()) {
+        SystemTranslationSettingsDialog(
+            message = viewState.systemTranslationSettingsMessage,
+            onOpenSettings = onOpenSystemTranslationSettings,
+            onDismiss = onDismissSystemTranslationSettings,
+        )
+    }
+}
+
+@Composable
+private fun SystemTranslationSettingsDialog(
+    message: String,
+    onOpenSettings: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Text(message)
+        },
+        confirmButton = {
+            TextButton(onClick = onOpenSettings) {
+                Text(stringResource(R.string.open_settings))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
 }
 
 @Composable
@@ -586,7 +633,9 @@ fun ArticleContent(
 
         if (viewState.isTranslationLoading) {
             offsetCounter++
-            LinearProgressIndicator(
+            viewState.translationModelDownloadProgress?.let { progress ->
+                TranslationModelDownloadProgress(progress)
+            } ?: LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -645,6 +694,18 @@ fun ArticleContent(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun TranslationModelDownloadProgress(progress: BergamotModelDownloadProgress) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        TranslationProgressContent(
+            progress = progress,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

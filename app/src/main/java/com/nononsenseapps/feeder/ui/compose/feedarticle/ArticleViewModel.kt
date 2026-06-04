@@ -22,6 +22,9 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
+import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
@@ -30,6 +33,7 @@ import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
 import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.SystemTranslationSettingsRequiredException
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.TranslationManager
@@ -39,6 +43,7 @@ import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canSummarize
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
@@ -75,6 +80,8 @@ class ArticleViewModel(
     private val openAIApi: OpenAIApi by instance()
     private val toastMaker: ToastMaker by instance()
     private val translationManager: TranslationManager by instance()
+    private val bergamotModelManager: BergamotModelManager by instance()
+    private val localTranslator: LocalTranslator by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -146,6 +153,7 @@ class ArticleViewModel(
             openAiSummary,
             showTranslatedContent,
             articleTranslationState,
+            bergamotModelManager.downloadProgress,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -165,6 +173,7 @@ class ArticleViewModel(
             val openAiSummary = params[12] as OpenAISummaryState
             val showTranslated = params[13] as Boolean
             val translationState = params[14] as ArticleTranslationState
+            val translationDownloadProgress = params[15] as BergamotModelDownloadProgress?
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
@@ -207,7 +216,12 @@ class ArticleViewModel(
                 showTranslate = isShowingTranslated || (canRequestTranslation && alreadyInPreferredLanguage == null),
                 isShowingTranslated = isShowingTranslated,
                 isTranslationLoading = translationState is ArticleTranslationState.Loading,
+                translationModelDownloadProgress = translationDownloadProgress,
                 translationSourceLanguage = currentTranslation?.sourceLanguage ?: alreadyInPreferredLanguage?.sourceLanguage.orEmpty(),
+                systemTranslationSettingsMessage =
+                    (translationState as? ArticleTranslationState.SystemSettingsRequired)
+                        ?.message
+                        .orEmpty(),
                 articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
         }.stateIn(
@@ -230,7 +244,11 @@ class ArticleViewModel(
                     summarize()
                 }
 
-                if (repository.translateArticlesByDefault.value && canTranslateArticles()) {
+                if (
+                    repository.translateArticlesByDefault.value &&
+                    canTranslateArticles() &&
+                    canStartAutomaticArticleTranslation(article)
+                ) {
                     showTranslatedContent.value = true
                     translateCurrentArticle()
                 }
@@ -594,11 +612,54 @@ class ArticleViewModel(
                         sourceLanguage = translation.sourceLanguage,
                         isFullText = fullText,
                     )
+            } catch (e: SystemTranslationSettingsRequiredException) {
+                showTranslatedContent.value = false
+                translatedArticleContent.value = LinearArticle(emptyList())
+                articleTranslationState.value =
+                    ArticleTranslationState.SystemSettingsRequired(
+                        e.message ?: "Translation model required",
+                    )
             } catch (e: Exception) {
                 clearTranslatedContent()
                 toastMaker.makeToast(e.message ?: "Translation failed")
             }
         }
+    }
+
+    private suspend fun canStartAutomaticArticleTranslation(article: Article): Boolean {
+        val settings = repository.translationApiSettings.value
+        if (!settings.isLocalTranslation) {
+            return true
+        }
+
+        val targetLanguage = repository.preferredTranslationLanguage.value.trim()
+        if (targetLanguage.isBlank()) {
+            return false
+        }
+
+        val fullText = article.fullTextByDefault
+        val html = loadArticleHtml(article, fullText)
+
+        val hasCachedTranslation =
+            translationManager.hasCachedTranslatedArticle(
+                itemId = article.id,
+                title = article.title,
+                html = html,
+                isFullText = fullText,
+                settings = settings,
+                targetLanguage = targetLanguage,
+            )
+        if (hasCachedTranslation) {
+            return true
+        }
+
+        return runCatching {
+            localTranslator.canTranslateWithoutBergamotDownload(
+                content = html,
+                targetLanguage = targetLanguage,
+                preserveHtml = true,
+            )
+        }.getOrDefault(false)
     }
 
     private suspend fun loadTranslatedArticle(
@@ -751,6 +812,12 @@ class ArticleViewModel(
         articleTranslationState.value = ArticleTranslationState.Empty
     }
 
+    fun dismissSystemTranslationSettingsPrompt() {
+        if (articleTranslationState.value is ArticleTranslationState.SystemSettingsRequired) {
+            articleTranslationState.value = ArticleTranslationState.Empty
+        }
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"
     }
@@ -782,7 +849,9 @@ private data class ArticleState(
     override val showTranslate: Boolean = false,
     override val isShowingTranslated: Boolean = false,
     override val isTranslationLoading: Boolean = false,
+    override val translationModelDownloadProgress: BergamotModelDownloadProgress? = null,
     override val translationSourceLanguage: String = "",
+    override val systemTranslationSettingsMessage: String = "",
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -813,7 +882,9 @@ interface ArticleScreenViewState {
     val showTranslate: Boolean
     val isShowingTranslated: Boolean
     val isTranslationLoading: Boolean
+    val translationModelDownloadProgress: BergamotModelDownloadProgress?
     val translationSourceLanguage: String
+    val systemTranslationSettingsMessage: String
     val articleContent: LinearArticle
 }
 
@@ -836,6 +907,10 @@ sealed interface ArticleTranslationState {
     data class AlreadyInPreferredLanguage(
         val sourceLanguage: String,
         val isFullText: Boolean,
+    ) : ArticleTranslationState
+
+    data class SystemSettingsRequired(
+        val message: String,
     ) : ArticleTranslationState
 
     data class Result(
