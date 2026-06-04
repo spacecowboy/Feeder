@@ -320,4 +320,6 @@
     <string name="enter_azure_deployment_id_before_saving">Уведіть ID розгортання Azure перед збереженням.</string>
     <string name="summary_api_settings">API підсумків</string>
     <string name="translation_api_settings">API перекладу</string>
+    <string name="pref_paging_mode_title">Режим сторінок</string>
+    <string name="pref_paging_mode_description">Навігація статтями шляхом «гортання сторінок» замість безперервного прокручування. Оптимізовано для електронних книжок.</string>
 </resources>
