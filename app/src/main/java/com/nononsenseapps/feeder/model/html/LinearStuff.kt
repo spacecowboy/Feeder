@@ -11,6 +11,10 @@ data class LinearArticle(
     val idToIndex: Map<String, Int> =
         elements
             .asSequence()
+            .filterIndexed { index, _ ->
+                // Limit this to ensure we do not allocate too much memory
+                index < 1000
+            }
             .mapIndexedNotNull { index, element ->
                 val itemIds = element.ids()
 
