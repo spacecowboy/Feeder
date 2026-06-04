@@ -350,9 +350,9 @@
   <string name="preferred_translation_language_description">Choose the language Feeder should translate into.</string>
   <string name="preferred_translation_language_fallback">the preferred language</string>
   <string name="local_translation_setup_system">Uses Android system on-device translation first which must be downloaded in the system settings.</string>
-  <string name="local_translation_setup_bergamot">If the OS has no on-device translator, Feeder downloads Mozilla/Bergamot models for %1$s if available.</string>
+  <string name="local_translation_setup_bergamot">If the OS has no on-device translator, Feeder downloads Mozilla/Bergamot models for supported %1$s language pairs.</string>
   <string name="translation_language_placeholder">Select a language</string>
-  <string name="show_only_bergamot_languages">Show only languages with Mozilla/Bergamot models</string>
+  <string name="show_only_bergamot_languages">Show only target languages with any Mozilla/Bergamot model</string>
   <string name="set_translation_language_first">Set a preferred translation language in AI settings</string>
   <string name="translate_feed_cards_by_default">Translate article previews</string>
   <string name="translate_articles_by_default">Translate articles by default</string>

@@ -313,7 +313,7 @@ class LocalTranslator(
                     return when (preparation.reason) {
                         BergamotModelPreparation.ErrorReason.NoAppModel ->
                             LocalTranslationResult.Error(
-                                message = systemSettingsRequiredMessage(sourceLang, targetLang),
+                                message = noBergamotModelMessage(sourceLang, targetLang),
                                 action = ErrorAction.OpenSystemTranslationSettings,
                             )
                         else -> LocalTranslationResult.Error(preparation.message)
@@ -540,6 +540,11 @@ private fun systemSettingsRequiredMessage(
     sourceLang: String,
     targetLang: String,
 ): String = "Install $sourceLang -> $targetLang in system settings"
+
+private fun noBergamotModelMessage(
+    sourceLang: String,
+    targetLang: String,
+): String = "No Bergamot model for $sourceLang -> $targetLang. Install in system settings"
 
 private data class HtmlTextNodeTranslation(
     val textNode: TextNode,
