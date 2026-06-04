@@ -384,24 +384,6 @@ class LocalTranslator(
             )
         }
 
-        when (capability?.state) {
-            TranslationCapability.STATE_ON_DEVICE -> Unit
-            TranslationCapability.STATE_AVAILABLE_TO_DOWNLOAD -> {
-                return LocalTranslationResult.Error(
-                    message = systemSettingsRequiredMessage(sourceLang, targetLang),
-                    action = ErrorAction.OpenSystemTranslationSettings,
-                )
-            }
-            TranslationCapability.STATE_DOWNLOADING ->
-                return LocalTranslationResult.Error(
-                    "$sourceLang -> $targetLang is still downloading",
-                )
-            TranslationCapability.STATE_NOT_AVAILABLE ->
-                return LocalTranslationResult.Error("Unsupported $sourceLang -> $targetLang")
-            null ->
-                return LocalTranslationResult.Error("Unsupported $sourceLang -> $targetLang")
-        }
-
         val translationContext =
             TranslationContext
                 .Builder(sourceSpec, targetSpec)
@@ -548,16 +530,12 @@ private sealed interface LocalTranslationResult {
     ) : LocalTranslationResult
 }
 
-private fun systemSettingsRequiredMessage(
-    sourceLang: String,
-    targetLang: String,
-): String = "Install $sourceLang -> $targetLang in system settings"
-
 private fun noBergamotModelMessage(
     sourceLang: String,
     targetLang: String,
 ): String = "No Bergamot model for $sourceLang -> $targetLang. Check system translation languages"
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun Int?.translationCapabilityStateName(): String =
     when (this) {
         TranslationCapability.STATE_ON_DEVICE -> "ON_DEVICE"
@@ -567,6 +545,7 @@ private fun Int?.translationCapabilityStateName(): String =
         else -> "NONE"
     }
 
+@RequiresApi(Build.VERSION_CODES.S)
 private fun Collection<TranslationCapability>.toDebugSummary(): String =
     joinToString(
         separator = ", ",
