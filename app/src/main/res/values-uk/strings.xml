@@ -215,7 +215,7 @@
     <string name="max_lines">Макс. кількість рядків</string>
     <string name="filter_noun">Фільтр</string>
     <string name="no_feeds_in_the_page">На сторінці немає стрічок</string>
-    <string name="content_is_not_html">Зміст не є HTML</string>
+    <string name="content_is_not_html">Вміст не є HTML</string>
     <string name="failed_to_parse_the_page">Не вдалося проаналізувати сторінку</string>
     <string name="failed_to_parse_rss_feed">Не вдалося проаналізувати RSS-стрічку</string>
     <string name="http_error">Помилка HTTP</string>
@@ -322,4 +322,15 @@
     <string name="translation_api_settings">API перекладу</string>
     <string name="pref_paging_mode_title">Режим сторінок</string>
     <string name="pref_paging_mode_description">Навігація статтями шляхом «гортання сторінок» замість безперервного прокручування. Оптимізовано для електронних книжок.</string>
+    <string name="verifying_api_settings">Перевірка налаштувань API…</string>
+    <string name="verifying_azure_openai_settings">Перевірка налаштувань Azure OpenAI…</string>
+    <string name="verifying_deepl_key">Перевірка ключа DeepL…</string>
+    <string name="api_settings_could_not_be_verified">Не вдалося перевірити налаштування API.</string>
+    <string name="azure_openai_settings_could_not_be_verified">Не вдалося перевірити налаштування Azure OpenAI.</string>
+    <string name="deepl_key_could_not_be_verified">Не вдалося перевірити ключ DeepL.</string>
+    <string name="summary_api_settings_info">Використовується для створення підсумків статей.</string>
+    <string name="translation_api_settings_info">Використовується для перекладу карток стрічки та статей.</string>
+    <string name="base_url_optional">Базова URL-адреса (необов’язково)</string>
+    <string name="translation_endpoint">Кінцева точка перекладу</string>
+    <string name="enter_azure_endpoint_before_saving">Уведіть кінцеву точку Azure перед збереженням.</string>
 </resources>
