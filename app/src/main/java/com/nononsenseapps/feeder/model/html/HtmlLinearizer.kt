@@ -1025,7 +1025,8 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
     // Avoid allocating temporary strings at all cost during this iteration
     // as it can become very memory intensive when parsing a large full text
     // html document.
-    wholeText.codePoints()
+    wholeText
+        .codePoints()
         .forEach { codePoint ->
             // Want to drop collapsible whitespace.
             if (builder.endsWithWhitespace && isCollapsableWhiteSpaceCode(codePoint)) {
@@ -1138,8 +1139,7 @@ private fun Element.allIds(): Set<String> =
     sequence {
         yield(this@allIds)
         yieldDescendantsOf(this@allIds)
-    }
-        .take(100)
+    }.take(100)
         .map { it.id() }
         .filterNot { it.isEmpty() }
         .toSet()

@@ -72,7 +72,8 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
     // Avoid allocating temporary strings at all cost during this iteration
     // as it can become very memory intensive when parsing a large full text
     // html document.
-    wholeText.codePoints()
+    wholeText
+        .codePoints()
         .forEach { codePoint ->
             // Want to drop collapsible whitespace.
             if (stripLeading && isCollapsableWhiteSpaceCode(codePoint)) {
