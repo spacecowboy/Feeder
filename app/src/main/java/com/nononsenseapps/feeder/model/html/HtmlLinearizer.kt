@@ -16,13 +16,17 @@ import java.net.URL
 
 typealias IdHolder = (String) -> Unit
 
-class HtmlLinearizer {
+class HtmlLinearizer(
+    private val tooLargeText: String,
+    private val openInBrowserText: String,
+) {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
     private var idHolder: IdHolder = {
         linearTextBuilder.pushId(it)
     }
     private var elementCount = 0
     private var truncated = false
+    private var charCount = 0
 
     fun linearize(
         html: String,
@@ -51,9 +55,22 @@ class HtmlLinearizer {
                 elements +
                     LinearText(
                         ids = emptySet(),
-                        text = "\u2014 Article truncated (too large to fully display). Open in browser for the full content. \u2014",
-                        annotations = emptyList(),
+                        text = tooLargeText,
                         blockStyle = LinearTextBlockStyle.TEXT,
+                        annotations = emptyList(),
+                    ) +
+                    LinearText(
+                        ids = emptySet(),
+                        text = openInBrowserText,
+                        blockStyle = LinearTextBlockStyle.TEXT,
+                        annotations =
+                            listOf(
+                                LinearTextAnnotation(
+                                    data = LinearTextAnnotationLink("https://cowboyprogrammer.org"),
+                                    start = 0,
+                                    end = openInBrowserText.lastIndex,
+                                ),
+                            ),
                     )
             } else {
                 elements
@@ -86,6 +103,9 @@ class HtmlLinearizer {
             if (truncated) break
             when (node) {
                 is TextNode -> {
+                    // Keep track of total text size for truncation
+                    charCount += node.wholeText.length
+
                     if (blockStyle.shouldSoftWrap) {
                         node.appendCorrectlyNormalizedWhiteSpace(
                             linearTextBuilder,
@@ -747,9 +767,9 @@ class HtmlLinearizer {
     private fun ListBuilderScope<LinearElement>.addLimited(element: LinearElement) {
         if (truncated) return
         elementCount++
-        if (elementCount > MAX_ELEMENTS) {
+        if (elementCount > MAX_ELEMENTS || charCount > MAX_CHARS) {
             truncated = true
-            Log.w(LOG_TAG, "LinearArticle element cap ($MAX_ELEMENTS) reached, truncating")
+            Log.w(LOG_TAG, "LinearArticle limits reached. Elements: $elementCount, Chars: $charCount. Truncating...")
             return
         }
         add(element)
@@ -809,7 +829,7 @@ class HtmlLinearizer {
                 ?.splitToSequence(";")
                 ?.map { it.trim() }
                 ?.map { it.split(":", limit = 2) }
-                ?.mapNotNull { kv ->
+                ?.firstNotNullOfOrNull { kv ->
                     if (kv.size != 2) {
                         null
                     } else {
@@ -820,7 +840,7 @@ class HtmlLinearizer {
                             null
                         }
                     }
-                }?.firstOrNull()
+                }
                 ?: ""
 
         val result = mutableListOf<LinearImageSource>()
@@ -984,7 +1004,13 @@ class HtmlLinearizer {
     }
 
     companion object {
-        const val MAX_ELEMENTS = 3_000
+        // UI memory use is the primary limit.
+        // Limits have been set by testing against https://grapheneos.org/releases
+        // where the full page would cause an OOM.
+        // Setting 3000 elements reached 167_730 chars, and about 70MB used when finished rendered
+        // 100_000 chars is estimated at around 60 mins of reading time.
+        const val MAX_ELEMENTS = 2_000
+        const val MAX_CHARS = 100_000
         private const val LOG_TAG = "FEEDER_LINEARIZER"
         private val spaceRegex = Regex("\\s+")
     }
@@ -1047,26 +1073,16 @@ class ListBuilderScope<T>(
     }
 }
 
-private const val SPACE = ' '
 const val SPACE_CODE = ' '.code
-private const val TAB = '\t'
 private const val TAB_CODE = '\t'.code
-private const val LINE_FEED = '\n'
 private const val LINE_FEED_CODE = '\n'.code
-private const val CARRIAGE_RETURN = '\r'
 private const val CARRIAGE_RETURN_CODE = '\r'.code
 
 // 12 is form feed which as no escape in kotlin
-private const val FORM_FEED = 12.toChar()
 private const val FORM_FEED_CODE = 12.toChar().code
 
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
-private const val NON_BREAKING_SPACE = 160.toChar()
 private const val NON_BREAKING_SPACE_CODE = 160.toChar().code
-
-private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
-
-private fun isCollapsableWhiteSpace(c: Char) = c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
 
 fun isCollapsableWhiteSpaceCode(c: Int) = c == SPACE_CODE || c == TAB_CODE || c == LINE_FEED_CODE || c == CARRIAGE_RETURN_CODE || c == FORM_FEED_CODE || c == NON_BREAKING_SPACE_CODE
 
@@ -1113,11 +1129,17 @@ private suspend fun SequenceScope<Element>.yieldDescendantsOf(element: Element) 
     }
 }
 
-// TODO jonas reduce allocations here (23390 allocations)
-private fun Element.allIds(): Set<String> = emptySet()
-//    sequence {
-//        yield(this@allIds)
-//        yieldDescendantsOf(this@allIds)
-//    }.map { it.id() }
-//        .filterNot { it.isEmpty() }
-//        .toSet()
+/**
+ * This is used to collect all ids in a LinearItem for in-page fragment links.
+ * Constraining total amount because it is not expected for an item to have more than a
+ * couple of nested ids.
+ */
+private fun Element.allIds(): Set<String> =
+    sequence {
+        yield(this@allIds)
+        yieldDescendantsOf(this@allIds)
+    }
+        .take(100)
+        .map { it.id() }
+        .filterNot { it.isEmpty() }
+        .toSet()

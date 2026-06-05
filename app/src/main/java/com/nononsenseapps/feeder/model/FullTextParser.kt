@@ -129,11 +129,6 @@ class FullTextParser(
                         logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
                         val article = parseFullArticle(url, html)
 
-                        if (article != null && article.length > MAX_ARTICLE_CONTENT_CHARS) {
-                            Log.w(LOG_TAG, "Extracted article content too large (${article.length} chars) for $url, skipping")
-                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_ARTICLE_CONTENT_CHARS).left()
-                        }
-
                         logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                         withContext(Dispatchers.IO) {
                             article?.let { articleContent ->
@@ -160,8 +155,10 @@ class FullTextParser(
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
-        const val MAX_FULL_TEXT_BYTES = 1 * 1024 * 1024 // 1 MB
-        const val MAX_ARTICLE_CONTENT_CHARS = 200 * 1024 // 200 KB of extracted HTML
+
+        // 1 MB, giving a bit of leeway to allow for inline images but this is way higher
+        // than is possible to render. It will be truncated by HtmlLinearizer.
+        const val MAX_FULL_TEXT_BYTES = 1 * 1024 * 1024
     }
 }
 

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
@@ -304,7 +305,11 @@ class ArticleViewModel(
         logDebug(LOG_TAG, "parseArticleContent(${article.id}, $fullText)")
         return try {
             withContext(Dispatchers.IO) {
-                val htmlLinearizer = HtmlLinearizer()
+                val htmlLinearizer =
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                    )
                 when (fullText) {
                     false -> {
                         if (blobFile(article.id, filePathProvider.articleDir).isFile) {
@@ -586,7 +591,10 @@ class ArticleViewModel(
                     ) ?: throw IllegalStateException("Translation failed")
 
                 translatedArticleContent.value =
-                    HtmlLinearizer().linearize(
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                    ).linearize(
                         translation.translatedHtml,
                         article.feedUrl ?: "",
                     )

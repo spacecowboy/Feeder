@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.model.html
 
 import androidx.collection.ArrayMap
-import com.nononsenseapps.feeder.util.logDebug
 
 private const val LOG_TAG = "FEEDER_LINEAR"
 
@@ -11,17 +10,11 @@ data class LinearArticle(
     val idToIndex: Map<String, Int> =
         elements
             .asSequence()
-            .filterIndexed { index, _ ->
-                // TODO JONAS keep?
-                // Limit this to ensure we do not allocate too much memory
-                index < 1000
-            }
             .mapIndexedNotNull { index, element ->
                 val itemIds = element.ids()
 
                 when {
                     itemIds.isNotEmpty() -> {
-                        logDebug(LOG_TAG, "mapping ${element.javaClass.simpleName} $itemIds to $index")
                         itemIds.map { it to index }
                     }
                     else -> null
