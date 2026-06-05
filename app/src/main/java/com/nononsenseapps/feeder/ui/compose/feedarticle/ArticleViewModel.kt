@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
@@ -25,6 +26,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
+import com.nononsenseapps.feeder.model.FullTextTooLarge
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
@@ -303,7 +305,12 @@ class ArticleViewModel(
         logDebug(LOG_TAG, "parseArticleContent(${article.id}, $fullText)")
         return try {
             withContext(Dispatchers.IO) {
-                val htmlLinearizer = HtmlLinearizer()
+                val htmlLinearizer =
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
+                    )
                 when (fullText) {
                     false -> {
                         if (blobFile(article.id, filePathProvider.articleDir).isFile) {
@@ -356,6 +363,7 @@ class ArticleViewModel(
                                 is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
                                 is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
                                 is NotHTML -> TextToDisplay.FAILED_NOT_HTML
+                                is FullTextTooLarge -> TextToDisplay.FAILED_FULLTEXT_TOO_LARGE
                                 else -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
                             }?.let { errorText ->
                                 textToDisplay.update { errorText }
@@ -584,7 +592,11 @@ class ArticleViewModel(
                     ) ?: throw IllegalStateException("Translation failed")
 
                 translatedArticleContent.value =
-                    HtmlLinearizer().linearize(
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
+                    ).linearize(
                         translation.translatedHtml,
                         article.feedUrl ?: "",
                     )

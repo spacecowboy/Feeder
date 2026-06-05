@@ -5,7 +5,6 @@ import com.nononsenseapps.feeder.ui.compose.text.ancestors
 import com.nononsenseapps.feeder.ui.compose.text.attrInHierarchy
 import com.nononsenseapps.feeder.ui.compose.text.stripHtml
 import com.nononsenseapps.feeder.ui.text.getVideo
-import com.nononsenseapps.feeder.util.asUTF8Sequence
 import com.nononsenseapps.feeder.util.logDebug
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -17,11 +16,18 @@ import java.net.URL
 
 typealias IdHolder = (String) -> Unit
 
-class HtmlLinearizer {
+class HtmlLinearizer(
+    private val tooLargeText: String,
+    private val openInBrowserText: String,
+    private val articleLink: String,
+) {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
     private var idHolder: IdHolder = {
         linearTextBuilder.pushId(it)
     }
+    private var elementCount = 0
+    private var truncated = false
+    private var charCount = 0
 
     fun linearize(
         html: String,
@@ -31,21 +37,48 @@ class HtmlLinearizer {
     fun linearize(
         inputStream: InputStream,
         baseUrl: String,
-    ): LinearArticle =
-        LinearArticle(
-            elements =
-                try {
-                    Jsoup
-                        .parse(inputStream, null, baseUrl)
-                        .body()
-                        .let { body ->
-                            linearizeBody(body, baseUrl)
-                        }
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "htmlFormattingFailed", e)
-                    emptyList()
-                },
-        )
+    ): LinearArticle {
+        val elements =
+            try {
+                Jsoup
+                    .parse(inputStream, null, baseUrl)
+                    .body()
+                    .let { body ->
+                        linearizeBody(body, baseUrl)
+                    }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "htmlFormattingFailed", e)
+                emptyList()
+            }
+
+        val finalElements =
+            if (truncated) {
+                elements +
+                    LinearText(
+                        ids = emptySet(),
+                        text = tooLargeText,
+                        blockStyle = LinearTextBlockStyle.TEXT,
+                        annotations = emptyList(),
+                    ) +
+                    LinearText(
+                        ids = emptySet(),
+                        text = openInBrowserText,
+                        blockStyle = LinearTextBlockStyle.TEXT,
+                        annotations =
+                            listOf(
+                                LinearTextAnnotation(
+                                    data = LinearTextAnnotationLink(articleLink),
+                                    start = 0,
+                                    end = openInBrowserText.lastIndex,
+                                ),
+                            ),
+                    )
+            } else {
+                elements
+            }
+
+        return LinearArticle(elements = finalElements)
+    }
 
     private fun linearizeBody(
         body: Element,
@@ -68,8 +101,12 @@ class HtmlLinearizer {
     ) {
         var node = nodes.firstOrNull()
         while (node != null) {
+            if (truncated) break
             when (node) {
                 is TextNode -> {
+                    // Keep track of total text size for truncation
+                    charCount += node.wholeText.length
+
                     if (blockStyle.shouldSoftWrap) {
                         node.appendCorrectlyNormalizedWhiteSpace(
                             linearTextBuilder,
@@ -360,7 +397,7 @@ class HtmlLinearizer {
                                         acc
                                     } else {
                                         if (acc.isNotEmpty()) {
-                                            add(
+                                            addLimited(
                                                 LinearBlockQuote(
                                                     ids = ids,
                                                     cite = cite,
@@ -368,14 +405,14 @@ class HtmlLinearizer {
                                                 ),
                                             )
                                         }
-                                        add(
+                                        addLimited(
                                             item,
                                         )
                                         mutableListOf()
                                     }
                                 }.let {
                                     if (it.isNotEmpty()) {
-                                        add(
+                                        addLimited(
                                             LinearBlockQuote(
                                                 ids = ids,
                                                 cite = cite,
@@ -442,7 +479,7 @@ class HtmlLinearizer {
                                             it is LinearText && it.text.isNotBlank()
                                         } as? LinearText
 
-                                    add(
+                                    addLimited(
                                         LinearImage(
                                             ids = ids,
                                             sources = imageCandidates,
@@ -464,7 +501,7 @@ class HtmlLinearizer {
                                     val captionText: String? =
                                         stripHtml(element.attr("alt"))
                                             .takeIf { it.isNotBlank() }
-                                    add(
+                                    addLimited(
                                         LinearImage(
                                             ids = ids,
                                             sources = candidates,
@@ -513,7 +550,7 @@ class HtmlLinearizer {
                                         }
 
                                     if (item.isNotEmpty()) {
-                                        add(item)
+                                        addLimited(item)
                                     }
                                 }
                         }
@@ -575,7 +612,7 @@ class HtmlLinearizer {
                                     baseUrl = baseUrl,
                                 )
                             } else {
-                                add(
+                                addLimited(
                                     LinearTable.build(ids = ids, leftToRight = leftToRight) {
                                         rowSequence
                                             .forEach { row ->
@@ -632,7 +669,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearAudio(ids = element.allIds(), sources = sources))
+                                addLimited(LinearAudio(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -663,7 +700,7 @@ class HtmlLinearizer {
                                     .takeIf { it.isNotEmpty() }
 
                             if (sources != null) {
-                                add(LinearVideo(ids = element.allIds(), sources = sources))
+                                addLimited(LinearVideo(ids = element.allIds(), sources = sources))
                             }
                         }
 
@@ -686,7 +723,7 @@ class HtmlLinearizer {
         val width = element.attr("width").toIntOrNull()
         val height = element.attr("height").toIntOrNull()
         getVideo(element.attr("abs:src").ifBlank { null })?.let { video ->
-            add(
+            addLimited(
                 LinearVideo(
                     ids = element.allIds(),
                     sources =
@@ -728,9 +765,20 @@ class HtmlLinearizer {
         linearTextBuilder.append(c)
     }
 
+    private fun ListBuilderScope<LinearElement>.addLimited(element: LinearElement) {
+        if (truncated) return
+        elementCount++
+        if (elementCount > MAX_ELEMENTS || charCount > MAX_CHARS) {
+            truncated = true
+            Log.w(LOG_TAG, "LinearArticle limits reached. Elements: $elementCount, Chars: $charCount. Truncating...")
+            return
+        }
+        add(element)
+    }
+
     internal fun ListBuilderScope<LinearElement>.finalizeAndAddCurrentElement(blockStyle: LinearTextBlockStyle) {
         if (linearTextBuilder.isNotEmpty()) {
-            add(linearTextBuilder.toLinearText(blockStyle = blockStyle))
+            addLimited(linearTextBuilder.toLinearText(blockStyle = blockStyle))
             linearTextBuilder.clearKeepingSpans()
         }
     }
@@ -782,7 +830,7 @@ class HtmlLinearizer {
                 ?.splitToSequence(";")
                 ?.map { it.trim() }
                 ?.map { it.split(":", limit = 2) }
-                ?.mapNotNull { kv ->
+                ?.firstNotNullOfOrNull { kv ->
                     if (kv.size != 2) {
                         null
                     } else {
@@ -793,7 +841,7 @@ class HtmlLinearizer {
                             null
                         }
                     }
-                }?.firstOrNull()
+                }
                 ?: ""
 
         val result = mutableListOf<LinearImageSource>()
@@ -957,7 +1005,14 @@ class HtmlLinearizer {
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDERHtmlLinearizer"
+        // UI memory use is the primary limit.
+        // Limits have been set by testing against https://grapheneos.org/releases
+        // where the full page would cause an OOM.
+        // Setting 3000 elements reached 167_730 chars, and about 70MB used when finished rendered
+        // 100_000 chars is estimated at around 60 mins of reading time.
+        const val MAX_ELEMENTS = 2_000
+        const val MAX_CHARS = 100_000
+        private const val LOG_TAG = "FEEDER_LINEARIZER"
         private val spaceRegex = Regex("\\s+")
     }
 }
@@ -967,19 +1022,23 @@ class HtmlLinearizer {
  * such as ZWNJ which are crucial for several languages.
  */
 fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
+    // Inline loop as an optimization to avoid String allocations
+    // Avoid allocating temporary strings at all cost during this iteration
+    // as it can become very memory intensive when parsing a large full text
+    // html document.
     wholeText
-        .asUTF8Sequence()
-        .dropWhile {
-            builder.endsWithWhitespace && isCollapsableWhiteSpace(it)
-        }.fold(false) { lastWasWhite, char ->
-            if (isCollapsableWhiteSpace(char)) {
-                if (!lastWasWhite) {
-                    builder.append(' ')
-                }
-                true
+        .codePoints()
+        .forEach { codePoint ->
+            // Want to drop collapsible whitespace.
+            if (builder.endsWithWhitespace && isCollapsableWhiteSpaceCode(codePoint)) {
+                return@forEach
+            }
+
+            // All whitespace is added as regular space
+            if (isCollapsableWhiteSpaceCode(codePoint)) {
+                builder.append(' ')
             } else {
-                builder.append(char)
-                false
+                builder.appendCodePoint(codePoint)
             }
         }
 }
@@ -1016,20 +1075,18 @@ class ListBuilderScope<T>(
     }
 }
 
-private const val SPACE = ' '
-private const val TAB = '\t'
-private const val LINE_FEED = '\n'
-private const val CARRIAGE_RETURN = '\r'
+const val SPACE_CODE = ' '.code
+private const val TAB_CODE = '\t'.code
+private const val LINE_FEED_CODE = '\n'.code
+private const val CARRIAGE_RETURN_CODE = '\r'.code
 
 // 12 is form feed which as no escape in kotlin
-private const val FORM_FEED = 12.toChar()
+private const val FORM_FEED_CODE = 12.toChar().code
 
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
-private const val NON_BREAKING_SPACE = 160.toChar()
+private const val NON_BREAKING_SPACE_CODE = 160.toChar().code
 
-private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
-
-private fun isCollapsableWhiteSpace(c: Char) = c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
+fun isCollapsableWhiteSpaceCode(c: Int) = c == SPACE_CODE || c == TAB_CODE || c == LINE_FEED_CODE || c == CARRIAGE_RETURN_CODE || c == FORM_FEED_CODE || c == NON_BREAKING_SPACE_CODE
 
 private fun resolve(
     baseUrl: String,
@@ -1074,10 +1131,16 @@ private suspend fun SequenceScope<Element>.yieldDescendantsOf(element: Element) 
     }
 }
 
+/**
+ * This is used to collect all ids in a LinearItem for in-page fragment links.
+ * Constraining total amount because it is not expected for an item to have more than a
+ * couple of nested ids.
+ */
 private fun Element.allIds(): Set<String> =
     sequence {
         yield(this@allIds)
         yieldDescendantsOf(this@allIds)
-    }.map { it.id() }
+    }.take(100)
+        .map { it.id() }
         .filterNot { it.isEmpty() }
         .toSet()

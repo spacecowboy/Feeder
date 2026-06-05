@@ -67,6 +67,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FetchError
 import com.nononsenseapps.feeder.model.FullTextDecodingFailure
+import com.nononsenseapps.feeder.model.FullTextTooLarge
 import com.nononsenseapps.feeder.model.HttpError
 import com.nononsenseapps.feeder.model.JsonFeedParseError
 import com.nononsenseapps.feeder.model.MetaDataParseError
@@ -496,6 +497,7 @@ fun ColumnScope.rightContent(
                         is NoBody -> stringResource(R.string.no_body_in_response)
                         is UnsupportedContentType -> stringResource(R.string.unsupported_content_type)
                         is FullTextDecodingFailure -> stringResource(R.string.failed_to_parse_full_article)
+                        is FullTextTooLarge -> stringResource(R.string.failed_to_fetch_full_article_too_large)
                         is NoUrl -> stringResource(R.string.no_url)
                     }
 

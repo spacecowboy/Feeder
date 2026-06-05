@@ -81,12 +81,29 @@ class FullTextParser(
                             FullTextDecodingFailure(url, t)
                         },
                     ) {
-                        val body = response.body ?: return@catching NoBody(url = url).left()
+                        val body = response.body
 
-                        val bytes =
-                            body.use {
-                                it.bytes()
+                        val contentLength = body.contentLength()
+                        if (contentLength > MAX_FULL_TEXT_BYTES) {
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
+
+                        val maxBytes = MAX_FULL_TEXT_BYTES.toLong()
+                        val buffer = okio.Buffer()
+
+                        body.use {
+                            val source = body.source()
+                            while (buffer.size <= maxBytes) {
+                                val read = source.read(buffer, 8_192)
+                                if (read == -1L) break
                             }
+                        }
+
+                        if (buffer.size > maxBytes) {
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
+
+                        val bytes = buffer.readByteArray()
 
                         val contentType =
                             body.contentType()
@@ -119,6 +136,7 @@ class FullTextParser(
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                         logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
                         val article = parseFullArticle(url, html)
+
                         logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                         withContext(Dispatchers.IO) {
                             article?.let { articleContent ->
@@ -145,6 +163,10 @@ class FullTextParser(
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
+
+        // 1 MB, giving a bit of leeway to allow for inline images but this is way higher
+        // than is possible to render. It will be truncated by HtmlLinearizer.
+        const val MAX_FULL_TEXT_BYTES = 1 * 1024 * 1024
     }
 }
 
