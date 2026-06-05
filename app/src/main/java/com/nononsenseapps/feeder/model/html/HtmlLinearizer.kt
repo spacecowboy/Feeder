@@ -5,7 +5,6 @@ import com.nononsenseapps.feeder.ui.compose.text.ancestors
 import com.nononsenseapps.feeder.ui.compose.text.attrInHierarchy
 import com.nononsenseapps.feeder.ui.compose.text.stripHtml
 import com.nononsenseapps.feeder.ui.text.getVideo
-import com.nononsenseapps.feeder.util.asUTF8Sequence
 import com.nononsenseapps.feeder.util.logDebug
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -996,19 +995,22 @@ class HtmlLinearizer {
  * such as ZWNJ which are crucial for several languages.
  */
 fun TextNode.appendCorrectlyNormalizedWhiteSpace(builder: LinearTextBuilder) {
-    wholeText
-        .asUTF8Sequence()
-        .dropWhile {
-            builder.endsWithWhitespace && isCollapsableWhiteSpace(it)
-        }.fold(false) { lastWasWhite, char ->
-            if (isCollapsableWhiteSpace(char)) {
-                if (!lastWasWhite) {
-                    builder.append(' ')
-                }
-                true
+    // Inline loop as an optimization to avoid String allocations
+    // Avoid allocating temporary strings at all cost during this iteration
+    // as it can become very memory intensive when parsing a large full text
+    // html document.
+    wholeText.codePoints()
+        .forEach { codePoint ->
+            // Want to drop collapsible whitespace.
+            if (builder.endsWithWhitespace && isCollapsableWhiteSpaceCode(codePoint)) {
+                return@forEach
+            }
+
+            // All whitespace is added as regular space
+            if (isCollapsableWhiteSpaceCode(codePoint)) {
+                builder.append(' ')
             } else {
-                builder.append(char)
-                false
+                builder.appendCodePoint(codePoint)
             }
         }
 }
@@ -1046,19 +1048,27 @@ class ListBuilderScope<T>(
 }
 
 private const val SPACE = ' '
+const val SPACE_CODE = ' '.code
 private const val TAB = '\t'
+private const val TAB_CODE = '\t'.code
 private const val LINE_FEED = '\n'
+private const val LINE_FEED_CODE = '\n'.code
 private const val CARRIAGE_RETURN = '\r'
+private const val CARRIAGE_RETURN_CODE = '\r'.code
 
 // 12 is form feed which as no escape in kotlin
 private const val FORM_FEED = 12.toChar()
+private const val FORM_FEED_CODE = 12.toChar().code
 
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
 private const val NON_BREAKING_SPACE = 160.toChar()
+private const val NON_BREAKING_SPACE_CODE = 160.toChar().code
 
 private fun isCollapsableWhiteSpace(c: String) = c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
 
 private fun isCollapsableWhiteSpace(c: Char) = c == SPACE || c == TAB || c == LINE_FEED || c == CARRIAGE_RETURN || c == FORM_FEED || c == NON_BREAKING_SPACE
+
+fun isCollapsableWhiteSpaceCode(c: Int) = c == SPACE_CODE || c == TAB_CODE || c == LINE_FEED_CODE || c == CARRIAGE_RETURN_CODE || c == FORM_FEED_CODE || c == NON_BREAKING_SPACE_CODE
 
 private fun resolve(
     baseUrl: String,
@@ -1103,10 +1113,11 @@ private suspend fun SequenceScope<Element>.yieldDescendantsOf(element: Element) 
     }
 }
 
-private fun Element.allIds(): Set<String> =
-    sequence {
-        yield(this@allIds)
-        yieldDescendantsOf(this@allIds)
-    }.map { it.id() }
-        .filterNot { it.isEmpty() }
-        .toSet()
+// TODO jonas reduce allocations here (23390 allocations)
+private fun Element.allIds(): Set<String> = emptySet()
+//    sequence {
+//        yield(this@allIds)
+//        yieldDescendantsOf(this@allIds)
+//    }.map { it.id() }
+//        .filterNot { it.isEmpty() }
+//        .toSet()
