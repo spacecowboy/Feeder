@@ -76,7 +76,7 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
         .codePoints()
         .forEach { codePoint ->
             // Want to drop collapsible whitespace.
-            if (stripLeading && isCollapsableWhiteSpaceCode(codePoint)) {
+            if (builder.isEmpty() && stripLeading && isCollapsableWhiteSpaceCode(codePoint)) {
                 return@forEach
             }
 

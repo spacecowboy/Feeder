@@ -17,6 +17,8 @@ abstract class HtmlParser {
     val endsWithWhitespace: Boolean
         get() = builder.endsWithWhitespace
 
+    fun isEmpty(): Boolean = builder.isEmpty()
+
     fun append(text: String) = builder.append(text)
 
     fun append(char: Char) = builder.append(char)
