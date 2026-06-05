@@ -309,6 +309,7 @@ class ArticleViewModel(
                     HtmlLinearizer(
                         tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
                         openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
                     )
                 when (fullText) {
                     false -> {
@@ -594,6 +595,7 @@ class ArticleViewModel(
                     HtmlLinearizer(
                         tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
                         openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
                     ).linearize(
                         translation.translatedHtml,
                         article.feedUrl ?: "",

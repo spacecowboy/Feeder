@@ -12,7 +12,7 @@ class HtmlLinearizerTest {
 
     @Before
     fun setUp() {
-        linearizer = HtmlLinearizer("", "")
+        linearizer = HtmlLinearizer("", "", "")
     }
 
     @Test

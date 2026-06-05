@@ -19,6 +19,7 @@ typealias IdHolder = (String) -> Unit
 class HtmlLinearizer(
     private val tooLargeText: String,
     private val openInBrowserText: String,
+    private val articleLink: String,
 ) {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
     private var idHolder: IdHolder = {
@@ -66,7 +67,7 @@ class HtmlLinearizer(
                         annotations =
                             listOf(
                                 LinearTextAnnotation(
-                                    data = LinearTextAnnotationLink("https://cowboyprogrammer.org"),
+                                    data = LinearTextAnnotationLink(articleLink),
                                     start = 0,
                                     end = openInBrowserText.lastIndex,
                                 ),

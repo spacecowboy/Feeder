@@ -88,14 +88,22 @@ class FullTextParser(
                             return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
                         }
 
-                        val bytes =
-                            body.use {
-                                it.bytes()
-                            }
+                        val maxBytes = MAX_FULL_TEXT_BYTES.toLong()
+                        val buffer = okio.Buffer()
 
-                        if (bytes.size > MAX_FULL_TEXT_BYTES) {
+                        body.use {
+                            val source = body.source()
+                            while (buffer.size <= maxBytes) {
+                                val read = source.read(buffer, 8_192)
+                                if (read == -1L) break
+                            }
+                        }
+
+                        if (buffer.size > maxBytes) {
                             return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
                         }
+
+                        val bytes = buffer.readByteArray()
 
                         val contentType =
                             body.contentType()
