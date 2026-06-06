@@ -52,14 +52,14 @@
     <string name="sync_option_every_12_hours">每 12 小时</string>
     <string name="sync_option_every_day">每天</string>
     <string name="synchronization">同步</string>
-    <string name="only_on_wifi">仅在连接 WiFi 时</string>
+    <string name="only_on_wifi">仅在连接 Wi-Fi 时</string>
     <string name="show_thumbnails">显示缩略图</string>
     <string name="may_result_data_charges">可能产生移动数据费用。</string>
     <string name="only_when_charging">仅在充电时</string>
     <string name="image_loading">图片加载</string>
     <string name="no_activity_for_link">无法找到打开该链接的应用</string>
-    <string name="check_for_updates">查找新文章频率</string>
-    <string name="on_startup">在程序启动时</string>
+    <string name="check_for_updates">查找新文章…</string>
+    <string name="on_startup">应用启动时</string>
     <string name="show_fab">显示悬浮操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
     <string name="updated_feeds">更新订阅</string>
@@ -340,4 +340,5 @@
     <string name="local_translation_setup_pixel">对于 Pixel 手机上的本地翻译，请打开 Android 设置，然后打开系统、实时翻译、语言，添加 %1$s 进行离线翻译。菜单名称可能因 Android 版本而异；如果 Android 要求，请安装源语言。</string>
     <string name="local_translation_setup_samsung">对于 Samsung 设备上的本地翻译，请打开设置、常规管理、语言包，下载 %1$s。某些 Samsung 版本将其置于 Samsung 键盘或翻译下；如果 Android 要求，请安装源语言。</string>
     <string name="local_translation_setup_generic">对于本地翻译，请打开设备的设置应用，然后在系统、常规管理、语言或翻译下查找设备端或离线翻译语言包。下载 %1$s 以及您阅读的源语言。</string>
+    <string name="failed_to_fetch_full_article_too_large">文章太大。改为在浏览器中打开？</string>
 </resources>
