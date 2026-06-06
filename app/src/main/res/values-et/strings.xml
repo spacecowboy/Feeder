@@ -340,4 +340,5 @@
     <string name="local_translation_setup_generic">Kohaliku tõlke kasutamiseks ava nutiseadme rakendus „Seaded“ ja otsi seadmesisesed või võrguühenduseta tõlke keelepakette menüüpunktide „Süsteem“, „Üldine haldus“, „Keeled“ või „Tõlge“ alt. Laadi alla %1$s ja need lähtekeeled, mida sa tahad lugeda.</string>
     <string name="local_translation_setup_samsung">Kohaliku tõlke kasutamiseks Samsungi nutiseadmetes ava menüü „Seaded“, „Üldhaldus“, „Keelepaketid“ ja laadi alla %1$s. Mõnes Samsungi versioonis asub see valik menüü all „Samsungi klaviatuur“ või „Tõlge“; kui Android seda küsib, paigalda ka lähtekeel.</string>
     <string name="local_translation_setup_pixel">Kohaliku tõlke kasutamiseks Pixel-telefonides ava Androidi seadistsued (seaded), seejärel vali „Süsteem“, „Reaalajas tõlkimine“, „Keeled“ ja lisa %1$s, et kasutada tõlget vallasrežiimis. Menüüde nimetused võivad Androidi versioonist olenevalt erineda; kui Android seda küsib, paigalda ka lähtekeel.</string>
+    <string name="failed_to_fetch_full_article_too_large">Artikkel on liiga pikk. Kas pigem tahaksid ta avada veebibrauseris?</string>
 </resources>
