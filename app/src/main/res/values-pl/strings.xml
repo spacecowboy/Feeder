@@ -340,4 +340,5 @@
     <string name="local_translation_setup_pixel">Aby korzystać z funkcji tłumaczenia lokalnego na telefonach Pixel, otwórz Ustawienia Androida, następnie System, Tłumaczenie na żywo, Języki i dodaj %1$s dla tłumaczenia w trybie offline. Nazwy menu mogą się różnić w zależności od wersji Androida; zainstaluj również język źródłowy, jeśli Android o to poprosi.</string>
     <string name="local_translation_setup_samsung">Aby korzystać z funkcji tłumaczenia lokalnego na urządzeniach Samsung, otwórz Ustawienia, Zarządzanie ogólne, Pakiety językowe i pobierz %1$s. W niektórych wersjach Samsunga opcja ta znajduje się w Klawiatura Samsung lub Tłumaczenie; zainstaluj również język źródłowy, jeśli Android o to poprosi.</string>
     <string name="local_translation_setup_generic">Aby korzystać z funkcji tłumaczenia lokalnego, otwórz Ustawienia i wyszukaj pakiety językowe do tłumaczenia na urządzeniu lub offline w System, Ogólne, Języki lub Tłumaczenie. Pobierz %1$s i języki źródłowe, którymi się posługujesz.</string>
+    <string name="failed_to_fetch_full_article_too_large">Artykuł jest zbyt długi. Czy otworzyć go w przeglądarce?</string>
 </resources>
