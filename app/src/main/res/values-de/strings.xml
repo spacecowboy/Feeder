@@ -69,7 +69,7 @@
     <string name="open_in_webview">Webansicht</string>
     <string name="open_in_default_browser">Standardbrowser</string>
     <string name="open_in_custom_tab">In‑App‑Browser (Custom Tab)</string>
-    <string name="open_item_by_default_with">Nachrichten standardmäßig öffnen mit</string>
+    <string name="open_item_by_default_with">Artikel standardmäßig öffnen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
     <string name="reader_settings">Feedreader</string>
     <string name="open_link_in_web_view">Link in Webansicht öffnen</string>
@@ -174,7 +174,7 @@
     <string name="permission_read_label">Feeder Nur-Lese-Zugriff</string>
     <string name="use_detect_language">Sprache erkennen</string>
     <string name="only_available_on_android_n">Nur auf Android %1$s und höher verfügbar</string>
-    <string name="explanation_permission_notifications">Die Berechtigung muss erteilt werden, bevor Benachrichtigungen aktiviert werden können.</string>
+    <string name="explanation_permission_notifications">Berechtigung muss erteilt werden, bevor Benachrichtigungen aktiviert werden können.</string>
     <string name="description_for_read_aloud">Erkennt automatisch die Sprache des Artikels</string>
     <string name="text_to_speech">Text in Sprache</string>
     <string name="set_language">Sprache einstellen</string>
@@ -280,7 +280,7 @@
     <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
     <string name="time_out_placeholder">Zeitüberschreitung für KI-Anfragen</string>
     <string name="time_out">Zeitüberschreitung (Sekunden)</string>
-    <string name="time_out_validation_error">Die Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
+    <string name="time_out_validation_error">Zeitüberschreitung muss zwischen 30 und 600 Sekunden liegen</string>
     <string name="summarize_on_open">Beim Öffnen zusammenfassen</string>
     <string name="feed_search_suggestions_header">Vorschläge</string>
     <string name="openai_settings_info">Mit vielen KI-Anbietern kompatibel, jedoch nicht mit allen</string>
@@ -340,4 +340,5 @@
     <string name="local_translation_setup_pixel">Für die lokale Übersetzung auf Pixel-Smartphones, öffne die Android-Einstellungen, dann System, Live-Übersetzung, Sprachen und füge %1$s für die Offline-Übersetzung hinzu. Die Menünamen können je nach Android-Version variieren; installiere auch die Ausgangssprache, falls Android dich dazu auffordert.</string>
     <string name="local_translation_setup_samsung">Für die lokale Übersetzung auf Samsung-Geräten, öffne die Einstellungen, Allgemeine Verwaltung, Sprache und lade %1$s herunter. Bei einigen Samsung-Modellen findest du diese Option unter Samsung-Tastatur oder Übersetzung; installiere auch die Ausgangssprache, falls Android dich dazu auffordert.</string>
     <string name="local_translation_setup_generic">Für die lokale Übersetzung öffne die Geräteeinstellungen und suche unter System, Allgemeine Einstellungen, Sprachen, oder Übersetzung nach Sprachpaketen für die Übersetzung auf dem Gerät oder im Offline-Modus. Lade %1$s und die Ausgangssprachen herunter, die Sie lesen.</string>
+    <string name="failed_to_fetch_full_article_too_large">Artikel ist zu groß. Stattdessen im Browser öffnen?</string>
 </resources>
