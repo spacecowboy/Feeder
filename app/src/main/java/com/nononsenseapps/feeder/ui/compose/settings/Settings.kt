@@ -83,6 +83,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.MaxArticleSize
 import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
@@ -224,6 +225,8 @@ fun SettingsScreen(
             onIsPagingModeChange = settingsViewModel::setIsPagingMode,
             isAnimatedPaging = viewState.isAnimatedPaging,
             onIsAnimatedPagingChange = settingsViewModel::setIsAnimatedPaging,
+            maxArticleSize = viewState.maxArticleSize,
+            onMaxArticleSizeChange = settingsViewModel::setMaxArticleSize,
             onSendFeedback = {
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = true,
@@ -316,6 +319,8 @@ private fun SettingsScreenPreview() {
             onIsPagingModeChange = {},
             isAnimatedPaging = false,
             onIsAnimatedPagingChange = {},
+            maxArticleSize = MaxArticleSize.MB_1,
+            onMaxArticleSizeChange = {},
             onSendFeedback = {},
             modifier = Modifier,
         )
@@ -398,6 +403,8 @@ fun SettingsList(
     onIsPagingModeChange: (Boolean) -> Unit,
     isAnimatedPaging: Boolean,
     onIsAnimatedPagingChange: (Boolean) -> Unit,
+    maxArticleSize: MaxArticleSize,
+    onMaxArticleSizeChange: (MaxArticleSize) -> Unit,
     onTextSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     modifier: Modifier = Modifier,
@@ -753,6 +760,39 @@ fun SettingsList(
                     checked = isAnimatedPaging,
                     onCheckedChange = onIsAnimatedPagingChange,
                     description = stringResource(id = R.string.pref_animated_paging_description),
+                )
+            }
+
+            MenuSetting(
+                title = stringResource(id = R.string.max_article_size),
+                currentValue = maxArticleSize.asMaxArticleSizeOption(),
+                values =
+                    immutableListHolderOf(
+                        MaxArticleSize.MB_1.asMaxArticleSizeOption(),
+                        MaxArticleSize.MB_2.asMaxArticleSizeOption(),
+                        MaxArticleSize.MB_4.asMaxArticleSizeOption(),
+                        MaxArticleSize.MB_5.asMaxArticleSizeOption(),
+                        MaxArticleSize.MB_8.asMaxArticleSizeOption(),
+                        MaxArticleSize.MB_10.asMaxArticleSizeOption(),
+                        MaxArticleSize.UNLIMITED.asMaxArticleSizeOption(),
+                    ),
+                onSelection = {
+                    onMaxArticleSizeChange(it.maxArticleSize)
+                },
+                modifier =
+                    Modifier
+                        .width(dimens.maxContentWidth),
+            )
+
+            if (maxArticleSize != MaxArticleSize.MB_1) {
+                Text(
+                    text = stringResource(id = R.string.max_article_size_warning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier =
+                        Modifier
+                            .width(dimens.maxContentWidth)
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                 )
             }
         }
@@ -1523,5 +1563,20 @@ fun FeedItemStyle.asFeedItemStyleOption() =
 fun SwipeAsRead.asSwipeAsReadOption() =
     SwipeAsReadOption(
         swipeAsRead = this,
+        name = stringResource(id = stringId),
+    )
+
+@Immutable
+data class MaxArticleSizeOption(
+    val maxArticleSize: MaxArticleSize,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun MaxArticleSize.asMaxArticleSizeOption() =
+    MaxArticleSizeOption(
+        maxArticleSize = this,
         name = stringResource(id = stringId),
     )

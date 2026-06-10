@@ -159,6 +159,12 @@ class Repository(
         settingsStore.setMaxLines(value.coerceAtLeast(1))
     }
 
+    val maxArticleSize: StateFlow<MaxArticleSize> = settingsStore.maxArticleSize
+
+    fun setMaxArticleSize(value: MaxArticleSize) {
+        settingsStore.setMaxArticleSize(value)
+    }
+
     val showOnlyTitle: StateFlow<Boolean> = settingsStore.showOnlyTitle
 
     fun setShowOnlyTitles(value: Boolean) {

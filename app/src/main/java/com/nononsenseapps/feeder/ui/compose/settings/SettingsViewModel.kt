@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.MaxArticleSize
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SortingOptions
@@ -204,6 +205,10 @@ class SettingsViewModel(
         repository.setPreferredTranslationLanguage(value)
     }
 
+    fun setMaxArticleSize(value: MaxArticleSize) {
+        repository.setMaxArticleSize(value)
+    }
+
     private val summaryOpenAIModelsState = MutableStateFlow<OpenAIModelsState>(OpenAIModelsState.None)
     private val translationApiModelsState = MutableStateFlow<TranslationApiModelsState>(OpenAIModelsState.None)
 
@@ -272,6 +277,7 @@ class SettingsViewModel(
                 repository.font,
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
+                repository.maxArticleSize,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -320,6 +326,7 @@ class SettingsViewModel(
                     font = params[35] as FontSelection,
                     isPagingMode = params[36] as Boolean,
                     isAnimatedPaging = params[37] as Boolean,
+                    maxArticleSize = params[38] as MaxArticleSize,
                 )
             }.collect {
                 _viewState.value = it
@@ -412,6 +419,7 @@ data class SettingsViewState(
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,
+    val maxArticleSize: MaxArticleSize = MaxArticleSize.MB_1,
 )
 
 data class UIFeedSettings(

@@ -4,6 +4,7 @@ import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.MaxArticleSize
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.SettingsStore
@@ -101,6 +102,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
                         UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
+                        UserSettings.SETTING_MAX_ARTICLE_SIZE -> "MB_1"
                     },
             )
         }
@@ -113,6 +115,7 @@ class OpmlParserTest : DIAware {
             every { settingsStore.translationApiSettings } returns MutableStateFlow(TranslationApiSettings())
             every { settingsStore.setOpenAiSettings(any()) } just Runs
             every { settingsStore.setTranslationApiSettings(any()) } just Runs
+            every { settingsStore.setMaxArticleSize(any()) } just Runs
             setAllSettings()
             verify {
                 settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
@@ -155,6 +158,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setTranslateArticlePreviewsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)
+                settingsStore.setMaxArticleSize(MaxArticleSize.MB_1)
             }
 
             confirmVerified(settingsStore)

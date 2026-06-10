@@ -162,6 +162,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_translation_api_request_timeout_seconds" value="90"/>
               <feeder:setting key="pref_translate_feed_cards_by_default" value="true"/>
               <feeder:setting key="pref_translate_articles_by_default" value="true"/>
+              <feeder:setting key="pref_max_article_size" value="MB_1"/>
               <feeder:blocked pattern="foo"/>
               <feeder:blocked pattern="break &quot;xml id &apos;9&apos; &gt; 0 &amp; &lt; 10"/>
             </feeder:settings>
@@ -222,6 +223,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
                         UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
+                        UserSettings.SETTING_MAX_ARTICLE_SIZE -> "MB_1"
                     }
             }
     }

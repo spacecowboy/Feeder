@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.archmodel.defaultFont
 import com.nononsenseapps.feeder.archmodel.feedItemStyleFromString
 import com.nononsenseapps.feeder.archmodel.itemOpenerFromString
 import com.nononsenseapps.feeder.archmodel.linkOpenerFromString
+import com.nononsenseapps.feeder.archmodel.maxArticleSizeFromString
 import com.nononsenseapps.feeder.archmodel.sortingOptionsFromString
 import com.nononsenseapps.feeder.archmodel.swipeAsReadFromString
 import com.nononsenseapps.feeder.archmodel.syncFrequencyFromString
@@ -156,6 +157,7 @@ open class OPMLImporter(
                 settingsStore.setTranslationApiSettings(newSettings)
             }
             UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> settingsStore.setApplyBlocklistToSummaries(value.toBoolean())
+            UserSettings.SETTING_MAX_ARTICLE_SIZE -> settingsStore.setMaxArticleSize(maxArticleSizeFromString(value))
         }
     }
 

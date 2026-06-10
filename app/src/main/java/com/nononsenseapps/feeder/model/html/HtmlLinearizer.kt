@@ -20,6 +20,8 @@ class HtmlLinearizer(
     private val tooLargeText: String,
     private val openInBrowserText: String,
     private val articleLink: String,
+    private val maxElements: Int = MAX_ELEMENTS,
+    private val maxChars: Int = MAX_CHARS,
 ) {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
     private var idHolder: IdHolder = {
@@ -768,7 +770,7 @@ class HtmlLinearizer(
     private fun ListBuilderScope<LinearElement>.addLimited(element: LinearElement) {
         if (truncated) return
         elementCount++
-        if (elementCount > MAX_ELEMENTS || charCount > MAX_CHARS) {
+        if (elementCount > maxElements || charCount > maxChars) {
             truncated = true
             Log.w(LOG_TAG, "LinearArticle limits reached. Elements: $elementCount, Chars: $charCount. Truncating...")
             return

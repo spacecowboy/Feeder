@@ -437,6 +437,22 @@ class SettingsStore(
             ).apply()
     }
 
+    private val _maxArticleSize =
+        MutableStateFlow(
+            maxArticleSizeFromString(
+                sp.getStringNonNull(PREF_MAX_ARTICLE_SIZE, MaxArticleSize.MB_1.name),
+            ),
+        )
+    val maxArticleSize: StateFlow<MaxArticleSize> = _maxArticleSize.asStateFlow()
+
+    fun setMaxArticleSize(value: MaxArticleSize) {
+        _maxArticleSize.value = value
+        sp
+            .edit()
+            .putString(PREF_MAX_ARTICLE_SIZE, value.name)
+            .apply()
+    }
+
     private val _swipeAsRead =
         MutableStateFlow(
             swipeAsReadFromString(
@@ -695,6 +711,7 @@ const val PREF_FONT = "pref_font"
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
 const val PREF_MAX_LINES = "pref_max_lines"
+const val PREF_MAX_ARTICLE_SIZE = "pref_max_article_size"
 
 const val PREFS_FILTER_SAVED = "prefs_filter_saved"
 const val PREFS_FILTER_RECENTLY_READ = "prefs_filter_recently_read"
@@ -797,6 +814,7 @@ enum class UserSettings(
     SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS(key = PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS),
     SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT),
     SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
+    SETTING_MAX_ARTICLE_SIZE(key = PREF_MAX_ARTICLE_SIZE),
     ;
 
     companion object {
@@ -854,6 +872,19 @@ enum class SyncFrequency(
     EVERY_6_HOURS(360L, R.string.sync_option_every_6_hours),
     EVERY_12_HOURS(720L, R.string.sync_option_every_12_hours),
     EVERY_DAY(1440L, R.string.sync_option_every_day),
+}
+
+enum class MaxArticleSize(
+    val bytes: Int,
+    @StringRes val stringId: Int,
+) {
+    MB_1(1 * 1024 * 1024, R.string.max_article_size_1mb),
+    MB_2(2 * 1024 * 1024, R.string.max_article_size_2mb),
+    MB_4(4 * 1024 * 1024, R.string.max_article_size_4mb),
+    MB_5(5 * 1024 * 1024, R.string.max_article_size_5mb),
+    MB_8(8 * 1024 * 1024, R.string.max_article_size_8mb),
+    MB_10(10 * 1024 * 1024, R.string.max_article_size_10mb),
+    UNLIMITED(Int.MAX_VALUE, R.string.max_article_size_unlimited),
 }
 
 enum class FeedItemStyle(
@@ -953,6 +984,13 @@ fun syncFrequencyFromString(value: String) =
             it.minutes == value.toLongOrNull()
         }
         ?: SyncFrequency.MANUAL
+
+fun maxArticleSizeFromString(value: String): MaxArticleSize =
+    try {
+        MaxArticleSize.valueOf(value.uppercase())
+    } catch (_: Exception) {
+        MaxArticleSize.MB_1
+    }
 
 data class PrefsFeedListFilter(
     override val saved: Boolean,
