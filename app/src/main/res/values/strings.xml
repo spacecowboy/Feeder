@@ -109,6 +109,16 @@
   <string name="max_feed_items">Max items per feed</string>
   <string name="could_not_load_url">Could not load URL</string>
 
+  <string name="max_article_size">Maximum article size</string>
+  <string name="max_article_size_1mb">1 MB (default)</string>
+  <string name="max_article_size_2mb">2 MB</string>
+  <string name="max_article_size_4mb">4 MB</string>
+  <string name="max_article_size_5mb">5 MB</string>
+  <string name="max_article_size_8mb">8 MB</string>
+  <string name="max_article_size_10mb">10 MB</string>
+  <string name="max_article_size_unlimited">Unlimited</string>
+  <string name="max_article_size_warning">Warning: values above 1 MB may cause crashes on low-memory devices.</string>
+
   <string name="theme_system">System</string>
   <string name="theme_automatic">Auto</string>
   <string name="theme_day">Day</string>

@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.archmodel.MaxArticleSize
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
@@ -104,7 +105,8 @@ class ArticleViewModel(
         combine(
             articleFlow,
             displayFullTextOverride,
-        ) { article, fullTextOverride ->
+            repository.maxArticleSize,
+        ) { article, fullTextOverride, _ ->
             article?.let {
                 it to (fullTextOverride ?: it.fullTextByDefault)
             }
@@ -305,11 +307,14 @@ class ArticleViewModel(
         logDebug(LOG_TAG, "parseArticleContent(${article.id}, $fullText)")
         return try {
             withContext(Dispatchers.IO) {
+                val sizeLimit = repository.maxArticleSize.value
                 val htmlLinearizer =
                     HtmlLinearizer(
                         tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
                         openInBrowserText = application.getString(R.string.open_in_web_view),
                         articleLink = article.link ?: "",
+                        maxElements = if (sizeLimit == MaxArticleSize.UNLIMITED) Int.MAX_VALUE else HtmlLinearizer.MAX_ELEMENTS,
+                        maxChars = if (sizeLimit == MaxArticleSize.UNLIMITED) Int.MAX_VALUE else HtmlLinearizer.MAX_CHARS,
                     )
                 when (fullText) {
                     false -> {
@@ -381,13 +386,11 @@ class ArticleViewModel(
                                         textToDisplay.update { TextToDisplay.CONTENT }
                                     }
                             } catch (e: Exception) {
-                                // EOFException is possible
                                 Log.e(LOG_TAG, "Could not open blob", e)
                                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                                 LinearArticle(elements = emptyList())
                             }
                         } else {
-                            // Error text should already be set above
                             LinearArticle(elements = emptyList())
                         }
                     }
@@ -591,11 +594,14 @@ class ArticleViewModel(
                         isFullText = fullText,
                     ) ?: throw IllegalStateException("Translation failed")
 
+                val sizeLimit = repository.maxArticleSize.value
                 translatedArticleContent.value =
                     HtmlLinearizer(
                         tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
                         openInBrowserText = application.getString(R.string.open_in_web_view),
                         articleLink = article.link ?: "",
+                        maxElements = if (sizeLimit == MaxArticleSize.UNLIMITED) Int.MAX_VALUE else HtmlLinearizer.MAX_ELEMENTS,
+                        maxChars = if (sizeLimit == MaxArticleSize.UNLIMITED) Int.MAX_VALUE else HtmlLinearizer.MAX_CHARS,
                     ).linearize(
                         translation.translatedHtml,
                         article.feedUrl ?: "",
