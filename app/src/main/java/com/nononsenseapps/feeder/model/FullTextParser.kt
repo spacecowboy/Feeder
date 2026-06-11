@@ -84,7 +84,9 @@ class FullTextParser(
                         val body = response.body
 
                         val contentLength = body.contentLength()
+                        logDebug(LOG_TAG, "contentLength: $contentLength")
                         if (contentLength > MAX_FULL_TEXT_BYTES) {
+                            Log.i(LOG_TAG, "contentLength exceeds MAX LIMIT ($MAX_FULL_TEXT_BYTES) bytes")
                             return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
                         }
 
@@ -99,7 +101,9 @@ class FullTextParser(
                             }
                         }
 
+                        logDebug(LOG_TAG, "buffer size: ${buffer.size}")
                         if (buffer.size > maxBytes) {
+                            Log.i(LOG_TAG, "buffer exceeds MAX LIMIT ($MAX_FULL_TEXT_BYTES) bytes")
                             return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
                         }
 
@@ -164,9 +168,10 @@ class FullTextParser(
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
 
-        // 1 MB, giving a bit of leeway to allow for inline images but this is way higher
-        // than is possible to render. It will be truncated by HtmlLinearizer.
-        const val MAX_FULL_TEXT_BYTES = 1 * 1024 * 1024
+        // giving a bit of leeway to allow for inline images and junk like inline CSS and javscript
+        // but this is way higher than is possible to render if actual HTML.
+        // It will be truncated by HtmlLinearizer in that case.
+        const val MAX_FULL_TEXT_BYTES = 3 * 1024 * 1024
     }
 }
 
