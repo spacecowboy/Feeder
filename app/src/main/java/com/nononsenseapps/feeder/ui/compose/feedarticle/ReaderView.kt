@@ -71,12 +71,12 @@ import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
+import my.nanihadesuka.compose.ColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 import kotlin.math.roundToInt
-import my.nanihadesuka.compose.ColumnScrollbar
-import my.nanihadesuka.compose.ScrollbarSettings
 
 val dateTimeFormat: DateTimeFormatter =
     DateTimeFormatter
