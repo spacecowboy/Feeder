@@ -56,7 +56,7 @@
     <string name="many_unread_articles">%1$s nelasīti raksti</string>
     <string name="other_unread_articles">%1$s nelasīti raksti</string>
     <string name="device_sync">Ierīces sinhronizācija</string>
-    <string name="device_sync_financed_by_community">Šo pakalpojumu apmaksā kopiena. Lūdzu, ziedojiet, ja uzskatāt, ka šī funkcija ir noderīga - jūs vairs nevarat dzīvot bez tās.</string>
+    <string name="device_sync_financed_by_community">Šo pakalpojumu apmaksā kopiena. Lūdzu, ziedojiet, ja uzskatiet, ka šī funkcija ir noderīga - jūs vairs nevariet dzīvot bez tās.</string>
     <string name="add_new_device">Pievienot jaunu ierīci</string>
     <string name="this_device">%1$s (šī ierīce)</string>
     <string name="devices_on_sync_chain">Ierīces sinhronizācijas grupā</string>
@@ -278,11 +278,11 @@
     <string name="pref_animated_paging_title">Animēta lappušu pāršķiršana</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Atsvaidzina</string>
-    <string name="ai_provider">Pakalpojumu sniedzējs</string>
+    <string name="ai_provider">Pakalpojuma sniedzējs</string>
     <string name="provider_deepl">DeepL</string>
     <string name="summary_api_settings">Kopsavilkuma API</string>
     <string name="translation_api_settings">Tulkošanas API</string>
-    <string name="api_provider_summary">Pakalpojumu sniedzējs: %1$s</string>
+    <string name="api_provider_summary">Pakalpojuma sniedzējs: %1$s</string>
     <string name="provider_azure_openai">Azure OpenAI</string>
     <string name="translate_article">Tulkot rakstu</string>
     <string name="apply_blocklist_to_summaries">Piemērot kopsavilkumiem</string>
@@ -304,4 +304,9 @@
     <string name="include_mobile_hotspots">Ieskaitot mobīlos piekļuves punktus</string>
     <string name="notification_channel_description">Notifikācijas parādās tikai priekš neizlasītā iestatītajās lentās</string>
     <string name="toggle_tag_expansion">Pārslēgt birku paplašinājumu</string>
+    <string name="failed_to_fetch_full_article_too_large">Raksts ir pārāk liels. Vai atvērt pārlūkā?</string>
+    <string name="translation_api_settings_info">Izmanto rakstu saraksta un rakstu tulkošanai.</string>
+    <string name="ai_not_configured">Nav iestatīts</string>
+    <string name="provider_none">Nav iestatīts neviens</string>
+    <string name="summary_api_settings_info">Izmanto rakstu apkopošanai.</string>
 </resources>
