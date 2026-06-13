@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.1] - 2026-06-13
+
+### 🐛 Bug Fixes & Minor Changes
+- Increased max article download size to 3 MB from 1 MB (#1164) by @spacecowboy in [#1164](https://github.com/spacecowboy/feeder/pull/1164) 
+- Restored scroll position indicator in the article reader (#1165) by @mvanhorn in [#1165](https://github.com/spacecowboy/feeder/pull/1165) 
+
+### 🌐 Translations
+- Updated Tamil translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/f7b9422f8ddbfa752b5461dbaf740e6b41bff0c5)
+- Updated Czech translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/afb682c96b4d44eb1d909a72ed7217f0b29f4304)
+- Updated Latvian translation using Weblate by @Coool in [commit](https://github.com/spacecowboy/feeder/commit/ac6e0694ab808303cd626219c0fc9e5c4af7da49)
+- Updated Italian translation using Weblate by @Wiccio in [#1159](https://github.com/spacecowboy/feeder/pull/1159) 
+
+
 ## [2.21.0] - 2026-06-08
 
 ### 🚀 Features
@@ -4758,6 +4771,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.21.1]: https://github.com/spacecowboy/feeder/compare/2.21.0..2.21.1
 [2.21.0]: https://github.com/spacecowboy/feeder/compare/2.20.0..2.21.0
 [2.20.0]: https://github.com/spacecowboy/feeder/compare/2.19.0..2.20.0
 [2.19.0]: https://github.com/spacecowboy/feeder/compare/2.18.0..2.19.0
