@@ -12,6 +12,7 @@ import android.view.translation.TranslationResponse
 import android.view.translation.TranslationResponseValue
 import android.view.translation.TranslationSpec
 import androidx.annotation.RequiresApi
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.detectLocaleFromText
 import com.nononsenseapps.feeder.model.hasEnoughTextForLanguageDetection
 import com.nononsenseapps.feeder.model.prepareTextForLanguageDetection
@@ -44,7 +45,7 @@ class LocalTranslator(
         withContext(Dispatchers.IO) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 return@withContext TranslationResult.Error(
-                    content = "Local translation requires Android 12 or newer.",
+                    content = application.getString(R.string.local_translation_requires_android_12),
                 )
             }
 

@@ -615,9 +615,8 @@ fun SyncSetupContent(
                         },
             )
         }
-        // Let this be hard-coded. It should not be localized.
         Text(
-            text = "WARNING! This is a Beta feature. Do an OPML-export of all your feeds before and save as a backup.",
+            text = stringResource(R.string.device_sync_beta_warning),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.fillMaxWidth(),
         )
