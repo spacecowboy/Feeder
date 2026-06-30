@@ -341,4 +341,6 @@
     <string name="local_translation_setup_samsung">Für die lokale Übersetzung auf Samsung-Geräten, öffne die Einstellungen, Allgemeine Verwaltung, Sprache und lade %1$s herunter. Bei einigen Samsung-Modellen findest du diese Option unter Samsung-Tastatur oder Übersetzung; installiere auch die Ausgangssprache, falls Android dich dazu auffordert.</string>
     <string name="local_translation_setup_generic">Für die lokale Übersetzung öffne die Geräteeinstellungen und suche unter System, Allgemeine Einstellungen, Sprachen, oder Übersetzung nach Sprachpaketen für die Übersetzung auf dem Gerät oder im Offline-Modus. Lade %1$s und die Ausgangssprachen herunter, die Sie lesen.</string>
     <string name="failed_to_fetch_full_article_too_large">Artikel ist zu groß. Stattdessen im Browser öffnen?</string>
+    <string name="device_sync_beta_warning">ACHTUNG! Dies ist eine Beta-Funktion. Führe zuvor einen OPML-Export all deiner Feeds durch und speichere ihn als Sicherungskopie.</string>
+    <string name="local_translation_requires_android_12">Für die lokale Übersetzung ist Android 12 oder neuer erforderlich.</string>
 </resources>
