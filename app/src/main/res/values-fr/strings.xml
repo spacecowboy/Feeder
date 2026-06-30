@@ -63,7 +63,7 @@
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Toucher pour lire la vidéo</string>
     <string name="no_email_client">Impossible d’ouvrir le client de messagerie</string>
-    <string name="send_bug_report">Envoyer un rapport de bogue</string>
+    <string name="send_bug_report">Envoyer un rapport de bug</string>
     <string name="sort">Trier par</string>
     <string name="sort_oldest_first">Plus ancien d’abord</string>
     <string name="sort_newest_first">Plus récent d’abord</string>
@@ -159,7 +159,7 @@
     <string name="devices_on_sync_chain">Appareils sur la chaîne de synchronisation</string>
     <string name="scan_or_enter_code">Scanner ou entrer un code</string>
     <string name="sync_code">Code de synchronisation</string>
-    <string name="device_sync_financed_by_community">Ce service est financé par la communauté. Veuillez envisager de faire un don si vous le trouvez utile.</string>
+    <string name="device_sync_financed_by_community">Ce service est financé par la communauté. Envisagez de faire un don si vous le trouvez utile.</string>
     <string name="join_sync_chain">Rejoindre une chaîne de synchronisation</string>
     <string name="only_from_end">Seulement à partir de la fin</string>
     <string name="from_anywhere">À partir de n’importe où</string>
@@ -335,10 +335,12 @@
     <string name="set_translation_language_first">Définissez un langage préféré de traduction dans les paramètres IA</string>
     <string name="translate_feed_cards_by_default">Traduire les prévisualisations d\'articles</string>
     <string name="translate_articles_by_default">Par défaut traduire les articles</string>
-    <string name="failed_to_fetch_full_article_too_large">L\'article est trop grand. L\'ouvrir dans le navigateur ?</string>
+    <string name="failed_to_fetch_full_article_too_large">L\'article est trop gros. Voulez-vous l\'ouvrir dans le navigateur ?</string>
     <string name="provider_local_translation">Local</string>
     <string name="preferred_translation_language_fallback">le langage préféré</string>
     <string name="local_translation_setup_pixel">Pour la traduction en local des téléphones Pixel, ouvrir les paramètres Android, puis Système, Traduction en temps réel, Langages, et ajouter %1$s pour la traduction hors connexion. Selon vôtre version Android le nom des menus peuvent être différents ; installer aussi le langage source si Android le demande.</string>
     <string name="local_translation_setup_samsung">Pour la traduction en local des téléphones Samsung, ouvrir les paramètres, puis Préférences générales, Pack de langues, et télécharger %1$s. Certaines versions Samsung placent le paramètre sous Clavier Samsung ou Traduction ; installer aussi le langage source si Android le demande.</string>
     <string name="local_translation_setup_generic">Pour la traduction en local, ouvrir les paramètres de l\'appareil et chercher en local ou langage de traduction hors connexion sous Système, Paramètres généraux, Langues ou Traduction. Télécharger %1$s et les langages source que vous utilisez.</string>
+    <string name="device_sync_beta_warning">ATTENTION ! Il s\'agit d\'une fonctionnalité expérimentale. Faites un export OPML de tous vos flux et conservez le fichier exporté en backup.</string>
+    <string name="local_translation_requires_android_12">La traduction en local n\'est disponible que sur Android 12 ou plus.</string>
 </resources>
