@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">打开导航菜单</string>
     <string name="navigation_drawer_close">关闭导航菜单</string>
     <string name="action_settings">设置</string>
-    <string name="add_feed">添加订阅</string>
+    <string name="add_feed">添加订阅源</string>
     <string name="title_activity_edit_feed">订阅 Feed</string>
     <string name="url">URL</string>
     <string name="tag">标签</string>
@@ -13,14 +13,14 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">保存</string>
     <string name="empty_feed_top">没有可阅读的内容。您是否想要…</string>
-    <string name="empty_feed_open"><annotation style="link">打开</annotation>另一个订阅？</string>
-    <string name="empty_feed_add"><annotation style="link">添加</annotation>更多订阅？</string>
-    <string name="search_feed_empty_hint">输入一个订阅地址</string>
+    <string name="empty_feed_open"><annotation style="link">打开</annotation> 另一个订阅源？</string>
+    <string name="empty_feed_add"><annotation style="link">添加</annotation> 更多订阅源？</string>
+    <string name="search_feed_empty_hint">输入订阅源地址</string>
     <string name="mark_as_read">标记为已读</string>
     <string name="mark_as_unread">标记为未读</string>
     <string name="mark_all_as_read">全部标记为已读</string>
-    <string name="edit_feed">编辑订阅</string>
-    <string name="delete_feed">删除订阅</string>
+    <string name="edit_feed">编辑订阅源</string>
+    <string name="delete_feed">删除订阅源</string>
     <string name="show_all_items">显示全部内容</string>
     <string name="show_unread_items">显示未读内容</string>
     <string name="new_items_available">有新的内容</string>
@@ -33,8 +33,8 @@
     <string name="open_in_browser">在浏览器中打开</string>
     <string name="open_enclosed_media">打开内嵌媒体</string>
     <string name="sync">同步</string>
-    <string name="export_feeds_to_opml">将订阅导出为 OPML</string>
-    <string name="import_feeds_from_opml">从 OPML 导入订阅</string>
+    <string name="export_feeds_to_opml">将订阅源导出为 OPML</string>
+    <string name="import_feeds_from_opml">从 OPML 导入订阅源</string>
     <string name="view_debug_log">查看调试日志</string>
     <string name="new_based_on_this">在此基础上新建</string>
     <string name="indicator_for_mark_as_read">标记为已读的标志</string>
@@ -42,7 +42,7 @@
     <string name="no_such_feed">找不到这样的订阅。也许可以试试 HTTPS？</string>
     <string name="nothing_to_display">没有可显示内容！</string>
     <string name="title_activity_settings">设置</string>
-    <string name="all_feeds">全部订阅</string>
+    <string name="all_feeds">所有订阅源</string>
     <string name="sync_option_manually">手动</string>
     <string name="sync_option_every_15min">每 15 分钟</string>
     <string name="sync_option_every_30min">每 30 分钟</string>
@@ -62,8 +62,8 @@
     <string name="on_startup">应用启动时</string>
     <string name="show_fab">显示悬浮操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
-    <string name="updated_feeds">更新订阅</string>
-    <string name="notification_channel_name">未读订阅</string>
+    <string name="updated_feeds">已更新订阅源</string>
+    <string name="notification_channel_name">未读订阅源</string>
     <string name="notification_channel_description">仅对已配置订阅中的未读内容显示通知</string>
     <string name="open_in_reader">阅读器</string>
     <string name="open_in_webview">网页视图</string>
@@ -74,7 +74,7 @@
     <string name="reader_settings">阅读器</string>
     <string name="open_link_in_web_view">以网页视图打开链接</string>
     <string name="open_in_web_view">在网页视图中打开</string>
-    <string name="max_feed_items">每个订阅的最大内容数</string>
+    <string name="max_feed_items">每个订阅源的最大内容数</string>
     <string name="could_not_load_url">无法加载 URL</string>
     <string name="theme_system">跟随系统</string>
     <string name="theme_automatic">自动</string>
@@ -88,7 +88,7 @@
     <string name="no_email_client">无法打开电子邮件客户端</string>
     <string name="touch_to_play_video">轻触播放视频</string>
     <string name="javascript">Javascript</string>
-    <string name="open_feed">打开订阅</string>
+    <string name="open_feed">打开订阅源</string>
     <string name="mark_items_above_as_read">标记以上内容为已读</string>
     <string name="mark_items_below_as_read">标记以下内容为已读</string>
     <string name="discovered_feeds_list">已发现订阅列表</string>
@@ -341,4 +341,6 @@
     <string name="local_translation_setup_samsung">对于 Samsung 设备上的本地翻译，请打开设置、常规管理、语言包，下载 %1$s。某些 Samsung 版本将其置于 Samsung 键盘或翻译下；如果 Android 要求，请安装源语言。</string>
     <string name="local_translation_setup_generic">对于本地翻译，请打开设备的设置应用，然后在系统、常规管理、语言或翻译下查找设备端或离线翻译语言包。下载 %1$s 以及您阅读的源语言。</string>
     <string name="failed_to_fetch_full_article_too_large">文章太大。改为在浏览器中打开？</string>
+    <string name="device_sync_beta_warning">警告！这是一项测试功能。使用前请先将所有订阅源导出为 OPML 文件并保存为备份。</string>
+    <string name="local_translation_requires_android_12">本地翻译需要 Android 12 或更高版本。</string>
 </resources>
