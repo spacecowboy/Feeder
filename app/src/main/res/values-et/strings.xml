@@ -341,4 +341,6 @@
     <string name="local_translation_setup_samsung">Kohaliku tõlke kasutamiseks Samsungi nutiseadmetes ava menüü „Seaded“, „Üldhaldus“, „Keelepaketid“ ja laadi alla %1$s. Mõnes Samsungi versioonis asub see valik menüü all „Samsungi klaviatuur“ või „Tõlge“; kui Android seda küsib, paigalda ka lähtekeel.</string>
     <string name="local_translation_setup_pixel">Kohaliku tõlke kasutamiseks Pixel-telefonides ava Androidi seadistsued (seaded), seejärel vali „Süsteem“, „Reaalajas tõlkimine“, „Keeled“ ja lisa %1$s, et kasutada tõlget vallasrežiimis. Menüüde nimetused võivad Androidi versioonist olenevalt erineda; kui Android seda küsib, paigalda ka lähtekeel.</string>
     <string name="failed_to_fetch_full_article_too_large">Artikkel on liiga pikk. Kas pigem tahaksid ta avada veebibrauseris?</string>
+    <string name="device_sync_beta_warning">HOIATUS! See on beeta-järgus funktsionaalsus. Enne ekspordi kõik oma uudisvood OPML-failina ja salvesta nad varukoopiana.</string>
+    <string name="local_translation_requires_android_12">Kohalik tõlkimine eeldab, et kasutusel on Android 12 või uuem.</string>
 </resources>
