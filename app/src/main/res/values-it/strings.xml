@@ -341,4 +341,6 @@
     <string name="set_translation_language_first">Imposta una lingua di traduzione preferita nelle impostazioni IA</string>
     <string name="translate_feed_cards_by_default">Traduci le anteprime degli articoli</string>
     <string name="translate_articles_by_default">Traduci gli articoli per impostazione predefinita</string>
+    <string name="device_sync_beta_warning">ATTENZIONE! Questa feature è ancora in Beta. Prima di continuare, fai un backup OPML di tutti i tuoi feed.</string>
+    <string name="local_translation_requires_android_12">La traduzione locale richiede una versione Android 12 o più recente.</string>
 </resources>
