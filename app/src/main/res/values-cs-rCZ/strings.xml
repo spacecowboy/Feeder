@@ -341,4 +341,6 @@
     <string name="local_translation_setup_samsung">Pro lokální překlad na zařízeních Samsung otevřete Nastavení, Obecná správa, Jazykové balíčky a stáhněte si jazyk %1$s. Některé verze Samsungů mají toto nastavení v Klávesnici Samsung nebo Překladu; pokud ho Android bude chtít, nainstalujte také zdrojový jazyk.</string>
     <string name="local_translation_setup_generic">Pro lokální překlad na zařízeních otevřete Nastavení a hledejte místní nebo offline jazykové balíčky v kategoriích Systém, Obecná správa, Jazyky nebo Překlad. Stáhněte si jazyk %1$s a jazyky, které čtete.</string>
     <string name="failed_to_fetch_full_article_too_large">Článek je příliš velký. Chcete jej otevřít v prohlížeči?</string>
+    <string name="device_sync_beta_warning">VAROVÁNÍ! Toto je Beta funkce. Před jejím povolením proveďte export OPML všech vašich kanálů a uložte jej jako zálohu.</string>
+    <string name="local_translation_requires_android_12">Místní překlad vyžaduje Android 12 nebo novější.</string>
 </resources>
