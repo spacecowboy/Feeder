@@ -120,6 +120,13 @@ class FeedViewModel(
             repository.deleteFeeds(feedIds)
         }
 
+    fun renameTag(
+        oldTag: String,
+        newTag: String,
+    ) = applicationCoroutineScope.launch {
+        // TODO: implement tag renaming in repository
+    }
+
     fun markAllAsRead() =
         applicationCoroutineScope.launch {
             val (feedId, feedTag) = repository.currentFeedAndTag.value
@@ -349,6 +356,12 @@ class FeedViewModel(
         deleteDialogVisible.update { visible }
     }
 
+    private val renameTagDialogVisible = MutableStateFlow(false)
+
+    fun setShowRenameTagDialog(visible: Boolean) {
+        renameTagDialogVisible.update { visible }
+    }
+
     private fun setCurrentArticle(itemId: Long) {
         repository.setCurrentArticle(itemId)
         repository.setIsArticleOpen(true)
@@ -452,6 +465,7 @@ class FeedViewModel(
             repository.showTitleUnreadCount,
             repository.syncWorkerRunning,
             repository.isOpenDrawerOnFab,
+            renameTagDialogVisible,
         ) { params: Array<Any> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
@@ -471,6 +485,7 @@ class FeedViewModel(
                 feedScreenTitle = params[8] as ScreenTitle,
                 showEditDialog = params[9] as Boolean,
                 showDeleteDialog = params[10] as Boolean,
+                showRenameTagDialog = params[28] as Boolean,
                 visibleFeeds = params[11] as List<FeedTitle>,
                 isArticleOpen = params[12] as Boolean,
                 // 13
@@ -606,6 +621,7 @@ data class FeedState(
     override val showToolbarMenu: Boolean = false,
     override val showDeleteDialog: Boolean = false,
     override val showEditDialog: Boolean = false,
+    override val showRenameTagDialog: Boolean = false,
     // Defaults to true so empty screen doesn't appear before load
     override val haveVisibleFeedItems: Boolean = true,
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
@@ -639,6 +655,7 @@ interface FeedScreenViewState {
     val showToolbarMenu: Boolean
     val showDeleteDialog: Boolean
     val showEditDialog: Boolean
+    val showRenameTagDialog: Boolean
     val haveVisibleFeedItems: Boolean
     val swipeAsRead: SwipeAsRead
     val markAsReadOnScroll: Boolean
