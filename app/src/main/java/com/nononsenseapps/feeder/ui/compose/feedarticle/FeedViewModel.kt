@@ -24,6 +24,8 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.PodcastPlayerState
+import com.nononsenseapps.feeder.model.PodcastPlayerStateHolder
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
@@ -56,6 +58,7 @@ class FeedViewModel(
     FeedListFilterCallback {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val translationManager: TranslationManager by instance()
 
@@ -452,10 +455,12 @@ class FeedViewModel(
             repository.showTitleUnreadCount,
             repository.syncWorkerRunning,
             repository.isOpenDrawerOnFab,
+            podcastPlayerStateHolder.playerState,
         ) { params: Array<Any> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
             val ttsState = params[14] as PlaybackStatus
+            val podcastPlayerState = params[28] as PodcastPlayerState
 
             @Suppress("UNCHECKED_CAST")
             FeedState(
@@ -477,8 +482,8 @@ class FeedViewModel(
                 currentFeedOrTag = currentFeedOrTag,
                 // 14
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
-                // 14
-                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
+                podcastPlayerState = podcastPlayerState,
+                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED || podcastPlayerState.isVisible,
                 swipeAsRead = params[15] as SwipeAsRead,
                 ttsLanguages = params[16] as List<Locale>,
                 markAsReadOnScroll = params[17] as Boolean,
@@ -502,6 +507,26 @@ class FeedViewModel(
         ttsStateHolder.stop()
     }
 
+    fun podcastPlay() {
+        podcastPlayerStateHolder.play()
+    }
+
+    fun podcastPause() {
+        podcastPlayerStateHolder.pause()
+    }
+
+    fun podcastStop() {
+        podcastPlayerStateHolder.stop()
+    }
+
+    fun podcastSeekBy(deltaMillis: Int) {
+        podcastPlayerStateHolder.seekBy(deltaMillis)
+    }
+
+    fun podcastSeekTo(positionMillis: Int) {
+        podcastPlayerStateHolder.seekTo(positionMillis)
+    }
+
     fun ttsPause() {
         ttsStateHolder.pause()
     }
@@ -515,6 +540,7 @@ class FeedViewModel(
     }
 
     fun ttsPlay() {
+        podcastPlayerStateHolder.stop()
         viewModelScope.launch(Dispatchers.IO) {
             val article =
                 repository.getCurrentArticle()
@@ -602,6 +628,7 @@ data class FeedState(
     override val expandedTags: Set<String> = emptySet(),
     override val isBottomBarVisible: Boolean = false,
     override val isTTSPlaying: Boolean = false,
+    override val podcastPlayerState: PodcastPlayerState = PodcastPlayerState(),
     override val ttsLanguages: List<Locale> = emptyList(),
     override val showToolbarMenu: Boolean = false,
     override val showDeleteDialog: Boolean = false,
@@ -635,6 +662,7 @@ interface FeedScreenViewState {
     val expandedTags: Set<String>
     val isBottomBarVisible: Boolean
     val isTTSPlaying: Boolean
+    val podcastPlayerState: PodcastPlayerState
     val ttsLanguages: List<Locale>
     val showToolbarMenu: Boolean
     val showDeleteDialog: Boolean
