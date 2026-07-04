@@ -126,6 +126,7 @@ import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
+import com.nononsenseapps.feeder.ui.compose.feedarticle.HideablePodcastPlayer
 import com.nononsenseapps.feeder.ui.compose.feedarticle.TranslatedFeedCards
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnreadAndSaved
@@ -311,6 +312,12 @@ fun FeedScreen(
             ttsOnStop = viewModel::ttsStop,
             ttsOnSkipNext = viewModel::ttsSkipNext,
             ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+            podcastOnPlay = viewModel::podcastPlay,
+            podcastOnPause = viewModel::podcastPause,
+            podcastOnStop = viewModel::podcastStop,
+            podcastOnSeekBack = { viewModel.podcastSeekBy(-10_000) },
+            podcastOnSeekForward = { viewModel.podcastSeekBy(10_000) },
+            podcastOnSeekTo = viewModel::podcastSeekTo,
             onAddFeed = { SearchFeedDestination.navigate(navController) },
             onEditFeed = { feedId ->
                 EditFeedDestination.navigate(navController, feedId)
@@ -509,6 +516,12 @@ fun FeedScreen(
     ttsOnStop: () -> Unit,
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
+    podcastOnPlay: () -> Unit,
+    podcastOnPause: () -> Unit,
+    podcastOnStop: () -> Unit,
+    podcastOnSeekBack: () -> Unit,
+    podcastOnSeekForward: () -> Unit,
+    podcastOnSeekTo: (Int) -> Unit,
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
     onShowEditDialog: () -> Unit,
@@ -572,6 +585,12 @@ fun FeedScreen(
         ttsOnStop = ttsOnStop,
         ttsOnSkipNext = ttsOnSkipNext,
         ttsOnSelectLanguage = ttsOnSelectLanguage,
+        podcastOnPlay = podcastOnPlay,
+        podcastOnPause = podcastOnPause,
+        podcastOnStop = podcastOnStop,
+        podcastOnSeekBack = podcastOnSeekBack,
+        podcastOnSeekForward = podcastOnSeekForward,
+        podcastOnSeekTo = podcastOnSeekTo,
         onDismissDeleteDialog = onDismissDeleteDialog,
         onDismissEditDialog = onDismissEditDialog,
         onDelete = onDeleteFeeds,
@@ -1060,6 +1079,12 @@ fun FeedScreen(
     ttsOnStop: () -> Unit,
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
+    podcastOnPlay: () -> Unit,
+    podcastOnPause: () -> Unit,
+    podcastOnStop: () -> Unit,
+    podcastOnSeekBack: () -> Unit,
+    podcastOnSeekForward: () -> Unit,
+    podcastOnSeekTo: (Int) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
@@ -1172,21 +1197,34 @@ fun FeedScreen(
             )
         },
         bottomBar = {
-            HideableTTSPlayer(
-                visibleState = bottomBarVisibleState,
-                currentlyPlaying = viewState.isTTSPlaying,
-                onPlay = ttsOnPlay,
-                onPause = ttsOnPause,
-                onStop = ttsOnStop,
-                onSkipNext = ttsOnSkipNext,
-                languages = ImmutableHolder(viewState.ttsLanguages),
-                onSelectLanguage = ttsOnSelectLanguage,
-                floatingActionButton =
-                    when (viewState.showFab) {
-                        true -> floatingActionButton
-                        false -> null
-                    },
-            )
+            if (viewState.podcastPlayerState.isVisible) {
+                HideablePodcastPlayer(
+                    visibleState = bottomBarVisibleState,
+                    viewState = viewState.podcastPlayerState,
+                    onPlay = podcastOnPlay,
+                    onPause = podcastOnPause,
+                    onStop = podcastOnStop,
+                    onSeekBack = podcastOnSeekBack,
+                    onSeekForward = podcastOnSeekForward,
+                    onSeekTo = podcastOnSeekTo,
+                )
+            } else {
+                HideableTTSPlayer(
+                    visibleState = bottomBarVisibleState,
+                    currentlyPlaying = viewState.isTTSPlaying,
+                    onPlay = ttsOnPlay,
+                    onPause = ttsOnPause,
+                    onStop = ttsOnStop,
+                    onSkipNext = ttsOnSkipNext,
+                    languages = ImmutableHolder(viewState.ttsLanguages),
+                    onSelectLanguage = ttsOnSelectLanguage,
+                    floatingActionButton =
+                        when (viewState.showFab) {
+                            true -> floatingActionButton
+                            false -> null
+                        },
+                )
+            }
         },
         floatingActionButton = {
             if (viewState.showFab) {
