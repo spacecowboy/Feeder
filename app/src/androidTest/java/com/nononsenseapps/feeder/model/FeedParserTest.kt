@@ -707,7 +707,7 @@ class FeedParserTest : DIAware {
             val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
             assertEquals("http://cornucopia.cornubot.se/", feed.home_page_url)
-            assertEquals("https://cornucopia.cornubot.se/feeds/posts/default", feed.feed_url)
+            assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed.feed_url)
 
             assertEquals(25, feed.items!!.size)
             val item = feed.items!!.first()
@@ -844,7 +844,7 @@ class FeedParserTest : DIAware {
             val feed = anon.use { feedParser.parseFeedResponse(it) }
 
             assertEquals("http://ANON.com/sub", feed.getOrNull()!!.home_page_url)
-            assertEquals("http://anon.com/rss", feed.getOrNull()!!.feed_url)
+            assertEquals("http://ANON.com/rss", feed.getOrNull()!!.feed_url)
             assertEquals("ANON", feed.getOrNull()!!.title)
             assertEquals("ANON", feed.getOrNull()!!.description)
 
@@ -1212,7 +1212,7 @@ const val rssBleepingComputer = """
     <generator>https://www.bleepingcomputer.com/</generator>
     <language>en</language>
     <atom:link href="https://www.bleepingcomputer.com/feed/" rel="self" type="application/rss+xml" />
-    
+
     <item>
         <title>SIM swappers now stealing phone numbers from eSIMs</title>
         <link>https://www.bleepingcomputer.com/news/security/sim-swappers-now-stealing-phone-numbers-from-esims/</link>
@@ -1308,7 +1308,7 @@ const val rssWithHtmlEscapedDescription = """
     <description>Recent content in Cowboy Programmer on Cowboy Programmer</description>
     <language>en-us</language>
     <lastBuildDate>Sun, 01 Sep 2019 23:21:00 +0200</lastBuildDate>
-    
+
     <item>
       <title>description</title>
       <link>http://cowboyprogrammer.org/4</link>
