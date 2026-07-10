@@ -66,6 +66,17 @@ class FeedStoreTest : DIAware {
     }
 
     @Test
+    fun renameTag() {
+        runBlocking {
+            store.renameTag("oldTag", "newTag")
+        }
+
+        coVerify {
+            dao.renameTag("oldTag", "newTag")
+        }
+    }
+
+    @Test
     fun deleteFeeds() {
         runBlocking {
             store.deleteFeeds(listOf(3L, 5L))
