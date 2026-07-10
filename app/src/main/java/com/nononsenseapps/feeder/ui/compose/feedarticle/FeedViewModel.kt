@@ -124,7 +124,7 @@ class FeedViewModel(
         oldTag: String,
         newTag: String,
     ) = applicationCoroutineScope.launch {
-        // TODO: implement tag renaming in repository
+        repository.renameTag(oldTag, newTag)
     }
 
     fun markAllAsRead() =
