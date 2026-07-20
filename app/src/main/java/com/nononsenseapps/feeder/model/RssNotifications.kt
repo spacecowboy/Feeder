@@ -49,6 +49,7 @@ import org.kodein.di.instance
 const val SUMMARY_NOTIFICATION_ID = 2_147_483_646
 private const val CHANNEL_ID = "feederNotifications"
 private const val ARTICLE_NOTIFICATION_GROUP = "com.nononsenseapps.feeder.ARTICLE"
+internal const val ACTION_OPEN_IN_CUSTOM_TAB = "com.nononsenseapps.feeder.OPEN_IN_CUSTOM_TAB"
 
 private const val LOG_TAG = "FEEDER_NOTIFY"
 
@@ -140,6 +141,7 @@ private suspend fun singleNotification(
 ): Notification {
     val di by closestDI(context)
     val repository: Repository by di.instance()
+    val articleOpener = repository.getArticleOpener(item.id)
 
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
@@ -148,15 +150,7 @@ private suspend fun singleNotification(
     style.bigText(text)
     style.setBigContentTitle(title)
 
-    val contentIntent =
-        Intent(
-            Intent.ACTION_VIEW,
-            "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
-            context,
-            MainActivity::class.java,
-        ).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+    val contentIntent = getArticleNotificationIntent(context, item.id, item.link, articleOpener)
 
     val pendingIntent =
         PendingIntent.getActivity(
@@ -171,6 +165,7 @@ private suspend fun singleNotification(
     builder
         .setContentText(text)
         .setContentTitle(title)
+        .setContentIntent(pendingIntent)
         .setGroup(ARTICLE_NOTIFICATION_GROUP)
         .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
@@ -178,19 +173,6 @@ private suspend fun singleNotification(
         .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
-
-    if (repository.getArticleOpener(item.id) == ItemOpener.DEFAULT_BROWSER && item.link != null) {
-        builder.setContentIntent(
-            PendingIntent.getActivity(
-                context,
-                item.id.toInt(),
-                getOpenInDefaultActivityIntent(context, item.id, item.link),
-                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-            ),
-        )
-    } else {
-        builder.setContentIntent(pendingIntent)
-    }
 
     item.enclosureLink?.let { enclosureLink ->
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(enclosureLink))
@@ -207,7 +189,7 @@ private suspend fun singleNotification(
         )
     }
 
-    if (repository.getArticleOpener(item.id) != ItemOpener.DEFAULT_BROWSER) {
+    if (articleOpener != ItemOpener.DEFAULT_BROWSER) {
         item.link?.let { link ->
             builder.addAction(
                 R.drawable.notification_open_in_browser,
@@ -236,6 +218,31 @@ private suspend fun singleNotification(
     style.setBuilder(builder)
     return style.build() ?: error("Null??")
 }
+
+internal fun getArticleNotificationIntent(
+    context: Context,
+    feedItemId: Long,
+    link: String?,
+    articleOpener: ItemOpener,
+): Intent =
+    when {
+        link == null || articleOpener == ItemOpener.READER ->
+            Intent(
+                Intent.ACTION_VIEW,
+                "$DEEP_LINK_BASE_URI/article/$feedItemId".toUri(),
+                context,
+                MainActivity::class.java,
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+        articleOpener == ItemOpener.CUSTOM_TAB ->
+            getOpenInDefaultActivityIntent(context, feedItemId, link).apply {
+                action = ACTION_OPEN_IN_CUSTOM_TAB
+            }
+
+        else -> getOpenInDefaultActivityIntent(context, feedItemId, link)
+    }
 
 internal fun getOpenInDefaultActivityIntent(
     context: Context,

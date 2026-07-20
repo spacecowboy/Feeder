@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.ACTION_OPEN_IN_CUSTOM_TAB
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.DEEP_LINK_HOST
@@ -68,10 +69,18 @@ class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
 
         if (link != null) {
             try {
-                activityLauncher.openLinkInBrowser(
-                    link,
-                    openAdjacentIfSuitable = false,
-                )
+                if (intent.action == ACTION_OPEN_IN_CUSTOM_TAB) {
+                    activityLauncher.openLinkInCustomTab(
+                        link,
+                        toolbarColor = getColor(R.color.primary),
+                        openAdjacentIfSuitable = false,
+                    )
+                } else {
+                    activityLauncher.openLinkInBrowser(
+                        link,
+                        openAdjacentIfSuitable = false,
+                    )
+                }
             } catch (e: Throwable) {
                 e.printStackTrace()
                 Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
