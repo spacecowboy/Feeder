@@ -53,6 +53,13 @@ class FeedStore(
 
     suspend fun getDisplayTitle(feedId: Long): String? = feedDao.getFeedTitle(feedId)?.displayTitle
 
+    suspend fun renameTag(
+        oldTag: String,
+        newTag: String,
+    ) {
+        feedDao.renameTag(oldTag, newTag)
+    }
+
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedDao.deleteFeeds(feedIds)
     }

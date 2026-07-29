@@ -187,6 +187,36 @@ class RepositoryTest : DIAware {
     }
 
     @Test
+    fun renameTagNotCurrentTag() {
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(5L to "anotherTag")
+
+        runBlocking {
+            repository.renameTag("oldTag", "newTag")
+        }
+
+        coVerify {
+            feedStore.renameTag("oldTag", "newTag")
+        }
+        verify(exactly = 0) {
+            repository.setCurrentFeedAndTag(any(), any())
+        }
+    }
+
+    @Test
+    fun renameTagIsCurrentTag() {
+        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(ID_UNSET to "oldTag")
+
+        runBlocking {
+            repository.renameTag("oldTag", "newTag")
+        }
+
+        coVerify {
+            feedStore.renameTag("oldTag", "newTag")
+            repository.setCurrentFeedAndTag(ID_UNSET, "newTag")
+        }
+    }
+
+    @Test
     fun getTextToDisplayForItem() {
         coEvery { feedItemStore.getFullTextByDefault(5L) } returns true
         coEvery { feedItemStore.getFullTextByDefault(6L) } returns false

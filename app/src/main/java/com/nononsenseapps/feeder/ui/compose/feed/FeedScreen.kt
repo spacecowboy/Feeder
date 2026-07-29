@@ -122,6 +122,7 @@ import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
+import com.nononsenseapps.feeder.ui.compose.dialog.RenameTagDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
@@ -324,11 +325,20 @@ fun FeedScreen(
             onDeleteFeeds = { feedIds ->
                 viewModel.deleteFeeds(feedIds.toList())
             },
+            onRenameTag = { oldTag, newTag ->
+                viewModel.renameTag(oldTag, newTag)
+            },
             onShowDeleteDialog = {
                 viewModel.setShowDeleteDialog(true)
             },
             onDismissDeleteDialog = {
                 viewModel.setShowDeleteDialog(false)
+            },
+            onShowRenameTagDialog = {
+                viewModel.setShowRenameTagDialog(true)
+            },
+            onDismissRenameTagDialog = {
+                viewModel.setShowRenameTagDialog(false)
             },
             onSettings = {
                 SettingsDestination.navigate(navController)
@@ -516,6 +526,9 @@ fun FeedScreen(
     onDeleteFeeds: (Iterable<Long>) -> Unit,
     onShowDeleteDialog: () -> Unit,
     onDismissDeleteDialog: () -> Unit,
+    onRenameTag: (String, String) -> Unit,
+    onShowRenameTagDialog: () -> Unit,
+    onDismissRenameTagDialog: () -> Unit,
     onSettings: () -> Unit,
     onImport: () -> Unit,
     onExportOPML: () -> Unit,
@@ -574,6 +587,9 @@ fun FeedScreen(
         ttsOnSelectLanguage = ttsOnSelectLanguage,
         onDismissDeleteDialog = onDismissDeleteDialog,
         onDismissEditDialog = onDismissEditDialog,
+        onRenameTag = onRenameTag,
+        onShowRenameTagDialog = onShowRenameTagDialog,
+        onDismissRenameTagDialog = onDismissRenameTagDialog,
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
@@ -881,6 +897,24 @@ fun FeedScreen(
                                     Text(stringResource(id = R.string.delete_feed))
                                 },
                             )
+                            if (viewState.feedScreenTitle.type == FeedType.TAG && !viewState.currentFeedOrTag.isFeed) {
+                                HorizontalDivider()
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onShowRenameTagDialog()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Edit,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.rename_tag))
+                                    },
+                                )
+                            }
                             HorizontalDivider()
                             DropdownMenuItem(
                                 onClick = {
@@ -1062,6 +1096,9 @@ fun FeedScreen(
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
+    onRenameTag: (String, String) -> Unit,
+    onShowRenameTagDialog: () -> Unit,
+    onDismissRenameTagDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable (RowScope.() -> Unit),
@@ -1251,6 +1288,15 @@ fun FeedScreen(
                     ),
                 onDismiss = onDismissEditDialog,
                 onEdit = onEditFeed,
+            )
+        }
+        if (viewState.showRenameTagDialog) {
+            RenameTagDialog(
+                currentTagName = viewState.feedScreenTitle.title ?: "",
+                onDismiss = onDismissRenameTagDialog,
+                onRename = { newName ->
+                    onRenameTag(viewState.feedScreenTitle.title ?: "", newName)
+                },
             )
         }
     }

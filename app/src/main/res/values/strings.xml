@@ -25,6 +25,7 @@
   <string name="mark_all_as_read">Mark all as read</string>
   <string name="edit_feed">Edit feed</string>
   <string name="delete_feed">Delete feed</string>
+  <string name="rename_tag">Rename tag</string>
   <string name="show_all_items">Show all items</string>
   <string name="show_unread_items">Show unread items</string>
   <string name="new_items_available">New items available</string>

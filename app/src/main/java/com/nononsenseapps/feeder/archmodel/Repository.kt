@@ -141,6 +141,17 @@ class Repository(
         settingsStore.setCurrentWidgetFeedAndTag(feedId, tag)
     }
 
+    suspend fun renameTag(
+        oldTag: String,
+        newTag: String,
+    ) {
+        feedStore.renameTag(oldTag, newTag)
+        val (currentFeedId, currentTag) = currentFeedAndTag.value
+        if (currentFeedId == ID_UNSET && currentTag == oldTag) {
+            setCurrentFeedAndTag(ID_UNSET, newTag)
+        }
+    }
+
     val isArticleOpen: StateFlow<Boolean> = settingsStore.isArticleOpen
 
     fun setIsArticleOpen(open: Boolean) {
