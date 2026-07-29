@@ -3,8 +3,12 @@ package com.nononsenseapps.feeder.model
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.ui.MainActivity
+import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
+import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,6 +18,59 @@ import kotlin.test.assertNull
 
 @RunWith(AndroidJUnit4::class)
 class RssNotificationsKtTest {
+    @Test
+    fun readerContentIntentPointsToArticle() {
+        val intent = articleNotificationIntent(ItemOpener.READER)
+
+        assertEquals(MainActivity::class.java.name, intent.component?.className)
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals("$DEEP_LINK_BASE_URI/article/5", intent.dataString)
+    }
+
+    @Test
+    fun defaultBrowserContentIntentPointsToProxy() {
+        val intent = articleNotificationIntent(ItemOpener.DEFAULT_BROWSER)
+
+        assertEquals(OpenLinkInDefaultActivity::class.java.name, intent.component?.className)
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals("http://foo", intent.data?.getQueryParameter(COL_LINK))
+    }
+
+    @Test
+    fun customTabContentIntentPointsToProxy() {
+        val intent = articleNotificationIntent(ItemOpener.CUSTOM_TAB)
+
+        assertEquals(OpenLinkInDefaultActivity::class.java.name, intent.component?.className)
+        assertEquals(ACTION_OPEN_IN_CUSTOM_TAB, intent.action)
+        assertEquals("http://foo", intent.data?.getQueryParameter(COL_LINK))
+    }
+
+    @Test
+    fun customTabContentIntentDoesNotCollideWithBrowserAction() {
+        val customTabIntent = articleNotificationIntent(ItemOpener.CUSTOM_TAB)
+        val browserActionIntent =
+            getOpenInDefaultActivityIntent(
+                getInstrumentation().context,
+                5,
+                link = "http://foo",
+            )
+
+        assertFalse(
+            customTabIntent.filterEquals(browserActionIntent),
+            message = "custom-tab content intent should not be considered equal to browser action intent",
+        )
+    }
+
+    @Test
+    fun missingLinkFallsBackToReader() {
+        for (articleOpener in ItemOpener.entries) {
+            val intent = articleNotificationIntent(articleOpener, link = null)
+
+            assertEquals(MainActivity::class.java.name, intent.component?.className)
+            assertEquals("$DEEP_LINK_BASE_URI/article/5", intent.dataString)
+        }
+    }
+
     @Test
     fun openInBrowserIntentPointsToActivityWithIdAndLink() {
         val intent: Intent = getOpenInDefaultActivityIntent(getInstrumentation().context, 99, "http://foo")
@@ -78,4 +135,15 @@ class RssNotificationsKtTest {
             message = "Expected a null query parameter",
         )
     }
+
+    private fun articleNotificationIntent(
+        articleOpener: ItemOpener,
+        link: String? = "http://foo",
+    ): Intent =
+        getArticleNotificationIntent(
+            context = getInstrumentation().context,
+            feedItemId = 5,
+            link = link,
+            articleOpener = articleOpener,
+        )
 }
