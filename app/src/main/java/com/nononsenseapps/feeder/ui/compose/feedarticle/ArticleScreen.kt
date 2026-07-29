@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
+import android.content.Context
 import android.content.Intent
+import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
@@ -86,8 +88,11 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Date
+import java.util.TimeZone
 
 @Composable
 fun ArticleScreen(
@@ -561,9 +566,7 @@ fun ArticleContent(
                 viewState.author == null && viewState.pubDate != null ->
                     stringResource(
                         R.string.on_date,
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
-                            dateTimeFormat,
-                        ),
+                        formatArticleDate(context, viewState.pubDate),
                     )
 
                 viewState.author != null && viewState.pubDate != null ->
@@ -572,9 +575,7 @@ fun ArticleContent(
                         // Must wrap author in unicode marks to ensure it formats
                         // correctly in RTL
                         context.unicodeWrap(viewState.author ?: ""),
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
-                            dateTimeFormat,
-                        ),
+                        formatArticleDate(context, viewState.pubDate),
                     )
 
                 else -> null
@@ -658,6 +659,19 @@ fun ArticleContent(
         }
     }
 }
+
+internal fun formatArticleDate(
+    context: Context,
+    publicationDate: ZonedDateTime?,
+    zoneId: ZoneId = ZoneId.systemDefault(),
+): String =
+    publicationDate?.let {
+        val skeleton = if (DateFormat.is24HourFormat(context)) "yMMMMEEEEdHm" else "yMMMMEEEEdhm"
+        val locale = context.resources.configuration.locales[0]
+        SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
+            .apply { timeZone = TimeZone.getTimeZone(zoneId) }
+            .format(Date.from(it.toInstant()))
+    } ?: ""
 
 @Composable
 private fun SummarySection(summary: OpenAISummaryState) {

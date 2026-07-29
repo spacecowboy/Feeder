@@ -1,5 +1,8 @@
 package com.nononsenseapps.feeder.archmodel
 
+import android.app.Application
+import android.content.Context
+import android.text.format.DateFormat
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -31,11 +34,10 @@ import org.kodein.di.instance
 import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
+import java.time.ZonedDateTime
+import java.util.Date
+import java.util.TimeZone
 
 class FeedItemStore(
     override val di: DI,
@@ -44,6 +46,7 @@ class FeedItemStore(
     private val blocklistDao: BlocklistDao by instance()
     private val appDatabase: AppDatabase by instance()
     private val settingsStore: SettingsStore by instance()
+    private val application: Application by instance()
 
     suspend fun setBlockStatusForNewInFeed(
         feedId: Long,
@@ -82,7 +85,7 @@ class FeedItemStore(
             feedId > ID_UNSET -> dao.widgetPreviewsByFeed(feedId)
             tag.isNotEmpty() -> dao.widgetPreviewsByTag(tag)
             else -> dao.widgetPreviewsAllFeeds()
-        }.map { list -> list.map { it.toFeedListItem() } }
+        }.map { list -> list.map { it.toFeedListItem(application) } }
 
     fun getPagedFeedItemsRaw(
         feedId: Long,
@@ -121,7 +124,7 @@ class FeedItemStore(
         }.flow
             .map { pagingData ->
                 pagingData
-                    .map { it.toFeedListItem() }
+                    .map { it.toFeedListItem(application) }
             }
 
     private fun StringBuilder.rawQueryFilter(
@@ -356,20 +359,14 @@ class FeedItemStore(
     suspend fun getArticle(id: Long): FeedItemWithFeed? = dao.getFeedItem(id)
 }
 
-val mediumDateTimeFormat: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
-
-val shortTimeFormat: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault())
-
-private fun PreviewItem.toFeedListItem() =
+private fun PreviewItem.toFeedListItem(context: Context) =
     FeedListItem(
         id = id,
         title = plainTitle,
         snippet = plainSnippet,
         feedTitle = feedDisplayTitle,
         unread = readTime == null,
-        pubDate = pubDate?.withZoneSameInstant(ZoneId.systemDefault())?.toLocalDateTime()?.formatDynamically() ?: "",
+        pubDate = pubDate.formatForFeed(context),
         image = image,
         link = link,
         bookmarked = bookmarked,
@@ -379,10 +376,18 @@ private fun PreviewItem.toFeedListItem() =
         wordCount = bestWordCount,
     )
 
-private fun LocalDateTime.formatDynamically(): String {
-    val today = LocalDate.now().atStartOfDay()
-    return when {
-        this >= today -> format(shortTimeFormat)
-        else -> format(mediumDateTimeFormat)
-    }
-}
+internal fun ZonedDateTime?.formatForFeed(
+    context: Context,
+    zoneId: ZoneId = ZoneId.systemDefault(),
+    today: LocalDate = LocalDate.now(zoneId),
+): String =
+    this?.let { publicationDate ->
+        val formatter =
+            if (publicationDate.withZoneSameInstant(zoneId).toLocalDate() >= today) {
+                DateFormat.getTimeFormat(context)
+            } else {
+                DateFormat.getMediumDateFormat(context)
+            }
+        formatter.timeZone = TimeZone.getTimeZone(zoneId)
+        formatter.format(Date.from(publicationDate.toInstant()))
+    } ?: ""
