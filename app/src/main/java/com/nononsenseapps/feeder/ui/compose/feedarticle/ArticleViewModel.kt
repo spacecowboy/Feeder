@@ -32,6 +32,8 @@ import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
 import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.PodcastPlayerState
+import com.nononsenseapps.feeder.model.PodcastPlayerStateHolder
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.model.TranslationManager
@@ -72,6 +74,7 @@ class ArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val openAIApi: OpenAIApi by instance()
@@ -148,6 +151,7 @@ class ArticleViewModel(
             openAiSummary,
             showTranslatedContent,
             articleTranslationState,
+            podcastPlayerStateHolder.playerState,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -167,6 +171,7 @@ class ArticleViewModel(
             val openAiSummary = params[12] as OpenAISummaryState
             val showTranslated = params[13] as Boolean
             val translationState = params[14] as ArticleTranslationState
+            val podcastPlayerState = params[15] as PodcastPlayerState
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
@@ -181,8 +186,9 @@ class ArticleViewModel(
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
-                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
+                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED || podcastPlayerState.isVisible,
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
+                podcastPlayerState = podcastPlayerState,
                 ttsLanguages = ttsLanguages,
                 articleFeedUrl = article?.feedUrl,
                 articleId = itemId,
@@ -434,6 +440,7 @@ class ArticleViewModel(
     }
 
     fun ttsPlay() {
+        stopPodcastPlayback()
         viewModelScope.launch(Dispatchers.IO) {
             val feedItem = repository.getCurrentArticle() ?: return@launch
             val article = Article(feedItem)
@@ -507,6 +514,35 @@ class ArticleViewModel(
 
     fun ttsStop() {
         ttsStateHolder.stop()
+    }
+
+    fun openPodcastPlayer(link: String) {
+        if (link.isBlank()) {
+            return
+        }
+
+        ttsStop()
+        podcastPlayerStateHolder.playLink(link)
+    }
+
+    fun podcastPlay() {
+        podcastPlayerStateHolder.play()
+    }
+
+    fun podcastPause() {
+        podcastPlayerStateHolder.pause()
+    }
+
+    fun stopPodcastPlayback() {
+        podcastPlayerStateHolder.stop()
+    }
+
+    fun podcastSeekBy(deltaMillis: Int) {
+        podcastPlayerStateHolder.seekBy(deltaMillis)
+    }
+
+    fun podcastSeekTo(positionMillis: Int) {
+        podcastPlayerStateHolder.seekTo(positionMillis)
     }
 
     fun ttsSkipNext() {
@@ -772,6 +808,7 @@ private data class ArticleState(
     override val useDetectLanguage: Boolean = false,
     override val isBottomBarVisible: Boolean = false,
     override val isTTSPlaying: Boolean = false,
+    override val podcastPlayerState: PodcastPlayerState = PodcastPlayerState(),
     override val ttsLanguages: List<Locale> = emptyList(),
     override val articleFeedUrl: String? = null,
     override val articleId: Long = ID_UNSET,
@@ -803,6 +840,7 @@ interface ArticleScreenViewState {
     val useDetectLanguage: Boolean
     val isBottomBarVisible: Boolean
     val isTTSPlaying: Boolean
+    val podcastPlayerState: PodcastPlayerState
     val ttsLanguages: List<Locale>
     val articleFeedUrl: String?
     val articleId: Long

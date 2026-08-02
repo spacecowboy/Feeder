@@ -35,6 +35,7 @@ import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.AlwaysUseCacheIfPossibleRequestsInterceptor
 import com.nononsenseapps.feeder.model.ForceCacheOnSomeFailuresInterceptor
 import com.nononsenseapps.feeder.model.OneImageRequestPerHostInterceptor
+import com.nononsenseapps.feeder.model.PodcastPlayerStateHolder
 import com.nononsenseapps.feeder.model.RateLimitedInterceptor
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TooManyRequestsInterceptor
@@ -69,6 +70,7 @@ class FeederApplication :
     SingletonImageLoader.Factory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
+    private val podcastPlayerStateHolder = PodcastPlayerStateHolder(this, applicationCoroutineScope)
 
     override val di by DI.lazy {
         bind<FilePathProvider>() with
@@ -208,6 +210,7 @@ class FeederApplication :
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
         bind<TTSStateHolder>() with instance(ttsStateHolder)
+        bind<PodcastPlayerStateHolder>() with instance(podcastPlayerStateHolder)
         bind<NotificationsWorker>() with singleton { NotificationsWorker(di) }
     }
 
@@ -220,6 +223,7 @@ class FeederApplication :
     override fun onTerminate() {
         applicationCoroutineScope.cancel("Application is being terminated")
         ttsStateHolder.shutdown()
+        podcastPlayerStateHolder.shutdown()
         super.onTerminate()
     }
 
