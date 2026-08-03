@@ -20,7 +20,7 @@
     <string name="show_unread_items">Voir les articles non lus</string>
     <string name="new_items_available">Nouveaux articles disponibles</string>
     <string name="view">Voir</string>
-    <string name="no_tag">Aucune étiquette</string>
+    <string name="no_tag">Aucun tag</string>
     <string name="notify_for_new_items">Notification des nouveaux articles</string>
     <string name="toggle_read_status">Basculer l’état de la lecture</string>
     <string name="open_link_in_browser">Ouvrir le lien dans un navigateur</string>
@@ -55,7 +55,7 @@
     <string name="battery_optimization_enabled">Activé</string>
     <string name="battery_optimization_disabled">Désactivé</string>
     <string name="battery_optimization">Optimisation de la batterie</string>
-    <string name="toggle_tag_expansion">Ne pas regrouper les étiquettes</string>
+    <string name="toggle_tag_expansion">Ne pas regrouper les tags</string>
     <string name="discovered_feeds_list">Liste des flux découverts</string>
     <string name="mark_items_below_as_read">Marquer lus les articles en dessous</string>
     <string name="mark_items_above_as_read">Marquer lus les articles au dessus</string>
@@ -95,7 +95,7 @@
     <string name="mark_as_unread">Marquer comme non lu</string>
     <string name="mark_as_read">Marquer comme lu</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
-    <string name="tag">Étiquette</string>
+    <string name="tag">Tag</string>
     <string name="url">URL</string>
     <string name="failed_to_parse">Impossible d’analyser %1$s</string>
     <string name="fetching_full_article">Récupération de l’article complet…</string>
@@ -121,8 +121,8 @@
     <string name="go_to_feed">Aller à %1$s</string>
     <string name="open_menu">Ouvrir le menu</string>
     <string name="go_back">Retour</string>
-    <string name="contracted_tag">Étiquette regroupée</string>
-    <string name="expanded_tag">Étiquette dégroupée</string>
+    <string name="contracted_tag">Tag regroupé</string>
+    <string name="expanded_tag">Tag dégroupé</string>
     <string name="stop_reading">Arrêter la lecture</string>
     <string name="open_enclosed_media_file">Ouvrir %1$s</string>
     <string name="feed_item_style_super_compact">Super compact</string>
@@ -199,12 +199,12 @@
     <string name="many_feeds">%1$s flux</string>
     <string name="other_feeds">%1$s flux</string>
     <string name="import_x_feeds_with_y_tags">Importer %1$s avec %2$s \?</string>
-    <string name="zero_tags">%1$s étiquettes</string>
-    <string name="one_tags">%1$s étiquette</string>
-    <string name="two_tags">%1$s étiquettes</string>
-    <string name="few_tags">%1$s étiquettes</string>
-    <string name="many_tags">%1$s étiquettes</string>
-    <string name="other_tags">%1$s étiquettes</string>
+    <string name="zero_tags">%1$s tags</string>
+    <string name="one_tags">%1$s tag</string>
+    <string name="two_tags">%1$s tags</string>
+    <string name="few_tags">%1$s tags</string>
+    <string name="many_tags">%1$s tags</string>
+    <string name="other_tags">%1$s tags</string>
     <string name="failed_to_fetch_full_article_missing_body">Il n\'y a rien à récupérer</string>
     <string name="failed_to_fetch_full_article_missing_link">Le lien vers l\'article est manquant dans le flux</string>
     <string name="failed_to_fetch_full_article_not_html">Le lien n\'est pas un document HTML</string>
@@ -343,4 +343,11 @@
     <string name="local_translation_setup_generic">Pour la traduction en local, ouvrir les paramètres de l\'appareil et chercher en local ou langage de traduction hors connexion sous Système, Paramètres généraux, Langues ou Traduction. Télécharger %1$s et les langages source que vous utilisez.</string>
     <string name="device_sync_beta_warning">ATTENTION ! Il s\'agit d\'une fonctionnalité expérimentale. Faites un export OPML de tous vos flux et conservez le fichier exporté en backup.</string>
     <string name="local_translation_requires_android_12">La traduction en local n\'est disponible que sur Android 12 ou plus.</string>
+    <string name="rename_tag">Renommer le tag</string>
+    <string name="audio_playback_failed">Échec de lecture du fichier audio</string>
+    <string name="play_audio">Lire l\'audio</string>
+    <string name="pause_audio">Suspendre l\'audio</string>
+    <string name="stop_audio">Arrêter l\'audio</string>
+    <string name="seek_forward_10_seconds">Avancer de 10 secondes</string>
+    <string name="seek_back_10_seconds">Reculer de 10 secondes</string>
 </resources>
