@@ -343,4 +343,11 @@
     <string name="failed_to_fetch_full_article_too_large">A cikk túl nagy. Szeretné inkább böngészőben megnyitni?</string>
     <string name="device_sync_beta_warning">FIGYELEM! Ez egy béta funkció. Előbb exportálja OPML-fájlként az összes hírcsatornáját, és mentse el biztonsági mentésként.</string>
     <string name="local_translation_requires_android_12">A helyi fordításhoz Android 12 vagy újabb verzió szükséges.</string>
+    <string name="rename_tag">Címke átnevezése</string>
+    <string name="audio_playback_failed">Nem sikerült lejátszani ezt a hangfájlt</string>
+    <string name="play_audio">Hanglejátszás</string>
+    <string name="pause_audio">Hanglejátszás szüneteltetése</string>
+    <string name="stop_audio">Hanglejátszás megállítása</string>
+    <string name="seek_back_10_seconds">Visszatekerés 10 másodpercet</string>
+    <string name="seek_forward_10_seconds">Előretekerés 10 másodpercet</string>
 </resources>
