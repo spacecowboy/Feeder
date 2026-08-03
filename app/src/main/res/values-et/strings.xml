@@ -343,4 +343,5 @@
     <string name="failed_to_fetch_full_article_too_large">Artikkel on liiga pikk. Kas pigem tahaksid ta avada veebibrauseris?</string>
     <string name="device_sync_beta_warning">HOIATUS! See on beeta-järgus funktsionaalsus. Enne ekspordi kõik oma uudisvood OPML-failina ja salvesta nad varukoopiana.</string>
     <string name="local_translation_requires_android_12">Kohalik tõlkimine eeldab, et kasutusel on Android 12 või uuem.</string>
+    <string name="rename_tag">Muuda sildi nime</string>
 </resources>
