@@ -340,4 +340,7 @@
     <string name="translate_articles_by_default">Terjemahkan artikel secara bawaan</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Menyegarkan</string>
+    <string name="failed_to_fetch_full_article_too_large">Artikel terlalu besar. Buka di peramban?</string>
+    <string name="device_sync_beta_warning">PERINGATAN! Ini adalah fitur Beta. Ekspor dan cadangkan seluruh feed Anda terlebih dulu.</string>
+    <string name="local_translation_requires_android_12">Penerjemahan lokal membutuhkan Android 12 atau yang lebih baru.</string>
 </resources>
