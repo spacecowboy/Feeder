@@ -474,7 +474,7 @@ class FeedViewModel(
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
             val ttsState = params[14] as PlaybackStatus
-            val podcastPlayerState = params[28] as PodcastPlayerState
+            val podcastPlayerState = params[29] as PodcastPlayerState
 
             @Suppress("UNCHECKED_CAST")
             FeedState(
