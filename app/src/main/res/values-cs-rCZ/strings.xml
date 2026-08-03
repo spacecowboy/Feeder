@@ -343,4 +343,5 @@
     <string name="failed_to_fetch_full_article_too_large">Článek je příliš velký. Chcete jej otevřít v prohlížeči?</string>
     <string name="device_sync_beta_warning">VAROVÁNÍ! Toto je Beta funkce. Před jejím povolením proveďte export OPML všech vašich kanálů a uložte jej jako zálohu.</string>
     <string name="local_translation_requires_android_12">Místní překlad vyžaduje Android 12 nebo novější.</string>
+    <string name="rename_tag">Přejmenovat štítek</string>
 </resources>

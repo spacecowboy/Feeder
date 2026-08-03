@@ -343,4 +343,11 @@
     <string name="failed_to_fetch_full_article_too_large">文章太大。改为在浏览器中打开？</string>
     <string name="device_sync_beta_warning">警告！这是一项测试功能。使用前请先将所有订阅源导出为 OPML 文件并保存为备份。</string>
     <string name="local_translation_requires_android_12">本地翻译需要 Android 12 或更高版本。</string>
+    <string name="rename_tag">重命名标签</string>
+    <string name="audio_playback_failed">无法播放此音频文件</string>
+    <string name="play_audio">播放音频</string>
+    <string name="pause_audio">暂停音频</string>
+    <string name="stop_audio">停止音频</string>
+    <string name="seek_back_10_seconds">快退 10 秒</string>
+    <string name="seek_forward_10_seconds">快进 10 秒</string>
 </resources>

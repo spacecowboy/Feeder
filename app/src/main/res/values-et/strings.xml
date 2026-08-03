@@ -8,7 +8,7 @@
     <string name="add_feed_search_hint">Uudisvoo võrguaadress</string>
     <string name="title">Pealkiri</string>
     <string name="add_feed">Lisa uudisvoog</string>
-    <string name="title_activity_edit_feed">Telli uudisvoog</string>
+    <string name="title_activity_edit_feed">Jälgi seda uudisvoogu</string>
     <string name="search_feed_empty_hint">Sisesta uudisvoo aadress</string>
     <string name="feed_search_suggestions_header">Soovitused</string>
     <string name="mark_as_read">Märgi loetuks</string>
@@ -343,4 +343,5 @@
     <string name="failed_to_fetch_full_article_too_large">Artikkel on liiga pikk. Kas pigem tahaksid ta avada veebibrauseris?</string>
     <string name="device_sync_beta_warning">HOIATUS! See on beeta-järgus funktsionaalsus. Enne ekspordi kõik oma uudisvood OPML-failina ja salvesta nad varukoopiana.</string>
     <string name="local_translation_requires_android_12">Kohalik tõlkimine eeldab, et kasutusel on Android 12 või uuem.</string>
+    <string name="rename_tag">Muuda sildi nime</string>
 </resources>

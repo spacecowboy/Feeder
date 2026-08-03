@@ -343,4 +343,11 @@
     <string name="failed_to_fetch_full_article_too_large">Artykuł jest zbyt długi. Czy otworzyć go w przeglądarce?</string>
     <string name="device_sync_beta_warning">UWAGA: Jest to funkcja w wersji beta. Najpierw wykonaj eksport do OPML wszystkich swoich kanałów i zapisz go jako kopię zapasową.</string>
     <string name="local_translation_requires_android_12">Funkcja tłumaczenia lokalnego wymaga Androida 12 lub nowszego</string>
+    <string name="rename_tag">Zmień nazwę grupy</string>
+    <string name="audio_playback_failed">Nie można odtworzyć tego pliku audio</string>
+    <string name="play_audio">Odtwórz audio</string>
+    <string name="pause_audio">Wstrzymaj audio</string>
+    <string name="stop_audio">Zatrzymaj audio</string>
+    <string name="seek_back_10_seconds">Przewiń do tyłu o 10 sekund</string>
+    <string name="seek_forward_10_seconds">Przewiń do przodu o 10 sekund</string>
 </resources>
