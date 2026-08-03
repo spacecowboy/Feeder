@@ -8,7 +8,7 @@
     <string name="add_feed_search_hint">Uudisvoo võrguaadress</string>
     <string name="title">Pealkiri</string>
     <string name="add_feed">Lisa uudisvoog</string>
-    <string name="title_activity_edit_feed">Telli uudisvoog</string>
+    <string name="title_activity_edit_feed">Jälgi seda uudisvoogu</string>
     <string name="search_feed_empty_hint">Sisesta uudisvoo aadress</string>
     <string name="feed_search_suggestions_header">Soovitused</string>
     <string name="mark_as_read">Märgi loetuks</string>
