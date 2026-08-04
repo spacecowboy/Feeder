@@ -343,4 +343,11 @@
     <string name="set_translation_language_first">Поставља жељени језик за превођење у AI подешавањима</string>
     <string name="translate_feed_cards_by_default">Преводи прегледе чланака</string>
     <string name="translate_articles_by_default">Подразумеано преводи чланке</string>
+    <string name="rename_tag">Промени назив ознаке</string>
+    <string name="audio_playback_failed">Овај аудио фајл не може да се пусти</string>
+    <string name="play_audio">Репродукуј аудио</string>
+    <string name="pause_audio">Паузирај аудио</string>
+    <string name="stop_audio">Заустави аудио</string>
+    <string name="seek_back_10_seconds">Премотај 10 секунди уназад</string>
+    <string name="seek_forward_10_seconds">Премотај 10 секунди унапред</string>
 </resources>
