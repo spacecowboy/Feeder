@@ -343,4 +343,11 @@
     <string name="local_translation_setup_pixel">Для локального перекладу на телефонах Pixel відкрийте Налаштування Android, потім Система, Живий переклад, Мови та додайте %1$s для офлайн-перекладу. Назви меню можуть відрізнятися залежно від версії Android; також установіть початкову мову, якщо Android попросить про це.</string>
     <string name="local_translation_setup_samsung">Для локального перекладу на пристроях Samsung відкрийте Налаштування, Загальне керування, Мовні пакети та завантажте %1$s. У деяких версіях Samsung це меню знаходиться в розділі Клавіатура Samsung або Переклад; також установіть початкову мову, якщо Android попросить про це.</string>
     <string name="local_translation_setup_generic">Для локального перекладу відкрийте програму «Налаштування» вашого пристрою та знайдіть мовні пакети для перекладу на пристрої або офлайн-перекладу в розділі Система, Загальне керування, Мови або Переклад. Завантажте %1$s та початкові мови, якими ви читаєте.</string>
+    <string name="rename_tag">Перейменувати мітку</string>
+    <string name="audio_playback_failed">Не можливо відтворити цей аудіо-файл</string>
+    <string name="play_audio">Відтворити аудіо</string>
+    <string name="pause_audio">Призупинити аудіо</string>
+    <string name="stop_audio">Зупинити аудіо</string>
+    <string name="seek_forward_10_seconds">Перемотати вперед на 10 секунд</string>
+    <string name="seek_back_10_seconds">Перемотати назад на 10 секунд</string>
 </resources>
