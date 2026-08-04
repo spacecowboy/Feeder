@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.0] - 2026-08-04
+
+### 🚀 Features
+- Added button for renaming tags (#1173) by @EmaYYellow in [#1173](https://github.com/spacecowboy/feeder/pull/1173) 
+- Added audio player for media attachments (#1172) by @deprov447 in [#1172](https://github.com/spacecowboy/feeder/pull/1172) 
+
+### 🐛 Bug Fixes & Minor Changes
+- Format dates with device preferred 12/24-hour clock (#1183) by @arpitagarwal1301 in [#1183](https://github.com/spacecowboy/feeder/pull/1183) 
+- Honored custom tab preference in notifications (#1182) by @arpitagarwal1301 in [#1182](https://github.com/spacecowboy/feeder/pull/1182) 
+- Fixed crash introduced by audio player feature by @spacecowboy in [commit](https://github.com/spacecowboy/feeder/commit/1d885a6080999e9dc420fea90051b81bb2fb1afa)
+
+### 🌐 Translations
+- Updated translations from Hosted Weblate (#1174) by @weblate in [#1174](https://github.com/spacecowboy/feeder/pull/1174) 
+- Updated German translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/79d075a006f35b48d6f7f72507f51ccae65a376e)
+- Updated Serbian translation using Weblate by @eevan78 in [commit](https://github.com/spacecowboy/feeder/commit/07424402af050ee6cfcb8b61b1e2e41380dbac3a)
+- Updated Ukrainian translation using Weblate by @andm18 in [#1186](https://github.com/spacecowboy/feeder/pull/1186) 
+
+### ❤️  New Contributors
+* @deprov447 made their first contribution in [#1172](https://github.com/spacecowboy/feeder/pull/1172)
+* @EmaYYellow made their first contribution in [#1173](https://github.com/spacecowboy/feeder/pull/1173)
+* @arpitagarwal1301 made their first contribution in [#1182](https://github.com/spacecowboy/feeder/pull/1182)
+
 ## [2.21.2] - 2026-07-03
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -4795,6 +4817,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.22.0]: https://github.com/spacecowboy/feeder/compare/2.21.2..2.22.0
 [2.21.2]: https://github.com/spacecowboy/feeder/compare/2.21.1..2.21.2
 [2.21.1]: https://github.com/spacecowboy/feeder/compare/2.21.0..2.21.1
 [2.21.0]: https://github.com/spacecowboy/feeder/compare/2.20.0..2.21.0
