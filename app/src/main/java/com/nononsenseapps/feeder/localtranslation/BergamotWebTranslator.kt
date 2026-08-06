@@ -9,6 +9,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -107,7 +108,9 @@ class BergamotWebTranslator(
         return withTimeoutOrNull(WEBVIEW_TRANSLATION_TIMEOUT_MS) { response.await() }
             ?: run {
                 bridge.pending.remove(id)
-                BergamotWebTranslationResult.Error("Bergamot WebView translation timed out.")
+                BergamotWebTranslationResult.Error(
+                    application.getString(R.string.bergamot_webview_translation_timed_out),
+                )
             }
     }
 
@@ -156,7 +159,9 @@ class BergamotWebTranslator(
 
     private fun evaluate(script: String) {
         webView?.evaluateJavascript(script, null)
-            ?: throw IllegalStateException("Bergamot WebView is not initialized")
+            ?: throw IllegalStateException(
+                application.getString(R.string.bergamot_webview_not_initialized),
+            )
     }
 
     private inner class Bridge {
@@ -186,7 +191,11 @@ class BergamotWebTranslator(
                 runCatching {
                     json.decodeFromString<List<String>>(translatedTextJson)
                 }.getOrElse {
-                    pending.remove(id)?.complete(BergamotWebTranslationResult.Error(it.message ?: "Could not parse Bergamot response."))
+                    pending.remove(id)?.complete(
+                        BergamotWebTranslationResult.Error(
+                            it.message ?: application.getString(R.string.bergamot_response_parse_failed),
+                        ),
+                    )
                     return
                 }
             pending.remove(id)?.complete(BergamotWebTranslationResult.Success(translatedTexts))

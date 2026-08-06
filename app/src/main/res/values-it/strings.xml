@@ -334,9 +334,6 @@
     <string name="preferred_translation_language">Lingua di traduzione preferita</string>
     <string name="preferred_translation_language_description">Usa il nome o il codice di una lingua, ad esempio spagnolo, es, francese o fr-CA.</string>
     <string name="preferred_translation_language_fallback">la lingua preferita</string>
-    <string name="local_translation_setup_pixel">Per la traduzione locale sui telefoni Pixel, apri Impostazioni di Android, quindi Sistema, Traduzione in tempo reale, Lingue e aggiungi %1$s per la traduzione offline. I nomi dei menu possono variare a seconda della versione di Android; se richiesto, installa anche la lingua di origine.</string>
-    <string name="local_translation_setup_samsung">Per la traduzione locale sui dispositivi Samsung, apri Impostazioni, Gestione Generale, Pacchetti Lingua e scarica %1$s. In alcune versioni Samsung questa opzione si trova sotto Tastiera Samsung o Traduzione; se richiesto, installa anche la lingua di origine.</string>
-    <string name="local_translation_setup_generic">Per la traduzione locale, apri Impostazioni del dispositivo e cerca i pacchetti lingua per la traduzione sul dispositivo od offline nelle sezioni Sistema, Gestione Generale, Lingue o Traduzione. Scarica %1$s e le lingue di origine che utilizzi.</string>
     <string name="translation_language_placeholder">Ad esempio: inglese o en</string>
     <string name="set_translation_language_first">Imposta una lingua di traduzione preferita nelle impostazioni IA</string>
     <string name="translate_feed_cards_by_default">Traduci le anteprime degli articoli</string>

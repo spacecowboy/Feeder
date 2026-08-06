@@ -60,15 +60,17 @@ class BergamotModelManager(
                             targetLanguage = target,
                         )
                             ?: return@withLock BergamotModelPreparation.Error(
-                                message = "Connect to download model list.",
                                 reason = BergamotModelPreparation.ErrorReason.RegistryMissing,
+                                sourceLanguage = source,
+                                targetLanguage = target,
                             )
 
                     val path =
                         resolvePath(registry, source, target)
                             ?: return@withLock BergamotModelPreparation.Error(
-                                message = "No app model for $source -> $target.",
                                 reason = BergamotModelPreparation.ErrorReason.NoAppModel,
+                                sourceLanguage = source,
+                                targetLanguage = target,
                             )
 
                     val downloadState = ModelDownloadState.forPath(path)
@@ -79,8 +81,9 @@ class BergamotModelManager(
                                 entry = entry,
                                 downloadState = downloadState,
                             ) ?: return@withLock BergamotModelPreparation.Error(
-                                message = "Could not download ${entry.from} -> ${entry.to} model.",
                                 reason = BergamotModelPreparation.ErrorReason.DownloadFailed,
+                                sourceLanguage = entry.from,
+                                targetLanguage = entry.to,
                             )
                         entries += downloaded
                     }
@@ -475,8 +478,9 @@ sealed interface BergamotModelPreparation {
     ) : BergamotModelPreparation
 
     data class Error(
-        val message: String,
         val reason: ErrorReason,
+        val sourceLanguage: String,
+        val targetLanguage: String,
     ) : BergamotModelPreparation
 
     enum class ErrorReason {

@@ -166,7 +166,10 @@ class BergamotModelManagerTest {
             val preparation = modelManager().prepare(sourceLanguage = "de", targetLanguage = "en")
 
             assertTrue(preparation is BergamotModelPreparation.Error)
-            assertTrue((preparation as BergamotModelPreparation.Error).message.contains("Could not download"))
+            assertEquals(
+                BergamotModelPreparation.ErrorReason.DownloadFailed,
+                (preparation as BergamotModelPreparation.Error).reason,
+            )
         }
 
     @Test
