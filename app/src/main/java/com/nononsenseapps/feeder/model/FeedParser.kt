@@ -574,3 +574,11 @@ data class FullTextDecodingFailure(
     override val throwable: Throwable?,
     override val description: String = throwable?.message ?: "",
 ) : FeedParserError()
+
+@Parcelize
+data class FullTextTooLarge(
+    override val url: String,
+    val maxBytes: Int,
+    override val description: String = "Response body exceeded $maxBytes bytes",
+    override val throwable: Throwable? = null,
+) : FeedParserError()

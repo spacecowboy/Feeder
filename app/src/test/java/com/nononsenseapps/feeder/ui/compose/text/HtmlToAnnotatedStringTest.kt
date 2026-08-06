@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class HtmlToAnnotatedStringTest {
     @Test
@@ -10,16 +10,16 @@ class HtmlToAnnotatedStringTest {
         val markdown =
             """
             # AI Summary
-            
+
             This is a **summary** with *formatting*:
-            
+
             - **Key point 1**: Important information
             - *Key point 2*: More details
-            
+
             > Quote from the article
-            
+
             ## Conclusion
-            
+
             The article discusses `code` and more.
             """.trimIndent()
 
@@ -34,9 +34,9 @@ class HtmlToAnnotatedStringTest {
 
         // Check that the content is preserved
         val combinedText = annotatedStrings.joinToString("\n") { it.text }
-        assertTrue(combinedText.contains("AI Summary"))
-        assertTrue(combinedText.contains("summary"))
-        assertTrue(combinedText.contains("Key point"))
+        assertTrue(combinedText.contains("AI Summary"), combinedText)
+        assertTrue(combinedText.contains("summary"), combinedText)
+        assertTrue(combinedText.contains("Key point"), combinedText)
     }
 
     @Test
@@ -48,10 +48,10 @@ class HtmlToAnnotatedStringTest {
         assertTrue(annotatedStrings.isNotEmpty())
 
         val combinedText = annotatedStrings.joinToString("\n") { it.text }
-        assertTrue(combinedText.contains("This is"))
-        assertTrue(combinedText.contains("bold"))
-        assertTrue(combinedText.contains("italic"))
-        assertTrue(combinedText.contains("text"))
+        assertTrue(combinedText.contains("This is"), combinedText)
+        assertTrue(combinedText.contains("bold"), combinedText)
+        assertTrue(combinedText.contains("italic"), combinedText)
+        assertTrue(combinedText.contains("text"), combinedText)
     }
 
     @Test
@@ -70,8 +70,8 @@ class HtmlToAnnotatedStringTest {
         assertTrue(annotatedStrings.isNotEmpty())
 
         val combinedText = annotatedStrings.joinToString("\n") { it.text }
-        assertTrue(combinedText.contains("Item 1"))
-        assertTrue(combinedText.contains("Item 2"))
-        assertTrue(combinedText.contains("Item 3"))
+        assertTrue(combinedText.contains("Item 1"), combinedText)
+        assertTrue(combinedText.contains("Item 2"), combinedText)
+        assertTrue(combinedText.contains("Item 3"), combinedText)
     }
 }

@@ -81,12 +81,33 @@ class FullTextParser(
                             FullTextDecodingFailure(url, t)
                         },
                     ) {
-                        val body = response.body ?: return@catching NoBody(url = url).left()
+                        val body = response.body
 
-                        val bytes =
-                            body.use {
-                                it.bytes()
+                        val contentLength = body.contentLength()
+                        logDebug(LOG_TAG, "contentLength: $contentLength")
+                        if (contentLength > MAX_FULL_TEXT_BYTES) {
+                            Log.i(LOG_TAG, "contentLength exceeds MAX LIMIT ($MAX_FULL_TEXT_BYTES) bytes")
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
+
+                        val maxBytes = MAX_FULL_TEXT_BYTES.toLong()
+                        val buffer = okio.Buffer()
+
+                        body.use {
+                            val source = body.source()
+                            while (buffer.size <= maxBytes) {
+                                val read = source.read(buffer, 8_192)
+                                if (read == -1L) break
                             }
+                        }
+
+                        logDebug(LOG_TAG, "buffer size: ${buffer.size}")
+                        if (buffer.size > maxBytes) {
+                            Log.i(LOG_TAG, "buffer exceeds MAX LIMIT ($MAX_FULL_TEXT_BYTES) bytes")
+                            return@catching FullTextTooLarge(url = url, maxBytes = MAX_FULL_TEXT_BYTES).left()
+                        }
+
+                        val bytes = buffer.readByteArray()
 
                         val contentType =
                             body.contentType()
@@ -119,6 +140,7 @@ class FullTextParser(
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                         logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
                         val article = parseFullArticle(url, html)
+
                         logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                         withContext(Dispatchers.IO) {
                             article?.let { articleContent ->
@@ -145,6 +167,11 @@ class FullTextParser(
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
+
+        // giving a bit of leeway to allow for inline images and junk like inline CSS and javscript
+        // but this is way higher than is possible to render if actual HTML.
+        // It will be truncated by HtmlLinearizer in that case.
+        const val MAX_FULL_TEXT_BYTES = 3 * 1024 * 1024
     }
 }
 

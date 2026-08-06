@@ -26,6 +26,7 @@
   <string name="mark_all_as_read">Mark all as read</string>
   <string name="edit_feed">Edit feed</string>
   <string name="delete_feed">Delete feed</string>
+  <string name="rename_tag">Rename tag</string>
   <string name="show_all_items">Show all items</string>
   <string name="show_unread_items">Show unread items</string>
   <string name="new_items_available">New items available</string>
@@ -38,6 +39,12 @@
   <string name="open_in_browser">Open in web browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
   <string name="open_enclosed_media_file">Open %1$s</string>
+  <string name="audio_playback_failed">Unable to play this audio file</string>
+  <string name="play_audio">Play audio</string>
+  <string name="pause_audio">Pause audio</string>
+  <string name="stop_audio">Stop audio</string>
+  <string name="seek_back_10_seconds">Seek back 10 seconds</string>
+  <string name="seek_forward_10_seconds">Seek forward 10 seconds</string>
   <string name="read_article">Read aloud</string>
   <string name="text_to_speech">Text to speech</string>
   <string name="pause_reading">Pause reading</string>
@@ -237,6 +244,7 @@
   <string name="failed_to_fetch_full_article_missing_body">Found nothing to fetch</string>
   <string name="failed_to_fetch_full_article_missing_link">Feed is missing link to article</string>
   <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
+  <string name="failed_to_fetch_full_article_too_large">Article is too large. Open in browser instead?</string>
   <string name="max_lines">Max lines</string>
   <string name="time_out">Timeout (seconds)</string>
   <string name="time_out_validation_error">Timeout must be between 30 and 600 seconds</string>
@@ -306,6 +314,7 @@
   <string name="touch_to_play_audio">Touch to play audio</string>
   <string name="title_unread_count" translatable="false">(%1$d)</string>
   <string name="show_title_unread_count">Show unread article count in title</string>
+  <string name="device_sync_beta_warning">WARNING! This is a Beta feature. Do an OPML-export of all your feeds before and save as a backup.</string>
   <string name="unable_to_load_models">Unable to load models.</string>
   <string name="no_models_were_found">No models were found</string>
   <string name="azure_deployment_id">Azure deployment id</string>
@@ -349,6 +358,7 @@
   <string name="preferred_translation_language">Preferred translation language</string>
   <string name="preferred_translation_language_description">Choose the language Feeder should translate into.</string>
   <string name="preferred_translation_language_fallback">the preferred language</string>
+  <string name="local_translation_requires_android_12">Local translation requires Android 12 or newer.</string>
   <string name="local_translation_setup_system">Uses Android system on-device translation first which must be downloaded in the system settings.</string>
   <string name="local_translation_setup_bergamot">If the OS has no on-device translator, Feeder downloads Mozilla/Bergamot models for supported %1$s language pairs.</string>
   <string name="translation_language_placeholder">Select a language</string>

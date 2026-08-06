@@ -17,9 +17,21 @@ abstract class HtmlParser {
     val endsWithWhitespace: Boolean
         get() = builder.endsWithWhitespace
 
+    fun isEmpty(): Boolean = builder.isEmpty()
+
     fun append(text: String) = builder.append(text)
 
     fun append(char: Char) = builder.append(char)
+
+    fun appendCodePoint(codePoint: Int) {
+        if (Character.charCount(codePoint) == 1) {
+            // Easy just append the char
+            builder.append(codePoint.toChar())
+        } else {
+            // Multi character unicode char
+            builder.append(String(Character.toChars(codePoint)))
+        }
+    }
 
     fun pop(index: Int) = builder.pop(index)
 

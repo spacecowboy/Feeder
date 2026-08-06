@@ -174,6 +174,12 @@ interface FeedDao {
         notify: Boolean,
     )
 
+    @Query("UPDATE feeds SET tag = :newTag WHERE tag IS :oldTag")
+    suspend fun renameTag(
+        oldTag: String,
+        newTag: String,
+    )
+
     @Query("UPDATE feeds SET notify = :notify")
     suspend fun setAllNotify(notify: Boolean)
 

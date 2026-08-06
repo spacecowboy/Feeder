@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
+import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ScrollState
@@ -34,6 +36,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,8 +93,11 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Date
+import java.util.TimeZone
 
 @Composable
 fun ArticleScreen(
@@ -181,12 +187,19 @@ fun ArticleScreen(
         onFeedTitleClick = {
             onNavigateToFeed(viewState.articleFeedId)
         },
+        onOpenAudioPlayer = viewModel::openPodcastPlayer,
         onShowToolbarMenu = viewModel::setToolbarMenuVisible,
         ttsOnPlay = viewModel::ttsPlay,
         ttsOnPause = viewModel::ttsPause,
         ttsOnStop = viewModel::ttsStop,
         ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+        podcastOnPlay = viewModel::podcastPlay,
+        podcastOnPause = viewModel::podcastPause,
+        podcastOnStop = viewModel::stopPodcastPlayback,
+        podcastOnSeekBack = { viewModel.podcastSeekBy(-10_000) },
+        podcastOnSeekForward = { viewModel.podcastSeekBy(10_000) },
+        podcastOnSeekTo = viewModel::podcastSeekTo,
         onToggleBookmark = {
             viewModel.setBookmarked(!viewState.isBookmarked)
         },
@@ -223,12 +236,19 @@ fun ArticleScreen(
     onShare: () -> Unit,
     onOpenInCustomTab: () -> Unit,
     onFeedTitleClick: () -> Unit,
+    onOpenAudioPlayer: (url: String) -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
     ttsOnPlay: () -> Unit,
     ttsOnPause: () -> Unit,
     ttsOnStop: () -> Unit,
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
+    podcastOnPlay: () -> Unit,
+    podcastOnPause: () -> Unit,
+    podcastOnStop: () -> Unit,
+    podcastOnSeekBack: () -> Unit,
+    podcastOnSeekForward: () -> Unit,
+    podcastOnSeekTo: (Int) -> Unit,
     onToggleBookmark: () -> Unit,
     articleScrollState: ScrollState,
     onNavigateUp: () -> Unit,
@@ -456,16 +476,29 @@ fun ArticleScreen(
             )
         },
         bottomBar = {
-            HideableTTSPlayer(
-                visibleState = bottomBarVisibleState,
-                currentlyPlaying = viewState.isTTSPlaying,
-                onPlay = ttsOnPlay,
-                onPause = ttsOnPause,
-                onStop = ttsOnStop,
-                onSkipNext = ttsOnSkipNext,
-                languages = ImmutableHolder(viewState.ttsLanguages),
-                onSelectLanguage = ttsOnSelectLanguage,
-            )
+            if (viewState.podcastPlayerState.isVisible) {
+                HideablePodcastPlayer(
+                    visibleState = bottomBarVisibleState,
+                    viewState = viewState.podcastPlayerState,
+                    onPlay = podcastOnPlay,
+                    onPause = podcastOnPause,
+                    onStop = podcastOnStop,
+                    onSeekBack = podcastOnSeekBack,
+                    onSeekForward = podcastOnSeekForward,
+                    onSeekTo = podcastOnSeekTo,
+                )
+            } else {
+                HideableTTSPlayer(
+                    visibleState = bottomBarVisibleState,
+                    currentlyPlaying = viewState.isTTSPlaying,
+                    onPlay = ttsOnPlay,
+                    onPause = ttsOnPause,
+                    onStop = ttsOnStop,
+                    onSkipNext = ttsOnSkipNext,
+                    languages = ImmutableHolder(viewState.ttsLanguages),
+                    onSelectLanguage = ttsOnSelectLanguage,
+                )
+            }
         },
     ) { padding ->
         // Box handles the dynamic padding so ArticleContent don't have to recompose on scroll
@@ -480,6 +513,8 @@ fun ArticleScreen(
                 screenType = ScreenType.SINGLE,
                 articleScrollState = articleScrollState,
                 onFeedTitleClick = onFeedTitleClick,
+                onOpenAudioPlayer = onOpenAudioPlayer,
+                onOpenInCustomTab = onOpenInCustomTab,
                 modifier =
                     Modifier
                         .focusGroup()
@@ -575,6 +610,8 @@ fun ArticleContent(
     viewState: ArticleScreenViewState,
     screenType: ScreenType,
     onFeedTitleClick: () -> Unit,
+    onOpenAudioPlayer: (url: String) -> Unit,
+    onOpenInCustomTab: () -> Unit,
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
@@ -593,7 +630,11 @@ fun ArticleContent(
         wordCount = viewState.wordCount,
         onEnclosureClick = {
             if (viewState.enclosure.present) {
-                activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)
+                if (shouldOpenInPodcastPlayer(viewState.enclosure.link, viewState.enclosure)) {
+                    onOpenAudioPlayer(viewState.enclosure.link)
+                } else {
+                    activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)
+                }
             }
         },
         onFeedTitleClick = onFeedTitleClick,
@@ -605,9 +646,7 @@ fun ArticleContent(
                 viewState.author == null && viewState.pubDate != null ->
                     stringResource(
                         R.string.on_date,
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
-                            dateTimeFormat,
-                        ),
+                        formatArticleDate(context, viewState.pubDate),
                     )
 
                 viewState.author != null && viewState.pubDate != null ->
@@ -616,9 +655,7 @@ fun ArticleContent(
                         // Must wrap author in unicode marks to ensure it formats
                         // correctly in RTL
                         context.unicodeWrap(viewState.author ?: ""),
-                        (viewState.pubDate?.withZoneSameInstant(ZoneId.systemDefault()) ?: ZonedDateTime.now()).format(
-                            dateTimeFormat,
-                        ),
+                        formatArticleDate(context, viewState.pubDate),
                     )
 
                 else -> null
@@ -660,11 +697,15 @@ fun ArticleContent(
                                     }
                                 }
                             } else {
-                                // External link - open in browser/custom tab
-                                activityLauncher.openLink(
-                                    link = link,
-                                    toolbarColor = toolbarColor,
-                                )
+                                if (shouldOpenInPodcastPlayer(link, viewState.enclosure)) {
+                                    onOpenAudioPlayer(link)
+                                } else {
+                                    // External link - open in browser/custom tab
+                                    activityLauncher.openLink(
+                                        link = link,
+                                        toolbarColor = toolbarColor,
+                                    )
+                                }
                             }
                         },
                         onElementPosition = { index, yPosition ->
@@ -692,10 +733,31 @@ fun ArticleContent(
                 TextToDisplay.FAILED_NOT_HTML -> {
                     Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
                 }
+
+                TextToDisplay.FAILED_FULLTEXT_TOO_LARGE -> {
+                    Text(text = stringResource(id = R.string.failed_to_fetch_full_article_too_large))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onOpenInCustomTab) {
+                        Text(text = stringResource(id = R.string.open_in_web_view))
+                    }
+                }
             }
         }
     }
 }
+
+internal fun formatArticleDate(
+    context: Context,
+    publicationDate: ZonedDateTime?,
+    zoneId: ZoneId = ZoneId.systemDefault(),
+): String =
+    publicationDate?.let {
+        val skeleton = if (DateFormat.is24HourFormat(context)) "yMMMMEEEEdHm" else "yMMMMEEEEdhm"
+        val locale = context.resources.configuration.locales[0]
+        SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
+            .apply { timeZone = TimeZone.getTimeZone(zoneId) }
+            .format(Date.from(it.toInstant()))
+    } ?: ""
 
 @Composable
 private fun TranslationModelDownloadProgress(progress: BergamotModelDownloadProgress) {

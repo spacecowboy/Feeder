@@ -4,7 +4,7 @@
 
 <p>Feeder NEIZMANTO nekādus attālinātos serverus un pakalpojumus, lai atsvaidzinātu ziņu plūsmas, tāpēc nav nepieciešama nekāda konta reģistrācija.</p>
 
-<p>Feeder ir pieejams bez maksas, un darbojas tikai jūsu ierīcē. Jūsu dati ir 100% drošībā.</p>
+<p>Feeder ir pieejams pa brīvu, un darbojas tikai jūsu ierīcē. Jūsu dati ir 100% drošībā.</p>
 
 <p><b>Funkcionalitāte</b></p>
 

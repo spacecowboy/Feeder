@@ -151,6 +151,36 @@ A community-contributed feature. Users supply their own API keys via the Setting
 
 ---
 
+## Logging
+
+Always use the `logDebug` utility from `util/Logging.kt` instead of calling `android.util.Log.d` directly.
+`logDebug` is a no-op in production builds, so debug noise never reaches end users.
+
+```kotlin
+// Good
+import com.nononsenseapps.feeder.util.logDebug
+logDebug(LOG_TAG, "message")
+
+// Bad — leaks debug output to production
+android.util.Log.d("tag", "message")
+```
+
+For warnings and errors that should survive in production, `Log.w` / `Log.e` are fine to use directly.
+
+### Log tag convention
+
+- Declare the tag as a constant named `LOG_TAG` in the class's companion object (or at file scope for top-level code).
+- The value must be `SCREAMING_SNAKE_CASE` and **prefixed with `FEEDER_`**.
+- Keep it short enough to stay within Android's 23-character tag limit.
+
+```kotlin
+companion object {
+    private const val LOG_TAG = "FEEDER_MY_COMPONENT"
+}
+```
+
+---
+
 ## Things to avoid
 
 - Do **not** introduce new DI frameworks (Hilt, Dagger, etc.). Use Kodein.

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
@@ -28,11 +29,14 @@ import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.ArticleTranslation
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
+import com.nononsenseapps.feeder.model.FullTextTooLarge
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.NoBody
 import com.nononsenseapps.feeder.model.NoUrl
 import com.nononsenseapps.feeder.model.NotHTML
 import com.nononsenseapps.feeder.model.PlaybackStatus
+import com.nononsenseapps.feeder.model.PodcastPlayerState
+import com.nononsenseapps.feeder.model.PodcastPlayerStateHolder
 import com.nononsenseapps.feeder.model.SystemTranslationSettingsRequiredException
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.ThumbnailImage
@@ -75,6 +79,7 @@ class ArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val openAIApi: OpenAIApi by instance()
@@ -154,6 +159,7 @@ class ArticleViewModel(
             showTranslatedContent,
             articleTranslationState,
             bergamotModelManager.downloadProgress,
+            podcastPlayerStateHolder.playerState,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -174,6 +180,7 @@ class ArticleViewModel(
             val showTranslated = params[13] as Boolean
             val translationState = params[14] as ArticleTranslationState
             val translationDownloadProgress = params[15] as BergamotModelDownloadProgress?
+            val podcastPlayerState = params[16] as PodcastPlayerState
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
@@ -188,8 +195,9 @@ class ArticleViewModel(
 
             ArticleState(
                 useDetectLanguage = useDetectLanguage,
-                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
+                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED || podcastPlayerState.isVisible,
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
+                podcastPlayerState = podcastPlayerState,
                 ttsLanguages = ttsLanguages,
                 articleFeedUrl = article?.feedUrl,
                 articleId = itemId,
@@ -321,7 +329,12 @@ class ArticleViewModel(
         logDebug(LOG_TAG, "parseArticleContent(${article.id}, $fullText)")
         return try {
             withContext(Dispatchers.IO) {
-                val htmlLinearizer = HtmlLinearizer()
+                val htmlLinearizer =
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
+                    )
                 when (fullText) {
                     false -> {
                         if (blobFile(article.id, filePathProvider.articleDir).isFile) {
@@ -374,6 +387,7 @@ class ArticleViewModel(
                                 is NoUrl -> TextToDisplay.FAILED_MISSING_LINK
                                 is UnsupportedContentType -> TextToDisplay.FAILED_NOT_HTML
                                 is NotHTML -> TextToDisplay.FAILED_NOT_HTML
+                                is FullTextTooLarge -> TextToDisplay.FAILED_FULLTEXT_TOO_LARGE
                                 else -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
                             }?.let { errorText ->
                                 textToDisplay.update { errorText }
@@ -444,6 +458,7 @@ class ArticleViewModel(
     }
 
     fun ttsPlay() {
+        stopPodcastPlayback()
         viewModelScope.launch(Dispatchers.IO) {
             val feedItem = repository.getCurrentArticle() ?: return@launch
             val article = Article(feedItem)
@@ -517,6 +532,35 @@ class ArticleViewModel(
 
     fun ttsStop() {
         ttsStateHolder.stop()
+    }
+
+    fun openPodcastPlayer(link: String) {
+        if (link.isBlank()) {
+            return
+        }
+
+        ttsStop()
+        podcastPlayerStateHolder.playLink(link)
+    }
+
+    fun podcastPlay() {
+        podcastPlayerStateHolder.play()
+    }
+
+    fun podcastPause() {
+        podcastPlayerStateHolder.pause()
+    }
+
+    fun stopPodcastPlayback() {
+        podcastPlayerStateHolder.stop()
+    }
+
+    fun podcastSeekBy(deltaMillis: Int) {
+        podcastPlayerStateHolder.seekBy(deltaMillis)
+    }
+
+    fun podcastSeekTo(positionMillis: Int) {
+        podcastPlayerStateHolder.seekTo(positionMillis)
     }
 
     fun ttsSkipNext() {
@@ -602,7 +646,11 @@ class ArticleViewModel(
                     ) ?: throw IllegalStateException("Translation failed")
 
                 translatedArticleContent.value =
-                    HtmlLinearizer().linearize(
+                    HtmlLinearizer(
+                        tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
+                        openInBrowserText = application.getString(R.string.open_in_web_view),
+                        articleLink = article.link ?: "",
+                    ).linearize(
                         translation.translatedHtml,
                         article.feedUrl ?: "",
                     )
@@ -827,6 +875,7 @@ private data class ArticleState(
     override val useDetectLanguage: Boolean = false,
     override val isBottomBarVisible: Boolean = false,
     override val isTTSPlaying: Boolean = false,
+    override val podcastPlayerState: PodcastPlayerState = PodcastPlayerState(),
     override val ttsLanguages: List<Locale> = emptyList(),
     override val articleFeedUrl: String? = null,
     override val articleId: Long = ID_UNSET,
@@ -860,6 +909,7 @@ interface ArticleScreenViewState {
     val useDetectLanguage: Boolean
     val isBottomBarVisible: Boolean
     val isTTSPlaying: Boolean
+    val podcastPlayerState: PodcastPlayerState
     val ttsLanguages: List<Locale>
     val articleFeedUrl: String?
     val articleId: Long

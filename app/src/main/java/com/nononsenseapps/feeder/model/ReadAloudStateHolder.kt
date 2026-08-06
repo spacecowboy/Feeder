@@ -309,7 +309,7 @@ class TTSStateHolder(
     }
 
     companion object {
-        private const val LOG_TAG = "FeederTextToSpeech"
+        private const val LOG_TAG = "FEEDER_TTS"
         private val PUNCTUATION =
             arrayOf(
                 // New-lines

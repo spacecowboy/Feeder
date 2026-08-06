@@ -110,6 +110,6 @@ class FeederJobService : DIAwareJobService() {
     }
 
     companion object {
-        private const val LOG_TAG = "FeederJobService"
+        private const val LOG_TAG = "FEEDER_JOB_SERVICE"
     }
 }

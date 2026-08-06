@@ -12,7 +12,7 @@ class LinearTextBuilder : Appendable {
     private val text: StringBuilder = StringBuilder(16)
     private val annotations: MutableList<MutableRange<LinearTextAnnotationData>> = mutableListOf()
     private val annotationsStack: MutableList<MutableRange<LinearTextAnnotationData>> = mutableListOf()
-    private val mLastTwoChars: MutableList<Char> = mutableListOf()
+    private var lastCodePoint: Int? = null
 
     private val _ids: MutableSet<String> = mutableSetOf()
     val ids: Set<String>
@@ -21,22 +21,9 @@ class LinearTextBuilder : Appendable {
     val length: Int
         get() = text.length
 
-    val lastTwoChars: List<Char>
-        get() = mLastTwoChars
-
     val endsWithWhitespace: Boolean
         get() {
-            if (mLastTwoChars.isEmpty()) {
-                return true
-            }
-            mLastTwoChars.peekLatest()?.let { latest ->
-                // Non-breaking space (160) is not caught by trim or whitespace identification
-                if (latest.isWhitespace() || latest.code == 160) {
-                    return true
-                }
-            }
-
-            return false
+            return isCollapsableWhiteSpaceCode(lastCodePoint ?: SPACE_CODE)
         }
 
     fun pushId(id: String) {
@@ -46,18 +33,21 @@ class LinearTextBuilder : Appendable {
     }
 
     fun append(text: String) {
-        if (text.count() >= 2) {
-            mLastTwoChars.pushMaxTwo(text.secondToLast())
-        }
         if (text.isNotEmpty()) {
-            mLastTwoChars.pushMaxTwo(text.last())
+            lastCodePoint = text.codePointBefore(text.length)
         }
         this.text.append(text)
     }
 
     override fun append(char: Char): LinearTextBuilder {
-        mLastTwoChars.pushMaxTwo(char)
+        lastCodePoint = char.code
         text.append(char)
+        return this
+    }
+
+    fun appendCodePoint(codePoint: Int): LinearTextBuilder {
+        lastCodePoint = codePoint
+        text.appendCodePoint(codePoint)
         return this
     }
 
@@ -66,11 +56,8 @@ class LinearTextBuilder : Appendable {
             return this
         }
 
-        if (csq.count() >= 2) {
-            mLastTwoChars.pushMaxTwo(csq.secondToLast())
-        }
         if (csq.isNotEmpty()) {
-            mLastTwoChars.pushMaxTwo(csq.last())
+            lastCodePoint = csq.last().code
         }
         text.append(csq)
         return this
@@ -85,11 +72,8 @@ class LinearTextBuilder : Appendable {
             return this
         }
 
-        if (end - start >= 2) {
-            mLastTwoChars.pushMaxTwo(csq[start + end - 2])
-        }
         if (end - start > 0) {
-            mLastTwoChars.pushMaxTwo(csq[start + end - 1])
+            lastCodePoint = csq[start + end - 1].code
         }
         text.append(csq, start, end)
         return this
@@ -164,7 +148,7 @@ class LinearTextBuilder : Appendable {
     fun clearKeepingSpans() {
         _ids.clear()
         text.clear()
-        mLastTwoChars.clear()
+        lastCodePoint = null
         // Get rid of completed annotations
         annotations.clear()
 
@@ -184,27 +168,11 @@ class LinearTextBuilder : Appendable {
         return null
     }
 
+    fun isEmpty(): Boolean = lastCodePoint == null
+
+    fun isNotEmpty(): Boolean = !isEmpty()
+
     companion object {
         private const val LOG_TAG = "FEEDER_LINEARTB"
     }
 }
-
-fun LinearTextBuilder.isEmpty() = lastTwoChars.isEmpty()
-
-fun LinearTextBuilder.isNotEmpty() = lastTwoChars.isNotEmpty()
-
-private fun CharSequence.secondToLast(): Char {
-    if (count() < 2) {
-        throw NoSuchElementException("List has less than two items.")
-    }
-    return this[lastIndex - 1]
-}
-
-private fun <T> MutableList<T>.pushMaxTwo(item: T) {
-    this.add(0, item)
-    if (count() > 2) {
-        this.removeAt(this.lastIndex)
-    }
-}
-
-private fun <T> List<T>.peekLatest(): T? = this.firstOrNull()
