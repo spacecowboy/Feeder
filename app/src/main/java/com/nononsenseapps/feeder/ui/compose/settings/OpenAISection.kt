@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -66,6 +67,7 @@ import com.nononsenseapps.feeder.openai.isDeepL
 import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 enum class OpenAISectionType {
     Summary,
@@ -79,9 +81,12 @@ fun OpenAISection(
     state: OpenAISettingsState,
     onEvent: (OpenAISettingsEvent) -> Unit,
     section: OpenAISectionType,
+    modifier: Modifier = Modifier,
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
+    onLocalTranslationContentSave: () -> Unit = {},
+    onLocalTranslationContentDismiss: () -> Unit = {},
 ) {
     val sanitizedSettings = remember(section, state.settings) { section.sanitizeSettings(state.settings) }
 
@@ -110,7 +115,10 @@ fun OpenAISection(
                 )
             }
         Dialog(
-            onDismissRequest = { onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false)) },
+            onDismissRequest = {
+                onLocalTranslationContentDismiss()
+                onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
+            },
             properties = DialogProperties(usePlatformDefaultWidth = false),
         ) {
             Surface(
@@ -151,6 +159,7 @@ fun OpenAISection(
                             current = selected.applyTo(current)
                         },
                         onPreferredTranslationLanguageChange = { currentPreferredTranslationLanguage = it },
+                        localTranslationContent = localTranslationContent,
                         modifier =
                             Modifier
                                 .fillMaxWidth()
@@ -163,6 +172,7 @@ fun OpenAISection(
                     ) {
                         Button(
                             onClick = {
+                                onLocalTranslationContentDismiss()
                                 onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
                             },
                         ) {
@@ -175,6 +185,7 @@ fun OpenAISection(
                                 if (section == OpenAISectionType.Translation) {
                                     onPreferredTranslationLanguageChange(currentPreferredTranslationLanguage)
                                 }
+                                onLocalTranslationContentSave()
                                 onEvent(OpenAISettingsEvent.SwitchEditMode(enabled = false))
                             },
                             enabled = validationMessage == null,
@@ -194,9 +205,12 @@ fun TranslationApiSection(
     info: String,
     state: TranslationApiSettingsState,
     onEvent: (TranslationApiSettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
     preferredTranslationLanguage: String = "",
     onPreferredTranslationLanguageChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
+    onLocalTranslationContentSave: () -> Unit = {},
+    onLocalTranslationContentDismiss: () -> Unit = {},
 ) {
     OpenAISection(
         title = title,
@@ -207,6 +221,9 @@ fun TranslationApiSection(
         preferredTranslationLanguage = preferredTranslationLanguage,
         onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
         modifier = modifier,
+        localTranslationContent = localTranslationContent,
+        onLocalTranslationContentSave = onLocalTranslationContentSave,
+        onLocalTranslationContentDismiss = onLocalTranslationContentDismiss,
     )
 }
 
@@ -268,6 +285,7 @@ private fun OpenAISectionEdit(
     onProviderChange: (AIProviderPreset) -> Unit,
     onPreferredTranslationLanguageChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    localTranslationContent: @Composable () -> Unit = {},
 ) {
     val latestOnEvent by rememberUpdatedState(onEvent)
     val showAzureFields = provider == AIProviderPreset.AZURE_OPENAI
@@ -285,6 +303,8 @@ private fun OpenAISectionEdit(
 
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
+    var translationLanguageMenuExpanded by remember { mutableStateOf(false) }
+    var showOnlyBergamotLanguages by remember { mutableStateOf(false) }
     var timeoutString by remember(current.timeoutSeconds) { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
@@ -459,36 +479,23 @@ private fun OpenAISectionEdit(
         }
 
         if (section == OpenAISectionType.Translation && hasProvider) {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = preferredTranslationLanguage,
-                placeholder = {
-                    Text(stringResource(R.string.translation_language_placeholder))
-                },
-                label = {
-                    Text(stringResource(R.string.preferred_translation_language))
-                },
-                keyboardOptions =
-                    KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next,
-                    ),
-                keyboardActions =
-                    KeyboardActions(
-                        onNext = {
-                            focusManager.moveFocus(focusDirection = FocusDirection.Down)
-                        },
-                    ),
-                supportingText = {
-                    Text(
-                        text =
-                            preferredTranslationLanguageDescription(
-                                provider = provider,
-                                preferredTranslationLanguage = preferredTranslationLanguage,
-                            ),
-                    )
-                },
-                onValueChange = onPreferredTranslationLanguageChange,
+            TranslationLanguageField(
+                provider = provider,
+                preferredTranslationLanguage = preferredTranslationLanguage,
+                showOnlyBergamotLanguages = showOnlyBergamotLanguages,
+                expanded = translationLanguageMenuExpanded,
+                onExpandedChange = { translationLanguageMenuExpanded = it },
+                onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
             )
+
+            if (provider == AIProviderPreset.LOCAL_TRANSLATION) {
+                BergamotLanguagesOnlySwitch(
+                    checked = showOnlyBergamotLanguages,
+                    onCheckedChange = { showOnlyBergamotLanguages = it },
+                )
+
+                localTranslationContent()
+            }
         }
 
         if (hasProvider && provider != AIProviderPreset.LOCAL_TRANSLATION) {
@@ -584,31 +591,336 @@ private fun OpenAISectionEdit(
 }
 
 @Composable
-private fun preferredTranslationLanguageDescription(
+private fun TranslationLanguageField(
     provider: AIProviderPreset,
     preferredTranslationLanguage: String,
+    showOnlyBergamotLanguages: Boolean,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onPreferredTranslationLanguageChange: (String) -> Unit,
+) {
+    val languageOptions =
+        remember(provider, showOnlyBergamotLanguages) {
+            translationLanguageOptions(
+                provider = provider,
+                showOnlyBergamotLanguages = showOnlyBergamotLanguages,
+            )
+        }
+    val selectedLanguage =
+        remember(provider, preferredTranslationLanguage) {
+            translationLanguageOption(
+                provider = provider,
+                language = preferredTranslationLanguage,
+            )
+        }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = selectedLanguage?.label ?: preferredTranslationLanguage,
+                placeholder = {
+                    Text(stringResource(R.string.translation_language_placeholder))
+                },
+                label = {
+                    Text(stringResource(R.string.preferred_translation_language))
+                },
+                readOnly = true,
+                onValueChange = {},
+                trailingIcon = {
+                    IconButton(onClick = { onExpandedChange(true) }) {
+                        Icon(Icons.Filled.ExpandMore, contentDescription = stringResource(R.string.preferred_translation_language))
+                    }
+                },
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) },
+            ) {
+                languageOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(option.label)
+                        },
+                        onClick = {
+                            onPreferredTranslationLanguageChange(option.code)
+                            onExpandedChange(false)
+                        },
+                    )
+                }
+            }
+        }
+        Text(
+            modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
+            text =
+                preferredTranslationLanguageDescription(
+                    provider = provider,
+                    selectedLanguage = selectedLanguage,
+                ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Composable
+private fun BergamotLanguagesOnlySwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onCheckedChange(!checked) }
+                .semantics { role = Role.Switch }
+                .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.show_only_bergamot_languages),
+            modifier = Modifier.weight(1f),
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Composable
+private fun preferredTranslationLanguageDescription(
+    provider: AIProviderPreset,
+    selectedLanguage: TranslationLanguageOption?,
 ): String {
     if (provider != AIProviderPreset.LOCAL_TRANSLATION) {
         return stringResource(R.string.preferred_translation_language_description)
     }
 
-    val targetLanguage =
-        preferredTranslationLanguage
-            .takeIf { it.isNotBlank() }
-            ?: stringResource(R.string.preferred_translation_language_fallback)
+    val systemSetup = stringResource(R.string.local_translation_setup_system)
+    val targetLanguage = selectedLanguage?.name ?: stringResource(R.string.preferred_translation_language_fallback)
+    val targetCode = selectedLanguage?.normalizedBergamotCode()
 
-    return stringResource(
-        id = localTranslationSetupInstructionsRes(),
-        targetLanguage,
-    )
+    return if (targetCode != null && targetCode in BERGAMOT_TARGET_LANGUAGE_CODES) {
+        systemSetup + " " + stringResource(R.string.local_translation_setup_bergamot, targetLanguage)
+    } else {
+        systemSetup
+    }
 }
 
-private fun localTranslationSetupInstructionsRes(manufacturer: String = android.os.Build.MANUFACTURER): Int =
-    when {
-        manufacturer.equals("google", ignoreCase = true) -> R.string.local_translation_setup_pixel
-        manufacturer.equals("samsung", ignoreCase = true) -> R.string.local_translation_setup_samsung
-        else -> R.string.local_translation_setup_generic
+private data class TranslationLanguageOption(
+    val code: String,
+    val name: String,
+) {
+    val label: String = "$name ($code)"
+
+    fun normalizedBergamotCode(): String =
+        when (code.lowercase(Locale.ROOT).substringBefore('-')) {
+            "nb", "nn" -> "nb"
+            else -> code.lowercase(Locale.ROOT).substringBefore('-')
+        }
+}
+
+private fun translationLanguageOptions(
+    provider: AIProviderPreset,
+    showOnlyBergamotLanguages: Boolean,
+): List<TranslationLanguageOption> {
+    val options =
+        if (provider == AIProviderPreset.DEEPL) {
+            deepLTargetLanguageOptions()
+        } else {
+            isoLanguageOptions()
+        }
+
+    return if (provider == AIProviderPreset.LOCAL_TRANSLATION && showOnlyBergamotLanguages) {
+        options.filter { it.normalizedBergamotCode() in BERGAMOT_TARGET_LANGUAGE_CODES }
+    } else {
+        options
     }
+}
+
+private fun translationLanguageOption(
+    provider: AIProviderPreset,
+    language: String,
+): TranslationLanguageOption? {
+    val trimmed = language.trim().takeIf(String::isNotBlank) ?: return null
+    if (provider == AIProviderPreset.DEEPL) {
+        deepLTargetLanguageOptions()
+            .firstOrNull { option ->
+                option.code.equals(trimmed, ignoreCase = true) ||
+                    option.name.equals(trimmed, ignoreCase = true)
+            }?.let { return it }
+    }
+
+    isoLanguageOptions()
+        .firstOrNull { option ->
+            option.code.equals(trimmed, ignoreCase = true) ||
+                option.name.equals(trimmed, ignoreCase = true)
+        }?.let { return it }
+
+    val exactLocale = Locale.forLanguageTag(trimmed)
+    val exactLanguage = exactLocale.language.takeIf { it.isNotBlank() && it != "und" }
+    if (exactLanguage != null) {
+        return TranslationLanguageOption(
+            code = trimmed,
+            name = exactLocale.getDisplayLanguage(Locale.getDefault()).takeIf(String::isNotBlank) ?: trimmed,
+        )
+    }
+    return null
+}
+
+private fun isoLanguageOptions(): List<TranslationLanguageOption> =
+    Locale
+        .getISOLanguages()
+        .mapNotNull { code ->
+            val locale = Locale.forLanguageTag(code)
+            val name = locale.getDisplayLanguage(Locale.getDefault()).takeIf(String::isNotBlank) ?: return@mapNotNull null
+            TranslationLanguageOption(
+                code = code,
+                name = name,
+            )
+        }.distinctBy { it.code.lowercase(Locale.ROOT) }
+        .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
+
+private fun deepLTargetLanguageOptions(): List<TranslationLanguageOption> =
+    listOf(
+        TranslationLanguageOption("ACE", "Acehnese"),
+        TranslationLanguageOption("AF", "Afrikaans"),
+        TranslationLanguageOption("AN", "Aragonese"),
+        TranslationLanguageOption("AR", "Arabic"),
+        TranslationLanguageOption("AS", "Assamese"),
+        TranslationLanguageOption("AY", "Aymara"),
+        TranslationLanguageOption("AZ", "Azerbaijani"),
+        TranslationLanguageOption("BA", "Bashkir"),
+        TranslationLanguageOption("BE", "Belarusian"),
+        TranslationLanguageOption("BG", "Bulgarian"),
+        TranslationLanguageOption("BHO", "Bhojpuri"),
+        TranslationLanguageOption("BN", "Bengali"),
+        TranslationLanguageOption("BR", "Breton"),
+        TranslationLanguageOption("BS", "Bosnian"),
+        TranslationLanguageOption("CA", "Catalan"),
+        TranslationLanguageOption("CEB", "Cebuano"),
+        TranslationLanguageOption("CKB", "Kurdish (Sorani)"),
+        TranslationLanguageOption("CS", "Czech"),
+        TranslationLanguageOption("CY", "Welsh"),
+        TranslationLanguageOption("DA", "Danish"),
+        TranslationLanguageOption("DE", "German"),
+        TranslationLanguageOption("EL", "Greek"),
+        TranslationLanguageOption("EN", "English"),
+        TranslationLanguageOption("EN-GB", "English (British)"),
+        TranslationLanguageOption("EN-US", "English (American)"),
+        TranslationLanguageOption("EO", "Esperanto"),
+        TranslationLanguageOption("ES", "Spanish"),
+        TranslationLanguageOption("ES-419", "Spanish (Latin American)"),
+        TranslationLanguageOption("ET", "Estonian"),
+        TranslationLanguageOption("EU", "Basque"),
+        TranslationLanguageOption("FA", "Persian"),
+        TranslationLanguageOption("FI", "Finnish"),
+        TranslationLanguageOption("FR", "French"),
+        TranslationLanguageOption("GA", "Irish"),
+        TranslationLanguageOption("GL", "Galician"),
+        TranslationLanguageOption("GN", "Guarani"),
+        TranslationLanguageOption("GOM", "Konkani"),
+        TranslationLanguageOption("GU", "Gujarati"),
+        TranslationLanguageOption("HA", "Hausa"),
+        TranslationLanguageOption("HE", "Hebrew"),
+        TranslationLanguageOption("HI", "Hindi"),
+        TranslationLanguageOption("HR", "Croatian"),
+        TranslationLanguageOption("HT", "Haitian Creole"),
+        TranslationLanguageOption("HU", "Hungarian"),
+        TranslationLanguageOption("HY", "Armenian"),
+        TranslationLanguageOption("ID", "Indonesian"),
+        TranslationLanguageOption("IG", "Igbo"),
+        TranslationLanguageOption("IS", "Icelandic"),
+        TranslationLanguageOption("IT", "Italian"),
+        TranslationLanguageOption("JA", "Japanese"),
+        TranslationLanguageOption("JV", "Javanese"),
+        TranslationLanguageOption("KA", "Georgian"),
+        TranslationLanguageOption("KK", "Kazakh"),
+        TranslationLanguageOption("KMR", "Kurdish (Kurmanji)"),
+        TranslationLanguageOption("KO", "Korean"),
+        TranslationLanguageOption("KY", "Kyrgyz"),
+        TranslationLanguageOption("LA", "Latin"),
+        TranslationLanguageOption("LB", "Luxembourgish"),
+        TranslationLanguageOption("LMO", "Lombard"),
+        TranslationLanguageOption("LN", "Lingala"),
+        TranslationLanguageOption("LT", "Lithuanian"),
+        TranslationLanguageOption("LV", "Latvian"),
+        TranslationLanguageOption("MAI", "Maithili"),
+        TranslationLanguageOption("MG", "Malagasy"),
+        TranslationLanguageOption("MI", "Maori"),
+        TranslationLanguageOption("MK", "Macedonian"),
+        TranslationLanguageOption("ML", "Malayalam"),
+        TranslationLanguageOption("MN", "Mongolian"),
+        TranslationLanguageOption("MR", "Marathi"),
+        TranslationLanguageOption("MS", "Malay"),
+        TranslationLanguageOption("MT", "Maltese"),
+        TranslationLanguageOption("MY", "Burmese"),
+        TranslationLanguageOption("NB", "Norwegian Bokmal"),
+        TranslationLanguageOption("NE", "Nepali"),
+        TranslationLanguageOption("NL", "Dutch"),
+        TranslationLanguageOption("OC", "Occitan"),
+        TranslationLanguageOption("OM", "Oromo"),
+        TranslationLanguageOption("PA", "Punjabi"),
+        TranslationLanguageOption("PAG", "Pangasinan"),
+        TranslationLanguageOption("PAM", "Kapampangan"),
+        TranslationLanguageOption("PL", "Polish"),
+        TranslationLanguageOption("PRS", "Dari"),
+        TranslationLanguageOption("PS", "Pashto"),
+        TranslationLanguageOption("PT", "Portuguese"),
+        TranslationLanguageOption("PT-BR", "Portuguese (Brazilian)"),
+        TranslationLanguageOption("PT-PT", "Portuguese (European)"),
+        TranslationLanguageOption("QU", "Quechua"),
+        TranslationLanguageOption("RO", "Romanian"),
+        TranslationLanguageOption("RU", "Russian"),
+        TranslationLanguageOption("SA", "Sanskrit"),
+        TranslationLanguageOption("SCN", "Sicilian"),
+        TranslationLanguageOption("SK", "Slovak"),
+        TranslationLanguageOption("SL", "Slovenian"),
+        TranslationLanguageOption("SQ", "Albanian"),
+        TranslationLanguageOption("SR", "Serbian"),
+        TranslationLanguageOption("ST", "Sesotho"),
+        TranslationLanguageOption("SU", "Sundanese"),
+        TranslationLanguageOption("SV", "Swedish"),
+        TranslationLanguageOption("SW", "Swahili"),
+        TranslationLanguageOption("TA", "Tamil"),
+        TranslationLanguageOption("TE", "Telugu"),
+        TranslationLanguageOption("TG", "Tajik"),
+        TranslationLanguageOption("TH", "Thai"),
+        TranslationLanguageOption("TK", "Turkmen"),
+        TranslationLanguageOption("TL", "Tagalog"),
+        TranslationLanguageOption("TN", "Tswana"),
+        TranslationLanguageOption("TR", "Turkish"),
+        TranslationLanguageOption("TS", "Tsonga"),
+        TranslationLanguageOption("TT", "Tatar"),
+        TranslationLanguageOption("UK", "Ukrainian"),
+        TranslationLanguageOption("UR", "Urdu"),
+        TranslationLanguageOption("UZ", "Uzbek"),
+        TranslationLanguageOption("VI", "Vietnamese"),
+        TranslationLanguageOption("WO", "Wolof"),
+        TranslationLanguageOption("XH", "Xhosa"),
+        TranslationLanguageOption("YI", "Yiddish"),
+        TranslationLanguageOption("YUE", "Cantonese"),
+        TranslationLanguageOption("ZH", "Chinese"),
+        TranslationLanguageOption("ZH-HANS", "Chinese (simplified)"),
+        TranslationLanguageOption("ZH-HANT", "Chinese (traditional)"),
+        TranslationLanguageOption("ZU", "Zulu"),
+    ).sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, TranslationLanguageOption::name))
+
+private val BERGAMOT_TARGET_LANGUAGE_CODES =
+    setOf(
+        "bg",
+        "cs",
+        "de",
+        "en",
+        "es",
+        "et",
+        "fr",
+        "it",
+        "pt",
+        "ru",
+        "uk",
+    )
 
 @Composable
 private fun ProviderField(

@@ -338,9 +338,6 @@
     <string name="failed_to_fetch_full_article_too_large">L\'article est trop gros. Voulez-vous l\'ouvrir dans le navigateur ?</string>
     <string name="provider_local_translation">Local</string>
     <string name="preferred_translation_language_fallback">le langage préféré</string>
-    <string name="local_translation_setup_pixel">Pour la traduction en local des téléphones Pixel, ouvrir les paramètres Android, puis Système, Traduction en temps réel, Langages, et ajouter %1$s pour la traduction hors connexion. Selon vôtre version Android le nom des menus peuvent être différents ; installer aussi le langage source si Android le demande.</string>
-    <string name="local_translation_setup_samsung">Pour la traduction en local des téléphones Samsung, ouvrir les paramètres, puis Préférences générales, Pack de langues, et télécharger %1$s. Certaines versions Samsung placent le paramètre sous Clavier Samsung ou Traduction ; installer aussi le langage source si Android le demande.</string>
-    <string name="local_translation_setup_generic">Pour la traduction en local, ouvrir les paramètres de l\'appareil et chercher en local ou langage de traduction hors connexion sous Système, Paramètres généraux, Langues ou Traduction. Télécharger %1$s et les langages source que vous utilisez.</string>
     <string name="device_sync_beta_warning">ATTENTION ! Il s\'agit d\'une fonctionnalité expérimentale. Faites un export OPML de tous vos flux et conservez le fichier exporté en backup.</string>
     <string name="local_translation_requires_android_12">La traduction en local n\'est disponible que sur Android 12 ou plus.</string>
     <string name="rename_tag">Renommer le tag</string>

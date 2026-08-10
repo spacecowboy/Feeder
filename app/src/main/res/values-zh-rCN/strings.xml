@@ -337,9 +337,6 @@
     <string name="translate_articles_by_default">默认翻译文章</string>
     <string name="provider_local_translation">本地</string>
     <string name="preferred_translation_language_fallback">首选语言</string>
-    <string name="local_translation_setup_pixel">对于 Pixel 手机上的本地翻译，请打开 Android 设置，然后打开系统、实时翻译、语言，添加 %1$s 进行离线翻译。菜单名称可能因 Android 版本而异；如果 Android 要求，请安装源语言。</string>
-    <string name="local_translation_setup_samsung">对于 Samsung 设备上的本地翻译，请打开设置、常规管理、语言包，下载 %1$s。某些 Samsung 版本将其置于 Samsung 键盘或翻译下；如果 Android 要求，请安装源语言。</string>
-    <string name="local_translation_setup_generic">对于本地翻译，请打开设备的设置应用，然后在系统、常规管理、语言或翻译下查找设备端或离线翻译语言包。下载 %1$s 以及您阅读的源语言。</string>
     <string name="failed_to_fetch_full_article_too_large">文章太大。改为在浏览器中打开？</string>
     <string name="device_sync_beta_warning">警告！这是一项测试功能。使用前请先将所有订阅源导出为 OPML 文件并保存为备份。</string>
     <string name="local_translation_requires_android_12">本地翻译需要 Android 12 或更高版本。</string>

@@ -52,4 +52,25 @@ class TranslationLanguageUtilsKtTest {
             ),
         )
     }
+
+    @Test
+    fun prepareTextSamplesForLanguageDetectionSamplesLongTextAcrossContent() {
+        val content =
+            buildString {
+                append("A".repeat(4500))
+                append("B".repeat(4500))
+                append("C".repeat(4500))
+            }
+
+        val samples =
+            prepareTextSamplesForLanguageDetection(
+                content = content,
+                preserveHtml = false,
+            )
+
+        assertEquals(3, samples.size)
+        assertTrue(samples[0].startsWith("AAA"))
+        assertTrue(samples[1].contains("BBB"))
+        assertTrue(samples[2].endsWith("CCC"))
+    }
 }

@@ -31,6 +31,8 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +45,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -87,6 +90,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.localtranslation.LanguagePairInfo
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -103,6 +107,25 @@ import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.openGithubIssues
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import java.util.Locale
+
+private fun formatFileSize(bytes: Long): String {
+    val kb = bytes / 1024.0
+    val mb = kb / 1024.0
+    return when {
+        mb >= 1.0 -> "%.1f MB".format(mb)
+        kb >= 1.0 -> "%.0f KB".format(kb)
+        else -> "$bytes B"
+    }
+}
+
+private fun languageDisplayName(code: String): String =
+    runCatching {
+        Locale
+            .forLanguageTag(code)
+            .getDisplayLanguage(Locale.getDefault())
+            .replaceFirstChar { it.uppercase() }
+    }.getOrDefault(code)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -230,6 +253,10 @@ fun SettingsScreen(
                     intent = openGithubIssues(),
                 )
             },
+            downloadedLanguagePairs = viewState.translationModelPairs,
+            onDeleteLanguagePair = { source, target ->
+                settingsViewModel.deleteLanguagePair(source, target)
+            },
             modifier = Modifier.padding(padding),
         )
     }
@@ -317,6 +344,8 @@ private fun SettingsScreenPreview() {
             isAnimatedPaging = false,
             onIsAnimatedPagingChange = {},
             onSendFeedback = {},
+            downloadedLanguagePairs = emptyList(),
+            onDeleteLanguagePair = { _, _ -> },
             modifier = Modifier,
         )
     }
@@ -400,6 +429,8 @@ fun SettingsList(
     onIsAnimatedPagingChange: (Boolean) -> Unit,
     onTextSettings: () -> Unit,
     onSendFeedback: () -> Unit,
+    downloadedLanguagePairs: List<LanguagePairInfo>,
+    onDeleteLanguagePair: (source: String, target: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -787,6 +818,14 @@ fun SettingsList(
         SettingsGroup(
             title = R.string.openai_settings,
         ) {
+            var pendingDeletedLanguagePairs by remember { mutableStateOf(emptySet<Pair<String, String>>()) }
+            val visibleDownloadedLanguagePairs =
+                remember(downloadedLanguagePairs, pendingDeletedLanguagePairs) {
+                    downloadedLanguagePairs.filterNot { pair ->
+                        pair.sourceLanguage to pair.targetLanguage in pendingDeletedLanguagePairs
+                    }
+                }
+
             OpenAISection(
                 title = stringResource(R.string.summary_api_settings),
                 info = stringResource(R.string.summary_api_settings_info),
@@ -802,6 +841,31 @@ fun SettingsList(
                 onEvent = onTranslationApiEvent,
                 preferredTranslationLanguage = preferredTranslationLanguage,
                 onPreferredTranslationLanguageChange = onPreferredTranslationLanguageChange,
+                onLocalTranslationContentSave = {
+                    pendingDeletedLanguagePairs.forEach { (source, target) ->
+                        onDeleteLanguagePair(source, target)
+                    }
+                    pendingDeletedLanguagePairs = emptySet()
+                },
+                onLocalTranslationContentDismiss = {
+                    pendingDeletedLanguagePairs = emptySet()
+                },
+                localTranslationContent = {
+                    if (canTranslate && visibleDownloadedLanguagePairs.isNotEmpty()) {
+                        DownloadedModelsSection(
+                            downloadedLanguagePairs = visibleDownloadedLanguagePairs,
+                            onDeletePair = { source, target ->
+                                pendingDeletedLanguagePairs += source to target
+                            },
+                            onDeleteAll = {
+                                pendingDeletedLanguagePairs +=
+                                    visibleDownloadedLanguagePairs.map { pair ->
+                                        pair.sourceLanguage to pair.targetLanguage
+                                    }
+                            },
+                        )
+                    }
+                },
             )
 
             if (canTranslate) {
@@ -1525,3 +1589,149 @@ fun SwipeAsRead.asSwipeAsReadOption() =
         swipeAsRead = this,
         name = stringResource(id = stringId),
     )
+
+@Composable
+private fun DownloadedModelsSection(
+    downloadedLanguagePairs: List<LanguagePairInfo>,
+    onDeletePair: (source: String, target: String) -> Unit,
+    onDeleteAll: () -> Unit,
+) {
+    var deleteConfirmPair by remember { mutableStateOf<LanguagePairInfo?>(null) }
+    var showDeleteAllConfirm by remember { mutableStateOf(false) }
+
+    if (deleteConfirmPair != null) {
+        AlertDialog(
+            onDismissRequest = { deleteConfirmPair = null },
+            title = { Text(stringResource(R.string.delete_model_pair)) },
+            text = {
+                val pair = deleteConfirmPair!!
+                Text(
+                    stringResource(
+                        R.string.delete_model_pair_desc,
+                        languageDisplayName(pair.sourceLanguage),
+                        languageDisplayName(pair.targetLanguage),
+                        formatFileSize(pair.sizeBytes),
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDeletePair(deleteConfirmPair!!.sourceLanguage, deleteConfirmPair!!.targetLanguage)
+                    deleteConfirmPair = null
+                }) {
+                    Text(stringResource(R.string.delete_model_pair))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteConfirmPair = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    if (showDeleteAllConfirm) {
+        val totalSize = downloadedLanguagePairs.sumOf { it.sizeBytes }
+        AlertDialog(
+            onDismissRequest = { showDeleteAllConfirm = false },
+            title = { Text(stringResource(R.string.delete_all_models)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.delete_all_models_desc,
+                        downloadedLanguagePairs.size,
+                        formatFileSize(totalSize),
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDeleteAll()
+                    showDeleteAllConfirm = false
+                }) {
+                    Text(stringResource(R.string.delete_model_pair))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAllConfirm = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.downloaded_translation_models),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+        )
+        Text(
+            text = stringResource(R.string.downloaded_translation_models_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        for (pair in downloadedLanguagePairs) {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "${languageDisplayName(pair.sourceLanguage)} → ${languageDisplayName(pair.targetLanguage)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = formatFileSize(pair.sizeBytes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = { deleteConfirmPair = pair }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.delete_model_pair),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        if (downloadedLanguagePairs.size > 1) {
+            val totalSize = downloadedLanguagePairs.sumOf { it.sizeBytes }
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.delete_all_models),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = formatFileSize(totalSize),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = { showDeleteAllConfirm = true }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.delete_all_models),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}

@@ -21,6 +21,9 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
+import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
@@ -29,6 +32,7 @@ import com.nononsenseapps.feeder.model.PodcastPlayerStateHolder
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
+import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
@@ -61,6 +65,8 @@ class FeedViewModel(
     private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val translationManager: TranslationManager by instance()
+    private val bergamotModelManager: BergamotModelManager by instance()
+    private val localTranslator: LocalTranslator by instance()
 
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
@@ -258,6 +264,21 @@ class FeedViewModel(
 
                 if (cached.isFullyCached) {
                     return@launch
+                }
+
+                if (config.settings.isLocalTranslation) {
+                    val text =
+                        listOf(item.title, item.snippet)
+                            .filter { it.isNotBlank() }
+                            .joinToString(separator = " ")
+                    if (!localTranslator.canTranslateWithoutBergamotDownload(
+                            content = text,
+                            targetLanguage = config.targetLanguage,
+                            preserveHtml = false,
+                        )
+                    ) {
+                        return@launch
+                    }
                 }
 
                 val translatedItem =
@@ -468,13 +489,14 @@ class FeedViewModel(
             repository.showTitleUnreadCount,
             repository.syncWorkerRunning,
             repository.isOpenDrawerOnFab,
+            bergamotModelManager.downloadProgress,
             renameTagDialogVisible,
             podcastPlayerStateHolder.playerState,
-        ) { params: Array<Any> ->
+        ) { params: Array<Any?> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
             val currentFeedOrTag = params[13] as FeedOrTag
             val ttsState = params[14] as PlaybackStatus
-            val podcastPlayerState = params[29] as PodcastPlayerState
+            val podcastPlayerState = params[30] as PodcastPlayerState
 
             @Suppress("UNCHECKED_CAST")
             FeedState(
@@ -490,7 +512,7 @@ class FeedViewModel(
                 feedScreenTitle = params[8] as ScreenTitle,
                 showEditDialog = params[9] as Boolean,
                 showDeleteDialog = params[10] as Boolean,
-                showRenameTagDialog = params[28] as Boolean,
+                showRenameTagDialog = params[29] as Boolean,
                 visibleFeeds = params[11] as List<FeedTitle>,
                 isArticleOpen = params[12] as Boolean,
                 // 13
@@ -511,6 +533,7 @@ class FeedViewModel(
                 showReadingTime = params[24] as Boolean,
                 showTitleUnreadCount = params[25] as Boolean,
                 isOpenDrawerOnFab = params[27] as Boolean,
+                translationModelDownloadProgress = params[28] as BergamotModelDownloadProgress?,
             )
         }.stateIn(
             viewModelScope,
@@ -663,6 +686,7 @@ data class FeedState(
     override val search: String = "",
     override val showTitleUnreadCount: Boolean = false,
     override val isOpenDrawerOnFab: Boolean = false,
+    override val translationModelDownloadProgress: BergamotModelDownloadProgress? = null,
 ) : FeedScreenViewState
 
 @Immutable
@@ -696,6 +720,7 @@ interface FeedScreenViewState {
     val search: String
     val showTitleUnreadCount: Boolean
     val isOpenDrawerOnFab: Boolean
+    val translationModelDownloadProgress: BergamotModelDownloadProgress?
 }
 
 private data class FeedCardTranslationConfig(

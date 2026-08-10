@@ -336,9 +336,6 @@
     <string name="preferred_translation_language_description">Употребите име језика или кôд, као на пример, шпански, es, француски, или fr-CA.</string>
     <string name="preferred_translation_language_fallback">жељени језик</string>
     <string name="local_translation_requires_android_12">За локално превођење је потребна Android 12 или новији.</string>
-    <string name="local_translation_setup_pixel">За локално превођење на Pixel телефонима, отворите Android подешавања, затим Систем, Преведи уживо, Језици, па додајте %1$s за превођење ван мреже. Имена менија могу да се разликују у различиим Android верзијама; инсталирајте и изворни језик ако Android то затражи.</string>
-    <string name="local_translation_setup_samsung">За локално превођење на Samsung уређајима, итворите Подешавања, Опште управљање, Језички пакети, па преузмите %1$s. Неке Samsung верзије постављају ово под Samsung тастатура или Превођење; инсталирајте и изворни језик ако Android то затражи.</string>
-    <string name="local_translation_setup_generic">За локално превођење, отворите апликацију Подешавања и потражите језички пакети за превеђење на уређају или ван мреже под Систем, Опште управљање, Језици, или Превођење. Преузмите %1$s и изворне језике на којима читате.</string>
     <string name="translation_language_placeholder">На пример: енглески или en</string>
     <string name="set_translation_language_first">Поставља жељени језик за превођење у AI подешавањима</string>
     <string name="translate_feed_cards_by_default">Преводи прегледе чланака</string>

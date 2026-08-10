@@ -343,9 +343,6 @@
     <string name="preferred_translation_language_description">Använd ett språknamn eller en språkkod som spanska, es, franska eller fr-CA.</string>
     <string name="preferred_translation_language_fallback">föredraget språk</string>
     <string name="local_translation_requires_android_12">Lokal översättning kräver Android 12 eller senare.</string>
-    <string name="local_translation_setup_pixel">För lokal översättning på Pixel-telefoner, öppna Android-inställningar, sedan System, Live Translate, Språk och lägg till %1$s för offline-översättning. Menynamn kan variera beroende på Android-version; installera även källspråket om Android ber om det.</string>
-    <string name="local_translation_setup_samsung">För lokal översättning på Samsung-enheter, öppna Inställningar, Allmän hantering, Språkpaket och ladda ner %1$s. Vissa Samsung-versioner placerar detta under Samsung-tangentbord eller översättning; installera även källspråket om Android ber om det.</string>
-    <string name="local_translation_setup_generic">För lokal översättning öppnar du enhetens inställningsapp och letar efter språkpaket för översättning på enheten eller offline under System, Allmän hantering, Språk eller Översättning. Ladda ner %1$s och de källspråk du läser.</string>
     <string name="translation_language_placeholder">Till exempel: Swedish eller sv</string>
     <string name="set_translation_language_first">Ställ in ett önskat översättningsspråk i AI-inställningarna</string>
     <string name="translate_feed_cards_by_default">Översätt förhandsgranskningar av artiklar</string>

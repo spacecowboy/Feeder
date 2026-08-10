@@ -12,6 +12,8 @@ import com.nononsenseapps.feeder.archmodel.SyncRemoteStore
 import com.nononsenseapps.feeder.base.bindWithActivityViewModelScope
 import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
 import com.nononsenseapps.feeder.data.suggestions.SuggestedFeedRepository
+import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.BergamotWebTranslator
 import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.TranslationManager
@@ -50,6 +52,8 @@ val archModelModule =
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
+        bind<BergamotModelManager>() with singleton { BergamotModelManager(di) }
+        bind<BergamotWebTranslator>() with singleton { BergamotWebTranslator(di) }
         bind<LocalTranslator>() with singleton { LocalTranslator(di) }
         bind<TranslationManager>() with singleton { TranslationManager(di) }
         bindFactory<OpenAISettings, OpenAIClient> { settings -> OpenAIClientDefault(settings) }

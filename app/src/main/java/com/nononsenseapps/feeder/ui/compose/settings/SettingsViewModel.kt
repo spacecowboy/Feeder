@@ -17,6 +17,8 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
+import com.nononsenseapps.feeder.localtranslation.LanguagePairInfo
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
@@ -42,6 +44,7 @@ class SettingsViewModel(
     private val context: Application by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val openAIApi: OpenAIApi by instance()
+    private val bergamotModelManager: BergamotModelManager by instance()
 
     fun setCurrentTheme(value: ThemeOptions) {
         repository.setCurrentTheme(value)
@@ -204,8 +207,35 @@ class SettingsViewModel(
         repository.setPreferredTranslationLanguage(value)
     }
 
+    fun loadDownloadedLanguagePairs() {
+        viewModelScope.launch {
+            _downloadedLanguagePairs.value = bergamotModelManager.getDownloadedLanguagePairs()
+        }
+    }
+
+    fun deleteLanguagePair(
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
+        viewModelScope.launch {
+            bergamotModelManager.deleteLanguagePair(sourceLanguage, targetLanguage)
+            _downloadedLanguagePairs.value = bergamotModelManager.getDownloadedLanguagePairs()
+        }
+    }
+
+    fun deleteAllLanguagePairs() {
+        viewModelScope.launch {
+            _downloadedLanguagePairs.value.forEach { pair ->
+                bergamotModelManager.deleteLanguagePair(pair.sourceLanguage, pair.targetLanguage)
+            }
+            _downloadedLanguagePairs.value = emptyList()
+        }
+    }
+
     private val summaryOpenAIModelsState = MutableStateFlow<OpenAIModelsState>(OpenAIModelsState.None)
     private val translationApiModelsState = MutableStateFlow<TranslationApiModelsState>(OpenAIModelsState.None)
+    private val _downloadedLanguagePairs = MutableStateFlow<List<LanguagePairInfo>>(emptyList())
+    val downloadedLanguagePairs: StateFlow<List<LanguagePairInfo>> = _downloadedLanguagePairs.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
@@ -232,6 +262,7 @@ class SettingsViewModel(
         get() = _viewState.asStateFlow()
 
     init {
+        loadDownloadedLanguagePairs()
         viewModelScope.launch {
             combine(
                 repository.currentTheme,
@@ -272,6 +303,7 @@ class SettingsViewModel(
                 repository.font,
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
+                downloadedLanguagePairs,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -320,6 +352,7 @@ class SettingsViewModel(
                     font = params[35] as FontSelection,
                     isPagingMode = params[36] as Boolean,
                     isAnimatedPaging = params[37] as Boolean,
+                    translationModelPairs = params[38] as List<LanguagePairInfo>,
                 )
             }.collect {
                 _viewState.value = it
@@ -409,6 +442,7 @@ data class SettingsViewState(
     val isOpenDrawerOnFab: Boolean = false,
     val translateArticlePreviewsByDefault: Boolean = false,
     val translateArticlesByDefault: Boolean = false,
+    val translationModelPairs: List<LanguagePairInfo> = emptyList(),
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,

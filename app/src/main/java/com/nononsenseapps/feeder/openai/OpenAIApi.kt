@@ -86,7 +86,13 @@ class OpenAIApi(
 
         data class Error(
             override val content: String,
+            val action: ErrorAction = ErrorAction.None,
         ) : TranslationResult
+
+        enum class ErrorAction {
+            None,
+            OpenSystemTranslationSettings,
+        }
     }
 
     sealed interface ModelsResult {
