@@ -397,6 +397,14 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_OPEN_ADJACENT, value).apply()
     }
 
+    private val _useInAppAudioPlayer = MutableStateFlow(sp.getBoolean(PREF_USE_IN_APP_AUDIO_PLAYER, true))
+    val useInAppAudioPlayer = _useInAppAudioPlayer.asStateFlow()
+
+    fun setUseInAppAudioPlayer(value: Boolean) {
+        _useInAppAudioPlayer.value = value
+        sp.edit().putBoolean(PREF_USE_IN_APP_AUDIO_PLAYER, value).apply()
+    }
+
     private val _isPagingMode = MutableStateFlow(sp.getBoolean(PREF_PAGING_MODE, false))
     val isPagingMode = _isPagingMode.asStateFlow()
 
@@ -680,6 +688,7 @@ const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
 const val PREF_OPEN_ADJACENT = "pref_open_adjacent"
+const val PREF_USE_IN_APP_AUDIO_PLAYER = "pref_use_in_app_audio_player"
 
 const val PREF_PAGING_MODE = "pref_paging_mode"
 const val PREF_ANIMATED_PAGING = "pref_animated_paging"
@@ -762,6 +771,7 @@ enum class UserSettings(
     SETTING_DEFAULT_OPEN_ITEM_WITH(key = PREF_DEFAULT_OPEN_ITEM_WITH),
     SETTING_OPEN_LINKS_WITH(key = PREF_OPEN_LINKS_WITH),
     SETTING_OPEN_ADJACENT(key = PREF_OPEN_ADJACENT),
+    SETTING_USE_IN_APP_AUDIO_PLAYER(key = PREF_USE_IN_APP_AUDIO_PLAYER),
     SETTING_PAGING_MODE(key = PREF_PAGING_MODE),
     SETTING_ANIMATED_PAGING(key = PREF_ANIMATED_PAGING),
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),

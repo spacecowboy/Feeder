@@ -769,6 +769,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_USE_IN_APP_AUDIO_PLAYER -> "false"
                         UserSettings.SETTING_FONT -> "bundled/roboto_flex"
                         UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
                         UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"
@@ -848,6 +849,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_default_open_item_with" value="3"/>
           <feeder:setting key="pref_open_links_with" value="3"/>
           <feeder:setting key="pref_open_adjacent" value="true"/>
+          <feeder:setting key="pref_use_in_app_audio_player" value="false"/>
           <feeder:setting key="pref_paging_mode" value="true"/>
           <feeder:setting key="pref_animated_paging" value="true"/>
           <feeder:setting key="pref_body_text_scale" value="1.6"/>

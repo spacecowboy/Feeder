@@ -630,7 +630,7 @@ fun ArticleContent(
         wordCount = viewState.wordCount,
         onEnclosureClick = {
             if (viewState.enclosure.present) {
-                if (shouldOpenInPodcastPlayer(viewState.enclosure.link, viewState.enclosure)) {
+                if (viewState.useInAppAudioPlayer && shouldOpenInPodcastPlayer(viewState.enclosure.link, viewState.enclosure)) {
                     onOpenAudioPlayer(viewState.enclosure.link)
                 } else {
                     activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)
@@ -697,7 +697,7 @@ fun ArticleContent(
                                     }
                                 }
                             } else {
-                                if (shouldOpenInPodcastPlayer(link, viewState.enclosure)) {
+                                if (viewState.useInAppAudioPlayer && shouldOpenInPodcastPlayer(link, viewState.enclosure)) {
                                     onOpenAudioPlayer(link)
                                 } else {
                                     // External link - open in browser/custom tab

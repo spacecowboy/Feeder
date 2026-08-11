@@ -344,6 +344,10 @@ class Repository(
 
     fun setLinkOpener(value: LinkOpener) = settingsStore.setLinkOpener(value)
 
+    val useInAppAudioPlayer = settingsStore.useInAppAudioPlayer
+
+    fun setUseInAppAudioPlayer(value: Boolean) = settingsStore.setUseInAppAudioPlayer(value)
+
     val syncFrequency = settingsStore.syncFrequency
 
     fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)

@@ -110,6 +110,8 @@
   <string name="use_app_default">Use app default</string>
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>
+  <string name="use_in_app_audio_player">Play audio links with built-in player</string>
+  <string name="use_in_app_audio_player_description">When disabled, audio links open with your default app instead</string>
   <string name="reader_settings">Reader</string>
   <string name="article_list_settings">Article list</string>
   <string name="open_link_in_web_view">Open link in web view</string>
