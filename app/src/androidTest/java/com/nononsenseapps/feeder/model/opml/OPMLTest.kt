@@ -769,6 +769,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTINGS_FILTER_READ -> "false"
                         UserSettings.SETTINGS_LIST_SHOW_ONLY_TITLES -> "true"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"
+                        UserSettings.SETTING_USE_IN_APP_AUDIO_PLAYER -> "false"
                         UserSettings.SETTING_FONT -> "bundled/roboto_flex"
                         UserSettings.SETTING_LIST_SHOW_READING_TIME -> "false"
                         UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> "true"

@@ -160,6 +160,7 @@ class ArticleViewModel(
             articleTranslationState,
             bergamotModelManager.downloadProgress,
             podcastPlayerStateHolder.playerState,
+            repository.useInAppAudioPlayer,
         ) { params ->
             val article = params[0] as Article?
             val textToDisplay = params[1] as TextToDisplay
@@ -181,6 +182,7 @@ class ArticleViewModel(
             val translationState = params[14] as ArticleTranslationState
             val translationDownloadProgress = params[15] as BergamotModelDownloadProgress?
             val podcastPlayerState = params[16] as PodcastPlayerState
+            val useInAppAudioPlayer = params[17] as Boolean
             val currentTranslation =
                 (translationState as? ArticleTranslationState.Result)
                     ?.takeIf { it.isFullText == isFullText }
@@ -198,6 +200,7 @@ class ArticleViewModel(
                 isBottomBarVisible = ttsState != PlaybackStatus.STOPPED || podcastPlayerState.isVisible,
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
                 podcastPlayerState = podcastPlayerState,
+                useInAppAudioPlayer = useInAppAudioPlayer,
                 ttsLanguages = ttsLanguages,
                 articleFeedUrl = article?.feedUrl,
                 articleId = itemId,
@@ -876,6 +879,7 @@ private data class ArticleState(
     override val isBottomBarVisible: Boolean = false,
     override val isTTSPlaying: Boolean = false,
     override val podcastPlayerState: PodcastPlayerState = PodcastPlayerState(),
+    override val useInAppAudioPlayer: Boolean = true,
     override val ttsLanguages: List<Locale> = emptyList(),
     override val articleFeedUrl: String? = null,
     override val articleId: Long = ID_UNSET,
@@ -910,6 +914,7 @@ interface ArticleScreenViewState {
     val isBottomBarVisible: Boolean
     val isTTSPlaying: Boolean
     val podcastPlayerState: PodcastPlayerState
+    val useInAppAudioPlayer: Boolean
     val ttsLanguages: List<Locale>
     val articleFeedUrl: String?
     val articleId: Long

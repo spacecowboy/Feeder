@@ -205,6 +205,8 @@ fun SettingsScreen(
             onLinkOpenerChange = settingsViewModel::setLinkOpener,
             currentSyncFrequencyValue = viewState.syncFrequency,
             onSyncFrequencyChange = settingsViewModel::setSyncFrequency,
+            useInAppAudioPlayer = viewState.useInAppAudioPlayer,
+            onUseInAppAudioPlayerChange = settingsViewModel::setUseInAppAudioPlayer,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
             useDynamicTheme = viewState.useDynamicTheme,
@@ -303,6 +305,8 @@ private fun SettingsScreenPreview() {
             onLinkOpenerChange = {},
             currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
             onSyncFrequencyChange = {},
+            useInAppAudioPlayer = true,
+            onUseInAppAudioPlayerChange = {},
             batteryOptimizationIgnoredValue = false,
             onOpenSyncSettings = {},
             useDynamicTheme = true,
@@ -388,6 +392,8 @@ fun SettingsList(
     onLinkOpenerChange: (LinkOpener) -> Unit,
     currentSyncFrequencyValue: SyncFrequency,
     onSyncFrequencyChange: (SyncFrequency) -> Unit,
+    useInAppAudioPlayer: Boolean,
+    onUseInAppAudioPlayerChange: (Boolean) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
@@ -759,6 +765,13 @@ fun SettingsList(
                 modifier =
                     Modifier
                         .width(dimens.maxContentWidth),
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.use_in_app_audio_player),
+                checked = useInAppAudioPlayer,
+                onCheckedChange = onUseInAppAudioPlayerChange,
+                description = stringResource(id = R.string.use_in_app_audio_player_description),
             )
 
             val notCompactScreen = LocalConfiguration.current.smallestScreenWidthDp >= 600

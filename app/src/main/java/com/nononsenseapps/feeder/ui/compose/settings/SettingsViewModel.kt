@@ -21,7 +21,6 @@ import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
 import com.nononsenseapps.feeder.localtranslation.LanguagePairInfo
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
-import com.nononsenseapps.feeder.ui.compose.settings.FontSelection
 import com.nononsenseapps.feeder.ui.compose.settings.FontSelection.SystemDefault
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -102,6 +101,10 @@ class SettingsViewModel(
 
     fun setLinkOpener(value: LinkOpener) {
         repository.setLinkOpener(value)
+    }
+
+    fun setUseInAppAudioPlayer(value: Boolean) {
+        repository.setUseInAppAudioPlayer(value)
     }
 
     fun setSyncFrequency(value: SyncFrequency) =
@@ -304,6 +307,7 @@ class SettingsViewModel(
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
                 downloadedLanguagePairs,
+                repository.useInAppAudioPlayer,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -353,6 +357,7 @@ class SettingsViewModel(
                     isPagingMode = params[36] as Boolean,
                     isAnimatedPaging = params[37] as Boolean,
                     translationModelPairs = params[38] as List<LanguagePairInfo>,
+                    useInAppAudioPlayer = params[39] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -446,6 +451,7 @@ data class SettingsViewState(
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,
+    val useInAppAudioPlayer: Boolean = true,
 )
 
 data class UIFeedSettings(
