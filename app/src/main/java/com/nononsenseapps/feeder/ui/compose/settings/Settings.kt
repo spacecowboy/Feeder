@@ -259,6 +259,8 @@ fun SettingsScreen(
             onDeleteLanguagePair = { source, target ->
                 settingsViewModel.deleteLanguagePair(source, target)
             },
+            forceSingleColumn = viewState.forceSingleColumn,
+            onForceSingleColumnChange = settingsViewModel::setForceSingleColumn,
             modifier = Modifier.padding(padding),
         )
     }
@@ -350,6 +352,8 @@ private fun SettingsScreenPreview() {
             onSendFeedback = {},
             downloadedLanguagePairs = emptyList(),
             onDeleteLanguagePair = { _, _ -> },
+            forceSingleColumn = false,
+            onForceSingleColumnChange = {},
             modifier = Modifier,
         )
     }
@@ -437,6 +441,8 @@ fun SettingsList(
     onSendFeedback: () -> Unit,
     downloadedLanguagePairs: List<LanguagePairInfo>,
     onDeleteLanguagePair: (source: String, target: String) -> Unit,
+    forceSingleColumn: Boolean,
+    onForceSingleColumnChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -726,6 +732,12 @@ fun SettingsList(
                 title = stringResource(id = R.string.show_title_unread_count),
                 checked = showTitleUnreadCount,
                 onCheckedChange = onShowTitleUnreadCountChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.force_single_column),
+                checked = forceSingleColumn,
+                onCheckedChange = onForceSingleColumnChange,
             )
         }
 

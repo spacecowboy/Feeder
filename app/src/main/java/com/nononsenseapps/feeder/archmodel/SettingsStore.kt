@@ -608,6 +608,14 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_OPEN_DRAWER_ON_FAB, value).apply()
     }
 
+    private val _forceSingleColumn = MutableStateFlow(sp.getBoolean(PREF_FORCE_SINGLE_COLUMN, false))
+    val forceSingleColumn = _forceSingleColumn.asStateFlow()
+
+    fun setForceSingleColumn(value: Boolean) {
+        _forceSingleColumn.value = value
+        sp.edit().putBoolean(PREF_FORCE_SINGLE_COLUMN, value).apply()
+    }
+
     fun getAllSettings(): Map<String, String> {
         val all = sp.all ?: emptyMap()
 
@@ -747,6 +755,7 @@ const val PREF_TRANSLATE_ARTICLES_BY_DEFAULT = "pref_translate_articles_by_defau
  * Appearance settings
  */
 const val PREF_SHOW_TITLE_UNREAD_COUNT = "pref_show_title_unread_count"
+const val PREF_FORCE_SINGLE_COLUMN = "pref_force_single_column"
 
 /**
  * Used for OPML Import/Export. Please add new (only) user configurable settings here
@@ -807,6 +816,7 @@ enum class UserSettings(
     SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS(key = PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS),
     SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT),
     SETTING_TRANSLATE_ARTICLES_BY_DEFAULT(key = PREF_TRANSLATE_ARTICLES_BY_DEFAULT),
+    SETTINGS_FORCE_SINGLE_COLUMN(key = PREF_FORCE_SINGLE_COLUMN),
     ;
 
     companion object {

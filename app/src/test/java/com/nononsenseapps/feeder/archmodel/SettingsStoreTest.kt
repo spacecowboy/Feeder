@@ -393,6 +393,17 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun forceSingleColumn() {
+        store.setForceSingleColumn(true)
+
+        verify {
+            sp.edit().putBoolean(PREF_FORCE_SINGLE_COLUMN, true).apply()
+        }
+
+        assertEquals(true, store.forceSingleColumn.value)
+    }
+
+    @Test
     fun applyBlocklistToSummariesDefaultsToFalse() {
         every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns false
 

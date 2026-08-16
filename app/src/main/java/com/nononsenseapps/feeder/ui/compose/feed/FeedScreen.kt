@@ -1677,7 +1677,7 @@ fun FeedGridContent(
         ) {
             LazyVerticalStaggeredGrid(
                 state = gridState,
-                columns = StaggeredGridCells.Fixed(LocalDimens.current.feedScreenColumns),
+                columns = StaggeredGridCells.Fixed(if (viewState.forceSingleColumn) 1 else LocalDimens.current.feedScreenColumns),
                 contentPadding =
                     if (viewState.isBottomBarVisible) {
                         PaddingValues(0.dp)

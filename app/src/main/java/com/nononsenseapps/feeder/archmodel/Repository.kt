@@ -386,6 +386,10 @@ class Repository(
 
     fun setOpenDrawerOnFab(value: Boolean) = settingsStore.setOpenDrawerOnFab(value)
 
+    val forceSingleColumn = settingsStore.forceSingleColumn
+
+    fun setForceSingleColumn(value: Boolean) = settingsStore.setForceSingleColumn(value)
+
     /**
      * Returns true if the latest sync timestamp is within the last 10 seconds
      */
