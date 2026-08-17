@@ -637,6 +637,9 @@ fun ArticleContent(
                 }
             }
         },
+        onEnclosureLongPress = {
+            activityLauncher.openLinkInBrowser(link = viewState.enclosure.link)
+        },
         onFeedTitleClick = onFeedTitleClick,
         enclosure = viewState.enclosure,
         articleTitle = viewState.articleTitle,

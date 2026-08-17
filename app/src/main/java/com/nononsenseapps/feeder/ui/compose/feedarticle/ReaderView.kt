@@ -5,6 +5,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
@@ -88,6 +90,7 @@ fun ReaderView(
     screenType: ScreenType,
     wordCount: Int,
     onEnclosureClick: () -> Unit,
+    onEnclosureLongPress: () -> Unit,
     onFeedTitleClick: () -> Unit,
     enclosure: Enclosure,
     articleTitle: String,
@@ -273,8 +276,11 @@ fun ReaderView(
                                     modifier =
                                         Modifier
                                             .width(dimens.maxReaderWidth)
-                                            .clickable {
-                                                onEnclosureClick()
+                                            .pointerInput(Unit) {
+                                                detectTapGestures(
+                                                    onTap = { onEnclosureClick() },
+                                                    onLongPress = { onEnclosureLongPress() },
+                                                )
                                             }.clearAndSetSemantics {
                                                 try {
                                                     customActions =
@@ -379,6 +385,7 @@ private fun ReaderPreview() {
                 screenType = ScreenType.SINGLE,
                 wordCount = 9700,
                 onEnclosureClick = {},
+                onEnclosureLongPress = {},
                 onFeedTitleClick = {},
                 enclosure = Enclosure(),
                 articleTitle = "Article title on top",
