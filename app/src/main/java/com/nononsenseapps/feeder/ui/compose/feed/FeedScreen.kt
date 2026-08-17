@@ -166,6 +166,7 @@ import org.kodein.di.instance
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 
@@ -1461,16 +1462,23 @@ fun FeedListContent(
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
+                    // Last known position relative to the top edge of the list. Only items which
+                    // have been scrolled past the top may be marked as read - items which leave at
+                    // the bottom (scrolling back up, or being pushed down by newly synced items)
+                    // must stay unread. Deliberately not snapshot state - it is written from the
+                    // layout phase and only read once the item leaves composition, so making it
+                    // observable would dirty the snapshot on every scroll frame.
+                    val itemScrolledOffTop = remember(previewItem.id) { AtomicBoolean(false) }
 
                     LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
                         onTranslateFeedCard(loadedItem)
                     }
 
-                    // Gets executed when only unread items are being shown
-                    // Marks items which have been visible as read when they scroll off screen
+                    // Marks items which have been visible long enough as read once they leave
+                    // composition, which happens when they scroll out of the viewport
                     DisposableEffect(previewItem.id, markAsUnread) {
                         onDispose {
-                            if (itemWasVisible) {
+                            if (itemWasVisible && itemScrolledOffTop.get()) {
                                 coroutineScope.launch {
                                     logDebug(LOG_TAG, "Marking ${previewItem.id} as read")
                                     markAsUnread(previewItem.id, false)
@@ -1562,20 +1570,18 @@ fun FeedListContent(
                                 }.let { modifier ->
                                     if (viewState.markAsReadOnScroll && previewItem.unread) {
                                         modifier.trackVisibility(0.9f) { info ->
+                                            // Remembered so the disposable effect can tell in which
+                                            // direction the item left the screen
+                                            itemScrolledOffTop.set(info.isScrolledOffTop)
                                             if (info.isAboveThreshold) {
                                                 // Using itemCoroutineScope because that scope gets destroyed when item scrolls off screen
                                                 // So implicitly, if user is scrolling very fast, the coroutine will be cancelled
                                                 // before marking as read
                                                 itemCoroutineScope.launch {
                                                     delay(REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ)
-                                                    if (viewState.filter.unread) {
-                                                        logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
-                                                        itemWasVisible = true
-                                                        // Marks as read in disposable effect
-                                                    } else {
-                                                        logDebug(LOG_TAG, "Item $itemIndex marking as read")
-                                                        markAsUnread(previewItem.id, false)
-                                                    }
+                                                    logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
+                                                    itemWasVisible = true
+                                                    // Marks as read in disposable effect
                                                 }
                                             }
                                         }
@@ -1705,16 +1711,23 @@ fun FeedGridContent(
 
                     val itemCoroutineScope = rememberCoroutineScope()
                     var itemWasVisible by remember(previewItem.id) { mutableStateOf(false) }
+                    // Last known position relative to the top edge of the list. Only items which
+                    // have been scrolled past the top may be marked as read - items which leave at
+                    // the bottom (scrolling back up, or being pushed down by newly synced items)
+                    // must stay unread. Deliberately not snapshot state - it is written from the
+                    // layout phase and only read once the item leaves composition, so making it
+                    // observable would dirty the snapshot on every scroll frame.
+                    val itemScrolledOffTop = remember(previewItem.id) { AtomicBoolean(false) }
 
                     LaunchedEffect(loadedItem.id, loadedItem.title, loadedItem.snippet, translatedFeedCards.generation, onTranslateFeedCard) {
                         onTranslateFeedCard(loadedItem)
                     }
 
-                    // Gets executed when only unread items are being shown
-                    // Marks items which have been visible as read when they scroll off screen
+                    // Marks items which have been visible long enough as read once they leave
+                    // composition, which happens when they scroll out of the viewport
                     DisposableEffect(previewItem.id, markAsUnread) {
                         onDispose {
-                            if (itemWasVisible) {
+                            if (itemWasVisible && itemScrolledOffTop.get()) {
                                 coroutineScope.launch {
                                     logDebug(LOG_TAG, "Marking ${previewItem.id} as read")
                                     markAsUnread(previewItem.id, false)
@@ -1790,20 +1803,18 @@ fun FeedGridContent(
                             if (viewState.markAsReadOnScroll && previewItem.unread) {
                                 Modifier
                                     .trackVisibility(0.9f) { info ->
+                                        // Remembered so the disposable effect can tell in which
+                                        // direction the item left the screen
+                                        itemScrolledOffTop.set(info.isScrolledOffTop)
                                         if (info.isAboveThreshold) {
                                             // Using itemCoroutineScope because that scope gets destroyed when item scrolls off screen
                                             // So implicitly, if user is scrolling very fast, the coroutine will be cancelled
                                             // before marking as read
                                             itemCoroutineScope.launch {
                                                 delay(REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ)
-                                                if (viewState.filter.unread) {
-                                                    logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
-                                                    itemWasVisible = true
-                                                    // Marks as read in disposable effect
-                                                } else {
-                                                    logDebug(LOG_TAG, "Item $itemIndex marking as read")
-                                                    markAsUnread(previewItem.id, false)
-                                                }
+                                                logDebug(LOG_TAG, "Item $itemIndex marking as wasVisible")
+                                                itemWasVisible = true
+                                                // Marks as read in disposable effect
                                             }
                                         }
                                     }.then(
