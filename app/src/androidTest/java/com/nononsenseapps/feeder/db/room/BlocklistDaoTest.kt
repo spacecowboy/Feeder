@@ -54,12 +54,12 @@ class BlocklistDaoTest {
     }
 
     @Test
-    fun blockByTitleOnly_doesNotBlockBySnippet() =
+    fun blockByTitleOnly_doesNotBlockBySnippetAndLink() =
         runBlocking {
             // Add blocklist pattern
             blocklistDao.insertSafely("blocked")
 
-            // Create items - one with blocked title, one with blocked snippet
+            // Create items - one with blocked title, one with blocked snippet, one with blocked link
             val item1Id =
                 feedItemDao.insertFeedItem(
                     FeedItem(
@@ -68,6 +68,7 @@ class BlocklistDaoTest {
                         plainTitle = "This contains blocked word",
                         plainSnippet = "Normal snippet",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
                     ),
                 )
             val item2Id =
@@ -78,6 +79,7 @@ class BlocklistDaoTest {
                         plainTitle = "Normal title",
                         plainSnippet = "This contains blocked word",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
                     ),
                 )
             val item3Id =
@@ -88,29 +90,43 @@ class BlocklistDaoTest {
                         plainTitle = "Clean title",
                         plainSnippet = "Clean snippet",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
+                    ),
+                )
+            val item4Id =
+                feedItemDao.insertFeedItem(
+                    FeedItem(
+                        guid = "item4",
+                        feedId = testFeedId,
+                        plainTitle = "Normal title",
+                        plainSnippet = "Normal snippet",
+                        pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/blocked",
                     ),
                 )
 
             // Block with title only (applyToSummaries = false)
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = false)
 
-            // Verify: item1 should be blocked, item2 should NOT be blocked, item3 should not be blocked
+            // Verify: item1 should be blocked, item2 should NOT be blocked, item3 should not be blocked, item4 should NOT be blocked
             val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
             val retrievedItem2 = feedItemDao.loadFeedItem(item2Id)
             val retrievedItem3 = feedItemDao.loadFeedItem(item3Id)
+            val retrievedItem4 = feedItemDao.loadFeedItem(item4Id)
 
             assertNotNull("Item1 should be blocked", retrievedItem1?.blockTime)
             assertNull("Item2 should NOT be blocked (title-only mode)", retrievedItem2?.blockTime)
             assertNull("Item3 should not be blocked", retrievedItem3?.blockTime)
+            assertNull("Item4 should NOT be blocked (title-only mode)", retrievedItem4?.blockTime)
         }
 
     @Test
-    fun blockByTitleAndSnippet_blocksFromBoth() =
+    fun blockByTitleSnippetAndLink_blocksFromSnippetOrLink() =
         runBlocking {
             // Add blocklist pattern
             blocklistDao.insertSafely("blocked")
 
-            // Create items - one with blocked title, one with blocked snippet
+            // Create items - one with blocked title, one with blocked snippet, one with blocked link
             val item1Id =
                 feedItemDao.insertFeedItem(
                     FeedItem(
@@ -119,6 +135,7 @@ class BlocklistDaoTest {
                         plainTitle = "This contains blocked word",
                         plainSnippet = "Normal snippet",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
                     ),
                 )
             val item2Id =
@@ -129,6 +146,7 @@ class BlocklistDaoTest {
                         plainTitle = "Normal title",
                         plainSnippet = "This contains blocked word",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
                     ),
                 )
             val item3Id =
@@ -139,20 +157,48 @@ class BlocklistDaoTest {
                         plainTitle = "Clean title",
                         plainSnippet = "Clean snippet",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
+                    ),
+                )
+            val item4Id =
+                feedItemDao.insertFeedItem(
+                    FeedItem(
+                        guid = "item4",
+                        feedId = testFeedId,
+                        plainTitle = "Normal title",
+                        plainSnippet = "Normal snippet",
+                        pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/blocked",
                     ),
                 )
 
-            // Block with title AND snippet (applyToSummaries = true)
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = true)
+            // Block with title AND snippet (applyToSummaries = true, applyToLinks = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = true, applyToLinks = false)
 
-            // Verify: both item1 and item2 should be blocked, item3 should not
-            val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
-            val retrievedItem2 = feedItemDao.loadFeedItem(item2Id)
-            val retrievedItem3 = feedItemDao.loadFeedItem(item3Id)
+            // Verify: both item1 and item2 should be blocked, item3 and item4 should not
+            var retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
+            var retrievedItem2 = feedItemDao.loadFeedItem(item2Id)
+            var retrievedItem3 = feedItemDao.loadFeedItem(item3Id)
+            var retrievedItem4 = feedItemDao.loadFeedItem(item4Id)
 
             assertNotNull("Item1 should be blocked", retrievedItem1?.blockTime)
             assertNotNull("Item2 should be blocked (title+snippet mode)", retrievedItem2?.blockTime)
             assertNull("Item3 should not be blocked", retrievedItem3?.blockTime)
+            assertNull("Item4 should NOT be blocked (title+snippet mode)", retrievedItem4?.blockTime)
+
+            // Block with title AND link (applyToSummaries = false, applyToLinks = true)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = true)
+
+            // Verify: both item1 and item4 should be blocked, item2 and item3 should not
+            retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
+            retrievedItem2 = feedItemDao.loadFeedItem(item2Id)
+            retrievedItem3 = feedItemDao.loadFeedItem(item3Id)
+            retrievedItem4 = feedItemDao.loadFeedItem(item4Id)
+
+            assertNotNull("Item1 should be blocked", retrievedItem1?.blockTime)
+            assertNull("Item2 should NOT be blocked (title+link mode)", retrievedItem2?.blockTime)
+            assertNull("Item3 should not be blocked", retrievedItem3?.blockTime)
+            assertNotNull("Item4 should be blocked (title+link mode)", retrievedItem4?.blockTime)
         }
 
     @Test
@@ -187,7 +233,7 @@ class BlocklistDaoTest {
             val newBlockTime = Instant.now()
 
             // Block only where null
-            blocklistDao.setItemBlockStatusWhereNull(newBlockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatusWhereNull(newBlockTime, applyToSummaries = false, applyToLinks = false)
 
             // Verify: item1 should have new block time, item2 should keep old block time
             val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
@@ -245,7 +291,7 @@ class BlocklistDaoTest {
                 )
 
             // Block only for first feed
-            blocklistDao.setItemBlockStatusForNewInFeed(testFeedId, blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatusForNewInFeed(testFeedId, blockTime, applyToSummaries = false, applyToLinks = false)
 
             // Verify: only item1 should be blocked
             val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
@@ -273,13 +319,13 @@ class BlocklistDaoTest {
                 )
 
             // Block
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = false)
             var retrievedItem = feedItemDao.loadFeedItem(itemId)
             assertNotNull("Item should be blocked", retrievedItem?.blockTime)
 
             // Remove pattern and re-run blocking
             blocklistDao.deletePattern("bad")
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false, applyToLinks = false)
 
             // Verify: item should be unblocked
             retrievedItem = feedItemDao.loadFeedItem(itemId)
@@ -313,7 +359,7 @@ class BlocklistDaoTest {
                     ),
                 )
 
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = false)
 
             // Both should be blocked due to wildcard pattern
             val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
@@ -339,7 +385,7 @@ class BlocklistDaoTest {
                     ),
                 )
 
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = false)
 
             val retrievedItem = feedItemDao.loadFeedItem(itemId)
             assertNotNull("Should match case-insensitively", retrievedItem?.blockTime)
@@ -382,7 +428,7 @@ class BlocklistDaoTest {
                     ),
                 )
 
-            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(blockTime, applyToSummaries = false, applyToLinks = false)
 
             val retrievedItem1 = feedItemDao.loadFeedItem(item1Id)
             val retrievedItem2 = feedItemDao.loadFeedItem(item2Id)

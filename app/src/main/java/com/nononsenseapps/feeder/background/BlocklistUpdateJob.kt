@@ -39,11 +39,12 @@ class BlocklistUpdateJob(
         val onlyNew = params.extras.getBoolean(ARG_ONLY_NEW, false)
         val feedId = params.extras.getLong(ARG_FEED_ID, ID_UNSET)
         val applyToSummaries = settingsStore.applyBlocklistToSummaries.value
+        val applyToLinks = settingsStore.applyBlocklistToLinks.value
 
         when {
-            feedId != ID_UNSET -> blocklistDao.setItemBlockStatusForNewInFeed(feedId, Instant.now(), applyToSummaries)
-            onlyNew -> blocklistDao.setItemBlockStatusWhereNull(Instant.now(), applyToSummaries)
-            else -> blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries)
+            feedId != ID_UNSET -> blocklistDao.setItemBlockStatusForNewInFeed(feedId, Instant.now(), applyToSummaries, applyToLinks)
+            onlyNew -> blocklistDao.setItemBlockStatusWhereNull(Instant.now(), applyToSummaries, applyToLinks)
+            else -> blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries, applyToLinks)
         }
 
         logDebug(LOG_TAG, "Work done!")

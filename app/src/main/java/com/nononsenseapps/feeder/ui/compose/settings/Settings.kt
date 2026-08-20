@@ -183,6 +183,8 @@ fun SettingsScreen(
             blockListValue = ImmutableHolder(viewState.blockList.sorted()),
             applyBlocklistToSummaries = viewState.applyBlocklistToSummaries,
             onApplyBlocklistToSummariesChange = settingsViewModel::setApplyBlocklistToSummaries,
+            applyBlocklistToLinks = viewState.applyBlocklistToLinks,
+            onApplyBlocklistToLinksChange = settingsViewModel::setApplyBlocklistToLinks,
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChange = settingsViewModel::setSwipeAsRead,
             syncOnStartupValue = viewState.syncOnResume,
@@ -285,6 +287,8 @@ private fun SettingsScreenPreview() {
             blockListValue = ImmutableHolder(emptyList()),
             applyBlocklistToSummaries = false,
             onApplyBlocklistToSummariesChange = {},
+            applyBlocklistToLinks = false,
+            onApplyBlocklistToLinksChange = {},
             swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
             onSwipeAsReadOptionChange = {},
             syncOnStartupValue = true,
@@ -374,6 +378,8 @@ fun SettingsList(
     blockListValue: ImmutableHolder<List<String>>,
     applyBlocklistToSummaries: Boolean,
     onApplyBlocklistToSummariesChange: (Boolean) -> Unit,
+    applyBlocklistToLinks: Boolean,
+    onApplyBlocklistToLinksChange: (Boolean) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChange: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
@@ -510,39 +516,57 @@ fun SettingsList(
                     .width(dimens.maxContentWidth),
         )
 
-        ListDialogSetting(
-            title = stringResource(id = R.string.block_list),
-            dialogTitle = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.block_list),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Text(
-                        text = stringResource(id = R.string.block_list_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = "feeder feed?r fe*er",
-                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalTypographySettings.current.monoFontFamily),
-                    )
-                }
-            },
-            currentValue = blockListValue,
-            showToggle = true,
-            toggleValue = applyBlocklistToSummaries,
-            toggleLabel = stringResource(id = R.string.apply_blocklist_to_summaries),
-            onAddItem = onBlockListAdd,
-            onRemoveItem = onBlockListRemove,
-            onToggleChange = onApplyBlocklistToSummariesChange,
-        )
-
         NotificationsSetting(
             items = feedsSettings,
             onToggleItem = onToggleNotification,
         )
+
+        HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        SettingsGroup(
+            title = R.string.block_list,
+        ) {
+            ListDialogSetting(
+                title = stringResource(id = R.string.filters),
+                dialogTitle = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.filters),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.block_list_description),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = "feeder feed?r fe*er",
+                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = LocalTypographySettings.current.monoFontFamily),
+                        )
+                    }
+                },
+                currentValue = blockListValue,
+                showToggle = false,
+                toggleValue = false,
+                toggleLabel = "",
+                onAddItem = onBlockListAdd,
+                onRemoveItem = onBlockListRemove,
+                onToggleChange = {},
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.apply_blocklist_to_summaries),
+                checked = applyBlocklistToSummaries,
+                onCheckedChange = onApplyBlocklistToSummariesChange,
+            )
+
+            SwitchSetting(
+                title = stringResource(id = R.string.apply_blocklist_to_links),
+                checked = applyBlocklistToLinks,
+                onCheckedChange = onApplyBlocklistToLinksChange,
+            )
+        }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
 

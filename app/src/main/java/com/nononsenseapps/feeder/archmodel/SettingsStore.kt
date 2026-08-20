@@ -500,6 +500,17 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, value).apply()
     }
 
+    private val _applyBlocklistToLinks =
+        MutableStateFlow(
+            sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_LINKS, false),
+        )
+    val applyBlocklistToLinks: StateFlow<Boolean> = _applyBlocklistToLinks.asStateFlow()
+
+    fun setApplyBlocklistToLinks(value: Boolean) {
+        _applyBlocklistToLinks.value = value
+        sp.edit().putBoolean(PREF_BLOCKLIST_APPLY_TO_LINKS, value).apply()
+    }
+
     private val _syncFrequency by lazy {
         MutableStateFlow(
             syncFrequencyFromString(sp.getStringNonNull(PREF_SYNC_FREQ, "60")),
@@ -675,6 +686,7 @@ const val PREF_SWIPE_AS_READ = "pref_swipe_as_read"
  * Block list settings
  */
 const val PREF_BLOCKLIST_APPLY_TO_SUMMARIES = "pref_blocklist_apply_to_summaries"
+const val PREF_BLOCKLIST_APPLY_TO_LINKS = "pref_blocklist_apply_to_links"
 
 /**
  * Sync settings
@@ -807,6 +819,7 @@ enum class UserSettings(
     SETTING_OPENAI_AZURE_DEPLOYMENT_ID(key = PREF_OPENAI_AZURE_DEPLOYMENT_ID),
     SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS(key = PREF_OPENAI_REQUEST_TIMEOUT_SECONDS),
     SETTING_BLOCKLIST_APPLY_TO_SUMMARIES(key = PREF_BLOCKLIST_APPLY_TO_SUMMARIES),
+    SETTING_BLOCKLIST_APPLY_TO_LINKS(key = PREF_BLOCKLIST_APPLY_TO_LINKS),
     SETTING_PREFERRED_TRANSLATION_LANGUAGE(key = PREF_PREFERRED_TRANSLATION_LANGUAGE),
     SETTING_TRANSLATION_API_KEY(key = PREF_TRANSLATION_API_KEY),
     SETTING_TRANSLATION_API_MODEL_ID(key = PREF_TRANSLATION_API_MODEL_ID),
