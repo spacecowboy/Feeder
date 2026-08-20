@@ -182,6 +182,10 @@ class SettingsViewModel(
         repository.setIsPagingMode(value)
     }
 
+    fun setForceSingleColumn(value: Boolean) {
+        repository.setForceSingleColumn(value)
+    }
+
     fun setIsAnimatedPaging(value: Boolean) {
         repository.setIsAnimatedPaging(value)
     }
@@ -308,6 +312,7 @@ class SettingsViewModel(
                 repository.isAnimatedPaging,
                 downloadedLanguagePairs,
                 repository.useInAppAudioPlayer,
+                repository.forceSingleColumn,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -358,6 +363,7 @@ class SettingsViewModel(
                     isAnimatedPaging = params[37] as Boolean,
                     translationModelPairs = params[38] as List<LanguagePairInfo>,
                     useInAppAudioPlayer = params[39] as Boolean,
+                    forceSingleColumn = params[40] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -452,6 +458,7 @@ data class SettingsViewState(
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,
     val useInAppAudioPlayer: Boolean = true,
+    val forceSingleColumn: Boolean = true,
 )
 
 data class UIFeedSettings(

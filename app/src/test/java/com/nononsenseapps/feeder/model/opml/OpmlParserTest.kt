@@ -102,6 +102,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
                         UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "true"
+                        UserSettings.SETTINGS_FORCE_SINGLE_COLUMN -> "true"
                     },
             )
         }
@@ -157,6 +158,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setTranslateArticlePreviewsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)
+                settingsStore.setForceSingleColumn(true)
             }
 
             confirmVerified(settingsStore)

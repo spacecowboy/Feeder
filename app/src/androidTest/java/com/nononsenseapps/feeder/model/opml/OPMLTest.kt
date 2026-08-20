@@ -793,6 +793,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS -> "90"
                         UserSettings.SETTING_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT -> "true"
                         UserSettings.SETTING_TRANSLATE_ARTICLES_BY_DEFAULT -> "false"
+                        UserSettings.SETTINGS_FORCE_SINGLE_COLUMN -> "false"
                     }
             }
     }
@@ -881,6 +882,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_translation_api_request_timeout_seconds" value="90"/>
           <feeder:setting key="pref_translate_feed_cards_by_default" value="true"/>
           <feeder:setting key="pref_translate_articles_by_default" value="false"/>
+          <feeder:setting key="pref_force_single_column" value="false"/>
           <feeder:blocked pattern="foo"/>
         </feeder:settings>
       </body>
