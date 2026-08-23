@@ -29,8 +29,8 @@
     <string name="sync_option_every_6_hours">Ik pēc 6 stundām</string>
     <string name="sync_option_every_12_hours">Ik pēc 12 stundām</string>
     <string name="sync_status">Atsvaidzināšanas statuss</string>
-    <string name="open_in_reader">Lietotnē</string>
-    <string name="use_app_default">Lietot noklusēto</string>
+    <string name="open_in_reader">Lietotnē (WebView)</string>
+    <string name="use_app_default">Izmantojot lietotnes iestatīto veidu</string>
     <string name="open_link_in_web_view">Atvērt saiti WebView</string>
     <string name="open_in_web_view">Atvērt WebView</string>
     <string name="max_feed_items">Maksimālais rakstu skaits vienā ziņu plūsmā</string>
@@ -49,13 +49,13 @@
     <string name="open_feed">Atvērt ziņu plūsmu</string>
     <string name="contracted_tag">Aizvērta birka</string>
     <string name="expanded_tag">Atvērta birka</string>
-    <string name="sync_to_fetch">Atsvaidzināt, lai iegūtu rakstu</string>
+    <string name="sync_to_fetch">Atsvaidziniet, lai iegūtu rakstu</string>
     <string name="synchronize_feeds">Atsvaidzināt ziņu plūsmas</string>
     <string name="two_unread_articles">%1$s nelasīti raksti</string>
     <string name="few_unread_articles">%1$s nelasīti raksti</string>
     <string name="many_unread_articles">%1$s nelasīti raksti</string>
     <string name="other_unread_articles">%1$s nelasīti raksti</string>
-    <string name="device_sync">Ierīces sinhronizācija</string>
+    <string name="device_sync">Ierīču sinhronizācija</string>
     <string name="device_sync_financed_by_community">Šo pakalpojumu apmaksā kopiena. Lūdzu, ziedojiet, ja uzskatiet, ka šī funkcija ir noderīga - jūs vairs nevariet dzīvot bez tās.</string>
     <string name="add_new_device">Pievienot jaunu ierīci</string>
     <string name="this_device">%1$s (šī ierīce)</string>
@@ -96,7 +96,7 @@
     <string name="something_went_wrong">Kaut kas nogāja greizi</string>
     <string name="text_settings">Teksta iestatījumi</string>
     <string name="tag">Birka</string>
-    <string name="add_feed_search_hint">Ziņu plūsmas URL</string>
+    <string name="add_feed_search_hint">Ziņu plūsmas URL adrese</string>
     <string name="zero_minutes">%1$s minūtes</string>
     <string name="few_minutes">%1$s minūtes</string>
     <string name="summarize">Apkopot</string>
@@ -123,7 +123,7 @@
     <string name="saved_articles">Atzīmētie raksti</string>
     <string name="saved_article">Atzīmētais raksts</string>
     <string name="title_activity_edit_feed">Abonēt ziņu plūsmu</string>
-    <string name="url">URL</string>
+    <string name="url">URL adrese</string>
     <string name="title">Nosaukums</string>
     <string name="search_feed_empty_hint">Ievadiet ziņu plūsmas adresi</string>
     <string name="empty_feed_top">Šeit nav ko lasīt. Vai vēlaties…</string>
@@ -132,7 +132,7 @@
     <string name="view">Skatīt</string>
     <string name="no_tag">Nav birkas</string>
     <string name="notify_for_new_items">Paziņot par jauniem rakstiem</string>
-    <string name="open_enclosed_media">Atvērt pievienoto multivides datni</string>
+    <string name="open_enclosed_media">Atvērt pievienoto multimedijas datni</string>
     <string name="dont_notify_for_new_items">Neziņot</string>
     <string name="read_article">Lasīt priekšā</string>
     <string name="stop_reading">Pārtraukt lasīt priekšā</string>
@@ -142,13 +142,13 @@
     <string name="export_feeds_to_opml">Izgūt ziņu plūsmas OPML datnē</string>
     <string name="import_feeds_from_opml">Ievietot ziņu plūsmas no OPML datnes</string>
     <string name="view_debug_log">Skatīt atkļūdošanas žurnālu</string>
-    <string name="no_such_feed">Šāda ziņu plūsmas URL neeksistē. Vai mēģinājiet ar HTTPS?</string>
+    <string name="no_such_feed">Šāda ziņu plūsmas URL adrese neeksistē. Vai mēģinājiet ar HTTPS?</string>
     <string name="nothing_to_display">Šeit nekā nav!</string>
     <string name="all_feeds">Visas ziņu plūsmas</string>
     <string name="failed_to_export_OPML">Neizdevās izgūt OPML datni</string>
     <string name="failed_to_export_saved_articles">Neizdevās izgūt atzīmētos rakstus</string>
     <string name="failed_to_import_OPML">Neizdevās ievietot OPML datni</string>
-    <string name="import_x_feeds_with_y_tags">Vai ievietot %1$s ar %2$s?</string>
+    <string name="import_x_feeds_with_y_tags">Vai ievietot %1$s, kas satur %2$s?</string>
     <string name="nostr_feed_description">Nostr raksti no %1$s</string>
     <string name="empty_feed_open">Vai <annotation style="link">atvērt</annotation> citu ziņu plūsmu?</string>
     <string name="unsave_article">Noņemt no atzīmētiem</string>
@@ -250,7 +250,7 @@
     <string name="open_in_webview">Iebūvētajā sistēmas pārlūkā - WebView</string>
     <string name="reader_settings">Lasīt</string>
     <string name="article_list_settings">Rakstu saraksts</string>
-    <string name="could_not_load_url">Nevarēja ielādēt URL saiti</string>
+    <string name="could_not_load_url">Nevarēja ielādēt URL adreses saiti</string>
     <string name="theme_e_ink">E-tinte</string>
     <string name="dark_theme_preference">Vēlamais nakts motīvs</string>
     <string name="no_barcode_scanner_installed">Nevarēja atrast svītrkodu skeneri</string>
@@ -270,7 +270,7 @@
     <string name="go_to_feed">Doties uz %1$s</string>
     <string name="explanation_permission_notifications">Pirms paziņojumu iespējošanas ir jāpiešķir atļauja.</string>
     <string name="summarize_on_open">Apkopot, kad atver</string>
-    <string name="open_in_custom_tab">Iebūvētajā pārlūkā (pielāgota cilne)</string>
+    <string name="open_in_custom_tab">Pielāgotā cilnē</string>
     <string name="open_article_in_reader">Atvērt lasītājā</string>
     <string name="open_article_in_default_browser">Atvērt noklusējuma pārlūkā</string>
     <string name="no_article_link_browser">Rakstu nevar atvērt pārlūkā</string>
@@ -296,8 +296,8 @@
     <string name="translate_feed_cards_by_default">Tulkot rakstu priekšskatījumus</string>
     <string name="failed_to_import_saved_articles">Neizdevās ievietot atzīmētos rakstus</string>
     <string name="import_saved_articles">Ievietot atzīmētos rakstus</string>
-    <string name="open_article_in_custom_tab">Atvērt lietotnes pārlūkā (pielāgotā cilnē)</string>
-    <string name="no_article_link_custom_tab">Rakstu nevar atvērt lietotnes pārlūkā (pielāgotā cilnē)</string>
+    <string name="open_article_in_custom_tab">Atvērt pielāgotā cilnē</string>
+    <string name="no_article_link_custom_tab">Rakstu nevar atvērt pielāgotā cilnē</string>
     <string name="feed_search_suggestions_header">Ieteikumi</string>
     <string name="toggle_read_status">Pārslēgt statusu uz lasītu/nelasītu</string>
     <string name="indicator_for_mark_as_read">Indikators atzīmēšanai kā lasīts</string>
@@ -336,4 +336,16 @@
     <string name="device_sync_beta_warning">BRĪDINĀJUMS! Šī ir Beta funkcija. Vispirms izgūstiet visas savas ziņu plūsmas OPML datnē un saglabājiet to kā rezerves kopiju.</string>
     <string name="local_translation_requires_android_12">Vietējā tulkošana darbojas uz Android 12 un jaunākām versijām.</string>
     <string name="original_article">oriģinālais</string>
+    <string name="rename_tag">Pārsaukt birku</string>
+    <string name="audio_playback_failed">Nevar atskaņot šo audio datni</string>
+    <string name="play_audio">Atskaņot audio</string>
+    <string name="pause_audio">Iepauzēt audio</string>
+    <string name="stop_audio">Apturēt audio</string>
+    <string name="seek_back_10_seconds">Attīt atpakaļ 10 sekundes</string>
+    <string name="seek_forward_10_seconds">Patīt uz priekšu 10 sekundes</string>
+    <string name="local_translation_setup_pixel">Lai veiktu vietējo, bezsaistes tulkošanu Pixel tālruņos, atveriet Android iestatījumus, pēc tam Sistēma, Tulkošana tiešsaistē, Valodas un pievienojiet %1$s, lai varētu veikt bezsaistes tulkošanu. Izvēlnes nosaukumi var atšķirties atkarībā no Android versijas; uzstādiet arī avota valodu, ja Android to pieprasa.</string>
+    <string name="press_scan_sync">Savā ierīcē atveriet \"Ierīču sinhronizācija\" un nospiediet \"Skenēt vai ievadīt sinhronizācijas kodu\".</string>
+    <string name="translation_endpoint">Tulkošanas galapunkts</string>
+    <string name="enter_azure_endpoint_before_saving">Ievadiet savu Azure galapunktu pirms saglabāšanas.</string>
+    <string name="preload_custom_tab">Iepriekš ielādēt pielāgotās cilnes saturu</string>
 </resources>
