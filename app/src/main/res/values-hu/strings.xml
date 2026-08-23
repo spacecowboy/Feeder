@@ -293,14 +293,14 @@
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Frissítés</string>
     <string name="pref_paging_mode_title">Lapozási mód</string>
-    <string name="pref_paging_mode_description">A cikkek böngészése „oldalanként” a folyamatos görgetés helyett. E-ink eszközökhöz optimalizálva.</string>
+    <string name="pref_paging_mode_description">A cikkek böngészése „oldalanként” a folyamatos görgetés helyett. E-ink-eszközökhöz optimalizálva.</string>
     <string name="pref_animated_paging_title">Animált lapozás</string>
-    <string name="pref_animated_paging_description">Rövid animáció a lapozásnál. Néhány e-ink eszközön előfordulhat szellemkép.</string>
+    <string name="pref_animated_paging_description">Rövid animáció a lapozásnál. Néhány e-ink-eszközön előfordulhat szellemkép.</string>
     <string name="fetch_og_images">Cikkek metaadataiból származó bélyegképek javítása</string>
     <string name="summary_api_settings">API az összegzéshez</string>
     <string name="summary_api_settings_info">Cikkek összefoglalására szolgál.</string>
     <string name="translation_api_settings">API a fordításhoz</string>
-    <string name="translation_api_settings_info">Hírfolyam-kártyák és cikkek fordítására szolgál.</string>
+    <string name="translation_api_settings_info">Hírfolyamkártyák és cikkek fordítására szolgál.</string>
     <string name="deepl_api_key">DeepL hitelesítési kulcs</string>
     <string name="ai_provider">Szolgáltató</string>
     <string name="ai_not_configured">Nincs beállítva</string>
@@ -322,7 +322,7 @@
     <string name="verifying_azure_openai_settings">Azure OpenAI beállításainak ellenőrzése…</string>
     <string name="azure_openai_settings_could_not_be_verified">Nem sikerült ellenőrizni az Azure OpenAI beállításokat.</string>
     <string name="verifying_deepl_key">DeepL-kulcs ellenőrzése…</string>
-    <string name="deepl_key_could_not_be_verified">Nem sikerült ellenőrizni a DeepL-Kulcsot.</string>
+    <string name="deepl_key_could_not_be_verified">Nem sikerült ellenőrizni a DeepL-kulcsot.</string>
     <string name="translate_article">Cikk fordítása</string>
     <string name="show_original_language">Eredeti megjelenítése (%1$s)</string>
     <string name="original_article">eredeti</string>
@@ -360,7 +360,7 @@
     <string name="no_bergamot_translation_model">Nincs bergamott modell a következőhöz: %1$s -&gt; %2$s. Ellenőrizze a rendszer fordítási nyelveit</string>
     <string name="bergamot_translation_timed_out">Időtúllépés történt a bergamott fordításkor.</string>
     <string name="bergamot_translation_failed">Nem sikerült a bergamott fordítás.</string>
-    <string name="bergamot_model_registry_unavailable">Kapcsolódás a modell-lista letöltéséhez.</string>
+    <string name="bergamot_model_registry_unavailable">Kapcsolódás a modelllista letöltéséhez.</string>
     <string name="bergamot_model_download_failed">Nem sikerült letölteni a(z) %1$s -&gt; %2$s modellt.</string>
     <string name="bergamot_webview_translation_timed_out">Időtúllépés történt a Bergamot WebView fordításkor.</string>
     <string name="bergamot_webview_not_initialized">Nincs előkészítve a Bergamot WebView.</string>
@@ -380,5 +380,5 @@
     <string name="delete_button_text">Törlés</string>
     <string name="cancel">Mégse</string>
     <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lehátszóval</string>
-    <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor az audiohivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
+    <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor a hanghivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
 </resources>
