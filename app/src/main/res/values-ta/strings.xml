@@ -311,7 +311,7 @@
     <string name="provider_openai_compatible">OpenAI அல்லது இணக்கமானது</string>
     <string name="provider_azure_openai">அசூர் OpenAI</string>
     <string name="provider_deepl">ஆழம்எல்</string>
-    <string name="provider_local_translation">உள்ளக</string>
+    <string name="provider_local_translation">உள்ளக இணைப்பின்றி</string>
     <string name="base_url_optional">அடிப்படை முகவரி (விரும்பினால்)</string>
     <string name="translation_endpoint">மொழிபெயர்ப்பு இறுதிப்புள்ளி</string>
     <string name="enter_api_key_before_saving">சேமிப்பதற்கு முன் பநிஇ விசையை உள்ளிடவும்.</string>
@@ -330,9 +330,9 @@
     <string name="show_original_language">அசலைக் காட்டு (%1$s)</string>
     <string name="original_article">அசல்</string>
     <string name="preferred_translation_language">விருப்பமான மொழிபெயர்ப்பு மொழி</string>
-    <string name="preferred_translation_language_description">ச்பானிச், es, பிரஞ்சு அல்லது fr-CA போன்ற மொழி பெயர் அல்லது குறியீட்டைப் பயன்படுத்தவும்.</string>
+    <string name="preferred_translation_language_description">ஃபீடர் மொழிபெயர்க்கப்பட வேண்டிய மொழியைத் தேர்ந்தெடுக்கவும்.</string>
     <string name="preferred_translation_language_fallback">விருப்பமான மொழி</string>
-    <string name="translation_language_placeholder">உதாரணமாக: ஆங்கிலம் அல்லது என்</string>
+    <string name="translation_language_placeholder">ஒரு மொழியைத் தேர்ந்தெடு</string>
     <string name="set_translation_language_first">AI அமைப்புகளில் விருப்பமான மொழிபெயர்ப்பு மொழியை அமைக்கவும்</string>
     <string name="translate_feed_cards_by_default">கட்டுரை முன்னோட்டங்களை மொழிபெயர்க்கவும்</string>
     <string name="translate_articles_by_default">கட்டுரைகளை இயல்பாக மொழிபெயர்க்கவும்</string>
