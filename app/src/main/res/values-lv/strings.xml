@@ -343,7 +343,6 @@
     <string name="stop_audio">Apturēt audio</string>
     <string name="seek_back_10_seconds">Attīt atpakaļ 10 sekundes</string>
     <string name="seek_forward_10_seconds">Patīt uz priekšu 10 sekundes</string>
-    <string name="local_translation_setup_pixel">Lai veiktu vietējo, bezsaistes tulkošanu Pixel tālruņos, atveriet Android iestatījumus, pēc tam Sistēma, Tulkošana tiešsaistē, Valodas un pievienojiet %1$s, lai varētu veikt bezsaistes tulkošanu. Izvēlnes nosaukumi var atšķirties atkarībā no Android versijas; uzstādiet arī avota valodu, ja Android to pieprasa.</string>
     <string name="press_scan_sync">Savā ierīcē atveriet \"Ierīču sinhronizācija\" un nospiediet \"Skenēt vai ievadīt sinhronizācijas kodu\".</string>
     <string name="translation_endpoint">Tulkošanas galapunkts</string>
     <string name="enter_azure_endpoint_before_saving">Ievadiet savu Azure galapunktu pirms saglabāšanas.</string>
