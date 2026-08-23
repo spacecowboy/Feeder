@@ -381,4 +381,5 @@
     <string name="cancel">Mégse</string>
     <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lehátszóval</string>
     <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor a hanghivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
+    <string name="force_single_column">Egy oszlopos elrendezés kikényszerítése</string>
 </resources>
