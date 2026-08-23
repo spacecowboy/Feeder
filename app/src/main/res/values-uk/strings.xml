@@ -64,8 +64,8 @@
     <string name="contracted_tag">Закрита мітка</string>
     <string name="expanded_tag">Відкрита мітка</string>
     <string name="discovered_feeds_list">Список виявлених стрічок</string>
-    <string name="mark_items_below_as_read">Позначити статті нижче прочитаними</string>
-    <string name="mark_items_above_as_read">Позначити статті вище прочитаними</string>
+    <string name="mark_items_below_as_read">Позначити нижче прочитаним</string>
+    <string name="mark_items_above_as_read">Позначити вище прочитаним</string>
     <string name="open_feed">Відкрити стрічку</string>
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Натисніть, щоб відтворити відео</string>
@@ -309,10 +309,10 @@
     <string name="enter_deepl_api_key_before_saving">Введіть ключ API DeepL перед збереженням.</string>
     <string name="enter_model_id_before_saving">Введіть ID моделі перед збереженням.</string>
     <string name="enter_azure_api_version_before_saving">Введіть версію Azure API перед збереженням.</string>
-    <string name="translation_language_placeholder">Наприклад: Ukrainian або uk</string>
+    <string name="translation_language_placeholder">Виберіть мову</string>
     <string name="translate_articles_by_default">Перекладати статті типово</string>
     <string name="translate_feed_cards_by_default">Перекладати попередній перегляд статей</string>
-    <string name="preferred_translation_language_description">Використовуйте назву мови або код: Spanish, es, French, fr-CA тощо.</string>
+    <string name="preferred_translation_language_description">Оберіть мову, на яку потрібно перекласти Feeder.</string>
     <string name="show_original_language">Показати оригінал (%1$s)</string>
     <string name="original_article">оригінал</string>
     <string name="set_translation_language_first">Встановіть бажану мову перекладу в налаштуваннях ШІ</string>
@@ -336,7 +336,7 @@
     <string name="import_saved_articles">Імпортувати збережені статті</string>
     <string name="failed_to_import_saved_articles">Не вдалося імпортувати збережені статті</string>
     <string name="failed_to_fetch_full_article_too_large">Стаття занадто велика. Відкрити в браузері замість цього?</string>
-    <string name="provider_local_translation">Локально</string>
+    <string name="provider_local_translation">Локально поза мережею</string>
     <string name="device_sync_beta_warning">УВАГА! Це бета-функція. Перед цим виконайте OPML-експорт усіх ваших стрічок і збережіть як резервну копію.</string>
     <string name="preferred_translation_language_fallback">Бажана мова</string>
     <string name="local_translation_requires_android_12">Локальний переклад потребує Android 12 або новішої версії.</string>
