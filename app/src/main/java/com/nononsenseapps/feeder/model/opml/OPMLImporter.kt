@@ -158,6 +158,7 @@ open class OPMLImporter(
                 settingsStore.setTranslationApiSettings(newSettings)
             }
             UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> settingsStore.setApplyBlocklistToSummaries(value.toBoolean())
+            UserSettings.SETTING_BLOCKLIST_APPLY_TO_LINKS -> settingsStore.setApplyBlocklistToLinks(value.toBoolean())
         }
     }
 

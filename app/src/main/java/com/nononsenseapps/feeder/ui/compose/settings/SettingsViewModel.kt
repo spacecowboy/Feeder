@@ -131,6 +131,11 @@ class SettingsViewModel(
             repository.setApplyBlocklistToSummaries(value)
         }
 
+    fun setApplyBlocklistToLinks(value: Boolean) =
+        applicationCoroutineScope.launch {
+            repository.setApplyBlocklistToLinks(value)
+        }
+
     fun toggleNotifications(
         feedId: Long,
         value: Boolean,
@@ -313,6 +318,7 @@ class SettingsViewModel(
                 downloadedLanguagePairs,
                 repository.useInAppAudioPlayer,
                 repository.forceSingleColumn,
+                repository.applyBlocklistToLinks,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -364,6 +370,7 @@ class SettingsViewModel(
                     translationModelPairs = params[38] as List<LanguagePairInfo>,
                     useInAppAudioPlayer = params[39] as Boolean,
                     forceSingleColumn = params[40] as Boolean,
+                    applyBlocklistToLinks = params[41] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -459,6 +466,7 @@ data class SettingsViewState(
     val isAnimatedPaging: Boolean = false,
     val useInAppAudioPlayer: Boolean = true,
     val forceSingleColumn: Boolean = true,
+    val applyBlocklistToLinks: Boolean = false,
 )
 
 data class UIFeedSettings(

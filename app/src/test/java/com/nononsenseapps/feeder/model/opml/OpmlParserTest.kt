@@ -93,6 +93,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID -> "test-deployment"
                         UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS -> "45"
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
+                        UserSettings.SETTING_BLOCKLIST_APPLY_TO_LINKS -> "true"
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "French"
                         UserSettings.SETTING_TRANSLATION_API_KEY -> "translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> ""
@@ -158,6 +159,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setTranslateArticlePreviewsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)
+                settingsStore.setApplyBlocklistToLinks(true)
                 settingsStore.setForceSingleColumn(true)
             }
 

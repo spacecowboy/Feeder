@@ -235,8 +235,15 @@ class Repository(
 
     val applyBlocklistToSummaries: StateFlow<Boolean> = settingsStore.applyBlocklistToSummaries
 
-    suspend fun setApplyBlocklistToSummaries(value: Boolean) {
+    fun setApplyBlocklistToSummaries(value: Boolean) {
         settingsStore.setApplyBlocklistToSummaries(value)
+        runOnceBlocklistUpdate(di)
+    }
+
+    val applyBlocklistToLinks: StateFlow<Boolean> = settingsStore.applyBlocklistToLinks
+
+    fun setApplyBlocklistToLinks(value: Boolean) {
+        settingsStore.setApplyBlocklistToLinks(value)
         runOnceBlocklistUpdate(di)
     }
 

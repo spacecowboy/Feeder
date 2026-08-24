@@ -56,8 +56,8 @@ class BlocklistToggleTest {
     @Test
     fun toggleApplyToSummaries_correctlyBlocksAndUnblocks() =
         runBlocking {
-            // Create an article where the keyword is ONLY in the snippet, not the title
-            val articleId =
+            // Create articles - one with keyword in snippet, one with keyword in link
+            val article1Id =
                 feedItemDao.insertFeedItem(
                     FeedItem(
                         guid = "test1",
@@ -65,71 +65,122 @@ class BlocklistToggleTest {
                         plainTitle = "Some Normal Title",
                         plainSnippet = "This article mentions citizens in the description.",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
+                    ),
+                )
+            val article2Id =
+                feedItemDao.insertFeedItem(
+                    FeedItem(
+                        guid = "test2",
+                        feedId = testFeedId,
+                        plainTitle = "Some Normal Title",
+                        plainSnippet = "Normal snippet",
+                        pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/citizens",
                     ),
                 )
 
             // Add "citizens" to blocklist
             blocklistDao.insertSafely("citizens")
 
-            // Step 1: Apply blocklist with applyToSummaries = FALSE
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false)
+            // Step 1: Apply blocklist with applyToSummaries = FALSE and applyToLinks = FALSE
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false, applyToLinks = false)
 
-            var article = feedItemDao.loadFeedItem(articleId)
+            var article1 = feedItemDao.loadFeedItem(article1Id)
+            var article2 = feedItemDao.loadFeedItem(article2Id)
+
             assertNull(
-                "Article should NOT be blocked when checking title only (toggle OFF)",
-                article?.blockTime,
+                "Article1 should NOT be blocked when checking title only (toggle OFF)",
+                article1?.blockTime,
+            )
+            assertNull(
+                "Article2 should NOT be blocked when checking title only (toggle OFF)",
+                article2?.blockTime,
             )
 
-            // Step 2: Apply blocklist with applyToSummaries = TRUE
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true)
+            // Step 2: Apply blocklist with applyToSummaries = TRUE and applyToLinks = TRUE
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true, applyToLinks = true)
 
-            article = feedItemDao.loadFeedItem(articleId)
+            article1 = feedItemDao.loadFeedItem(article1Id)
+            article2 = feedItemDao.loadFeedItem(article2Id)
+
             assertNotNull(
-                "Article SHOULD be blocked when checking summaries (toggle ON)",
-                article?.blockTime,
+                "Article1 SHOULD be blocked when checking summaries (toggle ON)",
+                article1?.blockTime,
+            )
+            assertNotNull(
+                "Article2 SHOULD be blocked when checking links (toggle ON)",
+                article2?.blockTime,
             )
 
             // Step 3: Toggle back to FALSE - should unblock
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false)
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = false, applyToLinks = false)
 
-            article = feedItemDao.loadFeedItem(articleId)
+            article1 = feedItemDao.loadFeedItem(article1Id)
+            article2 = feedItemDao.loadFeedItem(article2Id)
+
             assertNull(
-                "Article should be unblocked when toggle is OFF again",
-                article?.blockTime,
+                "Article1 should be unblocked when toggle is OFF again",
+                article1?.blockTime,
+            )
+            assertNull(
+                "Article2 should be unblocked when toggle is OFF again",
+                article2?.blockTime,
             )
         }
 
     @Test
     fun addWordToBlocklist_withToggleAlreadyOn_blocksImmediately() =
         runBlocking {
-            // Create an article
-            val articleId =
+            // Create articles - one with keyword in snippet, one with keyword in link
+            val article1Id =
+                feedItemDao.insertFeedItem(
+                    FeedItem(
+                        guid = "test1",
+                        feedId = testFeedId,
+                        plainTitle = "Normal Title",
+                        plainSnippet = "This mentions advertisement in the summary.",
+                        pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/article",
+                    ),
+                )
+            val article2Id =
                 feedItemDao.insertFeedItem(
                     FeedItem(
                         guid = "test2",
                         feedId = testFeedId,
                         plainTitle = "Normal Title",
-                        plainSnippet = "This mentions advertisement in the summary.",
+                        plainSnippet = "Normal snippet",
                         pubDate = ZonedDateTime.now(),
+                        link = "https://example.com/advertisement",
                     ),
                 )
 
             // First, apply blocklist with empty blocklist but toggle ON
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true)
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true, applyToLinks = true)
 
-            var article = feedItemDao.loadFeedItem(articleId)
-            assertNull("Article should not be blocked yet (no patterns)", article?.blockTime)
+            var article1 = feedItemDao.loadFeedItem(article1Id)
+            var article2 = feedItemDao.loadFeedItem(article2Id)
+
+            assertNull("Article1 should not be blocked yet (no patterns)", article1?.blockTime)
+            assertNull("Article2 should not be blocked yet (no patterns)", article2?.blockTime)
 
             // Now add "advertisement" to blocklist
             blocklistDao.insertSafely("advertisement")
 
             // Re-apply blocklist with toggle still ON
-            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true)
+            blocklistDao.setItemBlockStatus(Instant.now(), applyToSummaries = true, applyToLinks = true)
 
-            article = feedItemDao.loadFeedItem(articleId)
+            article1 = feedItemDao.loadFeedItem(article1Id)
+            article2 = feedItemDao.loadFeedItem(article2Id)
+
             assertNotNull(
-                "Article SHOULD be blocked after adding pattern with toggle ON",
-                article?.blockTime,
+                "Article1 SHOULD be blocked after adding pattern with toggle ON",
+                article1?.blockTime,
+            )
+            assertNotNull(
+                "Article2 SHOULD be blocked after adding pattern with toggle ON",
+                article2?.blockTime,
             )
         }
 }
