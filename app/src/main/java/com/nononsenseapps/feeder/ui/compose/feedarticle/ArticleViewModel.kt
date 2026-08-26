@@ -462,10 +462,7 @@ class ArticleViewModel(
 
     fun ttsPlay() {
         stopPodcastPlayback()
-        if (ttsStateHolder.ttsState.value == PlaybackStatus.PAUSED &&
-            ttsStateHolder.queuedArticleId() == itemId
-        ) {
-            ttsStateHolder.play()
+        if (ttsStateHolder.resumeIfPausedOn(itemId)) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {

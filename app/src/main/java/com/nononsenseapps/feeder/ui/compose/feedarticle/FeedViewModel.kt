@@ -585,10 +585,7 @@ class FeedViewModel(
             val article =
                 repository.getCurrentArticle()
                     ?: return@launch
-            if (ttsStateHolder.ttsState.value == PlaybackStatus.PAUSED &&
-                ttsStateHolder.queuedArticleId() == article.id
-            ) {
-                ttsStateHolder.play()
+            if (ttsStateHolder.resumeIfPausedOn(article.id)) {
                 return@launch
             }
             val isFullText = repository.shouldDisplayFullTextForItemByDefault(article.id)

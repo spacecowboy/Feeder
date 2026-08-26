@@ -142,7 +142,18 @@ class TTSStateHolder(
         }
     }
 
-    fun queuedArticleId(): Long? = queuedArticleId
+    /**
+     * Resumes the paused queue when it already holds [articleId], so pressing play on the
+     * article being read continues it instead of re-reading it from the top. Returns false
+     * when the caller still has to build a queue.
+     */
+    fun resumeIfPausedOn(articleId: Long): Boolean {
+        if (_ttsState.value != PlaybackStatus.PAUSED || queuedArticleId != articleId) {
+            return false
+        }
+        play()
+        return true
+    }
 
     fun tts(
         textArray: List<AnnotatedString>,
