@@ -77,6 +77,7 @@ class TTSStateHolder(
         }
     }
     private val textToSpeechQueue = mutableListOf<CharSequence>()
+    private var queuedArticleId: Long? = null
     private var initializedState: Int? = null
     private var startJob: Job? = null
 
@@ -141,12 +142,18 @@ class TTSStateHolder(
         }
     }
 
+    fun queuedArticleId(): Long? = queuedArticleId
+
     fun tts(
         textArray: List<AnnotatedString>,
         useDetectLanguage: Boolean,
+        articleId: Long,
     ) {
         this.useDetectLanguage = useDetectLanguage
-//        val textArray = fullText.split(*PUNCTUATION)
+        startJob?.cancel()
+        textToSpeech?.stop()
+        textToSpeechQueue.clear()
+        queuedArticleId = articleId
         for (text in textArray) {
             if (text.isBlank()) {
                 continue
@@ -212,6 +219,7 @@ class TTSStateHolder(
         startJob?.cancel()
         textToSpeech?.stop()
         textToSpeechQueue.clear()
+        queuedArticleId = null
         _ttsState.value = PlaybackStatus.STOPPED
         textToSpeech = null
     }
