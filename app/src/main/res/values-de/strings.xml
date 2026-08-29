@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">Audio-Links mit integriertem Player abspielen</string>
     <string name="use_in_app_audio_player_description">Wenn deaktiviert, werden Audio-Links stattdessen mit der Standard-App geöffnet</string>
     <string name="force_single_column">Einspaltige Darstellung erzwingen</string>
+    <string name="apply_blocklist_to_links">Auf Links anwenden</string>
+    <string name="filters">Filter</string>
 </resources>
