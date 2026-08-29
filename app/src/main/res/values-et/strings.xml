@@ -382,4 +382,6 @@
     <string name="local_translation_setup_bergamot">Kui operatsioonisüsteemipoolset kohalikku tõlkeliidest ei leidu, laadib Feeder alla Mozilla/Bergamoti tõlkemudelid toetatud %1$s keelapaari jaoks.</string>
     <string name="show_only_bergamot_languages">Näita vaid sihtkeeli iga Mozilla/Bergamoti tõlkemudeli jaoks</string>
     <string name="force_single_column">Kuva sundkorras üheveerulisena</string>
+    <string name="apply_blocklist_to_links">Rakenda linkidele</string>
+    <string name="filters">Filtrid</string>
 </resources>
