@@ -382,4 +382,6 @@
     <string name="delete_button_text">Smazat</string>
     <string name="cancel">Zrušit</string>
     <string name="force_single_column">Vynutit jeden sloupec</string>
+    <string name="apply_blocklist_to_links">Použít na odkazy</string>
+    <string name="filters">Filtry</string>
 </resources>
