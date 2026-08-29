@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">Пуштај аудио линкове уграђеним плејером</string>
     <string name="use_in_app_audio_player_description">Када је искључено, аудио линкови се отварају вашом подразумеваном апликацијом</string>
     <string name="force_single_column">Форсирај једну колону</string>
+    <string name="apply_blocklist_to_links">Примени на линкове</string>
+    <string name="filters">Филтери</string>
 </resources>
