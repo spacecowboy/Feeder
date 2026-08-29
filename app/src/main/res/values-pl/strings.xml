@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">Odtwarzaj linki audio z wbudowanym odtwarzaczem</string>
     <string name="use_in_app_audio_player_description">Gdy wyłączone, linki audio otwierają się w domyślnej aplikacji</string>
     <string name="force_single_column">Wymuszaj pojedynczą kolumnę</string>
+    <string name="apply_blocklist_to_links">Zastosuj do linków</string>
+    <string name="filters">Filtry</string>
 </resources>
