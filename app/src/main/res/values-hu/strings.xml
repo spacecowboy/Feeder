@@ -277,7 +277,7 @@
     <string name="font">Betűtípus</string>
     <string name="text_preview">Szöveg előnézete</string>
     <string name="something_went_wrong">Valamilyen hiba történt</string>
-    <string name="system_default">Rendszer alapértelmezett</string>
+    <string name="system_default">Rendszer alapértelmezése</string>
     <string name="time_out_placeholder">Időtúllépés az MI-kérésekhez</string>
     <string name="time_out">Időtúllépés (másodpercben)</string>
     <string name="time_out_validation_error">Az időtúllépésnek 30 és 600 másodperc között kell lennie</string>
@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lehátszóval</string>
     <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor a hanghivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
     <string name="force_single_column">Egy oszlopos elrendezés kikényszerítése</string>
+    <string name="apply_blocklist_to_links">Használat hivatkozásokhoz</string>
+    <string name="filters">Szűrők</string>
 </resources>
