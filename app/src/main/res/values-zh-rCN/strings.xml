@@ -184,7 +184,7 @@
     <string name="article_image">文章图片</string>
     <string name="feed_icon">Feed 图标</string>
     <string name="text_scale">文本缩放</string>
-    <string name="block_list_description">隐藏标题中含任意下列筛选器的文章。示例筛选器：</string>
+    <string name="block_list_description">隐藏标题中包含以下任意筛选条件的文章。示例筛选条件：</string>
     <string name="sync_to_fetch">同步以获取文章</string>
     <string name="saved_articles">已保存文章</string>
     <string name="saved_article">已保存文章</string>
@@ -213,7 +213,7 @@
     <string name="read_adjective">已读</string>
     <string name="saved_adjective">已保存</string>
     <string name="show_only_title">仅显示标题</string>
-    <string name="filter_noun">过滤器</string>
+    <string name="filter_noun">筛选器</string>
     <string name="max_lines">最大行数</string>
     <string name="failed_to_download">无法下载</string>
     <string name="failed_to_parse_the_page">无法解析页面</string>
@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">使用内置播放器播放音频链接</string>
     <string name="use_in_app_audio_player_description">禁用后，音频链接将改用您的默认应用打开</string>
     <string name="force_single_column">强制单列布局</string>
+    <string name="apply_blocklist_to_links">应用于链接</string>
+    <string name="filters">筛选条件</string>
 </resources>
