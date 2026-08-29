@@ -382,4 +382,6 @@
     <string name="use_in_app_audio_player">Lire les liens audio avec le lecteur interne</string>
     <string name="use_in_app_audio_player_description">Si désactivé les liens audio seront ouverts avec l\'application par défaut</string>
     <string name="force_single_column">Utiliser une seule colonne</string>
+    <string name="filters">Filtres</string>
+    <string name="apply_blocklist_to_links">Appliquer aux liens</string>
 </resources>
