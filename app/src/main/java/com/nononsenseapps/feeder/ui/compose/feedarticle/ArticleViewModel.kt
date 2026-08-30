@@ -462,6 +462,9 @@ class ArticleViewModel(
 
     fun ttsPlay() {
         stopPodcastPlayback()
+        if (ttsStateHolder.resumeIfPausedOn(itemId)) {
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             val feedItem = repository.getCurrentArticle() ?: return@launch
             val article = Article(feedItem)
@@ -524,6 +527,7 @@ class ArticleViewModel(
                 ttsStateHolder.tts(
                     textArray = it,
                     useDetectLanguage = repository.useDetectLanguage.value,
+                    articleId = itemId,
                 )
             }
         }

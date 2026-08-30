@@ -77,6 +77,7 @@ class TTSStateHolder(
         }
     }
     private val textToSpeechQueue = mutableListOf<CharSequence>()
+    private var queuedArticleId: Long? = null
     private var initializedState: Int? = null
     private var startJob: Job? = null
 
@@ -141,12 +142,29 @@ class TTSStateHolder(
         }
     }
 
+    /**
+     * Resumes the paused queue when it already holds [articleId], so pressing play on the
+     * article being read continues it instead of re-reading it from the top. Returns false
+     * when the caller still has to build a queue.
+     */
+    fun resumeIfPausedOn(articleId: Long): Boolean {
+        if (_ttsState.value != PlaybackStatus.PAUSED || queuedArticleId != articleId) {
+            return false
+        }
+        play()
+        return true
+    }
+
     fun tts(
         textArray: List<AnnotatedString>,
         useDetectLanguage: Boolean,
+        articleId: Long,
     ) {
         this.useDetectLanguage = useDetectLanguage
-//        val textArray = fullText.split(*PUNCTUATION)
+        startJob?.cancel()
+        textToSpeech?.stop()
+        textToSpeechQueue.clear()
+        queuedArticleId = articleId
         for (text in textArray) {
             if (text.isBlank()) {
                 continue
@@ -212,6 +230,7 @@ class TTSStateHolder(
         startJob?.cancel()
         textToSpeech?.stop()
         textToSpeechQueue.clear()
+        queuedArticleId = null
         _ttsState.value = PlaybackStatus.STOPPED
         textToSpeech = null
     }
