@@ -41,7 +41,9 @@ fun getNotification(
     context: Context,
     notificationManager: NotificationManagerCompat,
 ): Notification {
-    createNotificationChannel(context, notificationManager)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        createNotificationChannel(context, notificationManager)
+    }
 
     val syncingText = context.getString(R.string.syncing)
 

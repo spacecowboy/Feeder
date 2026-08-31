@@ -99,8 +99,8 @@ class TTSStateHolder(
         textToSpeechQueue.firstOrNull()?.let { text ->
             val lang = _language.value
             val localesToUse: Sequence<Locale> =
-                when (lang) {
-                    is ForcedAuto -> {
+                when {
+                    lang is ForcedAuto && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
                         context
                             .detectLocaleFromText(text)
                             .sortedByDescending { it.confidence }
@@ -108,7 +108,7 @@ class TTSStateHolder(
                             .plus(_availableLanguages.value)
                     }
 
-                    is ForcedLocale -> {
+                    lang is ForcedLocale -> {
                         sequenceOf(
                             lang.locale,
                         )
@@ -116,7 +116,7 @@ class TTSStateHolder(
 
                     else -> {
                         // Use app setting
-                        if (useDetectLanguage) {
+                        if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             context
                                 .detectLocaleFromText(text)
                                 .sortedByDescending { it.confidence }
@@ -270,21 +270,32 @@ class TTSStateHolder(
         allAvailableLanguages = textToSpeech?.availableLanguages ?: emptySet()
 
         val sortedLanguages =
-            context
-                .detectLocaleFromText(
-                    textToSpeechQueue.joinToString("\n\n"),
-                    minConfidence = 0f,
-                ).sortedByDescending { it.confidence }
-                .map { it.locale }
-                .plus(
-                    context
-                        .getLocales()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                ).plus(
-                    allAvailableLanguages
-                        .asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                ).distinctBy { it.toLanguageTag() }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                context
+                    .detectLocaleFromText(
+                        textToSpeechQueue.joinToString("\n\n"),
+                        minConfidence = 0f,
+                    ).sortedByDescending { it.confidence }
+                    .map { it.locale }
+                    .plus(
+                        context
+                            .getLocales()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    ).plus(
+                        allAvailableLanguages
+                            .asSequence()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    )
+            } else {
+                context
+                    .getLocales()
+                    .sortedBy { it.displayName }
+                    .plus(
+                        allAvailableLanguages
+                            .asSequence()
+                            .sortedBy { it.getDisplayName(it).lowercase(it) },
+                    )
+            }.distinctBy { it.toLanguageTag() }
                 .toList()
 
         _availableLanguages.update {
