@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.job.JobScheduler
 import android.content.ContentResolver
 import android.content.SharedPreferences
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
@@ -54,6 +55,7 @@ import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okio.Path.Companion.toOkioPath
+import org.conscrypt.Conscrypt
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
@@ -61,6 +63,7 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
 import java.io.File
+import java.security.Security
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoilApi::class)
@@ -212,6 +215,17 @@ class FeederApplication :
         bind<TTSStateHolder>() with instance(ttsStateHolder)
         bind<PodcastPlayerStateHolder>() with instance(podcastPlayerStateHolder)
         bind<NotificationsWorker>() with singleton { NotificationsWorker(di) }
+    }
+
+    init {
+        // Install Conscrypt to handle TLSv1.3 pre Android10
+        // This crashes if app is installed to SD-card. Since it should still work for many
+        // devices, try to ignore errors
+        try {
+            Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Failed to insert Conscrypt. Attempt to ignore.", t)
+        }
     }
 
     override fun onCreate() {
