@@ -531,15 +531,19 @@ class LocalTranslator(
                     preserveHtml = preserveHtml,
                 ).filter(::hasEnoughTextForLanguageDetection)
                     .mapNotNull { sample ->
-                        application
-                            .detectLocaleFromText(
-                                text = sample,
-                                minConfidence = 60.0f,
-                            ).firstOrNull()
-                            ?.locale
-                            ?.language
-                            ?.let(::normalizeLanguageCode)
-                            ?.takeIf { it != "und" }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            application
+                                .detectLocaleFromText(
+                                    text = sample,
+                                    minConfidence = 60.0f,
+                                ).firstOrNull()
+                                ?.locale
+                                ?.language
+                                ?.let(::normalizeLanguageCode)
+                                ?.takeIf { it != "und" }
+                        } else {
+                            null
+                        }
                     }
 
             val languageCounts = detectedLanguages.groupingBy { it }.eachCount()
