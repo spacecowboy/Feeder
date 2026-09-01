@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.readaloud
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.MutableTransitionState
@@ -191,15 +192,17 @@ fun TTSPlayer(
                             Text(stringResource(id = R.string.use_app_default))
                         },
                     )
-                    DropdownMenuItem(
-                        onClick = {
-                            onSelectLanguage(ForcedAuto)
-                            showMenu = false
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.use_detect_language))
-                        },
-                    )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        DropdownMenuItem(
+                            onClick = {
+                                onSelectLanguage(ForcedAuto)
+                                showMenu = false
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.use_detect_language))
+                            },
+                        )
+                    }
                     HorizontalDivider()
                     for (lang in languages.item) {
                         DropdownMenuItem(

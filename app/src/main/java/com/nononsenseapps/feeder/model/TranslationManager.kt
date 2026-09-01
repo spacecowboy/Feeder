@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model
 
 import android.app.Application
+import android.os.Build
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
@@ -579,13 +580,17 @@ class TranslationManager(
             val detectedLanguages =
                 detectionSamples.map { sample ->
                     val detectedLanguage =
-                        application
-                            .detectLocaleFromText(
-                                text = sample,
-                                minConfidence = 95.0f,
-                            ).firstOrNull()
-                            ?.locale
-                            ?.toLanguageTag()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            application
+                                .detectLocaleFromText(
+                                    text = sample,
+                                    minConfidence = 95.0f,
+                                ).firstOrNull()
+                                ?.locale
+                                ?.toLanguageTag()
+                        } else {
+                            null
+                        }
                             ?: return@runCatching null
 
                     if (
