@@ -71,8 +71,10 @@ private class ProtocolFilteringSslSocketFactory(
     override fun createSocket(): Socket = configure(delegate.createSocket())
 
     @Throws(IOException::class)
-    override fun createSocket(host: String, port: Int): Socket =
-        configure(delegate.createSocket(host, port))
+    override fun createSocket(
+        host: String,
+        port: Int,
+    ): Socket = configure(delegate.createSocket(host, port))
 
     @Throws(IOException::class)
     override fun createSocket(
@@ -83,8 +85,10 @@ private class ProtocolFilteringSslSocketFactory(
     ): Socket = configure(delegate.createSocket(host, port, localHost, localPort))
 
     @Throws(IOException::class)
-    override fun createSocket(host: InetAddress, port: Int): Socket =
-        configure(delegate.createSocket(host, port))
+    override fun createSocket(
+        host: InetAddress,
+        port: Int,
+    ): Socket = configure(delegate.createSocket(host, port))
 
     @Throws(IOException::class)
     override fun createSocket(
@@ -95,8 +99,12 @@ private class ProtocolFilteringSslSocketFactory(
     ): Socket = configure(delegate.createSocket(address, port, localAddress, localPort))
 
     @Throws(IOException::class)
-    override fun createSocket(socket: Socket, host: String, port: Int, autoClose: Boolean): Socket =
-        configure(delegate.createSocket(socket, host, port, autoClose))
+    override fun createSocket(
+        socket: Socket,
+        host: String,
+        port: Int,
+        autoClose: Boolean,
+    ): Socket = configure(delegate.createSocket(socket, host, port, autoClose))
 
     private fun configure(socket: Socket): Socket {
         if (socket is SSLSocket) {
