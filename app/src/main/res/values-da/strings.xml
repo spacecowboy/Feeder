@@ -318,7 +318,6 @@
     <string name="translation_endpoint">Oversættelseslutpunkt</string>
     <string name="device_sync_beta_warning">ADVARSEL! Dette er en betafunktion. Udfør først en OPML-eksport af alle dine feeds, og gem den som en sikkerhedskopi.</string>
     <string name="enter_api_key_before_saving">Indtast en API-nøgle, før du gemmer.</string>
-    <string name="open_settings">Åbn indstillinger</string>
     <string name="rename_tag">Omdøb etiket</string>
     <string name="audio_playback_failed">Det er ikke muligt at afspille denne lydfil</string>
     <string name="play_audio">Afspil lyd</string>
@@ -340,17 +339,8 @@
     <string name="translate_article">Oversæt artiklen</string>
     <string name="show_original_language">Vis oprindelig (%1$s)</string>
     <string name="original_article">oprindelig</string>
-    <string name="preparing_offline_translation_model">Forbereder offline oversættelsesmodel %1$s til %2$s…</string>
-    <string name="downloading_offline_translation_model">Downloader offline oversættelsesmodel %1$s til %2$s: %3$d%%</string>
-    <string name="offline_translation_model_download_hint">Den første download kan være på 20–50 MB og kan tage et par minutter. Herefter fungerer oversættelsen offline.</string>
     <string name="preferred_translation_language">Foretrukket oversættelsessprog</string>
     <string name="preferred_translation_language_description">Vælg det sprog, som Feeder skal oversætte til.</string>
     <string name="preferred_translation_language_fallback">det foretrukne sprog</string>
     <string name="local_translation_requires_android_12">Lokal oversættelse kræver Android 12 eller nyere.</string>
-    <string name="local_translation_unavailable">Lokal oversættelse er ikke tilgængelig på denne enhed.</string>
-    <string name="local_translator_creation_failed">Det var ikke muligt at oprette den lokale oversætter.</string>
-    <string name="local_translation_timed_out">Tidsgrænsen for den lokale oversættelse er overskredet.</string>
-    <string name="local_translation_failed">Den lokale oversættelse mislykkedes.</string>
-    <string name="local_translation_empty_result">Den lokale oversættelse returnerede ingen tekst.</string>
-    <string name="local_translator_not_ready">Den lokale oversætter var ikke klar. Kontroller enhedens oversættelsesindstillinger, og prøv igen.</string>
 </resources>

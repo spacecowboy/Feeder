@@ -334,13 +334,15 @@
     <string name="preferred_translation_language">Lingua di traduzione preferita</string>
     <string name="preferred_translation_language_description">Scegli la lingua di destinazione per le traduzioni di Feeder.</string>
     <string name="preferred_translation_language_fallback">la lingua preferita</string>
+    <string name="local_translation_setup_pixel">Per la traduzione locale sui telefoni Pixel, apri Impostazioni di Android, quindi Sistema, Traduzione in tempo reale, Lingue e aggiungi %1$s per la traduzione offline. I nomi dei menu possono variare a seconda della versione di Android; se richiesto, installa anche la lingua di origine.</string>
+    <string name="local_translation_setup_samsung">Per la traduzione locale sui dispositivi Samsung, apri Impostazioni, Gestione Generale, Pacchetti Lingua e scarica %1$s. In alcune versioni Samsung questa opzione si trova sotto Tastiera Samsung o Traduzione; se richiesto, installa anche la lingua di origine.</string>
+    <string name="local_translation_setup_generic">Per la traduzione locale, apri Impostazioni del dispositivo e cerca i pacchetti lingua per la traduzione sul dispositivo od offline nelle sezioni Sistema, Gestione Generale, Lingue o Traduzione. Scarica %1$s e le lingue di origine che utilizzi.</string>
     <string name="translation_language_placeholder">Ad esempio: inglese o en</string>
     <string name="set_translation_language_first">Imposta una lingua di traduzione preferita nelle impostazioni IA</string>
     <string name="translate_feed_cards_by_default">Traduci le anteprime degli articoli</string>
     <string name="translate_articles_by_default">Traduci gli articoli per impostazione predefinita</string>
     <string name="device_sync_beta_warning">ATTENZIONE! Questa feature è ancora in Beta. Prima di continuare, fai un backup OPML di tutti i tuoi feed.</string>
     <string name="local_translation_requires_android_12">La traduzione locale richiede una versione Android 12 o più recente.</string>
-    <string name="open_settings">Apri impostazioni</string>
     <string name="rename_tag">Rinomina tag</string>
     <string name="audio_playback_failed">Impossibile riprodurre il file audio</string>
     <string name="play_audio">Riproduci audio</string>
@@ -350,15 +352,4 @@
     <string name="seek_forward_10_seconds">Vai avanti 10 secondi</string>
     <string name="use_in_app_audio_player">Riproduci i link audio con il lettore integrato</string>
     <string name="use_in_app_audio_player_description">Se disattivato, i link audio si aprono con l\'app predefinita</string>
-    <string name="preparing_offline_translation_model">Modello di traduzione offline %1$s a %2$s in preparazione…</string>
-    <string name="downloading_offline_translation_model">Download di modello offline di traduzione %1$s a %2$s: %3$d%%</string>
-    <string name="offline_translation_model_download_hint">Il primo download può occupare 20-50 MB e potrebbe richiedere qualche minuto. La traduzione in seguito avverrà offline.</string>
-    <string name="local_translation_unavailable">La traduzione locale non è disponibile su questo dispositivo.</string>
-    <string name="local_translator_creation_failed">Impossibile creare il traduttore locale.</string>
-    <string name="local_translation_timed_out">Traduzione locale scaduta per timeout.</string>
-    <string name="local_translation_failed">Traduzione locale non riuscita.</string>
-    <string name="local_translation_empty_result">Traduzione locale non ha restituito alcun testo.</string>
-    <string name="local_translator_not_ready">Il traduttore locale non era pronto. Controlla le impostazioni di traduzione del dispositivo e riprova.</string>
-    <string name="bergamot_translation_timed_out">Traduzione Bergamot scaduta per timeout.</string>
-    <string name="bergamot_translation_failed">Traduzione Bergamot non riuscita.</string>
 </resources>

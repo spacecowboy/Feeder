@@ -65,7 +65,6 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
@@ -115,13 +114,11 @@ import com.nononsenseapps.feeder.archmodel.FeedType
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.export.exportSavedArticles
 import com.nononsenseapps.feeder.model.export.importSavedArticles
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
-import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressContent
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
@@ -1301,16 +1298,6 @@ fun FeedScreen(
                     Modifier
                         .align(Alignment.TopCenter),
             )
-
-            viewState.translationModelDownloadProgress?.let { progress ->
-                TranslationModelDownloadProgress(
-                    progress = progress,
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxWidth(),
-                )
-            }
         }
 
         if (viewState.showDeleteDialog) {
@@ -1826,23 +1813,6 @@ fun FeedGridContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TranslationModelDownloadProgress(
-    progress: BergamotModelDownloadProgress,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-        tonalElevation = 3.dp,
-    ) {
-        TranslationProgressContent(
-            progress = progress,
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 

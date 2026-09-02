@@ -7,7 +7,6 @@ import com.nononsenseapps.feeder.archmodel.TranslationApiSettings
 import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult
-import com.nononsenseapps.feeder.openai.OpenAIApi.TranslationResult.ErrorAction
 import com.nononsenseapps.feeder.openai.canTranslate
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isDeepL
@@ -61,21 +60,11 @@ class TranslationManager(
             val hasCachedTitle =
                 item.title.isNotBlank() &&
                     cache.titleHash == titleHash &&
-                    cache.translatedTitle.isUsableCachedTranslation(
-                        original = item.title,
-                        sourceLanguage = cache.sourceLanguage,
-                        targetLanguage = targetLanguage,
-                        settings = settings,
-                    )
+                    !cache.translatedTitle.isNullOrBlank()
             val hasCachedSnippet =
                 item.snippet.isNotBlank() &&
                     cache.snippetHash == snippetHash &&
-                    cache.translatedSnippet.isUsableCachedTranslation(
-                        original = item.snippet,
-                        sourceLanguage = cache.sourceLanguage,
-                        targetLanguage = targetLanguage,
-                        settings = settings,
-                    )
+                    !cache.translatedSnippet.isNullOrBlank()
             val titleReady = item.title.isBlank() || hasCachedTitle
             val snippetReady = item.snippet.isBlank() || hasCachedSnippet
 
@@ -114,22 +103,12 @@ class TranslationManager(
             val cachedTitle =
                 cache.translatedTitle.takeIf {
                     cache.titleHash == titleHash &&
-                        it.isUsableCachedTranslation(
-                            original = item.title,
-                            sourceLanguage = cache.sourceLanguage,
-                            targetLanguage = targetLanguage,
-                            settings = settings,
-                        )
+                        !cache.translatedTitle.isNullOrBlank()
                 }
             val cachedSnippet =
                 cache.translatedSnippet.takeIf {
                     cache.snippetHash == snippetHash &&
-                        it.isUsableCachedTranslation(
-                            original = item.snippet,
-                            sourceLanguage = cache.sourceLanguage,
-                            targetLanguage = targetLanguage,
-                            settings = settings,
-                        )
+                        !cache.translatedSnippet.isNullOrBlank()
                 }
 
             val titleReady = item.title.isBlank() || cachedTitle != null
@@ -140,12 +119,6 @@ class TranslationManager(
                     snippet = cachedSnippet ?: item.snippet,
                 )
             }
-            val cachedSourceLanguage =
-                if (cachedTitle != null || cachedSnippet != null) {
-                    cache.sourceLanguage
-                } else {
-                    ""
-                }
 
             val detectedSameLanguage =
                 detectSourceLanguageIfAlreadyTargetLanguage(
@@ -176,24 +149,6 @@ class TranslationManager(
                 return@withContext item
             }
 
-            val translatedSnippetResult =
-                if (item.snippet.isBlank() || cachedSnippet != null) {
-                    null
-                } else {
-                    translateOrNull(
-                        content = item.snippet,
-                        targetLanguage = targetLanguage,
-                        settings = settings,
-                        sourceLangHint = cachedSourceLanguage,
-                    )
-                }
-            val translatedSnippet = cachedSnippet ?: translatedSnippetResult?.content.orEmpty()
-            val sourceLanguageHint =
-                translatedSnippetResult
-                    ?.detectedLanguageOrBlank()
-                    .orEmpty()
-                    .ifBlank { cachedSourceLanguage }
-
             val translatedTitleResult =
                 if (item.title.isBlank() || cachedTitle != null) {
                     null
@@ -202,10 +157,27 @@ class TranslationManager(
                         content = item.title,
                         targetLanguage = targetLanguage,
                         settings = settings,
-                        sourceLangHint = sourceLanguageHint,
                     )
                 }
             val translatedTitle = cachedTitle ?: translatedTitleResult?.content.orEmpty()
+
+            val translatedSnippetResult =
+                if (item.snippet.isBlank() || cachedSnippet != null) {
+                    null
+                } else {
+                    translateOrNull(
+                        content = item.snippet,
+                        targetLanguage = targetLanguage,
+                        settings = settings,
+                    )
+                }
+            val translatedSnippet = cachedSnippet ?: translatedSnippetResult?.content.orEmpty()
+            val cachedSourceLanguage =
+                if (cachedTitle != null || cachedSnippet != null) {
+                    cache.sourceLanguage
+                } else {
+                    ""
+                }
             val sourceLanguage =
                 translatedSnippetResult
                     ?.detectedLanguageOrBlank()
@@ -283,12 +255,7 @@ class TranslationManager(
             val cachedTitle =
                 cache.translatedTitle.takeIf {
                     cache.titleHash == titleHash &&
-                        it.isUsableCachedTranslation(
-                            original = title,
-                            sourceLanguage = cache.sourceLanguage,
-                            targetLanguage = targetLanguage,
-                            settings = settings,
-                        )
+                        !cache.translatedTitle.isNullOrBlank()
                 }
 
             if (cachedHtml != null && cachedTitle != null) {
@@ -316,25 +283,6 @@ class TranslationManager(
                     sourceLanguage = detectedSameLanguage,
                 )
             }
-            val cachedSourceLanguage = cache.sourceLanguage
-
-            val translatedHtmlResult =
-                if (cachedHtml != null) {
-                    null
-                } else {
-                    translateOrThrow(
-                        content = html,
-                        targetLanguage = targetLanguage,
-                        settings = settings,
-                        sourceLangHint = cachedSourceLanguage,
-                        preserveHtml = true,
-                    )
-                }
-            val sourceLanguageHint =
-                translatedHtmlResult
-                    ?.detectedLanguageOrBlank()
-                    .orEmpty()
-                    .ifBlank { cachedSourceLanguage }
 
             val translatedTitleResult =
                 if (cachedTitle != null) {
@@ -344,11 +292,27 @@ class TranslationManager(
                         content = title,
                         targetLanguage = targetLanguage,
                         settings = settings,
-                        sourceLangHint = sourceLanguageHint,
+                    )
+                }
+            val translatedHtmlResult =
+                if (cachedHtml != null) {
+                    null
+                } else {
+                    translateOrThrow(
+                        content = html,
+                        targetLanguage = targetLanguage,
+                        settings = settings,
+                        preserveHtml = true,
                     )
                 }
             val translatedTitle = cachedTitle ?: translatedTitleResult?.content.orEmpty().ifBlank { title }
             val translatedHtml = cachedHtml ?: translatedHtmlResult?.content.orEmpty().ifBlank { html }
+            val cachedSourceLanguage =
+                if (cachedTitle != null || cachedHtml != null) {
+                    cache.sourceLanguage
+                } else {
+                    ""
+                }
             val sourceLanguage =
                 translatedHtmlResult
                     ?.detectedLanguageOrBlank()
@@ -374,43 +338,6 @@ class TranslationManager(
                 translatedHtml = translatedHtml,
                 sourceLanguage = sourceLanguage,
             )
-        }
-
-    suspend fun hasCachedTranslatedArticle(
-        itemId: Long,
-        title: String,
-        html: String,
-        isFullText: Boolean,
-        settings: TranslationApiSettings,
-        targetLanguage: String,
-    ): Boolean =
-        withContext(Dispatchers.IO) {
-            val targetLanguage = targetLanguage.trim()
-            if (!settings.canTranslate || targetLanguage.isBlank() || html.isBlank()) {
-                return@withContext false
-            }
-
-            val cache = loadCache(itemId, settings, targetLanguage)
-            val titleHash = sha256(title)
-            val htmlHash = sha256(html)
-            val cachedHtml =
-                if (isFullText) {
-                    cache.translatedFullArticleHtml.takeIf { cache.fullArticleHtmlHash == htmlHash }
-                } else {
-                    cache.translatedArticleHtml.takeIf { cache.articleHtmlHash == htmlHash }
-                }
-            val cachedTitle =
-                cache.translatedTitle.takeIf {
-                    cache.titleHash == titleHash &&
-                        it.isUsableCachedTranslation(
-                            original = title,
-                            sourceLanguage = cache.sourceLanguage,
-                            targetLanguage = targetLanguage,
-                            settings = settings,
-                        )
-                }
-
-            cachedHtml != null && cachedTitle != null
         }
 
     suspend fun detectArticleAlreadyInTargetLanguage(
@@ -491,7 +418,6 @@ class TranslationManager(
         content: String,
         targetLanguage: String,
         settings: TranslationApiSettings,
-        sourceLangHint: String = "",
         preserveHtml: Boolean = false,
     ): TranslationResult.Success? =
         when (
@@ -500,7 +426,6 @@ class TranslationManager(
                     content = content,
                     targetLanguage = targetLanguage,
                     settings = settings,
-                    sourceLangHint = sourceLangHint,
                     preserveHtml = preserveHtml,
                 )
         ) {
@@ -512,7 +437,6 @@ class TranslationManager(
         content: String,
         targetLanguage: String,
         settings: OpenAISettings,
-        sourceLangHint: String = "",
         preserveHtml: Boolean = false,
     ): TranslationResult.Success =
         when (
@@ -521,34 +445,25 @@ class TranslationManager(
                     content = content,
                     targetLanguage = targetLanguage,
                     settings = settings,
-                    sourceLangHint = sourceLangHint,
                     preserveHtml = preserveHtml,
                 )
         ) {
             is TranslationResult.Success ->
                 result.takeIf { it.content.isNotBlank() }
                     ?: throw IllegalStateException("Translation failed")
-            is TranslationResult.Error -> {
-                val message = result.content.ifBlank { "Translation failed" }
-                if (result.action == ErrorAction.OpenSystemTranslationSettings) {
-                    throw SystemTranslationSettingsRequiredException(message)
-                }
-                throw IllegalStateException(message)
-            }
+            is TranslationResult.Error -> throw IllegalStateException(result.content.ifBlank { "Translation failed" })
         }
 
     private suspend fun translate(
         content: String,
         targetLanguage: String,
         settings: OpenAISettings,
-        sourceLangHint: String,
         preserveHtml: Boolean,
     ): TranslationResult =
         if (settings.isLocalTranslation) {
             localTranslator.translate(
                 content = content,
                 targetLanguage = targetLanguage,
-                sourceLangHint = sourceLangHint,
                 preserveHtml = preserveHtml,
             )
         } else {
@@ -567,41 +482,25 @@ class TranslationManager(
         preserveHtml: Boolean = false,
     ): String? =
         runCatching {
-            val detectionSamples =
-                prepareTextSamplesForLanguageDetection(
-                    content = content,
-                    preserveHtml = preserveHtml,
-                ).filter(::hasEnoughTextForLanguageDetection)
-            if (detectionSamples.isEmpty()) {
+            val detectionText = prepareTextForLanguageDetection(content, preserveHtml)
+            if (!hasEnoughTextForLanguageDetection(detectionText)) {
                 return@runCatching null
             }
 
-            val detectedLanguages =
-                detectionSamples.map { sample ->
-                    val detectedLanguage =
-                        application
-                            .detectLocaleFromText(
-                                text = sample,
-                                minConfidence = 95.0f,
-                            ).firstOrNull()
-                            ?.locale
-                            ?.toLanguageTag()
-                            ?: return@runCatching null
-
-                    if (
-                        !detectedLanguageMatchesTranslationTarget(
-                            detectedLanguage = detectedLanguage,
-                            targetLanguage = targetLanguage,
-                            settings = settings,
-                        )
-                    ) {
-                        return@runCatching null
-                    }
-
-                    detectedLanguage
+            application
+                .detectLocaleFromText(
+                    text = detectionText,
+                    minConfidence = 95.0f,
+                ).firstOrNull()
+                ?.locale
+                ?.toLanguageTag()
+                ?.takeIf {
+                    detectedLanguageMatchesTranslationTarget(
+                        detectedLanguage = it,
+                        targetLanguage = targetLanguage,
+                        settings = settings,
+                    )
                 }
-
-            detectedLanguages.firstOrNull()
         }.getOrNull()
 
     private fun detectArticleAlreadyInTargetLanguage(
@@ -683,10 +582,6 @@ data class ArticleTranslation(
     val sourceLanguage: String,
 )
 
-class SystemTranslationSettingsRequiredException(
-    message: String,
-) : IllegalStateException(message)
-
 @Serializable
 private data class CachedTranslations(
     val sourceLanguage: String = "",
@@ -705,26 +600,6 @@ private fun OpenAIApi.TranslationResult.detectedLanguageOrBlank(): String =
         is OpenAIApi.TranslationResult.Success -> detectedLanguage
         is OpenAIApi.TranslationResult.Error -> ""
     }
-
-private fun String?.isUsableCachedTranslation(
-    original: String,
-    sourceLanguage: String,
-    targetLanguage: String,
-    settings: OpenAISettings,
-): Boolean {
-    if (isNullOrBlank()) {
-        return false
-    }
-    if (this != original) {
-        return true
-    }
-    return sourceLanguage.isBlank() ||
-        detectedLanguageMatchesTranslationTarget(
-            detectedLanguage = sourceLanguage,
-            targetLanguage = targetLanguage,
-            settings = settings,
-        )
-}
 
 data class CachedFeedListItemTranslation(
     val item: FeedListItem,

@@ -332,7 +332,10 @@
     <string name="preferred_translation_language">விருப்பமான மொழிபெயர்ப்பு மொழி</string>
     <string name="preferred_translation_language_description">ஃபீடர் மொழிபெயர்க்கப்பட வேண்டிய மொழியைத் தேர்ந்தெடுக்கவும்.</string>
     <string name="preferred_translation_language_fallback">விருப்பமான மொழி</string>
-    <string name="translation_language_placeholder">ஒரு மொழியைத் தேர்ந்தெடு</string>
+    <string name="local_translation_setup_pixel">படப்புள்ளி ஃபோன்களில் உள்ளக மொழிபெயர்ப்பிற்கு, ஆண்ட்ராய்டு அமைப்புகளைத் திறந்து, பின்னர் சிச்டம், நேரடி மொழிபெயர்ப்பு, மொழிகள் மற்றும் இணைப்பில்லாத மொழிபெயர்ப்புக்கு %1$sஐச் சேர்க்கவும். ஆண்ட்ராய்டு பதிப்பின்படி பட்டியல் பெயர்கள் மாறுபடலாம்; ஆண்ட்ராய்ட் கேட்டால் மூல மொழியையும் நிறுவவும்.</string>
+    <string name="local_translation_setup_samsung">Samsung சாதனங்களில் உள்ளக மொழிபெயர்ப்பிற்கு, அமைப்புகள், பொது மேலாண்மை, மொழிப் பொதிகளைத் திறந்து %1$sஐப் பதிவிறக்கவும். சில Samsung பதிப்புகள் இதை Samsung Keyboard அல்லது மொழிபெயர்ப்பு கீழ் வைக்கின்றன; ஆண்ட்ராய்ட் கேட்டால் மூல மொழியையும் நிறுவவும்.</string>
+    <string name="local_translation_setup_generic">உள்ளக மொழிபெயர்ப்பிற்கு, உங்கள் சாதன அமைப்புகள் பயன்பாட்டைத் திறந்து, கணினி, பொது மேலாண்மை, மொழிகள் அல்லது மொழிபெயர்ப்பின் கீழ் சாதனம் அல்லது இணைப்பில்லாத மொழிபெயர்ப்பு மொழிப் பொதிகளைத் தேடுங்கள். %1$s மற்றும் நீங்கள் படித்த மூல மொழிகளைப் பதிவிறக்கவும்.</string>
+    <string name="translation_language_placeholder">உதாரணமாக: ஆங்கிலம் அல்லது என்</string>
     <string name="set_translation_language_first">AI அமைப்புகளில் விருப்பமான மொழிபெயர்ப்பு மொழியை அமைக்கவும்</string>
     <string name="translate_feed_cards_by_default">கட்டுரை முன்னோட்டங்களை மொழிபெயர்க்கவும்</string>
     <string name="translate_articles_by_default">கட்டுரைகளை இயல்பாக மொழிபெயர்க்கவும்</string>
