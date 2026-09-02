@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.localtranslation
 
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
+import io.airlift.compress.zstd.ZstdOutputStream
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -24,6 +25,7 @@ import org.junit.rules.TemporaryFolder
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
+import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
@@ -54,7 +56,7 @@ class BergamotModelManagerTest {
             val manager = modelManager()
             val preparation = manager.prepare(sourceLanguage = "German", targetLanguage = "English")
 
-            assertTrue(preparation is BergamotModelPreparation.Ready)
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
             val ready = preparation as BergamotModelPreparation.Ready
             assertEquals(listOf("de" to "en"), ready.modelRegistry.map { it.from to it.to })
             assertTrue(
@@ -82,6 +84,38 @@ class BergamotModelManagerTest {
             manager.deleteLanguagePair("de", "en")
 
             assertEquals(BergamotLanguagePairStatus.AvailableToDownload, manager.languagePairStatus("de", "en"))
+        }
+
+    @Test
+    fun prepareDownloadsCurrentMozillaSwedishModel() =
+        runTest {
+            server.start()
+            val model = "swedish model".toByteArray()
+            val lex = "swedish lex".toByteArray()
+            val vocab = "swedish vocab".toByteArray()
+            val compressedFiles = listOf(model, lex, vocab).map(::zstdCompress)
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(mozillaRegistry("sv", "en", model, lex, vocab, compressedFiles)),
+            )
+            compressedFiles.forEach { content ->
+                server.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setBody(okio.Buffer().write(content)),
+                )
+            }
+
+            val manager = modelManager()
+            val preparation = manager.prepare(sourceLanguage = "Swedish", targetLanguage = "English")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            assertEquals(BergamotLanguagePairStatus.Downloaded, manager.languagePairStatus("sv", "en"))
+            val files = (preparation as BergamotModelPreparation.Ready).modelRegistry.single().files
+            assertEquals(setOf("model", "lex", "vocab"), files.keys)
+            assertTrue(files.values.all { it.url?.startsWith("file:") == true })
+            assertEquals(model.size.toLong(), manager.pairDir("sv", "en").resolve("model.sven.intgemm.alphas.bin").length())
         }
 
     @Test
@@ -150,7 +184,7 @@ class BergamotModelManagerTest {
             assertEquals("de", emittedProgress.sourceLanguage)
             assertEquals("en", emittedProgress.targetLanguage)
             assertTrue(emittedProgress.isIndeterminate)
-            assertEquals("registry.json", emittedProgress.fileName)
+            assertEquals("registry-v2.json", emittedProgress.fileName)
             assertTrue(preparation.await() is BergamotModelPreparation.Ready)
             assertNull(manager.downloadProgress.value)
         }
@@ -251,9 +285,53 @@ class BergamotModelManagerTest {
                     bind<OkHttpClient>() with singleton { OkHttpClient() }
                 },
             registryUrl = server.url("/registry.json").toString(),
+            attachmentBaseUrl = server.url("/").toString(),
             runtimeUrl = server.url("/bergamot-translator-worker.wasm").toString(),
             runtimeSha256 = runtimeSha256,
         )
+
+    private fun mozillaRegistry(
+        from: String,
+        to: String,
+        model: ByteArray,
+        lex: ByteArray,
+        vocab: ByteArray,
+        compressedFiles: List<ByteArray>,
+    ): String {
+        val files =
+            listOf(
+                Triple("model", "model.${from}$to.intgemm.alphas.bin", model),
+                Triple("lex", "lex.50.50.${from}$to.s2t.bin", lex),
+                Triple("vocab", "vocab.${from}$to.spm", vocab),
+            )
+        return files
+            .mapIndexed { index, (fileType, name, content) ->
+                val compressed = compressedFiles[index]
+                """
+                {
+                  "name": "$name",
+                  "version": "3.0",
+                  "fileType": "$fileType",
+                  "architecture": "tiny",
+                  "sourceLanguage": "$from",
+                  "targetLanguage": "$to",
+                  "decompressedHash": "${sha256(content)}",
+                  "decompressedSize": ${content.size},
+                  "attachment": {
+                    "hash": "${sha256(compressed)}",
+                    "size": ${compressed.size},
+                    "location": "$from$to/$name.zst"
+                  }
+                }
+                """.trimIndent()
+            }.joinToString(prefix = "{\"data\":[", postfix = "]}")
+    }
+
+    private fun zstdCompress(content: ByteArray): ByteArray =
+        ByteArrayOutputStream().use { output ->
+            ZstdOutputStream(output).use { it.write(content) }
+            output.toByteArray()
+        }
 
     private fun registry(
         pair: String,

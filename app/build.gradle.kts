@@ -260,6 +260,7 @@ dependencies {
     implementation(libs.bundles.kotlin)
     implementation(libs.openai.client)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.aircompressor)
 
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)

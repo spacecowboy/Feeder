@@ -52,6 +52,7 @@ emoji2 = "1.6.0"
 icu4j = "78.3"
 activity = "1.12.1"
 constraintlayout = "2.1.4"
+aircompressor = "2.0.3"
 
 [libraries]
 retrofit-bom = { module = "com.squareup.retrofit2:retrofit-bom", version.ref = "retrofit" }
@@ -135,6 +136,7 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-test-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-junit-ktx" }
+aircompressor = { module = "io.airlift:aircompressor", version.ref = "aircompressor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidPlugin" }

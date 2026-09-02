@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.localtranslation
 
 import com.nononsenseapps.feeder.util.FilePathProvider
+import io.airlift.compress.zstd.ZstdInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -30,6 +32,7 @@ import java.util.Locale
 class BergamotModelManager(
     override val di: DI,
     private val registryUrl: String = DEFAULT_REGISTRY_URL,
+    private val attachmentBaseUrl: String = MOZILLA_ATTACHMENT_BASE_URL,
     private val runtimeUrl: String = DEFAULT_RUNTIME_URL,
     private val runtimeSha256: String = RUNTIME_SHA256,
 ) : DIAware {
@@ -42,7 +45,7 @@ class BergamotModelManager(
             explicitNulls = false
             prettyPrint = false
         }
-    private val registryFile: File = modelRoot.resolve("registry.json")
+    private val registryFile: File = modelRoot.resolve(REGISTRY_FILE_NAME)
     private val runtimeFile: File = modelRoot.resolve(RUNTIME_FILE_NAME)
     private val downloadMutex = Mutex()
     private val _downloadProgress = MutableStateFlow<BergamotModelDownloadProgress?>(null)
@@ -243,24 +246,79 @@ class BergamotModelManager(
 
     private fun parseRegistry(content: String): List<BergamotModelRegistryEntry>? =
         runCatching {
-            json
-                .parseToJsonElement(content)
-                .jsonObject
-                .mapNotNull { (key, value) ->
-                    val normalizedKey = key.lowercase(Locale.ROOT)
-                    if (normalizedKey.length < 4) {
-                        return@mapNotNull null
-                    }
-                    val from = normalizedKey.substring(0, 2)
-                    val to = normalizedKey.substring(2, 4)
-                    val files = parseModelFiles(value.jsonObject, from, to)
+            val root = json.parseToJsonElement(content).jsonObject
+            if ("data" in root) {
+                parseMozillaRegistry(content)
+            } else {
+                parseLegacyRegistry(root)
+            }
+        }.getOrNull()
+
+    private fun parseMozillaRegistry(content: String): List<BergamotModelRegistryEntry> =
+        json
+            .decodeFromString<MozillaModelRegistry>(content)
+            .data
+            .groupBy { record ->
+                MozillaModelSet(
+                    from = record.sourceLanguage.lowercase(Locale.ROOT),
+                    to = record.targetLanguage.lowercase(Locale.ROOT),
+                    version = record.version,
+                    architecture = record.architecture,
+                )
+            }.mapNotNull { (modelSet, records) ->
+                val files =
+                    records
+                        .filter { it.fileType in REQUIRED_MODEL_FILE_TYPES }
+                        .associate { record ->
+                            record.fileType to
+                                BergamotModelFile(
+                                    name = record.name,
+                                    remoteUrl = attachmentBaseUrl + record.attachment.location,
+                                    size = record.attachment.size,
+                                    expectedSha256Hash = record.decompressedHash,
+                                    downloadSha256Hash = record.attachment.hash,
+                                    decompressedSize = record.decompressedSize,
+                                    isZstdCompressed = true,
+                                )
+                        }
+                if (!files.isCompleteModel()) {
+                    return@mapNotNull null
+                }
+                modelSet to
                     BergamotModelRegistryEntry(
-                        from = from,
-                        to = to,
+                        from = modelSet.from,
+                        to = modelSet.to,
                         files = files,
                     )
-                }
-        }.getOrNull()
+            }.groupBy { (modelSet) -> modelSet.from to modelSet.to }
+            .values
+            .map { candidates ->
+                candidates
+                    .maxWithOrNull(
+                        compareBy<Pair<MozillaModelSet, BergamotModelRegistryEntry>>(
+                            { (modelSet) -> modelSet.isStableVersion },
+                            { (modelSet) -> modelSet.versionScore },
+                            { (modelSet) -> modelSet.architecturePriority },
+                        ),
+                    )!!
+                    .second
+            }
+
+    private fun parseLegacyRegistry(root: JsonObject): List<BergamotModelRegistryEntry> =
+        root.mapNotNull { (key, value) ->
+            val normalizedKey = key.lowercase(Locale.ROOT)
+            if (normalizedKey.length < 4) {
+                return@mapNotNull null
+            }
+            val from = normalizedKey.substring(0, 2)
+            val to = normalizedKey.substring(2, 4)
+            val files = parseModelFiles(value.jsonObject, from, to)
+            BergamotModelRegistryEntry(
+                from = from,
+                to = to,
+                files = files,
+            )
+        }
 
     private fun parseModelFiles(
         files: JsonObject,
@@ -355,8 +413,15 @@ class BergamotModelManager(
         targetLanguage: String,
         downloadState: ModelDownloadState,
         isRuntimeDownload: Boolean = false,
-    ): Boolean =
-        runCatching {
+    ): Boolean {
+        val tempFile = File(destination.parentFile, "${destination.name}.download")
+        val payloadFile =
+            if (modelFile.isZstdCompressed) {
+                File(destination.parentFile, "${destination.name}.download.zst")
+            } else {
+                tempFile
+            }
+        return runCatching {
             _downloadProgress.value =
                 downloadState.toProgress(
                     sourceLanguage = sourceLanguage,
@@ -369,11 +434,11 @@ class BergamotModelManager(
                 if (!response.isSuccessful) {
                     return@runCatching false
                 }
-                val tempFile = File(destination.parentFile, "${destination.name}.download")
                 tempFile.delete()
+                payloadFile.delete()
                 val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
                 response.body.byteStream().use { input ->
-                    tempFile.outputStream().use { output ->
+                    payloadFile.outputStream().use { output ->
                         while (true) {
                             val read = input.read(buffer)
                             if (read <= 0) {
@@ -391,14 +456,31 @@ class BergamotModelManager(
                         }
                     }
                 }
+                if (!modelFile.matchesDownloadSha256(payloadFile)) {
+                    return@runCatching false
+                }
+                if (modelFile.isZstdCompressed) {
+                    ZstdInputStream(payloadFile.inputStream()).use { input ->
+                        tempFile.outputStream().use { output -> input.copyTo(output) }
+                    }
+                    payloadFile.delete()
+                    if (modelFile.decompressedSize > 0L && tempFile.length() != modelFile.decompressedSize) {
+                        return@runCatching false
+                    }
+                }
                 if (!modelFile.matchesSha256(tempFile)) {
-                    tempFile.delete()
                     return@runCatching false
                 }
                 destination.parentFile?.mkdirs()
                 moveDownloadedFile(tempFile, destination)
             }
-        }.getOrDefault(false)
+        }.getOrDefault(false).also { succeeded ->
+            if (!succeeded) {
+                tempFile.delete()
+                payloadFile.delete()
+            }
+        }
+    }
 
     private fun isDownloaded(entry: BergamotModelRegistryEntry): Boolean =
         entry.files.values.all { file ->
@@ -437,6 +519,11 @@ class BergamotModelManager(
 
     private fun BergamotModelFile.matchesSha256(file: File): Boolean = expectedSha256Hash.isNotBlank() && sha256(file).equals(expectedSha256Hash, ignoreCase = true)
 
+    private fun BergamotModelFile.matchesDownloadSha256(file: File): Boolean {
+        val expectedHash = downloadSha256Hash.ifBlank { expectedSha256Hash }
+        return expectedHash.isNotBlank() && sha256(file).equals(expectedHash, ignoreCase = true)
+    }
+
     private fun sha256(file: File): String {
         val digest = MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
@@ -458,16 +545,68 @@ class BergamotModelManager(
             .ifBlank { "model-file" }
 
     companion object {
-        private const val DEFAULT_REGISTRY_URL = "https://bergamot.s3.amazonaws.com/models/index.json"
+        private const val DEFAULT_REGISTRY_URL =
+            "https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/translations-models-v2/records"
+        private const val MOZILLA_ATTACHMENT_BASE_URL = "https://firefox-settings-attachments.cdn.mozilla.net/"
         private const val DEFAULT_MODEL_BASE_URL = "https://bergamot.s3.amazonaws.com/models"
         private const val PIVOT_LANGUAGE = "en"
-        private const val REGISTRY_FILE_NAME = "registry.json"
+        private const val REGISTRY_FILE_NAME = "registry-v2.json"
         private const val RUNTIME_FILE_NAME = "bergamot-translator-worker.wasm"
         private const val RUNTIME_SIZE_BYTES = 5_174_294L
         private const val RUNTIME_SHA256 = "95a2b58dd6773bf1b3f345d71f9149928b9f75f4ec9c9064c0b3e42c298671b2"
         private const val DEFAULT_RUNTIME_URL =
             "https://cdn.jsdelivr.net/npm/@browsermt/bergamot-translator@0.4.5/worker/bergamot-translator-worker.wasm"
+        private val REQUIRED_MODEL_FILE_TYPES = setOf("model", "lex", "vocab", "srcvocab", "trgvocab")
     }
+}
+
+private fun Map<String, BergamotModelFile>.isCompleteModel(): Boolean = "model" in this && "lex" in this && ("vocab" in this || ("srcvocab" in this && "trgvocab" in this))
+
+@Serializable
+private data class MozillaModelRegistry(
+    val data: List<MozillaModelRecord>,
+)
+
+@Serializable
+private data class MozillaModelRecord(
+    val name: String,
+    val version: String,
+    val fileType: String,
+    val attachment: MozillaModelAttachment,
+    val architecture: String,
+    val sourceLanguage: String,
+    val targetLanguage: String,
+    val decompressedHash: String,
+    val decompressedSize: Long,
+)
+
+@Serializable
+private data class MozillaModelAttachment(
+    val hash: String,
+    val size: Long,
+    val location: String,
+)
+
+private data class MozillaModelSet(
+    val from: String,
+    val to: String,
+    val version: String,
+    val architecture: String,
+) {
+    val isStableVersion: Boolean = version.matches(Regex("[0-9]+(\\.[0-9]+)*"))
+    val versionScore: Int =
+        version
+            .split('.')
+            .take(3)
+            .map { part -> part.takeWhile(Char::isDigit).toIntOrNull() ?: 0 }
+            .fold(0) { score, part -> score * 1_000 + part }
+    val architecturePriority: Int =
+        when (architecture) {
+            "base-memory" -> 3
+            "base" -> 2
+            "tiny" -> 1
+            else -> 0
+        }
 }
 
 data class BergamotModelDownloadProgress(
@@ -565,6 +704,9 @@ data class BergamotModelFile(
     val remoteUrl: String,
     val size: Long,
     val expectedSha256Hash: String = "",
+    val downloadSha256Hash: String = "",
+    val decompressedSize: Long = 0L,
+    val isZstdCompressed: Boolean = false,
     val url: String? = null,
     val config: JsonElement? = null,
 )
