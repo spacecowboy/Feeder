@@ -49,11 +49,12 @@ class BergamotWebTranslator(
         targetLanguage: String,
         preserveHtml: Boolean,
         modelRegistry: List<BergamotModelRegistryEntry>,
+        runtimeFileUrl: String,
     ): BergamotWebTranslationResult =
         // WebView must be created and called on the UI thread. Translation work runs inside
         // the Bergamot Web Worker loaded by this page, so this should only schedule JS calls.
         withContext(Dispatchers.Main.immediate) {
-            initialize(modelRegistry)
+            initialize(modelRegistry, runtimeFileUrl)
             translateBatch(
                 content = content,
                 sourceLanguage = sourceLanguage,
@@ -62,8 +63,12 @@ class BergamotWebTranslator(
             )
         }
 
-    private suspend fun initialize(modelRegistry: List<BergamotModelRegistryEntry>) {
+    private suspend fun initialize(
+        modelRegistry: List<BergamotModelRegistryEntry>,
+        runtimeFileUrl: String,
+    ) {
         val registryJson = json.encodeToString(modelRegistry)
+        val initializationKey = "$runtimeFileUrl\n$registryJson"
         initMutex.withLock {
             ensureWebView()
             try {
@@ -72,9 +77,9 @@ class BergamotWebTranslator(
                 destroyWebView()
                 throw e
             }
-            if (initializedRegistryJson != registryJson) {
-                evaluate("window.FeederBergamot.initialize($registryJson);")
-                initializedRegistryJson = registryJson
+            if (initializedRegistryJson != initializationKey) {
+                evaluate("window.FeederBergamot.initialize($registryJson, ${json.encodeToString(runtimeFileUrl)});")
+                initializedRegistryJson = initializationKey
             }
         }
     }

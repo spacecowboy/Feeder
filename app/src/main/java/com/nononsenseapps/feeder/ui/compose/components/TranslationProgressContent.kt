@@ -23,7 +23,12 @@ fun TranslationProgressContent(
     ) {
         Text(
             text =
-                if (progress.isIndeterminate) {
+                if (progress.isRuntimeDownload) {
+                    stringResource(
+                        R.string.downloading_offline_translation_runtime,
+                        (progress.fraction * 100).toInt(),
+                    )
+                } else if (progress.isIndeterminate) {
                     stringResource(
                         R.string.preparing_offline_translation_model,
                         progress.sourceLanguage,

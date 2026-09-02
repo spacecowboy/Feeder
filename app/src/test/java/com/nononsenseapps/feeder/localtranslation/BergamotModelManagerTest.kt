@@ -85,6 +85,49 @@ class BergamotModelManagerTest {
         }
 
     @Test
+    fun downloadRuntimeStoresVerifiedExecutable() =
+        runTest {
+            server.start()
+            val runtime = "verified runtime".toByteArray()
+            server.enqueue(MockResponse().setResponseCode(200).setBody(String(runtime)))
+
+            val manager = modelManager(runtimeSha256 = sha256(runtime))
+
+            assertTrue(manager.downloadRuntime())
+            assertTrue(manager.isRuntimeDownloaded())
+            assertTrue(manager.runtimeFileUrl()?.startsWith("file:") == true)
+            assertNull(manager.downloadProgress.value)
+        }
+
+    @Test
+    fun downloadRuntimeRejectsExecutableWithWrongHash() =
+        runTest {
+            server.start()
+            server.enqueue(MockResponse().setResponseCode(200).setBody("corrupted runtime"))
+
+            val manager = modelManager(runtimeSha256 = sha256("expected runtime".toByteArray()))
+
+            assertTrue(!manager.downloadRuntime())
+            assertTrue(!manager.isRuntimeDownloaded())
+            assertNull(manager.runtimeFileUrl())
+            assertNull(manager.downloadProgress.value)
+        }
+
+    @Test
+    fun downloadRuntimeDoesNotFetchVerifiedExecutableAgain() =
+        runTest {
+            server.start()
+            val runtime = "verified runtime".toByteArray()
+            server.enqueue(MockResponse().setResponseCode(200).setBody(String(runtime)))
+            val manager = modelManager(runtimeSha256 = sha256(runtime))
+
+            assertTrue(manager.downloadRuntime())
+            assertTrue(manager.downloadRuntime())
+
+            assertEquals(1, server.requestCount)
+        }
+
+    @Test
     fun prepareReportsProgressWhileLoadingRegistry() =
         runTest {
             server.start()
@@ -194,7 +237,7 @@ class BergamotModelManagerTest {
             assertTrue(preparation is BergamotModelPreparation.Error)
         }
 
-    private fun modelManager(): BergamotModelManager =
+    private fun modelManager(runtimeSha256: String = sha256("runtime".toByteArray())): BergamotModelManager =
         BergamotModelManager(
             di =
                 DI {
@@ -208,6 +251,8 @@ class BergamotModelManagerTest {
                     bind<OkHttpClient>() with singleton { OkHttpClient() }
                 },
             registryUrl = server.url("/registry.json").toString(),
+            runtimeUrl = server.url("/bergamot-translator-worker.wasm").toString(),
+            runtimeSha256 = runtimeSha256,
         )
 
     private fun registry(

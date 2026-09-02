@@ -30,6 +30,8 @@ import java.util.Locale
 class BergamotModelManager(
     override val di: DI,
     private val registryUrl: String = DEFAULT_REGISTRY_URL,
+    private val runtimeUrl: String = DEFAULT_RUNTIME_URL,
+    private val runtimeSha256: String = RUNTIME_SHA256,
 ) : DIAware {
     private val filePathProvider: FilePathProvider by instance()
     private val okHttpClient: OkHttpClient by instance()
@@ -41,9 +43,51 @@ class BergamotModelManager(
             prettyPrint = false
         }
     private val registryFile: File = modelRoot.resolve("registry.json")
+    private val runtimeFile: File = modelRoot.resolve(RUNTIME_FILE_NAME)
     private val downloadMutex = Mutex()
     private val _downloadProgress = MutableStateFlow<BergamotModelDownloadProgress?>(null)
     val downloadProgress: StateFlow<BergamotModelDownloadProgress?> = _downloadProgress.asStateFlow()
+
+    suspend fun isRuntimeDownloaded(): Boolean =
+        withContext(Dispatchers.IO) {
+            runtimeFile.isFile && sha256(runtimeFile).equals(runtimeSha256, ignoreCase = true)
+        }
+
+    suspend fun downloadRuntime(): Boolean =
+        withContext(Dispatchers.IO) {
+            downloadMutex.withLock {
+                try {
+                    if (runtimeFile.isFile && sha256(runtimeFile).equals(runtimeSha256, ignoreCase = true)) {
+                        return@withLock true
+                    }
+                    runtimeFile.parentFile?.mkdirs()
+                    downloadFile(
+                        modelFile =
+                            BergamotModelFile(
+                                name = RUNTIME_FILE_NAME,
+                                remoteUrl = runtimeUrl,
+                                size = RUNTIME_SIZE_BYTES,
+                                expectedSha256Hash = runtimeSha256,
+                            ),
+                        destination = runtimeFile,
+                        sourceLanguage = "",
+                        targetLanguage = "",
+                        downloadState = ModelDownloadState(totalBytes = RUNTIME_SIZE_BYTES),
+                        isRuntimeDownload = true,
+                    )
+                } finally {
+                    _downloadProgress.value = null
+                }
+            }
+        }
+
+    suspend fun runtimeFileUrl(): String? =
+        withContext(Dispatchers.IO) {
+            runtimeFile
+                .takeIf { it.isFile && sha256(it).equals(runtimeSha256, ignoreCase = true) }
+                ?.toURI()
+                ?.toString()
+        }
 
     suspend fun prepare(
         sourceLanguage: String,
@@ -310,6 +354,7 @@ class BergamotModelManager(
         sourceLanguage: String,
         targetLanguage: String,
         downloadState: ModelDownloadState,
+        isRuntimeDownload: Boolean = false,
     ): Boolean =
         runCatching {
             _downloadProgress.value =
@@ -317,6 +362,7 @@ class BergamotModelManager(
                     sourceLanguage = sourceLanguage,
                     targetLanguage = targetLanguage,
                     fileName = modelFile.name,
+                    isRuntimeDownload = isRuntimeDownload,
                 )
             val request = Request.Builder().url(modelFile.remoteUrl).build()
             okHttpClient.newCall(request).execute().use { response ->
@@ -340,6 +386,7 @@ class BergamotModelManager(
                                     sourceLanguage = sourceLanguage,
                                     targetLanguage = targetLanguage,
                                     fileName = modelFile.name,
+                                    isRuntimeDownload = isRuntimeDownload,
                                 )
                         }
                     }
@@ -415,6 +462,11 @@ class BergamotModelManager(
         private const val DEFAULT_MODEL_BASE_URL = "https://bergamot.s3.amazonaws.com/models"
         private const val PIVOT_LANGUAGE = "en"
         private const val REGISTRY_FILE_NAME = "registry.json"
+        private const val RUNTIME_FILE_NAME = "bergamot-translator-worker.wasm"
+        private const val RUNTIME_SIZE_BYTES = 5_174_294L
+        private const val RUNTIME_SHA256 = "95a2b58dd6773bf1b3f345d71f9149928b9f75f4ec9c9064c0b3e42c298671b2"
+        private const val DEFAULT_RUNTIME_URL =
+            "https://cdn.jsdelivr.net/npm/@browsermt/bergamot-translator@0.4.5/worker/bergamot-translator-worker.wasm"
     }
 }
 
@@ -424,6 +476,7 @@ data class BergamotModelDownloadProgress(
     val fileName: String,
     val downloadedBytes: Long,
     val totalBytes: Long,
+    val isRuntimeDownload: Boolean = false,
 ) {
     val isIndeterminate: Boolean
         get() = totalBytes <= 0L
@@ -452,6 +505,7 @@ private data class ModelDownloadState(
         sourceLanguage: String,
         targetLanguage: String,
         fileName: String,
+        isRuntimeDownload: Boolean = false,
     ): BergamotModelDownloadProgress =
         BergamotModelDownloadProgress(
             sourceLanguage = sourceLanguage,
@@ -459,6 +513,7 @@ private data class ModelDownloadState(
             fileName = fileName,
             downloadedBytes = downloadedBytes,
             totalBytes = totalBytes,
+            isRuntimeDownload = isRuntimeDownload,
         )
 
     companion object {

@@ -27,6 +27,7 @@ import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.localtranslation.BergamotModelManager
 import com.nononsenseapps.feeder.localtranslation.LocalTranslator
 import com.nononsenseapps.feeder.model.ArticleTranslation
+import com.nononsenseapps.feeder.model.BergamotRuntimeDownloadRequiredException
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FullTextParser
 import com.nononsenseapps.feeder.model.FullTextTooLarge
@@ -233,6 +234,7 @@ class ArticleViewModel(
                     (translationState as? ArticleTranslationState.SystemSettingsRequired)
                         ?.message
                         .orEmpty(),
+                showBergamotRuntimeDownloadPrompt = translationState is ArticleTranslationState.RuntimeDownloadRequired,
                 articleContent = if (isShowingTranslated) translatedArticleContent else articleContent,
             )
         }.stateIn(
@@ -674,6 +676,10 @@ class ArticleViewModel(
                     ArticleTranslationState.SystemSettingsRequired(
                         e.message ?: "Translation model required",
                     )
+            } catch (e: BergamotRuntimeDownloadRequiredException) {
+                showTranslatedContent.value = false
+                translatedArticleContent.value = LinearArticle(emptyList())
+                articleTranslationState.value = ArticleTranslationState.RuntimeDownloadRequired
             } catch (e: Exception) {
                 clearTranslatedContent()
                 toastMaker.makeToast(e.message ?: "Translation failed")
@@ -873,6 +879,25 @@ class ArticleViewModel(
         }
     }
 
+    fun downloadBergamotRuntimeAndTranslate() {
+        articleTranslationState.value = ArticleTranslationState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            if (bergamotModelManager.downloadRuntime()) {
+                showTranslatedContent.value = true
+                translateCurrentArticle()
+            } else {
+                clearTranslatedContent()
+                toastMaker.makeToast(R.string.bergamot_runtime_download_failed)
+            }
+        }
+    }
+
+    fun dismissBergamotRuntimeDownloadPrompt() {
+        if (articleTranslationState.value is ArticleTranslationState.RuntimeDownloadRequired) {
+            articleTranslationState.value = ArticleTranslationState.Empty
+        }
+    }
+
     companion object {
         private const val LOG_TAG = "FEEDER_ArticleVM"
     }
@@ -909,6 +934,7 @@ private data class ArticleState(
     override val translationModelDownloadProgress: BergamotModelDownloadProgress? = null,
     override val translationSourceLanguage: String = "",
     override val systemTranslationSettingsMessage: String = "",
+    override val showBergamotRuntimeDownloadPrompt: Boolean = false,
     override val articleContent: LinearArticle = LinearArticle(emptyList()),
 ) : ArticleScreenViewState
 
@@ -944,6 +970,7 @@ interface ArticleScreenViewState {
     val translationModelDownloadProgress: BergamotModelDownloadProgress?
     val translationSourceLanguage: String
     val systemTranslationSettingsMessage: String
+    val showBergamotRuntimeDownloadPrompt: Boolean
     val articleContent: LinearArticle
 }
 
@@ -971,6 +998,8 @@ sealed interface ArticleTranslationState {
     data class SystemSettingsRequired(
         val message: String,
     ) : ArticleTranslationState
+
+    data object RuntimeDownloadRequired : ArticleTranslationState
 
     data class Result(
         val translatedTitle: String,

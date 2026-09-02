@@ -142,7 +142,8 @@ class LocalTranslator(
                 sourceLanguage = sourceLang,
                 targetLanguage = targetLang,
                 allowNetwork = false,
-            ) == BergamotLanguagePairStatus.Downloaded
+            ) == BergamotLanguagePairStatus.Downloaded &&
+                bergamotModelManager.isRuntimeDownloaded()
         }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -305,6 +306,38 @@ class LocalTranslator(
         targetLang: String,
         preserveHtml: Boolean,
     ): LocalTranslationResult {
+        when (
+            bergamotModelManager.languagePairStatus(
+                sourceLanguage = sourceLang,
+                targetLanguage = targetLang,
+            )
+        ) {
+            BergamotLanguagePairStatus.RegistryMissing ->
+                return LocalTranslationResult.Error(
+                    application.getString(R.string.bergamot_model_registry_unavailable),
+                )
+            BergamotLanguagePairStatus.Unavailable ->
+                return LocalTranslationResult.Error(
+                    message =
+                        application.getString(
+                            R.string.no_bergamot_translation_model,
+                            sourceLang,
+                            targetLang,
+                        ),
+                    action = ErrorAction.OpenSystemTranslationSettings,
+                )
+            BergamotLanguagePairStatus.AvailableToDownload,
+            BergamotLanguagePairStatus.Downloaded,
+            -> Unit
+        }
+
+        if (!bergamotModelManager.isRuntimeDownloaded()) {
+            return LocalTranslationResult.Error(
+                message = application.getString(R.string.bergamot_runtime_download_required),
+                action = ErrorAction.DownloadBergamotRuntime,
+            )
+        }
+
         val preparation =
             bergamotModelManager.prepare(
                 sourceLanguage = sourceLang,
@@ -351,6 +384,11 @@ class LocalTranslator(
                             targetLanguage = targetLang,
                             preserveHtml = preserveHtml,
                             modelRegistry = modelRegistry,
+                            runtimeFileUrl =
+                                bergamotModelManager.runtimeFileUrl()
+                                    ?: return@withTimeoutOrNull BergamotWebTranslationResult.Error(
+                                        application.getString(R.string.bergamot_runtime_download_required),
+                                    ),
                         )
                     } ?: return LocalTranslationResult.Error(
                         application.getString(R.string.bergamot_translation_timed_out),

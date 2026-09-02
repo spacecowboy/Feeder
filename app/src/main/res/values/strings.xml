@@ -374,6 +374,12 @@
   <string name="bergamot_translation_failed">Bergamot translation failed.</string>
   <string name="bergamot_model_registry_unavailable">Connect to download model list.</string>
   <string name="bergamot_model_download_failed">Could not download %1$s -> %2$s model.</string>
+  <string name="bergamot_runtime_download_required">Download the offline translation engine to continue.</string>
+  <string name="bergamot_runtime_download_title">Download offline translation engine?</string>
+  <string name="bergamot_runtime_download_warning">Feeder will download a 4.9 MB executable WebAssembly runtime from the Mozilla/Bergamot project. This code is not built or checked by F-Droid. After the download, translation works offline.</string>
+  <string name="bergamot_runtime_download_failed">Could not download the offline translation engine.</string>
+  <string name="downloading_offline_translation_runtime">Downloading offline translation engine: %1$d%%</string>
+  <string name="download">Download</string>
   <string name="bergamot_webview_translation_timed_out">Bergamot WebView translation timed out.</string>
   <string name="bergamot_webview_not_initialized">Bergamot WebView is not initialized.</string>
   <string name="bergamot_response_parse_failed">Could not parse Bergamot response.</string>

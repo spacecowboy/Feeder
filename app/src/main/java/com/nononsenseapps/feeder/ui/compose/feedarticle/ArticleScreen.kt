@@ -219,6 +219,8 @@ fun ArticleScreen(
             viewModel.dismissSystemTranslationSettingsPrompt()
         },
         onDismissSystemTranslationSettings = viewModel::dismissSystemTranslationSettingsPrompt,
+        onDownloadBergamotRuntime = viewModel::downloadBergamotRuntimeAndTranslate,
+        onDismissBergamotRuntimeDownload = viewModel::dismissBergamotRuntimeDownloadPrompt,
         modifier = modifier,
         isPagingMode = isPagingMode,
         isAnimatedPaging = isAnimatedPaging,
@@ -256,6 +258,8 @@ fun ArticleScreen(
     onTranslate: () -> Unit,
     onOpenSystemTranslationSettings: () -> Unit,
     onDismissSystemTranslationSettings: () -> Unit,
+    onDownloadBergamotRuntime: () -> Unit,
+    onDismissBergamotRuntimeDownload: () -> Unit,
     modifier: Modifier = Modifier,
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
@@ -579,6 +583,34 @@ fun ArticleScreen(
             onDismiss = onDismissSystemTranslationSettings,
         )
     }
+    if (viewState.showBergamotRuntimeDownloadPrompt) {
+        BergamotRuntimeDownloadDialog(
+            onDownload = onDownloadBergamotRuntime,
+            onDismiss = onDismissBergamotRuntimeDownload,
+        )
+    }
+}
+
+@Composable
+private fun BergamotRuntimeDownloadDialog(
+    onDownload: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.bergamot_runtime_download_title)) },
+        text = { Text(stringResource(R.string.bergamot_runtime_download_warning)) },
+        confirmButton = {
+            TextButton(onClick = onDownload) {
+                Text(stringResource(R.string.download))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.cancel))
+            }
+        },
+    )
 }
 
 @Composable

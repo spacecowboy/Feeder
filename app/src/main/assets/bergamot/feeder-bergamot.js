@@ -66,12 +66,13 @@ class FeederBacking extends TranslatorBacking {
 let translator = null;
 
 window.FeederBergamot = {
-    initialize(modelRegistry) {
+    initialize(modelRegistry, wasmUrl) {
         if (translator) {
             translator.delete();
         }
         const options = {
             modelRegistry,
+            wasmUrl,
             pivotLanguage: "en",
             workers: 1,
             batchSize: 4,
