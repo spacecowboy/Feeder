@@ -9,15 +9,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.archmodel.formatForFeed
 import com.nononsenseapps.feeder.ui.compose.feedarticle.formatArticleDate
+import com.nononsenseapps.jsonfeed.filterLegacyTlsProtocols
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.IOException
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Locale
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -77,6 +80,36 @@ class DateFormattingTest {
         assertTrue(twelveHourDate.contains("6:05"))
         assertTrue(twelveHourDate.contains("PM"))
         assertEquals("", formatArticleDate(context, null, zoneId))
+    }
+
+    @Test
+    fun legacyTlsProtocolsAreRemovedWhileSupportedAndFutureProtocolsRemainEnabled() {
+        val filteredProtocols =
+            filterLegacyTlsProtocols(
+                arrayOf(
+                    "SSL",
+                    "SSLv2Hello",
+                    "SSLv3",
+                    "sSlCustom",
+                    "TLSv1",
+                    "TLSv1.0",
+                    "TLSv1.1",
+                    "TLSv1.2",
+                    "TLSv1.3",
+                    "TLSv9.0",
+                ),
+            )
+
+        assertEquals(listOf("TLSv1.2", "TLSv1.3", "TLSv9.0"), filteredProtocols.toList())
+    }
+
+    @Test
+    fun legacyTlsProtocolFilteringFailsClosedWhenNothingAcceptableRemains() {
+        assertFailsWith<IOException> {
+            filterLegacyTlsProtocols(
+                arrayOf("SSLv3", "TLSv1", "TLSv1.0", "TLSv1.1"),
+            )
+        }
     }
 
     private fun setTimeFormat(value: String?) {
