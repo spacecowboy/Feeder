@@ -952,6 +952,7 @@ private val BERGAMOT_TARGET_LANGUAGE_CODES =
         "ru",
         "sk",
         "sl",
+        "sq",
         "sr",
         "sv",
         "ta",
@@ -961,7 +962,6 @@ private val BERGAMOT_TARGET_LANGUAGE_CODES =
         "uk",
         "ur",
         "vi",
-        "zh",
     )
 
 @Composable

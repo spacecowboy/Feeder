@@ -47,6 +47,8 @@ class FeederBacking extends TranslatorBacking {
             config["gemm-precision"] = "int8shiftAll";
         } else if (files.model.name.endsWith("intgemm.alphas.bin")) {
             config["gemm-precision"] = "int8shiftAlphaAll";
+        } else if (files.model.name.endsWith("intgemm.bin")) {
+            config["gemm-precision"] = "int8shift";
         }
         if (files.qualityModel) {
             config["skip-cost"] = false;

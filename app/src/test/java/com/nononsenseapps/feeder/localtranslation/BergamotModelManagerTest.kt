@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.localtranslation
 
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
-import io.airlift.compress.zstd.ZstdOutputStream
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,7 +24,6 @@ import org.junit.rules.TemporaryFolder
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.singleton
-import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
@@ -93,13 +91,12 @@ class BergamotModelManagerTest {
             val model = "swedish model".toByteArray()
             val lex = "swedish lex".toByteArray()
             val vocab = "swedish vocab".toByteArray()
-            val compressedFiles = listOf(model, lex, vocab).map(::zstdCompress)
             server.enqueue(
                 MockResponse()
                     .setResponseCode(200)
-                    .setBody(mozillaRegistry("sv", "en", model, lex, vocab, compressedFiles)),
+                    .setBody(mozillaRegistry("sv", "en", model, lex, vocab)),
             )
-            compressedFiles.forEach { content ->
+            listOf(model, lex, vocab).forEach { content ->
                 server.enqueue(
                     MockResponse()
                         .setResponseCode(200)
@@ -116,6 +113,53 @@ class BergamotModelManagerTest {
             assertEquals(setOf("model", "lex", "vocab"), files.keys)
             assertTrue(files.values.all { it.url?.startsWith("file:") == true })
             assertEquals(model.size.toLong(), manager.pairDir("sv", "en").resolve("model.sven.intgemm.alphas.bin").length())
+        }
+
+    @Test
+    fun preparePrefersNewerStableMozillaModelVersion() =
+        runTest {
+            server.start()
+            val oldModel = "old model".toByteArray()
+            val newModel = "new model".toByteArray()
+            val lex = "lex".toByteArray()
+            val vocab = "vocab".toByteArray()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        mozillaRegistryWithVersions(
+                            from = "de",
+                            to = "en",
+                            versions =
+                                listOf(
+                                    MozillaModelVersion(
+                                        version = "3.1.0",
+                                        modelName = "model.old.intgemm.alphas.bin",
+                                        model = oldModel,
+                                    ),
+                                    MozillaModelVersion(
+                                        version = "3.2",
+                                        modelName = "model.new.intgemm.alphas.bin",
+                                        model = newModel,
+                                    ),
+                                ),
+                            lex = lex,
+                            vocab = vocab,
+                        ),
+                    ),
+            )
+            listOf(newModel, lex, vocab).forEach { content ->
+                server.enqueue(MockResponse().setResponseCode(200).setBody(okio.Buffer().write(content)))
+            }
+
+            val manager = modelManager()
+            val preparation = manager.prepare(sourceLanguage = "de", targetLanguage = "en")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            val files = (preparation as BergamotModelPreparation.Ready).modelRegistry.single().files
+            assertEquals("model.new.intgemm.alphas.bin", files.getValue("model").name)
+            assertTrue(manager.pairDir("de", "en").resolve("model.new.intgemm.alphas.bin").isFile)
+            assertTrue(!manager.pairDir("de", "en").resolve("model.old.intgemm.alphas.bin").exists())
         }
 
     @Test
@@ -184,7 +228,7 @@ class BergamotModelManagerTest {
             assertEquals("de", emittedProgress.sourceLanguage)
             assertEquals("en", emittedProgress.targetLanguage)
             assertTrue(emittedProgress.isIndeterminate)
-            assertEquals("registry-v2.json", emittedProgress.fileName)
+            assertEquals("registry-v3.json", emittedProgress.fileName)
             assertTrue(preparation.await() is BergamotModelPreparation.Ready)
             assertNull(manager.downloadProgress.value)
         }
@@ -296,7 +340,6 @@ class BergamotModelManagerTest {
         model: ByteArray,
         lex: ByteArray,
         vocab: ByteArray,
-        compressedFiles: List<ByteArray>,
     ): String {
         val files =
             listOf(
@@ -305,33 +348,88 @@ class BergamotModelManagerTest {
                 Triple("vocab", "vocab.${from}$to.spm", vocab),
             )
         return files
-            .mapIndexed { index, (fileType, name, content) ->
-                val compressed = compressedFiles[index]
-                """
-                {
-                  "name": "$name",
-                  "version": "3.0",
-                  "fileType": "$fileType",
-                  "architecture": "tiny",
-                  "sourceLanguage": "$from",
-                  "targetLanguage": "$to",
-                  "decompressedHash": "${sha256(content)}",
-                  "decompressedSize": ${content.size},
-                  "attachment": {
-                    "hash": "${sha256(compressed)}",
-                    "size": ${compressed.size},
-                    "location": "$from$to/$name.zst"
-                  }
-                }
-                """.trimIndent()
-            }.joinToString(prefix = "{\"data\":[", postfix = "]}")
+            .joinToString(prefix = "{\"data\":[", postfix = "]}") { (fileType, name, content) ->
+                mozillaRecord(
+                    name = name,
+                    version = "3.0",
+                    fileType = fileType,
+                    from = from,
+                    to = to,
+                    content = content,
+                )
+            }
     }
 
-    private fun zstdCompress(content: ByteArray): ByteArray =
-        ByteArrayOutputStream().use { output ->
-            ZstdOutputStream(output).use { it.write(content) }
-            output.toByteArray()
+    private data class MozillaModelVersion(
+        val version: String,
+        val modelName: String,
+        val model: ByteArray,
+    )
+
+    private fun mozillaRegistryWithVersions(
+        from: String,
+        to: String,
+        versions: List<MozillaModelVersion>,
+        lex: ByteArray,
+        vocab: ByteArray,
+    ): String {
+        val lexName = "lex.50.50.${from}$to.s2t.bin"
+        val vocabName = "vocab.${from}$to.spm"
+        val records = mutableListOf<String>()
+        versions.forEach { version ->
+            records +=
+                mozillaRecord(
+                    name = version.modelName,
+                    version = version.version,
+                    fileType = "model",
+                    from = from,
+                    to = to,
+                    content = version.model,
+                )
+            records +=
+                mozillaRecord(
+                    name = lexName,
+                    version = version.version,
+                    fileType = "lex",
+                    from = from,
+                    to = to,
+                    content = lex,
+                )
+            records +=
+                mozillaRecord(
+                    name = vocabName,
+                    version = version.version,
+                    fileType = "vocab",
+                    from = from,
+                    to = to,
+                    content = vocab,
+                )
         }
+        return records.joinToString(prefix = "{\"data\":[", postfix = "]}")
+    }
+
+    private fun mozillaRecord(
+        name: String,
+        version: String,
+        fileType: String,
+        from: String,
+        to: String,
+        content: ByteArray,
+    ): String =
+        """
+        {
+          "name": "$name",
+          "version": "$version",
+          "fileType": "$fileType",
+          "fromLang": "$from",
+          "toLang": "$to",
+          "attachment": {
+            "hash": "${sha256(content)}",
+            "size": ${content.size},
+            "location": "$from$to/$name"
+          }
+        }
+        """.trimIndent()
 
     private fun registry(
         pair: String,
