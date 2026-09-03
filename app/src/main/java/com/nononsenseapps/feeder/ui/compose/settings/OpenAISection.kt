@@ -304,7 +304,7 @@ private fun OpenAISectionEdit(
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
     var translationLanguageMenuExpanded by remember { mutableStateOf(false) }
-    var showOnlyBergamotLanguages by remember { mutableStateOf(false) }
+    var showOnlyBergamotLanguages by remember { mutableStateOf(true) }
     var timeoutString by remember(current.timeoutSeconds) { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
