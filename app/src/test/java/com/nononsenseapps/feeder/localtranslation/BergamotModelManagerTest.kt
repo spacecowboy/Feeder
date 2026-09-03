@@ -54,7 +54,7 @@ class BergamotModelManagerTest {
             val manager = modelManager()
             val preparation = manager.prepare(sourceLanguage = "German", targetLanguage = "English")
 
-            assertTrue(preparation is BergamotModelPreparation.Ready)
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
             val ready = preparation as BergamotModelPreparation.Ready
             assertEquals(listOf("de" to "en"), ready.modelRegistry.map { it.from to it.to })
             assertTrue(
@@ -85,6 +85,205 @@ class BergamotModelManagerTest {
         }
 
     @Test
+    fun prepareDownloadsCurrentMozillaSwedishModel() =
+        runTest {
+            server.start()
+            val model = "swedish model".toByteArray()
+            val lex = "swedish lex".toByteArray()
+            val vocab = "swedish vocab".toByteArray()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(mozillaRegistry("sv", "en", model, lex, vocab)),
+            )
+            listOf(model, lex, vocab).forEach { content ->
+                server.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setBody(okio.Buffer().write(content)),
+                )
+            }
+
+            val manager = modelManager()
+            val preparation = manager.prepare(sourceLanguage = "Swedish", targetLanguage = "English")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            assertEquals(BergamotLanguagePairStatus.Downloaded, manager.languagePairStatus("sv", "en"))
+            val files = (preparation as BergamotModelPreparation.Ready).modelRegistry.single().files
+            assertEquals(setOf("model", "lex", "vocab"), files.keys)
+            assertTrue(files.values.all { it.url?.startsWith("file:") == true })
+            assertEquals(model.size.toLong(), manager.pairDir("sv", "en").resolve("model.sven.intgemm.alphas.bin").length())
+        }
+
+    @Test
+    fun preparePrefersNewerStableMozillaModelVersion() =
+        runTest {
+            server.start()
+            val oldModel = "old model".toByteArray()
+            val newModel = "new model".toByteArray()
+            val lex = "lex".toByteArray()
+            val vocab = "vocab".toByteArray()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        mozillaRegistryWithVersions(
+                            from = "de",
+                            to = "en",
+                            versions =
+                                listOf(
+                                    MozillaModelVersion(
+                                        version = "3.1.0",
+                                        modelName = "model.old.intgemm.alphas.bin",
+                                        model = oldModel,
+                                    ),
+                                    MozillaModelVersion(
+                                        version = "3.2",
+                                        modelName = "model.new.intgemm.alphas.bin",
+                                        model = newModel,
+                                    ),
+                                ),
+                            lex = lex,
+                            vocab = vocab,
+                        ),
+                    ),
+            )
+            listOf(newModel, lex, vocab).forEach { content ->
+                server.enqueue(MockResponse().setResponseCode(200).setBody(okio.Buffer().write(content)))
+            }
+
+            val manager = modelManager()
+            val preparation = manager.prepare(sourceLanguage = "de", targetLanguage = "en")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            val files = (preparation as BergamotModelPreparation.Ready).modelRegistry.single().files
+            assertEquals("model.new.intgemm.alphas.bin", files.getValue("model").name)
+            assertTrue(manager.pairDir("de", "en").resolve("model.new.intgemm.alphas.bin").isFile)
+            assertTrue(!manager.pairDir("de", "en").resolve("model.old.intgemm.alphas.bin").exists())
+        }
+
+    @Test
+    fun prepareIgnoresMozillaModelsExcludedFromAndroidRelease() =
+        runTest {
+            server.start()
+            val androidModel = "android model".toByteArray()
+            val desktopModel = "desktop model".toByteArray()
+            val lex = "lex".toByteArray()
+            val vocab = "vocab".toByteArray()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        mozillaRegistryWithVersions(
+                            from = "de",
+                            to = "en",
+                            versions =
+                                listOf(
+                                    MozillaModelVersion(
+                                        version = "2.0",
+                                        modelName = "model.android.intgemm.alphas.bin",
+                                        model = androidModel,
+                                        filterExpression = "env.appinfo.OS == 'Android'",
+                                    ),
+                                    MozillaModelVersion(
+                                        version = "3.0",
+                                        modelName = "model.desktop.intgemm.alphas.bin",
+                                        model = desktopModel,
+                                        filterExpression = "env.appinfo.OS != 'Android' || env.channel != 'release'",
+                                    ),
+                                ),
+                            lex = lex,
+                            vocab = vocab,
+                        ),
+                    ),
+            )
+            listOf(androidModel, lex, vocab).forEach { content ->
+                server.enqueue(MockResponse().setResponseCode(200).setBody(okio.Buffer().write(content)))
+            }
+
+            val preparation = modelManager().prepare(sourceLanguage = "de", targetLanguage = "en")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            val files = (preparation as BergamotModelPreparation.Ready).modelRegistry.single().files
+            assertEquals("model.android.intgemm.alphas.bin", files.getValue("model").name)
+        }
+
+    @Test
+    fun languagePairStatusIgnoresMozillaModelsLimitedToNightly() =
+        runTest {
+            server.start()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(
+                        mozillaRegistryWithVersions(
+                            from = "en",
+                            to = "sq",
+                            versions =
+                                listOf(
+                                    MozillaModelVersion(
+                                        version = "1.0a",
+                                        modelName = "model.ensq.intgemm.alphas.bin",
+                                        model = "nightly model".toByteArray(),
+                                        filterExpression = "env.channel == 'default' || env.channel == 'nightly'",
+                                    ),
+                                ),
+                            lex = "lex".toByteArray(),
+                            vocab = "vocab".toByteArray(),
+                        ),
+                    ),
+            )
+
+            assertEquals(
+                BergamotLanguagePairStatus.Unavailable,
+                modelManager().languagePairStatus("en", "sq"),
+            )
+        }
+
+    @Test
+    fun downloadRuntimeStoresVerifiedExecutable() =
+        runTest {
+            server.start()
+            val runtime = "verified runtime".toByteArray()
+            server.enqueue(MockResponse().setResponseCode(200).setBody(String(runtime)))
+
+            val manager = modelManager(runtimeSha256 = sha256(runtime))
+
+            assertTrue(manager.downloadRuntime())
+            assertTrue(manager.isRuntimeDownloaded())
+            assertTrue(manager.runtimeFileUrl()?.startsWith("file:") == true)
+            assertNull(manager.downloadProgress.value)
+        }
+
+    @Test
+    fun downloadRuntimeRejectsExecutableWithWrongHash() =
+        runTest {
+            server.start()
+            server.enqueue(MockResponse().setResponseCode(200).setBody("corrupted runtime"))
+
+            val manager = modelManager(runtimeSha256 = sha256("expected runtime".toByteArray()))
+
+            assertTrue(!manager.downloadRuntime())
+            assertTrue(!manager.isRuntimeDownloaded())
+            assertNull(manager.runtimeFileUrl())
+            assertNull(manager.downloadProgress.value)
+        }
+
+    @Test
+    fun downloadRuntimeDoesNotFetchVerifiedExecutableAgain() =
+        runTest {
+            server.start()
+            val runtime = "verified runtime".toByteArray()
+            server.enqueue(MockResponse().setResponseCode(200).setBody(String(runtime)))
+            val manager = modelManager(runtimeSha256 = sha256(runtime))
+
+            assertTrue(manager.downloadRuntime())
+            assertTrue(manager.downloadRuntime())
+
+            assertEquals(1, server.requestCount)
+        }
+
+    @Test
     fun prepareReportsProgressWhileLoadingRegistry() =
         runTest {
             server.start()
@@ -107,7 +306,7 @@ class BergamotModelManagerTest {
             assertEquals("de", emittedProgress.sourceLanguage)
             assertEquals("en", emittedProgress.targetLanguage)
             assertTrue(emittedProgress.isIndeterminate)
-            assertEquals("registry.json", emittedProgress.fileName)
+            assertEquals("registry-v3.json", emittedProgress.fileName)
             assertTrue(preparation.await() is BergamotModelPreparation.Ready)
             assertNull(manager.downloadProgress.value)
         }
@@ -194,7 +393,7 @@ class BergamotModelManagerTest {
             assertTrue(preparation is BergamotModelPreparation.Error)
         }
 
-    private fun modelManager(): BergamotModelManager =
+    private fun modelManager(runtimeSha256: String = sha256("runtime".toByteArray())): BergamotModelManager =
         BergamotModelManager(
             di =
                 DI {
@@ -208,7 +407,113 @@ class BergamotModelManagerTest {
                     bind<OkHttpClient>() with singleton { OkHttpClient() }
                 },
             registryUrl = server.url("/registry.json").toString(),
+            attachmentBaseUrl = server.url("/").toString(),
+            runtimeUrl = server.url("/bergamot-translator-worker.wasm").toString(),
+            runtimeSha256 = runtimeSha256,
         )
+
+    private fun mozillaRegistry(
+        from: String,
+        to: String,
+        model: ByteArray,
+        lex: ByteArray,
+        vocab: ByteArray,
+    ): String {
+        val files =
+            listOf(
+                Triple("model", "model.${from}$to.intgemm.alphas.bin", model),
+                Triple("lex", "lex.50.50.${from}$to.s2t.bin", lex),
+                Triple("vocab", "vocab.${from}$to.spm", vocab),
+            )
+        return files
+            .joinToString(prefix = "{\"data\":[", postfix = "]}") { (fileType, name, content) ->
+                mozillaRecord(
+                    name = name,
+                    version = "3.0",
+                    fileType = fileType,
+                    from = from,
+                    to = to,
+                    content = content,
+                )
+            }
+    }
+
+    private data class MozillaModelVersion(
+        val version: String,
+        val modelName: String,
+        val model: ByteArray,
+        val filterExpression: String = "",
+    )
+
+    private fun mozillaRegistryWithVersions(
+        from: String,
+        to: String,
+        versions: List<MozillaModelVersion>,
+        lex: ByteArray,
+        vocab: ByteArray,
+    ): String {
+        val lexName = "lex.50.50.${from}$to.s2t.bin"
+        val vocabName = "vocab.${from}$to.spm"
+        val records = mutableListOf<String>()
+        versions.forEach { version ->
+            records +=
+                mozillaRecord(
+                    name = version.modelName,
+                    version = version.version,
+                    fileType = "model",
+                    from = from,
+                    to = to,
+                    content = version.model,
+                    filterExpression = version.filterExpression,
+                )
+            records +=
+                mozillaRecord(
+                    name = lexName,
+                    version = version.version,
+                    fileType = "lex",
+                    from = from,
+                    to = to,
+                    content = lex,
+                    filterExpression = version.filterExpression,
+                )
+            records +=
+                mozillaRecord(
+                    name = vocabName,
+                    version = version.version,
+                    fileType = "vocab",
+                    from = from,
+                    to = to,
+                    content = vocab,
+                    filterExpression = version.filterExpression,
+                )
+        }
+        return records.joinToString(prefix = "{\"data\":[", postfix = "]}")
+    }
+
+    private fun mozillaRecord(
+        name: String,
+        version: String,
+        fileType: String,
+        from: String,
+        to: String,
+        content: ByteArray,
+        filterExpression: String = "",
+    ): String =
+        """
+        {
+          "name": "$name",
+          "version": "$version",
+          "fileType": "$fileType",
+          "fromLang": "$from",
+          "toLang": "$to",
+          "filter_expression": "$filterExpression",
+          "attachment": {
+            "hash": "${sha256(content)}",
+            "size": ${content.size},
+            "location": "$from$to/$name"
+          }
+        }
+        """.trimIndent()
 
     private fun registry(
         pair: String,

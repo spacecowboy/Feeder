@@ -219,7 +219,7 @@ export class CancelledError extends Error {}
         // Pre-fetch the WASM binary in the main thread since Workers can't
         // access file:// URLs via fetch() on Android WebView, and fetch() doesn't
         // support file:// at all. Use XMLHttpRequest instead.
-        const wasmUrl = new URL('./worker/bergamot-translator-worker.wasm', import.meta.url);
+        const wasmUrl = new URL(this.options.wasmUrl);
         const wasmBinary = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', wasmUrl.href, true);

@@ -304,7 +304,7 @@ private fun OpenAISectionEdit(
     var modelsMenuExpanded by remember { mutableStateOf(false) }
     var providerMenuExpanded by remember { mutableStateOf(false) }
     var translationLanguageMenuExpanded by remember { mutableStateOf(false) }
-    var showOnlyBergamotLanguages by remember { mutableStateOf(false) }
+    var showOnlyBergamotLanguages by remember { mutableStateOf(true) }
     var timeoutString by remember(current.timeoutSeconds) { mutableStateOf(current.timeoutSeconds.toString()) }
     val isTimeoutInputValid =
         remember(timeoutString) {
@@ -909,17 +909,58 @@ private fun deepLTargetLanguageOptions(): List<TranslationLanguageOption> =
 
 private val BERGAMOT_TARGET_LANGUAGE_CODES =
     setOf(
+        "af",
+        "ar",
+        "az",
         "bg",
+        "bn",
+        "bs",
+        "ca",
         "cs",
+        "da",
         "de",
+        "el",
         "en",
         "es",
         "et",
+        "eu",
+        "fa",
+        "fi",
         "fr",
+        "gl",
+        "gu",
+        "he",
+        "hi",
+        "hr",
+        "hu",
+        "id",
+        "is",
         "it",
+        "ja",
+        "kn",
+        "ko",
+        "lt",
+        "lv",
+        "ml",
+        "mr",
+        "ms",
+        "nb",
+        "nl",
+        "pl",
         "pt",
+        "ro",
         "ru",
+        "sk",
+        "sl",
+        "sr",
+        "sv",
+        "ta",
+        "te",
+        "th",
+        "tr",
         "uk",
+        "ur",
+        "vi",
     )
 
 @Composable

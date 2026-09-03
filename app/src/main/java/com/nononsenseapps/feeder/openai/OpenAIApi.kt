@@ -91,6 +91,7 @@ class OpenAIApi(
 
         enum class ErrorAction {
             None,
+            DownloadBergamotRuntime,
             OpenSystemTranslationSettings,
         }
     }

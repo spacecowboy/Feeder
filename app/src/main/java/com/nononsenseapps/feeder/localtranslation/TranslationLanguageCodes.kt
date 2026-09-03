@@ -32,6 +32,7 @@ fun normalizeLanguageCode(language: String): String {
         "icelandic", "is" -> "is"
         "norwegian", "nb", "nn" -> "nb"
         "persian", "fa" -> "fa"
+        "swedish", "sv" -> "sv"
         "ukrainian", "uk" -> "uk"
         else -> normalized
     }

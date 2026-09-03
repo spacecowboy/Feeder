@@ -530,10 +530,11 @@ class TranslationManager(
                     ?: throw IllegalStateException("Translation failed")
             is TranslationResult.Error -> {
                 val message = result.content.ifBlank { "Translation failed" }
-                if (result.action == ErrorAction.OpenSystemTranslationSettings) {
-                    throw SystemTranslationSettingsRequiredException(message)
+                when (result.action) {
+                    ErrorAction.DownloadBergamotRuntime -> throw BergamotRuntimeDownloadRequiredException(message)
+                    ErrorAction.OpenSystemTranslationSettings -> throw SystemTranslationSettingsRequiredException(message)
+                    ErrorAction.None -> throw IllegalStateException(message)
                 }
-                throw IllegalStateException(message)
             }
         }
 
@@ -684,6 +685,10 @@ data class ArticleTranslation(
 )
 
 class SystemTranslationSettingsRequiredException(
+    message: String,
+) : IllegalStateException(message)
+
+class BergamotRuntimeDownloadRequiredException(
     message: String,
 ) : IllegalStateException(message)
 

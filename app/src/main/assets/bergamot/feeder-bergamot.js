@@ -45,6 +45,10 @@ class FeederBacking extends TranslatorBacking {
         const config = {};
         if (files.model.name.endsWith("intgemm8.bin")) {
             config["gemm-precision"] = "int8shiftAll";
+        } else if (files.model.name.endsWith("intgemm.alphas.bin")) {
+            config["gemm-precision"] = "int8shiftAlphaAll";
+        } else if (files.model.name.endsWith("intgemm.bin")) {
+            config["gemm-precision"] = "int8shift";
         }
         if (files.qualityModel) {
             config["skip-cost"] = false;
@@ -66,12 +70,13 @@ class FeederBacking extends TranslatorBacking {
 let translator = null;
 
 window.FeederBergamot = {
-    initialize(modelRegistry) {
+    initialize(modelRegistry, wasmUrl) {
         if (translator) {
             translator.delete();
         }
         const options = {
             modelRegistry,
+            wasmUrl,
             pivotLanguage: "en",
             workers: 1,
             batchSize: 4,
