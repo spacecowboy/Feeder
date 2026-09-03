@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -266,6 +267,7 @@ class BergamotModelManager(
         json
             .decodeFromString<MozillaModelRegistry>(content)
             .data
+            .filter(MozillaModelRecord::isCompatibleWithAndroidRelease)
             .groupBy { record ->
                 MozillaModelSet(
                     from = record.fromLang.lowercase(Locale.ROOT),
@@ -572,7 +574,16 @@ private data class MozillaModelRecord(
     val attachment: MozillaModelAttachment,
     val fromLang: String,
     val toLang: String,
-)
+    @SerialName("filter_expression")
+    val filterExpression: String = "",
+) {
+    // Do not bypass staged/nightly or non-Android Remote Settings rollouts.
+    fun isCompatibleWithAndroidRelease(): Boolean =
+        when (filterExpression.trim()) {
+            "", ANDROID_FILTER_EXPRESSION -> true
+            else -> false
+        }
+}
 
 @Serializable
 private data class MozillaModelAttachment(
@@ -582,6 +593,7 @@ private data class MozillaModelAttachment(
 )
 
 private val STABLE_VERSION_REGEX = Regex("[0-9]+(\\.[0-9]+)*")
+private const val ANDROID_FILTER_EXPRESSION = "env.appinfo.OS == 'Android'"
 
 private data class MozillaModelSet(
     val from: String,
