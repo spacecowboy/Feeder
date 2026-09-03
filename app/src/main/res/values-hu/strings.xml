@@ -284,7 +284,7 @@
     <string name="summarize_on_open">Összegzés megnyitáskor</string>
     <string name="feed_search_suggestions_header">Javaslatok</string>
     <string name="openai_settings_info">Sok MI-szolgáltatóval kompatibilis, de nem mindegyikkel</string>
-    <string name="apply_blocklist_to_summaries">Alkalmazás az összefoglalókhoz</string>
+    <string name="apply_blocklist_to_summaries">Használat az összefoglalókhoz</string>
     <string name="open_article_in_reader">Megnyitás az olvasóban</string>
     <string name="open_article_in_default_browser">Megnyitás az alapértelmezett böngészőben</string>
     <string name="open_article_in_custom_tab">Megnyitás egyéni lapon</string>
@@ -379,9 +379,9 @@
     <string name="no_downloaded_models">Még nincsenek fordítási modellek letöltve. A fordítás automatikusan letölti a szükséges modellt.</string>
     <string name="delete_button_text">Törlés</string>
     <string name="cancel">Mégse</string>
-    <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lehátszóval</string>
+    <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lejátszóval</string>
     <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor a hanghivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
     <string name="force_single_column">Egy oszlopos elrendezés kikényszerítése</string>
-    <string name="apply_blocklist_to_links">Használat hivatkozásokhoz</string>
+    <string name="apply_blocklist_to_links">Használat a hivatkozásokhoz</string>
     <string name="filters">Szűrők</string>
 </resources>
