@@ -381,4 +381,7 @@
     <string name="no_downloaded_models">Ще немає завантажених моделей перекладу. Перекладач автоматично завантажить потрібну модель.</string>
     <string name="delete_button_text">Видалити</string>
     <string name="cancel">Скасувати</string>
+    <string name="apply_blocklist_to_links">Застосувати до посилань</string>
+    <string name="filters">Фільтри</string>
+    <string name="force_single_column">Один стовпчик (примусово)</string>
 </resources>
