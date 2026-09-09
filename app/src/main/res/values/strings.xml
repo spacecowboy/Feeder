@@ -306,6 +306,7 @@
   <string name="rule_error_unknown_field">Line %1$d: \'%2$s\' is not a known field. Invalid lines are ignored.</string>
   <string name="rule_error_empty_pattern">Line %1$d: the pattern is empty, which would match everything. Invalid lines are ignored.</string>
   <string name="rule_error_invalid_regex">Line %1$d: not a valid regular expression. Invalid lines are ignored.</string>
+  <string name="rule_error_too_many_rules">Line %1$d: only the first %2$d rules are used. Later lines are ignored.</string>
   <string name="openai_settings">AI and translation</string>
   <string name="openai_settings_info">Compatible with many AI providers, but not all</string>
   <string name="summary_api_settings">Summary API</string>

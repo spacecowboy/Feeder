@@ -672,6 +672,9 @@ private fun ruleErrorText(error: EntryRuleError?): String? =
 
         is EntryRuleError.InvalidRegex ->
             stringResource(id = R.string.rule_error_invalid_regex, error.lineNumber)
+
+        is EntryRuleError.TooManyRules ->
+            stringResource(id = R.string.rule_error_too_many_rules, error.lineNumber, error.maxRules)
     }
 
 @Stable

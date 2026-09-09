@@ -126,6 +126,10 @@ class EntryFilterRulesTest {
         val result = EntryRules.parse(text)
 
         assertEquals(EntryRules.MAX_RULES, result.rules.size)
+        assertEquals(
+            listOf(EntryRuleError.TooManyRules(EntryRules.MAX_RULES + 1, EntryRules.MAX_RULES)),
+            result.errors,
+        )
     }
 
     // --------------------------------------------------------------- matching
@@ -205,6 +209,22 @@ class EntryFilterRulesTest {
     }
 
     @Test
+    fun entryContentFallsBackToContentHtmlWhenContentTextIsBlank() {
+        val rule = EntryRule(EntryRuleField.ENTRY_CONTENT, "sponsor\\.example")
+
+        // content_text is never null in practice - plainContent strips markup and urls,
+        // so a blank or markup-only body has to fall through to the html.
+        assertTrue(
+            rule.matches(
+                article(
+                    contentText = "",
+                    contentHtml = "<a href=\"https://sponsor.example/promo\">here</a>",
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun entryContentNeverReadsSummary() {
         val rule = EntryRule(EntryRuleField.ENTRY_CONTENT, "uniquemarker")
 
@@ -216,6 +236,33 @@ class EntryFilterRulesTest {
         assertTrue(EntryRule(EntryRuleField.ENTRY_TITLE, "^Ad: ").matches(article(title = "Ad: buy now")))
         assertFalse(EntryRule(EntryRuleField.ENTRY_TITLE, "^Ad: ").matches(article(title = "An Ad: buy now")))
         assertTrue(EntryRule(EntryRuleField.ENTRY_TITLE, "sponsored$").matches(article(title = "This is sponsored")))
+    }
+
+    @Test
+    fun endAnchorDoesNotBindToTheTruncationPointOfLongValues() {
+        val padding = "x".repeat(EntryRule.MAX_MATCHED_LENGTH + 50_000)
+
+        // The searched window ends mid-padding, but $ must still mean the real end.
+        assertFalse(
+            EntryRule(EntryRuleField.ENTRY_CONTENT, "x$").matches(article(contentText = padding)),
+        )
+        // ^ still anchors at the real start, which is inside the window.
+        assertTrue(
+            EntryRule(EntryRuleField.ENTRY_CONTENT, "^x").matches(article(contentText = padding)),
+        )
+        // Unanchored matching inside the window is unaffected.
+        assertTrue(
+            EntryRule(EntryRuleField.ENTRY_CONTENT, "marker")
+                .matches(article(contentText = "marker$padding")),
+        )
+    }
+
+    @Test
+    fun contentBeyondTheLengthCapIsNotSearched() {
+        val rule = EntryRule(EntryRuleField.ENTRY_CONTENT, "marker")
+        val text = "x".repeat(EntryRule.MAX_MATCHED_LENGTH + 10) + "marker"
+
+        assertFalse(rule.matches(article(contentText = text)))
     }
 
     // ----------------------------------------------------------------- policy

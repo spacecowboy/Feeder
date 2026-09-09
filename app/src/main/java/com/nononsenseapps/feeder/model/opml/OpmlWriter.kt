@@ -94,17 +94,19 @@ internal fun escape(s: String): String =
         .replace(">", "&gt;")
 
 /**
- * XML attribute values are newline-normalized to spaces by conformant parsers,
- * so newlines must be written as character references to survive a round trip.
+ * Conformant parsers normalize every whitespace character in an attribute value
+ * (#x9, #xA and #xD) to a space, so those must be written as character references
+ * to survive a round trip.
  *
  * Order matters: [escape] runs first because it turns every '&' into "&amp;",
- * after which the newline substitution introduces the only raw '&' meant to survive.
+ * after which these substitutions introduce the only raw '&' meant to survive.
  */
 internal fun escapeAttribute(s: String): String =
     escape(s)
         .replace("\r\n", "\n")
         .replace("\r", "\n")
         .replace("\n", "&#10;")
+        .replace("\t", "&#9;")
 
 /**
 

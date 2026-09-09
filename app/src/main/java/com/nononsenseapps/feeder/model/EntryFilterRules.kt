@@ -42,17 +42,44 @@ data class EntryRule(
             EntryRuleField.ENTRY_TITLE -> matchesValue(article.title)
             EntryRuleField.ENTRY_URL -> matchesValue(article.url)
             EntryRuleField.ENTRY_AUTHOR -> matchesValue(article.author?.name)
-            EntryRuleField.ENTRY_CONTENT -> matchesValue(article.content_text ?: article.content_html)
+            // content_text is never null for parsed feeds (it is FeederGoItem.plainContent,
+            // "" at worst), so the fallback has to test for blankness rather than null or
+            // markup-targeting rules could never reach the HTML at all.
+            EntryRuleField.ENTRY_CONTENT ->
+                matchesValue(article.content_text?.takeIf { it.isNotBlank() } ?: article.content_html)
             // Miniflux iterates entry.Tags and stops on first hit, so an entry
             // with no tags matches no EntryTag rule at all — not even ".*".
             EntryRuleField.ENTRY_TAG -> article.tags?.any { matchesValue(it) } == true
         }
 
     /** Missing scalars match as "", mirroring Go's zero-value strings. */
-    private fun matchesValue(value: String?): Boolean = regex.containsMatchIn((value ?: "").take(MAX_MATCHED_LENGTH))
+    private fun matchesValue(value: String?): Boolean {
+        val text = value ?: ""
+
+        if (text.length <= MAX_MATCHED_LENGTH) {
+            return regex.containsMatchIn(text)
+        }
+
+        // Only the first MAX_MATCHED_LENGTH characters are searched, but the cut-off
+        // point must not masquerade as the end of the text. Transparent, non-anchoring
+        // bounds evaluate ^ and $ against the whole value, so ^ still anchors at the
+        // real start while an end-anchored rule simply does not match instead of
+        // matching at MAX_MATCHED_LENGTH.
+        return regex
+            .toPattern()
+            .matcher(text)
+            .region(0, MAX_MATCHED_LENGTH)
+            .useTransparentBounds(true)
+            .useAnchoringBounds(false)
+            .find()
+    }
 
     companion object {
-        /** Bounds worst-case backtracking on large article bodies. */
+        /**
+         * Bounds worst-case backtracking on large article bodies. Values longer than
+         * this are searched only up to this length; see [matchesValue] for how the
+         * anchors behave there.
+         */
         const val MAX_MATCHED_LENGTH = 100_000
     }
 }
@@ -77,6 +104,12 @@ sealed interface EntryRuleError {
     data class InvalidRegex(
         override val lineNumber: Int,
         val reason: String,
+    ) : EntryRuleError
+
+    /** The line is valid but exceeds [EntryRules.MAX_RULES]; it and every later line are ignored. */
+    data class TooManyRules(
+        override val lineNumber: Int,
+        val maxRules: Int,
     ) : EntryRuleError
 }
 
@@ -106,10 +139,6 @@ object EntryRules {
         val errors = mutableListOf<EntryRuleError>()
 
         for ((index, rawLine) in text.lineSequence().withIndex()) {
-            if (rules.size >= MAX_RULES) {
-                break
-            }
-
             val lineNumber = index + 1
             // Also disposes of the \r in CRLF line endings.
             val line = rawLine.trim()
@@ -139,6 +168,13 @@ object EntryRules {
             if (pattern.isEmpty()) {
                 errors.add(EntryRuleError.EmptyPattern(lineNumber))
                 continue
+            }
+
+            // Reported rather than silently dropped: an unnoticed cap on an allow
+            // list would discard every article matching only the dropped rules.
+            if (rules.size >= MAX_RULES) {
+                errors.add(EntryRuleError.TooManyRules(lineNumber, MAX_RULES))
+                break
             }
 
             try {

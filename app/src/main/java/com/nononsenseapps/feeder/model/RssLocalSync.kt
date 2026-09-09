@@ -329,11 +329,16 @@ class RssLocalSync(
 
                     val totalItems = itemsWithGuids.size
 
+                    // Ids of items the feed still serves but which the rules filtered out.
+                    // They are not stored again, but they must survive pruning below.
+                    val filteredButStoredIds = mutableSetOf<Long>()
+
                     val feedItemSqls =
                         itemsWithGuids
                             .mapIndexedNotNull { index, (item, guid) ->
-                                // Per-feed block/allow rules. Applied before any DB read, og:image fetch,
-                                // or blob write, so a filtered item never becomes a row, file, or notification.
+                                // Per-feed block/allow rules. Applied before the og:image fetch, the
+                                // duplicate check and the blob write, so a filtered item never becomes
+                                // a row, a file or a notification.
                                 //
                                 // Deliberately inside this lambda rather than before it: filtering the list
                                 // earlier would change the input of the isNotUniqueIds computation (flipping
@@ -342,6 +347,18 @@ class RssLocalSync(
                                 // were filtered ahead of it.
                                 if (!EntryFilterPolicy.shouldKeep(item, entryFilterRules)) {
                                     logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
+                                    // A rule added after the fact does not delete what is already stored,
+                                    // so an existing row for this item still has to be protected from the
+                                    // pruning below - the feed does still serve it.
+                                    (
+                                        repository.loadFeedItem(
+                                            guid = item.alternateId,
+                                            feedId = feedSql.id,
+                                        ) ?: repository.loadFeedItem(
+                                            guid = item.id ?: item.alternateId,
+                                            feedId = feedSql.id,
+                                        )
+                                    )?.let { filteredButStoredIds.add(it.id) }
                                     return@mapIndexedNotNull null
                                 }
 
@@ -458,6 +475,7 @@ class RssLocalSync(
                     val presentIds =
                         feedItemSqls
                             .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
+                            .apply { addAll(filteredButStoredIds) }
 
                     val articlesToDelete =
                         repository

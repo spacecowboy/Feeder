@@ -79,6 +79,29 @@ class OpmlWriterKtTest {
         }
 
     @Test
+    fun writesRulesWithTabsEncodedAsCharacterReferences() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                        blockRules = "EntryContent=Price:\tfree",
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(
+                "feeder:blockRules=\"EntryContent=Price:&#9;free\"",
+                Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
+            )
+        }
+
+    @Test
     fun doesNotWriteRuleAttributesWhenRulesAreEmpty() =
         runBlocking {
             val bos = ByteArrayOutputStream()
