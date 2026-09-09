@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -54,6 +55,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,6 +70,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.model.EntryRuleError
 import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteResults
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
@@ -571,7 +574,105 @@ fun ColumnScope.RightContent(
         icon = null,
         minHeight = 48.dp,
     )
+    HorizontalDivider(modifier = Modifier.fillMaxWidth())
+    GroupTitle(
+        startingSpace = false,
+        height = 48.dp,
+    ) {
+        Text(stringResource(id = R.string.entry_filter_rules))
+    }
+    Text(
+        text = stringResource(id = R.string.entry_filter_rules_desc),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.width(LocalDimens.current.maxContentWidth),
+    )
+    RulesField(
+        label = stringResource(id = R.string.block_rules),
+        supportingText = stringResource(id = R.string.block_rules_desc),
+        value = viewState.blockRules,
+        onValueChange = { viewState.blockRules = it },
+        error = viewState.blockRulesError,
+    )
+    RulesField(
+        label = stringResource(id = R.string.allow_rules),
+        supportingText = stringResource(id = R.string.allow_rules_desc),
+        value = viewState.allowRules,
+        onValueChange = { viewState.allowRules = it },
+        error = viewState.allowRulesError,
+    )
 }
+
+/**
+ * A multi-line field for one `FieldName=regex` rule per line.
+ *
+ * Deliberately does NOT use ImeAction.Next/Done or intercept the Enter key like the
+ * other fields on this screen do - the return key must insert a newline, since that
+ * is the rule separator.
+ */
+@Composable
+private fun RulesField(
+    label: String,
+    supportingText: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    error: EntryRuleError?,
+    modifier: Modifier = Modifier,
+) {
+    val errorText = ruleErrorText(error)
+
+    Column(modifier = modifier.width(LocalDimens.current.maxContentWidth)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = {
+                Text(label)
+            },
+            placeholder = {
+                Text(stringResource(id = R.string.entry_rules_placeholder))
+            },
+            isError = error != null,
+            singleLine = false,
+            minLines = 3,
+            maxLines = 8,
+            textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace),
+            keyboardOptions =
+                KeyboardOptions(
+                    capitalization = KeyboardCapitalization.None,
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Default,
+                ),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        AnimatedVisibility(visible = errorText != null) {
+            Text(
+                text = errorText ?: "",
+                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
+            )
+        }
+        Text(
+            text = supportingText,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+@Composable
+private fun ruleErrorText(error: EntryRuleError?): String? =
+    when (error) {
+        null -> null
+        is EntryRuleError.MissingSeparator ->
+            stringResource(id = R.string.rule_error_missing_separator, error.lineNumber)
+
+        is EntryRuleError.UnknownField ->
+            stringResource(id = R.string.rule_error_unknown_field, error.lineNumber, error.fieldName)
+
+        is EntryRuleError.EmptyPattern ->
+            stringResource(id = R.string.rule_error_empty_pattern, error.lineNumber)
+
+        is EntryRuleError.InvalidRegex ->
+            stringResource(id = R.string.rule_error_invalid_regex, error.lineNumber)
+    }
 
 @Stable
 interface EditFeedScreenState {
@@ -585,6 +686,10 @@ interface EditFeedScreenState {
     var alternateId: Boolean
     var summarizeOnOpen: Boolean
     var fetchOgImages: Boolean
+    var blockRules: String
+    var allowRules: String
+    val blockRulesError: EntryRuleError?
+    val allowRulesError: EntryRuleError?
     val isOkToSave: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
@@ -608,6 +713,8 @@ private class ScreenState(
     override val allTags: List<String> = emptyList(),
     override val defaultTitle: String = "",
     override val feedImage: String = "",
+    override val blockRulesError: EntryRuleError? = null,
+    override val allowRulesError: EntryRuleError? = null,
 ) : EditFeedScreenState {
     override var feedUrl: String by mutableStateOf("")
     override var feedTitle: String by mutableStateOf("")
@@ -619,6 +726,8 @@ private class ScreenState(
     override var alternateId: Boolean by mutableStateOf(false)
     override var summarizeOnOpen: Boolean by mutableStateOf(false)
     override var fetchOgImages: Boolean by mutableStateOf(false)
+    override var blockRules: String by mutableStateOf("")
+    override var allowRules: String by mutableStateOf("")
 }
 
 @Preview("Edit Feed Phone")

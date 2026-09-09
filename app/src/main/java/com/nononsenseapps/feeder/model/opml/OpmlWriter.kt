@@ -94,6 +94,19 @@ internal fun escape(s: String): String =
         .replace(">", "&gt;")
 
 /**
+ * XML attribute values are newline-normalized to spaces by conformant parsers,
+ * so newlines must be written as character references to survive a round trip.
+ *
+ * Order matters: [escape] runs first because it turns every '&' into "&amp;",
+ * after which the newline substitution introduces the only raw '&' meant to survive.
+ */
+internal fun escapeAttribute(s: String): String =
+    escape(s)
+        .replace("\r\n", "\n")
+        .replace("\r", "\n")
+        .replace("\n", "&#10;")
+
+/**
 
  * @param s string to unescape
  * *
@@ -242,6 +255,8 @@ abstract class BodyTag(
             openArticlesWith = feed.openArticlesWith
             alternateId = feed.alternateId
             fetchOgImages = feed.fetchOgImages
+            feed.blockRules.takeIf { it.isNotBlank() }?.let { blockRules = escapeAttribute(it) }
+            feed.allowRules.takeIf { it.isNotBlank() }?.let { allowRules = escapeAttribute(it) }
         }
 }
 
@@ -301,6 +316,16 @@ class Outline : BodyTag("outline") {
         get() = attributes["feeder:fetchOgImages"]!!.toBoolean()
         set(value) {
             attributes["feeder:fetchOgImages"] = value.toString()
+        }
+    var blockRules: String
+        get() = attributes["feeder:blockRules"]!!
+        set(value) {
+            attributes["feeder:blockRules"] = value
+        }
+    var allowRules: String
+        get() = attributes["feeder:allowRules"]!!
+        set(value) {
+            attributes["feeder:allowRules"] = value
         }
 }
 

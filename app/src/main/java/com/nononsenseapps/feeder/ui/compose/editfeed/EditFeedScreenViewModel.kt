@@ -13,6 +13,8 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.model.EntryRuleError
+import com.nononsenseapps.feeder.model.EntryRules
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -48,6 +50,17 @@ class EditFeedScreenViewModel(
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var summarizeOnOpen: Boolean by mutableSavedStateOf(state, false)
     override var fetchOgImages: Boolean by mutableSavedStateOf(state, false)
+
+    // Invalid rules deliberately do not block saving - a regex is invalid while being
+    // typed, and the engine ignores invalid lines anyway.
+    override var blockRulesError: EntryRuleError? by mutableStateOf(null)
+    override var allowRulesError: EntryRuleError? by mutableStateOf(null)
+    override var blockRules: String by mutableSavedStateOf(state, "") { value ->
+        blockRulesError = EntryRules.parse(value).errors.firstOrNull()
+    }
+    override var allowRules: String by mutableSavedStateOf(state, "") { value ->
+        allowRulesError = EntryRules.parse(value).errors.firstOrNull()
+    }
     override var allTags: List<String> by mutableStateOf(emptyList())
 
     override var feedImage: String by mutableStateOf("")
@@ -116,6 +129,12 @@ class EditFeedScreenViewModel(
             if (!state.contains("fetchOgImages")) {
                 fetchOgImages = feed.fetchOgImages
             }
+            if (!state.contains("blockRules")) {
+                blockRules = feed.blockRules
+            }
+            if (!state.contains("allowRules")) {
+                allowRules = feed.allowRules
+            }
 
             repository.allTags
                 .collect { value ->
@@ -143,6 +162,8 @@ class EditFeedScreenViewModel(
                     alternateId = alternateId,
                     summarizeOnOpen = summarizeOnOpen,
                     fetchOgImages = fetchOgImages,
+                    blockRules = blockRules,
+                    allowRules = allowRules,
                 )
 
             // No point in doing anything unless they actually differ

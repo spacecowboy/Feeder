@@ -33,6 +33,8 @@ class EncryptedFeedTest {
         assertTrue(feed.alternateId)
         assertFalse(feed.fullTextByDefault)
         assertFalse(feed.fetchOgImages)
+        assertEquals("", feed.blockRules)
+        assertEquals("", feed.allowRules)
     }
 
     @Test
@@ -50,5 +52,28 @@ class EncryptedFeedTest {
 
         assertFalse(encrypted.fetchOgImages)
         assertFalse(restored.fetchOgImages)
+    }
+
+    @Test
+    fun multiLineRulesRoundTripThroughEncryptedFeed() {
+        val blockRules = "EntryTitle=(?i)sponsored\nEntryURL=example\\.com/ads/"
+        val allowRules = "EntryTag=(?i)linux"
+
+        val original =
+            Feed(
+                url = URL("https://foo.bar"),
+                title = "foo",
+                blockRules = blockRules,
+                allowRules = allowRules,
+                whenModified = Instant.now(),
+            )
+
+        val encrypted = original.toEncryptedFeed()
+        val restored = encrypted.updateFeedCopy(Feed())
+
+        assertEquals(blockRules, encrypted.blockRules)
+        assertEquals(allowRules, encrypted.allowRules)
+        assertEquals(blockRules, restored.blockRules)
+        assertEquals(allowRules, restored.allowRules)
     }
 }

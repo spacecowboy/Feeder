@@ -103,6 +103,8 @@ data class EncryptedFeed(
     val openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
     val alternateId: Boolean = false,
     val fetchOgImages: Boolean = false,
+    val blockRules: String = "",
+    val allowRules: String = "",
     val whenModified: Instant = Instant.EPOCH,
 )
 
@@ -117,6 +119,8 @@ fun Feed.toEncryptedFeed(): EncryptedFeed =
         openArticlesWith = openArticlesWith,
         alternateId = alternateId,
         fetchOgImages = fetchOgImages,
+        blockRules = blockRules,
+        allowRules = allowRules,
         whenModified = whenModified,
     )
 
@@ -131,5 +135,7 @@ fun EncryptedFeed.updateFeedCopy(feed: Feed): Feed =
         openArticlesWith = openArticlesWith,
         alternateId = alternateId,
         fetchOgImages = fetchOgImages,
+        blockRules = blockRules,
+        allowRules = allowRules,
         whenModified = whenModified,
     )

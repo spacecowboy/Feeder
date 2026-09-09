@@ -304,6 +304,13 @@ class RssLocalSync(
 
                     val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
 
+                    // Compiled once per feed per sync. Never inside the item loop.
+                    val entryFilterRules =
+                        EntryFilterRules.compile(
+                            blockRulesText = feedSql.blockRules,
+                            allowRulesText = feedSql.allowRules,
+                        )
+
                     val itemsWithGuids =
                         items
                             ?.map {
@@ -325,6 +332,19 @@ class RssLocalSync(
                     val feedItemSqls =
                         itemsWithGuids
                             .mapIndexedNotNull { index, (item, guid) ->
+                                // Per-feed block/allow rules. Applied before any DB read, og:image fetch,
+                                // or blob write, so a filtered item never becomes a row, file, or notification.
+                                //
+                                // Deliberately inside this lambda rather than before it: filtering the list
+                                // earlier would change the input of the isNotUniqueIds computation (flipping
+                                // the guid scheme for the whole feed) and would renumber index/totalItems,
+                                // making the fallback clock of a kept item depend on how many other items
+                                // were filtered ahead of it.
+                                if (!EntryFilterPolicy.shouldKeep(item, entryFilterRules)) {
+                                    logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
+                                    return@mapIndexedNotNull null
+                                }
+
                                 // Each undated item in the feed gets a distinct fallback clock.
                                 // Items are in reversed feed order here (oldest position = index 0),
                                 // so higher indices correspond to items that appeared earlier in the feed
@@ -443,6 +463,9 @@ class RssLocalSync(
                         repository
                             .getItemsToBeCleanedFromFeed(
                                 feedId = feedSql.id,
+                                // Deliberately the raw parsed count, not the filtered one.
+                                // Shrinking the retention window by the number of filtered
+                                // items would prune stored articles the user has read and kept.
                                 keepCount = max(maxFeedItemCount, items?.size ?: 0),
                             ).filterNot { id ->
                                 // Don't delete articles that are present in feed or currently selected

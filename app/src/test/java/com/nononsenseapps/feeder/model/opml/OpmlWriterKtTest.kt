@@ -51,6 +51,54 @@ class OpmlWriterKtTest {
         }
 
     @Test
+    fun writesRulesWithNewlinesEncodedAsCharacterReferences() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                        blockRules = "EntryTitle=(?i)sponsored\r\nEntryURL=ads & \"tracking\"",
+                        allowRules = "EntryTag=(?i)linux",
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(
+                "feeder:blockRules=\"EntryTitle=(?i)sponsored&#10;EntryURL=ads &amp; &quot;tracking&quot;\"",
+                Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
+            )
+            assertEquals(
+                "feeder:allowRules=\"EntryTag=(?i)linux\"",
+                Regex("feeder:allowRules=\"[^\"]*\"").find(output)?.value,
+            )
+        }
+
+    @Test
+    fun doesNotWriteRuleAttributesWhenRulesAreEmpty() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(false, output.contains("feeder:blockRules"))
+            assertEquals(false, output.contains("feeder:allowRules"))
+        }
+
+    @Test
     fun exportsSettings() =
         runBlocking {
             val bos = ByteArrayOutputStream()
