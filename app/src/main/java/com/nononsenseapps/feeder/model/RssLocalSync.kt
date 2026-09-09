@@ -329,16 +329,11 @@ class RssLocalSync(
 
                     val totalItems = itemsWithGuids.size
 
-                    // Ids of items the feed still serves but which the rules filtered out.
-                    // They are not stored again, but they must survive pruning below.
-                    val filteredButStoredIds = mutableSetOf<Long>()
-
                     val feedItemSqls =
                         itemsWithGuids
                             .mapIndexedNotNull { index, (item, guid) ->
-                                // Per-feed block/allow rules. Applied before the og:image fetch, the
-                                // duplicate check and the blob write, so a filtered item never becomes
-                                // a row, a file or a notification.
+                                // Per-feed block/allow rules. Applied before any DB read, og:image fetch,
+                                // or blob write, so a filtered item never becomes a row, file, or notification.
                                 //
                                 // Deliberately inside this lambda rather than before it: filtering the list
                                 // earlier would change the input of the isNotUniqueIds computation (flipping
@@ -347,18 +342,6 @@ class RssLocalSync(
                                 // were filtered ahead of it.
                                 if (!EntryFilterPolicy.shouldKeep(item, entryFilterRules)) {
                                     logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
-                                    // A rule added after the fact does not delete what is already stored,
-                                    // so an existing row for this item still has to be protected from the
-                                    // pruning below - the feed does still serve it.
-                                    (
-                                        repository.loadFeedItem(
-                                            guid = item.alternateId,
-                                            feedId = feedSql.id,
-                                        ) ?: repository.loadFeedItem(
-                                            guid = item.id ?: item.alternateId,
-                                            feedId = feedSql.id,
-                                        )
-                                    )?.let { filteredButStoredIds.add(it.id) }
                                     return@mapIndexedNotNull null
                                 }
 
@@ -475,15 +458,17 @@ class RssLocalSync(
                     val presentIds =
                         feedItemSqls
                             .mapTo(mutableSetOf()) { (fi, _) -> fi.id }
-                            .apply { addAll(filteredButStoredIds) }
 
                     val articlesToDelete =
                         repository
                             .getItemsToBeCleanedFromFeed(
                                 feedId = feedSql.id,
-                                // Deliberately the raw parsed count, not the filtered one.
-                                // Shrinking the retention window by the number of filtered
-                                // items would prune stored articles the user has read and kept.
+                                // Deliberately the raw parsed count, not the filtered one - this is
+                                // what keeps keepCount >= the served count, so a feed at steady state
+                                // never prunes anything the filter dropped. Known limitation: if a feed
+                                // shrinks (or the user lowers the max item count) so that stored rows
+                                // exceed keepCount, a still-served article that the rules now filter can
+                                // be pruned, since it is absent from presentIds.
                                 keepCount = max(maxFeedItemCount, items?.size ?: 0),
                             ).filterNot { id ->
                                 // Don't delete articles that are present in feed or currently selected

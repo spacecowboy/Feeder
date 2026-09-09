@@ -1024,52 +1024,6 @@ class RssLocalSyncKtTest : DIAware {
         }
 
     @Test
-    fun filteredItemsAlreadyStoredSurvivePruning() =
-        runBlocking {
-            // keepCount is max(maxFeedItemCount, items.size), so the stored set only
-            // exceeds it once the feed starts serving fewer items than it used to.
-            val maxFeedItemCount = 5
-            val url = server.url("/foo.xml").toUrl()
-            val feedId = insertFeed("foo", url, fooRss(9), isJson = false)
-
-            rssLocalSync.syncFeeds(feedId = feedId, maxFeedItemCount = maxFeedItemCount)
-
-            assertEquals(
-                9,
-                testDb.db
-                    .feedItemDao()
-                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
-                    .size,
-            )
-
-            testDb.db.feedDao().getFeed(feedId)!!.let { feed ->
-                testDb.db.feedDao().updateFeed(feed.copy(blockRules = "EntryTitle=Foo Item 9"))
-            }
-
-            // The feed now serves only three items, one of them the oldest - and blocked.
-            // keepCount drops to 5, so the four oldest stored rows become prune candidates.
-            responses[url] =
-                MockResponse().apply {
-                    setResponseCode(200)
-                    setHeader("Content-Type", "application/xml")
-                    setBody(fooRssWithItems(listOf(1, 2, 9)))
-                }
-
-            rssLocalSync.syncFeeds(
-                feedId = feedId,
-                maxFeedItemCount = maxFeedItemCount,
-                debugReallyForceNetwork = true,
-            )
-
-            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
-
-            assertTrue(
-                "A stored item the feed still serves must not be pruned just because a rule now filters it",
-                items.any { it.plainTitle == "Foo Item 9" },
-            )
-        }
-
-    @Test
     fun invalidRulesDoNotBreakTheFeed() =
         runBlocking {
             val feedId =
@@ -1119,11 +1073,9 @@ class RssLocalSyncKtTest : DIAware {
             )
         }
 
-    private fun fooRss(itemsCount: Int = 1): String = fooRssWithItems((1..itemsCount).toList())
-
-    private fun fooRssWithItems(itemNumbers: List<Int>): String {
+    private fun fooRss(itemsCount: Int = 1): String {
         val items =
-            itemNumbers.joinToString("\n") {
+            (1..itemsCount).joinToString("\n") {
                 """
                 <item>
                   <title>Foo Item $it</title>
