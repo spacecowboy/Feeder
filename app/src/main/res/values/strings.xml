@@ -300,7 +300,7 @@
   <string name="block_rules">Block rules</string>
   <string name="block_rules_desc">Matching articles are never downloaded. Unlike the blocklist, this cannot be undone: removing a rule does not bring back articles which were already skipped.</string>
   <string name="allow_rules">Allow rules</string>
-  <string name="allow_rules_desc">If any allow rule is set, only matching articles are downloaded. Note that articles without any tags never match an EntryTag rule.</string>
+  <string name="allow_rules_desc">If any allow rule is set, only matching articles are downloaded. An EntryTag rule is skipped for articles which have no tags, so a feed without tags is not emptied by an EntryTag rule alone.</string>
   <string name="entry_rules_placeholder">EntryTitle=(?i)sponsored</string>
   <string name="rule_error_missing_separator">Line %1$d: missing \'=\'. Invalid lines are ignored.</string>
   <string name="rule_error_unknown_field">Line %1$d: \'%2$s\' is not a known field. Invalid lines are ignored.</string>

@@ -49,7 +49,23 @@ data class EntryRule(
                 matchesValue(article.content_text?.takeIf { it.isNotBlank() } ?: article.content_html)
             // Miniflux iterates entry.Tags and stops on first hit, so an entry
             // with no tags matches no EntryTag rule at all — not even ".*".
+            // See [appliesTo] for why that is not enough on the allow side.
             EntryRuleField.ENTRY_TAG -> article.tags?.any { matchesValue(it) } == true
+        }
+
+    /**
+     * Whether this rule can say anything meaningful about [article].
+     *
+     * Only EntryTag can be inapplicable: many feeds emit no <category> at all, and an
+     * untagged entry matches no EntryTag rule — not even ".*". On the block side that is
+     * harmless, but as an allow rule it would drop every entry in such a feed. Treating
+     * the rule as inapplicable instead means an untagged entry is judged only by the
+     * allow rules that can actually be evaluated against it.
+     */
+    fun appliesTo(article: ParsedArticle): Boolean =
+        when (field) {
+            EntryRuleField.ENTRY_TAG -> !article.tags.isNullOrEmpty()
+            else -> true
         }
 
     /** Missing scalars match as "", mirroring Go's zero-value strings. */
@@ -218,6 +234,11 @@ internal object EntryFilterPolicy {
      * Miniflux semantics: block rules are evaluated first and the first match drops
      * the item. Then, if any allow rules exist, the item must match at least one.
      *
+     * Deviation from Miniflux: only the allow rules that [EntryRule.appliesTo] this
+     * article get a vote. An EntryTag rule cannot judge an entry with no categories,
+     * so a feed that emits none is not emptied by "EntryTag=..." alone. Allow rules on
+     * other fields still apply as usual, so a mixed allow list keeps working.
+     *
      * Note that invalid rules are dropped at parse time, so a feed whose rules are
      * all invalid fails open — everything is kept, in both directions. That is the
      * only safe direction for a filter that drops items permanently.
@@ -230,6 +251,9 @@ internal object EntryFilterPolicy {
             rules.isNoOp -> true
             rules.blockRules.any { it.matches(article) } -> false
             rules.allowRules.isEmpty() -> true
-            else -> rules.allowRules.any { it.matches(article) }
+            else ->
+                rules.allowRules
+                    .filter { it.appliesTo(article) }
+                    .let { applicable -> applicable.isEmpty() || applicable.any { it.matches(article) } }
         }
 }

@@ -186,6 +186,8 @@ class EntryFilterRulesTest {
         assertFalse(rule.matches(article(tags = listOf("android", "windows"))))
     }
 
+    // Note this is about EntryRule.matches only. On the allow side an untagged article
+    // is judged by appliesTo instead - see the policy tests below.
     @Test
     fun untaggedArticleMatchesNoTagRuleNotEvenMatchAll() {
         val matchAll = EntryRule(EntryRuleField.ENTRY_TAG, ".*")
@@ -299,6 +301,43 @@ class EntryFilterRulesTest {
         val rules = EntryFilterRules.compile("", "EntryTitle=keep")
 
         assertFalse(EntryFilterPolicy.shouldKeep(article(title = "something else"), rules))
+    }
+
+    @Test
+    fun tagAllowRuleIsSkippedForUntaggedArticles() {
+        val rules = EntryFilterRules.compile("", "EntryTag=(?i)linux")
+
+        // The whole point: a feed which emits no <category> is not emptied.
+        assertTrue(EntryFilterPolicy.shouldKeep(article(title = "no tags here"), rules))
+        assertTrue(
+            EntryFilterPolicy.shouldKeep(article(title = "no tags here", tags = emptyList()), rules),
+        )
+    }
+
+    @Test
+    fun tagAllowRuleStillFiltersTaggedArticles() {
+        val rules = EntryFilterRules.compile("", "EntryTag=(?i)linux")
+
+        assertTrue(EntryFilterPolicy.shouldKeep(article(tags = listOf("Linux", "kernel")), rules))
+        assertFalse(EntryFilterPolicy.shouldKeep(article(tags = listOf("windows")), rules))
+    }
+
+    @Test
+    fun otherAllowRulesStillApplyToUntaggedArticles() {
+        val rules = EntryFilterRules.compile("", "EntryTag=(?i)linux\nEntryTitle=(?i)kernel")
+
+        // The tag rule is skipped, but the title rule can still be evaluated.
+        assertTrue(EntryFilterPolicy.shouldKeep(article(title = "New kernel released"), rules))
+        assertFalse(EntryFilterPolicy.shouldKeep(article(title = "Unrelated news"), rules))
+    }
+
+    @Test
+    fun tagBlockRuleStillDoesNotBlockUntaggedArticles() {
+        val rules = EntryFilterRules.compile("EntryTag=.*", "")
+
+        // Unchanged behaviour - an untagged article matches no EntryTag rule.
+        assertTrue(EntryFilterPolicy.shouldKeep(article(title = "no tags here"), rules))
+        assertFalse(EntryFilterPolicy.shouldKeep(article(tags = listOf("anything")), rules))
     }
 
     @Test
