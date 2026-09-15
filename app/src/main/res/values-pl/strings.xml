@@ -365,11 +365,11 @@
     <string name="bergamot_webview_translation_timed_out">Przekroczono limit czasu tłumaczenia Bergamot WebView</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView nie został zainicjowany</string>
     <string name="bergamot_response_parse_failed">Nie udało się przeanalizować odpowiedzi Bergamot</string>
-    <string name="local_translation_setup_system">Najpierw korzysta z wbudowanego tłumaczenia systemowego Androida, które należy pobrać w ustawieniach systemowych</string>
-    <string name="local_translation_setup_bergamot">Jeśli system nie ma wbudowanego translatora, Feeder pobiera modele Mozilla/Bergamot dla obsługiwanych par języków %1$s</string>
-    <string name="show_only_bergamot_languages">Pokazuj tylko języki docelowe z dowolnym modelem Mozilla/Bergamot</string>
+    <string name="local_translation_setup_system">Najpierw korzysta z usługi tłumaczenia Twojego urządzenia</string>
+    <string name="local_translation_setup_bergamot">Jeśli jest niedostępny, Feeder może skorzystać z silnika tłumaczenia offline, który można pobrać</string>
+    <string name="show_only_bergamot_languages">Pokazuj tylko języki, które można pobrać</string>
     <string name="downloaded_translation_models">Pobrane modele tłumaczeń</string>
-    <string name="downloaded_translation_models_desc">Modele Mozilla/Bergamot przechowywane na urządzeniu do tłumaczenia offline. Usuń nieużywane pary języków, aby zwolnić miejsce.</string>
+    <string name="downloaded_translation_models_desc">Języki tłumaczenia offline pobrane przez Feedera. Usuń języki, których już nie potrzebujesz, aby zwolnić miejsce.</string>
     <string name="delete_model_pair">Usuń model</string>
     <string name="delete_model_pair_desc">Czy usunąć model tłumaczenia %1$s na %2$s (%3$s)?</string>
     <string name="delete_all_models">Usuń wszystkie pobrane modele</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">Wymuszaj pojedynczą kolumnę</string>
     <string name="apply_blocklist_to_links">Zastosuj do linków</string>
     <string name="filters">Filtry</string>
+    <string name="bergamot_runtime_download_required">Pobierz silnik tłumaczenia offline, aby kontynuować</string>
+    <string name="bergamot_runtime_download_title">Czy pobrać silnik tłumaczenia offline?</string>
+    <string name="bergamot_runtime_download_warning">Feeder pobierze 4,9 MB wykonywalnego środowiska uruchomieniowego WebAssembly z projektu Mozilla/Bergamot. Kod ten nie został zbudowany ani zweryfikowany przez F-Droid. Po pobraniu tłumaczenie będzie działać w trybie offline.</string>
+    <string name="bergamot_runtime_download_failed">Nie udało się pobrać silnika tłumaczenia offline</string>
+    <string name="downloading_offline_translation_runtime">Pobieranie silnika tłumaczenia offline: %1$d%%</string>
+    <string name="download">Pobierz</string>
 </resources>
