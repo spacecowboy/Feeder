@@ -359,11 +359,11 @@
     <string name="deleted_all_models">Alle heruntergeladenen Modelle gelöscht</string>
     <string name="delete_all_models_desc">Alle %1$d heruntergeladenen Übersetzungsmodelle (%2$s) löschen?</string>
     <string name="downloaded_translation_models">Heruntergeladene Übersetzungsmodelle</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot-Modelle, die für die Offline-Übersetzung auf dem Gerät gespeichert sind. Lösche nicht verwendete Sprachpaare, um Speicherplatz freizugeben.</string>
+    <string name="downloaded_translation_models_desc">Von Feeder heruntergeladene Sprachen für die Offline-Übersetzung. Entferne nicht mehr benötigte Sprachen, um Speicherplatz freizugeben.</string>
     <string name="delete_button_text">Löschen</string>
     <string name="cancel">Abbrechen</string>
     <string name="no_downloaded_models">Es wurden noch keine Übersetzungsmodelle heruntergeladen. Die Übersetzungsfunktion lädt das erforderliche Modell automatisch herunter.</string>
-    <string name="show_only_bergamot_languages">Nur Zielsprachen anzeigen, für die ein Mozilla/Bergamot-Modell vorhanden ist</string>
+    <string name="show_only_bergamot_languages">Nur herunterladbare Sprachen anzeigen</string>
     <string name="local_translation_timed_out">Zeitüberschreitung bei lokaler Übersetzung.</string>
     <string name="bergamot_translation_timed_out">Zeitüberschreitung bei Bergamot-Übersetzung.</string>
     <string name="bergamot_webview_translation_timed_out">Zeitüberschreitung bei Bergamot-WebView-Übersetzung.</string>
@@ -374,8 +374,8 @@
     <string name="bergamot_model_registry_unavailable">Verbindung herstellen, um Modellliste herunterzuladen.</string>
     <string name="bergamot_model_download_failed">Das Modell %1$s -&gt; %2$s konnte nicht heruntergeladen werden.</string>
     <string name="bergamot_response_parse_failed">Die Antwort von Bergamot konnte nicht ausgewertet werden.</string>
-    <string name="local_translation_setup_system">Es wird zunächst die geräteinterne Übersetzungsfunktion des Android-Systems verwendet, die in den Systemeinstellungen heruntergeladen werden muss.</string>
-    <string name="local_translation_setup_bergamot">Wenn das Betriebssystem über keinen geräteinternen Übersetzer verfügt, lädt Feeder Mozilla/Bergamot-Modelle für die unterstützten %1$s-Sprachpaare herunter.</string>
+    <string name="local_translation_setup_system">Nutzt zunächst den Übersetzungsdienst deines Geräts.</string>
+    <string name="local_translation_setup_bergamot">Sollte dieser nicht verfügbar sein, kann Feeder seine herunterladbare Offline-Übersetzungsmaschine nutzen.</string>
     <string name="preparing_offline_translation_model">Offline-Übersetzungsmodell %1$s bis %2$s wird vorbereitet …</string>
     <string name="downloading_offline_translation_model">Offline-Übersetzungsmodell %1$s bis %2$s wird heruntergeladen: %3$d%%</string>
     <string name="delete_model_pair_desc">Das Übersetzungsmodell %1$s bis %2$s (%3$s) löschen?</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">Einspaltige Darstellung erzwingen</string>
     <string name="apply_blocklist_to_links">Auf Links anwenden</string>
     <string name="filters">Filter</string>
+    <string name="bergamot_runtime_download_required">Lade die Offline-Übersetzungsmaschine herunter, um fortzufahren.</string>
+    <string name="bergamot_runtime_download_title">Offline-Übersetzungsmaschine herunterladen?</string>
+    <string name="bergamot_runtime_download_warning">Feeder wird eine 4,9 MB große ausführbare WebAssembly-Laufzeitumgebung aus dem Mozilla/Bergamot-Projekt herunterladen. Dieser Code wird nicht von F-Droid kompiliert oder geprüft. Nach dem Herunterladen funktioniert die Übersetzung offline.</string>
+    <string name="bergamot_runtime_download_failed">Die Offline-Übersetzungsmaschine konnte nicht heruntergeladen werden.</string>
+    <string name="downloading_offline_translation_runtime">Offline-Übersetzungsmaschine wird heruntergeladen: %1$d%%</string>
+    <string name="download">Herunterladen</string>
 </resources>
