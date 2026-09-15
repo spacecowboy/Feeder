@@ -363,7 +363,7 @@
     <string name="local_translator_not_ready">Kohalik tõlkeliides polnud valmis. Kontrolli tõlkimise seadistusi nutiseadmes ja proovi uuesti.</string>
     <string name="no_bergamot_translation_model">Bergamoti tõlkemudelit ei leidu keelepaarile: „%1$s“ → „%2$s“. Kontrolli süsteemi tõlkimise seadistusi</string>
     <string name="bergamot_translation_timed_out">Päring Bergamoti tõlkeliidesele aegus.</string>
-    <string name="bergamot_translation_failed">Bergamoti tõlkeliides ei osanud and vastust.</string>
+    <string name="bergamot_translation_failed">Bergamoti tõlkeliides ei osanud anda vastust.</string>
     <string name="bergamot_model_registry_unavailable">Tõlkemudelite allalaadimiseks loo ühendus.</string>
     <string name="bergamot_model_download_failed">Tõlkemudeli allalaadimine ei õnnestunud: „%1$s“ → „%2$s“.</string>
     <string name="bergamot_webview_translation_timed_out">Tõlkepäring Bergamoti WebView tõlkeliidesele aegus.</string>
@@ -371,17 +371,23 @@
     <string name="bergamot_response_parse_failed">Bergamoti tõlkeliidese vastuse töötlemine ei õnnestuud.</string>
     <string name="downloaded_translation_models">Laadi tõlkemudelid alla</string>
     <string name="delete_model_pair">Kustuta mudel</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamoti mudelid salvestuvad sinu nutiseadmesse kasutamiseks vallasrežiimis. Kui tahad andmeruumi vabastada, siis kustuta mudelipaarid, mida sa ei kasuta.</string>
+    <string name="downloaded_translation_models_desc">Feederi poolt allalaaditud vallasrežiimis kasutamiseks mõeldud tõlkekeeled. Kui tahad andmeruumi vabastada, siis kustuta keeled, mida sa ei kasuta.</string>
     <string name="delete_model_pair_desc">Kas kustutad tõlkemudeli: „%1$s“ → „%2$s“ (%3$s)?</string>
     <string name="delete_all_models">Kustuta kõik allalaaditud tõlkemudelid</string>
     <string name="delete_all_models_desc">Kas kustutad kõik %1$d allalaaditud tõlkemudeli(d) (%2$s)?</string>
     <string name="deleted_model_pair">Tõlkemudel on kustutatud: „%1$s“ → „%2$s“</string>
     <string name="deleted_all_models">Kõik allalaaditud tõlkemudelid on kustutatud</string>
     <string name="no_downloaded_models">Ühtegi tõlkemudelit pole veel allalaaditud. Tõlkeprotsessi käigus laaditakse vajalik mudel automaatselt alla.</string>
-    <string name="local_translation_setup_system">Kasutab Androidi süsteemiülest tõlkeliidestust, mille pead süsteemi seadistustest esmalt alla laadima.</string>
-    <string name="local_translation_setup_bergamot">Kui operatsioonisüsteemipoolset kohalikku tõlkeliidest ei leidu, laadib Feeder alla Mozilla/Bergamoti tõlkemudelid toetatud %1$s keelapaari jaoks.</string>
-    <string name="show_only_bergamot_languages">Näita vaid sihtkeeli iga Mozilla/Bergamoti tõlkemudeli jaoks</string>
+    <string name="local_translation_setup_system">Esmalt kasutab seadme tõlketeenust.</string>
+    <string name="local_translation_setup_bergamot">Kui see pole saadaval, siis Feeder oskab kasutada allalaaditavat vallasrežiimis toimivat tõlkemootorit.</string>
+    <string name="show_only_bergamot_languages">Näita vaid allalaaditavaid keeli</string>
     <string name="force_single_column">Kuva sundkorras üheveerulisena</string>
     <string name="apply_blocklist_to_links">Rakenda linkidele</string>
     <string name="filters">Filtrid</string>
+    <string name="bergamot_runtime_download_required">Jätkamiseks laadi alla vallasrežiimis toimiv tõlkemootor.</string>
+    <string name="bergamot_runtime_download_title">Kas laadid alla vallasrežiimis toimiva tõlkemootori?</string>
+    <string name="bergamot_runtime_download_warning">Feeder laadib alla 4,9 MB suuruse käivitatava WebAssembly käitusteegi, mille on loonud Mozilla/Bergamoti projekt. F-Droid pole seda koodi kontrollinud ega kompileerinud. Peale allalaadimist toimib tõlkimine ilma võrguühendust kasutamata.</string>
+    <string name="bergamot_runtime_download_failed">Vallasrežiimis toimiva tõlkemootori allalaadimine ei õnnestunud.</string>
+    <string name="downloading_offline_translation_runtime">Vallasrežiimis toimiv tõlkemootor on allalaadimisel: %1$d%%</string>
+    <string name="download">Laadi alla</string>
 </resources>
