@@ -365,12 +365,12 @@
     <string name="bergamot_webview_translation_timed_out">Bergamot WebView 翻译超时。</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView 未初始化。</string>
     <string name="bergamot_response_parse_failed">无法解析 Bergamot 响应。</string>
-    <string name="local_translation_setup_system">首先使用 Android 系统设备端翻译，必须在系统设置中下载。</string>
-    <string name="local_translation_setup_bergamot">如果操作系统没有设备端翻译器，Feeder 将为支持的 %1$s 语言对下载 Mozilla/Bergamot 模型。</string>
-    <string name="show_only_bergamot_languages">仅显示拥有任何 Mozilla/Bergamot 模型的目标语言</string>
+    <string name="local_translation_setup_system">优先使用您设备的翻译服务。</string>
+    <string name="local_translation_setup_bergamot">如果该服务不可用，Feeder 可以使用其可下载的离线翻译引擎。</string>
+    <string name="show_only_bergamot_languages">仅显示可下载的语言</string>
     <string name="downloaded_translation_models">已下载的翻译模型</string>
     <string name="delete_model_pair">删除模型</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot 模型存储在设备端用于离线翻译。删除未使用的语言对以释放空间。</string>
+    <string name="downloaded_translation_models_desc">Feeder 下载的离线翻译语言。移除不再需要的语言以释放空间。</string>
     <string name="delete_model_pair_desc">删除 %1$s 到 %2$s 的翻译模型（%3$s）？</string>
     <string name="delete_all_models">删除所有已下载的模型</string>
     <string name="delete_all_models_desc">删除所有 %1$d 个已下载的翻译模型（%2$s）？</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">强制单列布局</string>
     <string name="apply_blocklist_to_links">应用于链接</string>
     <string name="filters">筛选条件</string>
+    <string name="bergamot_runtime_download_required">下载离线翻译引擎以继续。</string>
+    <string name="bergamot_runtime_download_title">下载离线翻译引擎？</string>
+    <string name="bergamot_runtime_download_warning">Feeder 将从 Mozilla/Bergamot 项目下载 4.9 MB 的可执行 WebAssembly 运行时。此代码并非由 F-Droid 构建或检查。下载完成后，翻译功能即可离线使用。</string>
+    <string name="bergamot_runtime_download_failed">无法下载离线翻译引擎。</string>
+    <string name="downloading_offline_translation_runtime">正在下载离线翻译引擎：%1$d%%</string>
+    <string name="download">下载</string>
 </resources>
