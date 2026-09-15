@@ -367,11 +367,11 @@
     <string name="bergamot_webview_translation_timed_out">Překlad Bergamot WebView vypršel.</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView není připraven.</string>
     <string name="bergamot_response_parse_failed">Nepodařilo se zpracovat odpověď Bergamotu.</string>
-    <string name="local_translation_setup_system">Nejprve používá překlad na zařízení systému Android, který musí být stažen v nastavení systému.</string>
-    <string name="local_translation_setup_bergamot">Pokud OS nemá překlad na zařízení, stáhne si Feeder modely Mozilla/Bergamot pro podporovaných %1$s jazykových párů.</string>
-    <string name="show_only_bergamot_languages">Zobrazit pouze cílové jazyky u kteréhokoli modelu Mozilla/Bergamot</string>
+    <string name="local_translation_setup_system">Používá nejprve překlad vašeho zařízení.</string>
+    <string name="local_translation_setup_bergamot">Pokud je nedostupný, může Feeder použít svůj offline překladač, který je k dispozici ke stažení.</string>
+    <string name="show_only_bergamot_languages">Zobrazit pouze jazyky k dispozici ke stažení</string>
     <string name="downloaded_translation_models">Stažené modely překladu</string>
-    <string name="downloaded_translation_models_desc">Modely Mozilla/Bergamot uložené na zařízení pro offline překlad. Pro uvolnění místa smažte nepoužívané jazykové páry.</string>
+    <string name="downloaded_translation_models_desc">Offline jazyky překladu stažené Feederem. Pro uvolnění místa odstraňte jazyky, které již nepotřebujete.</string>
     <string name="delete_model_pair">Smazat model</string>
     <string name="delete_model_pair_desc">Smazat překladový model z %1$s do %2$s (%3$s)?</string>
     <string name="delete_all_models">Smazat všechny stažené modely</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">Vynutit jeden sloupec</string>
     <string name="apply_blocklist_to_links">Použít na odkazy</string>
     <string name="filters">Filtry</string>
+    <string name="bergamot_runtime_download_required">Pro pokračování si stáhněte offline překladač.</string>
+    <string name="bergamot_runtime_download_title">Stáhnout offline překladač?</string>
+    <string name="bergamot_runtime_download_warning">Feeder stáhne spustitelné prostředí WebAssemly o velikost 4,9 MB z projektu Mozilla/Bergamot. Tento kód nebyl sestaven ani zkontrolován F-Droidem. Po stažení budou překlady fungovat offline.</string>
+    <string name="bergamot_runtime_download_failed">Nepoodařilo se stáhnout offline překladač.</string>
+    <string name="downloading_offline_translation_runtime">Stahování offline překladače: %1$d%%</string>
+    <string name="download">Stáhnout</string>
 </resources>
