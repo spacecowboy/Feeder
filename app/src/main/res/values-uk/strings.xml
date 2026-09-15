@@ -367,11 +367,11 @@
     <string name="bergamot_webview_translation_timed_out">Час очікування перекладу Bergamot WebView вичерпано.</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView не ініціалізовано.</string>
     <string name="bergamot_response_parse_failed">Не вдалося розпізнати відповідь Bergamot.</string>
-    <string name="local_translation_setup_system">Спершу використовується системний переклад Android, який слід завантажити в налаштуваннях.</string>
-    <string name="local_translation_setup_bergamot">Якщо в ОС відсутній локальний перекладач, Feeder завантажує моделі Mozilla/Bergamot для підтримуваних мовних пар %1$s.</string>
-    <string name="show_only_bergamot_languages">Показувати лише мови перекладу з будь-якою моделлю Mozilla/Bergamot</string>
+    <string name="local_translation_setup_system">Спочатку використовує службу перекладу вашого пристрою.</string>
+    <string name="local_translation_setup_bergamot">Якщо недоступно, Feeder може використовувати свій завантажуваний офлайн-модуль перекладу.</string>
+    <string name="show_only_bergamot_languages">Показувати лише доступні для завантаження мови</string>
     <string name="downloaded_translation_models">Завантажені моделі перекладу</string>
-    <string name="downloaded_translation_models_desc">Моделі Mozilla/Bergamot, збережені на пристрої для офлайн-перекладу. Видаліть невикористовувані мовні пари, щоб звільнити місце.</string>
+    <string name="downloaded_translation_models_desc">Офлайн-мови перекладу, завантажені Feeder. Видаліть мови, які вам більше не потрібні, щоб звільнити місце.</string>
     <string name="delete_model_pair">Видалити модель</string>
     <string name="delete_model_pair_desc">Видалити модель перекладу з %1$s на %2$s (%3$s)?</string>
     <string name="delete_all_models">Видалити всі завантажені моделі</string>
@@ -381,4 +381,13 @@
     <string name="no_downloaded_models">Ще немає завантажених моделей перекладу. Перекладач автоматично завантажить потрібну модель.</string>
     <string name="delete_button_text">Видалити</string>
     <string name="cancel">Скасувати</string>
+    <string name="apply_blocklist_to_links">Застосувати до посилань</string>
+    <string name="filters">Фільтри</string>
+    <string name="force_single_column">Один стовпчик (примусово)</string>
+    <string name="bergamot_runtime_download_required">Завантажте офлайн-модуль перекладу, щоб продовжити.</string>
+    <string name="bergamot_runtime_download_title">Завантажити офлайн-модуль перекладу?</string>
+    <string name="bergamot_runtime_download_warning">Feeder завантажить виконуване середовище WebAssembly розміром 4,9 МБ із проєкту Mozilla/Bergamot. Цей код не створений і не перевірений F-Droid. Після завантаження переклад працюватиме офлайн.</string>
+    <string name="bergamot_runtime_download_failed">Не вдалося завантажити офлайн-модуль перекладу.</string>
+    <string name="downloading_offline_translation_runtime">Завантаження офлайн-модуля перекладу: %1$d%%</string>
+    <string name="download">Завантажити</string>
 </resources>
