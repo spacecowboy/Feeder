@@ -252,7 +252,7 @@
     <string name="show_message">メッセージを表示</string>
     <string name="time_out">タイムアウト（秒）</string>
     <string name="time_out_validation_error">タイムアウトは３０～６００秒にしてください</string>
-    <string name="time_out_placeholder">OpenAIリクエストのタイムアウト</string>
+    <string name="time_out_placeholder">AIリクエストのタイムアウト</string>
     <string name="api_key">API キー</string>
     <string name="open_settings">設定を開く</string>
     <string name="feed_search_suggestions_header">提案</string>
@@ -361,15 +361,15 @@
     <string name="bergamot_webview_translation_timed_out">ベルガモット WebView 翻訳がタイムアウトしました。</string>
     <string name="bergamot_webview_not_initialized">ベルガモット WebView が初期化できません。</string>
     <string name="bergamot_response_parse_failed">ベルガモットのレスポンスをパースできません。</string>
-    <string name="local_translation_setup_system">Androidシステムの端末内翻訳機能を使用するには、まずシステム設定でダウンロードする必要があります。</string>
-    <string name="local_translation_setup_bergamot">OSにオンデバイス翻訳機能がない場合は、Feederはサポートされている%1$s言語ペアのMozilla/Bergamotモデルをダウンロードします。</string>
+    <string name="local_translation_setup_system">まず、お使いのデバイスの翻訳サービスを使用します。</string>
+    <string name="local_translation_setup_bergamot">利用できない場合、Feederはダウンロード可能なオフライン翻訳エンジンを使用できます。</string>
     <string name="translation_language_placeholder">言語を選択</string>
-    <string name="show_only_bergamot_languages">Mozilla/Bergamotモデルで利用可能な言語のみを表示する</string>
+    <string name="show_only_bergamot_languages">ダウンロード可能な言語のみ表示</string>
     <string name="set_translation_language_first">AI設定で希望する翻訳言語をセット</string>
     <string name="translate_feed_cards_by_default">記事のプレビューを翻訳</string>
     <string name="translate_articles_by_default">デフォルトで記事を翻訳</string>
     <string name="downloaded_translation_models">翻訳モデルをダウンロード</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamotモデルは、オフライン翻訳のために端末に保存されます。使用していない言語ペアを削除して、空き容量を確保できます。</string>
+    <string name="downloaded_translation_models_desc">オフライン翻訳言語がFeederによりダウンロードされました。不要になった言語を削除して、空き容量を確保できます。</string>
     <string name="delete_model_pair">モデルを削除</string>
     <string name="delete_model_pair_desc">%1$s から %2$s への翻訳モデルを削除しますか (%3$s)?</string>
     <string name="delete_all_models">すべてのダウンロード済みモデルを削除</string>
@@ -382,4 +382,11 @@
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">再読み込み</string>
     <string name="force_single_column">単一カラムを強制</string>
+    <string name="audio_playback_failed">このオーディオファイルを再生できません</string>
+    <string name="play_audio">再生</string>
+    <string name="bergamot_runtime_download_required">続行するには、オフライン翻訳エンジンをダウンロードしてください。</string>
+    <string name="bergamot_runtime_download_title">オフライン翻訳エンジンをダウンロードしますか？</string>
+    <string name="bergamot_runtime_download_warning">Feederは、Mozilla/Bergamotプロジェクトから4.9MBの実行可能なWebAssemblyランタイムをダウンロードします。このコードはF-Droidによってビルドまたは検証されていません。ダウンロード後、翻訳はオフラインで動作します。</string>
+    <string name="bergamot_runtime_download_failed">オフライン翻訳エンジンをダウンロードできませんでした。</string>
+    <string name="downloading_offline_translation_runtime">オフライン翻訳エンジンをダウンロード中: %1$d%%</string>
 </resources>
