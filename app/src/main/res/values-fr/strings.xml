@@ -365,11 +365,11 @@
     <string name="bergamot_webview_translation_timed_out">Le délai d\'attente pour la traduction WebView avec Bergamot a été dépassé.</string>
     <string name="bergamot_webview_not_initialized">WebView avec Bergamot n\'est pas initialisé.</string>
     <string name="bergamot_response_parse_failed">Impossible d\'analyser la réponse de Bergamot.</string>
-    <string name="local_translation_setup_system">Utilise la traduction locale d\'Android en priorité. Celle-ci doit être téléchargée à partir des paramètres système.</string>
-    <string name="local_translation_setup_bergamot">Si le système n\'a pas de traducteur local, Feeder téléchargera les modèles Mozilla/Bergamot pour les paires de langues avec %1$s.</string>
-    <string name="show_only_bergamot_languages">N\'afficher que les langues cibles ayant un modèle Mozilla/Bergamot</string>
+    <string name="local_translation_setup_system">Utilise la traduction de votre appareil en priorité.</string>
+    <string name="local_translation_setup_bergamot">Si elle n\'est pas disponible, Feeder peut utiliser et télécharger son propre moteur de traduction local.</string>
+    <string name="show_only_bergamot_languages">N\'afficher que les langues téléchargeables</string>
     <string name="downloaded_translation_models">Modèles de traduction téléchargés</string>
-    <string name="downloaded_translation_models_desc">Modèles de traduction locaux Mozilla/Bergamot sur l\'appareil. Supprimez les paires de langues inutilisées pour libérer de l\'espace.</string>
+    <string name="downloaded_translation_models_desc">Modèles de traduction locaux téléchargés par Feeder. Supprimez les langages inutilisés pour libérer de l\'espace.</string>
     <string name="delete_model_pair">Supprimer le modèle</string>
     <string name="delete_model_pair_desc">Supprimer le modèle de traduction %1$s vers %2$s (%3$s) ?</string>
     <string name="delete_all_models">Supprimer tous les modèles téléchargés</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">Utiliser une seule colonne</string>
     <string name="filters">Filtres</string>
     <string name="apply_blocklist_to_links">Appliquer aux liens</string>
+    <string name="bergamot_runtime_download_required">Télécharger le moteur de traduction local pour continuer.</string>
+    <string name="bergamot_runtime_download_title">Télécharger le moteur de traduction local ?</string>
+    <string name="bergamot_runtime_download_warning">Feeder téléchargera un runtime WebAssembly exécutable de 4.9 Mo depuis le projet Mozilla/Bergamot. Ce code n\'est pas compiler ou vérifier par F-Droid. Après ce téléchargement, la traduction fonctionnera en locale.</string>
+    <string name="bergamot_runtime_download_failed">Échec du téléchargement du moteur de traduction local.</string>
+    <string name="downloading_offline_translation_runtime">Téléchargement en cours du moteur de traduction local : %1$d%%</string>
+    <string name="download">Télécharger</string>
 </resources>
