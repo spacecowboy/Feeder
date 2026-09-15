@@ -284,7 +284,7 @@
     <string name="summarize_on_open">Összegzés megnyitáskor</string>
     <string name="feed_search_suggestions_header">Javaslatok</string>
     <string name="openai_settings_info">Sok MI-szolgáltatóval kompatibilis, de nem mindegyikkel</string>
-    <string name="apply_blocklist_to_summaries">Alkalmazás az összefoglalókhoz</string>
+    <string name="apply_blocklist_to_summaries">Használat az összefoglalókhoz</string>
     <string name="open_article_in_reader">Megnyitás az olvasóban</string>
     <string name="open_article_in_default_browser">Megnyitás az alapértelmezett böngészőben</string>
     <string name="open_article_in_custom_tab">Megnyitás egyéni lapon</string>
@@ -365,11 +365,11 @@
     <string name="bergamot_webview_translation_timed_out">Időtúllépés történt a Bergamot WebView fordításkor.</string>
     <string name="bergamot_webview_not_initialized">Nincs előkészítve a Bergamot WebView.</string>
     <string name="bergamot_response_parse_failed">Nem sikerült elemezni a Bergamot választ.</string>
-    <string name="local_translation_setup_system">Először az Android rendszer beépített fordítási funkciójának használata, amelyet a rendszerbeállításokban kell letölteni.</string>
-    <string name="local_translation_setup_bergamot">Ha az operációs rendszer nem rendelkezik beépített fordítóval, a Feeder letölti a Mozilla/Bergamot modelleket a támogatott %1$s nyelvpárokhoz.</string>
-    <string name="show_only_bergamot_languages">Csak azon célnyelvek megjelenítése, amelyekhez tartozik Mozilla/Bergamot modell</string>
+    <string name="local_translation_setup_system">Az alkalmazás először az eszköz fordítási szolgáltatását használja.</string>
+    <string name="local_translation_setup_bergamot">Ha nem érhető el az eszköz fordítási szolgáltatása, akkor a Feeder használhatja a Mozilla Bergamot nevű letölthető offline fordítómotorját.</string>
+    <string name="show_only_bergamot_languages">Csak a letölthető nyelvek megjelenítése</string>
     <string name="downloaded_translation_models">Letöltött fordítási modellek</string>
-    <string name="downloaded_translation_models_desc">A Mozilla/Bergamot modellek az eszközön tárolódnak az offline fordításhoz. A helymegtakarítás érdekében törölje a nem használt nyelvpárokat.</string>
+    <string name="downloaded_translation_models_desc">A Mozilla Bergamot nevű modelljei az eszközön tárolódnak az offline fordításhoz. A helymegtakarítás érdekében törölje a nem használt nyelvpárokat.</string>
     <string name="delete_model_pair">Modell törlése</string>
     <string name="delete_model_pair_desc">Biztosan törli a(z) %1$s-%2$s fordítási modellt (%3$s)?</string>
     <string name="delete_all_models">Az összes letöltött modell törlése</string>
@@ -379,9 +379,15 @@
     <string name="no_downloaded_models">Még nincsenek fordítási modellek letöltve. A fordítás automatikusan letölti a szükséges modellt.</string>
     <string name="delete_button_text">Törlés</string>
     <string name="cancel">Mégse</string>
-    <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lehátszóval</string>
+    <string name="use_in_app_audio_player">Hanghivatkozások lejátszása a beépített lejátszóval</string>
     <string name="use_in_app_audio_player_description">Ha ez a beállítás ki van kapcsolva, akkor a hanghivatkozások az alapértelmezett alkalmazásban nyílnak meg</string>
     <string name="force_single_column">Egy oszlopos elrendezés kikényszerítése</string>
-    <string name="apply_blocklist_to_links">Használat hivatkozásokhoz</string>
+    <string name="apply_blocklist_to_links">Használat a hivatkozásokhoz</string>
     <string name="filters">Szűrők</string>
+    <string name="bergamot_runtime_download_required">A folytatáshoz t töltse le az offline fordítómotort.</string>
+    <string name="bergamot_runtime_download_title">Letölti az offline fordítómotort?</string>
+    <string name="bergamot_runtime_download_warning">A Feeder le fog tölteni egy 4,9 MB-os futtatható WebAssembly futásidejű fájlt a Mozilla/Bergamot projektből. Ezt a kódot nem az F-Droid fordította vagy ellenőrizte. A letöltés után a fordítás offline is működik.</string>
+    <string name="bergamot_runtime_download_failed">Nem sikerült letölteni az offline fordítómotort.</string>
+    <string name="downloading_offline_translation_runtime">Offline fordítómotor letöltése: %1$d%%</string>
+    <string name="download">Letöltés</string>
 </resources>
