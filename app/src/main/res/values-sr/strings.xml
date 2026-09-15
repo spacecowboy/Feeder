@@ -365,11 +365,11 @@
     <string name="bergamot_webview_translation_timed_out">Истекло је максимално време за Bergamot WebView превођење.</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView није иницијализован.</string>
     <string name="bergamot_response_parse_failed">Није могао да се парсира Bergamot одговор.</string>
-    <string name="local_translation_setup_system">Користи превођење Android система на уређају, што прво мора да се преузме у подешавањима система.</string>
-    <string name="local_translation_setup_bergamot">Ако ОС нема преводиоца на уређају, Feeder преузима Mozilla/Bergamot моделе за подржане %1$s парове језика.</string>
-    <string name="show_only_bergamot_languages">Прикажи само циљне језике за било који Mozilla/Bergamot модел</string>
+    <string name="local_translation_setup_system">Најпре користи сервис превођења на уређају.</string>
+    <string name="local_translation_setup_bergamot">Ако он није доступан, Feeder може да преузме и користи свој механизам за превођење ван мреже.</string>
+    <string name="show_only_bergamot_languages">Прикажи само језике који могу да се преузму</string>
     <string name="downloaded_translation_models">Преузети модели превођења</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot модели за превођење ван мреже који се чувају на уређају. Обришите парове језика које не користите да ослободите простор.</string>
+    <string name="downloaded_translation_models_desc">Језици за превођење ван мреже које је преузео Feeder. Обришите језике који вам не требају да ослободите простор.</string>
     <string name="delete_model_pair">Обриши модел</string>
     <string name="delete_model_pair_desc">Желите ли да обришете модел за превод са %1$s на %2$s (%3$s)?</string>
     <string name="delete_all_models">Обриши све преузете моделе</string>
@@ -384,4 +384,10 @@
     <string name="force_single_column">Форсирај једну колону</string>
     <string name="apply_blocklist_to_links">Примени на линкове</string>
     <string name="filters">Филтери</string>
+    <string name="bergamot_runtime_download_required">Да бисте наставили, преузмите механизам за превођење ван мреже.</string>
+    <string name="bergamot_runtime_download_title">Желите ли да преузмете механизам за превођење ван мреже?</string>
+    <string name="bergamot_runtime_download_warning">Feeder ће преузети извршни WebAssembly runtime величине 4.9 MB са Mozilla/Bergamot пројекта. F-Droid није изградио или проверио овај кôд. Након преузимања, превођење функционише без потребе за везом са мрежом.</string>
+    <string name="bergamot_runtime_download_failed">Није могао да се преузме механизам за превођење ван мреже.</string>
+    <string name="downloading_offline_translation_runtime">Преузима се механизам за превођење ван мреже: %1$d%%</string>
+    <string name="download">Преузми</string>
 </resources>
