@@ -65,7 +65,9 @@ suspend fun notify(
         return@withContext
     }
 
-    createNotificationChannel(appContext)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        createNotificationChannel(appContext)
+    }
 
     val di by closestDI(appContext)
 
