@@ -29,13 +29,13 @@ class EntryFilterRulesTest {
 
     @Test
     fun blankTextParsesToEmptyRuleSet() {
-        assertEquals(EntryRuleSet.EMPTY, EntryRules.parse(""))
-        assertEquals(EntryRuleSet.EMPTY, EntryRules.parse("   \n  \n"))
+        assertEquals(EntryRuleSet.EMPTY, EntryRuleSet.parse(""))
+        assertEquals(EntryRuleSet.EMPTY, EntryRuleSet.parse("   \n  \n"))
     }
 
     @Test
     fun parsesOneValidLine() {
-        val result = EntryRules.parse("EntryTitle=spam")
+        val result = EntryRuleSet.parse("EntryTitle=spam")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_TITLE, "spam")), result.rules)
         assertTrue(result.errors.isEmpty())
@@ -43,28 +43,28 @@ class EntryFilterRulesTest {
 
     @Test
     fun fieldNameIsMatchedCaseInsensitively() {
-        val result = EntryRules.parse("entrytitle=spam")
+        val result = EntryRuleSet.parse("entrytitle=spam")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_TITLE, "spam")), result.rules)
     }
 
     @Test
     fun linesAreTrimmed() {
-        val result = EntryRules.parse("   EntryTitle = spam   ")
+        val result = EntryRuleSet.parse("   EntryTitle = spam   ")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_TITLE, "spam")), result.rules)
     }
 
     @Test
     fun splitsOnFirstEqualsOnlySoPatternsMayContainEquals() {
-        val result = EntryRules.parse("EntryURL=a=b")
+        val result = EntryRuleSet.parse("EntryURL=a=b")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_URL, "a=b")), result.rules)
     }
 
     @Test
     fun blankLinesAreSkippedWithoutShiftingLaterLineNumbers() {
-        val result = EntryRules.parse("EntryTitle=a\n\n\nnonsense")
+        val result = EntryRuleSet.parse("EntryTitle=a\n\n\nnonsense")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_TITLE, "a")), result.rules)
         assertEquals(listOf(EntryRuleError.MissingSeparator(4)), result.errors)
@@ -73,14 +73,14 @@ class EntryFilterRulesTest {
     @Test
     fun crlfParsesIdenticallyToLf() {
         assertEquals(
-            EntryRules.parse("EntryTitle=a\nEntryURL=b"),
-            EntryRules.parse("EntryTitle=a\r\nEntryURL=b"),
+            EntryRuleSet.parse("EntryTitle=a\nEntryURL=b"),
+            EntryRuleSet.parse("EntryTitle=a\r\nEntryURL=b"),
         )
     }
 
     @Test
     fun unknownFieldIsReportedAndSiblingsSurvive() {
-        val result = EntryRules.parse("EntryFoo=a\nEntryTitle=b")
+        val result = EntryRuleSet.parse("EntryFoo=a\nEntryTitle=b")
 
         assertEquals(listOf(EntryRule(EntryRuleField.ENTRY_TITLE, "b")), result.rules)
         assertEquals(listOf(EntryRuleError.UnknownField(1, "EntryFoo")), result.errors)
@@ -88,7 +88,7 @@ class EntryFilterRulesTest {
 
     @Test
     fun missingSeparatorIsReported() {
-        val result = EntryRules.parse("EntryTitle")
+        val result = EntryRuleSet.parse("EntryTitle")
 
         assertTrue(result.rules.isEmpty())
         assertEquals(listOf(EntryRuleError.MissingSeparator(1)), result.errors)
@@ -96,7 +96,7 @@ class EntryFilterRulesTest {
 
     @Test
     fun emptyPatternIsRejectedAndIsNotAMatchEverythingRule() {
-        val result = EntryRules.parse("EntryTitle=")
+        val result = EntryRuleSet.parse("EntryTitle=")
 
         assertTrue(result.rules.isEmpty())
         assertEquals(listOf(EntryRuleError.EmptyPattern(1)), result.errors)
@@ -104,7 +104,7 @@ class EntryFilterRulesTest {
 
     @Test
     fun invalidRegexIsReportedAndNoExceptionEscapes() {
-        val result = EntryRules.parse("EntryTitle=(unclosed")
+        val result = EntryRuleSet.parse("EntryTitle=(unclosed")
 
         assertTrue(result.rules.isEmpty())
         assertEquals(1, result.errors.size)
@@ -114,20 +114,20 @@ class EntryFilterRulesTest {
 
     @Test
     fun duplicateRulesAreBothParsed() {
-        val result = EntryRules.parse("EntryTitle=a\nEntryTitle=a")
+        val result = EntryRuleSet.parse("EntryTitle=a\nEntryTitle=a")
 
         assertEquals(2, result.rules.size)
     }
 
     @Test
     fun ruleCountIsCappedWithoutCrashing() {
-        val text = (1..EntryRules.MAX_RULES + 50).joinToString("\n") { "EntryTitle=a$it" }
+        val text = (1..EntryRuleSet.MAX_RULES + 50).joinToString("\n") { "EntryTitle=a$it" }
 
-        val result = EntryRules.parse(text)
+        val result = EntryRuleSet.parse(text)
 
-        assertEquals(EntryRules.MAX_RULES, result.rules.size)
+        assertEquals(EntryRuleSet.MAX_RULES, result.rules.size)
         assertEquals(
-            listOf(EntryRuleError.TooManyRules(EntryRules.MAX_RULES + 1, EntryRules.MAX_RULES)),
+            listOf(EntryRuleError.TooManyRules(EntryRuleSet.MAX_RULES + 1, EntryRuleSet.MAX_RULES)),
             result.errors,
         )
     }

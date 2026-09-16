@@ -29,7 +29,7 @@ enum class EntryRuleField(
  *
  * [regex] lives in the class body, not the primary constructor, so data-class
  * equals/hashCode cover only (field, pattern) — Regex has identity equality.
- * The constructor THROWS on a bad pattern; always build via [EntryRules.parse].
+ * The constructor THROWS on a bad pattern; always build via [EntryRuleSet.parse].
  */
 data class EntryRule(
     val field: EntryRuleField,
@@ -122,7 +122,7 @@ sealed interface EntryRuleError {
         val reason: String,
     ) : EntryRuleError
 
-    /** The line is valid but exceeds [EntryRules.MAX_RULES]; it and every later line are ignored. */
+    /** The line is valid but exceeds [EntryRuleSet.MAX_RULES]; it and every later line are ignored. */
     data class TooManyRules(
         override val lineNumber: Int,
         val maxRules: Int,
@@ -135,76 +135,73 @@ data class EntryRuleSet(
 ) {
     companion object {
         val EMPTY = EntryRuleSet(emptyList(), emptyList())
+
+        const val MAX_RULES = 100
+
+        /**
+         * Parses one `FieldName=regex` rule per line. Blank lines are skipped without
+         * shifting the line numbers of later lines. Invalid lines produce an
+         * [EntryRuleError] instead of throwing, and are simply left out of the result.
+         */
+        fun parse(text: String): EntryRuleSet {
+            if (text.isBlank()) {
+                return EntryRuleSet.EMPTY
+            }
+
+            val rules = mutableListOf<EntryRule>()
+            val errors = mutableListOf<EntryRuleError>()
+
+            for ((index, rawLine) in text.lineSequence().withIndex()) {
+                val lineNumber = index + 1
+                // Also disposes of the \r in CRLF line endings.
+                val line = rawLine.trim()
+
+                if (line.isEmpty()) {
+                    continue
+                }
+
+                val separatorIndex = line.indexOf('=')
+                if (separatorIndex < 0) {
+                    errors.add(EntryRuleError.MissingSeparator(lineNumber))
+                    continue
+                }
+
+                val fieldName = line.substring(0, separatorIndex).trim()
+                // Split on the first '=' only, so patterns may contain '='.
+                val pattern = line.substring(separatorIndex + 1).trim()
+
+                val field = EntryRuleField.fromFieldName(fieldName)
+                if (field == null) {
+                    errors.add(EntryRuleError.UnknownField(lineNumber, fieldName))
+                    continue
+                }
+
+                // Deliberate deviation from Miniflux: an empty pattern compiles fine and
+                // matches everything, which would silently swallow an entire feed.
+                if (pattern.isEmpty()) {
+                    errors.add(EntryRuleError.EmptyPattern(lineNumber))
+                    continue
+                }
+
+                // Reported rather than silently dropped: an unnoticed cap on an allow
+                // list would discard every article matching only the dropped rules.
+                if (rules.size >= MAX_RULES) {
+                    errors.add(EntryRuleError.TooManyRules(lineNumber, MAX_RULES))
+                    break
+                }
+
+                try {
+                    rules.add(EntryRule(field, pattern))
+                } catch (e: PatternSyntaxException) {
+                    errors.add(EntryRuleError.InvalidRegex(lineNumber, e.description ?: e.message ?: ""))
+                }
+            }
+
+            return EntryRuleSet(rules, errors)
+        }
     }
 }
 
-object EntryRules {
-    const val MAX_RULES = 100
-
-    /**
-     * Parses one `FieldName=regex` rule per line. Blank lines are skipped without
-     * shifting the line numbers of later lines. Invalid lines produce an
-     * [EntryRuleError] instead of throwing, and are simply left out of the result.
-     */
-    fun parse(text: String): EntryRuleSet {
-        if (text.isBlank()) {
-            return EntryRuleSet.EMPTY
-        }
-
-        val rules = mutableListOf<EntryRule>()
-        val errors = mutableListOf<EntryRuleError>()
-
-        for ((index, rawLine) in text.lineSequence().withIndex()) {
-            val lineNumber = index + 1
-            // Also disposes of the \r in CRLF line endings.
-            val line = rawLine.trim()
-
-            if (line.isEmpty()) {
-                continue
-            }
-
-            val separatorIndex = line.indexOf('=')
-            if (separatorIndex < 0) {
-                errors.add(EntryRuleError.MissingSeparator(lineNumber))
-                continue
-            }
-
-            val fieldName = line.substring(0, separatorIndex).trim()
-            // Split on the first '=' only, so patterns may contain '='.
-            val pattern = line.substring(separatorIndex + 1).trim()
-
-            val field = EntryRuleField.fromFieldName(fieldName)
-            if (field == null) {
-                errors.add(EntryRuleError.UnknownField(lineNumber, fieldName))
-                continue
-            }
-
-            // Deliberate deviation from Miniflux: an empty pattern compiles fine and
-            // matches everything, which would silently swallow an entire feed.
-            if (pattern.isEmpty()) {
-                errors.add(EntryRuleError.EmptyPattern(lineNumber))
-                continue
-            }
-
-            // Reported rather than silently dropped: an unnoticed cap on an allow
-            // list would discard every article matching only the dropped rules.
-            if (rules.size >= MAX_RULES) {
-                errors.add(EntryRuleError.TooManyRules(lineNumber, MAX_RULES))
-                break
-            }
-
-            try {
-                rules.add(EntryRule(field, pattern))
-            } catch (e: PatternSyntaxException) {
-                errors.add(EntryRuleError.InvalidRegex(lineNumber, e.description ?: e.message ?: ""))
-            }
-        }
-
-        return EntryRuleSet(rules, errors)
-    }
-}
-
-/** The compiled block/allow rules of a single feed. */
 data class EntryFilterRules(
     val blockRules: List<EntryRule>,
     val allowRules: List<EntryRule>,
@@ -218,8 +215,8 @@ data class EntryFilterRules(
             blockRulesText: String,
             allowRulesText: String,
         ): EntryFilterRules {
-            val blockRules = EntryRules.parse(blockRulesText).rules
-            val allowRules = EntryRules.parse(allowRulesText).rules
+            val blockRules = EntryRuleSet.parse(blockRulesText).rules
+            val allowRules = EntryRuleSet.parse(allowRulesText).rules
             return if (blockRules.isEmpty() && allowRules.isEmpty()) {
                 NONE
             } else {

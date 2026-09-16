@@ -14,7 +14,7 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.EntryRuleError
-import com.nononsenseapps.feeder.model.EntryRules
+import com.nononsenseapps.feeder.model.EntryRuleSet
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -56,10 +56,10 @@ class EditFeedScreenViewModel(
     override var blockRulesError: EntryRuleError? by mutableStateOf(null)
     override var allowRulesError: EntryRuleError? by mutableStateOf(null)
     override var blockRules: String by mutableSavedStateOf(state, "") { value ->
-        blockRulesError = EntryRules.parse(value).errors.firstOrNull()
+        blockRulesError = EntryRuleSet.parse(value).errors.firstOrNull()
     }
     override var allowRules: String by mutableSavedStateOf(state, "") { value ->
-        allowRulesError = EntryRules.parse(value).errors.firstOrNull()
+        allowRulesError = EntryRuleSet.parse(value).errors.firstOrNull()
     }
     override var allTags: List<String> by mutableStateOf(emptyList())
 
