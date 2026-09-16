@@ -115,6 +115,7 @@ class RssLocalSyncKtTest : DIAware {
 
     private val rssLocalSync: RssLocalSync by instance()
     private val settingsStore: SettingsStore by instance()
+    private val filePaths: FilePathProvider by instance()
 
     @After
     fun stopServer() {
@@ -134,6 +135,8 @@ class RssLocalSyncKtTest : DIAware {
         isJson: Boolean = true,
         useAlternateId: Boolean = false,
         skipDuplicates: Boolean = false,
+        blockRules: String = "",
+        allowRules: String = "",
     ): Long {
         val id =
             testDb.db.feedDao().insertFeed(
@@ -143,6 +146,8 @@ class RssLocalSyncKtTest : DIAware {
                     tag = "",
                     alternateId = useAlternateId,
                     skipDuplicates = skipDuplicates,
+                    blockRules = blockRules,
+                    allowRules = allowRules,
                 ),
             )
 
@@ -911,6 +916,160 @@ class RssLocalSyncKtTest : DIAware {
             assertTrue(
                 "No items should be marked as read when there are no remote read marks",
                 feedItems.all { it.readTime == null },
+            )
+        }
+
+    @Test
+    fun blockRuleDropsMatchingItemsAtFetchTime() =
+        runBlocking {
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                    blockRules = "Title=Foo Item 2",
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+
+            assertEquals("Blocked item should not have been stored", 2, items.size)
+            assertTrue(
+                "Blocked item should not have been stored",
+                items.none { it.plainTitle == "Foo Item 2" },
+            )
+        }
+
+    @Test
+    fun allowRuleKeepsOnlyMatchingItems() =
+        runBlocking {
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                    allowRules = "Title=Foo Item 2",
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            val items = testDb.db.feedItemDao().loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+
+            assertEquals("Only the allowed item should have been stored", 1, items.size)
+            assertEquals("Foo Item 2", items.single().plainTitle)
+        }
+
+    @Test
+    fun blockedItemsGetNoBlobFile() =
+        runBlocking {
+            // Blob files live in the shared app files dir, so start from a known state
+            filePaths.articleDir.listFiles()?.forEach { it.delete() }
+
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                    blockRules = "Title=Foo Item 2",
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            assertEquals(
+                "No blob file should have been written for the blocked item",
+                2,
+                filePaths.articleDir.listFiles()?.size,
+            )
+        }
+
+    @Test
+    fun itemsStoredBeforeRuleWasAddedAreNotDeleted() =
+        runBlocking {
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            assertEquals(
+                3,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+                    .size,
+            )
+
+            testDb.db.feedDao().getFeed(feedId)!!.let { feed ->
+                testDb.db.feedDao().updateFeed(feed.copy(blockRules = "Title=Foo Item"))
+            }
+
+            rssLocalSync.syncFeeds(feedId = feedId, debugReallyForceNetwork = true)
+
+            assertEquals(
+                "Rules apply to future fetches only - stored items must survive",
+                3,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+                    .size,
+            )
+        }
+
+    @Test
+    fun invalidRulesDoNotBreakTheFeed() =
+        runBlocking {
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                    blockRules = "Title=(unclosed\nnonsense",
+                    allowRules = "Foo=bar",
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            assertEquals(
+                "Invalid rules must fail open",
+                3,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+                    .size,
+            )
+        }
+
+    @Test
+    fun blockRuleTakesPrecedenceOverAllowRule() =
+        runBlocking {
+            val feedId =
+                insertFeed(
+                    "foo",
+                    server.url("/foo.xml").toUrl(),
+                    fooRss(3),
+                    isJson = false,
+                    blockRules = "Title=Foo Item 2",
+                    allowRules = "Title=Foo Item 2",
+                )
+
+            rssLocalSync.syncFeeds(feedId = feedId)
+
+            assertEquals(
+                "Block rules are evaluated first",
+                0,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+                    .size,
             )
         }
 

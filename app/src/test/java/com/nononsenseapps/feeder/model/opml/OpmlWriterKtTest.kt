@@ -51,6 +51,77 @@ class OpmlWriterKtTest {
         }
 
     @Test
+    fun writesRulesWithNewlinesEncodedAsCharacterReferences() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                        blockRules = "Title=(?i)sponsored\r\nURL=ads & \"tracking\"",
+                        allowRules = "Tag=(?i)linux",
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(
+                "feeder:blockRules=\"Title=(?i)sponsored&#10;URL=ads &amp; &quot;tracking&quot;\"",
+                Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
+            )
+            assertEquals(
+                "feeder:allowRules=\"Tag=(?i)linux\"",
+                Regex("feeder:allowRules=\"[^\"]*\"").find(output)?.value,
+            )
+        }
+
+    @Test
+    fun writesRulesWithTabsEncodedAsCharacterReferences() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                        blockRules = "Content=Price:\tfree",
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(
+                "feeder:blockRules=\"Content=Price:&#9;free\"",
+                Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
+            )
+        }
+
+    @Test
+    fun doesNotWriteRuleAttributesWhenRulesAreEmpty() =
+        runBlocking {
+            val bos = ByteArrayOutputStream()
+            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
+                listOf(
+                    Feed(
+                        id = 1L,
+                        title = "title",
+                        url = URL("http://example.com/rss.xml"),
+                        tag = tag,
+                    ),
+                )
+            }
+            val output = String(bos.toByteArray())
+
+            assertEquals(false, output.contains("feeder:blockRules"))
+            assertEquals(false, output.contains("feeder:allowRules"))
+        }
+
+    @Test
     fun exportsSettings() =
         runBlocking {
             val bos = ByteArrayOutputStream()

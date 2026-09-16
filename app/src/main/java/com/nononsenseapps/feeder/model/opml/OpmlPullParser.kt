@@ -48,6 +48,10 @@ private const val ATTR_OPEN_ARTICLES_WITH = "openArticlesWith"
 
 private const val ATTR_FETCH_OG_IMAGES = "fetchOgImages"
 
+private const val ATTR_BLOCK_RULES = "blockRules"
+
+private const val ATTR_ALLOW_RULES = "allowRules"
+
 private const val TAG_BLOCKED = "blocked"
 
 @Suppress("NAME_SHADOWING")
@@ -298,6 +302,16 @@ class OpmlPullParser(
                                 .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_FETCH_OG_IMAGES)
                                 ?.toBoolean()
                                 ?: feed.fetchOgImages,
+                        // Not run through unescape() - the parser already resolves
+                        // entities and character references in attribute values.
+                        blockRules =
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_BLOCK_RULES)
+                                ?: feed.blockRules,
+                        allowRules =
+                            parser
+                                .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_ALLOW_RULES)
+                                ?: feed.allowRules,
                         imageUrl =
                             parser
                                 .getAttributeValue(OPML_FEEDER_NAMESPACE, ATTR_IMAGE_URL)

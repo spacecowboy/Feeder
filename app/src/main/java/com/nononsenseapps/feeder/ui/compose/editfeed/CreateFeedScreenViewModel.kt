@@ -13,6 +13,8 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.model.ArticleRuleError
+import com.nononsenseapps.feeder.model.ArticleRuleSet
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.launch
@@ -45,6 +47,17 @@ class CreateFeedScreenViewModel(
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var summarizeOnOpen: Boolean by mutableSavedStateOf(state, false)
     override var fetchOgImages: Boolean by mutableSavedStateOf(state, false)
+
+    // Invalid rules deliberately do not block saving - a regex is invalid while being
+    // typed, and the engine ignores invalid lines anyway.
+    override var blockRulesError: ArticleRuleError? by mutableStateOf(null)
+    override var allowRulesError: ArticleRuleError? by mutableStateOf(null)
+    override var blockRules: String by mutableSavedStateOf(state, "") { value ->
+        blockRulesError = ArticleRuleSet.parse(value).errors.firstOrNull()
+    }
+    override var allowRules: String by mutableSavedStateOf(state, "") { value ->
+        allowRulesError = ArticleRuleSet.parse(value).errors.firstOrNull()
+    }
     override var allTags: List<String> by mutableStateOf(emptyList())
     override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")
     override var feedImage: String by mutableStateOf(state["feedImage"] ?: "")
@@ -95,7 +108,10 @@ class CreateFeedScreenViewModel(
                         alternateId = alternateId,
                         whenModified = Instant.now(),
                         imageUrl = sloppyLinkToStrictURLOrNull(feedImage),
+                        summarizeOnOpen = summarizeOnOpen,
                         fetchOgImages = fetchOgImages,
+                        blockRules = blockRules,
+                        allowRules = allowRules,
                     ),
                 )
 

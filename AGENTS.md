@@ -36,7 +36,7 @@ UI (Jetpack Compose screens)
 | **ViewModels** | `ui/*.kt` (e.g. `MainActivityViewModel`) | Own coroutine scopes, transform Repository flows into UI state, handle one-off commands. |
 | **Repository** | `archmodel/Repository.kt` | The single place where all dynamic data decisions are made. Coordinates between stores. |
 | **Stores** | `archmodel/*Store.kt` | Each store owns one data domain (feeds, feed items, settings, sync remotes, etc.). |
-| **Database** | `db/room/` | Room entities, DAOs, and the `AppDatabase`. Current schema version: **39**. |
+| **Database** | `db/room/` | Room entities, DAOs, and the `AppDatabase`. Current schema version: **40**. |
 | **Model / parsers** | `model/` | Feed parsing, full-text extraction, HTML handling, OPML, notifications. |
 | **Background** | `background/` | WorkManager/JobScheduler jobs for sync, blocklist updates, cleanup. |
 | **Sync** | `sync/` | Optional cross-device sync REST client (see below). |
