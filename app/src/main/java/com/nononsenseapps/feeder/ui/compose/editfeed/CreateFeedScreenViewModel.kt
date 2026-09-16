@@ -13,8 +13,8 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.model.EntryRuleError
-import com.nononsenseapps.feeder.model.EntryRuleSet
+import com.nononsenseapps.feeder.model.ArticleRuleError
+import com.nononsenseapps.feeder.model.ArticleRuleSet
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.launch
@@ -50,13 +50,13 @@ class CreateFeedScreenViewModel(
 
     // Invalid rules deliberately do not block saving - a regex is invalid while being
     // typed, and the engine ignores invalid lines anyway.
-    override var blockRulesError: EntryRuleError? by mutableStateOf(null)
-    override var allowRulesError: EntryRuleError? by mutableStateOf(null)
+    override var blockRulesError: ArticleRuleError? by mutableStateOf(null)
+    override var allowRulesError: ArticleRuleError? by mutableStateOf(null)
     override var blockRules: String by mutableSavedStateOf(state, "") { value ->
-        blockRulesError = EntryRuleSet.parse(value).errors.firstOrNull()
+        blockRulesError = ArticleRuleSet.parse(value).errors.firstOrNull()
     }
     override var allowRules: String by mutableSavedStateOf(state, "") { value ->
-        allowRulesError = EntryRuleSet.parse(value).errors.firstOrNull()
+        allowRulesError = ArticleRuleSet.parse(value).errors.firstOrNull()
     }
     override var allTags: List<String> by mutableStateOf(emptyList())
     override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")

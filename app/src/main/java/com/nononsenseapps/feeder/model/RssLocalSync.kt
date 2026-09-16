@@ -305,8 +305,8 @@ class RssLocalSync(
                     val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
 
                     // Compiled once per feed per sync. Never inside the item loop.
-                    val entryFilterRules =
-                        EntryFilterRules.compile(
+                    val articleFilterRules =
+                        ArticleFilterRules.compile(
                             blockRulesText = feedSql.blockRules,
                             allowRulesText = feedSql.allowRules,
                         )
@@ -340,7 +340,7 @@ class RssLocalSync(
                                 // the guid scheme for the whole feed) and would renumber index/totalItems,
                                 // making the fallback clock of a kept item depend on how many other items
                                 // were filtered ahead of it.
-                                if (!EntryFilterPolicy.shouldKeep(item, entryFilterRules)) {
+                                if (!ArticleFilterPolicy.shouldKeep(item, articleFilterRules)) {
                                     logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
                                     return@mapIndexedNotNull null
                                 }

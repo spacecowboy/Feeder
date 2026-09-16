@@ -61,19 +61,19 @@ class OpmlWriterKtTest {
                         title = "title",
                         url = URL("http://example.com/rss.xml"),
                         tag = tag,
-                        blockRules = "EntryTitle=(?i)sponsored\r\nEntryURL=ads & \"tracking\"",
-                        allowRules = "EntryTag=(?i)linux",
+                        blockRules = "Title=(?i)sponsored\r\nURL=ads & \"tracking\"",
+                        allowRules = "Tag=(?i)linux",
                     ),
                 )
             }
             val output = String(bos.toByteArray())
 
             assertEquals(
-                "feeder:blockRules=\"EntryTitle=(?i)sponsored&#10;EntryURL=ads &amp; &quot;tracking&quot;\"",
+                "feeder:blockRules=\"Title=(?i)sponsored&#10;URL=ads &amp; &quot;tracking&quot;\"",
                 Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
             )
             assertEquals(
-                "feeder:allowRules=\"EntryTag=(?i)linux\"",
+                "feeder:allowRules=\"Tag=(?i)linux\"",
                 Regex("feeder:allowRules=\"[^\"]*\"").find(output)?.value,
             )
         }
@@ -89,14 +89,14 @@ class OpmlWriterKtTest {
                         title = "title",
                         url = URL("http://example.com/rss.xml"),
                         tag = tag,
-                        blockRules = "EntryContent=Price:\tfree",
+                        blockRules = "Content=Price:\tfree",
                     ),
                 )
             }
             val output = String(bos.toByteArray())
 
             assertEquals(
-                "feeder:blockRules=\"EntryContent=Price:&#9;free\"",
+                "feeder:blockRules=\"Content=Price:&#9;free\"",
                 Regex("feeder:blockRules=\"[^\"]*\"").find(output)?.value,
             )
         }

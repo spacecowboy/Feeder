@@ -928,7 +928,7 @@ class RssLocalSyncKtTest : DIAware {
                     server.url("/foo.xml").toUrl(),
                     fooRss(3),
                     isJson = false,
-                    blockRules = "EntryTitle=Foo Item 2",
+                    blockRules = "Title=Foo Item 2",
                 )
 
             rssLocalSync.syncFeeds(feedId = feedId)
@@ -951,7 +951,7 @@ class RssLocalSyncKtTest : DIAware {
                     server.url("/foo.xml").toUrl(),
                     fooRss(3),
                     isJson = false,
-                    allowRules = "EntryTitle=Foo Item 2",
+                    allowRules = "Title=Foo Item 2",
                 )
 
             rssLocalSync.syncFeeds(feedId = feedId)
@@ -974,7 +974,7 @@ class RssLocalSyncKtTest : DIAware {
                     server.url("/foo.xml").toUrl(),
                     fooRss(3),
                     isJson = false,
-                    blockRules = "EntryTitle=Foo Item 2",
+                    blockRules = "Title=Foo Item 2",
                 )
 
             rssLocalSync.syncFeeds(feedId = feedId)
@@ -1008,7 +1008,7 @@ class RssLocalSyncKtTest : DIAware {
             )
 
             testDb.db.feedDao().getFeed(feedId)!!.let { feed ->
-                testDb.db.feedDao().updateFeed(feed.copy(blockRules = "EntryTitle=Foo Item"))
+                testDb.db.feedDao().updateFeed(feed.copy(blockRules = "Title=Foo Item"))
             }
 
             rssLocalSync.syncFeeds(feedId = feedId, debugReallyForceNetwork = true)
@@ -1032,8 +1032,8 @@ class RssLocalSyncKtTest : DIAware {
                     server.url("/foo.xml").toUrl(),
                     fooRss(3),
                     isJson = false,
-                    blockRules = "EntryTitle=(unclosed\nnonsense",
-                    allowRules = "EntryFoo=bar",
+                    blockRules = "Title=(unclosed\nnonsense",
+                    allowRules = "Foo=bar",
                 )
 
             rssLocalSync.syncFeeds(feedId = feedId)
@@ -1057,8 +1057,8 @@ class RssLocalSyncKtTest : DIAware {
                     server.url("/foo.xml").toUrl(),
                     fooRss(3),
                     isJson = false,
-                    blockRules = "EntryTitle=Foo Item 2",
-                    allowRules = "EntryTitle=Foo Item 2",
+                    blockRules = "Title=Foo Item 2",
+                    allowRules = "Title=Foo Item 2",
                 )
 
             rssLocalSync.syncFeeds(feedId = feedId)

@@ -364,8 +364,8 @@ class OPMLTest : DIAware {
     @Test
     fun multiLineRulesRoundTripThroughOpml() =
         runBlocking {
-            val blockRules = "EntryTitle=(?i)sponsored\nEntryURL=ads & \"tracking\""
-            val allowRules = "EntryTag=(?i)linux\nEntryAuthor=Bob"
+            val blockRules = "Title=(?i)sponsored\nURL=ads & \"tracking\""
+            val allowRules = "Tag=(?i)linux\nAuthor=Bob"
 
             db.feedDao().insertFeed(
                 Feed(

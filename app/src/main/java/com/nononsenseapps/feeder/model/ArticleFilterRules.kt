@@ -6,21 +6,24 @@ import java.util.regex.PatternSyntaxException
  * The article fields a per-feed filtering rule can match against.
  *
  * Modelled on Miniflux's entry filtering rules, minus the fields Feeder cannot
- * support: EntryDate (non-regex syntax) and EntryCommentsURL (not carried by the
- * native gofeed bridge).
+ * support: Miniflux's EntryDate (non-regex syntax) and EntryCommentsURL (not carried
+ * by the native gofeed bridge).
+ *
+ * The names deliberately drop Miniflux's "Entry" prefix - Feeder calls these articles,
+ * so a rule reads "Title=..." rather than "EntryTitle=...".
  */
-enum class EntryRuleField(
+enum class ArticleRuleField(
     val fieldName: String,
 ) {
-    ENTRY_TITLE("EntryTitle"),
-    ENTRY_URL("EntryURL"),
-    ENTRY_AUTHOR("EntryAuthor"),
-    ENTRY_TAG("EntryTag"),
-    ENTRY_CONTENT("EntryContent"),
+    TITLE("Title"),
+    URL("URL"),
+    AUTHOR("Author"),
+    TAG("Tag"),
+    CONTENT("Content"),
     ;
 
     companion object {
-        fun fromFieldName(name: String): EntryRuleField? = entries.firstOrNull { it.fieldName.equals(name, ignoreCase = true) }
+        fun fromFieldName(name: String): ArticleRuleField? = entries.firstOrNull { it.fieldName.equals(name, ignoreCase = true) }
     }
 }
 
@@ -29,42 +32,42 @@ enum class EntryRuleField(
  *
  * [regex] lives in the class body, not the primary constructor, so data-class
  * equals/hashCode cover only (field, pattern) — Regex has identity equality.
- * The constructor THROWS on a bad pattern; always build via [EntryRuleSet.parse].
+ * The constructor THROWS on a bad pattern; always build via [ArticleRuleSet.parse].
  */
-data class EntryRule(
-    val field: EntryRuleField,
+data class ArticleRule(
+    val field: ArticleRuleField,
     val pattern: String,
 ) {
     private val regex: Regex = Regex(pattern)
 
     fun matches(article: ParsedArticle): Boolean =
         when (field) {
-            EntryRuleField.ENTRY_TITLE -> matchesValue(article.title)
-            EntryRuleField.ENTRY_URL -> matchesValue(article.url)
-            EntryRuleField.ENTRY_AUTHOR -> matchesValue(article.author?.name)
+            ArticleRuleField.TITLE -> matchesValue(article.title)
+            ArticleRuleField.URL -> matchesValue(article.url)
+            ArticleRuleField.AUTHOR -> matchesValue(article.author?.name)
             // content_text is never null for parsed feeds (it is FeederGoItem.plainContent,
             // "" at worst), so the fallback has to test for blankness rather than null or
             // markup-targeting rules could never reach the HTML at all.
-            EntryRuleField.ENTRY_CONTENT ->
+            ArticleRuleField.CONTENT ->
                 matchesValue(article.content_text?.takeIf { it.isNotBlank() } ?: article.content_html)
-            // Miniflux iterates entry.Tags and stops on first hit, so an entry
-            // with no tags matches no EntryTag rule at all — not even ".*".
+            // Miniflux iterates entry.Tags and stops on first hit, so an article
+            // with no tags matches no Tag rule at all — not even ".*".
             // See [appliesTo] for why that is not enough on the allow side.
-            EntryRuleField.ENTRY_TAG -> article.tags?.any { matchesValue(it) } == true
+            ArticleRuleField.TAG -> article.tags?.any { matchesValue(it) } == true
         }
 
     /**
      * Whether this rule can say anything meaningful about [article].
      *
-     * Only EntryTag can be inapplicable: many feeds emit no <category> at all, and an
-     * untagged entry matches no EntryTag rule — not even ".*". On the block side that is
-     * harmless, but as an allow rule it would drop every entry in such a feed. Treating
-     * the rule as inapplicable instead means an untagged entry is judged only by the
+     * Only Tag can be inapplicable: many feeds emit no <category> at all, and an
+     * untagged article matches no Tag rule — not even ".*". On the block side that is
+     * harmless, but as an allow rule it would drop every article in such a feed. Treating
+     * the rule as inapplicable instead means an untagged article is judged only by the
      * allow rules that can actually be evaluated against it.
      */
     fun appliesTo(article: ParsedArticle): Boolean =
         when (field) {
-            EntryRuleField.ENTRY_TAG -> !article.tags.isNullOrEmpty()
+            ArticleRuleField.TAG -> !article.tags.isNullOrEmpty()
             else -> true
         }
 
@@ -101,55 +104,55 @@ data class EntryRule(
 }
 
 /** Why one line was rejected. [lineNumber] is 1-based over the raw text. */
-sealed interface EntryRuleError {
+sealed interface ArticleRuleError {
     val lineNumber: Int
 
     data class MissingSeparator(
         override val lineNumber: Int,
-    ) : EntryRuleError
+    ) : ArticleRuleError
 
     data class UnknownField(
         override val lineNumber: Int,
         val fieldName: String,
-    ) : EntryRuleError
+    ) : ArticleRuleError
 
     data class EmptyPattern(
         override val lineNumber: Int,
-    ) : EntryRuleError
+    ) : ArticleRuleError
 
     data class InvalidRegex(
         override val lineNumber: Int,
         val reason: String,
-    ) : EntryRuleError
+    ) : ArticleRuleError
 
-    /** The line is valid but exceeds [EntryRuleSet.MAX_RULES]; it and every later line are ignored. */
+    /** The line is valid but exceeds [ArticleRuleSet.MAX_RULES]; it and every later line are ignored. */
     data class TooManyRules(
         override val lineNumber: Int,
         val maxRules: Int,
-    ) : EntryRuleError
+    ) : ArticleRuleError
 }
 
-data class EntryRuleSet(
-    val rules: List<EntryRule>,
-    val errors: List<EntryRuleError>,
+data class ArticleRuleSet(
+    val rules: List<ArticleRule>,
+    val errors: List<ArticleRuleError>,
 ) {
     companion object {
-        val EMPTY = EntryRuleSet(emptyList(), emptyList())
+        val EMPTY = ArticleRuleSet(emptyList(), emptyList())
 
         const val MAX_RULES = 100
 
         /**
          * Parses one `FieldName=regex` rule per line. Blank lines are skipped without
          * shifting the line numbers of later lines. Invalid lines produce an
-         * [EntryRuleError] instead of throwing, and are simply left out of the result.
+         * [ArticleRuleError] instead of throwing, and are simply left out of the result.
          */
-        fun parse(text: String): EntryRuleSet {
+        fun parse(text: String): ArticleRuleSet {
             if (text.isBlank()) {
-                return EntryRuleSet.EMPTY
+                return ArticleRuleSet.EMPTY
             }
 
-            val rules = mutableListOf<EntryRule>()
-            val errors = mutableListOf<EntryRuleError>()
+            val rules = mutableListOf<ArticleRule>()
+            val errors = mutableListOf<ArticleRuleError>()
 
             for ((index, rawLine) in text.lineSequence().withIndex()) {
                 val lineNumber = index + 1
@@ -162,7 +165,7 @@ data class EntryRuleSet(
 
                 val separatorIndex = line.indexOf('=')
                 if (separatorIndex < 0) {
-                    errors.add(EntryRuleError.MissingSeparator(lineNumber))
+                    errors.add(ArticleRuleError.MissingSeparator(lineNumber))
                     continue
                 }
 
@@ -170,70 +173,70 @@ data class EntryRuleSet(
                 // Split on the first '=' only, so patterns may contain '='.
                 val pattern = line.substring(separatorIndex + 1).trim()
 
-                val field = EntryRuleField.fromFieldName(fieldName)
+                val field = ArticleRuleField.fromFieldName(fieldName)
                 if (field == null) {
-                    errors.add(EntryRuleError.UnknownField(lineNumber, fieldName))
+                    errors.add(ArticleRuleError.UnknownField(lineNumber, fieldName))
                     continue
                 }
 
                 // Deliberate deviation from Miniflux: an empty pattern compiles fine and
                 // matches everything, which would silently swallow an entire feed.
                 if (pattern.isEmpty()) {
-                    errors.add(EntryRuleError.EmptyPattern(lineNumber))
+                    errors.add(ArticleRuleError.EmptyPattern(lineNumber))
                     continue
                 }
 
                 // Reported rather than silently dropped: an unnoticed cap on an allow
                 // list would discard every article matching only the dropped rules.
                 if (rules.size >= MAX_RULES) {
-                    errors.add(EntryRuleError.TooManyRules(lineNumber, MAX_RULES))
+                    errors.add(ArticleRuleError.TooManyRules(lineNumber, MAX_RULES))
                     break
                 }
 
                 try {
-                    rules.add(EntryRule(field, pattern))
+                    rules.add(ArticleRule(field, pattern))
                 } catch (e: PatternSyntaxException) {
-                    errors.add(EntryRuleError.InvalidRegex(lineNumber, e.description ?: e.message ?: ""))
+                    errors.add(ArticleRuleError.InvalidRegex(lineNumber, e.description ?: e.message ?: ""))
                 }
             }
 
-            return EntryRuleSet(rules, errors)
+            return ArticleRuleSet(rules, errors)
         }
     }
 }
 
-data class EntryFilterRules(
-    val blockRules: List<EntryRule>,
-    val allowRules: List<EntryRule>,
+data class ArticleFilterRules(
+    val blockRules: List<ArticleRule>,
+    val allowRules: List<ArticleRule>,
 ) {
     val isNoOp: Boolean get() = blockRules.isEmpty() && allowRules.isEmpty()
 
     companion object {
-        val NONE = EntryFilterRules(emptyList(), emptyList())
+        val NONE = ArticleFilterRules(emptyList(), emptyList())
 
         fun compile(
             blockRulesText: String,
             allowRulesText: String,
-        ): EntryFilterRules {
-            val blockRules = EntryRuleSet.parse(blockRulesText).rules
-            val allowRules = EntryRuleSet.parse(allowRulesText).rules
+        ): ArticleFilterRules {
+            val blockRules = ArticleRuleSet.parse(blockRulesText).rules
+            val allowRules = ArticleRuleSet.parse(allowRulesText).rules
             return if (blockRules.isEmpty() && allowRules.isEmpty()) {
                 NONE
             } else {
-                EntryFilterRules(blockRules, allowRules)
+                ArticleFilterRules(blockRules, allowRules)
             }
         }
     }
 }
 
-internal object EntryFilterPolicy {
+internal object ArticleFilterPolicy {
     /**
      * Miniflux semantics: block rules are evaluated first and the first match drops
      * the item. Then, if any allow rules exist, the item must match at least one.
      *
-     * Deviation from Miniflux: only the allow rules that [EntryRule.appliesTo] this
-     * article get a vote. An EntryTag rule cannot judge an entry with no categories,
-     * so a feed that emits none is not emptied by "EntryTag=..." alone. Allow rules on
+     * Deviation from Miniflux: only the allow rules that [ArticleRule.appliesTo] this
+     * article get a vote. A Tag rule cannot judge an article with no categories,
+     * so a feed that emits none is not emptied by "Tag=..." alone. Allow rules on
      * other fields still apply as usual, so a mixed allow list keeps working.
      *
      * Note that invalid rules are dropped at parse time, so a feed whose rules are
@@ -242,7 +245,7 @@ internal object EntryFilterPolicy {
      */
     fun shouldKeep(
         article: ParsedArticle,
-        rules: EntryFilterRules,
+        rules: ArticleFilterRules,
     ): Boolean =
         when {
             rules.isNoOp -> true

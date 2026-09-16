@@ -295,13 +295,13 @@
   <string name="summarize_on_open">Summarize on open</string>
   <string name="fetch_og_images">Enhance thumbnails from article metadata</string>
   <string name="fetch_og_images_desc">Try to improve missing or low-quality thumbnails for this feed</string>
-  <string name="entry_filter_rules">Entry filtering rules</string>
-  <string name="entry_filter_rules_desc">One rule per line, written as FieldName=pattern. Available fields are EntryTitle, EntryURL, EntryAuthor, EntryTag and EntryContent. The pattern is a regular expression which matches anywhere in the field; start it with (?i) to ignore case. Rules take effect on the next fetch and do not affect already-saved articles.</string>
+  <string name="article_filter_rules">Article filtering rules</string>
+  <string name="article_filter_rules_desc">One rule per line, written as FieldName=pattern. Available fields are Title, URL, Author, Tag and Content. The pattern is a regular expression which matches anywhere in the field; start it with (?i) to ignore case. Rules take effect on the next fetch and do not affect already-saved articles.</string>
   <string name="block_rules">Block rules</string>
   <string name="block_rules_desc">Matching articles are never downloaded. Unlike the blocklist, this cannot be undone: removing a rule does not bring back articles which were already skipped.</string>
   <string name="allow_rules">Allow rules</string>
-  <string name="allow_rules_desc">If any allow rule is set, only matching articles are downloaded. An EntryTag rule is skipped for articles which have no tags, so a feed without tags is not emptied by an EntryTag rule alone.</string>
-  <string name="entry_rules_placeholder">EntryTitle=(?i)sponsored</string>
+  <string name="allow_rules_desc">If any allow rule is set, only matching articles are downloaded. A Tag rule is skipped for articles which have no tags, so a feed without tags is not emptied by a Tag rule alone.</string>
+  <string name="article_rules_placeholder">Title=(?i)sponsored</string>
   <string name="rule_error_missing_separator">Line %1$d: missing \'=\'. Invalid lines are ignored.</string>
   <string name="rule_error_unknown_field">Line %1$d: \'%2$s\' is not a known field. Invalid lines are ignored.</string>
   <string name="rule_error_empty_pattern">Line %1$d: the pattern is empty, which would match everything. Invalid lines are ignored.</string>

@@ -56,8 +56,8 @@ class EncryptedFeedTest {
 
     @Test
     fun multiLineRulesRoundTripThroughEncryptedFeed() {
-        val blockRules = "EntryTitle=(?i)sponsored\nEntryURL=example\\.com/ads/"
-        val allowRules = "EntryTag=(?i)linux"
+        val blockRules = "Title=(?i)sponsored\nURL=example\\.com/ads/"
+        val allowRules = "Tag=(?i)linux"
 
         val original =
             Feed(

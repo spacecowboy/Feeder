@@ -70,7 +70,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
-import com.nononsenseapps.feeder.model.EntryRuleError
+import com.nononsenseapps.feeder.model.ArticleRuleError
 import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteResults
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
@@ -579,10 +579,10 @@ fun ColumnScope.RightContent(
         startingSpace = false,
         height = 48.dp,
     ) {
-        Text(stringResource(id = R.string.entry_filter_rules))
+        Text(stringResource(id = R.string.article_filter_rules))
     }
     Text(
-        text = stringResource(id = R.string.entry_filter_rules_desc),
+        text = stringResource(id = R.string.article_filter_rules_desc),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.width(LocalDimens.current.maxContentWidth),
     )
@@ -615,7 +615,7 @@ private fun RulesField(
     supportingText: String,
     value: String,
     onValueChange: (String) -> Unit,
-    error: EntryRuleError?,
+    error: ArticleRuleError?,
     modifier: Modifier = Modifier,
 ) {
     val errorText = ruleErrorText(error)
@@ -628,7 +628,7 @@ private fun RulesField(
                 Text(label)
             },
             placeholder = {
-                Text(stringResource(id = R.string.entry_rules_placeholder))
+                Text(stringResource(id = R.string.article_rules_placeholder))
             },
             isError = error != null,
             singleLine = false,
@@ -658,22 +658,22 @@ private fun RulesField(
 }
 
 @Composable
-private fun ruleErrorText(error: EntryRuleError?): String? =
+private fun ruleErrorText(error: ArticleRuleError?): String? =
     when (error) {
         null -> null
-        is EntryRuleError.MissingSeparator ->
+        is ArticleRuleError.MissingSeparator ->
             stringResource(id = R.string.rule_error_missing_separator, error.lineNumber)
 
-        is EntryRuleError.UnknownField ->
+        is ArticleRuleError.UnknownField ->
             stringResource(id = R.string.rule_error_unknown_field, error.lineNumber, error.fieldName)
 
-        is EntryRuleError.EmptyPattern ->
+        is ArticleRuleError.EmptyPattern ->
             stringResource(id = R.string.rule_error_empty_pattern, error.lineNumber)
 
-        is EntryRuleError.InvalidRegex ->
+        is ArticleRuleError.InvalidRegex ->
             stringResource(id = R.string.rule_error_invalid_regex, error.lineNumber)
 
-        is EntryRuleError.TooManyRules ->
+        is ArticleRuleError.TooManyRules ->
             stringResource(id = R.string.rule_error_too_many_rules, error.lineNumber, error.maxRules)
     }
 
@@ -691,8 +691,8 @@ interface EditFeedScreenState {
     var fetchOgImages: Boolean
     var blockRules: String
     var allowRules: String
-    val blockRulesError: EntryRuleError?
-    val allowRulesError: EntryRuleError?
+    val blockRulesError: ArticleRuleError?
+    val allowRulesError: ArticleRuleError?
     val isOkToSave: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
@@ -716,8 +716,8 @@ private class ScreenState(
     override val allTags: List<String> = emptyList(),
     override val defaultTitle: String = "",
     override val feedImage: String = "",
-    override val blockRulesError: EntryRuleError? = null,
-    override val allowRulesError: EntryRuleError? = null,
+    override val blockRulesError: ArticleRuleError? = null,
+    override val allowRulesError: ArticleRuleError? = null,
 ) : EditFeedScreenState {
     override var feedUrl: String by mutableStateOf("")
     override var feedTitle: String by mutableStateOf("")
