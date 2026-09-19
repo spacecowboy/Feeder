@@ -379,9 +379,16 @@
     <string name="delete_all_models">Tüm indirilmiş modelleri sil</string>
     <string name="deleted_model_pair">%1$s -&gt; %2$s modeli silindi</string>
     <string name="set_translation_language_first">YZ ayarlarında tercih edilen çeviri dilini belirleyin</string>
-    <string name="downloaded_translation_models_desc">Çevrimdışı çeviri için cihazda depolanan Mozilla/Bergamot modelleri. Depolama alanında yer açmak için kullanılmayan dil çiftlerini silin.</string>
-    <string name="delete_all_models_desc">İndirilen tüm %1$d çeviri modellerini silmek istiyor musunuz (%2$s)?</string>
+    <string name="downloaded_translation_models_desc">Feeder tarafından indirilen çevrim dışı çeviri dilleri. Yer açmak için artık ihtiyacınız olmayan dilleri kaldırın.</string>
+    <string name="delete_all_models_desc">İndirilen tüm %1$d çeviri modelini silmek istiyor musunuz (%2$s)?</string>
     <string name="force_single_column">Tek sütunlu görünümü zorunlu kıl</string>
-    <string name="show_only_bergamot_languages">Herhangi bir Mozilla/Bergamot modeline sahip hedef dilleri göster</string>
-    <string name="local_translation_setup_bergamot">İşletim sisteminde cihaz üzerinde çalışan bir çevirici yoksa, Feeder desteklenen %1$s dil çiftleri için Mozilla/Bergamot modellerini indirir.</string>
+    <string name="show_only_bergamot_languages">Yalnızca indirilebilir dilleri göster</string>
+    <string name="local_translation_setup_bergamot">Kullanılabilir değilse, Feeder indirilebilir çevrim dışı çeviri motorunu kullanabilir.</string>
+    <string name="bergamot_runtime_download_required">Devam etmek için çevrim dışı çeviri motorunu indirin.</string>
+    <string name="bergamot_runtime_download_title">Çevrim dışı çeviri motoru indirilsin mi?</string>
+    <string name="bergamot_runtime_download_warning">Feeder, Mozilla/Bergamot projesinden 4,9 MB boyutunda bir WebAssembly çalışma zamanı dosyası indirecek. Bu kod, F-Droid tarafından derlenmedi veya denetlenmedi. İndirme işlemi tamamlandıktan sonra çeviri işlemi çevrim dışı olarak gerçekleştirilir.</string>
+    <string name="bergamot_runtime_download_failed">Çevrim dışı çeviri motoru indirilemedi.</string>
+    <string name="downloading_offline_translation_runtime">Çevrim dışı çeviri motoru indiriliyor: %%%1$d</string>
+    <string name="download">İndir</string>
+    <string name="local_translation_setup_system">Öncelikle aygıtınızın çeviri hizmetini kullanır.</string>
 </resources>
