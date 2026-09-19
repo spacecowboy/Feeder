@@ -381,4 +381,7 @@
     <string name="no_downloaded_models">மொழிபெயர்ப்பு மாதிரிகள் எதுவும் இன்னும் பதிவிறக்கப்படவில்லை. மொழிபெயர்ப்பு தானாகவே தேவையான மாதிரியைப் பதிவிறக்கும்.</string>
     <string name="delete_button_text">நீக்கு</string>
     <string name="cancel">ரத்துசெய்</string>
+    <string name="apply_blocklist_to_links">இணைப்புகளுக்கு இடவும்</string>
+    <string name="filters">வடிப்பான்கள்</string>
+    <string name="bergamot_runtime_download_required">தொடர ஆஃப்லைன் மொழிபெயர்ப்பு இயந்திரத்தைப் பதிவிறக்கம் செய்.</string>
 </resources>
