@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.23.2] - 2026-09-20
+
+### 🌐 Translations
+- Updated Hungarian translation using Weblate by @summoner001 in [commit](https://github.com/spacecowboy/feeder/commit/a9002e959b76a4ee8c603b446f27258134bbd90e)
+- Updated Ukrainian translation using Weblate by @G-H-User in [commit](https://github.com/spacecowboy/feeder/commit/cd0d1715116cd1e607d27644bffbd3344bd77284)
+- Updated Japanese translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/9943865a9d24f0c287eab778e85858d357a45041)
+- Updated Tamil translation using Weblate by @TamilNeram in [commit](https://github.com/spacecowboy/feeder/commit/461d8eaf0fee211e305a082e72371d7718db6f09)
+- Updated Czech translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/08846720dc231bb4bb475630fdb5d10cd7825b27)
+- Updated German translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/5f7f74834a336babb4cab702c0baad986b703b39)
+- Updated French translation using Weblate by @Matth7878 in [commit](https://github.com/spacecowboy/feeder/commit/503e44fc120833b307151819aca04f1d55667767)
+- Updated Polish translation using Weblate by @Aga-C in [commit](https://github.com/spacecowboy/feeder/commit/03a010e6148358eac2616b24f293cce8c0e544da)
+- Updated Chinese (Simplified Han script) translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/1e24247a603e92e24103f23a84b32ecbd93b970b)
+- Updated Serbian translation using Weblate by @eevan78 in [commit](https://github.com/spacecowboy/feeder/commit/03fe2622d80d47526de27c0c104fb9ef41ae07ad)
+- Updated Danish translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/a36f822da7a8cab1d5ad8529695d73631ba9cc86)
+- Updated Estonian translation using Weblate in [#1205](https://github.com/spacecowboy/feeder/pull/1205) 
+- Updated Turkish translation using Weblate by @oersen in [commit](https://github.com/spacecowboy/feeder/commit/45de3c880b012a41e49be2ec649fb89da4229444)
+- Updated Slovenian translation using Weblate in [commit](https://github.com/spacecowboy/feeder/commit/403d9dcef130941d1aebcb98fb9e9c0a69069e8d)
+- Updated Italian translation using Weblate by @Wiccio in [#1221](https://github.com/spacecowboy/feeder/pull/1221) 
+
+### ❤️  New Contributors
+* @YujiSoftware made their first contribution
+
 ## [2.23.1] - 2026-09-10
 
 ### 🐛 Bug Fixes & Minor Changes
@@ -343,7 +365,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.14.0] - 2025-09-14
 
 ### 🚀 Features
-- Added setting to automatically summarize article when opened (if OpenAI API key configured) (#895) by @npnpatidar in [#895](https://github.com/spacecowboy/feeder/pull/895) 
+- Added setting to automatically summarize article when opened (if OpenAI API key configured) (#895) in [#895](https://github.com/spacecowboy/feeder/pull/895) 
 
 ### 🐛 Bug Fixes & Minor Changes
 - Include newly added settings in OPML export (#904) by @spacecowboy in [#904](https://github.com/spacecowboy/feeder/pull/904) 
@@ -369,7 +391,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @ebraminio made their first contribution in [#908](https://github.com/spacecowboy/feeder/pull/908)
 * @gbpu made their first contribution
-* @npnpatidar made their first contribution in [#895](https://github.com/spacecowboy/feeder/pull/895)
 
 ## [2.13.0] - 2025-08-26
 
@@ -4862,6 +4883,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ❤️  New Contributors
 * @spacecowboy made their first contribution
 
+[2.23.2]: https://github.com/spacecowboy/feeder/compare/2.23.1..2.23.2
 [2.23.1]: https://github.com/spacecowboy/feeder/compare/2.23.0..2.23.1
 [2.23.0]: https://github.com/spacecowboy/feeder/compare/2.22.0..2.23.0
 [2.22.0]: https://github.com/spacecowboy/feeder/compare/2.21.2..2.22.0
