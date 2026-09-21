@@ -501,7 +501,13 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText(ids = emptySet(), "\nCode\n  block", LinearTextBlockStyle.CODE_BLOCK, LinearTextAnnotation(LinearTextAnnotationCode, 0, 12)),
+            LinearText(
+                ids = emptySet(),
+                "\nCode\n  block",
+                LinearTextBlockStyle.CODE_BLOCK,
+                LinearTextAnnotation(data = LinearTextAnnotationMonospace, start = 0, end = 12),
+                LinearTextAnnotation(LinearTextAnnotationCode, 0, 12),
+            ),
             result[0],
         )
     }
@@ -514,7 +520,12 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText(ids = emptySet(), "Code\n  block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(
+                ids = emptySet(),
+                "Code\n  block",
+                LinearTextBlockStyle.PRE_FORMATTED,
+                LinearTextAnnotation(data = LinearTextAnnotationMonospace, start = 0, end = 11),
+            ),
             result[0],
         )
     }
@@ -527,7 +538,7 @@ class HtmlLinearizerTest {
 
         assertEquals(1, result.size, "Expected one item: $result")
         assertEquals(
-            LinearText(ids = emptySet(), "Not a code block", LinearTextBlockStyle.PRE_FORMATTED),
+            LinearText(ids = emptySet(), "Not a code block", LinearTextBlockStyle.PRE_FORMATTED, LinearTextAnnotation(data = LinearTextAnnotationMonospace, start = 0, end = 15)),
             result[0],
         )
     }
