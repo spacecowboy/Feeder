@@ -41,7 +41,7 @@ paging = "3.5.1"
 accompanist = "0.37.3"
 coil = "3.6.3"
 androidWindow = "1.5.1"
-lazycolumnscrollbar = "2.2.0"
+lazycolumnscrollbar = "3.0.0"
 androidxBrowser = "1.10.0"
 jetbrains-markdown = "0.7.14"
 junit = "4.13.2"
@@ -120,7 +120,7 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "moshi" }
 qrgen = { module = "com.github.kenglxn.qrgen:android", version.ref = "qrgen" }
-lazycolumnscrollbar = { module = "com.github.nanihadesuka:LazyColumnScrollbar", version.ref = "lazycolumnscrollbar" }
+lazycolumnscrollbar = { module = "com.github.nanihadesuka.LazyColumnScrollbar:lazycolumnscrollbar", version.ref = "lazycolumnscrollbar" }
 emoji2-view-helper = { module = "androidx.emoji2:emoji2-views-helper", version.ref = "emoji2" }
 emoji2 = { module = "androidx.emoji2:emoji2", version.ref = "emoji2" }
 junit = { module = "junit:junit", version.ref = "junit" }
