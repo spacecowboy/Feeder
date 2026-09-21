@@ -85,48 +85,39 @@ android {
         }
         if (project.hasProperty("STORE_FILE")) {
             create("release") {
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val STORE_FILE: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val STORE_PASSWORD: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val KEY_ALIAS: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val KEY_PASSWORD: String by project.properties
-                storeFile = file(STORE_FILE)
-                storePassword = STORE_PASSWORD
-                keyAlias = KEY_ALIAS
-                keyPassword = KEY_PASSWORD
+                storeFile = file(project.property("STORE_FILE") as String)
+                storePassword = project.findProperty("STORE_PASSWORD") as String?
+                keyAlias = project.findProperty("KEY_ALIAS") as String?
+                keyPassword = project.findProperty("KEY_PASSWORD") as String?
             }
         }
     }
 
     buildTypes {
-        val debug by getting {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            applicationIdSuffix = ".debug"
-            isPseudoLocalesEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-            signingConfig = signingConfigs.getByName("shareddebug")
-        }
-        val release by getting {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-            if (project.hasProperty("STORE_FILE")) {
-                signingConfig = signingConfigs.getByName("release")
+        val debug =
+            getByName("debug") {
+                isMinifyEnabled = false
+                isShrinkResources = false
+                applicationIdSuffix = ".debug"
+                isPseudoLocalesEnabled = true
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro",
+                )
+                signingConfig = signingConfigs.getByName("shareddebug")
             }
-        }
+        val release =
+            getByName("release") {
+                isMinifyEnabled = true
+                isShrinkResources = true
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro",
+                )
+                if (project.hasProperty("STORE_FILE")) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
+            }
         // See androidComponents below for related configurations
         flavorDimensions += "store"
         productFlavors {

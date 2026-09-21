@@ -156,7 +156,7 @@ class MigrationFrom36To37(
     DIAware {
     private val filePathProvider: FilePathProvider by instance()
 
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         Log.i(LOG_TAG, "Starting migration of article files from oldArticleDir to articleDir")
 
         try {
@@ -196,8 +196,8 @@ class MigrationFrom37To38(
     override val di: DI,
 ) : Migration(37, 38),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN summarize_on_open INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -207,8 +207,8 @@ class MigrationFrom37To38(
 
 @Suppress("ClassName")
 object MIGRATION_38_39 : Migration(38, 39) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN fetch_og_images INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -218,13 +218,13 @@ object MIGRATION_38_39 : Migration(38, 39) {
 
 @Suppress("ClassName")
 object MIGRATION_39_40 : Migration(39, 40) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN block_rules TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN allow_rules TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
@@ -236,9 +236,9 @@ class MigrationFrom35To36(
     override val di: DI,
 ) : Migration(35, 36),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // TODO add column retry_after to feeds, default epoch, not null
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN retry_after INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -250,16 +250,16 @@ class MigrationFrom34To35(
     override val di: DI,
 ) : Migration(34, 35),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("drop view feeds_with_items_for_nav_drawer")
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("drop view feeds_with_items_for_nav_drawer")
 
-        database.execSQL("alter table feed_items add column block_time integer default null")
-        database.execSQL("create index index_feed_items_block_time on feed_items (block_time)")
+        db.execSQL("alter table feed_items add column block_time integer default null")
+        db.execSQL("create index index_feed_items_block_time on feed_items (block_time)")
 
         // Room schema is anal about whitespace
         @Suppress("ktlint:standard:max-line-length")
         val sql = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where block_time is null\n    )\n    ON feeds.id = feed_id"
-        database.execSQL(sql)
+        db.execSQL(sql)
 
         runOnceBlocklistUpdate(di)
     }
@@ -269,11 +269,11 @@ class MigrationFrom33To34(
     override val di: DI,
 ) : Migration(33, 34),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // Room schema is anal about whitespace
         @Suppress("ktlint:standard:max-line-length")
         val sql = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where not exists(select 1 from blocklist where lower(feed_items.plain_title) glob blocklist.glob_pattern)\n    )\n    ON feeds.id = feed_id"
-        database.execSQL(sql)
+        db.execSQL(sql)
     }
 }
 
@@ -281,8 +281,8 @@ class MigrationFrom32To33(
     override val di: DI,
 ) : Migration(32, 33),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feeds add column skip_duplicates integer not null default 0
             """.trimIndent(),
@@ -294,8 +294,8 @@ class MigrationFrom31To32(
     override val di: DI,
 ) : Migration(31, 32),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feed_items add column image_from_body integer not null default 0
             """.trimIndent(),
@@ -307,8 +307,8 @@ class MigrationFrom30To31(
     override val di: DI,
 ) : Migration(30, 31),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feed_items add column word_count_full integer not null default 0
             """.trimIndent(),
@@ -320,8 +320,8 @@ class MigrationFrom29To30(
     override val di: DI,
 ) : Migration(29, 30),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feed_items add column word_count integer not null default 0
             """.trimIndent(),
@@ -333,8 +333,8 @@ class MigrationFrom28To29(
     override val di: DI,
 ) : Migration(28, 29),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feed_items add column enclosure_type text
             """.trimIndent(),
@@ -346,8 +346,8 @@ class MigrationFrom27To28(
     override val di: DI,
 ) : Migration(27, 28),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             alter table feeds add column site_fetched integer not null default 0
             """.trimIndent(),
@@ -359,14 +359,14 @@ class MigrationFrom26To27(
     override val di: DI,
 ) : Migration(26, 27),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN read_time INTEGER DEFAULT null
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             update feed_items
                 set read_time = 1690317917000
@@ -380,15 +380,15 @@ class MigrationFrom25To26(
     override val di: DI,
 ) : Migration(25, 26),
     DIAware {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE UNIQUE INDEX idx_feed_items_cursor
             ON feed_items (primary_sort_time, pub_date, id)
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             update feed_items
                 set bookmarked = 1
@@ -404,8 +404,8 @@ class MigrationFrom24To25(
     DIAware {
     private val filePathProvider: FilePathProvider by instance()
 
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN fulltext_downloaded INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -450,8 +450,8 @@ class MigrationFrom23To24(
     DIAware {
     private val sharedPrefs: SharedPreferences by instance()
 
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `blocklist`
                 (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -459,7 +459,7 @@ class MigrationFrom23To24(
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_blocklist_glob_pattern` on `blocklist` (`glob_pattern`)
             """.trimIndent(),
@@ -474,7 +474,7 @@ class MigrationFrom23To24(
             val valuesList = blocks.joinToString(separator = ",") { "('*$it*')" }
 
             try {
-                database.execSQL(
+                db.execSQL(
                     """
                     INSERT INTO `blocklist`
                         (`glob_pattern`)
@@ -495,8 +495,8 @@ class MigrationFrom23To24(
 
 @Suppress("ClassName")
 object MIGRATION_22_23 : Migration(22, 23) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN bookmarked INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -506,8 +506,8 @@ object MIGRATION_22_23 : Migration(22, 23) {
 
 @Suppress("ClassName")
 object MIGRATION_21_22 : Migration(21, 22) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -517,47 +517,47 @@ object MIGRATION_21_22 : Migration(21, 22) {
 
 @Suppress("ClassName")
 object MIGRATION_20_21 : Migration(20, 21) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE sync_remote
               ADD COLUMN secret_key TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE sync_remote
               ADD COLUMN last_feeds_remote_hash INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE feeds
               ADD COLUMN when_modified INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `remote_feed` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `url` TEXT NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_remote_feed_sync_remote_url` ON `remote_feed` (`sync_remote`, `url`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_remote_feed_url` ON `remote_feed` (`url`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_remote_feed_sync_remote` ON `remote_feed` (`sync_remote`)
             """.trimIndent(),
         )
         // And generate encryption key
-        database.execSQL(
+        db.execSQL(
             """
             UPDATE sync_remote
             SET secret_key = ?
@@ -570,30 +570,30 @@ object MIGRATION_20_21 : Migration(20, 21) {
 
 @Suppress("ClassName")
 object MIGRATION_19_20 : Migration(19, 20) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE sync_remote
               ADD COLUMN device_id INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE sync_remote
               ADD COLUMN device_name TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `sync_device` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `device_id` INTEGER NOT NULL, `device_name` TEXT NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_device_sync_remote_device_id` ON `sync_device` (`sync_remote`, `device_id`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_sync_device_sync_remote` ON `sync_device` (`sync_remote`)
             """.trimIndent(),
@@ -603,28 +603,28 @@ object MIGRATION_19_20 : Migration(19, 20) {
 
 @Suppress("ClassName")
 object MIGRATION_18_19 : Migration(18, 19) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `remote_read_mark` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `feed_url` TEXT NOT NULL, `guid` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_remote_read_mark_sync_remote_feed_url_guid` ON `remote_read_mark` (`sync_remote`, `feed_url`, `guid`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_remote_read_mark_feed_url_guid` ON `remote_read_mark` (`feed_url`, `guid`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_remote_read_mark_sync_remote` ON `remote_read_mark` (`sync_remote`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_remote_read_mark_timestamp` ON `remote_read_mark` (`timestamp`)
             """.trimIndent(),
@@ -634,23 +634,23 @@ object MIGRATION_18_19 : Migration(18, 19) {
 
 @Suppress("ClassName")
 object MIGRATION_17_18 : Migration(17, 18) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `read_status_synced` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `feed_item` INTEGER NOT NULL, FOREIGN KEY(`feed_item`) REFERENCES `feed_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_read_status_synced_feed_item_sync_remote` ON `read_status_synced` (`feed_item`, `sync_remote`)
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_read_status_synced_feed_item` ON `read_status_synced` (`feed_item`);
             """.trimIndent(),
         )
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_read_status_synced_sync_remote` ON `read_status_synced` (`sync_remote`);
             """.trimIndent(),
@@ -660,8 +660,8 @@ object MIGRATION_17_18 : Migration(17, 18) {
 
 @Suppress("ClassName")
 object MIGRATION_16_17 : Migration(16, 17) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE sync_remote (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `sync_chain_id` TEXT NOT NULL, `latest_message_timestamp` INTEGER NOT NULL);
             """.trimIndent(),
@@ -671,8 +671,8 @@ object MIGRATION_16_17 : Migration(16, 17) {
 
 @Suppress("ClassName")
 object MIGRATION_15_16 : Migration(15, 16) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN currently_syncing INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -682,8 +682,8 @@ object MIGRATION_15_16 : Migration(15, 16) {
 
 @Suppress("ClassName")
 object MIGRATION_14_15 : Migration(14, 15) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN alternate_id INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -693,8 +693,8 @@ object MIGRATION_14_15 : Migration(14, 15) {
 
 @Suppress("ClassName")
 object MIGRATION_13_14 : Migration(13, 14) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN open_articles_with TEXT NOT NULL DEFAULT ''
             """.trimIndent(),
@@ -704,8 +704,8 @@ object MIGRATION_13_14 : Migration(13, 14) {
 
 @Suppress("ClassName")
 object MIGRATION_12_13 : Migration(12, 13) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN fulltext_by_default INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -715,8 +715,8 @@ object MIGRATION_12_13 : Migration(12, 13) {
 
 @Suppress("ClassName")
 object MIGRATION_11_12 : Migration(11, 12) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN primary_sort_time INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -726,8 +726,8 @@ object MIGRATION_11_12 : Migration(11, 12) {
 
 @Suppress("ClassName")
 object MIGRATION_10_11 : Migration(10, 11) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN first_synced_time INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -737,14 +737,14 @@ object MIGRATION_10_11 : Migration(10, 11) {
 
 @Suppress("ClassName")
 object MIGRATION_9_10 : Migration(9, 10) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `feed_items_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             INSERT INTO `feed_items_new` (`id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id`)
             SELECT `id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id` FROM `feed_items`
@@ -753,7 +753,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
 
         // Iterate over all items using the minimum query. Also restrict the text field to
         // 1 MB which should be safe enough considering the window size is 2MB large.
-        database
+        db
             .query(
                 """
                 SELECT id, substr(description,0,1000000) FROM feed_items
@@ -772,25 +772,25 @@ object MIGRATION_9_10 : Migration(9, 10) {
                 }
             }
 
-        database.execSQL(
+        db.execSQL(
             """
             DROP TABLE feed_items
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             ALTER TABLE feed_items_new RENAME TO feed_items
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_feed_items_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
             """.trimIndent(),
         )
 
-        database.execSQL(
+        db.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_feed_items_feed_id` ON `feed_items` (`feed_id`)
             """.trimIndent(),
@@ -798,7 +798,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
 
         // And reset response hash on all feeds to trigger parsing of results next sync so items
         // are written disk (in case migration substring was too short)
-        database.execSQL(
+        db.execSQL(
             """
             UPDATE `feeds` SET `response_hash` = 0
             """.trimIndent(),
@@ -808,8 +808,8 @@ object MIGRATION_9_10 : Migration(9, 10) {
 
 @Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_8_9 : Migration(8, 9) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN response_hash INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -819,8 +819,8 @@ object MIGRATION_8_9 : Migration(8, 9) {
 
 @Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_7_8 : Migration(7, 8) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL(
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN last_sync INTEGER NOT NULL DEFAULT 0
             """.trimIndent(),
@@ -830,59 +830,59 @@ object MIGRATION_7_8 : Migration(7, 8) {
 
 @Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_6_7 : Migration(6, 7) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        legacyMigration(database, 6)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        legacyMigration(db, 6)
     }
 }
 
 @Suppress("ktlint:standard:property-naming", "ClassName")
 object MIGRATION_5_7 : Migration(5, 7) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        legacyMigration(database, 5)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        legacyMigration(db, 5)
     }
 }
 
 private fun legacyMigration(
-    database: SupportSQLiteDatabase,
+    db: SupportSQLiteDatabase,
     version: Int,
 ) {
     // Create new tables and indices
     // Feeds
-    database.execSQL(
+    db.execSQL(
         """
         CREATE TABLE IF NOT EXISTS `feeds` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `custom_title` TEXT NOT NULL, `url` TEXT NOT NULL, `tag` TEXT NOT NULL, `notify` INTEGER NOT NULL, `image_url` TEXT)
         """.trimIndent(),
     )
-    database.execSQL(
+    db.execSQL(
         """
         CREATE UNIQUE INDEX `index_Feed_url` ON `feeds` (`url`)
         """.trimIndent(),
     )
-    database.execSQL(
+    db.execSQL(
         """
         CREATE UNIQUE INDEX `index_Feed_id_url_title` ON `feeds` (`id`, `url`, `title`)
         """.trimIndent(),
     )
 
     // Items
-    database.execSQL(
+    db.execSQL(
         """
         CREATE TABLE IF NOT EXISTS `feed_items` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
         """.trimIndent(),
     )
-    database.execSQL(
+    db.execSQL(
         """
         CREATE UNIQUE INDEX `index_feed_item_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
         """.trimIndent(),
     )
-    database.execSQL(
+    db.execSQL(
         """
         CREATE  INDEX `index_feed_item_feed_id` ON `feed_items` (`feed_id`)
         """.trimIndent(),
     )
 
     // Migrate to new tables
-    database
+    db
         .query(
             """
             SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
@@ -893,7 +893,7 @@ private fun legacyMigration(
                 val oldFeedId = cursor.getLong(0)
 
                 val newFeedId =
-                    database.insert(
+                    db.insert(
                         "feeds",
                         SQLiteDatabase.CONFLICT_FAIL,
                         contentValues {
@@ -908,7 +908,7 @@ private fun legacyMigration(
                         },
                     )
 
-                database
+                db
                     .query(
                         """
                         SELECT title, description, plainTitle, plainSnippet, imageUrl, link, author,
@@ -917,9 +917,9 @@ private fun legacyMigration(
                         WHERE feed = $oldFeedId
                         """.trimIndent(),
                     ).use { cursor ->
-                        database.inTransaction {
+                        db.inTransaction {
                             cursor.forEach { _ ->
-                                database.insert(
+                                db.insert(
                                     "feed_items",
                                     SQLiteDatabase.CONFLICT_FAIL,
                                     contentValues {
@@ -945,13 +945,13 @@ private fun legacyMigration(
         }
 
     // Remove all legacy content
-    database.execSQL("DROP TRIGGER IF EXISTS trigger_tag_updater")
+    db.execSQL("DROP TRIGGER IF EXISTS trigger_tag_updater")
 
-    database.execSQL("DROP VIEW IF EXISTS WithUnreadCount")
-    database.execSQL("DROP VIEW IF EXISTS TagsWithUnreadCount")
+    db.execSQL("DROP VIEW IF EXISTS WithUnreadCount")
+    db.execSQL("DROP VIEW IF EXISTS TagsWithUnreadCount")
 
-    database.execSQL("DROP TABLE IF EXISTS Feed")
-    database.execSQL("DROP TABLE IF EXISTS FeedItem")
+    db.execSQL("DROP TABLE IF EXISTS Feed")
+    db.execSQL("DROP TABLE IF EXISTS FeedItem")
 }
 
 fun SupportSQLiteDatabase.inTransaction(init: (SupportSQLiteDatabase) -> Unit) {

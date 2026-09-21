@@ -676,7 +676,7 @@ class FeedParserTest : DIAware {
             assertEquals("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss", feed.feed_url)
 
             assertEquals(25, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
@@ -710,7 +710,7 @@ class FeedParserTest : DIAware {
             assertEquals("https://cornucopia.cornubot.se/feeds/posts/default", feed.feed_url, "did not expect URL to change. going from https to http should not be automatic")
 
             assertEquals(25, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
@@ -741,7 +741,7 @@ class FeedParserTest : DIAware {
             val feed = cowboyAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
             assertEquals(15, feed.items!!.size)
-            val item = feed.items!![1]
+            val item = feed.items[1]
 
             assertEquals("http://cowboyprogrammer.org/dummy-id-to-distinguis-from-alternate-link", item.id)
             assertTrue(item.date_published!!.contains("2016"), "Should take the updated timestamp")
@@ -763,7 +763,7 @@ class FeedParserTest : DIAware {
             assertEquals("https://blog.acolyer.org/feed/", feed.feed_url)
 
             assertEquals(10, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "Thou shalt not depend on me: analysing the use of outdated JavaScript libraries on the web",
@@ -785,7 +785,7 @@ class FeedParserTest : DIAware {
             assertEquals("https://rss.slashdot.org/Slashdot/slashdotMain", feed.feed_url)
 
             assertEquals(15, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "https://a.fsdn.com/sd/topics/topicslashdot.gif",
@@ -824,7 +824,7 @@ class FeedParserTest : DIAware {
             assertEquals("http://londonist.com/feed", feed.feed_url)
 
             assertEquals(40, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "Make The Most Of London's Offerings With Chip",
@@ -903,7 +903,7 @@ class FeedParserTest : DIAware {
             assertEquals("http://www.fz.se/nyheter/", feed.home_page_url)
 
             assertEquals(20, feed.items!!.size)
-            val item = feed.items!!.first()
+            val item = feed.items.first()
 
             assertEquals(
                 "Nier: Automata bjuder på maffig lanseringstrailer",
@@ -931,7 +931,7 @@ class FeedParserTest : DIAware {
         runBlocking {
             val feed = contentTypeHtml.use { feedParser.parseFeedResponse(it) }
 
-            val gofeed = contentTypeHtml.use { exp.parseBody(it.body?.string() ?: "") }
+            val gofeed = contentTypeHtml.use { exp.parseBody(it.body.string()) }
             print(gofeed)
 
             val item = feed.getOrNull()?.items!!.single()
@@ -941,7 +941,7 @@ class FeedParserTest : DIAware {
             )
 
             assertTrue(
-                item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon &lt;- ncvar_get(nc.obs, 'lon')"),
+                item.content_html.contains(" <pre><code class=\"language-R\">obs.lon &lt;- ncvar_get(nc.obs, 'lon')"),
             )
         }
 
