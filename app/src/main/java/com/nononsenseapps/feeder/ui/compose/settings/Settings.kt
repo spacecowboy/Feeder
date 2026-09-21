@@ -60,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -1445,8 +1444,10 @@ fun SwitchSetting(
     icon: @Composable (() -> Unit)? = {},
     enabled: Boolean = true,
 ) {
-    val context = LocalContext.current
     val dimens = LocalDimens.current
+    val onString = stringResource(R.string.on)
+    val offString = stringResource(R.string.off)
+
     Row(
         modifier =
             modifier
@@ -1458,8 +1459,8 @@ fun SwitchSetting(
                 ).safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
-                            true -> context.getString(R.string.on)
-                            else -> context.getString(R.string.off)
+                            true -> onString
+                            else -> offString
                         }
                     role = Role.Switch
                 },

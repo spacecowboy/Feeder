@@ -690,6 +690,9 @@ fun FeedScreen(
                                             onShowFilterMenu(false)
                                         },
                             ) {
+                                val selectedString = stringResource(androidx.compose.ui.R.string.selected)
+                                val notSelectedString = stringResource(androidx.compose.ui.R.string.not_selected)
+
                                 DropdownMenuItem(
                                     enabled = false,
                                     onClick = { /* Can't be modified - only shown for completeness */ },
@@ -710,8 +713,8 @@ fun FeedScreen(
                                             .safeSemantics {
                                                 stateDescription =
                                                     when (viewState.filter.unread) {
-                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                        true -> selectedString
+                                                        else -> notSelectedString
                                                     }
                                                 role = Role.Checkbox
                                             },
@@ -738,8 +741,8 @@ fun FeedScreen(
                                             .safeSemantics {
                                                 stateDescription =
                                                     when (viewState.filter.saved) {
-                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                        true -> selectedString
+                                                        else -> notSelectedString
                                                     }
                                                 role = Role.Checkbox
                                             },
@@ -766,8 +769,8 @@ fun FeedScreen(
                                             .safeSemantics {
                                                 stateDescription =
                                                     when (viewState.filter.recentlyRead) {
-                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                        true -> selectedString
+                                                        else -> notSelectedString
                                                     }
                                                 role = Role.Checkbox
                                             },
@@ -795,8 +798,8 @@ fun FeedScreen(
                                             .safeSemantics {
                                                 stateDescription =
                                                     when (viewState.filter.read) {
-                                                        true -> context.getString(androidx.compose.ui.R.string.selected)
-                                                        else -> context.getString(androidx.compose.ui.R.string.not_selected)
+                                                        true -> selectedString
+                                                        else -> notSelectedString
                                                     }
                                                 role = Role.Checkbox
                                             },
