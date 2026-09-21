@@ -9,15 +9,16 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
-val commitCount by project.extra {
+project.extra.set(
+    "commitCount",
     providers
         .exec {
             commandLine("git", "rev-list", "--count", "HEAD")
         }.standardOutput.asText
         .get()
         .trim()
-        .toInt()
-}
+        .toInt(),
+)
 
 val kotlinToolchainVersion =
     JavaVersion
@@ -136,7 +137,7 @@ android {
             create("play") {
                 dimension = "store"
                 versionName = "2.23.2"
-                versionCode = commitCount
+                versionCode = project.extra["commitCount"] as Int?
                 applicationIdSuffix = ".play"
             }
         }
