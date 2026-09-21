@@ -149,7 +149,6 @@
     <string name="failed_to_export_saved_articles">Neizdevās izgūt atzīmētos rakstus</string>
     <string name="failed_to_import_OPML">Neizdevās ievietot OPML datni</string>
     <string name="import_x_feeds_with_y_tags">Vai ievietot %1$s, kas satur %2$s?</string>
-    <string name="nostr_feed_description">Nostr raksti no %1$s</string>
     <string name="empty_feed_open">Vai <annotation style="link">atvērt</annotation> citu ziņu plūsmu?</string>
     <string name="unsave_article">Noņemt no atzīmētiem</string>
     <string name="check_for_updates">Atsvaidzināt ziņu plūsmas…</string>

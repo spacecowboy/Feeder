@@ -249,7 +249,6 @@
     <string name="touch_to_play_audio">Atingeți pentru a reda audio</string>
     <string name="skip_duplicate_articles_desc">Articolele cu linkuri sau titluri identice cu articole existente sunt ignorate</string>
     <string name="feed_item_style_compact_card">Card compact</string>
-    <string name="nostr_feed_description">Articole Nostr de %1$s</string>
     <string name="time_out">Timp de așteptare (secunde)</string>
     <string name="time_out_validation_error">Timpul de așteptare trebuie să fie între 30 și 600 de secunde</string>
     <string name="time_out_placeholder">Timp de așteptare pentru cererile OpenAI</string>

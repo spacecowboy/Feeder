@@ -261,7 +261,6 @@
     <string name="azure_deployment_id">ID della distribuzione di Azure</string>
     <string name="list_of_available_models">Elenco dei modelli disponibili</string>
     <string name="open_drawer_on_fab">Mostra i feed dopo averli contrassegnati come letti</string>
-    <string name="nostr_feed_description">Articoli di Nostr da %1$s</string>
     <string name="on">Abilitato</string>
     <string name="off">Disabilitato</string>
     <string name="text">Testo</string>

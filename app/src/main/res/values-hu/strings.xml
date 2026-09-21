@@ -261,7 +261,6 @@
     <string name="unable_to_load_models">Nem lehet betölteni a modelleket.</string>
     <string name="show_message">Üzenet megjelenítése</string>
     <string name="open_drawer_on_fab">Hírforrások megjelenítése miután az összes cikk meg lett jelölve olvasottként</string>
-    <string name="nostr_feed_description">%1$s Nostr-cikkei</string>
     <string name="off">Kikapcsolva</string>
     <string name="on">Bekapcsolva</string>
     <string name="search_verb">Keresés</string>

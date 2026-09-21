@@ -183,7 +183,6 @@
     <string name="new_indicator">Ny</string>
     <string name="feed_icon">Informasjonkanalsikon</string>
     <string name="article_image">Artikkelbilde</string>
-    <string name="nostr_feed_description">Nostr artikler av %1$s</string>
     <string name="open_article_in_default_browser">Åpne i standard nettleser</string>
     <string name="open_article_in_custom_tab">Åpne i tilpasset fane</string>
     <string name="no_article_link_browser">Klarte ikke åpne artikkelen i nettleseren</string>
