@@ -231,11 +231,13 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     "pre" -> {
                         emitParagraph()
                         // TODO some TTS annotation?
-                        appendTextChildren(
-                            element.childNodes(),
-                            preFormatted = true,
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                preFormatted = true,
+                                baseUrl = baseUrl,
+                            )
+                        }
                         emitParagraph()
                     }
 

@@ -1125,11 +1125,17 @@ private fun PreviewCodeBlock() {
 @PreviewLightDark
 @Composable
 private fun PreviewPreFormatted() {
+    val t = "This is pre-formatted text\n     with some indentation"
     val preFormatted =
         LinearText(
-            ids = emptySet(),
-            text = "This is pre-formatted text\n    with some indentation",
-            blockStyle = LinearTextBlockStyle.PRE_FORMATTED,
+            ids = emptySet<String>(),
+            text = t,
+            blockStyle = LinearTextBlockStyle.CODE_BLOCK,
+            LinearTextAnnotation(
+                LinearTextAnnotationMonospace,
+                start = 0,
+                end = t.lastIndex,
+            ),
         )
 
     PreviewContent(preFormatted)
