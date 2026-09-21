@@ -246,7 +246,6 @@
     <string name="export_saved_articles">保存した記事をエクスポート</string>
     <string name="failed_to_export_saved_articles">保存した記事のエクスポートに失敗しました</string>
     <string name="feed_item_style_compact_card">コンパクトなカード</string>
-    <string name="nostr_feed_description">%1$sによるNostrの記事</string>
     <string name="skip_duplicate_articles">重複記事をスキップする</string>
     <string name="azure_api_version">Azure APIのバージョン</string>
     <string name="show_message">メッセージを表示</string>

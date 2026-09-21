@@ -261,7 +261,6 @@
     <string name="azure_deployment_id">ID розгортання Azure</string>
     <string name="list_of_available_models">Список доступних моделей</string>
     <string name="open_drawer_on_fab">Показувати стрічки після позначення всіх прочитаними</string>
-    <string name="nostr_feed_description">Статті Nostr від %1$s</string>
     <string name="on">Увімк.</string>
     <string name="summarize">Короткий опис</string>
     <string name="cancel_search">Скасувати пошук</string>

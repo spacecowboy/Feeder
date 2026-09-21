@@ -261,7 +261,6 @@
     <string name="openai_settings">AI மற்றும் மொழிபெயர்ப்பு</string>
     <string name="api_key">பநிஇ விசை</string>
     <string name="model_id">மாதிரி ஐடி</string>
-    <string name="nostr_feed_description">%1$s இன் Nostr கட்டுரைகள்</string>
     <string name="feed_search_suggestions_header">பரிந்துரைகள்</string>
     <string name="time_out">நேரம் முடிந்தது (வினாடிகள்)</string>
     <string name="time_out_validation_error">காலக்கெடு 30 முதல் 600 வினாடிகளுக்குள் இருக்க வேண்டும்</string>

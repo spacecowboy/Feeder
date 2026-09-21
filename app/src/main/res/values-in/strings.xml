@@ -261,7 +261,6 @@
     <string name="list_of_available_models">Daftar model yang tersedia</string>
     <string name="model_id">ID Model</string>
     <string name="azure_deployment_id">ID deployment azure</string>
-    <string name="nostr_feed_description">Artikel Nostr oleh %1$s</string>
     <string name="on">Aktif</string>
     <string name="off">Nonaktif</string>
     <string name="time_out">Waktu habis (detik)</string>

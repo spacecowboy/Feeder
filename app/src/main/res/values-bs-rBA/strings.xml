@@ -263,7 +263,6 @@
     <string name="api_key">API ključ</string>
     <string name="model_id">ID modela</string>
     <string name="azure_api_version">Verzija Azure API-ja</string>
-    <string name="nostr_feed_description">Nostraj članke od %1$s</string>
     <string name="feed_search_suggestions_header">Prijedlozi</string>
     <string name="import_saved_articles">Uvezi sačuvane članke</string>
     <string name="apply_blocklist_to_summaries">Primijeni na sažetke</string>

@@ -256,7 +256,6 @@
     <string name="summarize">Resumir</string>
     <string name="openai_settings">IA e tradução</string>
     <string name="api_key">Chave API</string>
-    <string name="nostr_feed_description">Artigos Nostr por %1$s</string>
     <string name="time_out">Tempo limite (segundos)</string>
     <string name="time_out_validation_error">Tempo limite deve ser entre 30 e 600 segundos</string>
     <string name="time_out_placeholder">Tempo limite para solicitações da OpenAI</string>
