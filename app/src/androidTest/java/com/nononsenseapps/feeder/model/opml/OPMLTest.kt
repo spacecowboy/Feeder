@@ -360,6 +360,48 @@ class OPMLTest : DIAware {
         }
 
     @Throws(IOException::class)
+    @MediumTest
+    @Test
+    fun multiLineRulesRoundTripThroughOpml() =
+        runBlocking {
+            val blockRules = "Title=(?i)sponsored\nURL=ads & \"tracking\""
+            val allowRules = "Tag=(?i)linux\nAuthor=Bob"
+
+            db.feedDao().insertFeed(
+                Feed(
+                    url = URL("http://example.com/rules.xml"),
+                    title = "rules",
+                    tag = "rules",
+                    blockRules = blockRules,
+                    allowRules = allowRules,
+                ),
+            )
+
+            writeFile(
+                path = path!!.absolutePath,
+                settings = emptyMap(),
+                blockedPatterns = emptyList(),
+                tags = getTags(),
+            ) { tag ->
+                db.feedDao().getFeedsByTitle(tag = tag)
+            }
+
+            // Wipe and read back through the real XmlPullParser - the only thing which
+            // catches XML attribute-value newline normalization.
+            db.feedDao().getAllFeeds().forEach { db.feedDao().deleteFeed(it) }
+            assertEquals(0, db.feedDao().getAllFeeds().size)
+
+            val parser = OpmlPullParser(opmlParserHandler)
+            parser.parseFile(path!!.canonicalPath).leftOrNull()?.let { e ->
+                fail("Failed to parse file: ${e.throwable}")
+            }
+
+            val feed = db.feedDao().getAllFeeds().single()
+
+            assertEquals(blockRules, feed.blockRules)
+            assertEquals(allowRules, feed.allowRules)
+        }
+
     private fun writeSampleFile() =
         runBlocking {
             // Use test write to write the sample file

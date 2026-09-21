@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.nononsenseapps.feeder.db.COL_ALLOW_RULES
 import com.nononsenseapps.feeder.db.COL_ALTERNATE_ID
+import com.nononsenseapps.feeder.db.COL_BLOCK_RULES
 import com.nononsenseapps.feeder.db.COL_CURRENTLY_SYNCING
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FETCH_OG_IMAGES
@@ -63,6 +65,8 @@ data class Feed
         @ColumnInfo(name = COL_RETRY_AFTER) var retryAfter: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_SUMMARIZE_ON_OPEN) var summarizeOnOpen: Boolean = false,
         @ColumnInfo(name = COL_FETCH_OG_IMAGES) var fetchOgImages: Boolean = false,
+        @ColumnInfo(name = COL_BLOCK_RULES) var blockRules: String = "",
+        @ColumnInfo(name = COL_ALLOW_RULES) var allowRules: String = "",
     ) {
         constructor() : this(id = ID_UNSET)
 
