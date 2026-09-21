@@ -347,11 +347,13 @@ class HtmlLinearizer(
                                         LinearTextBlockStyle.PRE_FORMATTED
                                     },
                             ) {
-                                linearizeChildren(
-                                    element.childNodes(),
-                                    blockStyle = it,
-                                    baseUrl = baseUrl,
-                                )
+                                withLinearTextAnnotation(LinearTextAnnotationMonospace) {
+                                    linearizeChildren(
+                                        element.childNodes(),
+                                        blockStyle = it,
+                                        baseUrl = baseUrl,
+                                    )
+                                }
                             }
                         }
 
