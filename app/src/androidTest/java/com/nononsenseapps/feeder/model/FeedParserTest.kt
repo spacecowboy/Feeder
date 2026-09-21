@@ -707,7 +707,7 @@ class FeedParserTest : DIAware {
             val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }.getOrNull()!!
 
             assertEquals("http://cornucopia.cornubot.se/", feed.home_page_url)
-            assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed.feed_url)
+            assertEquals("https://cornucopia.cornubot.se/feeds/posts/default", feed.feed_url, "did not expect URL to change. going from https to http should not be automatic")
 
             assertEquals(25, feed.items!!.size)
             val item = feed.items!!.first()
