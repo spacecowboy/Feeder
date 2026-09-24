@@ -213,7 +213,7 @@
     <string name="read_adjective">Przeczytane</string>
     <string name="saved_adjective">Zapisane</string>
     <string name="article_list_settings">Lista artykułów</string>
-    <string name="max_lines">Maks. liczba linii</string>
+    <string name="max_lines">Maks. liczba wierszy</string>
     <string name="show_only_title">Pokazuj tylko tytuł</string>
     <string name="failed_to_download">Nie udało się pobrać</string>
     <string name="failed_to_parse_the_page">Nie udało się przetworzyć strony</string>
@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Nie udało się pobrać silnika tłumaczenia offline</string>
     <string name="downloading_offline_translation_runtime">Pobieranie silnika tłumaczenia offline: %1$d%%</string>
     <string name="download">Pobierz</string>
+    <string name="article_filter_rules">Reguły filtrowania artykułów</string>
+    <string name="article_filter_rules_desc">Jedna reguła w każdym wierszu, zapisana jako FieldName=pattern. Dostępne pola to Title, URL, Author, Tag i Content. Wzorzec jest wyrażeniem regularnym, które pasuje do dowolnego miejsca w polu; zacznij od (?i), aby zignorować wielkość liter. Reguły zaczynają działać od następnego pobrania i nie mają wpływu na już zapisane artykuły</string>
+    <string name="block_rules">Reguły blokowania</string>
+    <string name="block_rules_desc">Pasujące artykuły nigdy nie są pobierane. W przeciwieństwie do listy zablokowanych nie można tego cofnąć: usunięcie reguły nie przywraca artykułów, które zostały już pominięte</string>
+    <string name="allow_rules">Reguły dopuszczania</string>
+    <string name="allow_rules_desc">Jeśli jakakolwiek reguła dopuszczająca jest ustawiona, tylko pasujące artykuły są pobierane. Reguła Tag jest pomijana w przypadku artykułów, które nie mają grup, więc kanał bez grup nie jest opróżniany przez samą regułę Tag</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="rule_error_missing_separator">Wiersz %1$d: brakujący \'=\'. Nieprawidłowe wiersze są ignorowane</string>
+    <string name="rule_error_unknown_field">Wiersz %1$d: \'%2$s\'nie jest znanym polem. Nieprawidłowe wiersze są ignorowane</string>
+    <string name="rule_error_empty_pattern">Wiersz %1$d: wzorzec jest pusty, więc pasowałby do wszystkiego. Nieprawidłowe wiersze są ignorowane</string>
+    <string name="rule_error_invalid_regex">Wiersz %1$d: nieprawidłowe wyrażenie regularne. Nieprawidłowe wiersze są ignorowane</string>
+    <string name="rule_error_too_many_rules">Wiersz %1$d: tylko pierwsze %2$d reguł(y) są (jest) stosowane (stosowanych). Kolejne wiersze są ignorowane</string>
 </resources>
