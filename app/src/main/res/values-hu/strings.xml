@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Nem sikerült letölteni az offline fordítómotort.</string>
     <string name="downloading_offline_translation_runtime">Offline fordítómotor letöltése: %1$d%%</string>
     <string name="download">Letöltés</string>
+    <string name="article_filter_rules">Cikkszűrési szabályok</string>
+    <string name="article_filter_rules_desc">Soronként egy szabály, MezőNév=minta formátumban. Az elérhető mezőnevek: Title (cím), URL (webcím), Author (szerző), Tag (címke) és Content (tartalom). A minta egy reguláris kifejezés, amely a mező bármely részére illeszkedhet; a kis- és nagybetűk megkülönböztetésének mellőzéséhez kezdje a mintát a (?i) karakterekkel. A szabályok a következő lekérdezéskor lépnek életbe, és nem érintik a már elmentett cikkeket.</string>
+    <string name="block_rules">Tiltási szabályok</string>
+    <string name="block_rules_desc">Az ezen szabályokra illeszkedő cikkek sosem töltődnek le. A tiltólistával ellentétben ez a művelet nem vonható vissza: egy szabály eltávolítása nem hozza vissza azokat a cikkeket, amelyek korábban kimaradtak.</string>
+    <string name="allow_rules">Engedélyezési szabályok</string>
+    <string name="allow_rules_desc">Ha be van állítva egy engedélyezési szabály, akkor csak az ahhoz illeszkedő cikkek lesznek letöltve. A címkézési szabály ki lesz hagyva azoknál a cikkeknél, amelyek nem tartalmaznak címkéket, így egy címke nélküli hírforrást nem ürít ki pusztán a címkézési szabály.</string>
+    <string name="article_rules_placeholder">Title=(?i)szponzorált</string>
+    <string name="rule_error_missing_separator">%1$d. sor: Hiányzik az „=”. Az érvénytelen sorokat a rendszer figyelmen kívül hagyja.</string>
+    <string name="rule_error_unknown_field">%1$d. sor: A(z) „%2$s” egy ismeretlen mezőnév. Az érvénytelen sorokat a rendszer figyelmen kívül hagyja.</string>
+    <string name="rule_error_empty_pattern">%1$d. sor: Nem lett megadva minta, ami mindenre illeszkedne. A hibás sorokat a rendszer figyelmen kívül hagyja.</string>
+    <string name="rule_error_invalid_regex">%1$d. sor: Érvénytelen reguláris kifejezést tartalmaz. A hibás sorokat a rendszer figyelmen kívül hagyja.</string>
+    <string name="rule_error_too_many_rules">%1$d. sor: Csak az első %2$d szabály van használatban. A további sorokat a rendszer figyelmen kívül hagyja.</string>
 </resources>

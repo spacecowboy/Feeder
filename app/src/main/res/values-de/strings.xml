@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Die Offline-Übersetzungsmaschine konnte nicht heruntergeladen werden.</string>
     <string name="downloading_offline_translation_runtime">Offline-Übersetzungsmaschine wird heruntergeladen: %1$d%%</string>
     <string name="download">Herunterladen</string>
+    <string name="article_filter_rules">Artikel-Filterregeln</string>
+    <string name="block_rules">Sperrregeln</string>
+    <string name="allow_rules_desc">Wenn eine Erlaubnisregel festgelegt ist, werden nur Artikel heruntergeladen, die dieser Regel entsprechen. Eine Gruppenregel wird bei Artikeln ohne Gruppen übersprungen, sodass ein Feed ohne Gruppen nicht allein durch eine Gruppenregel geleert wird.</string>
+    <string name="allow_rules">Erlaubnisregeln</string>
+    <string name="article_filter_rules_desc">Eine Regel pro Zeile, geschrieben als Feldname=Muster. Verfügbare Felder sind Title, URL, Author, Tag und Content. Das Muster ist ein regulärer Ausdruck, der mit einer beliebigen Stelle im Feld übereinstimmt; beginne ihn mit (?i), um die Groß-/Kleinschreibung zu ignorieren. Die Regeln treten beim nächsten Abrufen in Kraft und haben keine Auswirkungen auf bereits gespeicherte Artikel.</string>
+    <string name="block_rules_desc">Entsprechende Artikel werden niemals heruntergeladen. Anders als bei der Sperrliste lässt sich dieser Vorgang nicht rückgängig machen: Das Entfernen einer Regel führt nicht dazu, dass bereits übersprungene Artikel wieder angezeigt werden.</string>
+    <string name="article_rules_placeholder">Title=(?i)gesponsert</string>
+    <string name="rule_error_missing_separator">Zeile %1$d: ‚=‘ fehlt. Ungültige Zeilen werden ignoriert.</string>
+    <string name="rule_error_unknown_field">Zeile %1$d: ‚%2$s‘ ist kein bekanntes Feld. Ungültige Zeilen werden ignoriert.</string>
+    <string name="rule_error_empty_pattern">Zeile %1$d: Das Muster ist leer, was allem entsprechen würde. Ungültige Zeilen werden ignoriert.</string>
+    <string name="rule_error_invalid_regex">Zeile %1$d: kein gültiger regulärer Ausdruck. Ungültige Zeilen werden ignoriert.</string>
+    <string name="rule_error_too_many_rules">Zeile %1$d: Es werden nur die ersten %2$d Regeln angewendet. Nachfolgende Zeilen werden ignoriert.</string>
 </resources>
