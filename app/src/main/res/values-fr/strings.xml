@@ -333,7 +333,7 @@
     <string name="translation_language_placeholder">Sélectionner une langue</string>
     <string name="set_translation_language_first">Définissez un langage préféré de traduction dans les paramètres IA</string>
     <string name="translate_feed_cards_by_default">Traduire les prévisualisations d\'articles</string>
-    <string name="translate_articles_by_default">Par défaut traduire les articles</string>
+    <string name="translate_articles_by_default">Traduire les articles par défaut</string>
     <string name="failed_to_fetch_full_article_too_large">L\'article est trop gros. Voulez-vous l\'ouvrir dans le navigateur ?</string>
     <string name="provider_local_translation">Local hors ligne</string>
     <string name="preferred_translation_language_fallback">le langage préféré</string>
@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Échec du téléchargement du moteur de traduction local.</string>
     <string name="downloading_offline_translation_runtime">Téléchargement en cours du moteur de traduction local : %1$d%%</string>
     <string name="download">Télécharger</string>
+    <string name="article_filter_rules">Règle de filtre des articles</string>
+    <string name="block_rules">Règles de blocage</string>
+    <string name="allow_rules">Règles d\'autorisation</string>
+    <string name="article_rules_placeholder">Titre=(?i)sponsorisé</string>
+    <string name="rule_error_missing_separator">Ligne %1$d : opérateur \'=\' manquant. La ligne sera ignorée.</string>
+    <string name="rule_error_unknown_field">Ligne %1$d : \'%2$s\' est un champs inconnu. La ligne sera ignorée.</string>
+    <string name="rule_error_empty_pattern">Ligne %1$d : le pattern est vide, ce qui correspond à tout. La ligne sera ignorée.</string>
+    <string name="rule_error_invalid_regex">Ligne %1$d : n\'est pas une expression régulière valide. La ligne sera ignorée.</string>
+    <string name="rule_error_too_many_rules">Ligne %1$d : seule les %2$d premières règles seront utilisées. Les lignes suivantes seront ignorées.</string>
+    <string name="allow_rules_desc">Si une règle d\'autorisation est paramétrée alors seuls les articles correspondants seront téléchargés. À noter que les règles d\'étiquette sont ignorées pour les articles sans étiquette. Un flux RSS sans étiquette ne sera pas vidé en raison d\'une telle règle.</string>
+    <string name="block_rules_desc">Les articles correspondants ne seront jamais téléchargés. Contrairement à la liste de blocage, c\'est irréversible : supprimer la règle ne permettra pas de récupérer les articles déjà ignorés.</string>
+    <string name="article_filter_rules_desc">Une ligne par règle, écrite sous la forme Champs=Pattern. Les champs disponibles sont Title, URL, Author, Tag et Content. Le pattern est une expression régulière qui cherche n\'importe où dans le champs ; commencez par (?i) pour ignorer la casse. Les règles prennent effets à la prochaine récupération des articles et n\'affecte pas les articles déjà sauvegardés.</string>
 </resources>
