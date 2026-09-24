@@ -62,6 +62,9 @@ class RepositoryTest : DIAware {
     private lateinit var syncRemoteStore: SyncRemoteStore
 
     @MockK
+    private lateinit var folderStore: FolderStore
+
+    @MockK
     private lateinit var androidSystemStore: AndroidSystemStore
 
     @MockK
@@ -77,6 +80,7 @@ class RepositoryTest : DIAware {
         bind<SessionStore>() with instance(sessionStore)
         bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
+        bind<FolderStore>() with instance(folderStore)
         bind<FontStore>() with instance(fontStore)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
         bind<SyncRestClient>() with instance(syncRestClient)
@@ -135,10 +139,10 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun setCurrentFeedAndTagTagDoesNotReportFeedShortcut() {
+    fun setCurrentFeedAndFolderFolderDoesNotReportFeedShortcut() {
         mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
 
-        repository.setCurrentFeedAndTag(ID_UNSET, "foo")
+        repository.setCurrentFeedAndFolder(ID_UNSET, 2L)
 
         coVerify(timeout = 500L, exactly = 0) {
             application.addDynamicShortcutToFeed(
@@ -151,14 +155,14 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun setCurrentFeedAndTagFeedReportsShortcutAndUpdatesMinReadTime() {
+    fun setCurrentFeedAndFolderFeedReportsShortcutAndUpdatesMinReadTime() {
         coEvery { feedStore.getDisplayTitle(10L) } returns "fooFeed"
-        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } returns true
+        coEvery { settingsStore.setCurrentFeedAndFolder(any(), any()) } returns true
         coEvery { settingsStore.setMinReadTime(any()) } just Runs
 
         mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
 
-        repository.setCurrentFeedAndTag(10L, "")
+        repository.setCurrentFeedAndFolder(10L, ID_UNSET)
 
         coVerify(timeout = 2000L) {
             application.addDynamicShortcutToFeed(
@@ -172,47 +176,17 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun setCurrentFeedAndTagToSameDoesntChangeMinReadTime() {
+    fun setCurrentFeedAndFolderToSameDoesntChangeMinReadTime() {
         coEvery { feedStore.getDisplayTitle(10L) } returns "fooFeed"
-        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } returns false
+        coEvery { settingsStore.setCurrentFeedAndFolder(any(), any()) } returns false
         coEvery { settingsStore.setMinReadTime(any()) } just Runs
 
         mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
 
-        repository.setCurrentFeedAndTag(10L, "")
+        repository.setCurrentFeedAndFolder(10L, ID_UNSET)
 
         coVerify(exactly = 0, timeout = 500L) {
             settingsStore.setMinReadTime(any())
-        }
-    }
-
-    @Test
-    fun renameTagNotCurrentTag() {
-        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(5L to "anotherTag")
-
-        runBlocking {
-            repository.renameTag("oldTag", "newTag")
-        }
-
-        coVerify {
-            feedStore.renameTag("oldTag", "newTag")
-        }
-        verify(exactly = 0) {
-            repository.setCurrentFeedAndTag(any(), any())
-        }
-    }
-
-    @Test
-    fun renameTagIsCurrentTag() {
-        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(ID_UNSET to "oldTag")
-
-        runBlocking {
-            repository.renameTag("oldTag", "newTag")
-        }
-
-        coVerify {
-            feedStore.renameTag("oldTag", "newTag")
-            repository.setCurrentFeedAndTag(ID_UNSET, "newTag")
         }
     }
 
@@ -264,7 +238,7 @@ class RepositoryTest : DIAware {
     @Test
     fun markAllAsReadInCurrentFeed() {
         runBlocking {
-            repository.markAllAsReadInFeedOrTag(5L, "foo")
+            repository.markAllAsReadInFeedOrFolder(5L, 2L)
         }
 
         coVerify {
@@ -276,13 +250,13 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun markAllAsReadInCurrentTag() {
+    fun markAllAsReadInCurrentFolder() {
         runBlocking {
-            repository.markAllAsReadInFeedOrTag(ID_UNSET, "foo")
+            repository.markAllAsReadInFeedOrFolder(ID_UNSET, 2L)
         }
 
         coVerify {
-            feedItemStore.markAllAsReadInTag("foo")
+            feedItemStore.markAllAsReadInFolder(2L)
         }
         verify {
             settingsStore.setMinReadTime(any())
@@ -303,7 +277,7 @@ class RepositoryTest : DIAware {
     @Test
     fun markAllAsReadInCurrentAll() {
         runBlocking {
-            repository.markAllAsReadInFeedOrTag(ID_ALL_FEEDS, "")
+            repository.markAllAsReadInFeedOrFolder(ID_ALL_FEEDS, ID_UNSET)
         }
 
         coVerify {
@@ -315,55 +289,57 @@ class RepositoryTest : DIAware {
     }
 
     @Test
-    fun getScreenTitleForCurrentFeedOrTagAll() {
+    fun getScreenTitleForCurrentFeedOrFolderAll() {
         val result =
             runBlocking {
-                repository.getScreenTitleForFeedOrTag(ID_ALL_FEEDS, "").toList().first()
+                repository.getScreenTitleForFeedOrFolder(ID_ALL_FEEDS, ID_UNSET).toList().first()
             }
 
         assertEquals(ScreenTitle(title = null, type = FeedType.ALL_FEEDS, unreadCount = 0), result)
     }
 
     @Test
-    fun getScreenTitleForCurrentFeedOrTagSavedArticles() {
+    fun getScreenTitleForCurrentFeedOrFolderSavedArticles() {
         val result =
             runBlocking {
-                repository.getScreenTitleForFeedOrTag(ID_SAVED_ARTICLES, "").toList().first()
+                repository.getScreenTitleForFeedOrFolder(ID_SAVED_ARTICLES, ID_UNSET).toList().first()
             }
 
         assertEquals(ScreenTitle(title = null, type = FeedType.SAVED_ARTICLES, unreadCount = 0), result)
     }
 
     @Test
-    fun getScreenTitleForCurrentFeedOrTagTag() {
+    fun getScreenTitleForCurrentFeedOrFolderFolder() {
+        every { folderStore.getFolderNameFlow(2L) } returns flowOf("fwr")
+
         val result =
             runBlocking {
-                repository.getScreenTitleForFeedOrTag(ID_UNSET, "fwr").toList().first()
+                repository.getScreenTitleForFeedOrFolder(ID_UNSET, 2L).toList().first()
             }
 
-        assertEquals(ScreenTitle(title = "fwr", type = FeedType.TAG, unreadCount = 0), result)
+        assertEquals(ScreenTitle(title = "fwr", type = FeedType.FOLDER, unreadCount = 0), result)
     }
 
     @Test
-    fun getScreenTitleForCurrentFeedOrTagFeed() {
-        coEvery { feedStore.getDisplayTitle(5L) } returns "floppa"
+    fun getScreenTitleForCurrentFeedOrFolderFeed() {
+        every { feedStore.getDisplayTitleFlow(5L) } returns flowOf("floppa")
 
         val result =
             runBlocking {
-                repository.getScreenTitleForFeedOrTag(5L, "fwr").toList().first()
+                repository.getScreenTitleForFeedOrFolder(5L, 2L).toList().first()
             }
 
         assertEquals(ScreenTitle(title = "floppa", type = FeedType.FEED, unreadCount = 0), result)
 
-        coVerify {
-            feedStore.getDisplayTitle(5L)
+        verify {
+            feedStore.getDisplayTitleFlow(5L)
         }
     }
 
     @Test
     fun deleteFeedsNotCurrentFeed() {
         coEvery { feedStore.deleteFeeds(any()) } just Runs
-        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(3L to "")
+        every { settingsStore.currentFeedAndFolder } returns MutableStateFlow(3L to ID_UNSET)
 
         runBlocking {
             repository.deleteFeeds(listOf(1, 2))
@@ -373,7 +349,7 @@ class RepositoryTest : DIAware {
             feedStore.deleteFeeds(listOf(1, 2))
         }
         verify(exactly = 0) {
-            settingsStore.setCurrentFeedAndTag(any(), any())
+            settingsStore.setCurrentFeedAndFolder(any(), any())
         }
 
         verify {
@@ -384,7 +360,7 @@ class RepositoryTest : DIAware {
     @Test
     fun deleteFeedsCurrentFeed() {
         coEvery { feedStore.deleteFeeds(any()) } just Runs
-        every { settingsStore.currentFeedAndTag } returns MutableStateFlow(1L to "")
+        every { settingsStore.currentFeedAndFolder } returns MutableStateFlow(1L to ID_UNSET)
 
         runBlocking {
             repository.deleteFeeds(listOf(1, 2))
@@ -394,7 +370,7 @@ class RepositoryTest : DIAware {
             feedStore.deleteFeeds(listOf(1, 2))
         }
         verify {
-            settingsStore.setCurrentFeedAndTag(ID_ALL_FEEDS, any())
+            settingsStore.setCurrentFeedAndFolder(ID_ALL_FEEDS, any())
         }
 
         verify {

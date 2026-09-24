@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.sync
 
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import java.net.URL
 import java.time.Instant
@@ -98,6 +100,7 @@ data class EncryptedFeed(
     val title: String = "",
     val customTitle: String = "",
     val tag: String = "",
+    val folderPath: List<String> = emptyList(),
     val imageUrl: URL? = null,
     val fullTextByDefault: Boolean = false,
     val openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
@@ -108,12 +111,15 @@ data class EncryptedFeed(
     val whenModified: Instant = Instant.EPOCH,
 )
 
-fun Feed.toEncryptedFeed(): EncryptedFeed =
+suspend fun Feed.toEncryptedFeed(repository: Repository): EncryptedFeed =
     EncryptedFeed(
         url = url,
         title = title,
         customTitle = customTitle,
-        tag = tag,
+        // Keep tag for now to avoid changing it on devices with old version
+        // when syncing from device with new version
+        tag = oldTag,
+        folderPath = repository.getFolderPathStringList(folderId),
         imageUrl = imageUrl,
         fullTextByDefault = fullTextByDefault,
         openArticlesWith = openArticlesWith,
@@ -124,12 +130,19 @@ fun Feed.toEncryptedFeed(): EncryptedFeed =
         whenModified = whenModified,
     )
 
-fun EncryptedFeed.updateFeedCopy(feed: Feed): Feed =
+suspend fun EncryptedFeed.updateFeedCopy(
+    feed: Feed,
+    repository: Repository,
+): Feed =
     feed.copy(
         url = url,
         title = title,
         customTitle = customTitle,
-        tag = tag,
+        oldTag = tag,
+        folderIdNullable =
+            repository
+                .folderPathStringToFolderId(folderPath)
+                .takeUnless { it == ID_UNSET },
         imageUrl = imageUrl,
         fullTextByDefault = fullTextByDefault,
         openArticlesWith = openArticlesWith,

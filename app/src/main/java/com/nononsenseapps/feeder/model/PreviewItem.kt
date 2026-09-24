@@ -18,7 +18,7 @@ import java.time.ZonedDateTime
 
 const val PREVIEW_COLUMNS = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,
-    author, pub_date, link, read_time, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
+    author, pub_date, link, read_time, feeds.folder_id AS folder_id, feeds.id AS feed_id, feeds.title AS feed_title,
     feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
     feeds.open_articles_with AS feed_open_articles_with, bookmarked,
     feeds.image_url as feed_image_url, primary_sort_time, word_count, word_count_full,
@@ -37,7 +37,7 @@ data class PreviewItem
         var author: String? = null,
         @ColumnInfo(name = "pub_date") var pubDate: ZonedDateTime? = null,
         var link: String? = null,
-        var tag: String = "",
+        @ColumnInfo(name = "folder_id") var folderIdNullable: Long? = null,
         @ColumnInfo(name = COL_READ_TIME) var readTime: Instant? = null,
         @ColumnInfo(name = "feed_id") var feedId: Long? = null,
         @ColumnInfo(name = "feed_title") var feedTitle: String = "",
@@ -67,6 +67,9 @@ data class PreviewItem
                     true -> wordCountFull
                     false -> wordCount
                 }
+
+        val folderId: Long
+            get() = folderIdNullable ?: ID_UNSET
     }
 
 fun String?.host(): String? {

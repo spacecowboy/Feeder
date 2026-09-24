@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -19,12 +20,15 @@ class FeedWidgetSettingsActivityViewModel(
             .getPagedNavDrawerItems()
             .cachedIn(viewModelScope)
 
-    fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
+    fun toggleFolderExpansion(folderId: Long) =
+        viewModelScope.launch {
+            repository.toggleFolderExpansion(folderId)
+        }
 
     fun selectFeedForWidget(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
-        repository.setCurrentWidgetFeedAndTag(feedId, tag)
+        repository.setCurrentWidgetFeedAndFolder(feedId, folderId)
     }
 }

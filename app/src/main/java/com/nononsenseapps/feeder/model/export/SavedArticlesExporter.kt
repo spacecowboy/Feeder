@@ -6,6 +6,7 @@ import android.util.Log
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.model.ThumbnailImage
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.ToastMaker
@@ -22,7 +23,7 @@ import kotlin.system.measureTimeMillis
 
 private const val LOG_TAG = "FEEDER_SAVEDARTEXPORT"
 const val SAVED_ARTICLES_EXPORT_FORMAT = "feeder-saved-articles"
-const val SAVED_ARTICLES_EXPORT_VERSION = 1
+const val SAVED_ARTICLES_EXPORT_VERSION = 2
 
 private val savedArticlesJson =
     Json {
@@ -50,6 +51,7 @@ suspend fun exportSavedArticles(
                 measureTimeMillis {
                     val contentResolver: ContentResolver by di.instance()
                     val feedItemDao: FeedItemDao by di.instance()
+                    val folderDao: FolderDao by di.instance()
                     contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { bw ->
                         val export =
                             SavedArticlesExport(
@@ -58,7 +60,9 @@ suspend fun exportSavedArticles(
                                 articles =
                                     feedItemDao
                                         .getBookmarkedItemsForExport()
-                                        .mapNotNull(FeedItemWithFeed::toSavedArticleExportItem),
+                                        .mapNotNull { feedItem ->
+                                            feedItem.toSavedArticleExportItem(folderDao)
+                                        },
                             )
                         bw.write(savedArticlesJson.encodeToString(export))
                     }
@@ -97,11 +101,12 @@ data class SavedArticleFeedExportItem(
     val url: String,
     val title: String,
     val customTitle: String,
-    val tag: String,
+    val tag: String? = null,
+    val folderPath: List<String>? = null,
     val fullTextByDefault: Boolean,
 )
 
-private fun FeedItemWithFeed.toSavedArticleExportItem(): SavedArticleExportItem? {
+private suspend fun FeedItemWithFeed.toSavedArticleExportItem(folderDao: FolderDao): SavedArticleExportItem? {
     val articleLink = link ?: return null
     return SavedArticleExportItem(
         link = articleLink,
@@ -122,7 +127,7 @@ private fun FeedItemWithFeed.toSavedArticleExportItem(): SavedArticleExportItem?
                 url = feedUrl.toString(),
                 title = feedTitle,
                 customTitle = feedCustomTitle,
-                tag = tag,
+                folderPath = folderDao.getFolderPathStringList(folderId),
                 fullTextByDefault = fullTextByDefault,
             ),
     )

@@ -22,7 +22,7 @@ class EditFeedDestinationTest {
     @Test
     fun editFeedHasCorrectRoute() {
         assertEquals(
-            "edit/feed/{feedId}",
+            "edit/feed/{feedId}?navigateFromEditFolders={navigateFromEditFolders}",
             EditFeedDestination.route,
         )
     }
@@ -32,10 +32,11 @@ class EditFeedDestinationTest {
         EditFeedDestination.navigate(
             navController,
             99L,
+            true,
         )
 
         verify {
-            navController.navigate("edit/feed/99")
+            navController.navigate("edit/feed/99?navigateFromEditFolders=true")
         }
     }
 }

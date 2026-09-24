@@ -183,13 +183,13 @@ interface FeedItemDao {
         SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
           AND block_time IS NULL
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         LIMIT 50
         """,
     )
-    fun widgetPreviewsByTag(tag: String): Flow<List<PreviewItem>>
+    fun widgetPreviewsByFolder(folderId: Long): Flow<List<PreviewItem>>
 
     @Query(
         """
@@ -239,15 +239,15 @@ interface FeedItemDao {
         SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
         """,
     )
-    fun pagingUnreadPreviewsDesc(
-        tag: String,
+    fun pagingUnreadPreviewsInFolderDesc(
+        folderId: Long,
         minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
@@ -291,15 +291,15 @@ interface FeedItemDao {
         SELECT $PREVIEW_COLUMNS
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
           AND (read_time is null or read_time >= :minReadTime)
           AND bookmarked in (1, :bookmarked)
           AND block_time is null
         ORDER BY $FEED_ITEM_LIST_SORT_ORDER_ASC
         """,
     )
-    fun pagingUnreadPreviewsAsc(
-        tag: String,
+    fun pagingUnreadPreviewsInFolderAsc(
+        folderId: Long,
         minReadTime: Instant,
         bookmarked: Boolean,
     ): PagingSource<Int, PreviewItem>
@@ -346,15 +346,14 @@ interface FeedItemDao {
         """
         UPDATE feed_items
         SET read_time = coalesce(read_time, :readTime), notified = 1
-        WHERE id IN (
-          SELECT feed_items.id
-          FROM feed_items
-          LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-          WHERE tag IS :tag
+        WHERE feed_id IN (
+          SELECT feeds.id
+          FROM feeds
+          WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
         )""",
     )
-    suspend fun markAllAsRead(
-        tag: String,
+    suspend fun markAllAsReadInFolder(
+        folderId: Long,
         readTime: Instant = Instant.now(),
     )
 
@@ -407,15 +406,14 @@ interface FeedItemDao {
         """
         UPDATE feed_items
         SET notified = :notified
-        WHERE id IN (
-          SELECT feed_items.id
-          FROM feed_items
-          LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-          WHERE tag IS :tag
+        WHERE feed_id IN (
+          SELECT feeds.id
+          FROM feeds
+          WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
         )""",
     )
-    suspend fun markTagAsNotified(
-        tag: String,
+    suspend fun markFolderAsNotified(
+        folderId: Long,
         notified: Boolean = true,
     )
 
@@ -504,14 +502,14 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
-            WHERE f.tag IS :tag
+            WHERE f.folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
               and (read_time is null or read_time >= :minReadTime)
               and bookmarked in (1, :bookmarked)
               and block_time is null
         """,
     )
-    fun getFeedItemCount(
-        tag: String,
+    fun getFeedItemCountInFolder(
+        folderId: Long,
         minReadTime: Instant,
         bookmarked: Boolean,
     ): Flow<Int>

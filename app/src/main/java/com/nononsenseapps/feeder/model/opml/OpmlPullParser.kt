@@ -3,6 +3,9 @@ package com.nononsenseapps.feeder.model.opml
 import android.util.Log
 import android.util.Xml
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.model.ImportFeed
+import com.nononsenseapps.feeder.model.ImportFolder
+import com.nononsenseapps.feeder.model.ImportNode
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
@@ -58,7 +61,7 @@ private const val TAG_BLOCKED = "blocked"
 class OpmlPullParser(
     private val opmlToDb: OPMLParserHandler,
 ) {
-    private val feeds: MutableList<Feed> = mutableListOf()
+    private val nodes: MutableList<ImportNode> = mutableListOf()
     private val settings: MutableMap<String, String> = mutableMapOf()
     private val blockList: MutableSet<String> = mutableSetOf()
     private val parser: XmlPullParser = Xml.newPullParser()
@@ -108,8 +111,8 @@ class OpmlPullParser(
                     parser.nextTag()
                     readOpml()
 
-                    for (feed in feeds) {
-                        opmlToDb.saveFeed(feed)
+                    for (node in nodes) {
+                        node.save(opmlToDb = opmlToDb)
                     }
                     for ((key, value) in settings) {
                         opmlToDb.saveSetting(key = key, value = value)
@@ -143,12 +146,18 @@ class OpmlPullParser(
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
-            if (parser.name == TAG_OUTLINE) {
-                readOutline(parser, parentOutlineTag = "")
-            } else if (parser.name == TAG_SETTINGS && parser.namespace == OPML_FEEDER_NAMESPACE) {
-                readSettings()
-            } else {
-                skip()
+            when {
+                parser.name == TAG_OUTLINE -> {
+                    readOutline(nodes)
+                }
+
+                parser.name == TAG_SETTINGS && parser.namespace == OPML_FEEDER_NAMESPACE -> {
+                    readSettings()
+                }
+
+                else -> {
+                    skip()
+                }
             }
         }
     }
@@ -208,36 +217,36 @@ class OpmlPullParser(
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readOutline(
-        parser: XmlPullParser,
-        parentOutlineTag: String,
-    ) {
+    private fun readOutline(currentNodes: MutableList<ImportNode>) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
         val xmlUrl by this
         when {
-            xmlUrl != null -> readOutlineAsRss(parser, tag = parentOutlineTag)
-            else -> readOutlineAsTag()
+            xmlUrl != null -> readOutlineAsRss(currentNodes)
+            else -> readOutlineAsFolder(currentNodes)
         }
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readOutlineAsTag() {
+    private fun readOutlineAsFolder(currentNodes: MutableList<ImportNode>) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
-        val tag =
+        val name =
             unescape(
                 parser.getAttributeValue(null, ATTR_TITLE)
                     ?: parser.getAttributeValue(null, ATTR_TEXT)
                     ?: "",
             )
+        val children = mutableListOf<ImportNode>()
+
+        currentNodes.add(ImportFolder(name, children))
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
             if (parser.name == TAG_OUTLINE) {
-                readOutline(parser, parentOutlineTag = tag)
+                readOutline(children)
             } else {
                 skip()
             }
@@ -245,10 +254,7 @@ class OpmlPullParser(
     }
 
     @Throws(XmlPullParserException::class, IOException::class)
-    private fun readOutlineAsRss(
-        parser: XmlPullParser,
-        tag: String,
-    ) {
+    private fun readOutlineAsRss(currentNodes: MutableList<ImportNode>) {
         parser.require(XmlPullParser.START_TAG, null, TAG_OUTLINE)
 
         val feedTitle =
@@ -265,7 +271,6 @@ class OpmlPullParser(
                     // Ensure not both are empty string: title will get replaced on sync
                     title = feedTitle.ifBlank { feedUrl.toString() },
                     customTitle = feedTitle,
-                    tag = tag,
                     url = feedUrl,
                 ).let { feed ->
                     // Copy so default values can be referenced
@@ -330,7 +335,7 @@ class OpmlPullParser(
                     )
                 }
 
-            feeds.add(feed)
+            currentNodes.add(ImportFeed(feed))
         } catch (e: MalformedURLException) {
             // Feed URL is REQUIRED, so don't try to add feeds without valid URLs
             Log.e(LOG_TAG, "Bad url on feed [$feedTitle] in OPML", e)

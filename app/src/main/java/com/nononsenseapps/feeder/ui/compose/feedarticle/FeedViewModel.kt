@@ -34,7 +34,7 @@ import com.nononsenseapps.feeder.model.TranslationManager
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
-import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
+import com.nononsenseapps.feeder.ui.compose.feed.FeedOrFolder
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -112,9 +112,9 @@ class FeedViewModel(
                 1,
             )
 
-    private val screenTitleForCurrentFeedOrTag: StateFlow<ScreenTitle> =
+    private val screenTitleForCurrentFeedOrFolder: StateFlow<ScreenTitle> =
         repository
-            .getScreenTitleForCurrentFeedOrTag()
+            .getScreenTitleForCurrentFeedOrFolder()
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -130,22 +130,24 @@ class FeedViewModel(
                 emptyList(),
             )
 
+    private val currentFolderId: StateFlow<Long?> =
+        repository
+            .getCurrentFolderId()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                ID_UNSET,
+            )
+
     fun deleteFeeds(feedIds: List<Long>) =
         applicationCoroutineScope.launch {
             repository.deleteFeeds(feedIds)
         }
 
-    fun renameTag(
-        oldTag: String,
-        newTag: String,
-    ) = applicationCoroutineScope.launch {
-        repository.renameTag(oldTag, newTag)
-    }
-
     fun markAllAsRead() =
         applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markAllAsReadInFeedOrTag(feedId, feedTag)
+            val (feedId, folderId) = repository.currentFeedAndFolder.value
+            repository.markAllAsReadInFeedOrFolder(feedId, folderId)
         }
 
     fun markAsUnread(itemId: Long) =
@@ -165,14 +167,14 @@ class FeedViewModel(
 
     fun markBeforeAsRead(cursor: FeedItemCursor) =
         applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markBeforeAsRead(cursor, feedId, feedTag)
+            val (feedId, folderId) = repository.currentFeedAndFolder.value
+            repository.markBeforeAsRead(cursor, feedId, folderId)
         }
 
     fun markAfterAsRead(cursor: FeedItemCursor) =
         applicationCoroutineScope.launch {
-            val (feedId, feedTag) = repository.currentFeedAndTag.value
-            repository.markAfterAsRead(cursor, feedId, feedTag)
+            val (feedId, folderId) = repository.currentFeedAndFolder.value
+            repository.markAfterAsRead(cursor, feedId, folderId)
         }
 
     fun setBookmarked(
@@ -182,12 +184,12 @@ class FeedViewModel(
         repository.setBookmarked(itemId, bookmarked)
     }
 
-    fun requestImmediateSyncOfCurrentFeedOrTag() {
-        val (feedId, feedTag) = repository.currentFeedAndTag.value
+    fun requestImmediateSyncOfCurrentFeedOrFolder() {
+        val (feedId, folderId) = repository.currentFeedAndFolder.value
         runOnceRssSync(
             di = di,
             feedId = feedId,
-            feedTag = feedTag,
+            folderId = folderId,
             forceNetwork = true,
             triggeredByUser = true,
         )
@@ -372,7 +374,10 @@ class FeedViewModel(
         repository.searchFor(search)
     }
 
-    fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
+    fun toggleFolderExpansion(folderId: Long) =
+        applicationCoroutineScope.launch {
+            repository.toggleFolderExpansion(folderId)
+        }
 
     private val editDialogVisible = MutableStateFlow(false)
 
@@ -384,12 +389,6 @@ class FeedViewModel(
 
     fun setShowDeleteDialog(visible: Boolean) {
         deleteDialogVisible.update { visible }
-    }
-
-    private val renameTagDialogVisible = MutableStateFlow(false)
-
-    fun setShowRenameTagDialog(visible: Boolean) {
-        renameTagDialogVisible.update { visible }
     }
 
     private fun setCurrentArticle(itemId: Long) {
@@ -468,16 +467,16 @@ class FeedViewModel(
             repository.currentlySyncing,
             repository.feedItemStyle,
             // 5
-            repository.expandedTags,
+            currentFolderId,
             toolbarVisible,
             visibleFeedItemCount,
-            screenTitleForCurrentFeedOrTag,
+            screenTitleForCurrentFeedOrFolder,
             editDialogVisible,
             // 10
             deleteDialogVisible,
             visibleFeeds,
             repository.isArticleOpen,
-            repository.currentFeedAndTag.map { (feedId, tag) -> FeedOrTag(feedId, tag) },
+            repository.currentFeedAndFolder.map { (feedId, folderId) -> FeedOrFolder(feedId, folderId) },
             ttsStateHolder.ttsState,
             // 15
             repository.swipeAsRead,
@@ -496,14 +495,15 @@ class FeedViewModel(
             repository.syncWorkerRunning,
             repository.isOpenDrawerOnFab,
             bergamotModelManager.downloadProgress,
-            renameTagDialogVisible,
             podcastPlayerStateHolder.playerState,
+            // 30
             repository.forceSingleColumn,
         ) { params: Array<Any?> ->
             val haveVisibleFeedItems = (params[7] as Int) > 0
-            val currentFeedOrTag = params[13] as FeedOrTag
+            val currentFeedOrFolder = params[13] as FeedOrFolder
+            val currentFolderId = (params[5] as Long?) ?: ID_UNSET
             val ttsState = params[14] as PlaybackStatus
-            val podcastPlayerState = params[30] as PodcastPlayerState
+            val podcastPlayerState = params[29] as PodcastPlayerState
 
             @Suppress("UNCHECKED_CAST")
             FeedState(
@@ -512,18 +512,17 @@ class FeedViewModel(
                 currentTheme = params[2] as ThemeOptions,
                 currentlySyncing = (params[26] as Boolean) && (params[3] as Boolean),
                 feedItemStyle = params[4] as FeedItemStyle,
-                expandedTags = params[5] as Set<String>,
+                currentFolderId = currentFolderId,
                 showToolbarMenu = params[6] as Boolean,
                 // 7
                 haveVisibleFeedItems = haveVisibleFeedItems,
                 feedScreenTitle = params[8] as ScreenTitle,
                 showEditDialog = params[9] as Boolean,
                 showDeleteDialog = params[10] as Boolean,
-                showRenameTagDialog = params[29] as Boolean,
                 visibleFeeds = params[11] as List<FeedTitle>,
                 isArticleOpen = params[12] as Boolean,
                 // 13
-                currentFeedOrTag = currentFeedOrTag,
+                currentFeedOrFolder = currentFeedOrFolder,
                 // 14
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
                 podcastPlayerState = podcastPlayerState,
@@ -541,7 +540,7 @@ class FeedViewModel(
                 showTitleUnreadCount = params[25] as Boolean,
                 isOpenDrawerOnFab = params[27] as Boolean,
                 translationModelDownloadProgress = params[28] as BergamotModelDownloadProgress?,
-                forceSingleColumn = params[31] as Boolean,
+                forceSingleColumn = params[30] as Boolean,
             )
         }.stateIn(
             viewModelScope,
@@ -664,7 +663,7 @@ class FeedViewModel(
 
 @Immutable
 data class FeedState(
-    override val currentFeedOrTag: FeedOrTag = FeedOrTag(ID_UNSET, ""),
+    override val currentFeedOrFolder: FeedOrFolder = FeedOrFolder(ID_UNSET, ID_UNSET),
     override val showFab: Boolean = true,
     override val showThumbnails: Boolean = true,
     override val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
@@ -673,7 +672,7 @@ data class FeedState(
     override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED, 0),
     override val visibleFeeds: List<FeedTitle> = emptyList(),
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
-    override val expandedTags: Set<String> = emptySet(),
+    override val currentFolderId: Long = ID_UNSET,
     override val isBottomBarVisible: Boolean = false,
     override val isTTSPlaying: Boolean = false,
     override val podcastPlayerState: PodcastPlayerState = PodcastPlayerState(),
@@ -681,7 +680,6 @@ data class FeedState(
     override val showToolbarMenu: Boolean = false,
     override val showDeleteDialog: Boolean = false,
     override val showEditDialog: Boolean = false,
-    override val showRenameTagDialog: Boolean = false,
     // Defaults to true so empty screen doesn't appear before load
     override val haveVisibleFeedItems: Boolean = true,
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
@@ -702,7 +700,7 @@ data class FeedState(
 
 @Immutable
 interface FeedScreenViewState {
-    val currentFeedOrTag: FeedOrTag
+    val currentFeedOrFolder: FeedOrFolder
     val showFab: Boolean
     val showThumbnails: Boolean
     val currentTheme: ThemeOptions
@@ -710,7 +708,7 @@ interface FeedScreenViewState {
     val feedScreenTitle: ScreenTitle
     val visibleFeeds: List<FeedTitle>
     val feedItemStyle: FeedItemStyle
-    val expandedTags: Set<String>
+    val currentFolderId: Long
     val isBottomBarVisible: Boolean
     val isTTSPlaying: Boolean
     val podcastPlayerState: PodcastPlayerState
@@ -718,7 +716,6 @@ interface FeedScreenViewState {
     val showToolbarMenu: Boolean
     val showDeleteDialog: Boolean
     val showEditDialog: Boolean
-    val showRenameTagDialog: Boolean
     val haveVisibleFeedItems: Boolean
     val swipeAsRead: SwipeAsRead
     val markAsReadOnScroll: Boolean

@@ -6,6 +6,7 @@ const val FEEDS_TABLE_NAME = "feeds"
 const val FEED_ITEMS_TABLE_NAME = "feed_items"
 const val SYNC_REMOTE_TABLE_NAME = "sync_remote"
 const val SYNC_DEVICE_TABLE_NAME = "sync_device"
+const val FOLDERS_TABLE_NAME = "folders"
 
 const val COL_ID = "id"
 const val COL_TITLE = "title"
@@ -58,6 +59,10 @@ const val COL_FETCH_OG_IMAGES = "fetch_og_images"
 const val COL_BLOCK_RULES = "block_rules"
 const val COL_ALLOW_RULES = "allow_rules"
 const val COL_TRUST_ALL_CERTIFICATES = "trust_all_certificates"
+const val COL_FOLDER_ID = "folder_id"
+const val COL_PARENT_ID = "parent_id"
+const val COL_FOLDER_NAME = "name"
+const val COL_EXPANDED = "expanded"
 
 // year 5000
 val FAR_FUTURE = Instant.ofEpochSecond(95635369646)

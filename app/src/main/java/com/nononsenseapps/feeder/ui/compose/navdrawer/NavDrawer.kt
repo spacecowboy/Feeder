@@ -4,10 +4,12 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,20 +19,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Feed
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.RssFeed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,9 +59,12 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
@@ -64,21 +75,26 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedIdWithFolderId
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
+import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.logDebug
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ScreenWithNavDrawer(
-    feedsAndTags: LazyPagingItems<FeedUnreadCount>,
-    onToggleTagExpansion: (String) -> Unit,
-    onDrawerItemSelect: (Long, String) -> Unit,
+    feedsAndFolders: LazyPagingItems<FeedUnreadCount>,
+    onToggleFolderExpansion: (Long) -> Unit,
+    onDrawerItemSelect: (Long, Long) -> Unit,
     drawerState: DrawerState,
     focusRequester: FocusRequester,
     navDrawerListState: LazyListState,
@@ -104,13 +120,13 @@ fun ScreenWithNavDrawer(
         drawerState = drawerState,
         drawerContent = {
             DismissibleDrawerSheet {
-                ListOfFeedsAndTags(
-                    feedsAndTags = feedsAndTags,
-                    onToggleTagExpansion = onToggleTagExpansion,
+                ListOfFeedsAndFolders(
+                    feedsAndFolders = feedsAndFolders,
+                    onToggleFolderExpansion = onToggleFolderExpansion,
                     state = navDrawerListState,
                     { item ->
                         coroutineScope.launch {
-                            onDrawerItemSelect(item.id, item.tag)
+                            onDrawerItemSelect(item.feedId, item.folderId)
                             drawerState.close()
                         }
                     },
@@ -126,11 +142,11 @@ fun ScreenWithNavDrawer(
 
 @ExperimentalAnimationApi
 @Composable
-fun ListOfFeedsAndTags(
-    feedsAndTags: LazyPagingItems<FeedUnreadCount>,
-    onToggleTagExpansion: (String) -> Unit,
+fun ListOfFeedsAndFolders(
+    feedsAndFolders: LazyPagingItems<FeedUnreadCount>,
+    onToggleFolderExpansion: (Long) -> Unit,
     state: LazyListState,
-    onItemClick: (FeedIdTag) -> Unit,
+    onItemClick: (FeedIdWithFolderId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -140,27 +156,27 @@ fun ListOfFeedsAndTags(
             modifier
                 .fillMaxSize()
                 .semantics {
-                    testTag = "feedsAndTags"
-                    collectionInfo = CollectionInfo(feedsAndTags.itemCount, 1)
+                    testTag = "feedsAndFolders"
+                    collectionInfo = CollectionInfo(feedsAndFolders.itemCount, 1)
                 },
     ) {
         items(
-            count = feedsAndTags.itemCount,
+            count = feedsAndFolders.itemCount,
             key =
-                feedsAndTags.itemKey {
-                    when (it.id) {
+                feedsAndFolders.itemKey {
+                    when (it.feedId) {
                         ID_ALL_FEEDS -> ID_ALL_FEEDS
                         ID_SAVED_ARTICLES -> ID_SAVED_ARTICLES
-                        ID_UNSET -> it.tag
-                        else -> it.id
+                        ID_UNSET -> "folder_${it.folderId}"
+                        else -> it.feedId
                     }
                 },
             contentType =
-                feedsAndTags.itemContentType {
+                feedsAndFolders.itemContentType {
                     it.contentType
                 },
         ) { itemIndex ->
-            val item = feedsAndTags[itemIndex]
+            val item = feedsAndFolders[itemIndex]
             val showFeedsDivider = itemIndex == 2 && item?.contentType?.isFeedListItem == true
 
             Column {
@@ -193,37 +209,30 @@ fun ListOfFeedsAndTags(
                         )
                     }
 
-                    ContentType.Tag -> {
-                        ExpandableTag(
+                    ContentType.Folder -> {
+                        Folder(
                             expanded = item.expanded,
-                            onToggleExpansion = onToggleTagExpansion,
+                            onToggleExpansion = {
+                                onToggleFolderExpansion(item.folderId)
+                            },
                             unreadCount = item.unreadCount,
-                            title = item.tag,
+                            title = item.displayTitle,
                             onItemClick = {
                                 onItemClick(item)
                             },
+                            depth = item.depth,
                         )
                     }
 
-                    ContentType.ChildFeed -> {
-                        ChildFeed(
+                    ContentType.Feed -> {
+                        Feed(
                             unreadCount = item.unreadCount,
                             title = item.displayTitle,
                             imageUrl = item.imageUrl?.toString(),
                             onItemClick = {
                                 onItemClick(item)
                             },
-                        )
-                    }
-
-                    ContentType.TopLevelFeed -> {
-                        TopLevelFeed(
-                            unreadCount = item.unreadCount,
-                            title = item.displayTitle,
-                            imageUrl = item.imageUrl?.toString(),
-                            onItemClick = {
-                                onItemClick(item)
-                            },
+                            depth = item.depth,
                         )
                     }
                 }
@@ -234,33 +243,25 @@ fun ListOfFeedsAndTags(
 
 val FeedUnreadCount.contentType: ContentType
     get() =
-        when (this.id) {
-            ID_UNSET -> ContentType.Tag
+        when (this.feedId) {
+            ID_UNSET -> ContentType.Folder
             ID_ALL_FEEDS -> ContentType.AllFeeds
             ID_SAVED_ARTICLES -> ContentType.SavedArticles
-            else -> {
-                if (this.tag.isNotEmpty()) {
-                    ContentType.ChildFeed
-                } else {
-                    ContentType.TopLevelFeed
-                }
-            }
+            else -> ContentType.Feed
         }
 
 enum class ContentType {
     AllFeeds,
     SavedArticles,
-    Tag,
-    ChildFeed,
-    TopLevelFeed,
+    Folder,
+    Feed,
 }
 
 private val ContentType.isFeedListItem: Boolean
     get() =
         when (this) {
-            ContentType.Tag,
-            ContentType.ChildFeed,
-            ContentType.TopLevelFeed,
+            ContentType.Folder,
+            ContentType.Feed,
             -> true
 
             ContentType.AllFeeds,
@@ -269,14 +270,14 @@ private val ContentType.isFeedListItem: Boolean
         }
 
 @ExperimentalAnimationApi
-@Preview(showBackground = true)
 @Composable
-private fun ExpandableTag(
-    title: String = "Foo",
-    unreadCount: Int = 99,
-    expanded: Boolean = true,
-    onToggleExpansion: (String) -> Unit = {},
-    onItemClick: () -> Unit = {},
+private fun Folder(
+    title: String,
+    unreadCount: Int,
+    expanded: Boolean,
+    onToggleExpansion: () -> Unit,
+    onItemClick: () -> Unit,
+    depth: Int = 0,
 ) {
     val angle: Float by animateFloatAsState(
         targetValue = if (expanded) 0f else 180f,
@@ -284,9 +285,12 @@ private fun ExpandableTag(
         label = "angle",
     )
 
-    val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
-    val expandedLabel = stringResource(id = R.string.expanded_tag)
-    val contractedLabel = stringResource(id = R.string.contracted_tag)
+    val indentation = depth.coerceIn(0, 4) * 32.dp
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val toggleExpandLabel = stringResource(id = R.string.toggle_folder_expansion)
+    val expandedLabel = stringResource(id = R.string.expanded_folder)
+    val contractedLabel = stringResource(id = R.string.contracted_folder)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -306,17 +310,29 @@ private fun ExpandableTag(
                     customActions =
                         listOf(
                             CustomAccessibilityAction(toggleExpandLabel) {
-                                onToggleExpansion(title)
+                                onToggleExpansion()
                                 true
                             },
                         )
                 },
     ) {
+        // Box for indentation that also toggles expansion on click
+        // It does not give visual touch feedback because that doesn't look good
+        Spacer(
+            modifier =
+                Modifier
+                    .clickable(
+                        onClick = onToggleExpansion,
+                        interactionSource = interactionSource,
+                        indication = null,
+                    ).fillMaxHeight()
+                    .width(indentation),
+        )
+        // Instead, provide visual touch feedback via MutableInteractionSource shared with ExpandArrow
         ExpandArrow(
             degrees = angle,
-            onClick = {
-                onToggleExpansion(title)
-            },
+            interactionSource = interactionSource,
+            onClick = onToggleExpansion,
         )
         Box(
             modifier =
@@ -328,6 +344,7 @@ private fun ExpandableTag(
             Text(
                 text = title,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -357,23 +374,27 @@ private fun ExpandableTag(
 @Composable
 private fun ExpandArrow(
     degrees: Float,
+    interactionSource: MutableInteractionSource,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick, modifier = Modifier.clearAndSetSemantics { }) {
+    IconButton(
+        onClick = onClick,
+        interactionSource = interactionSource,
+        modifier = Modifier.clearAndSetSemantics { },
+    ) {
         Icon(
             Icons.Filled.ExpandLess,
-            contentDescription = stringResource(id = R.string.toggle_tag_expansion),
+            contentDescription = stringResource(id = R.string.toggle_folder_expansion),
             modifier = Modifier.rotate(degrees = degrees),
         )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 private fun SavedArticles(
-    title: String = "Bar",
-    unreadCount: Int = 10,
-    onItemClick: () -> Unit = {},
+    title: String,
+    unreadCount: Int,
+    onItemClick: () -> Unit,
 ) {
     Feed(
         title = title,
@@ -386,40 +407,10 @@ private fun SavedArticles(
                 modifier = Modifier.size(24.dp),
             )
         },
+        depth = 0,
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun TopLevelFeed(
-    title: String = "Foo",
-    unreadCount: Int = 99,
-    onItemClick: () -> Unit = {},
-    imageUrl: String? = null,
-) = Feed(
-    title = title,
-    imageUrl = imageUrl,
-    unreadCount = unreadCount,
-    onItemClick = onItemClick,
-)
-
-@Preview(showBackground = true)
-@Composable
-private fun ChildFeed(
-    title: String = "Foo",
-    imageUrl: String? = null,
-    unreadCount: Int = 99,
-    onItemClick: () -> Unit = {},
-) {
-    Feed(
-        title = title,
-        imageUrl = imageUrl,
-        unreadCount = unreadCount,
-        onItemClick = onItemClick,
-    )
-}
-
-@Preview(showBackground = true)
 @Composable
 private fun Placeholder() {
     Box(
@@ -431,20 +422,24 @@ private fun Placeholder() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 private fun AllFeeds(
-    title: String = "All Feeds",
-    unreadCount: Int = 99,
-    onItemClick: () -> Unit = {},
+    title: String,
+    unreadCount: Int,
+    onItemClick: () -> Unit,
 ) {
     Feed(
         title = title,
         unreadCount = unreadCount,
         onItemClick = onItemClick,
         image = {
-            Box(modifier = Modifier.size(24.dp)) {}
+            Icon(
+                Icons.AutoMirrored.Filled.Feed,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+            )
         },
+        depth = 0,
     )
 }
 
@@ -454,7 +449,10 @@ private fun Feed(
     image: (@Composable () -> Unit),
     unreadCount: Int,
     onItemClick: () -> Unit,
+    depth: Int,
 ) {
+    val indentation = depth.coerceIn(0, 4) * 32.dp
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -469,14 +467,17 @@ private fun Feed(
                 ).fillMaxWidth()
                 .height(48.dp),
     ) {
+        Spacer(
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .width(indentation),
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier =
                 Modifier
                     .minimumInteractiveComponentSize(),
-            //                    .height(48.dp)
-//                    // Taking 4dp spacing into account
-//                    .width(44.dp),
         ) {
             image()
         }
@@ -489,6 +490,7 @@ private fun Feed(
             Text(
                 text = title,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -520,6 +522,7 @@ private fun Feed(
     imageUrl: String?,
     unreadCount: Int,
     onItemClick: () -> Unit,
+    depth: Int,
 ) {
     Feed(
         title = title,
@@ -546,14 +549,57 @@ private fun Feed(
                                 .precision(Precision.INEXACT)
                                 .build(),
                         contentDescription = stringResource(id = R.string.feed_icon),
+                        fallback = rememberTintedVectorPainter(Icons.Filled.RssFeed),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.size(24.dp),
                     )
                 }
             } else {
                 {
-                    Box(modifier = Modifier.size(24.dp)) {}
+                    Icon(
+                        Icons.Filled.RssFeed,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
                 }
             },
+        depth = depth,
     )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@PreviewThemes
+@Composable
+private fun PreviewListOfFeedsAndFolders() {
+    val previewItems =
+        listOf(
+            FeedUnreadCount(depth = 0, feedId = ID_ALL_FEEDS, displayTitle = "", unreadCount = 13),
+            FeedUnreadCount(depth = 0, feedId = ID_SAVED_ARTICLES, displayTitle = "", unreadCount = 0),
+            FeedUnreadCount(depth = 0, folderId = 1L, displayTitle = "Folder collapsed", unreadCount = 1, expanded = false),
+            FeedUnreadCount(depth = 0, folderId = 2L, displayTitle = "Folder with folder and feeds", unreadCount = 12, expanded = true),
+            FeedUnreadCount(depth = 1, folderId = 3L, displayTitle = "Folder with feed", unreadCount = 11, expanded = true),
+            FeedUnreadCount(depth = 2, feedId = 1L, displayTitle = "Child Feed", unreadCount = 10),
+            FeedUnreadCount(depth = 2, feedId = 2L, displayTitle = "Child Feed with indentation and long display name", unreadCount = 1),
+            FeedUnreadCount(depth = 1, feedId = 3L, displayTitle = "Another Child Feed", unreadCount = 1),
+            FeedUnreadCount(depth = 0, folderId = 4L, displayTitle = "Indentation Test Folder 1", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 1, folderId = 5L, displayTitle = "Folder 2", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 2, folderId = 6L, displayTitle = "Folder 3", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 3, folderId = 7L, displayTitle = "Folder 4", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 4, folderId = 8L, displayTitle = "Folder 5", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 5, folderId = 9L, displayTitle = "Folder 6", unreadCount = 0, expanded = true),
+            FeedUnreadCount(depth = 0, feedId = 4L, displayTitle = "Top Level Feed", unreadCount = 0),
+        )
+    val pagingData = PagingData.from(previewItems)
+    val dataFlow = MutableStateFlow(pagingData)
+
+    PreviewTheme {
+        Surface {
+            ListOfFeedsAndFolders(
+                feedsAndFolders = dataFlow.collectAsLazyPagingItems(),
+                onToggleFolderExpansion = {},
+                state = rememberLazyListState(),
+                onItemClick = {},
+            )
+        }
+    }
 }

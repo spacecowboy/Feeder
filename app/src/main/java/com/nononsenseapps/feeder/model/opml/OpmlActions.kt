@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.ToastMaker
@@ -45,16 +46,20 @@ suspend fun exportOpml(
                 measureTimeMillis {
                     val contentResolver: ContentResolver by di.instance()
                     val feedDao: FeedDao by di.instance()
+                    val folderDao: FolderDao by di.instance()
                     val settingsStore: SettingsStore by di.instance()
                     contentResolver.openOutputStream(uri)?.let {
                         writeOutputStream(
                             os = it,
                             settings = settingsStore.getAllSettings(),
                             blockedPatterns = settingsStore.blockListPreference.first(),
-                            tags = feedDao.loadTags(),
-                        ) { tag ->
-                            feedDao.getFeedsByTitle(tag = tag)
-                        }
+                            folders = { folderId ->
+                                folderDao.getChildFolders(folderId)
+                            },
+                            feeds = { folderId ->
+                                feedDao.getFeedsByTitle(folderId)
+                            },
+                        )
                     }
                 }
             logDebug(LOG_TAG, "Exported OPML in $time ms on ${Thread.currentThread().name}")

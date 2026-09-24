@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -127,7 +128,6 @@ import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressConten
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
-import com.nononsenseapps.feeder.ui.compose.dialog.RenameTagDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilterCallback
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
@@ -143,6 +143,7 @@ import com.nononsenseapps.feeder.ui.compose.modifiers.trackVisibility
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ScreenWithNavDrawer
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.EditFoldersDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
@@ -240,12 +241,12 @@ fun FeedScreen(
     // Each feed gets its own scroll state. Persists across device rotations, but is cleared when
     // switching feeds
     val feedListState =
-        key(viewState.currentFeedOrTag) {
+        key(viewState.currentFeedOrFolder) {
             pagedFeedItems.rememberLazyListState()
         }
 
     val feedGridState =
-        key(viewState.currentFeedOrTag) {
+        key(viewState.currentFeedOrFolder) {
             rememberLazyStaggeredGridState()
         }
 
@@ -283,12 +284,12 @@ fun FeedScreen(
     }
 
     ScreenWithNavDrawer(
-        feedsAndTags = pagedNavDrawerItems,
-        onToggleTagExpansion = { tag ->
-            viewModel.toggleTagExpansion(tag)
+        feedsAndFolders = pagedNavDrawerItems,
+        onToggleFolderExpansion = { folderId ->
+            viewModel.toggleFolderExpansion(folderId)
         },
-        onDrawerItemSelect = { feedId, tag ->
-            FeedDestination.navigate(navController, feedId = feedId, tag = tag)
+        onDrawerItemSelect = { feedId, folderId ->
+            FeedDestination.navigate(navController, feedId = feedId, folderId = folderId)
         },
         focusRequester = focusNavDrawer,
         drawerState = drawerState,
@@ -297,7 +298,7 @@ fun FeedScreen(
         FeedScreen(
             viewState = viewState,
             onRefreshVisible = {
-                viewModel.requestImmediateSyncOfCurrentFeedOrTag()
+                viewModel.requestImmediateSyncOfCurrentFeedOrFolder()
             },
             onRefreshAll = {
                 viewModel.requestImmediateSyncOfAll()
@@ -345,20 +346,11 @@ fun FeedScreen(
             onDeleteFeeds = { feedIds ->
                 viewModel.deleteFeeds(feedIds.toList())
             },
-            onRenameTag = { oldTag, newTag ->
-                viewModel.renameTag(oldTag, newTag)
-            },
             onShowDeleteDialog = {
                 viewModel.setShowDeleteDialog(true)
             },
             onDismissDeleteDialog = {
                 viewModel.setShowDeleteDialog(false)
-            },
-            onShowRenameTagDialog = {
-                viewModel.setShowRenameTagDialog(true)
-            },
-            onDismissRenameTagDialog = {
-                viewModel.setShowRenameTagDialog(false)
             },
             onSettings = {
                 SettingsDestination.navigate(navController)
@@ -522,11 +514,14 @@ fun FeedScreen(
             pagedFeedItems = pagedFeedItems,
             translatedFeedCards = translatedFeedCards,
             onTranslateFeedCard = viewModel::translateFeedCardIfNeeded,
+            onNavigateToFolder = { folderId ->
+                EditFoldersDestination.navigate(navController, folderId)
+            },
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
@@ -552,9 +547,6 @@ fun FeedScreen(
     onDeleteFeeds: (Iterable<Long>) -> Unit,
     onShowDeleteDialog: () -> Unit,
     onDismissDeleteDialog: () -> Unit,
-    onRenameTag: (String, String) -> Unit,
-    onShowRenameTagDialog: () -> Unit,
-    onDismissRenameTagDialog: () -> Unit,
     onSettings: () -> Unit,
     onImport: () -> Unit,
     onExportOPML: () -> Unit,
@@ -579,6 +571,7 @@ fun FeedScreen(
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     translatedFeedCards: TranslatedFeedCards,
     onTranslateFeedCard: (FeedListItem) -> Unit,
+    onNavigateToFolder: (Long) -> Unit,
     modifier: Modifier = Modifier,
     readAloudProgress: StateFlow<ReadAloudProgress>? = null,
     ttsOnSeekTo: (Long) -> Unit = {},
@@ -625,9 +618,6 @@ fun FeedScreen(
         podcastOnSeekTo = podcastOnSeekTo,
         onDismissDeleteDialog = onDismissDeleteDialog,
         onDismissEditDialog = onDismissEditDialog,
-        onRenameTag = onRenameTag,
-        onShowRenameTagDialog = onShowRenameTagDialog,
-        onDismissRenameTagDialog = onDismissRenameTagDialog,
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
@@ -682,7 +672,7 @@ fun FeedScreen(
                     }
                 }
 
-                if (viewState.currentFeedOrTag.isNotSavedArticles) {
+                if (viewState.currentFeedOrFolder.isNotSavedArticles) {
                     PlainTooltipBox(
                         tooltip = {
                             Text(stringResource(id = R.string.filter_noun))
@@ -938,24 +928,22 @@ fun FeedScreen(
                                     Text(stringResource(id = R.string.delete_feed))
                                 },
                             )
-                            if (viewState.feedScreenTitle.type == FeedType.TAG && !viewState.currentFeedOrTag.isFeed) {
-                                HorizontalDivider()
-                                DropdownMenuItem(
-                                    onClick = {
-                                        onShowToolbarMenu(false)
-                                        onShowRenameTagDialog()
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.Edit,
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    text = {
-                                        Text(stringResource(id = R.string.rename_tag))
-                                    },
-                                )
-                            }
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onNavigateToFolder(viewState.currentFolderId)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Folder,
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.manage_folders))
+                                },
+                            )
                             HorizontalDivider()
                             DropdownMenuItem(
                                 onClick = {
@@ -1143,9 +1131,6 @@ fun FeedScreen(
     podcastOnSeekTo: (Int) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
-    onRenameTag: (String, String) -> Unit,
-    onShowRenameTagDialog: () -> Unit,
-    onDismissRenameTagDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable (RowScope.() -> Unit),
@@ -1206,7 +1191,7 @@ fun FeedScreen(
     }
 
     val topAppBarState =
-        key(viewState.currentFeedOrTag) {
+        key(viewState.currentFeedOrFolder) {
             rememberTopAppBarState()
         }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
@@ -1226,7 +1211,7 @@ fun FeedScreen(
                 scrollBehavior = scrollBehavior,
                 title =
                     when (viewState.feedScreenTitle.type) {
-                        FeedType.FEED, FeedType.TAG -> viewState.feedScreenTitle.title
+                        FeedType.FEED, FeedType.FOLDER -> viewState.feedScreenTitle.title
                         FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
                         FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
                     }.let { title ->
@@ -1364,15 +1349,6 @@ fun FeedScreen(
                     ),
                 onDismiss = onDismissEditDialog,
                 onEdit = onEditFeed,
-            )
-        }
-        if (viewState.showRenameTagDialog) {
-            RenameTagDialog(
-                currentTagName = viewState.feedScreenTitle.title ?: "",
-                onDismiss = onDismissRenameTagDialog,
-                onRename = { newName ->
-                    onRenameTag(viewState.feedScreenTitle.title ?: "", newName)
-                },
             )
         }
     }
@@ -1521,7 +1497,7 @@ fun FeedListContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
-                        bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
+                        bookmarkIndicator = !viewState.currentFeedOrFolder.isSavedArticles,
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
@@ -1780,7 +1756,7 @@ fun FeedGridContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
-                        bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
+                        bookmarkIndicator = !viewState.currentFeedOrFolder.isSavedArticles,
                         maxLines = viewState.maxLines,
                         showOnlyTitle = viewState.showOnlyTitle,
                         showReadingTime = viewState.showReadingTime,
@@ -1892,19 +1868,19 @@ private fun TranslationModelDownloadProgress(
 }
 
 @Immutable
-data class FeedOrTag(
-    val id: Long,
-    val tag: String,
+data class FeedOrFolder(
+    val feedId: Long,
+    val folderId: Long,
 )
 
 @Suppress("unused")
-val FeedOrTag.isFeed
-    get() = id > ID_UNSET
+val FeedOrFolder.isFeed
+    get() = feedId > ID_UNSET
 
-val FeedOrTag.isSavedArticles
-    get() = id == ID_SAVED_ARTICLES
+val FeedOrFolder.isSavedArticles
+    get() = feedId == ID_SAVED_ARTICLES
 
-val FeedOrTag.isNotSavedArticles
+val FeedOrFolder.isNotSavedArticles
     get() = !isSavedArticles
 
 enum class FeedScreenType {

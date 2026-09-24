@@ -19,6 +19,9 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.Folder
+import com.nononsenseapps.feeder.db.room.FolderDao
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.Either
@@ -43,6 +46,7 @@ import org.kodein.di.singleton
 import java.io.File
 import java.io.IOException
 import java.net.URL
+import kotlin.collections.plus
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
@@ -60,6 +64,7 @@ class OPMLTest : DIAware {
             bind<AppDatabase>() with instance(db)
             bind<FeedDao>() with singleton { db.feedDao() }
             bind<BlocklistDao>() with singleton { db.blocklistDao() }
+            bind<FolderDao>() with singleton { db.folderDao() }
             bind<SettingsStore>() with singleton { SettingsStore(di) }
             bind<FeedStore>() with singleton { FeedStore(di) }
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
@@ -95,7 +100,13 @@ class OPMLTest : DIAware {
         path = context.externalCacheDir!!.resolve("${Random.nextInt()}").also { it.createNewFile() }
         assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
 
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        db =
+            Room
+                .inMemoryDatabaseBuilder(
+                    context,
+                    AppDatabase::class.java,
+                ).addCallback(AppDatabase.dbCallback)
+                .build()
     }
 
     @After
@@ -114,10 +125,13 @@ class OPMLTest : DIAware {
                 path = path!!.absolutePath,
                 settings = ALL_SETTINGS_WITH_VALUES,
                 blockedPatterns = BLOCKED_PATTERNS,
-                tags = getTags(),
-            ) { tag ->
-                db.feedDao().getFeedsByTitle(tag = tag)
-            }
+                folders = { folderId ->
+                    db.folderDao().getChildFolders(folderId = folderId)
+                },
+                feeds = { folderId ->
+                    db.feedDao().getFeedsByTitle(folderId = folderId)
+                },
+            )
 
             val fullFile = path!!.bufferedReader().use { it.readText() }
             assertEquals(sampleFile.joinToString("\n"), fullFile.trim())
@@ -203,9 +217,9 @@ class OPMLTest : DIAware {
                 }
 
                 when {
-                    i % 3 == 1 -> assertEquals("tag1", feed.tag)
-                    i % 3 == 2 -> assertEquals("tag2", feed.tag)
-                    else -> assertEquals("", feed.tag)
+                    i % 3 == 1 -> assertEquals("folder1", db.folderDao().getFolderName(feed.folderId))
+                    i % 3 == 2 -> assertEquals("folder2", db.folderDao().getFolderName(feed.folderId))
+                    else -> assertEquals(ID_UNSET, feed.folderId)
                 }
             }
             for (i in 0..9) {
@@ -220,11 +234,12 @@ class OPMLTest : DIAware {
             writeSampleFile()
 
             // Create something that does not exist
+            val folderId = db.folderDao().insertFolder("kapow", ID_UNSET)
             var feednew =
                 Feed(
                     url = URL("http://example.com/20/rss.xml"),
                     title = "\"20\"",
-                    tag = "kapow",
+                    folderIdNullable = folderId,
                 )
             var id = db.feedDao().insertFeed(feednew)
             feednew = feednew.copy(id = id)
@@ -264,12 +279,12 @@ class OPMLTest : DIAware {
                     i == 20 -> {
                         assertEquals("Should not have changed", feednew.id, feed.id)
                         assertEquals("Should not have changed", feednew.url, feed.url)
-                        assertEquals("Should not have changed", feednew.tag, feed.tag)
+                        assertEquals("Should not have changed", feednew.folderId, feed.folderId)
                     }
 
-                    i % 3 == 1 -> assertEquals("tag1", feed.tag)
-                    i % 3 == 2 -> assertEquals("tag2", feed.tag)
-                    else -> assertEquals("", feed.tag)
+                    i % 3 == 1 -> assertEquals("folder1", db.folderDao().getFolderName(feed.folderId))
+                    i % 3 == 2 -> assertEquals("folder2", db.folderDao().getFolderName(feed.folderId))
+                    else -> assertEquals(ID_UNSET, feed.folderId)
                 }
 
                 // Ensure titles are correct
@@ -371,7 +386,6 @@ class OPMLTest : DIAware {
                 Feed(
                     url = URL("http://example.com/rules.xml"),
                     title = "rules",
-                    tag = "rules",
                     blockRules = blockRules,
                     allowRules = allowRules,
                 ),
@@ -381,10 +395,13 @@ class OPMLTest : DIAware {
                 path = path!!.absolutePath,
                 settings = emptyMap(),
                 blockedPatterns = emptyList(),
-                tags = getTags(),
-            ) { tag ->
-                db.feedDao().getFeedsByTitle(tag = tag)
-            }
+                folders = { folderId ->
+                    db.folderDao().getChildFolders(folderId = folderId)
+                },
+                feeds = { folderId ->
+                    db.feedDao().getFeedsByTitle(folderId = folderId)
+                },
+            )
 
             // Wipe and read back through the real XmlPullParser - the only thing which
             // catches XML attribute-value newline normalization.
@@ -417,17 +434,21 @@ class OPMLTest : DIAware {
         }
 
     private suspend fun createSampleFeeds() {
+        val folder1Id = db.folderDao().insertFolder("folder1", ID_UNSET)
+        val folder2Id = db.folderDao().insertFolder("folder2", folder1Id)
+        db.folderDao().insertFolder("nothing", ID_UNSET)
+
         for (i in 0..9) {
             val feed =
                 Feed(
                     url = URL("http://example.com/$i/rss.xml"),
                     title = "\"$i\"",
                     customTitle = if (i == 0) "" else "custom \"$i\"",
-                    tag =
+                    folderIdNullable =
                         when (i % 3) {
-                            1 -> "tag1"
-                            2 -> "tag2"
-                            else -> ""
+                            1 -> folder1Id
+                            2 -> folder2Id
+                            else -> null
                         },
                     notify = i == 0,
                     alternateId = i == 0,
@@ -450,8 +471,6 @@ class OPMLTest : DIAware {
         }
     }
 
-    private suspend fun getTags(): List<String> = db.feedDao().loadTags()
-
     @Test
     @MediumTest
     fun antennaPodOPMLImports() =
@@ -465,12 +484,12 @@ class OPMLTest : DIAware {
 
             // then
             val feeds = db.feedDao().getAllFeeds()
-            val tags = db.feedDao().loadTags()
+            val folders = db.folderDao().getAllFolders()
             assertEquals("Expecting 8 feeds", 8, feeds.size)
-            assertEquals("Expecting 1 tags (incl empty)", 1, tags.size)
+            assertEquals("Expecting 0 folders", 0, folders.size)
 
             feeds.forEach { feed ->
-                assertEquals("No tag expected", "", feed.tag)
+                assertEquals("No folder expected", ID_UNSET, feed.folderId)
                 when (feed.url) {
                     URL("http://aliceisntdead.libsyn.com/rss") -> {
                         assertEquals("Alice Isn't Dead", feed.title)
@@ -522,74 +541,80 @@ class OPMLTest : DIAware {
 
             // then
             val feeds = db.feedDao().getAllFeeds()
-            val tags = db.feedDao().loadTags()
+            val folders = db.folderDao().getAllFolders()
             assertEquals("Expecting 11 feeds", 11, feeds.size)
-            assertEquals("Expecting 4 tags (incl empty)", 4, tags.size)
+            assertEquals("Expecting 4 folders", 4, folders.size)
 
             feeds.forEach { feed ->
+                val folderName =
+                    when {
+                        feed.folderId > ID_UNSET -> db.folderDao().getFolderName(feed.folderId)
+                        else -> ""
+                    }
+
                 when (feed.url) {
                     URL("http://www.smbc-comics.com/rss.php") -> {
-                        assertEquals("black humor", feed.tag)
+                        assertEquals("black humor", folderName)
                         assertEquals("SMBC", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("http://www.deathbulge.com/rss.xml") -> {
-                        assertEquals("black humor", feed.tag)
+                        assertEquals("black humor", folderName)
                         assertEquals("Deathbulge", feed.customTitle)
                         assertTrue(feed.fullTextByDefault)
                     }
 
                     URL("http://www.sandraandwoo.com/gaia/feed/") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Gaia", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("http://replaycomic.com/feed/") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Replay", feed.customTitle)
                         assertTrue(feed.fullTextByDefault)
                     }
 
                     URL("http://www.cuttimecomic.com/rss.php") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Cut Time", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("http://www.commitstrip.com/feed/") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Commit strip", feed.customTitle)
                         assertTrue(feed.fullTextByDefault)
                     }
 
                     URL("http://www.sandraandwoo.com/feed/") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Sandra and Woo", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("http://www.awakencomic.com/rss.php") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Awaken", feed.customTitle)
                         assertTrue(feed.fullTextByDefault)
                     }
 
                     URL("http://www.questionablecontent.net/QCRSS.xml") -> {
-                        assertEquals("comics", feed.tag)
+                        assertEquals("comics", folderName)
                         assertEquals("Questionable Content", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("https://www.archlinux.org/feeds/news/") -> {
-                        assertEquals("Tech", feed.tag)
+                        assertEquals("Tech", folderName)
                         assertEquals("Arch news", feed.customTitle)
                         assertFalse(feed.fullTextByDefault)
                     }
 
                     URL("https://grisebouille.net/feed/") -> {
-                        assertEquals("Political humour", feed.tag)
+                        assertEquals("Political humour", folderName)
                         assertEquals("Grisebouille", feed.customTitle)
                         assertTrue(feed.fullTextByDefault)
                     }
@@ -612,44 +637,50 @@ class OPMLTest : DIAware {
 
             // then
             val feeds = db.feedDao().getAllFeeds()
-            val tags = db.feedDao().loadTags()
+            val folders = db.folderDao().getAllFolders()
             assertEquals("Expecting 30 feeds", 30, feeds.size)
-            assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
+            assertEquals("Expecting 5 folders", 5, folders.size)
 
             feeds.forEach { feed ->
+                val folderName =
+                    when {
+                        feed.folderId > ID_UNSET -> db.folderDao().getFolderName(feed.folderId)
+                        else -> ""
+                    }
+
                 when (feed.url) {
                     URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
-                        assertEquals("Religion", feed.tag)
+                        assertEquals("Religion", folderName)
                         assertEquals("Les trois sagesses", feed.customTitle)
                     }
 
                     URL("http://www.avrildeperthuis.com/feed/") -> {
-                        assertEquals("Amis", feed.tag)
+                        assertEquals("Amis", folderName)
                         assertEquals("avril de perthuis", feed.customTitle)
                     }
 
                     URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
-                        assertEquals("Actu Geek", feed.tag)
+                        assertEquals("Actu Geek", folderName)
                         assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.customTitle)
                     }
 
                     URL("http://feeds2.feedburner.com/ChartPorn") -> {
-                        assertEquals("Graphs", feed.tag)
+                        assertEquals("Graphs", folderName)
                         assertEquals("Chart Porn", feed.customTitle)
                     }
 
                     URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
-                        assertEquals("Religion", feed.tag)
+                        assertEquals("Religion", folderName)
                         assertEquals("Mosquee de Paris", feed.customTitle)
                     }
 
                     URL("http://sourceforge.net/projects/stuntrally/rss") -> {
-                        assertEquals("Mainstream update", feed.tag)
+                        assertEquals("Mainstream update", folderName)
                         assertEquals("Stunt Rally", feed.customTitle)
                     }
 
                     URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
-                        assertEquals("", feed.tag)
+                        assertEquals("", folderName)
                         assertEquals("Actualités", feed.customTitle)
                     }
                 }
@@ -736,44 +767,50 @@ class OPMLTest : DIAware {
 
             // then
             val feeds = db.feedDao().getAllFeeds()
-            val tags = db.feedDao().loadTags()
+            val folders = db.folderDao().getAllFolders()
             assertEquals("Expecting 30 feeds", 30, feeds.size)
-            assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
+            assertEquals("Expecting 5 folders", 5, folders.size)
 
             feeds.forEach { feed ->
+                val folderName =
+                    when {
+                        feed.folderId > ID_UNSET -> db.folderDao().getFolderName(feed.folderId)
+                        else -> ""
+                    }
+
                 when (feed.url) {
                     URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
-                        assertEquals("Religion", feed.tag)
+                        assertEquals("Religion", folderName)
                         assertEquals("Les trois sagesses", feed.customTitle)
                     }
 
                     URL("http://www.avrildeperthuis.com/feed/") -> {
-                        assertEquals("Amis", feed.tag)
+                        assertEquals("Amis", folderName)
                         assertEquals("avril de perthuis", feed.customTitle)
                     }
 
                     URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
-                        assertEquals("Actu Geek", feed.tag)
+                        assertEquals("Actu Geek", folderName)
                         assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.customTitle)
                     }
 
                     URL("http://feeds2.feedburner.com/ChartPorn") -> {
-                        assertEquals("Graphs", feed.tag)
+                        assertEquals("Graphs", folderName)
                         assertEquals("Chart Porn", feed.customTitle)
                     }
 
                     URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
-                        assertEquals("Religion", feed.tag)
+                        assertEquals("Religion", folderName)
                         assertEquals("Mosquee de Paris", feed.customTitle)
                     }
 
                     URL("http://sourceforge.net/projects/stuntrally/rss") -> {
-                        assertEquals("Mainstream update", feed.tag)
+                        assertEquals("Mainstream update", folderName)
                         assertEquals("Stunt Rally", feed.customTitle)
                     }
 
                     URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
-                        assertEquals("", feed.tag)
+                        assertEquals("", folderName)
                         assertEquals("Actualités", feed.customTitle)
                     }
                 }
@@ -861,20 +898,21 @@ private val sampleFile: List<String> =
         </title>
       </head>
       <body>
-        <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage.png" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://example.com/0/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;3&quot;" text="custom &quot;3&quot;" type="rss" xmlUrl="http://example.com/3/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;6&quot;" text="custom &quot;6&quot;" type="rss" xmlUrl="http://example.com/6/rss.xml"/>
-        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;9&quot;" text="custom &quot;9&quot;" type="rss" xmlUrl="http://example.com/9/rss.xml"/>
-        <outline title="tag1" text="tag1">
+        <outline title="folder1" text="folder1">
+          <outline title="folder2" text="folder2">
+            <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;2&quot;" text="custom &quot;2&quot;" type="rss" xmlUrl="http://example.com/2/rss.xml"/>
+            <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;5&quot;" text="custom &quot;5&quot;" type="rss" xmlUrl="http://example.com/5/rss.xml"/>
+            <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://example.com/8/rss.xml"/>
+          </outline>
           <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;1&quot;" text="custom &quot;1&quot;" type="rss" xmlUrl="http://example.com/1/rss.xml"/>
           <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;4&quot;" text="custom &quot;4&quot;" type="rss" xmlUrl="http://example.com/4/rss.xml"/>
           <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;7&quot;" text="custom &quot;7&quot;" type="rss" xmlUrl="http://example.com/7/rss.xml"/>
         </outline>
-        <outline title="tag2" text="tag2">
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;2&quot;" text="custom &quot;2&quot;" type="rss" xmlUrl="http://example.com/2/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;5&quot;" text="custom &quot;5&quot;" type="rss" xmlUrl="http://example.com/5/rss.xml"/>
-          <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://example.com/8/rss.xml"/>
-        </outline>
+        <outline title="nothing" text="nothing"/>
+        <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage.png" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://example.com/0/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;3&quot;" text="custom &quot;3&quot;" type="rss" xmlUrl="http://example.com/3/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;6&quot;" text="custom &quot;6&quot;" type="rss" xmlUrl="http://example.com/6/rss.xml"/>
+        <outline feeder:notify="false" feeder:fullTextByDefault="false" feeder:openArticlesWith="" feeder:alternateId="false" feeder:fetchOgImages="false" title="custom &quot;9&quot;" text="custom &quot;9&quot;" type="rss" xmlUrl="http://example.com/9/rss.xml"/>
         <feeder:settings>
           <feeder:setting key="pref_added_feeder_news" value="true"/>
           <feeder:setting key="pref_theme" value="night"/>
@@ -936,11 +974,35 @@ private val sampleFile: List<String> =
 
 class OpmlFeedList : OPMLParserHandler {
     val feeds = mutableMapOf<URL, Feed>()
+    val folders = mutableMapOf<Pair<Long, String>, Folder>()
     val settings = mutableMapOf<String, String>()
     val blockList = mutableListOf<String>()
 
-    override suspend fun saveFeed(feed: Feed) {
-        feeds[feed.url] = feed
+    override suspend fun saveFeed(
+        feed: Feed,
+        folderId: Long,
+    ) {
+        feeds[feed.url] =
+            feed.copy(
+                folderIdNullable = folderId.takeUnless { it == ID_UNSET },
+            )
+    }
+
+    override suspend fun saveFolder(
+        name: String,
+        parentId: Long,
+    ): Long {
+        return folders
+            .getOrElse(parentId to name) {
+                val newFolderId = folders.size + 1L
+                folders + (parentId to name) to
+                    Folder(
+                        id = newFolderId,
+                        parentIdNullable = parentId.takeUnless { it == ID_UNSET },
+                        name = name,
+                    )
+                return newFolderId
+            }.id
     }
 
     override suspend fun saveSetting(

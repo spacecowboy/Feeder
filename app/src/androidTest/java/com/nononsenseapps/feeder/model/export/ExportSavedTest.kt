@@ -17,6 +17,8 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FolderDao
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OPMLImporter
@@ -59,6 +61,7 @@ class ExportSavedTest : DIAware {
             bind<FeedDao>() with singleton { db.feedDao() }
             bind<FeedItemDao>() with singleton { db.feedItemDao() }
             bind<BlocklistDao>() with singleton { db.blocklistDao() }
+            bind<FolderDao>() with singleton { db.folderDao() }
             bind<SettingsStore>() with singleton { SettingsStore(di) }
             bind<FeedStore>() with singleton { FeedStore(di) }
             bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
@@ -83,7 +86,13 @@ class ExportSavedTest : DIAware {
         path = context.externalCacheDir!!.resolve("${Random.nextInt()}").also { it.createNewFile() }
         Assert.assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
 
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        db =
+            Room
+                .inMemoryDatabaseBuilder(
+                    context,
+                    AppDatabase::class.java,
+                ).addCallback(AppDatabase.dbCallback)
+                .build()
     }
 
     @After
@@ -142,6 +151,36 @@ class ExportSavedTest : DIAware {
                     url = "https://example.com/ampersands",
                     title = "Ampersands are & the worst",
                     customTitle = "Ampersands",
+                    folderPath = listOf("Characters"),
+                    fullTextByDefault = true,
+                ),
+        )
+
+    private fun savedArticleExportItemWithLegacyFeedTag(): SavedArticleExportItem =
+        SavedArticleExportItem(
+            link = "https://example.com/ampersands/1",
+            guid = "guid anime2you",
+            title = "Item with image",
+            snippet = "Snippet with image",
+            pubDate = "2026-05-12T08:30Z",
+            primarySortTime = "2026-05-12T08:29:30Z",
+            readTime = "2026-05-12T08:31:00Z",
+            author = "Example Author",
+            thumbnailImage =
+                MediaImage(
+                    url = "https://example.com/ampersands/image.png",
+                    width = 640,
+                    height = 320,
+                ),
+            enclosureLink = "https://example.com/ampersands/podcast.mp3",
+            enclosureType = "audio/mpeg",
+            wordCount = 42,
+            wordCountFull = 420,
+            feed =
+                SavedArticleFeedExportItem(
+                    url = "https://example.com/ampersands",
+                    title = "Ampersands are & the worst",
+                    customTitle = "Ampersands",
                     tag = "Characters",
                     fullTextByDefault = true,
                 ),
@@ -149,12 +188,13 @@ class ExportSavedTest : DIAware {
 
     private suspend fun insertTestFeed(): Long {
         val article = savedArticleExportItem()
+        val folderId = db.folderDao().folderPathStringToFolderId(article.feed.folderPath!!)
         return db.feedDao().insertFeed(
             Feed(
                 title = article.feed.title,
                 customTitle = article.feed.customTitle,
                 url = URL(article.feed.url),
-                tag = article.feed.tag,
+                folderIdNullable = folderId.takeUnless { it == ID_UNSET },
                 fullTextByDefault = article.feed.fullTextByDefault,
             ),
         )
@@ -300,6 +340,36 @@ class ExportSavedTest : DIAware {
                 imported = imported,
                 feedId = feedId,
             )
+        }
+    }
+
+    @SmallTest
+    @Test
+    fun testImportArticleExportItemWithLegacyFeedTag() {
+        runBlocking {
+            val article = savedArticleExportItemWithLegacyFeedTag()
+            path!!.writeText(
+                Json.encodeToString(
+                    SavedArticlesExport.serializer(),
+                    SavedArticlesExport(
+                        format = SAVED_ARTICLES_EXPORT_FORMAT,
+                        version = 1,
+                        articles = listOf(article),
+                    ),
+                ),
+            )
+
+            assertTrue {
+                importSavedArticles(
+                    di,
+                    path!!.toUri(),
+                ).isRight()
+            }
+
+            val importedFeed = assertNotNull(db.feedDao().loadFeedWithUrl(URL(article.feed.url)))
+            val importedFolder = assertNotNull(db.folderDao().getFolder(importedFeed.folderId))
+            assertEquals(ID_UNSET, importedFolder.parentId)
+            assertEquals(article.feed.tag!!, importedFolder.name)
         }
     }
 }

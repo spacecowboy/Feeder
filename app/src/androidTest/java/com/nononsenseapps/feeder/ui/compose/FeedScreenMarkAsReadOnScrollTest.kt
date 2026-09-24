@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -52,7 +53,7 @@ class FeedScreenMarkAsReadOnScrollTest : BaseComposeTest {
                         ),
                     )
 
-                repository.setCurrentFeedAndTag(feedId, "")
+                repository.setCurrentFeedAndFolder(feedId, ID_UNSET)
 
                 repository.upsertFeedItems(
                     (1..50).map { i ->
@@ -124,7 +125,7 @@ class FeedScreenMarkAsReadOnScrollTest : BaseComposeTest {
                         ),
                     )
 
-                repository.setCurrentFeedAndTag(feedId, "")
+                repository.setCurrentFeedAndFolder(feedId, ID_UNSET)
 
                 repository.upsertFeedItems(
                     (1..50).map { i ->

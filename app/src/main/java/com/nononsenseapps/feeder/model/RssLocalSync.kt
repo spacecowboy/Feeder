@@ -64,7 +64,7 @@ class RssLocalSync(
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
-        feedTag: String = "",
+        folderId: Long = ID_UNSET,
         forceNetwork: Boolean = false,
         minFeedAgeMinutes: Int = 5,
         // Used in tests to force network without having to wait
@@ -78,7 +78,7 @@ class RssLocalSync(
 
                     syncFeeds(
                         feedId = feedId,
-                        feedTag = feedTag,
+                        folderId = folderId,
                         maxFeedItemCount = repository.maximumCountPerFeed.value,
                         forceNetwork = forceNetwork,
                         minFeedAgeMinutes = minFeedAgeMinutes,
@@ -93,7 +93,7 @@ class RssLocalSync(
 
     internal suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
-        feedTag: String = "",
+        folderId: Long = ID_UNSET,
         maxFeedItemCount: Int = 100,
         forceNetwork: Boolean = false,
         minFeedAgeMinutes: Int = 5,
@@ -133,7 +133,7 @@ class RssLocalSync(
                         }
 
                         val feedsToFetch =
-                            feedsToSync(feedId, feedTag, staleTime = staleTime)
+                            feedsToSync(feedId, folderId, staleTime = staleTime)
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
@@ -532,11 +532,11 @@ class RssLocalSync(
 
     internal suspend fun feedsToSync(
         feedId: Long,
-        tag: String,
+        folderId: Long,
         staleTime: Long = -1L,
     ): List<Feed> =
         when {
-            feedId > 0 -> {
+            feedId > ID_UNSET -> {
                 val feed =
                     if (staleTime > 0) {
                         repository.syncLoadFeedIfStale(
@@ -555,15 +555,15 @@ class RssLocalSync(
                 }
             }
 
-            tag.isNotEmpty() ->
+            folderId > ID_UNSET ->
                 if (staleTime > 0) {
                     repository.syncLoadFeedsIfStale(
-                        tag = tag,
+                        folderId = folderId,
                         staleTime = staleTime,
                         retryAfter = Instant.now(),
                     )
                 } else {
-                    repository.syncLoadFeeds(tag, retryAfter = Instant.now())
+                    repository.syncLoadFeeds(folderId, retryAfter = Instant.now())
                 }
 
             else ->

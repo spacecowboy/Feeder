@@ -12,7 +12,7 @@ import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
+import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndFolders
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
@@ -27,15 +27,15 @@ class FeedWidgetSettingsActivity : DIAwareComponentActivity() {
         setContent {
             withAllProviders {
                 Surface {
-                    val feedsAndTags = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
-                    ListOfFeedsAndTags(
-                        feedsAndTags = feedsAndTags,
-                        { tag ->
-                            viewModel.toggleTagExpansion(tag)
+                    val feedsAndFolders = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
+                    ListOfFeedsAndFolders(
+                        feedsAndFolders = feedsAndFolders,
+                        { folderId ->
+                            viewModel.toggleFolderExpansion(folderId)
                         },
                         rememberLazyListState(),
                         onItemClick = {
-                            viewModel.selectFeedForWidget(it.id, it.tag)
+                            viewModel.selectFeedForWidget(it.feedId, it.folderId)
                             viewModel.viewModelScope.launch {
                                 val manager = GlanceAppWidgetManager(this@FeedWidgetSettingsActivity)
                                 val widget = FeedWidget()

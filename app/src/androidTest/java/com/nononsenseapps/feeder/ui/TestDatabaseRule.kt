@@ -16,7 +16,8 @@ class TestDatabaseRule(
                 .inMemoryDatabaseBuilder(
                     context,
                     AppDatabase::class.java,
-                ).build()
+                ).addCallback(AppDatabase.dbCallback)
+                .build()
                 .also {
                     // Ensure all classes use test database
                     AppDatabase.setInstance(it)

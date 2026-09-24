@@ -50,9 +50,11 @@ private const val LOG_TAG = "FEEDER_APPDB"
         RemoteReadMark::class,
         RemoteFeed::class,
         SyncDevice::class,
+        Folder::class,
     ],
     views = [
         FeedsWithItemsForNavDrawer::class,
+        FolderClosures::class,
     ],
     version = 41,
 )
@@ -74,10 +76,47 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun syncDeviceDao(): SyncDeviceDao
 
+    abstract fun folderDao(): FolderDao
+
     companion object {
         // For Singleton instantiation
         @Volatile
         private var instance: AppDatabase? = null
+
+        val dbCallback =
+            object : Callback() {
+                // Triggers need to be dropped and recreated in a new migration if modified
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+
+                    db.execSQL(
+                        """
+                        CREATE TRIGGER prevent_folder_cycles_after_insert
+                        AFTER INSERT ON folders
+                        WHEN EXISTS(
+                            SELECT 1 FROM folder_closures
+                            WHERE ancestor_id = NEW.id AND descendant_id = NEW.parent_id
+                        )
+                        BEGIN
+                            SELECT RAISE(ABORT, 'Cannot insert folder into own subtree');
+                        END
+                        """.trimIndent(),
+                    )
+                    db.execSQL(
+                        """
+                        CREATE TRIGGER prevent_folder_cycles_after_update
+                        AFTER UPDATE OF parent_id ON folders
+                        WHEN EXISTS(
+                            SELECT 1 FROM folder_closures
+                            WHERE ancestor_id = OLD.id AND descendant_id = NEW.parent_id
+                        )
+                        BEGIN
+                            SELECT RAISE(ABORT, 'Cannot move folder into own subtree');
+                        END
+                        """.trimIndent(),
+                    )
+                }
+            }
 
         /**
          * Use this in tests only
@@ -95,6 +134,7 @@ abstract class AppDatabase : RoomDatabase() {
             val di: DI by closestDI(context)
             return Room
                 .databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
+                .addCallback(dbCallback)
                 .addMigrations(*getAllMigrations(di))
                 .build()
         }
@@ -140,12 +180,160 @@ fun getAllMigrations(di: DI) =
         MIGRATION_38_39,
         MIGRATION_39_40,
         MIGRATION_40_41,
+        MigrationFrom40To41(di),
     )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+
+class MigrationFrom40To41(
+    override val di: DI,
+) : Migration(40, 41),
+    DIAware {
+    private val sharedPrefs: SharedPreferences by instance()
+
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Schema
+        db.execSQL(
+            """
+            DROP VIEW IF EXISTS `feeds_with_items_for_nav_drawer`
+            """.trimIndent(),
+        )
+
+        // folders table
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parent_id` INTEGER, `name` TEXT NOT NULL, `expanded` INTEGER NOT NULL, FOREIGN KEY(`parent_id`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS `index_folders_parent_id_name` ON `folders` (`parent_id`, `name`)
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_folders_parent_id` ON `folders` (`parent_id`)
+            """.trimIndent(),
+        )
+
+        // feeds table
+        db.execSQL(
+            """
+            ALTER TABLE `feeds` ADD COLUMN `folder_id` INTEGER REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_feeds_folder_id` ON `feeds` (`folder_id`)
+            """.trimIndent(),
+        )
+
+        // Views
+        @Suppress("ktlint:standard:max-line-length")
+        val sqlView1 = "CREATE VIEW `feeds_with_items_for_nav_drawer` AS select feeds.id as feed_id, folder_id, item_id, case when custom_title is '' then title else custom_title end as display_title, image_url, unread, bookmarked\n    from feeds\n    left join (\n        select id as item_id, feed_id, read_time is null as unread, bookmarked\n        from feed_items\n        where block_time is null\n    )\n    ON feeds.id = feed_id"
+        db.execSQL(sqlView1)
+
+        @Suppress("ktlint:standard:max-line-length")
+        val sqlView2 = "CREATE VIEW `folder_closures` AS WITH RECURSIVE recursive_folder_closures AS (\n        SELECT id AS ancestor_id, id AS descendant_id, 0 AS depth\n        FROM folders\n        UNION ALL\n        SELECT cte.ancestor_id, f.id AS descendant_id, cte.depth + 1\n        FROM folders f\n        JOIN recursive_folder_closures cte\n        ON f.parent_id = cte.descendant_id\n            AND f.id <> cte.ancestor_id\n    )\n    SELECT ancestor_id, descendant_id, depth\n    FROM recursive_folder_closures"
+        db.execSQL(sqlView2)
+
+        // Triggers
+        db.execSQL(
+            """
+            CREATE TRIGGER prevent_folder_cycles_after_insert
+            AFTER INSERT ON folders
+            WHEN EXISTS(
+                SELECT 1 FROM folder_closures
+                WHERE ancestor_id = NEW.id AND descendant_id = NEW.parent_id
+            )
+            BEGIN
+                SELECT RAISE(ABORT, 'Cannot insert folder into own subtree');
+            END
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            CREATE TRIGGER prevent_folder_cycles_after_update
+            AFTER UPDATE OF parent_id ON folders
+            WHEN EXISTS(
+                SELECT 1 FROM folder_closures
+                WHERE ancestor_id = OLD.id AND descendant_id = NEW.parent_id
+            )
+            BEGIN
+                SELECT RAISE(ABORT, 'Cannot move folder into own subtree');
+            END
+            """.trimIndent(),
+        )
+
+        // Insert tags into folders table, then update feeds.folder_id to the corresponding values
+        db.execSQL(
+            """
+            INSERT INTO folders (parent_id, name, expanded)
+            SELECT DISTINCT NULL, tag, 0
+            FROM feeds
+            WHERE tag <> ''
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            UPDATE feeds
+            SET folder_id = (
+                SELECT folders.id
+                FROM folders
+                WHERE folders.parent_id IS NULL AND feeds.tag = folders.name
+            )
+            WHERE feeds.tag <> ''
+            """.trimIndent(),
+        )
+
+        // Update preferences
+        val lastFeedTag = sharedPrefs.getString("pref_last_feed_tag", null)?.takeUnless { it.isBlank() }
+        val lastFolderId =
+            lastFeedTag?.let {
+                db
+                    .query(
+                        """
+                        SELECT id FROM folders WHERE parent_id IS NULL AND name = ?
+                        """.trimIndent(),
+                        arrayOf(lastFeedTag),
+                    ).use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            cursor.getLong(0)
+                        } else {
+                            null
+                        }
+                    }
+            } ?: ID_UNSET
+        val lastWidgetFeedTag = sharedPrefs.getString("pref_widget_last_feed_tag", null)?.takeUnless { it.isBlank() }
+        val lastWidgetFolderId =
+            lastWidgetFeedTag?.let {
+                db
+                    .query(
+                        """
+                        SELECT id FROM folders WHERE parent_id IS NULL AND name = ?
+                        """.trimIndent(),
+                        arrayOf(lastWidgetFeedTag),
+                    ).use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            cursor.getLong(0)
+                        } else {
+                            null
+                        }
+                    }
+            } ?: ID_UNSET
+
+        sharedPrefs
+            .edit()
+            .putLong("pref_last_folder_id", lastFolderId)
+            .putLong("pref_widget_last_folder_id", lastWidgetFolderId)
+            .remove("pref_last_feed_tag")
+            .remove("pref_widget_last_feed_tag")
+            .apply()
+    }
+}
 
 /**
  * Moving main articles back to data dir because of issues some have

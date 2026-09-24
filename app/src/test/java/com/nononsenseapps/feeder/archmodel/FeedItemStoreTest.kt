@@ -132,13 +132,13 @@ class FeedItemStoreTest : DIAware {
     }
 
     @Test
-    fun markAllAsReadInTag() {
+    fun markAllAsReadInFolder() {
         runBlocking {
-            store.markAllAsReadInTag("sfz")
+            store.markAllAsReadInFolder(2L)
         }
 
         coVerify {
-            dao.markAllAsRead("sfz", any())
+            dao.markAllAsReadInFolder(2L, any())
         }
     }
 

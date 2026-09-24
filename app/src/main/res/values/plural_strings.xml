@@ -40,4 +40,20 @@
     <item quantity="many">@string/many_minutes</item>
     <item quantity="other">@string/other_minutes</item>
   </plurals>
+  <plurals name="n_folders">
+    <item quantity="zero">@string/zero_folders</item>
+    <item quantity="one">@string/one_folders</item>
+    <item quantity="two">@string/two_folders</item>
+    <item quantity="few">@string/few_folders</item>
+    <item quantity="many">@string/many_folders</item>
+    <item quantity="other">@string/other_folders</item>
+  </plurals>
+  <plurals name="n_selected">
+    <item quantity="zero">@string/zero_selected</item>
+    <item quantity="one">@string/one_selected</item>
+    <item quantity="two">@string/two_selected</item>
+    <item quantity="few">@string/few_selected</item>
+    <item quantity="many">@string/many_selected</item>
+    <item quantity="other">@string/other_selected</item>
+  </plurals>
 </resources>

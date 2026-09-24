@@ -13,15 +13,23 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.SelectableFolder
 import com.nononsenseapps.feeder.model.ArticleRuleError
 import com.nononsenseapps.feeder.model.ArticleRuleSet
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.URL
 import java.time.Instant
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EditFeedScreenViewModel(
     di: DI,
     private val state: SavedStateHandle,
@@ -42,7 +50,8 @@ class EditFeedScreenViewModel(
         isOkToSave = isValidUrlOrUri(value)
     }
     override var feedTitle: String by mutableSavedStateOf(state, "")
-    override var feedTag: String by mutableSavedStateOf(state, "")
+    override var folderId: Long by mutableSavedStateOf(state, ID_UNSET)
+    override var folderName: String by mutableSavedStateOf(state, "")
     override var fullTextByDefault: Boolean by mutableSavedStateOf(state, false)
     override var skipDuplicates: Boolean by mutableSavedStateOf(state, false)
     override var notify: Boolean by mutableSavedStateOf(state, false)
@@ -62,7 +71,9 @@ class EditFeedScreenViewModel(
     override var allowRules: String by mutableSavedStateOf(state, "") { value ->
         allowRulesError = ArticleRuleSet.parse(value).errors.firstOrNull()
     }
-    override var allTags: List<String> by mutableStateOf(emptyList())
+
+    override var showFolderDialog: Boolean by mutableSavedStateOf(state, false)
+    override var allFolders: List<SelectableFolder> by mutableStateOf(emptyList())
 
     override var feedImage: String by mutableStateOf("")
 
@@ -103,8 +114,8 @@ class EditFeedScreenViewModel(
             if (!state.contains("feedUrl")) {
                 feedUrl = feed.url.toString()
             }
-            if (!state.contains("feedTag")) {
-                feedTag = feed.tag
+            if (!state.contains("folderId")) {
+                folderId = feed.folderId
             }
             if (!state.contains("feedTitle")) {
                 feedTitle = feed.displayTitle
@@ -140,10 +151,27 @@ class EditFeedScreenViewModel(
                 allowRules = feed.allowRules
             }
 
-            repository.allTags
-                .collect { value ->
-                    allTags = value
-                }
+            repository.allFolders
+                .onEach { value ->
+                    allFolders = value
+                }.launchIn(viewModelScope)
+
+            state
+                .getMutableStateFlow("folderId", ID_UNSET)
+                .flatMapLatest { folderId ->
+                    if (folderId > ID_UNSET) {
+                        repository.getFolderNameFlow(folderId)
+                    } else {
+                        flowOf("")
+                    }
+                }.onEach { name ->
+                    if (name != null) {
+                        folderName = name
+                    } else {
+                        // Reset because folder does not exist
+                        folderId = ID_UNSET
+                    }
+                }.launchIn(viewModelScope)
         }
     }
 
@@ -158,7 +186,7 @@ class EditFeedScreenViewModel(
                     url = URL(feedUrl),
                     title = feedTitle,
                     customTitle = feedTitle,
-                    tag = feedTag,
+                    folderIdNullable = folderId.takeUnless { it == ID_UNSET },
                     fullTextByDefault = fullTextByDefault,
                     notify = notify,
                     skipDuplicates = skipDuplicates,

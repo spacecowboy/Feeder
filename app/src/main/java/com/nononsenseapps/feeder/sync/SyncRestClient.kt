@@ -484,7 +484,7 @@ class SyncRestClient(
                         // Entirely new remote feed
                         logDebug(LOG_TAG, "Saving new feed: ${remoteFeed.url}")
                         repository.saveFeed(
-                            remoteFeed.updateFeedCopy(Feed()),
+                            remoteFeed.updateFeedCopy(Feed(), repository),
                         )
                     }
 
@@ -502,7 +502,7 @@ class SyncRestClient(
                         if (remoteFeed.whenModified > dbFeed.whenModified) {
                             logDebug(LOG_TAG, "Saving updated feed: ${remoteFeed.url}")
                             repository.saveFeed(
-                                remoteFeed.updateFeedCopy(dbFeed),
+                                remoteFeed.updateFeedCopy(dbFeed, repository),
                             )
                         } else {
                             logDebug(
@@ -538,7 +538,7 @@ class SyncRestClient(
                 val feeds =
                     repository
                         .getFeedsOrderedByUrl()
-                        .map { it.toEncryptedFeed() }
+                        .map { it.toEncryptedFeed(repository) }
 
                 // Yes, List hashCodes are based on elements. Just remember to hash what you send
                 // - and not raw database objects

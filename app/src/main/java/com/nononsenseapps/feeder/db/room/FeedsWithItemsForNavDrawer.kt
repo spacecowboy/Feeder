@@ -5,7 +5,7 @@ import androidx.room.DatabaseView
 
 @DatabaseView(
     value = """
-    select feeds.id as feed_id, item_id, case when custom_title is '' then title else custom_title end as display_title, tag, image_url, unread, bookmarked
+    select feeds.id as feed_id, folder_id, item_id, case when custom_title is '' then title else custom_title end as display_title, image_url, unread, bookmarked
     from feeds
     left join (
         select id as item_id, feed_id, read_time is null as unread, bookmarked
@@ -19,7 +19,8 @@ import androidx.room.DatabaseView
 data class FeedsWithItemsForNavDrawer(
     @ColumnInfo(name = "feed_id")
     val feedId: Long,
-    val tag: String,
+    @ColumnInfo(name = "folder_id")
+    val folderIdNullable: Long?,
     @ColumnInfo(name = "display_title")
     val displayTitle: String,
     @ColumnInfo(name = "image_url")

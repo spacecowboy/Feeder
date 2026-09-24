@@ -24,7 +24,7 @@ class FeedDestinationTest {
     @Test
     fun feedHasCorrectRoute() {
         assertEquals(
-            "feed?id={id}&tag={tag}",
+            "feed?feedId={feedId}&folderId={folderId}",
             FeedDestination.route,
         )
     }
@@ -33,7 +33,7 @@ class FeedDestinationTest {
     fun feedHasCorrectDeeplinks() {
         assertEquals(
             listOf(
-                "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}",
+                "$DEEP_LINK_BASE_URI/feed?feedId={feedId}&folderId={folderId}",
             ),
             FeedDestination.deepLinks.map { it.uriPattern },
         )
@@ -51,39 +51,39 @@ class FeedDestinationTest {
     }
 
     @Test
-    fun feedNavigateId() {
+    fun feedNavigateFeed() {
         FeedDestination.navigate(
             navController,
             feedId = 6L,
         )
 
         verify {
-            navController.navigate("feed?id=6")
+            navController.navigate("feed?feedId=6")
         }
     }
 
     @Test
-    fun feedNavigateTag() {
+    fun feedNavigateFolder() {
         FeedDestination.navigate(
             navController,
-            tag = "foo bar+cop",
+            folderId = 3L,
         )
 
         verify {
-            navController.navigate("feed?tag=foo+bar%2Bcop")
+            navController.navigate("feed?folderId=3")
         }
     }
 
     @Test
-    fun feedNavigateIdAndTag() {
+    fun feedNavigateFeedAndFolder() {
         FeedDestination.navigate(
             navController,
             feedId = ID_ALL_FEEDS,
-            tag = "foo bar+cop",
+            folderId = 3L,
         )
 
         verify {
-            navController.navigate("feed?id=-10&tag=foo+bar%2Bcop")
+            navController.navigate("feed?feedId=-10&folderId=3")
         }
     }
 }

@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.EditFoldersDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
@@ -175,6 +176,8 @@ class MainActivity : DIAwareComponentActivity() {
             SyncScreenDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
             // Add Fonts
             TextSettingsDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
+            // Folders
+            EditFoldersDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
         }
 
         DisposableEffect(navController) {

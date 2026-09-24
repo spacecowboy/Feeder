@@ -5,9 +5,11 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
@@ -34,6 +36,13 @@ class FeedsToSyncTest : DIAware {
         bind<AppDatabase>(overrides = true) with instance(testDb.db)
         bind<FeedDao>(overrides = true) with singleton { testDb.db.feedDao() }
         bind<FeedStore>(overrides = true) with singleton { FeedStore(di) }
+        bind<FolderDao>(overrides = true) with singleton { testDb.db.folderDao() }
+        bind<SettingsStore>(overrides = true) with
+            singleton {
+                SettingsStore(di).also {
+                    it.setAddedFeederNews(true)
+                }
+            }
         bind<Repository>(overrides = true) with singleton { Repository(di) }
         bind<RssLocalSync>(overrides = true) with singleton { RssLocalSync(di) }
     }
@@ -47,7 +56,7 @@ class FeedsToSyncTest : DIAware {
             val feed = withFeed()
 
             // when
-            val result = rssLocalSync.feedsToSync(feedId = feed.id, tag = "")
+            val result = rssLocalSync.feedsToSync(feedId = feed.id, folderId = ID_UNSET)
 
             // then
             assertEquals(listOf(feed), result)
@@ -64,7 +73,7 @@ class FeedsToSyncTest : DIAware {
             val result =
                 rssLocalSync.feedsToSync(
                     feedId = feed.id,
-                    tag = "",
+                    folderId = ID_UNSET,
                     staleTime = now.minusMinutes(2).toEpochMilli(),
                 )
 
@@ -81,7 +90,7 @@ class FeedsToSyncTest : DIAware {
                     withFeed(url = URL("http://two")),
                 )
 
-            val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
+            val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, folderId = ID_UNSET)
 
             assertEquals(items, result)
         }
@@ -100,7 +109,7 @@ class FeedsToSyncTest : DIAware {
             val result =
                 rssLocalSync.feedsToSync(
                     feedId = ID_UNSET,
-                    tag = "",
+                    folderId = ID_UNSET,
                     staleTime = now.minusMinutes(2).toEpochMilli(),
                 )
 
@@ -108,34 +117,36 @@ class FeedsToSyncTest : DIAware {
         }
 
     @Test
-    fun returnsTaggedStaleFeeds() =
+    fun returnsStaleFeedsInFolder() =
         runBlocking {
+            val folderId = testDb.db.folderDao().insertFolder("folder", ID_UNSET)
             val items =
                 listOf(
-                    withFeed(url = URL("http://one"), tag = "tag"),
-                    withFeed(url = URL("http://two"), tag = "tag"),
+                    withFeed(url = URL("http://one"), folderId = folderId),
+                    withFeed(url = URL("http://two"), folderId = folderId),
                 )
 
-            val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
+            val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, folderId = ID_UNSET)
 
             assertEquals(items, result)
         }
 
     @Test
-    fun doesNotReturnTaggedFreshFeeds() =
+    fun doesNotReturnFreshFeedsInFolder() =
         runBlocking {
             // Truncate to milliseconds to match database precision
             val now = Instant.ofEpochMilli(Instant.now().toEpochMilli())
+            val folderId = testDb.db.folderDao().insertFolder("folder", ID_UNSET)
             val items =
                 listOf(
-                    withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),
-                    withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag"),
+                    withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), folderId = folderId),
+                    withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), folderId = folderId),
                 )
 
             val result =
                 rssLocalSync.feedsToSync(
                     feedId = ID_UNSET,
-                    tag = "tag",
+                    folderId = folderId,
                     staleTime = now.minusMinutes(2).toEpochMilli(),
                 )
 
@@ -145,13 +156,13 @@ class FeedsToSyncTest : DIAware {
     private suspend fun withFeed(
         lastSync: Instant = Instant.ofEpochMilli(0),
         url: URL = URL("http://url"),
-        tag: String = "",
+        folderId: Long = ID_UNSET,
     ): Feed {
         val feed =
             Feed(
                 lastSync = lastSync,
                 url = url,
-                tag = tag,
+                folderIdNullable = folderId.takeUnless { it == ID_UNSET },
             )
 
         val id = testDb.db.feedDao().insertFeed(feed)

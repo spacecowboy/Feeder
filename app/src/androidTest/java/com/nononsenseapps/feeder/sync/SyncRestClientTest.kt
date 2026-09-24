@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.AndroidSystemStore
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.FolderStore
 import com.nononsenseapps.feeder.archmodel.FontStore
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
@@ -23,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkDao
 import com.nononsenseapps.feeder.db.room.SyncRemote
@@ -65,8 +67,10 @@ class SyncRestClientTest : DIAware {
         bind<RemoteReadMarkDao>() with singleton { testDb.db.remoteReadMarkDao() }
         bind<ReadStatusSyncedDao>() with singleton { testDb.db.readStatusSyncedDao() }
         bind<SyncRemoteDao>() with singleton { testDb.db.syncRemoteDao() }
+        bind<FolderDao>() with singleton { testDb.db.folderDao() }
         bind<FeedStore>() with singleton { FeedStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
+        bind<FolderStore>() with singleton { FolderStore(di) }
         bind<SettingsStore>() with
             singleton {
                 SettingsStore(di).also { it.setAddedFeederNews(true) }

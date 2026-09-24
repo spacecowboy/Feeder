@@ -55,49 +55,49 @@ class SettingsStore(
         _minReadTime.value = value
     }
 
-    private val _currentFeedAndTag =
+    private val _currentFeedAndFolder =
         MutableStateFlow(
-            sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_FEED_TAG, null) ?: ""),
+            sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getLong(PREF_LAST_FOLDER_ID, ID_UNSET)),
         )
-    val currentFeedAndTag = _currentFeedAndTag.asStateFlow()
+    val currentFeedAndFolder = _currentFeedAndFolder.asStateFlow()
 
     /**
      * Returns true if the parameters were different from current state
      */
-    fun setCurrentFeedAndTag(
+    fun setCurrentFeedAndFolder(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ): Boolean =
-        if (_currentFeedAndTag.value.first != feedId ||
-            _currentFeedAndTag.value.second != tag
+        if (_currentFeedAndFolder.value.first != feedId ||
+            _currentFeedAndFolder.value.second != folderId
         ) {
-            _currentFeedAndTag.value = feedId to tag
+            _currentFeedAndFolder.value = feedId to folderId
             sp.edit().putLong(PREF_LAST_FEED_ID, feedId).apply()
-            sp.edit().putString(PREF_LAST_FEED_TAG, tag).apply()
+            sp.edit().putLong(PREF_LAST_FOLDER_ID, folderId).apply()
             true
         } else {
             false
         }
 
-    private val _currentWidgetFeedAndTag =
+    private val _currentWidgetFeedAndFolder =
         MutableStateFlow(
-            sp.getLong(PREF_LAST_WIDGET_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_WIDGET_FEED_TAG, null) ?: ""),
+            sp.getLong(PREF_LAST_WIDGET_FEED_ID, ID_UNSET) to (sp.getLong(PREF_LAST_WIDGET_FOLDER_ID, ID_UNSET)),
         )
-    val currentWidgetFeedAndTag = _currentWidgetFeedAndTag.asStateFlow()
+    val currentWidgetFeedAndFolder = _currentWidgetFeedAndFolder.asStateFlow()
 
     /**
      * Returns true if the parameters were different from current state
      */
-    fun setCurrentWidgetFeedAndTag(
+    fun setCurrentWidgetFeedAndFolder(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ): Boolean =
-        if (_currentWidgetFeedAndTag.value.first != feedId ||
-            _currentWidgetFeedAndTag.value.second != tag
+        if (_currentWidgetFeedAndFolder.value.first != feedId ||
+            _currentWidgetFeedAndFolder.value.second != folderId
         ) {
-            _currentWidgetFeedAndTag.value = feedId to tag
+            _currentWidgetFeedAndFolder.value = feedId to folderId
             sp.edit().putLong(PREF_LAST_WIDGET_FEED_ID, feedId).apply()
-            sp.edit().putString(PREF_LAST_WIDGET_FEED_TAG, tag).apply()
+            sp.edit().putLong(PREF_LAST_WIDGET_FOLDER_ID, folderId).apply()
             true
         } else {
             false
@@ -665,9 +665,9 @@ const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
 /**
  * These indicate which fragment to open by default
  */
-const val PREF_LAST_FEED_TAG = "pref_last_feed_tag"
+const val PREF_LAST_FOLDER_ID = "pref_last_folder_id"
 const val PREF_LAST_FEED_ID = "pref_last_feed_id"
-const val PREF_LAST_WIDGET_FEED_TAG = "pref_widget_last_feed_tag"
+const val PREF_LAST_WIDGET_FOLDER_ID = "pref_widget_last_folder_id"
 const val PREF_LAST_WIDGET_FEED_ID = "pref_widget_last_feed_id"
 const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
 const val PREF_IS_ARTICLE_OPEN = "pref_is_article_open"
