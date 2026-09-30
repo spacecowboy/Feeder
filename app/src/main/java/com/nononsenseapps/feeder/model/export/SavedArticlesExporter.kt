@@ -90,6 +90,7 @@ data class SavedArticleExportItem(
     val wordCount: Int,
     val wordCountFull: Int,
     val feed: SavedArticleFeedExportItem,
+    val articleTags: String?,
 )
 
 @Serializable
@@ -125,6 +126,7 @@ private fun FeedItemWithFeed.toSavedArticleExportItem(): SavedArticleExportItem?
                 tag = tag,
                 fullTextByDefault = fullTextByDefault,
             ),
+        articleTags = articleTags,
     )
 }
 
