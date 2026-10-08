@@ -229,7 +229,7 @@
     <string name="theme_e_ink">電子ペーパー</string>
     <string name="add_anyway">とにかく追加</string>
     <string name="open_browser_in_split_screen">分割画面でブラウザーを開く</string>
-    <string name="show_reading_time">読み終わるまでの推定時間を表示する</string>
+    <string name="show_reading_time">読み終わるまでの推定時間を表示</string>
     <string name="many_words">%1$s 語</string>
     <string name="other_minutes">%1$s 分</string>
     <string name="few_minutes">%1$s 分</string>
@@ -261,8 +261,8 @@
     <string name="seek_back_10_seconds">10秒戻す</string>
     <string name="seek_forward_10_seconds">10秒進む</string>
     <string name="import_saved_articles">保存した記事をインポート</string>
-    <string name="apply_blocklist_to_summaries">要約を適用</string>
-    <string name="apply_blocklist_to_links">リンクを適用</string>
+    <string name="apply_blocklist_to_summaries">要約に適用</string>
+    <string name="apply_blocklist_to_links">リンクに適用</string>
     <string name="filters">フィルター</string>
     <string name="open_article_in_reader">リーダーで開く</string>
     <string name="open_article_in_default_browser">デフォルトブラウザーで開く</string>
@@ -270,7 +270,7 @@
     <string name="no_article_link_browser">ブラウザで記事を開けませんでした</string>
     <string name="no_article_link_custom_tab">カスタムタブで記事を開けませんでした</string>
     <string name="use_in_app_audio_player">オーディオリンクを内蔵プレイヤーで再生する</string>
-    <string name="use_in_app_audio_player_description">無効な場合、オーディオリンクをデフォルトアプリで開きます</string>
+    <string name="use_in_app_audio_player_description">無効な場合、オーディオリンクをデフォルトアプリで開きます。</string>
     <string name="failed_to_import_saved_articles">保存された記事のインポートに失敗しました</string>
     <string name="failed_to_fetch_full_article_too_large">記事が大きすぎます。代わりにブラウザで開きますか？</string>
     <string name="pref_paging_mode_title">ページめくりモード</string>
@@ -388,4 +388,17 @@
     <string name="bergamot_runtime_download_warning">Feederは、Mozilla/Bergamotプロジェクトから4.9MBの実行可能なWebAssemblyランタイムをダウンロードします。このコードはF-Droidによってビルドまたは検証されていません。ダウンロード後、翻訳はオフラインで動作します。</string>
     <string name="bergamot_runtime_download_failed">オフライン翻訳エンジンをダウンロードできませんでした。</string>
     <string name="downloading_offline_translation_runtime">オフライン翻訳エンジンをダウンロード中: %1$d%%</string>
+    <string name="article_filter_rules">記事のフィルタリングルール</string>
+    <string name="article_filter_rules_desc">ルールは1行に1つずつ記述し、FieldName=pattern の形式で指定します。使用可能なフィールドは、Title、URL、Author、Tag、Content です。pattern は、フィールド内の任意の場所に一致する正規表現です。大文字と小文字を区別するには、(?i) で始めます。ルールは次回の取得時に有効になり、既に保存されている記事には反映されません。</string>
+    <string name="block_rules">ブロックルール</string>
+    <string name="block_rules_desc">マッチした記事はダウンロードされません。ブロックリストとは異なり、この設定は元に戻すことができません。ルールを削除しても、既にスキップされた記事は復元されません。</string>
+    <string name="allow_rules">許可ルール</string>
+    <string name="allow_rules_desc">許可ルールが設定されている場合、マッチする記事のみがダウンロードされます。タグルールはタグのない記事には適用されないため、タグのないフィードはタグルールのみによって空になることはありません。</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="rule_error_missing_separator">行 %1$d: \'=\' がありません。無効な行は無視されます。</string>
+    <string name="rule_error_unknown_field">行 %1$d: \'%2$s\' は既定のフィールドではありません。無効な行は無視されます。</string>
+    <string name="rule_error_empty_pattern">行 %1$d: パターンが空です。これはすべてに一致します。無効な行は無視されます。</string>
+    <string name="rule_error_invalid_regex">行 %1$d: 無効な正規表現です。無効な行は無視されます。</string>
+    <string name="rule_error_too_many_rules">行 %1$d: 最初の %2$d 個のルールが使用されます。このあとの行は無視されます。</string>
+    <string name="download">ダウンロード</string>
 </resources>
