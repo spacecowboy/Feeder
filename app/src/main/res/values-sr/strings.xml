@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Није могао да се преузме механизам за превођење ван мреже.</string>
     <string name="downloading_offline_translation_runtime">Преузима се механизам за превођење ван мреже: %1$d%%</string>
     <string name="download">Преузми</string>
+    <string name="article_filter_rules">Правила за филтрирање чланака</string>
+    <string name="article_filter_rules_desc">Једно правило по линији, у облику ИмеПоља=шаблон. Доступна поља су Title, URL, Author, Tag и Content. Шаблон је регуларни израз који се подудара било где у пољу; почните га са (?i) ако желите да се не прави разлика у величини слова. Правила ступају на снагу приликом наредног дохватања и неће се примењивати на раније сачуване чланке.</string>
+    <string name="block_rules">Правила за блокирање</string>
+    <string name="block_rules_desc">Никада се не преузимају чланци који се подударају. За разлику од листи блокираних, ово не може да се поништи: уклањањем правила, чланци који су већ прескочени се не враћају.</string>
+    <string name="allow_rules">Правила за дозвољавање</string>
+    <string name="allow_rules_desc">Ако је постављено макар једно правило за дозвољавање, преузимају се само чланци који га задовољавају. Tag правило се прескаче за чланке који немају ознаке, тако да се довод без ознака не празни само са Tag правилом.</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="rule_error_missing_separator">Линија %1$d: недостаје ’=\' Неисправне линије се игноришу.</string>
+    <string name="rule_error_unknown_field">Линија %1$d: ’%2$s’ није познато поље. Неисправне линије се игноришу.</string>
+    <string name="rule_error_empty_pattern">Линија %1$d: шаблон је празан, па ће се подударати све. Неисправне линије се игноришу.</string>
+    <string name="rule_error_invalid_regex">Линија %1$d: није исправан регуларни израз. Неисправне линије се игноришу.</string>
+    <string name="rule_error_too_many_rules">Линија %1$d: користи се само првох %2$d правила. Касније линије се игноришу.</string>
 </resources>
