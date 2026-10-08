@@ -390,4 +390,16 @@
     <string name="downloading_offline_translation_runtime">Çevrim dışı çeviri motoru indiriliyor: %%%1$d</string>
     <string name="download">İndir</string>
     <string name="local_translation_setup_system">Öncelikle aygıtınızın çeviri hizmetini kullanır.</string>
+    <string name="article_filter_rules">Makale filtreleme kuralları</string>
+    <string name="article_filter_rules_desc">Her satırda bir kural bulunur ve AlanAdı=desen biçiminde yazılır. Kullanılabilir alanlar şunlardır: Title, URL, Author, Tag ve Content. Desen, alanın herhangi bir yerinde eşleşen bir düzenli ifadedir; büyük/küçük harf farkını göz ardı etmek için (?i) ile başlatın. Kurallar bir sonraki getirme işleminde geçerli olur ve önceden kaydedilen makaleleri etkilemez.</string>
+    <string name="block_rules">Engelleme kuralları</string>
+    <string name="block_rules_desc">Eşleşen makaleler hiçbir zaman indirilmez. Engelleme listesinin aksine, bu işlem geri alınamaz: Bir kuralın kaldırılması, daha önce atlanan makaleleri geri getirmez.</string>
+    <string name="allow_rules">İzin verme kuralları</string>
+    <string name="allow_rules_desc">Herhangi bir izin verme kuralı ayarlandıysa, yalnızca bu kuralla eşleşen makaleler indirilir. Etiket kuralı, etiketi olmayan makaleler için atlanır; dolayısıyla, etiketi olmayan bir akış, yalnızca bir etiket kuralı nedeniyle boşaltılmaz.</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsorlu</string>
+    <string name="rule_error_missing_separator">%1$d. satır: \'=\' eksik. Geçersiz satırlar göz ardı edilir.</string>
+    <string name="rule_error_unknown_field">%1$d. satır: \'%2$s\' bilinen bir alan değil. Geçersiz satırlar göz ardı edilir.</string>
+    <string name="rule_error_empty_pattern">%1$d. satır: Desen boş, bu durumda her şeyle eşleşir. Geçersiz satırlar göz ardı edilir.</string>
+    <string name="rule_error_invalid_regex">%1$d. satır: geçerli bir düzenli ifade değil. Geçersiz satırlar göz ardı edilir.</string>
+    <string name="rule_error_too_many_rules">%1$d. satır: Yalnızca ilk %2$d kural kullanılır. Sonraki satırlar göz ardı edilir.</string>
 </resources>
