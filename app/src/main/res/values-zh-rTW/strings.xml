@@ -261,4 +261,19 @@
     <string name="unable_to_load_models">無法載入模型。</string>
     <string name="no_models_were_found">沒有找到模型</string>
     <string name="list_of_available_models">可用模型清單</string>
+    <string name="open_settings">開啟設定</string>
+    <string name="feed_search_suggestions_header">建議</string>
+    <string name="rename_tag">重新命名標籤</string>
+    <string name="audio_playback_failed">無法播放此檔案</string>
+    <string name="play_audio">播放</string>
+    <string name="pause_audio">暫停</string>
+    <string name="stop_audio">停止</string>
+    <string name="seek_back_10_seconds">倒退10秒</string>
+    <string name="seek_forward_10_seconds">前進10秒</string>
+    <string name="import_saved_articles">匯入已儲存文章</string>
+    <string name="filters">篩選</string>
+    <string name="open_article_in_reader">在閱讀器打開</string>
+    <string name="open_article_in_default_browser">在預設瀏覽器打開</string>
+    <string name="open_article_in_custom_tab">在客製分頁打開</string>
+    <string name="no_article_link_browser">無法在瀏覽器打開文章</string>
 </resources>
