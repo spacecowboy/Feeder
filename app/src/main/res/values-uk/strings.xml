@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Не вдалося завантажити офлайн-модуль перекладу.</string>
     <string name="downloading_offline_translation_runtime">Завантаження офлайн-модуля перекладу: %1$d%%</string>
     <string name="download">Завантажити</string>
+    <string name="article_filter_rules">Правила фільтрації статей</string>
+    <string name="article_filter_rules_desc">Одне правило на рядок у форматі: FieldName=pattern. Доступні поля: Title, URL, Author, Tag та Content. Шаблон — це регулярний вираз, який збігається з будь-якою частиною поля; починайте його з (?i), щоб ігнорувати регістр. Правила починають діяти з наступного отримання даних і не впливають на вже збережені статті.</string>
+    <string name="block_rules">Правила блокування</string>
+    <string name="block_rules_desc">Статті, які відповідають правилам, ніколи не завантажуються. На відміну від списку блокування, цю дію неможливо скасувати: видалення правила не повертає статті, які вже було пропущено.</string>
+    <string name="allow_rules">Правила дозволу</string>
+    <string name="allow_rules_desc">Якщо встановлено хоча б одне правило дозволу, завантажуються лише статті, які їм відповідають. Правило для тегів (Tag) пропускається для статей, які не мають тегів, тому стрічка без тегів не буде повністю порожньою лише через одне правило для тегів.</string>
+    <string name="article_rules_placeholder">Title=(?i)рекламний</string>
+    <string name="rule_error_missing_separator">Рядок %1$d: пропущено \'=\'. Недійсні рядки ігноруються.</string>
+    <string name="rule_error_unknown_field">Рядок %1$d: \'%2$s\' не є відомим полем. Недійсні рядки ігноруються.</string>
+    <string name="rule_error_empty_pattern">Рядок %1$d: шаблон порожній, тому він відповідатиме всьому. Недійсні рядки ігноруються.</string>
+    <string name="rule_error_invalid_regex">Рядок %1$d: некоректний регулярний вираз. Недійсні рядки ігноруються.</string>
+    <string name="rule_error_too_many_rules">Рядок %1$d: використовуються лише перші %2$d правил. Наступні рядки ігноруються.</string>
 </resources>
