@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Nepoodařilo se stáhnout offline překladač.</string>
     <string name="downloading_offline_translation_runtime">Stahování offline překladače: %1$d%%</string>
     <string name="download">Stáhnout</string>
+    <string name="article_filter_rules">Pravidla filtrování článků</string>
+    <string name="article_filter_rules_desc">Jedno pravidlo na řádek, ve formátu NázevPole=vzor. Dostupná pole jsou Title, URL, Author, Tag a Content. Vzor je regulární výraz, který může odpovídat čemukoli v poli; pro ignorování velikosti písmen přidejte na začátek (?i). Pravidla budou použita při dalším načtení a neovlivňují již uložené články.</string>
+    <string name="block_rules">Pravidla blokování</string>
+    <string name="block_rules_desc">Odpovídající články nebudou nikdy staženy. Na rozdíl od seznamu blokování je tato akce nevratná: odstranění pravidla nevrátí články, které již byly přeskočeny.</string>
+    <string name="allow_rules">Pravidla povolených</string>
+    <string name="allow_rules_desc">Pokud je nastaveno jakékoli pravidlo povolení, budou staženy pouze odpovídající články. Pravidlo Tag je přeskočeno pro články, které nemají žádné štítky, takže kanál bez štítků nebude promazán pouze samotným pravidlem Tag.</string>
+    <string name="article_rules_placeholder">Title=(?i)sponzor</string>
+    <string name="rule_error_missing_separator">Řádek %1$d: chybějící \'=\'. Neplatné řádky jsou ignorovány.</string>
+    <string name="rule_error_unknown_field">Řádek %1$d: \'%2$s\' není platné pole. Neplatné řádky jsou ignorovány.</string>
+    <string name="rule_error_empty_pattern">Řádek %1$d: vzor je prázdný, což by odpovídalo všemu. Neplatné řádky jsou ignorovány.</string>
+    <string name="rule_error_invalid_regex">Řádek %1$d: neplatný regulární výraz. Neplatné řádky jsou ignorovány.</string>
+    <string name="rule_error_too_many_rules">Řádek %1$d: je použito pouze prvních %2$d pravidel. Další řádky jsou ignorovány.</string>
 </resources>
