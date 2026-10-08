@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">Vallasrežiimis toimiva tõlkemootori allalaadimine ei õnnestunud.</string>
     <string name="downloading_offline_translation_runtime">Vallasrežiimis toimiv tõlkemootor on allalaadimisel: %1$d%%</string>
     <string name="download">Laadi alla</string>
+    <string name="article_filter_rules">Artiklite filtreerimise reeglid</string>
+    <string name="article_filter_rules_desc">Üks reegel rea kohta, kirjutatuna VäljaNimi=muster stiilis. Kasutatavad väljad on: Title, URL, Author, Tag ja Content. Muster on regulaaravaldis, mis võib vastava ükspuha mis välja osale, tõstutundetuks muutmiseks lisa algusesse (?i). Reeglid kehtivad järgmisel laadimisel ja ei mõjuta seni salvestatud artikleid.</string>
+    <string name="block_rules">Blokeerimisreeglid</string>
+    <string name="block_rules_desc">Reeglile vastavaid artikleid ei laadita kunagi alla. Erinevalt keeluloendist ei saa seda tegevust tagasi pöörata - reegli eemaldamisel ei laadita juba vahelejäetud artiklit alla.</string>
+    <string name="allow_rules">Lubamisreeglid</string>
+    <string name="allow_rules_desc">Kui lubamisreegel on seadistatud, siis laaditakse alla vaid sellele vastavad artiklid. Kui artiklil pole silte, siis jäetakse sildireegel vahele - seega siltideta artiklite allaadimiseks ei piisa ainult siltidekohasest reeglist.</string>
+    <string name="rule_error_missing_separator">Rida %1$d: puudu on \'=\'. Eiran vigaseid ridu.</string>
+    <string name="rule_error_unknown_field">Rida %1$d: \'%2$s\' pole teadaolev väli. Eiran vigaseid ridu.</string>
+    <string name="rule_error_empty_pattern">Rida %1$d: see muster on tühi ja vastaks seega kõigele. Eiran vigaseid ridu.</string>
+    <string name="rule_error_invalid_regex">Rida %1$d: pole korrektne regulaaravaldis. Eiran vigaseid ridu.</string>
+    <string name="rule_error_too_many_rules">Rida %1$d: kasutan vaid esimest %2$d reeglid. Eiran hilisemaid ridu.</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
 </resources>
