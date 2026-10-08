@@ -389,4 +389,16 @@
     <string name="bergamot_runtime_download_failed">无法下载离线翻译引擎。</string>
     <string name="downloading_offline_translation_runtime">正在下载离线翻译引擎：%1$d%%</string>
     <string name="download">下载</string>
+    <string name="article_filter_rules">文章过滤规则</string>
+    <string name="article_filter_rules_desc">每行一条规则，格式为 FieldName=pattern。可用字段为标题、URL、作者、标签和内容。模式是匹配字段中任何地方的正则表达式；以 (?i) 开头来忽略大小写。规则在下次获取文章时生效，不影响已经保存的文章。</string>
+    <string name="block_rules">拦截规则</string>
+    <string name="block_rules_desc">永不下载匹配的文章。和黑名单不同，这无法撤销：删除规则不会恢复已经被跳过的文章。</string>
+    <string name="allow_rules">放行规则</string>
+    <string name="allow_rules_desc">如设置了任意放行规则将只下载匹配的文章。不会对没有标签的文章执行标签规则，因此单单标签规则不会清空没有标签的订阅源。</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="rule_error_missing_separator">第 %1$d 行: 缺少 \'=\' 。忽略无效行。</string>
+    <string name="rule_error_unknown_field">第 %1$d 行: \'%2$s\' 不是已知字段。忽略无效行。</string>
+    <string name="rule_error_empty_pattern">第 %1$d 行: 模式为空，这代表匹配一切。忽略无效行。</string>
+    <string name="rule_error_invalid_regex">第 %1$d 行: 非有效正则表达式。忽略无效行。</string>
+    <string name="rule_error_too_many_rules">第 %1$d 行: 只使用前面 %2$d 条规则。忽略后面的行。</string>
 </resources>
