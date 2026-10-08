@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="navigation_drawer_open">Apri menù di navigazione</string>
-    <string name="navigation_drawer_close">Chiudi menù di navigazione</string>
+    <string name="navigation_drawer_open">Apri menu di navigazione</string>
+    <string name="navigation_drawer_close">Chiudi menu di navigazione</string>
     <string name="action_settings">Impostazioni</string>
     <string name="add_feed">Aggiungi feed</string>
     <string name="title_activity_edit_feed">Iscriviti a un feed</string>
-    <string name="tag">Etichetta</string>
+    <string name="tag">Tag</string>
     <string name="add_feed_search_hint">URL del feed</string>
     <string name="title">Titolo</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">da %1$s, %2$s</string>
@@ -23,7 +23,7 @@
     <string name="show_unread_items">Mostra elementi non letti</string>
     <string name="new_items_available">Nuovi elementi disponibili</string>
     <string name="view">Visualizza</string>
-    <string name="no_tag">Nessuna etichetta</string>
+    <string name="no_tag">Nessun tag</string>
     <string name="notify_for_new_items">Notifica la presenza di nuovi elementi</string>
     <string name="dont_notify_for_new_items">Interrompi notifiche</string>
     <string name="toggle_read_status">Inverti lo stato di lettura</string>
@@ -35,7 +35,7 @@
     <string name="import_feeds_from_opml">Importa i feed da OPML</string>
     <string name="view_debug_log">Visualizza log di debug</string>
     <string name="new_based_on_this">Novità basate su questo</string>
-    <string name="indicator_for_mark_as_read">Indicatore di elemento letto</string>
+    <string name="indicator_for_mark_as_read">Indicatore di Segna come letto</string>
     <string name="share">Condividi</string>
     <string name="no_such_feed">Impossibile trovare il feed. Riprovare utilizzando HTTPS?</string>
     <string name="nothing_to_display">Nulla da visualizzare!</string>
@@ -52,19 +52,19 @@
     <string name="synchronization">Sincronizzazione</string>
     <string name="only_on_wifi">Solo con Wi-Fi</string>
     <string name="show_thumbnails">Mostra le miniature</string>
-    <string name="may_result_data_charges">Può comportare costi aggiuntivi.</string>
+    <string name="may_result_data_charges">Potrebbe comportare costi per il traffico dati mobile.</string>
     <string name="only_when_charging">Solo quando il dispositivo è in carica</string>
-    <string name="image_loading">Scaricamento delle immagini</string>
+    <string name="image_loading">Caricamento delle immagini</string>
     <string name="no_activity_for_link">Installa prima qualcosa per aprire questo collegamento</string>
     <string name="check_for_updates">Cerca nuovi articoli…</string>
-    <string name="on_startup">All’avvio dell’app</string>
+    <string name="on_startup">All\'avvio dell\'app</string>
     <string name="show_fab">Mostra pulsante di azione fluttuante</string>
     <string name="include_mobile_hotspots">Includi hotspot mobili</string>
     <string name="updated_feeds">Feed aggiornati</string>
     <string name="notification_channel_name">Feed non letti</string>
     <string name="notification_channel_description">Le notifiche sono visualizzate solo per gli elementi non letti nei feed configurati</string>
     <string name="open_in_reader">Lettore</string>
-    <string name="open_in_webview">Web view</string>
+    <string name="open_in_webview">Vista web</string>
     <string name="open_in_default_browser">Browser predefinito</string>
     <string name="open_in_custom_tab">Scheda personalizzata</string>
     <string name="open_item_by_default_with">Apri gli elementi con</string>
@@ -88,7 +88,7 @@
     <string name="open_feed">Apri feed</string>
     <string name="mark_items_below_as_read">Segna gli elementi in basso come letti</string>
     <string name="discovered_feeds_list">Lista dei feed trovati</string>
-    <string name="toggle_tag_expansion">Attiva l\'espansione delle etichette</string>
+    <string name="toggle_tag_expansion">Attiva l\'espansione dei tag</string>
     <string name="battery_optimization">Ottimizzazione batteria</string>
     <string name="battery_optimization_disabled">Disabilitata</string>
     <string name="battery_optimization_enabled">Abilitata</string>
@@ -99,7 +99,7 @@
     <string name="url">URL</string>
     <string name="failed_to_parse">Impossibile analizzare %1$s</string>
     <string name="fetching_full_article">Recupero dell\'articolo completo…</string>
-    <string name="failed_to_fetch_full_article">Impossibile recuperare l’articolo completo</string>
+    <string name="failed_to_fetch_full_article">Impossibile recuperare l\'articolo completo</string>
     <string name="fetch_full_articles_by_default">Recupera articoli completi per impostazione predefinita</string>
     <string name="fetch_full_article">Recupera l\'articolo completo</string>
     <string name="failed_to_load_text_to_speech">Impossibile caricare la sintesi vocale</string>
@@ -119,10 +119,10 @@
     <string name="already_read">Già letto</string>
     <string name="unread_adjective">Non letto</string>
     <string name="go_to_feed">Vai a %1$s</string>
-    <string name="open_menu">Apri il menù</string>
+    <string name="open_menu">Apri il menu</string>
     <string name="go_back">Indietro</string>
-    <string name="contracted_tag">Etichetta chiusa</string>
-    <string name="expanded_tag">Etichetta aperta</string>
+    <string name="contracted_tag">Tag chiuso</string>
+    <string name="expanded_tag">Tag aperto</string>
     <string name="stop_reading">Concludi la lettura</string>
     <string name="open_enclosed_media_file">Apri %1$s</string>
     <string name="feed_item_style_super_compact">Super compatto</string>
@@ -198,13 +198,13 @@
     <string name="few_feeds">%1$s feed</string>
     <string name="other_feeds">%1$s feed</string>
     <string name="import_x_feeds_with_y_tags">Importare %1$s con %2$s\?</string>
-    <string name="zero_tags">%1$s etichette</string>
-    <string name="one_tags">%1$s etichetta</string>
-    <string name="two_tags">%1$s etichette</string>
-    <string name="few_tags">%1$s etichette</string>
-    <string name="other_tags">%1$s etichette</string>
+    <string name="zero_tags">%1$s tag</string>
+    <string name="one_tags">%1$s tag</string>
+    <string name="two_tags">%1$s tag</string>
+    <string name="few_tags">%1$s tag</string>
+    <string name="other_tags">%1$s tag</string>
     <string name="many_feeds">%1$s feed</string>
-    <string name="many_tags">%1$s etichette</string>
+    <string name="many_tags">%1$s tag</string>
     <string name="failed_to_fetch_full_article_missing_body">Non è stato trovato nulla da recuperare</string>
     <string name="failed_to_fetch_full_article_missing_link">Il feed non ha collegamenti all\'articolo</string>
     <string name="failed_to_fetch_full_article_not_html">Il collegamento non è un documento HTML</string>
@@ -216,15 +216,15 @@
     <string name="recently_read_adjective">Letti di recente</string>
     <string name="show_only_title">Mostra solo il titolo</string>
     <string name="http_error">Errore HTTP</string>
-    <string name="failed_to_parse_json_feed">Errore nel parsing del feed JSON</string>
+    <string name="failed_to_parse_json_feed">Errore nell\'analisi del feed JSON</string>
     <string name="content_is_not_html">Il contenuto non è HTML</string>
     <string name="no_feeds_in_the_page">Nessun feed nella pagina</string>
     <string name="no_url">Nessun URL</string>
-    <string name="failed_to_download">Download fallito</string>
-    <string name="failed_to_parse_the_page">Errore nel parsing della pagina</string>
-    <string name="failed_to_parse_rss_feed">Errore nel parsing del feed RSS</string>
+    <string name="failed_to_download">Impossibile scaricare</string>
+    <string name="failed_to_parse_the_page">Errore nell\'analisi della pagina</string>
+    <string name="failed_to_parse_rss_feed">Errore nell\'analisi del feed RSS</string>
     <string name="unsupported_content_type">Contenuto non supportato</string>
-    <string name="failed_to_parse_full_article">Errore nel parsing dell\'intero articolo</string>
+    <string name="failed_to_parse_full_article">Errore nell\'analisi dell\'intero articolo</string>
     <string name="no_body_in_response">Nessun contenuto</string>
     <string name="theme_e_ink">E-Ink</string>
     <string name="add_anyway">Aggiungi comunque</string>
@@ -242,7 +242,7 @@
     <string name="two_minutes">%1$s minuti</string>
     <string name="other_words">%1$s parole</string>
     <string name="one_word">%1$s parola</string>
-    <string name="close_menu">Chiudi menù</string>
+    <string name="close_menu">Chiudi menu</string>
     <string name="export_saved_articles">Esporta articoli salvati</string>
     <string name="failed_to_export_saved_articles">Impossibile esportare gli articoli salvati</string>
     <string name="skip_duplicate_articles">Salta gli articoli duplicati</string>
@@ -257,7 +257,7 @@
     <string name="unable_to_load_models">Non è possibile caricare i modelli.</string>
     <string name="no_models_were_found">Non sono stati trovati modelli</string>
     <string name="openai_settings">IA e traduzione</string>
-    <string name="summarize">Riepilogo</string>
+    <string name="summarize">Riassumi</string>
     <string name="azure_deployment_id">ID della distribuzione di Azure</string>
     <string name="list_of_available_models">Elenco dei modelli disponibili</string>
     <string name="open_drawer_on_fab">Mostra i feed dopo averli contrassegnati come letti</string>
@@ -280,9 +280,9 @@
     <string name="system_default">Sistema predefinito</string>
     <string name="weight">Peso</string>
     <string name="time_out">Timeout (secondi)</string>
-    <string name="summarize_on_open">Riepilogo all\'apertura</string>
+    <string name="summarize_on_open">Riassumi all\'apertura</string>
     <string name="feed_search_suggestions_header">Suggerimenti</string>
-    <string name="openai_settings_info">Compatibile con svariati fornitori di IA, ma non con tutti</string>
+    <string name="openai_settings_info">Compatibile con svariati gestori di IA, ma non con tutti</string>
     <string name="apply_blocklist_to_summaries">Applica ai riassunti</string>
     <string name="open_article_in_reader">Apri nel lettore</string>
     <string name="open_article_in_default_browser">Apri nel browser predefinito</string>
@@ -321,7 +321,7 @@
     <string name="verifying_api_settings">Verifica delle impostazioni API in corso…</string>
     <string name="api_settings_could_not_be_verified">Impossibile verificare le impostazioni API.</string>
     <string name="enter_azure_endpoint_before_saving">Inserisci l\'endpoint Azure prima di salvare.</string>
-    <string name="enter_azure_deployment_id_before_saving">Inserisci l\'ID del deployment Azure prima di salvare.</string>
+    <string name="enter_azure_deployment_id_before_saving">Inserisci l\'ID della distribuzione Azure prima di salvare.</string>
     <string name="enter_azure_api_version_before_saving">Inserisci la versione dell\'API Azure prima di salvare.</string>
     <string name="verifying_azure_openai_settings">Verifica delle impostazioni di Azure OpenAI in corso…</string>
     <string name="azure_openai_settings_could_not_be_verified">Impossibile verificare le impostazioni di Azure OpenAI.</string>
@@ -337,7 +337,7 @@
     <string name="set_translation_language_first">Imposta una lingua di traduzione preferita nelle impostazioni IA</string>
     <string name="translate_feed_cards_by_default">Traduci le anteprime degli articoli</string>
     <string name="translate_articles_by_default">Traduci gli articoli per impostazione predefinita</string>
-    <string name="device_sync_beta_warning">ATTENZIONE! Questa feature è ancora in Beta. Prima di continuare, fai un backup OPML di tutti i tuoi feed.</string>
+    <string name="device_sync_beta_warning">ATTENZIONE! Questa funzione è ancora in Beta. Prima di continuare, fai un backup OPML di tutti i tuoi feed.</string>
     <string name="local_translation_requires_android_12">La traduzione locale richiede una versione Android 12 o più recente.</string>
     <string name="open_settings">Apri impostazioni</string>
     <string name="rename_tag">Rinomina tag</string>
@@ -350,8 +350,8 @@
     <string name="use_in_app_audio_player">Riproduci i link audio con il lettore integrato</string>
     <string name="use_in_app_audio_player_description">Se disattivato, i link audio si aprono con l\'app predefinita</string>
     <string name="preparing_offline_translation_model">Modello di traduzione offline %1$s a %2$s in preparazione…</string>
-    <string name="downloading_offline_translation_model">Download di modello offline di traduzione %1$s a %2$s: %3$d%%</string>
-    <string name="offline_translation_model_download_hint">Il primo download può occupare 20-50 MB e potrebbe richiedere qualche minuto. La traduzione in seguito avverrà offline.</string>
+    <string name="downloading_offline_translation_model">Scaricamento del modello offline di traduzione %1$s a %2$s: %3$d%%</string>
+    <string name="offline_translation_model_download_hint">Il primo scaricamento può occupare 20-50 MB e potrebbe richiedere qualche minuto. La traduzione in seguito avverrà offline.</string>
     <string name="local_translation_unavailable">La traduzione locale non è disponibile su questo dispositivo.</string>
     <string name="local_translator_creation_failed">Impossibile creare il traduttore locale.</string>
     <string name="local_translation_timed_out">Traduzione locale scaduta per timeout.</string>
@@ -368,9 +368,9 @@
     <string name="bergamot_runtime_download_title">Scaricare il motore di traduzione offline?</string>
     <string name="bergamot_runtime_download_warning">Feeder scaricherà un runtime WebAssembly eseguibile di 4,9 MB dal progetto Mozilla/Bergamot. Questo codice non è compilato né verificato da F-Droid. Dopo il download, la traduzione funzionerà offline.</string>
     <string name="bergamot_runtime_download_failed">Impossibile scaricare il motore di traduzione offline.</string>
-    <string name="downloading_offline_translation_runtime">Download del motore di traduzione offline: %1$d%%</string>
+    <string name="downloading_offline_translation_runtime">Scaricamento del motore di traduzione offline: %1$d%%</string>
     <string name="download">Scarica</string>
-    <string name="bergamot_webview_translation_timed_out">Timeout della traduzione Bergamot WebView.</string>
+    <string name="bergamot_webview_translation_timed_out">Traduzione Bergamot WebView scaduta per timeout.</string>
     <string name="bergamot_webview_not_initialized">Bergamot WebView non è inizializzato.</string>
     <string name="bergamot_response_parse_failed">Impossibile analizzare la risposta di Bergamot.</string>
     <string name="local_translation_setup_system">Utilizza innanzitutto il servizio di traduzione del dispositivo.</string>
@@ -389,4 +389,16 @@
     <string name="cancel">Annulla</string>
     <string name="no_bergamot_translation_model">Nessun modello Bergamot per %1$s -&gt; %2$s. Controlla le lingue di traduzione del sistema</string>
     <string name="force_single_column">Forza colonna singola</string>
+    <string name="article_filter_rules">Regole di filtraggio degli articoli</string>
+    <string name="article_filter_rules_desc">Una regola per riga, nel formato NomeCampo=pattern. I campi disponibili sono Titolo, URL, Autore, Tag e Contenuto. Il pattern è un\'espressione regolare che cerca corrispondenze in qualsiasi punto del campo; inizia il pattern con (?i) per ignorare la distinzione tra maiuscole e minuscole. Le regole diventano effettive al successivo recupero e non influiscono sugli articoli già salvati.</string>
+    <string name="block_rules">Regole di blocco</string>
+    <string name="block_rules_desc">Gli articoli corrispondenti non vengono mai scaricati. A differenza della lista di blocco, questa operazione non può essere annullata: rimuovere una regola non recupera gli articoli che erano già stati ignorati.</string>
+    <string name="allow_rules">Regole di autorizzazione</string>
+    <string name="allow_rules_desc">Se è impostata almeno una regola di autorizzazione, vengono scaricati solo gli articoli corrispondenti. Una regola per il Tag viene ignorata per gli articoli che non hanno tag, quindi un feed senza tag non viene svuotato da una sola regola per il Tag.</string>
+    <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="rule_error_missing_separator">Riga %1$d: manca \'=\'. Le righe non valide vengono ignorate.</string>
+    <string name="rule_error_unknown_field">Riga %1$d: \'%2$s\' non è un campo riconosciuto. Le righe non valide vengono ignorate.</string>
+    <string name="rule_error_empty_pattern">Riga %1$d: il pattern è vuoto e corrisponderebbe a tutto. Le righe non valide vengono ignorate.</string>
+    <string name="rule_error_invalid_regex">Riga %1$d: non è un\'espressione regolare valida. Le righe non valide vengono ignorate.</string>
+    <string name="rule_error_too_many_rules">Riga %1$d: vengono utilizzate solo le prime %2$d regole. Le righe successive vengono ignorate.</string>
 </resources>
