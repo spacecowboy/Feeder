@@ -844,7 +844,7 @@ class FeedParserTest : DIAware {
             val feed = anon.use { feedParser.parseFeedResponse(it) }
 
             assertEquals("http://ANON.com/sub", feed.getOrNull()!!.home_page_url)
-            assertEquals("http://ANON.com/rss", feed.getOrNull()!!.feed_url)
+            assertEquals("http://anon.com/rss", feed.getOrNull()!!.feed_url)
             assertEquals("ANON", feed.getOrNull()!!.title)
             assertEquals("ANON", feed.getOrNull()!!.description)
 
@@ -1006,6 +1006,21 @@ class FeedParserTest : DIAware {
             assertTrue("Actual:\n${xhtml.content_html}") {
                 "<img src=\"hello.jpg&amp;cached=true\"/>" in xhtml.content_html!!
             }
+        }
+
+    @Test
+    fun selfLinkIsNotUpdated() =
+        runBlocking {
+            val feed =
+                feedParser.parseFeedResponse(
+                    URL("http://cowboyprogrammer.org"),
+                    atomWithInvalidSelfLink,
+                )
+
+            assertEquals(
+                "http://cowboyprogrammer.org",
+                feed.getOrNull()!!.feed_url,
+            )
         }
 
     @Test
@@ -1256,6 +1271,20 @@ const val atomWithAlternateLinks = """
   <title>Relative links</title>
   <updated>2003-12-13T18:30:02Z</updated>
   <link rel="self" href="/feed.atom"/>
+  <link rel="alternate" type="text/html" href="http://localhost:1313/" />
+  <link rel="alternate" type="application/rss" href="http://localhost:1313/index.xml" />
+  <link rel="alternate" type="application/json" href="http://localhost:1313/feed.json" />
+</feed>
+"""
+
+@Language("xml")
+const val atomWithInvalidSelfLink = """
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom'>
+  <id>http://cowboyprogrammer.org</id>
+  <title>Relative links</title>
+  <updated>2003-12-13T18:30:02Z</updated>
+  <link rel="self" href="https://example.com/notvalid"/>
   <link rel="alternate" type="text/html" href="http://localhost:1313/" />
   <link rel="alternate" type="application/rss" href="http://localhost:1313/index.xml" />
   <link rel="alternate" type="application/json" href="http://localhost:1313/feed.json" />
