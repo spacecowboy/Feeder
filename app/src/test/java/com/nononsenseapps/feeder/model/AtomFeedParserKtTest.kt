@@ -311,4 +311,48 @@ class AtomFeedParserKtTest {
         // SAX-resolved href uses feedUrl as the base for the relative path.
         assertEquals("https://lineageos.org/entry/1", xmlBases.entries[0].resolvedAlternateHref)
     }
+
+    // -------------------------------------------------------------------------
+    // Robustness: malformed / non-Atom input must not throw
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun brokenXmlFallsBackToFeedUrlWithoutThrowing() {
+        val feedUrl = URL("https://example.com/feed.xml")
+        val brokenXml = "<<<not valid XML at all>>>".toByteArray()
+
+        val xmlBases = extractAtomXmlBases(brokenXml, feedUrl)
+
+        assertEquals(feedUrl.toString(), xmlBases.feedBase.toString())
+        assertEquals(0, xmlBases.entries.size)
+    }
+
+    @Test
+    fun rssInputFallsBackToFeedUrlWithoutThrowing() {
+        val feedUrl = URL("https://example.com/rss.xml")
+        val rssXml =
+            """<?xml version='1.0' encoding='UTF-8'?>
+<rss version="2.0">
+  <channel>
+    <title>RSS Feed</title>
+    <link>https://example.com</link>
+    <item><title>Item</title><link>https://example.com/item1</link></item>
+  </channel>
+</rss>""".toByteArray()
+
+        val xmlBases = extractAtomXmlBases(rssXml, feedUrl)
+
+        assertEquals(feedUrl.toString(), xmlBases.feedBase.toString())
+    }
+
+    @Test
+    fun jsonInputFallsBackToFeedUrlWithoutThrowing() {
+        val feedUrl = URL("https://example.com/feed.json")
+        val jsonFeed = """{"version":"https://jsonfeed.org/version/1","title":"Test"}""".toByteArray()
+
+        val xmlBases = extractAtomXmlBases(jsonFeed, feedUrl)
+
+        assertEquals(feedUrl.toString(), xmlBases.feedBase.toString())
+        assertEquals(0, xmlBases.entries.size)
+    }
 }

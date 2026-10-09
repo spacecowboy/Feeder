@@ -1036,6 +1036,66 @@ class FeedParserTest : DIAware {
             assertEquals(8, feed.getOrNull()?.items!!.size)
         }
 
+    // -------------------------------------------------------------------------
+    // xml:base end-to-end tests (issue #883)
+    //
+    // These tests feed Atom fixtures through the real FeedParser, using a fetch
+    // URL that differs from the xml:base declared inside the feed.  They compile
+    // against master's public API and fail with wrong URLs on master.
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun xmlBaseRealCase_feedLevelBaseResolvesRelativeEntryLink() =
+        readResource("atom_xml_base_real_case.xml") { body ->
+            // Proxy URL intentionally differs from the feed's xml:base
+            val feed =
+                feedParser
+                    .parseFeedResponse(
+                        URL("https://proxy.example.com/feed.atom"),
+                        body,
+                    ).getOrNull()!!
+
+            assertEquals(
+                "https://example.org/posts/foo/",
+                feed.items!!.first().url,
+                "Entry link must resolve against xml:base, not the proxy fetch URL",
+            )
+        }
+
+    @Test
+    fun xmlBaseRealCase_feedHomepageResolvesAgainstBase() =
+        readResource("atom_xml_base_real_case.xml") { body ->
+            val feed =
+                feedParser
+                    .parseFeedResponse(
+                        URL("https://proxy.example.com/feed.atom"),
+                        body,
+                    ).getOrNull()!!
+
+            assertEquals(
+                "https://example.org/blog/",
+                feed.home_page_url,
+                "Feed home_page_url must resolve against xml:base",
+            )
+        }
+
+    @Test
+    fun xmlBaseRealCase_nestedEntryLevelBaseResolvesRelativeLink() =
+        readResource("atom_xml_base_real_case.xml") { body ->
+            val feed =
+                feedParser
+                    .parseFeedResponse(
+                        URL("https://proxy.example.com/feed.atom"),
+                        body,
+                    ).getOrNull()!!
+
+            assertEquals(
+                "https://example.org/blog/post1",
+                feed.items!![1].url,
+                "Entry with nested xml:base must resolve relative link against effective base",
+            )
+        }
+
     private fun <T> readResource(
         asdf: String,
         block: suspend (String) -> T,

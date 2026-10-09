@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Mirrors the real-world case reported in issue #883.
+     The feed is served from a proxy URL but declares xml:base="https://example.org/".
+     Entry links use bare relative paths (no leading slash).  The expected resolved
+     article link is https://example.org/posts/foo/ and https://example.org/blog/post1
+     for the nested entry-level xml:base case. -->
+<feed xmlns='http://www.w3.org/2005/Atom'
+      xml:base='https://example.org/'>
+  <id>https://example.org/</id>
+  <title>Real-Case xml:base Feed</title>
+  <updated>2024-06-01T00:00:00Z</updated>
+  <!-- feed-level link: relative, should resolve to https://example.org/blog/ -->
+  <link rel='alternate' type='text/html' href='blog/'/>
+
+  <!-- Entry 1: bare relative href, no entry-level xml:base -->
+  <entry>
+    <id>https://example.org/posts/foo/</id>
+    <title>Foo Post</title>
+    <link rel='alternate' href='posts/foo/'/>
+    <updated>2024-06-01T00:00:00Z</updated>
+    <summary>Should resolve to https://example.org/posts/foo/</summary>
+  </entry>
+
+  <!-- Entry 2: entry-level relative xml:base that stacks on the feed base -->
+  <entry xml:base='blog/'>
+    <id>https://example.org/blog/post1</id>
+    <title>Blog Post 1</title>
+    <link rel='alternate' href='post1'/>
+    <updated>2024-06-02T00:00:00Z</updated>
+    <summary>Should resolve to https://example.org/blog/post1</summary>
+  </entry>
+</feed>
