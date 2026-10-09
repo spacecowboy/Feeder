@@ -282,8 +282,8 @@ class FeedParser(
     }
 }
 
-private fun GoFeed.asFeed(url: URL): ParsedFeed {
-    return ParsedFeed(
+private fun GoFeed.asFeed(url: URL): ParsedFeed =
+    ParsedFeed(
         title = title,
         home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
         // NEVER set the feed url to the feedLink in the feed. While the specs all say this is what should be done,
@@ -298,7 +298,6 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed {
         expired = null,
         items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
     )
-}
 
 private fun FeederGoItem.asParsedArticle() =
     ParsedArticle(
