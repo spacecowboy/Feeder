@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.model
 
 import org.xml.sax.Attributes
+import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
+import java.io.StringReader
 import java.net.URL
 import javax.xml.parsers.SAXParserFactory
 
@@ -57,6 +59,27 @@ fun extractAtomXmlBases(
         val factory =
             SAXParserFactory.newInstance().apply {
                 isNamespaceAware = true
+                // Harden against XXE and entity-expansion attacks.
+                // Each setFeature is wrapped individually: an unsupported feature on a
+                // given runtime (e.g. Android's SAX implementation) silently falls through
+                // rather than preventing parsing.
+                runCatching {
+                    // Primary defence: reject any DOCTYPE declaration outright.
+                    setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+                }
+                // Belt-and-suspenders for runtimes that don't support the above:
+                runCatching {
+                    setFeature("http://xml.org/sax/features/external-general-entities", false)
+                }
+                runCatching {
+                    setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+                }
+                runCatching {
+                    setFeature(
+                        "http://apache.org/xml/features/nonvalidating/load-external-dtd",
+                        false,
+                    )
+                }
             }
         val saxParser = factory.newSAXParser()
         val handler = AtomXmlBaseHandler(feedUrl)
@@ -69,6 +92,16 @@ fun extractAtomXmlBases(
 private class AtomXmlBaseHandler(
     private val feedUrl: URL,
 ) : DefaultHandler() {
+    /**
+     * Return an empty document for any external entity request, so that even on SAX
+     * implementations that do not support the disallow-doctype-decl feature nothing
+     * external is fetched.
+     */
+    override fun resolveEntity(
+        publicId: String?,
+        systemId: String?,
+    ): InputSource = InputSource(StringReader(""))
+
     /**
      * Stack of effective base URIs mirroring the element nesting depth.
      * Initialised with [feedUrl] as the document-level base.

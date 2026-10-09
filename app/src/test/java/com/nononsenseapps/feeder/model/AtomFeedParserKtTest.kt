@@ -3,9 +3,12 @@ package com.nononsenseapps.feeder.model
 import com.nononsenseapps.feeder.model.gofeed.FeederGoItem
 import com.nononsenseapps.feeder.model.gofeed.GoEnclosure
 import com.nononsenseapps.feeder.model.gofeed.makeGoItem
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import java.net.URL
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
 /**
@@ -22,6 +25,10 @@ import kotlin.test.assertNotNull
  *  - [FeederGoItem]: applies the extracted bases when resolving URLs.
  */
 class AtomFeedParserKtTest {
+    @Rule
+    @JvmField
+    val tempFolder = TemporaryFolder()
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -351,6 +358,71 @@ class AtomFeedParserKtTest {
         val jsonFeed = """{"version":"https://jsonfeed.org/version/1","title":"Test"}""".toByteArray()
 
         val xmlBases = extractAtomXmlBases(jsonFeed, feedUrl)
+
+        assertEquals(feedUrl.toString(), xmlBases.feedBase.toString())
+        assertEquals(0, xmlBases.entries.size)
+    }
+
+    // -------------------------------------------------------------------------
+    // Security: XXE and entity-expansion hardening
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun xxeViaSYSTEMEntityDoesNotLeakLocalFileContent() {
+        val secret = tempFolder.newFile("secret.txt").also { it.writeText("TOP_SECRET_9a3f") }
+        val feedUrl = URL("https://example.com/feed.atom")
+        val xxeXml =
+            """<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE feed [<!ENTITY xxe SYSTEM "file://${secret.absolutePath}">]>
+<feed xmlns='http://www.w3.org/2005/Atom' xml:base="&xxe;">
+  <entry>
+    <id>1</id><title>t</title>
+    <link rel='alternate' href='&xxe;'/>
+    <updated>2024-01-01T00:00:00Z</updated>
+  </entry>
+</feed>""".toByteArray()
+
+        // Must not throw; file content must never appear in any resolved URL.
+        val xmlBases = extractAtomXmlBases(xxeXml, feedUrl)
+
+        assertFalse(
+            xmlBases.feedBase.toString().contains("TOP_SECRET_9a3f"),
+            "File content leaked into feedBase",
+        )
+        xmlBases.entries.forEach { entry ->
+            assertFalse(
+                entry.base.toString().contains("TOP_SECRET_9a3f"),
+                "File content leaked into entry base",
+            )
+            assertFalse(
+                entry.resolvedAlternateHref?.contains("TOP_SECRET_9a3f") == true,
+                "File content leaked into resolvedAlternateHref",
+            )
+        }
+    }
+
+    @Test
+    fun billionLaughsInternalEntityExpansionFallsBackToFeedUrl() {
+        val feedUrl = URL("https://example.com/feed.atom")
+        // Classic billion-laughs: exponential entity expansion via internal references.
+        // With disallow-doctype-decl=true the parser throws immediately on the DOCTYPE
+        // line, so this returns promptly rather than hanging or OOMing.
+        val billionLaughs =
+            """<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE lolz [
+  <!ENTITY lol  "lol">
+  <!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+  <!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+  <!ENTITY lol4 "&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;">
+  <!ENTITY lol5 "&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;">
+  <!ENTITY lol6 "&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;">
+  <!ENTITY lol7 "&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;">
+  <!ENTITY lol8 "&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;">
+  <!ENTITY lol9 "&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;">
+]>
+<feed xmlns='http://www.w3.org/2005/Atom' xml:base="&lol9;"></feed>""".toByteArray()
+
+        val xmlBases = extractAtomXmlBases(billionLaughs, feedUrl)
 
         assertEquals(feedUrl.toString(), xmlBases.feedBase.toString())
         assertEquals(0, xmlBases.entries.size)
