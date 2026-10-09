@@ -11,7 +11,6 @@ import com.nononsenseapps.feeder.model.gofeed.GoPerson
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
-import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrNullIfNotValid
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
@@ -283,21 +282,13 @@ class FeedParser(
     }
 }
 
-private fun GoFeed.asFeed(url: URL): ParsedFeed {
-    // Feed can update its URL which Feeder will respect, but going from https -> http, or http -> https
-    // will not be respected. This is often a bug in self-hosted feeds in similar.
-    val selfLink = feedLink?.let { relativeLinkIntoAbsoluteOrNullIfNotValid(url, it) } ?: url
-    val feedUrl =
-        if (selfLink.protocol == url.protocol) {
-            selfLink
-        } else {
-            url
-        }
-
-    return ParsedFeed(
+private fun GoFeed.asFeed(url: URL): ParsedFeed =
+    ParsedFeed(
         title = title,
         home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
-        feed_url = feedUrl.toString(),
+        // NEVER set the feed url to the feedLink in the feed. While the specs all say this is what should be done,
+        // a huge amount of feeds are just misconfigured and the selfLink is not valid.
+        feed_url = url.toString(),
         description = description,
         user_comment = "",
         next_url = "",
@@ -307,7 +298,6 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed {
         expired = null,
         items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
     )
-}
 
 private fun FeederGoItem.asParsedArticle() =
     ParsedArticle(
