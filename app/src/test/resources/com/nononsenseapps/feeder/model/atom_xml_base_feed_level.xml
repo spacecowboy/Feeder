@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Feed-level xml:base with relative entry links.
+     The feed is served from http://proxy.example.com/feeds/blog.atom but the canonical
+     base is https://blog.example.com/ declared via xml:base. All relative hrefs in entries
+     must be resolved against the canonical base, not the proxy URL. -->
+<feed xmlns='http://www.w3.org/2005/Atom'
+      xml:base='https://blog.example.com/'>
+  <id>https://blog.example.com/</id>
+  <title>xml:base Test Feed (feed-level)</title>
+  <updated>2024-01-01T00:00:00Z</updated>
+  <link rel='self' href='/feed.atom'/>
+  <link rel='alternate' type='text/html' href='/'/>
+
+  <entry>
+    <id>/posts/hello-world</id>
+    <title>Hello World</title>
+    <link href='/posts/hello-world'/>
+    <updated>2024-01-01T00:00:00Z</updated>
+    <summary>First post</summary>
+  </entry>
+
+  <entry>
+    <id>/posts/second-post</id>
+    <title>Second Post</title>
+    <link href='/posts/second-post'/>
+    <updated>2024-01-02T00:00:00Z</updated>
+    <summary>Second post</summary>
+  </entry>
+
+  <!-- Absolute link must not be changed even with a feed-level xml:base -->
+  <entry>
+    <id>https://other.example.com/external</id>
+    <title>External Link</title>
+    <link href='https://other.example.com/external'/>
+    <updated>2024-01-03T00:00:00Z</updated>
+    <summary>External link, must stay absolute</summary>
+  </entry>
+</feed>

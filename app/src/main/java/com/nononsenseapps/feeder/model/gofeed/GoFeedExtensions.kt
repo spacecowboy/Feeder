@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model.gofeed
 
+import com.nononsenseapps.feeder.model.AtomEntryInfo
 import com.nononsenseapps.feeder.model.EnclosureImage
 import com.nononsenseapps.feeder.model.MediaImage
 import com.nononsenseapps.feeder.model.ThumbnailImage
@@ -15,7 +16,17 @@ class FeederGoItem(
     private val goItem: GoItem,
     private val feedAuthor: GoPerson?,
     private val feedBaseUrl: URL,
+    /**
+     * Per-entry xml:base info extracted from the raw Atom XML.
+     * When non-null, [AtomEntryInfo.base] is used instead of [feedBaseUrl] for resolving all
+     * relative URLs within this entry (links, enclosure URLs, image URLs), and
+     * [AtomEntryInfo.resolvedAlternateHref] overrides the Go-parsed link when it is non-null
+     * (this handles element-level xml:base on <link> elements).
+     */
+    private val atomEntryInfo: AtomEntryInfo? = null,
 ) {
+    /** The base URL to use when resolving any relative URL belonging to this entry. */
+    internal val effectiveBaseUrl: URL get() = atomEntryInfo?.base ?: feedBaseUrl
     val title: String? by lazy {
         goItem.title?.let {
             HtmlToPlainTextConverter().convert(it)
@@ -58,16 +69,21 @@ class FeederGoItem(
     val snippet: String by lazy { plainContent.take(200) }
 
     val link: String? by lazy {
-        val rawLink =
-            goItem.link ?: goItem.guid?.takeIf { guid ->
-                try {
-                    val uri = URI(guid)
-                    uri.isAbsolute && (uri.scheme == "http" || uri.scheme == "https")
-                } catch (_: Exception) {
-                    false
-                }
+        // Prefer the SAX-resolved alternate href when available: it accounts for element-level
+        // xml:base on the <link> element itself, which the Go parser does not expose.
+        atomEntryInfo?.resolvedAlternateHref
+            ?: run {
+                val rawLink =
+                    goItem.link ?: goItem.guid?.takeIf { guid ->
+                        try {
+                            val uri = URI(guid)
+                            uri.isAbsolute && (uri.scheme == "http" || uri.scheme == "https")
+                        } catch (_: Exception) {
+                            false
+                        }
+                    }
+                rawLink?.let { relativeLinkIntoAbsolute(effectiveBaseUrl, it) }
             }
-        rawLink?.let { relativeLinkIntoAbsolute(feedBaseUrl, it) }
     }
 
     val updated: String?
@@ -80,7 +96,7 @@ class FeederGoItem(
         get() = goItem.author ?: feedAuthor
 
     val guid: String? by lazy {
-        (goItem.guid ?: goItem.link)?.let { relativeLinkIntoAbsolute(feedBaseUrl, it) }
+        (goItem.guid ?: goItem.link)?.let { relativeLinkIntoAbsolute(effectiveBaseUrl, it) }
     }
 
     val categories: List<String>?
@@ -105,7 +121,7 @@ class FeederGoItem(
                     goImage.url?.let { url ->
                         yield(
                             MediaImage(
-                                url = relativeLinkIntoAbsolute(feedBaseUrl, url),
+                                url = relativeLinkIntoAbsolute(effectiveBaseUrl, url),
                             ),
                         )
                     }
@@ -115,7 +131,7 @@ class FeederGoItem(
                     // Key is whatever name was assigned to the namespace in the XML
                     value.entries.forEach { (_, value) ->
                         value.forEach { extension ->
-                            recursiveExtensionThumbnailCandidates(extension, feedBaseUrl)
+                            recursiveExtensionThumbnailCandidates(extension, effectiveBaseUrl)
                         }
                     }
                 }
@@ -125,7 +141,7 @@ class FeederGoItem(
                         enclosure.url?.let { url ->
                             yield(
                                 EnclosureImage(
-                                    url = relativeLinkIntoAbsolute(feedBaseUrl, url),
+                                    url = relativeLinkIntoAbsolute(effectiveBaseUrl, url),
                                     length = enclosure.length?.toLongOrDefault(0L) ?: 0L,
                                 ),
                             )
@@ -139,7 +155,7 @@ class FeederGoItem(
 
     val bodyThumbnail: ThumbnailImage? by lazy {
         // Now we are resolving against original, not the feed
-        val baseUrl: String = linkToHtml(feedBaseUrl, link) ?: feedBaseUrl.toString()
+        val baseUrl: String = linkToHtml(effectiveBaseUrl, link) ?: effectiveBaseUrl.toString()
         findFirstImageInHtml(this.content, baseUrl)
     }
 

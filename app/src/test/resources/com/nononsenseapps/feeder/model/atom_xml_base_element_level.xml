@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Element-level xml:base: the xml:base attribute appears on a child element of <entry>
+     (<link> in this case).  Per the XML Base spec the effective base for that element's
+     attributes is the element's own xml:base resolved against the parent (entry) base.
+     The feed and entry have no xml:base of their own so the document base (fetch URL) is used;
+     the <link> element introduces a new base for its href attribute.
+
+     Fetch URL:  http://proxy.example.com/feed.atom
+     Feed base:  (none declared) → http://proxy.example.com/feed.atom
+     Entry base: (none declared) → http://proxy.example.com/feed.atom
+     <link xml:base='https://canonical.example.com/articles/' href='first-post'/>
+       → href resolved against link base → https://canonical.example.com/articles/first-post -->
+<feed xmlns='http://www.w3.org/2005/Atom'>
+  <id>http://proxy.example.com/feed</id>
+  <title>xml:base Test Feed (element-level link)</title>
+  <updated>2024-01-01T00:00:00Z</updated>
+
+  <entry>
+    <id>http://proxy.example.com/entry/1</id>
+    <title>First Post</title>
+    <link xml:base='https://canonical.example.com/articles/' href='first-post'/>
+    <updated>2024-01-01T00:00:00Z</updated>
+    <summary>Element-level xml:base on link</summary>
+  </entry>
+</feed>

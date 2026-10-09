@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Nested (relative) entry-level xml:base resolved against the feed-level base.
+     Feed base: https://blog.example.com/
+     Entry 1 base: 'posts/' → resolved against feed base → https://blog.example.com/posts/
+       Link href: '1' → https://blog.example.com/posts/1
+     Entry 2 base: absolute override https://other.example.com/articles/
+       Link href: 'my-article' → https://other.example.com/articles/my-article -->
+<feed xmlns='http://www.w3.org/2005/Atom'
+      xml:base='https://blog.example.com/'>
+  <id>https://blog.example.com/</id>
+  <title>xml:base Test Feed (entry-level, nested)</title>
+  <updated>2024-01-01T00:00:00Z</updated>
+  <link rel='self' href='/feed.atom'/>
+
+  <!-- Relative entry xml:base resolved against feed base -->
+  <entry xml:base='posts/'>
+    <id>1</id>
+    <title>Post One</title>
+    <link href='1'/>
+    <updated>2024-01-01T00:00:00Z</updated>
+  </entry>
+
+  <!-- Absolute entry xml:base overrides feed base entirely -->
+  <entry xml:base='https://other.example.com/articles/'>
+    <id>my-article</id>
+    <title>My Article</title>
+    <link href='my-article'/>
+    <updated>2024-01-02T00:00:00Z</updated>
+  </entry>
+</feed>

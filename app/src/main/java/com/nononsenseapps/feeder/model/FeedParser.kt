@@ -228,7 +228,16 @@ class FeedParser(
     private fun parseFeedBytes(
         url: URL,
         body: ByteArray,
-    ): ParsedFeed? = goFeedAdapter.parseBody(body)?.asFeed(url)
+    ): ParsedFeed? =
+        goFeedAdapter.parseBody(body)?.let { goFeed ->
+            val xmlBases =
+                if (goFeed.feedType?.lowercase() == "atom") {
+                    extractAtomXmlBases(body, url)
+                } else {
+                    null
+                }
+            goFeed.asFeed(url, xmlBases)
+        }
 
     /**
      * Takes body as bytes to handle encoding correctly
@@ -283,10 +292,14 @@ class FeedParser(
     }
 }
 
-private fun GoFeed.asFeed(url: URL): ParsedFeed {
+private fun GoFeed.asFeed(
+    url: URL,
+    xmlBases: AtomXmlBases? = null,
+): ParsedFeed {
+    val feedBase = xmlBases?.feedBase ?: url
     // Feed can update its URL which Feeder will respect, but going from https -> http, or http -> https
     // will not be respected. This is often a bug in self-hosted feeds in similar.
-    val selfLink = feedLink?.let { relativeLinkIntoAbsoluteOrNullIfNotValid(url, it) } ?: url
+    val selfLink = feedLink?.let { relativeLinkIntoAbsoluteOrNullIfNotValid(feedBase, it) } ?: url
     val feedUrl =
         if (selfLink.protocol == url.protocol) {
             selfLink
@@ -296,16 +309,22 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed {
 
     return ParsedFeed(
         title = title,
-        home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
+        home_page_url = link?.let { relativeLinkIntoAbsolute(feedBase, it) },
         feed_url = feedUrl.toString(),
         description = description,
         user_comment = "",
         next_url = "",
-        icon = image?.url?.let { relativeLinkIntoAbsolute(url, it) },
+        icon = image?.url?.let { relativeLinkIntoAbsolute(feedBase, it) },
         favicon = null,
         author = author?.asParsedAuthor(),
         expired = null,
-        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
+        items =
+            items?.mapIndexedNotNull { index, item ->
+                item?.let {
+                    val atomEntryInfo = xmlBases?.entries?.getOrNull(index)
+                    FeederGoItem(it, author, feedBase, atomEntryInfo).asParsedArticle()
+                }
+            },
     )
 }
 
@@ -323,13 +342,13 @@ private fun FeederGoItem.asParsedArticle() =
         date_modified = updated,
         author = author?.asParsedAuthor(),
         tags = categories,
-        attachments = enclosures?.map { it.asParsedEnclosure() },
+        attachments = enclosures?.map { it.asParsedEnclosure(effectiveBaseUrl) },
         hasFeedImage = thumbnail?.fromBody == false,
     )
 
-private fun GoEnclosure.asParsedEnclosure() =
+private fun GoEnclosure.asParsedEnclosure(baseUrl: URL) =
     ParsedEnclosure(
-        url = url,
+        url = url?.let { relativeLinkIntoAbsolute(baseUrl, it) },
         title = null,
         mime_type = type,
         size_in_bytes = length?.toLongOrNull(),
