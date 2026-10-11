@@ -302,6 +302,10 @@ class Repository(
 
     fun setTextScale(value: Float) = settingsStore.setTextScale(value)
 
+    val justifyText = settingsStore.justifyText
+
+    fun setJustifyText(value: Boolean) = settingsStore.setJustifyText(value)
+
     val font = settingsStore.font
 
     fun setFont(value: FontSelection) = settingsStore.setFont(value)

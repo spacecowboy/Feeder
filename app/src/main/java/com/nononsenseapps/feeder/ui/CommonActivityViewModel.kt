@@ -28,4 +28,7 @@ class CommonActivityViewModel(
 
     val font: StateFlow<FontSelection> =
         repository.font
+
+    val justifyText: StateFlow<Boolean> =
+        repository.justifyText
 }

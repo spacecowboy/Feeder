@@ -50,6 +50,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
@@ -625,10 +626,17 @@ fun LinearTextContent(
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
             val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val typographySettings = LocalTypographySettings.current
 
             Text(
                 text = annotatedString,
                 softWrap = softWrap,
+                textAlign =
+                    if (typographySettings.justifyText) {
+                        TextAlign.Justify
+                    } else {
+                        null
+                    },
                 modifier =
                     modifier
                         .indication(interactionSource, LocalIndication.current)

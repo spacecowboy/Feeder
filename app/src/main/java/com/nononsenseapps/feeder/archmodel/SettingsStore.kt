@@ -334,6 +334,21 @@ class SettingsStore(
         sp.edit().putString(PREF_FONT, value.serialize()).apply()
     }
 
+    private val _justifyText =
+        MutableStateFlow(
+            sp.getBoolean(
+                PREF_JUSTIFY_TEXT,
+                false,
+            ),
+        )
+
+    val justifyText = _justifyText.asStateFlow()
+
+    fun setJustifyText(value: Boolean) {
+        _justifyText.value = value
+        sp.edit().putBoolean(PREF_JUSTIFY_TEXT, value).apply()
+    }
+
     private val _maximumCountPerFeed =
         MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
@@ -720,6 +735,8 @@ const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
 const val PREF_FONT = "pref_font"
+
+private const val PREF_JUSTIFY_TEXT = "pref_justify_text"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
