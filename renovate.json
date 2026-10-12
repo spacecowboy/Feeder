@@ -5,7 +5,12 @@
         ":semanticCommitTypeAll(chore)"
     ],
     "rebaseWhen": "conflicted",
+    "platformAutomerge": true,
     "packageRules": [
+        {
+            "matchUpdateTypes": ["patch"],
+            "automerge": true
+        },
         {
             "groupName": "compiler",
             "matchPackageNames": [
