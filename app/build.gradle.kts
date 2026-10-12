@@ -185,6 +185,12 @@ android {
                 ),
             )
         }
+
+        jniLibs {
+            // Attempting any kind of stripping can introduce randomness and make the build non-reproducible
+            // Debug symbols should have been stripped already anywah
+            keepDebugSymbols.add("**/*.so")
+        }
     }
 
     lint {
