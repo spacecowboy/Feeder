@@ -5,7 +5,14 @@
         ":semanticCommitTypeAll(chore)"
     ],
     "rebaseWhen": "conflicted",
+    "minimumReleaseAge": "14 days",
+    "minimumReleaseAgeBuffer": "3 days",
+    "platformAutomerge": true,
     "packageRules": [
+        {
+            "matchUpdateTypes": ["patch"],
+            "automerge": true
+        },
         {
             "groupName": "compiler",
             "matchPackageNames": [
