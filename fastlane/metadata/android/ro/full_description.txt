@@ -1,21 +1,21 @@
-<p>Feeder este un cititor de feed-uri open source (RSS/Atom/JSONFeed) pentru Android creat în 2014.</p>
+<p>Feeder este un cititor de fluxuri open source (RSS/Atom/JSONFeed) pentru Android, creat în 2014.</p>
 
-<p>Cu Feeder puteți citi cele mai recente știri și postări de pe site-urile dumneavoastră preferate.</p>
+<p>Cu Feeder poți citi cele mai recente știri și postări de pe site-urile tale preferate.</p>
 
-<p>Feeder NU se sincronizează cu backend-urile la distanță obișnuite, astfel încât nu este necesară înregistrarea unui cont de niciun fel.</p>
+<p>Feeder NU se sincronizează cu serviciile de fundal obișnuite, așa că nu este necesară înregistrarea niciunui cont.</p>
 
-<p>Feeder este gratuit și rulează local pe dispozitivul dumneavoastră. Datele dumneavoastră sunt 100% private.</p>
+<p>Feeder este gratuit și rulează local pe dispozitivul dvs. Datele dvs. sunt 100% private.</p>
 
-<p><b>Caracteristici</b></p>
+<p><b>Funcționalități</b></p>
 
 <ul>
-<li>Analizează HTML și îl afișează într-un TextView nativ</li>
+<li>Analizează codul HTML și îl afișează într-un TextView nativ</li>
 <li>Citire offline</li>
 <li>Sincronizare în fundal</li>
 <li>Notificări</li>
-<li>OPML Import/Export</li>
-<li>Acces la îndemână la linkurile de închidere</li>
-<li>Material design</li>
+<li>Import/export OPML</li>
+<li>Acces rapid la linkurile atașate</li>
+<li>Design Material</li>
 </ul>
 
-Jurnalul complet de modificări este disponibil<a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md"> pe Github</a>.
+Jurnalul complet al modificărilor este disponibil <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">pe GitHub</a>.
