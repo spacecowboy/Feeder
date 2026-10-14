@@ -394,7 +394,7 @@
     <string name="block_rules">Tiltási szabályok</string>
     <string name="block_rules_desc">Az ezen szabályokra illeszkedő cikkek sosem töltődnek le. A tiltólistával ellentétben ez a művelet nem vonható vissza: egy szabály eltávolítása nem hozza vissza azokat a cikkeket, amelyek korábban kimaradtak.</string>
     <string name="allow_rules">Engedélyezési szabályok</string>
-    <string name="allow_rules_desc">Ha be van állítva egy engedélyezési szabály, akkor csak az ahhoz illeszkedő cikkek lesznek letöltve. A címkézési szabály ki lesz hagyva azoknál a cikkeknél, amelyek nem tartalmaznak címkéket, így egy címke nélküli hírforrást nem ürít ki pusztán a címkézési szabály.</string>
+    <string name="allow_rules_desc">Ha be van állítva egy engedélyezési szabály, akkor csak az ahhoz illeszkedő cikkek lesznek letöltve. A címkézési szabály ki lesz hagyva azoknál a cikkeknél, amelyek nem tartalmaznak címkéket, így egy címke nélküli hírforrást nem ürít ki pusztán egy címkézési szabály.</string>
     <string name="article_rules_placeholder">Title=(?i)szponzorált</string>
     <string name="rule_error_missing_separator">%1$d. sor: Hiányzik az „=”. Az érvénytelen sorokat a rendszer figyelmen kívül hagyja.</string>
     <string name="rule_error_unknown_field">%1$d. sor: A(z) „%2$s” egy ismeretlen mezőnév. Az érvénytelen sorokat a rendszer figyelmen kívül hagyja.</string>
