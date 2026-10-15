@@ -195,6 +195,10 @@ class SettingsViewModel(
         repository.setIsAnimatedPaging(value)
     }
 
+    fun setJustifyText(value: Boolean) {
+        repository.setJustifyText(value)
+    }
+
     fun onSummaryOpenAISettingsEvent(event: OpenAISettingsEvent) {
         handleOpenAISettingsEvent(
             event = event,
@@ -315,6 +319,7 @@ class SettingsViewModel(
                 repository.font,
                 repository.isPagingMode,
                 repository.isAnimatedPaging,
+                repository.justifyText,
                 downloadedLanguagePairs,
                 repository.useInAppAudioPlayer,
                 repository.forceSingleColumn,
@@ -367,10 +372,11 @@ class SettingsViewModel(
                     font = params[35] as FontSelection,
                     isPagingMode = params[36] as Boolean,
                     isAnimatedPaging = params[37] as Boolean,
-                    translationModelPairs = params[38] as List<LanguagePairInfo>,
-                    useInAppAudioPlayer = params[39] as Boolean,
-                    forceSingleColumn = params[40] as Boolean,
-                    applyBlocklistToLinks = params[41] as Boolean,
+                    justifyText = params[38] as Boolean,
+                    translationModelPairs = params[39] as List<LanguagePairInfo>,
+                    useInAppAudioPlayer = params[40] as Boolean,
+                    forceSingleColumn = params[41] as Boolean,
+                    applyBlocklistToLinks = params[42] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -464,6 +470,7 @@ data class SettingsViewState(
     val font: FontSelection = SystemDefault,
     val isPagingMode: Boolean = false,
     val isAnimatedPaging: Boolean = false,
+    val justifyText: Boolean = false,
     val useInAppAudioPlayer: Boolean = true,
     val forceSingleColumn: Boolean = true,
     val applyBlocklistToLinks: Boolean = false,

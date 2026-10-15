@@ -27,10 +27,11 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
         val dynamicColors by viewModel.dynamicColors.collectAsStateWithLifecycle()
         val textScale by viewModel.textScale.collectAsStateWithLifecycle()
         val font by viewModel.font.collectAsStateWithLifecycle()
+        val justifyText by viewModel.justifyText.collectAsStateWithLifecycle()
         withFoldableHinge {
             withWindowMetrics {
                 withWindowSize {
-                    ProvideTypographySettings(fontScale = textScale, font = font) {
+                    ProvideTypographySettings(fontScale = textScale, font = font, justifyText = justifyText) {
                         FeederTheme(
                             currentTheme = currentTheme,
                             darkThemePreference = darkThemePreference,

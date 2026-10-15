@@ -306,6 +306,7 @@ data class TypographySettings(
     val sansFontFamily: FontFamily,
     val monoFontFamily: FontFamily,
     val serifFontFamily: FontFamily = FontFamily.Serif,
+    val justifyText: Boolean = false,
 )
 
 val LocalTypographySettings: ProvidableCompositionLocal<TypographySettings> = compositionLocalOf { error("Missing TypographySettings!") }
@@ -314,6 +315,7 @@ val LocalTypographySettings: ProvidableCompositionLocal<TypographySettings> = co
 fun ProvideTypographySettings(
     fontScale: Float,
     font: FontSelection,
+    justifyText: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val sansFont =
@@ -332,6 +334,7 @@ fun ProvideTypographySettings(
             fontScale = fontScale,
             sansFontFamily = sansFont,
             monoFontFamily = getMonoFontFamily(font),
+            justifyText = justifyText,
         )
     CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)
 }

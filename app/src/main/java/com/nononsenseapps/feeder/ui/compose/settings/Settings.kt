@@ -250,6 +250,8 @@ fun SettingsScreen(
             onIsPagingModeChange = settingsViewModel::setIsPagingMode,
             isAnimatedPaging = viewState.isAnimatedPaging,
             onIsAnimatedPagingChange = settingsViewModel::setIsAnimatedPaging,
+            justifyText = viewState.justifyText,
+            onJustifyTextChange = settingsViewModel::setJustifyText,
             onSendFeedback = {
                 activityLauncher.startActivity(
                     openAdjacentIfSuitable = true,
@@ -352,6 +354,8 @@ private fun SettingsScreenPreview() {
             onIsPagingModeChange = {},
             isAnimatedPaging = false,
             onIsAnimatedPagingChange = {},
+            justifyText = false,
+            onJustifyTextChange = {},
             onSendFeedback = {},
             downloadedLanguagePairs = emptyList(),
             onDeleteLanguagePair = { _, _ -> },
@@ -442,6 +446,8 @@ fun SettingsList(
     onIsPagingModeChange: (Boolean) -> Unit,
     isAnimatedPaging: Boolean,
     onIsAnimatedPagingChange: (Boolean) -> Unit,
+    justifyText: Boolean,
+    onJustifyTextChange: (Boolean) -> Unit,
     onTextSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     downloadedLanguagePairs: List<LanguagePairInfo>,
@@ -834,6 +840,13 @@ fun SettingsList(
                     description = stringResource(id = R.string.pref_animated_paging_description),
                 )
             }
+
+            SwitchSetting(
+                title = stringResource(id = R.string.justify_article_text),
+                checked = justifyText,
+                onCheckedChange = onJustifyTextChange,
+                description = stringResource(id = R.string.justify_article_text_description),
+            )
         }
 
         HorizontalDivider(modifier = Modifier.width(dimens.maxContentWidth))
