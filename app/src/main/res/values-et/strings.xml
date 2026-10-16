@@ -401,4 +401,6 @@
     <string name="rule_error_invalid_regex">Rida %1$d: pole korrektne regulaaravaldis. Eiran vigaseid ridu.</string>
     <string name="rule_error_too_many_rules">Rida %1$d: kasutan vaid esimest %2$d reeglid. Eiran hilisemaid ridu.</string>
     <string name="article_rules_placeholder">Title=(?i)sponsored</string>
+    <string name="justify_article_text">Joonda artikli tekst rööpselt</string>
+    <string name="justify_article_text_description">Joonda artikli lõigud sirge joonega nii paremalt kui vasakult</string>
 </resources>
