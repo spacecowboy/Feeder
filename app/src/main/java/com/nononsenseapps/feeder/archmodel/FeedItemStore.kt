@@ -171,6 +171,7 @@ class FeedItemStore(
                 append("AND (\n")
                 append("plain_title LIKE ?\n").also { args.add("%$sanitizedSearch%") }
                 append("OR plain_snippet LIKE ?\n").also { args.add("%$sanitizedSearch%") }
+                append("OR article_tags LIKE ?\n").also { args.add("%$sanitizedSearch%") }
                 append(")\n")
             }
             onlySavedArticles -> append("AND bookmarked = 1\n")
