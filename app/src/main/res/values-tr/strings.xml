@@ -402,4 +402,6 @@
     <string name="rule_error_empty_pattern">%1$d. satır: Desen boş, bu durumda her şeyle eşleşir. Geçersiz satırlar göz ardı edilir.</string>
     <string name="rule_error_invalid_regex">%1$d. satır: geçerli bir düzenli ifade değil. Geçersiz satırlar göz ardı edilir.</string>
     <string name="rule_error_too_many_rules">%1$d. satır: Yalnızca ilk %2$d kural kullanılır. Sonraki satırlar göz ardı edilir.</string>
+    <string name="justify_article_text">Makale metnini iki yana hizala</string>
+    <string name="justify_article_text_description">Makale paragraflarını sol ve sağ kenarlara hizala</string>
 </resources>

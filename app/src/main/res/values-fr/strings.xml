@@ -401,4 +401,6 @@
     <string name="allow_rules_desc">Si une règle d\'autorisation est paramétrée alors seuls les articles correspondants seront téléchargés. À noter que les règles d\'étiquette sont ignorées pour les articles sans étiquette. Un flux RSS sans étiquette ne sera pas vidé en raison d\'une telle règle.</string>
     <string name="block_rules_desc">Les articles correspondants ne seront jamais téléchargés. Contrairement à la liste de blocage, c\'est irréversible : supprimer la règle ne permettra pas de récupérer les articles déjà ignorés.</string>
     <string name="article_filter_rules_desc">Une ligne par règle, écrite sous la forme Champs=Pattern. Les champs disponibles sont Title, URL, Author, Tag et Content. Le pattern est une expression régulière qui cherche n\'importe où dans le champs ; commencez par (?i) pour ignorer la casse. Les règles prennent effets à la prochaine récupération des articles et n\'affecte pas les articles déjà sauvegardés.</string>
+    <string name="justify_article_text_description">Aligner les paragraphes d\'article aux bords gauche et droite</string>
+    <string name="justify_article_text">Justification du texte des articles</string>
 </resources>
