@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Линија %1$d: шаблон је празан, па ће се подударати све. Неисправне линије се игноришу.</string>
     <string name="rule_error_invalid_regex">Линија %1$d: није исправан регуларни израз. Неисправне линије се игноришу.</string>
     <string name="rule_error_too_many_rules">Линија %1$d: користи се само првох %2$d правила. Касније линије се игноришу.</string>
+    <string name="justify_article_text">Обострано поравнај текст чланка</string>
+    <string name="justify_article_text_description">Поравнава и леву и десну ивицу пасуса чланка</string>
 </resources>
