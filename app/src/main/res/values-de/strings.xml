@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Zeile %1$d: Das Muster ist leer, was allem entsprechen würde. Ungültige Zeilen werden ignoriert.</string>
     <string name="rule_error_invalid_regex">Zeile %1$d: kein gültiger regulärer Ausdruck. Ungültige Zeilen werden ignoriert.</string>
     <string name="rule_error_too_many_rules">Zeile %1$d: Es werden nur die ersten %2$d Regeln angewendet. Nachfolgende Zeilen werden ignoriert.</string>
+    <string name="justify_article_text">Artikeltext ausrichten</string>
+    <string name="justify_article_text_description">Artikelabsätze sowohl am linken als auch am rechten Rand ausrichten</string>
 </resources>
