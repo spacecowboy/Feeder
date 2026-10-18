@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Riga %1$d: il pattern è vuoto e corrisponderebbe a tutto. Le righe non valide vengono ignorate.</string>
     <string name="rule_error_invalid_regex">Riga %1$d: non è un\'espressione regolare valida. Le righe non valide vengono ignorate.</string>
     <string name="rule_error_too_many_rules">Riga %1$d: vengono utilizzate solo le prime %2$d regole. Le righe successive vengono ignorate.</string>
+    <string name="justify_article_text">Giustifica il testo dell’articolo</string>
+    <string name="justify_article_text_description">Allinea i paragrafi dell’articolo a entrambi i margini</string>
 </resources>
