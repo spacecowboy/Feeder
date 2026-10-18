@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Řádek %1$d: vzor je prázdný, což by odpovídalo všemu. Neplatné řádky jsou ignorovány.</string>
     <string name="rule_error_invalid_regex">Řádek %1$d: neplatný regulární výraz. Neplatné řádky jsou ignorovány.</string>
     <string name="rule_error_too_many_rules">Řádek %1$d: je použito pouze prvních %2$d pravidel. Další řádky jsou ignorovány.</string>
+    <string name="justify_article_text">Zarovat text článku do bloku</string>
+    <string name="justify_article_text_description">Zarovnat odstavce článku podél levého i pravého okraje</string>
 </resources>
