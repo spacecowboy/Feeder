@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">第 %1$d 行: 模式为空，这代表匹配一切。忽略无效行。</string>
     <string name="rule_error_invalid_regex">第 %1$d 行: 非有效正则表达式。忽略无效行。</string>
     <string name="rule_error_too_many_rules">第 %1$d 行: 只使用前面 %2$d 条规则。忽略后面的行。</string>
+    <string name="justify_article_text">对齐文章文本</string>
+    <string name="justify_article_text_description">将文章段落与左右边缘对齐</string>
 </resources>
