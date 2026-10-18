@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Wiersz %1$d: wzorzec jest pusty, więc pasowałby do wszystkiego. Nieprawidłowe wiersze są ignorowane</string>
     <string name="rule_error_invalid_regex">Wiersz %1$d: nieprawidłowe wyrażenie regularne. Nieprawidłowe wiersze są ignorowane</string>
     <string name="rule_error_too_many_rules">Wiersz %1$d: tylko pierwsze %2$d reguł(y) są (jest) stosowane (stosowanych). Kolejne wiersze są ignorowane</string>
+    <string name="justify_article_text">Justuj tekst artykułów</string>
+    <string name="justify_article_text_description">Wyrównuj akapity artykułów zarówno do lewej, jak i prawej krawędzi</string>
 </resources>
