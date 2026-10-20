@@ -236,10 +236,8 @@ class FeedParser(
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, ParsedFeed> {
-        val primaryType = responseBody.contentType()?.type
-        val subType = responseBody.contentType()?.subtype ?: ""
         return when {
-            primaryType == null || primaryType == "text" || subType.contains("json") || subType.contains("xml") ->
+            responseBody.hasFeedContentType() ->
                 Either.catching(
                     onCatch = { t ->
                         RSSParseError(url = url.toString(), throwable = t)
@@ -332,6 +330,11 @@ private fun GoPerson.asParsedAuthor() =
         url = null,
         avatar = null,
     )
+
+internal fun ResponseBody.hasFeedContentType(): Boolean {
+    val type = contentType()
+    return type == null || type.type == "text" || type.subtype.contains("json") || type.subtype.contains("xml")
+}
 
 suspend fun OkHttpClient.getResponse(
     url: URL,

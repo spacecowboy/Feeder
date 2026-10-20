@@ -14,10 +14,13 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
 import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.SyncRemoteStore
+import com.nononsenseapps.feeder.blob.blobFile
+import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
@@ -37,7 +40,10 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.minusMinutes
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -52,6 +58,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -69,6 +76,9 @@ import kotlin.test.assertTrue
 class RssLocalSyncKtTest : DIAware {
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
+
+    @get:Rule
+    val testFiles = TemporaryFolder()
 
     override val di by DI.lazy {
         bind<AppDatabase>() with instance(testDb.db)
@@ -103,8 +113,8 @@ class RssLocalSyncKtTest : DIAware {
         bind<FilePathProvider>() with
             singleton {
                 filePathProvider(
-                    cacheDir = getApplicationContext<FeederApplication>().cacheDir,
-                    filesDir = getApplicationContext<FeederApplication>().filesDir,
+                    cacheDir = testFiles.newFolder("cache"),
+                    filesDir = testFiles.newFolder("files"),
                 )
             }
     }
@@ -173,6 +183,121 @@ class RssLocalSyncKtTest : DIAware {
 
         return id
     }
+
+    @Test
+    fun unchangedArticlesKeepTheirFilesAndChangedOrMissingContentIsSaved() =
+        runBlocking {
+            val prefix = "same ".repeat(60)
+            val originalText = prefix + "first"
+            val updatedText = prefix + "other"
+
+            fun feed(text: String) =
+                """
+                {"version":"https://jsonfeed.org/version/1","title":"Test",
+                 "icon":"https://example.com/icon.png",
+                 "items":[{"id":"article","title":"Title","url":"https://example.com/article",
+                           "date_published":"2020-01-01T00:00:00Z","content_text":"$text"}]}
+                """.trimIndent()
+
+            val url = server.url("/content.json").toUrl()
+            val feedId = insertFeed("content", url, feed(originalText))
+
+            suspend fun refresh() = rssLocalSync.syncFeeds(feedId = feedId, debugReallyForceNetwork = true)
+            assertTrue(refresh())
+            val dao = testDb.db.feedItemDao()
+            val item =
+                dao.loadFeedItemsInFeedDescDoNotUseInProd(feedId).single().copy(
+                    bookmarked = true,
+                    notified = true,
+                    readTime = Instant.ofEpochMilli(1_600_000_000_000L),
+                    fullTextDownloaded = true,
+                )
+            dao.updateFeedItem(item)
+            val file = blobFile(item.id, filePaths.articleDir)
+            assertTrue(file.setLastModified(1_600_000_000_000L))
+            val modified = file.lastModified()
+
+            assertTrue(refresh())
+            assertEquals(modified, file.lastModified())
+            assertEquals(item, dao.loadFeedItem(item.id))
+
+            // The changed text has the same snippet and word count, so metadata alone cannot detect it.
+            responses[url]!!.setBody(feed(updatedText))
+            assertTrue(refresh())
+
+            fun savedText() = blobInputStream(item.id, filePaths.articleDir).bufferedReader().use { it.readText() }
+            assertEquals(updatedText, savedText())
+            assertEquals(item, dao.loadFeedItem(item.id))
+
+            assertTrue(file.delete())
+            assertTrue(refresh())
+            assertEquals(updatedText, savedText())
+            file.writeText("broken gzip")
+            assertTrue(refresh())
+            assertEquals(updatedText, savedText())
+        }
+
+    @Test
+    fun slowResponseBodyDoesNotHoldUpOtherFeeds() =
+        runBlocking {
+            val slowUrl = server.url("/slow.json").toUrl()
+            val slowId = insertFeed("a-slow", slowUrl, cowboyJson)
+            val fastId = insertFeed("z-fast", server.url("/fast.json").toUrl(), cowboyJson)
+            responses[slowUrl]!!.setBodyDelay(5, TimeUnit.SECONDS)
+
+            val refresh = async { rssLocalSync.syncFeeds() }
+            withTimeout(4_000) {
+                while (testDb.db
+                        .feedItemDao()
+                        .loadFeedItemsInFeedDescDoNotUseInProd(fastId)
+                        .isEmpty()
+                ) {
+                    delay(20)
+                }
+            }
+            assertTrue(
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(slowId)
+                    .isEmpty(),
+            )
+            assertTrue(refresh.await())
+            assertEquals(
+                10,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(slowId)
+                    .size,
+            )
+        }
+
+    @Test
+    fun batchedLookupPreservesStateAndScopesToFeedAcrossSqliteChunks() =
+        runBlocking {
+            val firstFeed = insertFeed("first", server.url("/first").toUrl(), cowboyJson)
+            val secondFeed = insertFeed("second", server.url("/second").toUrl(), cowboyJson)
+            val readTime = Instant.now()
+            val item =
+                FeedItem(
+                    feedId = firstFeed,
+                    guid = "guid-1000",
+                    bookmarked = true,
+                    readTime = readTime,
+                    notified = true,
+                    fullTextDownloaded = true,
+                )
+            testDb.db.feedItemDao().insertFeedItem(item)
+            testDb.db.feedItemDao().insertFeedItem(FeedItem(feedId = secondFeed, guid = item.guid))
+
+            val repository: Repository by instance()
+            val loaded = repository.loadFeedItems(firstFeed, (0..1000).map { "guid-$it" }).single()
+            assertEquals(firstFeed, loaded.feedId)
+            assertEquals(readTime.toEpochMilli(), loaded.readTime?.toEpochMilli())
+            assertTrue(loaded.bookmarked)
+            assertTrue(loaded.notified)
+            assertTrue(loaded.fullTextDownloaded)
+            assertTrue(repository.loadFeedItems(firstFeed, emptyList()).isEmpty())
+        }
 
     @Test
     fun syncCowboyJsonWorks() =

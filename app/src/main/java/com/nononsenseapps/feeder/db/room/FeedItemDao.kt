@@ -76,6 +76,12 @@ interface FeedItemDao {
         feedId: Long?,
     ): FeedItem?
 
+    @Query("SELECT * FROM feed_items WHERE feed_id = :feedId AND guid IN (:guids)")
+    suspend fun loadFeedItems(
+        feedId: Long,
+        guids: List<String>,
+    ): List<FeedItem>
+
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
 
