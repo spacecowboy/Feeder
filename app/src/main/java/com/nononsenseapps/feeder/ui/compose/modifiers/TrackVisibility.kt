@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
@@ -27,6 +28,13 @@ private class VisibilityTrackerNode(
 ) : Modifier.Node(),
     GlobalPositionAwareModifierNode {
     private var previousVisibilityPercentage: Float? = null
+    private var previousScrolledOffTop: Boolean? = null
+
+    /**
+     * Top edge of the visible area. Cached because the parent bounds are empty once the layout has
+     * been clipped away completely.
+     */
+    private var lastKnownVisibleTop: Float? = null
     private val minimumVisibilityDelta = 0.01f
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
@@ -35,6 +43,7 @@ private class VisibilityTrackerNode(
 
         if (parentBounds == null || !coordinates.isAttached) {
             previousVisibilityPercentage = 0f
+            previousScrolledOffTop = null
             return
         }
 
@@ -51,30 +60,55 @@ private class VisibilityTrackerNode(
 
         val visibilityPercentage = (visibleArea / totalArea).coerceIn(0f, 1f)
 
+        if (!parentBounds.isEmpty) {
+            lastKnownVisibleTop = parentBounds.top
+        }
+
+        // boundsInWindow is clipped, so the unclipped position is needed to tell whether the layout
+        // left the visible area at the top (scrolled past) or at the bottom (scrolled back, or
+        // pushed down by items inserted above it)
+        val scrolledOffTop =
+            lastKnownVisibleTop?.let { visibleTop ->
+                coordinates.positionInWindow().y < visibleTop - TOP_EDGE_TOLERANCE_PX
+            } ?: previousScrolledOffTop ?: false
+
         val visibilityDifference =
             previousVisibilityPercentage?.let { previous ->
                 abs(visibilityPercentage - previous)
             } ?: Float.MAX_VALUE
 
-        if (visibilityDifference >= minimumVisibilityDelta) {
+        if (visibilityDifference >= minimumVisibilityDelta || scrolledOffTop != previousScrolledOffTop) {
             onVisibilityChanged(
                 VisibilityInfo(
                     isVisible = visibilityPercentage > 0f,
                     visiblePercentage = visibilityPercentage,
                     bounds = boundsInWindow,
                     isAboveThreshold = visibilityPercentage >= thresholdPercentage,
+                    isScrolledOffTop = scrolledOffTop,
                 ),
             )
             previousVisibilityPercentage = visibilityPercentage
+            previousScrolledOffTop = scrolledOffTop
         }
     }
 }
+
+/**
+ * Sub-pixel differences are rounding noise, not scrolling.
+ */
+private const val TOP_EDGE_TOLERANCE_PX = 1f
 
 data class VisibilityInfo(
     val isVisible: Boolean,
     val visiblePercentage: Float,
     val bounds: Rect,
     val isAboveThreshold: Boolean,
+    /**
+     * True when the top edge of the layout is above the top edge of its parent - in other words
+     * when it is scrolling off the top of the screen. False while it is fully inside the parent,
+     * and also when it leaves at the bottom.
+     */
+    val isScrolledOffTop: Boolean,
 )
 
 private class VisibilityTrackerElement(
