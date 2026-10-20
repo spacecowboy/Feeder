@@ -401,4 +401,6 @@
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Ĝisdatigado</string>
     <string name="force_single_column">Devigi unuopan kolumnon</string>
+    <string name="justify_article_text">Ĝisrandigi la tekston de artikoloj</string>
+    <string name="justify_article_text_description">Ĝisrandigi la alineojn de artikoloj ĉe kaj la maldekstra kaj la dekstra marĝenoj</string>
 </resources>
