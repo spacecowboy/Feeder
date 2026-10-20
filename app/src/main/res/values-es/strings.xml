@@ -383,4 +383,7 @@
     <string name="delete_button_text">Eliminar</string>
     <string name="cancel">Cancelar</string>
     <string name="force_single_column">Forzar columna única</string>
+    <string name="justify_article_text">Justificar texto del artículo</string>
+    <string name="justify_article_text_description">Alinea los párrafos del artículo tanto al borde izquierdo como al derecho</string>
+    <string name="article_filter_rules">Reglas de filtrado de artículos</string>
 </resources>
