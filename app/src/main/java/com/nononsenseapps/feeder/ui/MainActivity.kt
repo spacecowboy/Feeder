@@ -1,14 +1,21 @@
 package com.nononsenseapps.feeder.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.util.Consumer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -35,6 +42,17 @@ class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
     private val repository: Repository by instance()
+    private val preferences: SharedPreferences by instance()
+    private val localNetworkPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                runOnceRssSync(
+                    di = di,
+                    forceNetwork = false,
+                    triggeredByUser = false,
+                )
+            }
+        }
 
     override fun onStart() {
         super.onStart()
@@ -100,6 +118,15 @@ class MainActivity : DIAwareComponentActivity() {
                 AppContent()
             }
         }
+
+        if (Build.VERSION.SDK_INT >= 37 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_LOCAL_NETWORK) != PackageManager.PERMISSION_GRANTED &&
+            !preferences.getBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, false)
+        ) {
+            // Persist before launching so denial and activity recreation do not prompt again.
+            preferences.edit { putBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, true) }
+            localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+        }
     }
 
     @Composable
@@ -137,5 +164,6 @@ class MainActivity : DIAwareComponentActivity() {
     companion object {
         private const val LOG_TAG = "FEEDER_MAIN"
         private const val KEY_NOTIFICATION_PERMISSION_REQUESTED = "notification_permission_requested"
+        private const val KEY_LOCAL_NETWORK_PERMISSION_REQUESTED = "local_network_permission_requested"
     }
 }

@@ -11,6 +11,7 @@
     android:maxSdkVersion="29" />
   <!-- For syncing -->
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
