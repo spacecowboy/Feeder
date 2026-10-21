@@ -73,6 +73,7 @@ import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.model.ReadAloudProgress
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.ScrollDirection
 import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressContent
@@ -82,6 +83,7 @@ import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -89,6 +91,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.unicodeWrap
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -113,6 +116,8 @@ fun ArticleScreen(
 
     val mavm = remember { mainActivityViewModel }
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val readAloudProgress = viewModel.readAloudProgress
+    val speechHighlight by viewModel.speechHighlight.collectAsStateWithLifecycle(initialValue = null)
     val isPagingMode by mavm.isPagingMode.collectAsStateWithLifecycle()
     val isAnimatedPaging by mavm.isAnimatedPaging.collectAsStateWithLifecycle()
 
@@ -194,6 +199,9 @@ fun ArticleScreen(
         ttsOnStop = viewModel::ttsStop,
         ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+        readAloudProgress = readAloudProgress,
+        speechHighlight = speechHighlight,
+        ttsOnSeekTo = viewModel::ttsSeekTo,
         podcastOnPlay = viewModel::podcastPlay,
         podcastOnPause = viewModel::podcastPause,
         podcastOnStop = viewModel::stopPodcastPlayback,
@@ -261,6 +269,9 @@ fun ArticleScreen(
     onDownloadBergamotRuntime: () -> Unit,
     onDismissBergamotRuntimeDownload: () -> Unit,
     modifier: Modifier = Modifier,
+    readAloudProgress: StateFlow<ReadAloudProgress>? = null,
+    speechHighlight: SpeechHighlight? = null,
+    ttsOnSeekTo: (Long) -> Unit = {},
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
 ) {
@@ -501,6 +512,8 @@ fun ArticleScreen(
                     onSkipNext = ttsOnSkipNext,
                     languages = ImmutableHolder(viewState.ttsLanguages),
                     onSelectLanguage = ttsOnSelectLanguage,
+                    progress = readAloudProgress,
+                    onSeekTo = ttsOnSeekTo,
                 )
             }
         },
@@ -515,6 +528,7 @@ fun ArticleScreen(
             ArticleContent(
                 viewState = viewState,
                 screenType = ScreenType.SINGLE,
+                speechHighlight = speechHighlight,
                 articleScrollState = articleScrollState,
                 onFeedTitleClick = onFeedTitleClick,
                 onOpenAudioPlayer = onOpenAudioPlayer,
@@ -646,6 +660,7 @@ fun ArticleContent(
     onOpenInCustomTab: () -> Unit,
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
+    speechHighlight: SpeechHighlight? = null,
 ) {
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -719,6 +734,7 @@ fun ArticleContent(
                 TextToDisplay.CONTENT -> {
                     ColumnArticleContent(
                         articleContent = viewState.articleContent,
+                        speechHighlight = speechHighlight,
                         onLinkClick = { link, index ->
                             if (index != null && elementPositions.containsKey(index)) {
                                 // Anchor link - scroll to the element position

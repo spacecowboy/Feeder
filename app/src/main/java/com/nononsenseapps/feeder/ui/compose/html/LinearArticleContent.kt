@@ -28,6 +28,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -100,6 +101,9 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.layouts.Table
 import com.nononsenseapps.feeder.ui.compose.layouts.TableCell
 import com.nononsenseapps.feeder.ui.compose.layouts.TableData
+import com.nononsenseapps.feeder.ui.compose.readaloud.LocalSpeechHighlights
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlightIndex
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
 import com.nononsenseapps.feeder.ui.compose.text.asFontFamily
@@ -157,32 +161,43 @@ fun ColumnArticleContent(
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
     onElementPosition: (index: Int, yPosition: Float) -> Unit = { _, _ -> },
+    speechHighlight: SpeechHighlight? = null,
 ) {
-    articleContent.elements.forEachIndexed { index, element ->
-        ProvideTextStyle(
-            MaterialTheme.typography.bodyLarge.merge(
-                TextStyle(color = MaterialTheme.colorScheme.onBackground),
-            ),
-        ) {
-            BoxWithConstraints(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .onGloballyPositioned { coordinates ->
-                            onElementPosition(index, coordinates.positionInRoot().y)
-                        },
-                contentAlignment = Alignment.Center,
+    val speechIndex =
+        remember(articleContent, speechHighlight?.text) {
+            speechHighlight?.let { SpeechHighlightIndex(articleContent, it.text) }
+        }
+    val highlights =
+        remember(speechIndex, speechHighlight?.segment) {
+            speechHighlight?.let { speechIndex?.highlights(it.segment) } ?: emptyMap()
+        }
+    CompositionLocalProvider(LocalSpeechHighlights provides highlights) {
+        articleContent.elements.forEachIndexed { index, element ->
+            ProvideTextStyle(
+                MaterialTheme.typography.bodyLarge.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                ),
             ) {
-                LinearElementContent(
-                    linearElement = element,
-                    idToIndex = articleContent.idToIndex,
-                    allowHorizontalScroll = true,
-                    onLinkClick = onLinkClick,
+                BoxWithConstraints(
                     modifier =
                         Modifier
-                            .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
-                            .fillMaxWidth(),
-                )
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                onElementPosition(index, coordinates.positionInRoot().y)
+                            },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    LinearElementContent(
+                        linearElement = element,
+                        idToIndex = articleContent.idToIndex,
+                        allowHorizontalScroll = true,
+                        onLinkClick = onLinkClick,
+                        modifier =
+                            Modifier
+                                .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
+                                .fillMaxWidth(),
+                    )
+                }
             }
         }
     }
@@ -625,7 +640,21 @@ fun LinearTextContent(
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
-            val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val original = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val range = LocalSpeechHighlights.current[linearText]
+            val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            val annotatedString =
+                remember(original, range, highlightColor) {
+                    if (range == null) {
+                        original
+                    } else {
+                        AnnotatedString
+                            .Builder(original)
+                            .apply {
+                                addStyle(SpanStyle(background = highlightColor), range.first, (range.last + 1).coerceAtMost(original.length))
+                            }.toAnnotatedString()
+                    }
+                }
             val typographySettings = LocalTypographySettings.current
 
             Text(
