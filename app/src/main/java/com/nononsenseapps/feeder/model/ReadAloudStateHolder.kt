@@ -103,12 +103,23 @@ class TTSStateHolder(
         this.player = player
         player.addListener(
             object : Player.Listener {
+                override fun onPlayWhenReadyChanged(
+                    playWhenReady: Boolean,
+                    reason: Int,
+                ) {
+                    if (_progress.value.preparationProgress != null && request != null) {
+                        this@TTSStateHolder.playWhenReady = playWhenReady
+                        _ttsState.value = if (playWhenReady) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
+                    }
+                }
+
                 override fun onEvents(
                     player: Player,
                     events: Player.Events,
                 ) {
                     if (_progress.value.preparationProgress == null && _progress.value.error == null && request != null) {
-                        _ttsState.value = if (player.playWhenReady && player.playbackState != Player.STATE_ENDED) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
+                        _ttsState.value =
+                            if (player.playWhenReady && player.playbackState != Player.STATE_ENDED && player.playbackState != Player.STATE_IDLE) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
                         updatePosition()
                     }
                 }
@@ -139,6 +150,7 @@ class TTSStateHolder(
         service?.setArticle(current.articleId)
         player?.stop()
         player?.clearMediaItems()
+        player?.playWhenReady = playWhenReady
         segments = emptyList()
         preparation =
             coroutineScope.launch(Dispatchers.Main.immediate) {
@@ -312,6 +324,7 @@ class TTSStateHolder(
             } else {
                 player?.let {
                     if (it.playbackState == Player.STATE_ENDED) it.seekTo(0)
+                    if (it.playbackState == Player.STATE_IDLE && it.mediaItemCount > 0) it.prepare()
                     it.play()
                 }
                 if (request != null) _ttsState.value = PlaybackStatus.PLAYING
@@ -352,7 +365,6 @@ class TTSStateHolder(
         coroutineScope.launch(Dispatchers.Main.immediate) {
             val pending = preparation
             pending?.cancel()
-            preparation = null
             pendingServiceStart = false
             request = null
             player?.stop()
@@ -365,6 +377,9 @@ class TTSStateHolder(
             coroutineScope.launch(Dispatchers.IO) {
                 pending?.join()
                 directory?.deleteRecursively()
+                withContext(Dispatchers.Main.immediate) {
+                    if (preparation === pending) preparation = null
+                }
             }
             service?.stopForeground(android.app.Service.STOP_FOREGROUND_REMOVE)
             service?.stopSelf()

@@ -75,6 +75,8 @@ class ReadAloudService : MediaSessionService() {
                     },
                 ).build()
         holder.attach(this, player)
+        // The Compose UI uses the application facade, not a bound MediaController.
+        addSession(checkNotNull(session))
     }
 
     override fun onStartCommand(
@@ -83,26 +85,42 @@ class ReadAloudService : MediaSessionService() {
         startId: Int,
     ): Int {
         if (intent?.action == ACTION_PREPARE) {
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, getString(R.string.read_article), NotificationManager.IMPORTANCE_LOW))
-            val stop = PendingIntent.getService(this, 1, Intent(this, ReadAloudService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
-            startForeground(
-                NOTIFICATION_ID,
-                NotificationCompat
-                    .Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_stat_f)
-                    .setContentTitle(getString(R.string.read_article))
-                    .setContentText(getString(R.string.read_aloud_preparing))
-                    .setOngoing(true)
-                    .addAction(android.R.drawable.ic_media_pause, getString(R.string.stop_reading), stop)
-                    .build(),
-            )
+            showPreparationNotification()
             holder.prepare()
         } else if (intent?.action == ACTION_STOP) {
             holder.stop()
         }
         super.onStartCommand(intent, flags, startId)
         return START_NOT_STICKY
+    }
+
+    override fun onUpdateNotification(
+        session: MediaSession,
+        startInForegroundRequired: Boolean,
+    ) {
+        // Clearing the previous playlist must not demote an active synthesis job.
+        if (holder.progress.value.preparationProgress != null) {
+            showPreparationNotification()
+        } else {
+            super.onUpdateNotification(session, startInForegroundRequired)
+        }
+    }
+
+    private fun showPreparationNotification() {
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, getString(R.string.read_article), NotificationManager.IMPORTANCE_LOW))
+        val stop = PendingIntent.getService(this, 1, Intent(this, ReadAloudService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
+        startForeground(
+            NOTIFICATION_ID,
+            NotificationCompat
+                .Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_f)
+                .setContentTitle(getString(R.string.read_article))
+                .setContentText(getString(R.string.read_aloud_preparing))
+                .setOngoing(true)
+                .addAction(android.R.drawable.ic_media_pause, getString(R.string.stop_reading), stop)
+                .build(),
+        )
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = session

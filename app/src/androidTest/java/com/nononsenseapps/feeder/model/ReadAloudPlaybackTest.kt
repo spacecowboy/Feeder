@@ -1,5 +1,8 @@
 package com.nononsenseapps.feeder.model
 
+import android.app.ActivityManager
+import android.app.Notification
+import android.app.NotificationManager
 import android.content.ComponentName
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.Lifecycle
@@ -27,6 +30,70 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class ReadAloudPlaybackTest {
+    @Test fun replacingPreparedAudioKeptSynthesisInTheForeground() =
+        runBlocking<Unit> {
+            val app = getApplicationContext<FeederApplication>()
+            val holder: TTSStateHolder = app.di.direct.instance()
+            ActivityScenario.launch(MainActivity::class.java).use {
+                try {
+                    withContext(Dispatchers.Main) { holder.tts(listOf(AnnotatedString("A short article.")), false, -60) }
+                    val prepared = withTimeout(60000) { holder.progress.first { it.articleId == -60L && (it.durationMillis > 0 || it.error != null) } }
+                    assertNull(prepared.error)
+                    withTimeout(5000) {
+                        while (app.getSystemService(NotificationManager::class.java).activeNotifications.none {
+                                it.notification.extras.containsKey(Notification.EXTRA_MEDIA_SESSION)
+                            }
+                        ) {
+                            delay(50)
+                        }
+                    }
+                    withContext(Dispatchers.Main) { holder.tts(listOf(AnnotatedString("A much longer replacement article. ".repeat(500))), false, -61) }
+                    delay(500)
+                    assertTrue(holder.progress.value.preparationProgress != null)
+                    @Suppress("DEPRECATION")
+                    val service =
+                        app
+                            .getSystemService(ActivityManager::class.java)
+                            .getRunningServices(Int.MAX_VALUE)
+                            .first { service -> service.service.className == ReadAloudService::class.java.name }
+                    assertTrue(service.foreground)
+                    val future =
+                        withContext(Dispatchers.Main) {
+                            MediaController.Builder(app, SessionToken(app, ComponentName(app, ReadAloudService::class.java))).buildAsync()
+                        }
+                    val controller = withContext(Dispatchers.IO) { future.get(10, TimeUnit.SECONDS) }
+                    try {
+                        withContext(Dispatchers.Main) { controller.pause() }
+                        withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PAUSED } }
+                    } finally {
+                        withContext(Dispatchers.Main) { controller.release() }
+                    }
+                } finally {
+                    withContext(Dispatchers.Main) { holder.stop() }
+                }
+            }
+        }
+
+    @Test fun immediatelyRestartingAfterStopKeptTheNewRequest() =
+        runBlocking<Unit> {
+            val app = getApplicationContext<FeederApplication>()
+            val holder: TTSStateHolder = app.di.direct.instance()
+            ActivityScenario.launch(MainActivity::class.java).use {
+                try {
+                    withContext(Dispatchers.Main) { holder.tts(listOf(AnnotatedString("An old article. ".repeat(100))), false, -50) }
+                    delay(20)
+                    withContext(Dispatchers.Main) {
+                        holder.stop()
+                        holder.tts(listOf(AnnotatedString("A new article after stopping.")), false, -51)
+                    }
+                    val prepared = withTimeout(60000) { holder.progress.first { it.articleId == -51L && (it.durationMillis > 0 || it.error != null) } }
+                    assertNull(prepared.error)
+                } finally {
+                    withContext(Dispatchers.Main) { holder.stop() }
+                }
+            }
+        }
+
     @Test fun synthesizedAudioSupportedSystemPauseSeekAndResume() =
         runBlocking<Unit> {
             val app = getApplicationContext<FeederApplication>()
@@ -62,6 +129,10 @@ class ReadAloudPlaybackTest {
                         val beforeBackground = holder.progress.value.positionMillis
                         scenario.moveToState(Lifecycle.State.CREATED)
                         withTimeout(5000) { holder.progress.first { it.positionMillis > beforeBackground + 300 } }
+                        withContext(Dispatchers.Main) { controller.stop() }
+                        withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PAUSED } }
+                        withContext(Dispatchers.Main) { holder.play() }
+                        withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PLAYING } }
                     } finally {
                         withContext(Dispatchers.Main) { controller.release() }
                     }
