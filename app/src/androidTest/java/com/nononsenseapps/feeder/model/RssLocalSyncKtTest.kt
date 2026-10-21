@@ -40,7 +40,9 @@ import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.minusMinutes
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -185,9 +187,45 @@ class RssLocalSyncKtTest : DIAware {
     }
 
     @Test
+    fun cancellingRefreshClearsFeedStateAndAllowsAnotherRefresh() =
+        runBlocking {
+            val url = server.url("/cancel.json").toUrl()
+            val feedId = insertFeed("cancel", url, cowboyJson)
+            responses[url]!!.throttleBody(1, 1, TimeUnit.SECONDS)
+            val refresh = async(Dispatchers.Default) { rssLocalSync.syncFeeds(feedId = feedId) }
+            assertNotNull(server.takeRequest(5, TimeUnit.SECONDS))
+            assertTrue(
+                testDb.db
+                    .feedDao()
+                    .getFeed(feedId)!!
+                    .currentlySyncing,
+            )
+            withTimeout(2_000) { refresh.cancelAndJoin() }
+            assertEquals(
+                false,
+                testDb.db
+                    .feedDao()
+                    .getFeed(feedId)!!
+                    .currentlySyncing,
+            )
+
+            responses[url] = MockResponse().setHeader("Content-Type", "application/json").setBody(cowboyJson)
+            withTimeout(5_000) {
+                assertTrue(rssLocalSync.syncFeeds(feedId = feedId, debugReallyForceNetwork = true))
+            }
+            assertEquals(
+                10,
+                testDb.db
+                    .feedItemDao()
+                    .loadFeedItemsInFeedDescDoNotUseInProd(feedId)
+                    .size,
+            )
+        }
+
+    @Test
     fun unchangedArticlesKeepTheirFilesAndChangedOrMissingContentIsSaved() =
         runBlocking {
-            val prefix = "same ".repeat(60)
+            val prefix = "same ".repeat(6_000)
             val originalText = prefix + "first"
             val updatedText = prefix + "other"
 

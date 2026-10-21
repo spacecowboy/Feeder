@@ -23,7 +23,7 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.util.urlHasNoAuthParams
 import com.nononsenseapps.feeder.util.urlHasNoQueryParams
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
@@ -31,7 +31,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -223,10 +222,12 @@ class RssLocalSync(
                 e,
             )
         } finally {
-            repository.setCurrentlySyncingOn(
-                feedId = feed.id,
-                syncing = false,
-            )
+            withContext(NonCancellable) {
+                repository.setCurrentlySyncingOn(
+                    feedId = feed.id,
+                    syncing = false,
+                )
+            }
         }
     }
 
@@ -263,24 +264,14 @@ class RssLocalSync(
                     FetchError(url = url.toString(), throwable = t)
                 },
             ) {
-                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
+                okHttpClient.getBufferedFeedResponse(feedSql.url, forceNetwork = forceNetwork)
             }.flatMap { response ->
                 response.use {
                     if (response.isSuccessful) {
                         response.body?.let { responseBody ->
-                            // Only the blocking network read moves off the sync dispatcher.
-                            // Parsing and all mutable/database work remain serialized.
-                            val body =
-                                if (responseBody.hasFeedContentType()) {
-                                    withContext(Dispatchers.IO) {
-                                        responseBody.bytes().toResponseBody(responseBody.contentType())
-                                    }
-                                } else {
-                                    responseBody
-                                }
                             feedParser.parseFeedResponse(
                                 response.request.url.toUrl(),
-                                body,
+                                responseBody,
                             )
                         } ?: NoBody(url = url.toString()).left()
                     } else {
@@ -335,6 +326,7 @@ class RssLocalSync(
                             ?: emptyList()
 
                     val totalItems = itemsWithGuids.size
+                    val keepItems = itemsWithGuids.map { (item, _) -> ArticleFilterPolicy.shouldKeep(item, articleFilterRules) }
 
                     val existingItems =
                         repository
@@ -342,7 +334,7 @@ class RssLocalSync(
                                 feedId = feedSql.id,
                                 guids =
                                     itemsWithGuids
-                                        .filter { (item, _) -> ArticleFilterPolicy.shouldKeep(item, articleFilterRules) }
+                                        .filterIndexed { index, _ -> keepItems[index] }
                                         .flatMap { (item, _) -> listOf(item.alternateId, item.id ?: item.alternateId) }
                                         .distinct(),
                             ).associateBy { it.guid }
@@ -358,7 +350,7 @@ class RssLocalSync(
                                 // the guid scheme for the whole feed) and would renumber index/totalItems,
                                 // making the fallback clock of a kept item depend on how many other items
                                 // were filtered ahead of it.
-                                if (!ArticleFilterPolicy.shouldKeep(item, articleFilterRules)) {
+                                if (!keepItems[index]) {
                                     logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
                                     return@mapIndexedNotNull null
                                 }
@@ -588,13 +580,26 @@ class RssLocalSync(
     private fun articleContentMatches(
         itemId: Long,
         text: String,
-    ): Boolean =
+    ): Boolean {
         try {
-            blobInputStream(itemId, filePathProvider.articleDir).bufferedReader().use { it.readText() == text }
+            blobInputStream(itemId, filePathProvider.articleDir).bufferedReader().use { reader ->
+                val buffer = CharArray(DEFAULT_BUFFER_SIZE)
+                var offset = 0
+                while (true) {
+                    val count = reader.read(buffer)
+                    if (count == -1) return offset == text.length
+                    if (count > text.length - offset) return false
+                    for (index in 0 until count) {
+                        if (buffer[index] != text[offset + index]) return false
+                    }
+                    offset += count
+                }
+            }
         } catch (_: IOException) {
             // Missing or corrupt content must be repaired, even when metadata has not changed.
-            false
+            return false
         }
+    }
 
     /**
      * Final thumbnail priority policy:

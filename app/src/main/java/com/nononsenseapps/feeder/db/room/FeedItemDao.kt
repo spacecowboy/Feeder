@@ -587,6 +587,7 @@ suspend fun FeedItemDao.upsertFeedItems(
     itemsWithText: List<Pair<FeedItem, String>>,
     block: suspend (FeedItem, String) -> Unit,
 ) {
+    if (itemsWithText.isEmpty()) return
     val updatedItems =
         itemsWithText.filter { (item, _) ->
             item.id > ID_UNSET
