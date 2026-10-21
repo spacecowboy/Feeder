@@ -544,6 +544,8 @@ class ArticleViewModel(
                     useDetectLanguage = repository.useDetectLanguage.value,
                     articleId = itemId,
                     title = viewState.value.articleTitle,
+                    author = viewState.value.author.orEmpty(),
+                    feedTitle = viewState.value.feedDisplayTitle,
                 )
             }
         }

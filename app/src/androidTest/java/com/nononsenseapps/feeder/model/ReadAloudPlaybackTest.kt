@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.content.ComponentName
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.Lifecycle
+import androidx.media3.common.Player
+import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.test.core.app.ActivityScenario
@@ -102,7 +104,13 @@ class ReadAloudPlaybackTest {
                 try {
                     withContext(Dispatchers.Main) {
                         holder.setLanguage(ForcedLocale(java.util.Locale.ENGLISH))
-                        holder.tts(listOf(AnnotatedString("This is the first sentence. This is the second sentence. This is the last sentence.")), false, -42, "Read-aloud test")
+                        holder.tts(
+                            listOf(AnnotatedString("This is the first sentence. This is the second sentence. This is the last sentence.")),
+                            false,
+                            -42,
+                            "Read-aloud test",
+                            "Test Author",
+                        )
                     }
                     val prepared = withTimeout(60000) { holder.progress.first { it.durationMillis > 0 || it.error != null } }
                     assertNull(prepared.error)
@@ -117,6 +125,15 @@ class ReadAloudPlaybackTest {
                         withContext(Dispatchers.Main) {
                             assertTrue(kotlin.math.abs(controller.duration - prepared.durationMillis) < 50)
                             assertEquals("Read-aloud test", controller.mediaMetadata.title.toString())
+                            assertEquals("Test Author", controller.mediaMetadata.artist.toString())
+                            assertTrue(controller.mediaMetadata.artworkData?.isNotEmpty() == true)
+                            assertEquals(10_000, controller.seekBackIncrement)
+                            assertTrue(controller.isCommandAvailable(Player.COMMAND_SEEK_BACK))
+                            assertTrue(
+                                controller.mediaButtonPreferences.any {
+                                    it.icon == CommandButton.ICON_SKIP_BACK_10 && it.slots.contains(CommandButton.SLOT_BACK)
+                                },
+                            )
                         }
                         withContext(Dispatchers.Main) { controller.pause() }
                         withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PAUSED } }

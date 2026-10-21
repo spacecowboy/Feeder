@@ -10,6 +10,7 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -33,10 +34,13 @@ class ReadAloudService : MediaSessionService() {
                 .setNotificationId(NOTIFICATION_ID)
                 .setChannelId(CHANNEL_ID)
                 .setChannelName(R.string.read_article)
-                .build(),
+                .build()
+                .apply { setSmallIcon(R.drawable.ic_stat_f) },
         )
         val player =
             ExoPlayer.Builder(this).build().apply {
+                setSeekBackIncrementMs(10_000)
+                setSeekForwardIncrementMs(10_000)
                 setAudioAttributes(
                     AudioAttributes
                         .Builder()
@@ -53,7 +57,22 @@ class ReadAloudService : MediaSessionService() {
             MediaSession
                 .Builder(this, player)
                 .setSessionActivity(activity)
-                .setCallback(
+                .setMediaButtonPreferences(
+                    listOf(
+                        CommandButton
+                            .Builder(CommandButton.ICON_SKIP_BACK_10)
+                            .setPlayerCommand(Player.COMMAND_SEEK_BACK)
+                            .setDisplayName(getString(R.string.skip_back_10))
+                            .setSlots(CommandButton.SLOT_BACK)
+                            .build(),
+                        CommandButton
+                            .Builder(CommandButton.ICON_SKIP_FORWARD_10)
+                            .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
+                            .setDisplayName(getString(R.string.skip_forward_10))
+                            .setSlots(CommandButton.SLOT_FORWARD)
+                            .build(),
+                    ),
+                ).setCallback(
                     object : MediaSession.Callback {
                         override fun onConnect(
                             session: MediaSession,

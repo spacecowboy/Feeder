@@ -52,6 +52,8 @@
   <string name="resume_reading">Resume reading</string>
   <string name="stop_reading">Stop reading</string>
   <string name="skip_to_next">Skip to next</string>
+  <string name="skip_back_10">Back 10 seconds</string>
+  <string name="skip_forward_10">Forward 10 seconds</string>
   <string name="set_language">Set language</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>

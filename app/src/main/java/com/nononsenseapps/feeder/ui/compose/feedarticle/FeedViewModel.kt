@@ -640,6 +640,8 @@ class FeedViewModel(
                     useDetectLanguage = repository.useDetectLanguage.value,
                     articleId = article.id,
                     title = article.plainTitle,
+                    author = article.author.orEmpty(),
+                    feedTitle = article.feedDisplayTitle,
                 )
             }
         }

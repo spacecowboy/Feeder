@@ -2,6 +2,8 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.media.AudioFormat
 import android.os.Build
 import android.os.Bundle
@@ -34,6 +36,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Locale
 import java.util.UUID
@@ -71,17 +74,32 @@ class TTSStateHolder(
     private var cacheDirectory: File? = null
     private var service: ReadAloudService? = null
     private var pendingServiceStart = false
+    private val artwork by lazy {
+        runCatching {
+            val size = 256
+            val drawable = context.packageManager.getApplicationIcon(context.packageName)
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            drawable.setBounds(0, 0, size, size)
+            drawable.draw(Canvas(bitmap))
+            ByteArrayOutputStream().use { output ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
+                output.toByteArray()
+            }
+        }.getOrNull()
+    }
 
     fun tts(
         textArray: List<AnnotatedString>,
         useDetectLanguage: Boolean,
         articleId: Long,
         title: String = "",
+        author: String = "",
+        feedTitle: String = "",
     ) {
         val text = textArray.filterNot { it.isBlank() }.joinToString("\n\n") { it.text }
         if (text.isBlank()) return
         coroutineScope.launch(Dispatchers.Main.immediate) {
-            request = SpeechRequest(articleId, text, useDetectLanguage, title)
+            request = SpeechRequest(articleId, text, useDetectLanguage, title, author, feedTitle)
             playWhenReady = true
             _ttsState.value = PlaybackStatus.PLAYING
             _progress.value = ReadAloudProgress(articleId = articleId, text = text, preparationProgress = 0f)
@@ -182,7 +200,8 @@ class TTSStateHolder(
                                     MediaMetadata
                                         .Builder()
                                         .setTitle(current.title.ifBlank { context.getString(R.string.read_article) })
-                                        .setArtist(context.getString(R.string.app_name))
+                                        .setArtist(current.author.ifBlank { current.feedTitle }.ifBlank { context.getString(R.string.app_name) })
+                                        .setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
                                         .build(),
                                 ).build(),
                         )
@@ -320,7 +339,7 @@ class TTSStateHolder(
         coroutineScope.launch(Dispatchers.Main.immediate) {
             playWhenReady = true
             if (_progress.value.error != null) {
-                request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title) }
+                request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title, it.author, it.feedTitle) }
             } else {
                 player?.let {
                     if (it.playbackState == Player.STATE_ENDED) it.seekTo(0)
@@ -357,7 +376,7 @@ class TTSStateHolder(
     fun setLanguage(lang: LocaleOverride) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
             _language.value = lang
-            request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title) }
+            request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title, it.author, it.feedTitle) }
         }
     }
 
@@ -425,6 +444,8 @@ class TTSStateHolder(
         val text: String,
         val detectLanguage: Boolean,
         val title: String,
+        val author: String,
+        val feedTitle: String,
     )
 
     companion object {
