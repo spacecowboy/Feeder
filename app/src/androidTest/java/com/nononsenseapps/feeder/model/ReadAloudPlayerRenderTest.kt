@@ -134,6 +134,8 @@ class ReadAloudPlayerRenderTest {
             val text = "This sentence has already been read. This sentence is being read aloud now. The final sentence comes next."
             val article = LinearArticle(listOf(LinearText(emptySet(), text, emptyList(), LinearTextBlockStyle.TEXT)))
             for (theme in listOf(ThemeOptions.DAY, ThemeOptions.NIGHT)) {
+                val progress =
+                    mutableStateOf(ReadAloudProgress(articleId = -42, positionMillis = 125000, durationMillis = 351000, followSpokenText = true, isDurationEstimated = true, synthesisProgress = 0.38f))
                 ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                     scenario.onActivity { activity ->
                         activity.setContent {
@@ -151,7 +153,7 @@ class ReadAloudPlayerRenderTest {
                                             {},
                                             ImmutableHolder(emptyList()),
                                             {},
-                                            progress = ReadAloudProgress(articleId = -42, positionMillis = 125000, durationMillis = 306000, followSpokenText = true),
+                                            progress = progress.value,
                                             displayedArticleId = -42,
                                         )
                                     }
@@ -160,6 +162,7 @@ class ReadAloudPlayerRenderTest {
                         }
                     }
                     composeRule.waitForIdle()
+                    composeRule.onNodeWithText(app.getString(R.string.read_aloud_estimated_time, 38, "5:51")).assertExists()
                     delay(1000)
                     scenario.onActivity { activity ->
                         val view = activity.window.decorView
@@ -168,6 +171,10 @@ class ReadAloudPlayerRenderTest {
                         File(app.cacheDir, "read-aloud-preview-${theme.name}.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
                         bitmap.recycle()
                     }
+                    scenario.onActivity { progress.value = progress.value.copy(isDurationEstimated = false, synthesisProgress = 1f) }
+                    composeRule.waitForIdle()
+                    composeRule.onNodeWithText("5:51").assertExists()
+                    composeRule.onNodeWithText(app.getString(R.string.read_aloud_estimated_time, 38, "5:51")).assertDoesNotExist()
                 }
             }
         }

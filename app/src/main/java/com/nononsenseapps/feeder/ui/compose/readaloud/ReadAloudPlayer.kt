@@ -153,6 +153,7 @@ fun TTSPlayer(
                             if (progress.isDurationEstimated) {
                                 stringResource(
                                     R.string.read_aloud_estimated_time,
+                                    (progress.synthesisProgress * 100).toInt().coerceIn(0, 99),
                                     formatSpeechTime(progress.durationMillis),
                                 )
                             } else {

@@ -52,6 +52,7 @@ data class ReadAloudProgress(
     val error: String? = null,
     val generatedMillis: Long = 0,
     val isDurationEstimated: Boolean = false,
+    val synthesisProgress: Float = 0f,
     val focusRequestId: Long = 0,
     val followSpokenText: Boolean = false,
 )
@@ -363,6 +364,7 @@ class TTSStateHolder(
                                             durationMillis = (end / fraction).toLong().coerceAtLeast(end),
                                             generatedMillis = end,
                                             isDurationEstimated = index != parts.lastIndex,
+                                            synthesisProgress = fraction.toFloat(),
                                         )
                                     if (audioBuffer !== streaming) startProgressivePlayback(current, streaming)
                                 }
