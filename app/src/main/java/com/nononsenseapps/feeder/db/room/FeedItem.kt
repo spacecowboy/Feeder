@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.nononsenseapps.feeder.db.COL_ARTICLE_TAGS
 import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_BLOCK_TIME
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
@@ -43,6 +44,7 @@ import java.time.ZonedDateTime
 
 const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
+const val MAX_ARTICLE_TAGS_LENGTH = 200
 
 private val patternWhitespace = "\\s+".toRegex()
 
@@ -122,6 +124,7 @@ data class FeedItem
         @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
         @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
         @ColumnInfo(name = COL_BLOCK_TIME) var blockTime: Instant? = null,
+        @ColumnInfo(name = COL_ARTICLE_TAGS) var articleTags: String? = null,
     ) : FeedItemForFetching,
         FeedItemCursor {
         constructor() : this(id = ID_UNSET)
@@ -179,6 +182,8 @@ data class FeedItem
                     this.pubDate ?: ZonedDateTime.now(clock)
                 }
             primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
+
+            this.articleTags = entry.tags?.joinToString(separator = " ")?.take(MAX_ARTICLE_TAGS_LENGTH)
         }
 
         val enclosureFilename: String?

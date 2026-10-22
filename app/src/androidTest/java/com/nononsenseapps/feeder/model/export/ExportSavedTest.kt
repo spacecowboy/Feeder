@@ -145,6 +145,7 @@ class ExportSavedTest : DIAware {
                     tag = "Characters",
                     fullTextByDefault = true,
                 ),
+            articleTags = "test",
         )
 
     private suspend fun insertTestFeed(): Long {
@@ -185,6 +186,7 @@ class ExportSavedTest : DIAware {
                     readTime = Instant.parse("2026-05-12T08:31:00Z"),
                     wordCount = article.wordCount,
                     wordCountFull = article.wordCountFull,
+                    articleTags = article.articleTags,
                 ),
             )
         return itemId to feedId
@@ -209,6 +211,7 @@ class ExportSavedTest : DIAware {
         assertEquals(article.wordCount, imported.wordCount)
         assertEquals(article.wordCountFull, imported.wordCountFull)
         assertEquals(feedId, imported.feedId)
+        assertEquals(article.articleTags, imported.articleTags)
     }
 
     @SmallTest
