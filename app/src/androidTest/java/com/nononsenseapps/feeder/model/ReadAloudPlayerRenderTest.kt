@@ -12,7 +12,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
@@ -20,6 +22,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.unit.dp
@@ -31,12 +34,15 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.model.html.LinearText
+import com.nononsenseapps.feeder.model.html.LinearTextAnnotation
+import com.nononsenseapps.feeder.model.html.LinearTextAnnotationLink
 import com.nononsenseapps.feeder.model.html.LinearTextBlockStyle
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechFollowViewport
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
 import com.nononsenseapps.feeder.ui.compose.readaloud.TTSPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnAccessibilityScroll
 import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnUserScroll
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -55,6 +61,34 @@ import java.io.File
 class ReadAloudPlayerRenderTest {
     @get:Rule val composeRule = createEmptyComposeRule()
 
+    @get:Rule val keepScreenOnRule = KeepScreenOnRule()
+
+    @Test fun changingDurationEstimateDidNotDiscardAnActiveScrub() {
+        val app = getApplicationContext<FeederApplication>()
+        val progress = mutableStateOf(ReadAloudProgress(articleId = -42, positionMillis = 1000, durationMillis = 100000, generatedMillis = 90000, isDurationEstimated = true))
+        var sought = 0L
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    PreviewTheme {
+                        TTSPlayer(true, {}, {}, {}, {}, ImmutableHolder(emptyList()), {}, progress = progress.value, onSeekTo = { sought = it })
+                    }
+                }
+            }
+            composeRule.waitForIdle()
+            val slider = composeRule.onNodeWithContentDescription(app.getString(R.string.read_aloud_position))
+            slider.performTouchInput {
+                down(center)
+                moveTo(center + Offset(30f, 0f))
+            }
+            scenario.onActivity { progress.value = progress.value.copy(durationMillis = 120000, generatedMillis = 100000) }
+            composeRule.waitForIdle()
+            slider.performTouchInput { up() }
+            composeRule.waitForIdle()
+            assertTrue("The active drag must still seek after an estimate update", sought > 30000)
+        }
+    }
+
     @Test fun followedSpeechUntilUserScrolledAndResumedWhenRequested() =
         runBlocking<Unit> {
             val spoken = "Spoken sentence."
@@ -63,7 +97,13 @@ class ReadAloudPlayerRenderTest {
             val source = paragraphs.joinToString("\n\n")
             val start = source.indexOf("Spoken sentence")
             val segment = SpeechSegment(start, start + spoken.length)
-            val article = LinearArticle(paragraphs.map { LinearText(emptySet(), it, emptyList(), LinearTextBlockStyle.TEXT) })
+            val article =
+                LinearArticle(
+                    paragraphs.map {
+                        val annotations = if (it == spoken) listOf(LinearTextAnnotation(LinearTextAnnotationLink("https://example.com"), 0, it.lastIndex)) else emptyList()
+                        LinearText(emptySet(), it, annotations, LinearTextBlockStyle.TEXT)
+                    },
+                )
             val highlight = mutableStateOf<SpeechHighlight?>(null)
             lateinit var scroll: ScrollState
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
@@ -77,7 +117,14 @@ class ReadAloudPlayerRenderTest {
                                         highlight.value = highlight.value?.copy(followSpokenText = false)
                                     },
                                 ) {
-                                    Column(Modifier.weight(1f).verticalScroll(scroll).testTag("speech-reader")) {
+                                    Column(
+                                        Modifier
+                                            .weight(1f)
+                                            .stopSpeechFollowingOnAccessibilityScroll(scroll) {
+                                                highlight.value = highlight.value?.copy(followSpokenText = false)
+                                            }.verticalScroll(scroll)
+                                            .testTag("speech-reader"),
+                                    ) {
                                         ColumnArticleContent(article, { _, _ -> }, speechHighlight = highlight.value)
                                     }
                                     TTSPlayer(
@@ -125,6 +172,9 @@ class ReadAloudPlayerRenderTest {
                 assertTrue(withContext(Dispatchers.Main) { scroll.value > 0 })
                 assertCentered(next)
                 composeRule.onNodeWithContentDescription(app.getString(R.string.go_to_spoken_text)).assertIsSelected()
+                composeRule.onNodeWithTag("speech-reader").performSemanticsAction(SemanticsActions.ScrollBy) { it(0f, -100f) }
+                composeRule.waitForIdle()
+                assertEquals(false, highlight.value?.followSpokenText)
             }
         }
 

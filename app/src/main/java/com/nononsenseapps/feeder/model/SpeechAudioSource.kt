@@ -28,6 +28,11 @@ internal data class SpeechPcmFormat(
     val bits: Int,
     val floatingPoint: Boolean,
 ) {
+    init {
+        require(rate > 0 && channels in 1..2)
+        require(if (floatingPoint) bits == 32 else bits == 8 || bits == 16)
+    }
+
     val frameSize: Int = channels * bits / 8
     val bytesPerSecond: Long = rate.toLong() * frameSize
 
@@ -39,6 +44,7 @@ internal class SpeechAudioBuffer(
     val file: File,
     val format: SpeechPcmFormat,
 ) {
+    @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     private val signal = Object()
     private val completionListeners = mutableSetOf<() -> Unit>()
 
@@ -54,20 +60,26 @@ internal class SpeechAudioBuffer(
         bytes: Long,
         finished: Boolean = false,
     ) {
-        synchronized(signal) {
-            require(bytes >= publishedBytes && bytes % format.frameSize == 0L)
-            publishedBytes = bytes
-            complete = finished
-            if (finished) completionListeners.toList().forEach { it() }
-            signal.notifyAll()
-        }
+        val listeners =
+            synchronized(signal) {
+                failure?.let { throw it }
+                check(!complete) { "Speech audio was already completed" }
+                require(bytes >= publishedBytes && bytes % format.frameSize == 0L)
+                publishedBytes = bytes
+                complete = finished
+                signal.notifyAll()
+                if (finished) completionListeners.toList() else emptyList()
+            }
+        listeners.forEach { it() }
     }
 
     fun addCompletionListener(listener: () -> Unit) {
-        synchronized(signal) {
-            completionListeners.add(listener)
-            if (complete) listener()
-        }
+        val completed =
+            synchronized(signal) {
+                completionListeners.add(listener)
+                complete
+            }
+        if (completed) listener()
     }
 
     fun removeCompletionListener(listener: () -> Unit) {
@@ -81,6 +93,7 @@ internal class SpeechAudioBuffer(
         }
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     fun available(position: Long): Int {
         synchronized(signal) {
             while (true) {

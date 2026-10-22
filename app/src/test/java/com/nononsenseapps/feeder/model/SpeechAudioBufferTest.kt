@@ -14,6 +14,46 @@ import java.util.concurrent.TimeUnit
 class SpeechAudioBufferTest {
     @get:Rule val folder = TemporaryFolder()
 
+    @Test fun completionNotifiedEarlyAndLateListenersExactlyOnce() {
+        val buffer = SpeechAudioBuffer(folder.newFile(), SpeechPcmFormat(24000, 1, 16, false))
+        var early = 0
+        var late = 0
+        var removed = 0
+        val removedListener = {
+            removed++
+            Unit
+        }
+        buffer.addCompletionListener { early++ }
+        buffer.addCompletionListener(removedListener)
+        buffer.removeCompletionListener(removedListener)
+        buffer.publish(48000)
+        assertEquals(0, early)
+        buffer.publish(96000, finished = true)
+        buffer.addCompletionListener { late++ }
+        assertEquals(1, early)
+        assertEquals(1, late)
+        assertEquals(0, removed)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun completionWasTerminal() {
+        val buffer = SpeechAudioBuffer(folder.newFile(), SpeechPcmFormat(24000, 1, 16, false))
+        buffer.publish(48000, finished = true)
+        buffer.publish(96000)
+    }
+
+    @Test(expected = IOException::class)
+    fun cancellationWasTerminalForTheProducerToo() {
+        val buffer = SpeechAudioBuffer(folder.newFile(), SpeechPcmFormat(24000, 1, 16, false))
+        buffer.abort()
+        buffer.publish(48000)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectedInvalidPcmFormat() {
+        SpeechPcmFormat(0, 1, 16, false)
+    }
+
     @Test fun readerWaitedAtFrontierUntilMoreAudioWasPublished() {
         val buffer = SpeechAudioBuffer(folder.newFile(), SpeechPcmFormat(24000, 1, 16, false))
         buffer.publish(48000)

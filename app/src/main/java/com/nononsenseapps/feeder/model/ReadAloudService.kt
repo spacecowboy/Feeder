@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.model
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
@@ -110,6 +112,7 @@ class ReadAloudService : MediaSessionService() {
                             session: MediaSession,
                             controller: MediaSession.ControllerInfo,
                         ): MediaSession.ConnectionResult {
+                            if (!controller.isTrusted) return MediaSession.ConnectionResult.reject()
                             val defaults = super.onConnect(session, controller)
                             // External controls can operate this article, not replace its local audio.
                             val commands =
@@ -154,10 +157,13 @@ class ReadAloudService : MediaSessionService() {
         startId: Int,
     ): Int {
         if (intent?.action == ACTION_PREPARE) {
+            // Every foreground-service start must be acknowledged, even if Stop or
+            // a newer request already consumed this intent's pending preparation.
             showPreparationNotification()
             holder.prepare()
-        } else if (intent?.action == ACTION_STOP) {
-            holder.stop()
+            if (holder.progress.value.articleId != null && holder.progress.value.preparationProgress == null) {
+                session?.let { onUpdateNotification(it, it.player.playWhenReady) }
+            }
         }
         super.onStartCommand(intent, flags, startId)
         return START_NOT_STICKY
@@ -171,14 +177,15 @@ class ReadAloudService : MediaSessionService() {
         if (holder.progress.value.preparationProgress != null) {
             showPreparationNotification()
         } else {
-            super.onUpdateNotification(session, startInForegroundRequired)
+            val synthesizing = holder.progress.value.isDurationEstimated && holder.progress.value.error == null
+            super.onUpdateNotification(session, startInForegroundRequired || synthesizing)
         }
     }
 
     private fun showPreparationNotification() {
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, getString(R.string.read_article), NotificationManager.IMPORTANCE_LOW))
-        val stop = PendingIntent.getService(this, 1, Intent(this, ReadAloudService::class.java).setAction(ACTION_STOP), PendingIntent.FLAG_IMMUTABLE)
+        val stop = PendingIntent.getBroadcast(this, 1, Intent(this, ReadAloudStopReceiver::class.java), PendingIntent.FLAG_IMMUTABLE)
         startForeground(
             NOTIFICATION_ID,
             NotificationCompat
@@ -203,7 +210,7 @@ class ReadAloudService : MediaSessionService() {
     }
 
     override fun onDestroy() {
-        holder.detach()
+        holder.detach(this)
         session?.run {
             player.release()
             release()
@@ -217,5 +224,16 @@ class ReadAloudService : MediaSessionService() {
         private const val ACTION_STOP = "com.nononsenseapps.feeder.READ_ALOUD_STOP"
         private const val CHANNEL_ID = "read-aloud-preparation"
         private const val NOTIFICATION_ID = 2401
+    }
+}
+
+/** The notification grants Stop access without exporting an unrestricted service action. */
+class ReadAloudStopReceiver : BroadcastReceiver() {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
+        val holder: TTSStateHolder = (context.applicationContext as FeederApplication).di.direct.instance()
+        holder.stop()
     }
 }

@@ -85,6 +85,7 @@ import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechFollowViewport
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
+import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnAccessibilityScroll
 import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnUserScroll
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -546,6 +547,7 @@ fun ArticleScreen(
                 screenType = ScreenType.SINGLE,
                 speechHighlight = speechHighlight,
                 articleScrollState = articleScrollState,
+                onUserScroll = ttsOnUserScroll,
                 onFeedTitleClick = onFeedTitleClick,
                 onOpenAudioPlayer = onOpenAudioPlayer,
                 onOpenInCustomTab = onOpenInCustomTab,
@@ -679,6 +681,7 @@ fun ArticleContent(
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
     speechHighlight: SpeechHighlight? = null,
+    onUserScroll: (() -> Unit)? = null,
 ) {
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -728,7 +731,7 @@ fun ArticleContent(
         image = viewState.image,
         showHeaderImage = viewState.textToDisplay == TextToDisplay.CONTENT,
         contentImageUrls = contentImageUrls,
-        modifier = modifier,
+        modifier = if (onUserScroll != null) modifier.stopSpeechFollowingOnAccessibilityScroll(articleScrollState, onUserScroll) else modifier,
         articleScrollState = articleScrollState,
     ) { indexOffset ->
         var offsetCounter = indexOffset
@@ -755,6 +758,7 @@ fun ArticleContent(
                         speechHighlight = speechHighlight,
                         onLinkClick = { link, index ->
                             if (index != null && elementPositions.containsKey(index)) {
+                                onUserScroll?.invoke()
                                 // Anchor link - scroll to the element position
                                 val yPosition = elementPositions[index]
                                 if (yPosition != null) {

@@ -51,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -656,15 +655,14 @@ fun LinearTextContent(
             val range = LocalSpeechHighlights.current[linearText]
             val focusTarget = LocalSpeechFocusTarget.current?.takeIf { it.text === linearText }
             val bringIntoView = remember { BringIntoViewRequester() }
-            var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
-            var focusedRequest by remember { mutableStateOf<Pair<Long, IntRange>?>(null) }
-            LaunchedEffect(focusTarget, textLayout) {
+            var speechLines by remember { mutableStateOf<List<Pair<Int, Rect>>>(emptyList()) }
+            var focusedRequest by remember { mutableStateOf<Triple<Long, IntRange, Rect>?>(null) }
+            LaunchedEffect(focusTarget, speechLines) {
                 val target = focusTarget ?: return@LaunchedEffect
-                val layout = textLayout ?: return@LaunchedEffect
-                val request = target.requestId to target.range
+                val bounds = (speechLines.firstOrNull { target.range.first < it.first } ?: speechLines.lastOrNull())?.second ?: return@LaunchedEffect
+                val request = Triple(target.requestId, target.range, bounds)
                 if (focusedRequest != request && original.isNotEmpty()) {
-                    val line = layout.getLineForOffset(target.range.first.coerceIn(0, original.lastIndex))
-                    bringIntoView.bringIntoView(Rect(0f, layout.getLineTop(line), layout.size.width.toFloat(), layout.getLineBottom(line)))
+                    bringIntoView.bringIntoView(bounds)
                     focusedRequest = request
                 }
             }
@@ -690,7 +688,14 @@ fun LinearTextContent(
 
             Text(
                 text = annotatedString,
-                onTextLayout = { textLayout = it },
+                onTextLayout = { layout ->
+                    // Link listeners are recreated during composition. Retain geometry only,
+                    // so changing listener identities cannot trigger a layout feedback loop.
+                    speechLines =
+                        List(layout.lineCount) { line ->
+                            layout.getLineEnd(line) to Rect(0f, layout.getLineTop(line), layout.size.width.toFloat(), layout.getLineBottom(line))
+                        }
+                },
                 softWrap = softWrap,
                 textAlign =
                     if (typographySettings.justifyText) {

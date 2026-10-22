@@ -4,7 +4,9 @@ import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.Player
@@ -14,6 +16,7 @@ import androidx.media3.session.SessionToken
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
@@ -25,14 +28,65 @@ import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.direct
 import org.kodein.di.instance
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class ReadAloudPlaybackTest {
+    @get:Rule val keepScreenOnRule = KeepScreenOnRule()
+
+    @Before fun requiredInstalledSpeechVoice() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val ready = CountDownLatch(1)
+        var status = TextToSpeech.ERROR
+        lateinit var engine: TextToSpeech
+        instrumentation.runOnMainSync {
+            engine =
+                TextToSpeech(getApplicationContext<FeederApplication>()) {
+                    status = it
+                    ready.countDown()
+                }
+        }
+        try {
+            assumeTrue("Requires an installed TTS engine", ready.await(15, TimeUnit.SECONDS) && status == TextToSpeech.SUCCESS)
+            assumeTrue("Requires an installed English voice", engine.isLanguageAvailable(java.util.Locale.ENGLISH) >= TextToSpeech.LANG_AVAILABLE)
+        } finally {
+            instrumentation.runOnMainSync { engine.shutdown() }
+        }
+    }
+
+    @Test fun unavailableLanguageFailedCleanlyAndCouldBeRetried() =
+        runBlocking<Unit> {
+            val app = getApplicationContext<FeederApplication>()
+            val holder: TTSStateHolder = app.di.direct.instance()
+            ActivityScenario.launch(MainActivity::class.java).use {
+                try {
+                    withContext(Dispatchers.Main) {
+                        holder.setLanguage(ForcedLocale(java.util.Locale.forLanguageTag("zz")))
+                        holder.tts(listOf(AnnotatedString("An article with an unavailable speech language.")), false, -80)
+                    }
+                    withTimeout(60000) { holder.progress.first { it.articleId == -80L && it.error != null } }
+                    assertEquals(PlaybackStatus.PAUSED, holder.ttsState.value)
+                    withContext(Dispatchers.Main) { holder.setLanguage(ForcedLocale(java.util.Locale.ENGLISH)) }
+                    val recovered = withTimeout(60000) { holder.progress.first { it.articleId == -80L && it.durationMillis > 0 && !it.isDurationEstimated } }
+                    assertNull(recovered.error)
+                    assertEquals(1f, recovered.synthesisProgress, 0f)
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        holder.stop()
+                        holder.setLanguage(AppSetting)
+                    }
+                }
+            }
+        }
+
     @Test fun playedBeforeSynthesisFinishedAndSystemStopCancelledGeneration() =
         runBlocking<Unit> {
             val app = getApplicationContext<FeederApplication>()
@@ -191,6 +245,9 @@ class ReadAloudPlaybackTest {
                         val target = prepared.durationMillis / 2
                         withContext(Dispatchers.Main) { controller.seekTo(target) }
                         withTimeout(5000) { holder.progress.first { kotlin.math.abs(it.positionMillis - target) < 250 && it.segment != null } }
+                        app.startService(Intent(app, ReadAloudService::class.java).setAction(ReadAloudService.ACTION_PREPARE))
+                        delay(500)
+                        assertTrue(kotlin.math.abs(holder.progress.value.positionMillis - target) < 250)
                         withContext(Dispatchers.Main) { controller.play() }
                         withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PLAYING } }
                         withTimeout(5000) { holder.progress.first { it.positionMillis > target + 300 } }

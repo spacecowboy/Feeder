@@ -3,13 +3,16 @@
 package com.nononsenseapps.feeder.ui.compose.readaloud
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -19,6 +22,8 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.scrollBy
+import androidx.compose.ui.semantics.semantics
 import com.nononsenseapps.feeder.model.SpeechSegment
 import com.nononsenseapps.feeder.model.html.LinearArticle
 import com.nononsenseapps.feeder.model.html.LinearBlockQuote
@@ -26,6 +31,7 @@ import com.nononsenseapps.feeder.model.html.LinearElement
 import com.nononsenseapps.feeder.model.html.LinearListItem
 import com.nononsenseapps.feeder.model.html.LinearTable
 import com.nononsenseapps.feeder.model.html.LinearText
+import kotlinx.coroutines.launch
 import java.util.IdentityHashMap
 
 data class SpeechHighlight(
@@ -81,6 +87,22 @@ internal fun Modifier.stopSpeechFollowingOnUserScroll(onUserScroll: () -> Unit):
                     callback.value()
                 }
             }
+        }
+    }
+}
+
+/** Accessibility scroll actions do not produce pointer events. */
+@Composable
+internal fun Modifier.stopSpeechFollowingOnAccessibilityScroll(
+    state: ScrollState,
+    onUserScroll: () -> Unit,
+): Modifier {
+    val scope = rememberCoroutineScope()
+    return semantics {
+        scrollBy { _, y ->
+            onUserScroll()
+            scope.launch { state.animateScrollBy(y) }
+            true
         }
     }
 }

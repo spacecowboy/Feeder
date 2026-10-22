@@ -175,6 +175,8 @@
       android:readPermission="${applicationId}.permission.read" />
 
     <!-- Service for background jobs -->
+    <receiver android:name=".model.ReadAloudStopReceiver" android:exported="false" />
+
     <service
       android:name=".model.ReadAloudService"
       android:exported="true"

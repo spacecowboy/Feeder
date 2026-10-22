@@ -141,6 +141,7 @@ class TTSStateHolder(
         service: ReadAloudService,
         player: ExoPlayer,
     ) {
+        ticker?.cancel()
         this.service = service
         this.player = player
         player.addListener(
@@ -181,6 +182,11 @@ class TTSStateHolder(
     }
 
     internal fun prepare() {
+        // Only a user request through tts() may start or replace synthesis.
+        if (!pendingServiceStart) {
+            if (request == null) service?.stopSelf()
+            return
+        }
         pendingServiceStart = false
         val current =
             request ?: run {
@@ -217,11 +223,11 @@ class TTSStateHolder(
                     val duration = timeline.lastOrNull()?.endMillis ?: error("No speech audio")
                     _progress.value = _progress.value.copy(durationMillis = duration, generatedMillis = duration, isDurationEstimated = false)
                 } catch (e: TimeoutCancellationException) {
-                    fail(e)
+                    if (request === current) fail(e)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    fail(e)
+                    if (request === current) fail(e)
                 }
             }
     }
@@ -269,7 +275,7 @@ class TTSStateHolder(
                     is ForcedLocale -> selected.locale
                     else ->
                         if (selected is ForcedAuto || current.detectLanguage) {
-                            withContext(Dispatchers.Default) { context.detectLocaleFromText(current.text.take(4000)).firstOrNull()?.locale }
+                            detectSpeechLocale(current.text)
                                 ?: context.getLocales().firstOrNull() ?: Locale.getDefault()
                         } else {
                             context.getLocales().firstOrNull() ?: Locale.getDefault()
@@ -277,7 +283,7 @@ class TTSStateHolder(
                 }
             val candidates =
                 if (_language.value is ForcedLocale) {
-                    sequenceOf(preferredLocale)
+                    sequenceOf(preferredLocale, Locale.forLanguageTag(preferredLocale.language))
                 } else {
                     sequenceOf(preferredLocale).plus(context.getLocales()).plus(available)
                 }
@@ -384,8 +390,18 @@ class TTSStateHolder(
         }
     }
 
+    private suspend fun detectSpeechLocale(text: String): Locale? =
+        try {
+            withContext(Dispatchers.Default) { context.detectLocaleFromText(text.take(4000)).firstOrNull()?.locale }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(LOG_TAG, "Language detection unavailable; using device languages", e)
+            null
+        }
+
     fun resumeIfPausedOn(articleId: Long): Boolean {
-        if (_ttsState.value != PlaybackStatus.PAUSED || request?.articleId != articleId) return false
+        if (_ttsState.value != PlaybackStatus.PAUSED || _progress.value.articleId != articleId) return false
         play()
         return true
     }
@@ -470,6 +486,8 @@ class TTSStateHolder(
     }
 
     private fun fail(error: Exception) {
+        if (request == null) return
+        preparation?.cancel()
         audioBuffer?.abort()
         Log.e(LOG_TAG, "Read-aloud failed", error)
         player?.pause()
@@ -478,11 +496,13 @@ class TTSStateHolder(
         service?.stopForeground(android.app.Service.STOP_FOREGROUND_REMOVE)
     }
 
-    internal fun detach() {
+    internal fun detach(owner: ReadAloudService) {
+        if (service !== owner) return
         audioBuffer?.abort()
         audioBuffer = null
         ticker?.cancel()
-        preparation?.cancel()
+        val pending = preparation
+        pending?.cancel()
         player = null
         service = null
         segments = emptyList()
@@ -494,7 +514,10 @@ class TTSStateHolder(
         }
         val directory = cacheDirectory
         cacheDirectory = null
-        coroutineScope.launch(Dispatchers.IO) { directory?.deleteRecursively() }
+        coroutineScope.launch(Dispatchers.IO) {
+            pending?.join()
+            directory?.deleteRecursively()
+        }
     }
 
     fun shutdown() = stop()

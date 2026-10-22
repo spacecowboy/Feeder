@@ -130,17 +130,17 @@ fun TTSPlayer(
         Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                 val preparing = progress.preparationProgress
-                var scrubPosition by remember(progress.articleId, preparing != null, progress.durationMillis) { mutableStateOf<Float?>(null) }
+                var scrubPosition by remember(progress.articleId, preparing != null) { mutableStateOf<Float?>(null) }
                 if (preparing != null) {
                     Text(stringResource(R.string.read_aloud_preparing), style = MaterialTheme.typography.labelMedium)
-                    LinearProgressIndicator(progress = { preparing }, modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
                 } else {
                     val seekableDuration = if (progress.isDurationEstimated) progress.generatedMillis else progress.durationMillis
                     Slider(
-                        value = scrubPosition ?: progress.positionMillis.toFloat(),
+                        value = (scrubPosition ?: progress.positionMillis.toFloat()).coerceIn(0f, progress.durationMillis.coerceAtLeast(1).toFloat()),
                         onValueChange = { scrubPosition = it.coerceAtMost(seekableDuration.toFloat()) },
                         onValueChangeFinished = {
-                            scrubPosition?.let { onSeekTo(it.toLong()) }
+                            scrubPosition?.let { onSeekTo(it.toLong().coerceIn(0, seekableDuration)) }
                             scrubPosition = null
                         },
                         valueRange = 0f..progress.durationMillis.coerceAtLeast(1).toFloat(),
