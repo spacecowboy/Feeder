@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.ComponentName
+import android.os.Bundle
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.Lifecycle
 import androidx.media3.common.Player
@@ -32,6 +33,56 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class ReadAloudPlaybackTest {
+    @Test fun playedBeforeSynthesisFinishedAndSystemStopCancelledGeneration() =
+        runBlocking<Unit> {
+            val app = getApplicationContext<FeederApplication>()
+            val holder: TTSStateHolder = app.di.direct.instance()
+            ActivityScenario.launch(MainActivity::class.java).use {
+                var controller: MediaController? = null
+                try {
+                    withContext(Dispatchers.Main) {
+                        holder.tts(listOf(AnnotatedString("This sentence is ready to read while more audio is generated. ".repeat(200))), false, -70)
+                    }
+                    val started =
+                        withTimeout(60000) {
+                            holder.progress.first { it.error != null || (it.articleId == -70L && it.positionMillis > 200 && it.isDurationEstimated) }
+                        }
+                    assertNull(started.error)
+                    assertTrue(started.generatedMillis > 0)
+                    assertTrue(started.durationMillis > started.generatedMillis)
+                    assertTrue(started.segment != null)
+                    assertTrue(started.followSpokenText)
+                    withContext(Dispatchers.Main) {
+                        holder.stopFollowingSpokenText()
+                        assertEquals(false, holder.progress.value.followSpokenText)
+                        assertEquals(-70L, holder.requestSpokenTextFocus())
+                        assertTrue(holder.progress.value.followSpokenText)
+                    }
+                    val future =
+                        withContext(Dispatchers.Main) {
+                            MediaController.Builder(app, SessionToken(app, ComponentName(app, ReadAloudService::class.java))).buildAsync()
+                        }
+                    val remote = withContext(Dispatchers.IO) { future.get(10, TimeUnit.SECONDS) }
+                    controller = remote
+                    withContext(Dispatchers.Main) { remote.pause() }
+                    withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.PAUSED } }
+                    withContext(Dispatchers.Main) {
+                        val stop = remote.mediaButtonPreferences.single { it.icon == CommandButton.ICON_STOP }
+                        assertTrue(stop.slots.contains(CommandButton.SLOT_FORWARD_SECONDARY))
+                        remote.sendCustomCommand(checkNotNull(stop.sessionCommand), Bundle.EMPTY)
+                    }
+                    withTimeout(5000) { holder.ttsState.first { it == PlaybackStatus.STOPPED } }
+                    delay(300)
+                    assertNull(holder.progress.value.articleId)
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        controller?.release()
+                        holder.stop()
+                    }
+                }
+            }
+        }
+
     @Test fun replacingPreparedAudioKeptSynthesisInTheForeground() =
         runBlocking<Unit> {
             val app = getApplicationContext<FeederApplication>()
@@ -51,7 +102,7 @@ class ReadAloudPlaybackTest {
                     }
                     withContext(Dispatchers.Main) { holder.tts(listOf(AnnotatedString("A much longer replacement article. ".repeat(500))), false, -61) }
                     delay(500)
-                    assertTrue(holder.progress.value.preparationProgress != null)
+                    assertTrue(holder.progress.value.preparationProgress != null || holder.progress.value.isDurationEstimated)
                     @Suppress("DEPRECATION")
                     val service =
                         app
@@ -112,7 +163,7 @@ class ReadAloudPlaybackTest {
                             "Test Author",
                         )
                     }
-                    val prepared = withTimeout(60000) { holder.progress.first { it.durationMillis > 0 || it.error != null } }
+                    val prepared = withTimeout(60000) { holder.progress.first { (it.durationMillis > 0 && !it.isDurationEstimated) || it.error != null } }
                     assertNull(prepared.error)
                     assertTrue(prepared.durationMillis > 1000)
                     val future =

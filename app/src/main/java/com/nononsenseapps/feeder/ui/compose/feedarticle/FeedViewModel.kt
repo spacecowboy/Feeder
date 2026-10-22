@@ -64,6 +64,8 @@ class FeedViewModel(
     private val ttsStateHolder: TTSStateHolder by instance()
     val readAloudProgress = ttsStateHolder.progress
 
+    fun ttsFocusSpokenText(): Long? = ttsStateHolder.requestSpokenTextFocus()
+
     fun ttsSeekTo(positionMillis: Long) = ttsStateHolder.seekTo(positionMillis)
 
     private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()

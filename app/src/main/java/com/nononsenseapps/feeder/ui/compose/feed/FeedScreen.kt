@@ -322,6 +322,9 @@ fun FeedScreen(
             ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
             readAloudProgress = readAloudProgress,
             ttsOnSeekTo = viewModel::ttsSeekTo,
+            ttsOnGoToSpokenText = {
+                viewModel.ttsFocusSpokenText()?.let { ArticleDestination.navigate(navController, it) }
+            },
             podcastOnPlay = viewModel::podcastPlay,
             podcastOnPause = viewModel::podcastPause,
             podcastOnStop = viewModel::podcastStop,
@@ -578,6 +581,7 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     readAloudProgress: StateFlow<ReadAloudProgress>? = null,
     ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -611,6 +615,7 @@ fun FeedScreen(
         ttsOnSelectLanguage = ttsOnSelectLanguage,
         readAloudProgress = readAloudProgress,
         ttsOnSeekTo = ttsOnSeekTo,
+        ttsOnGoToSpokenText = ttsOnGoToSpokenText,
         podcastOnPlay = podcastOnPlay,
         podcastOnPause = podcastOnPause,
         podcastOnStop = podcastOnStop,
@@ -1146,6 +1151,7 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     readAloudProgress: StateFlow<ReadAloudProgress>? = null,
     ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
     content: @Composable (Modifier) -> Unit,
 ) {
     var manuallyTriggeredRefresh by rememberSaveable {
@@ -1275,6 +1281,7 @@ fun FeedScreen(
                     onSelectLanguage = ttsOnSelectLanguage,
                     progress = readAloudProgress,
                     onSeekTo = ttsOnSeekTo,
+                    onGoToSpokenText = ttsOnGoToSpokenText,
                     floatingActionButton =
                         when (viewState.showFab) {
                             true -> floatingActionButton

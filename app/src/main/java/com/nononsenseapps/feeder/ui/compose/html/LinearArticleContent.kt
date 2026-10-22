@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.icons.Icons
@@ -29,13 +31,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -45,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -101,6 +108,7 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.layouts.Table
 import com.nononsenseapps.feeder.ui.compose.layouts.TableCell
 import com.nononsenseapps.feeder.ui.compose.layouts.TableData
+import com.nononsenseapps.feeder.ui.compose.readaloud.LocalSpeechFocusTarget
 import com.nononsenseapps.feeder.ui.compose.readaloud.LocalSpeechHighlights
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlightIndex
@@ -171,7 +179,11 @@ fun ColumnArticleContent(
         remember(speechIndex, speechHighlight?.segment) {
             speechHighlight?.let { speechIndex?.highlights(it.segment) } ?: emptyMap()
         }
-    CompositionLocalProvider(LocalSpeechHighlights provides highlights) {
+    val focusTarget =
+        remember(speechIndex, speechHighlight) {
+            speechHighlight?.takeIf { it.followSpokenText }?.let { speechIndex?.focusTarget(it.segment, it.focusRequestId) }
+        }
+    CompositionLocalProvider(LocalSpeechHighlights provides highlights, LocalSpeechFocusTarget provides focusTarget) {
         articleContent.elements.forEachIndexed { index, element ->
             ProvideTextStyle(
                 MaterialTheme.typography.bodyLarge.merge(
@@ -642,7 +654,26 @@ fun LinearTextContent(
             val interactionSource = remember { MutableInteractionSource() }
             val original = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
             val range = LocalSpeechHighlights.current[linearText]
-            val highlightColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            val focusTarget = LocalSpeechFocusTarget.current?.takeIf { it.text === linearText }
+            val bringIntoView = remember { BringIntoViewRequester() }
+            var textLayout by remember { mutableStateOf<TextLayoutResult?>(null) }
+            var focusedRequest by remember { mutableStateOf<Pair<Long, IntRange>?>(null) }
+            LaunchedEffect(focusTarget, textLayout) {
+                val target = focusTarget ?: return@LaunchedEffect
+                val layout = textLayout ?: return@LaunchedEffect
+                val request = target.requestId to target.range
+                if (focusedRequest != request && original.isNotEmpty()) {
+                    val line = layout.getLineForOffset(target.range.first.coerceIn(0, original.lastIndex))
+                    bringIntoView.bringIntoView(Rect(0f, layout.getLineTop(line), layout.size.width.toFloat(), layout.getLineBottom(line)))
+                    focusedRequest = request
+                }
+            }
+            val highlightColor =
+                com.nononsenseapps.feeder.ui.compose.readaloud.speechHighlightColor(
+                    MaterialTheme.colorScheme.surface,
+                    MaterialTheme.colorScheme.onSurface,
+                    MaterialTheme.colorScheme.primary,
+                )
             val annotatedString =
                 remember(original, range, highlightColor) {
                     if (range == null) {
@@ -659,6 +690,7 @@ fun LinearTextContent(
 
             Text(
                 text = annotatedString,
+                onTextLayout = { textLayout = it },
                 softWrap = softWrap,
                 textAlign =
                     if (typographySettings.justifyText) {
@@ -668,6 +700,7 @@ fun LinearTextContent(
                     },
                 modifier =
                     modifier
+                        .bringIntoViewRequester(bringIntoView)
                         .indication(interactionSource, LocalIndication.current)
                         .focusableInNonTouchMode(interactionSource = interactionSource),
             )

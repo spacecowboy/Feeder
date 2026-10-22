@@ -50,6 +50,10 @@ data class ReadAloudProgress(
     val preparationProgress: Float? = null,
     val segment: SpeechSegment? = null,
     val error: String? = null,
+    val generatedMillis: Long = 0,
+    val isDurationEstimated: Boolean = false,
+    val focusRequestId: Long = 0,
+    val followSpokenText: Boolean = false,
 )
 
 /** Application facade; the foreground service owns the player and its lifetime. */
@@ -74,6 +78,25 @@ class TTSStateHolder(
     private var cacheDirectory: File? = null
     private var service: ReadAloudService? = null
     private var pendingServiceStart = false
+    private var audioBuffer: SpeechAudioBuffer? = null
+    private var focusSequence = 0L
+
+    fun requestSpokenTextFocus(): Long? {
+        val current = _progress.value
+        val articleId = current.articleId ?: return null
+        _progress.value =
+            current.copy(
+                focusRequestId = ++focusSequence,
+                followSpokenText = true,
+                segment = current.segment ?: segments.lastOrNull { it.startMillis <= current.positionMillis },
+            )
+        return articleId
+    }
+
+    fun stopFollowingSpokenText() {
+        _progress.value = _progress.value.copy(followSpokenText = false)
+    }
+
     private val artwork by lazy {
         runCatching {
             val size = 256
@@ -102,7 +125,7 @@ class TTSStateHolder(
             request = SpeechRequest(articleId, text, useDetectLanguage, title, author, feedTitle)
             playWhenReady = true
             _ttsState.value = PlaybackStatus.PLAYING
-            _progress.value = ReadAloudProgress(articleId = articleId, text = text, preparationProgress = 0f)
+            _progress.value = ReadAloudProgress(articleId = articleId, text = text, preparationProgress = 0f, followSpokenText = true, focusRequestId = ++focusSequence)
             try {
                 pendingServiceStart = true
                 ContextCompat.startForegroundService(context, Intent(context, ReadAloudService::class.java).setAction(ReadAloudService.ACTION_PREPARE))
@@ -164,6 +187,8 @@ class TTSStateHolder(
                 return
             }
         val previous = preparation
+        audioBuffer?.abort()
+        audioBuffer = null
         previous?.cancel()
         service?.setArticle(current.articleId)
         player?.stop()
@@ -189,25 +214,7 @@ class TTSStateHolder(
                     if (request !== current) return@launch
                     segments = timeline
                     val duration = timeline.lastOrNull()?.endMillis ?: error("No speech audio")
-                    _progress.value = ReadAloudProgress(current.articleId, current.text, durationMillis = duration)
-                    player?.apply {
-                        setMediaItem(
-                            MediaItem
-                                .Builder()
-                                .setMediaId(current.articleId.toString())
-                                .setUri(android.net.Uri.fromFile(audio))
-                                .setMediaMetadata(
-                                    MediaMetadata
-                                        .Builder()
-                                        .setTitle(current.title.ifBlank { context.getString(R.string.read_article) })
-                                        .setArtist(current.author.ifBlank { current.feedTitle }.ifBlank { context.getString(R.string.app_name) })
-                                        .setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
-                                        .build(),
-                                ).build(),
-                        )
-                        prepare()
-                        playWhenReady = this@TTSStateHolder.playWhenReady
-                    }
+                    _progress.value = _progress.value.copy(durationMillis = duration, generatedMillis = duration, isDurationEstimated = false)
                 } catch (e: TimeoutCancellationException) {
                     fail(e)
                 } catch (e: CancellationException) {
@@ -216,6 +223,33 @@ class TTSStateHolder(
                     fail(e)
                 }
             }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun startProgressivePlayback(
+        current: SpeechRequest,
+        buffer: SpeechAudioBuffer,
+    ) {
+        audioBuffer = buffer
+        val item =
+            MediaItem
+                .Builder()
+                .setMediaId(current.articleId.toString())
+                .setUri(android.net.Uri.fromFile(buffer.file))
+                .setMediaMetadata(
+                    MediaMetadata
+                        .Builder()
+                        .setTitle(current.title.ifBlank { context.getString(R.string.read_article) })
+                        .setArtist(current.author.ifBlank { current.feedTitle }.ifBlank { context.getString(R.string.app_name) })
+                        .setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+                        .build(),
+                ).build()
+        _progress.value = _progress.value.copy(preparationProgress = null)
+        player?.apply {
+            setMediaSource(speechMediaSource(buffer, item))
+            prepare()
+            playWhenReady = this@TTSStateHolder.playWhenReady
+        }
     }
 
     private suspend fun synthesize(
@@ -249,78 +283,97 @@ class TTSStateHolder(
             val locale =
                 candidates.firstOrNull { engine.setLanguage(it) >= TextToSpeech.LANG_AVAILABLE }
                     ?: error("Speech language is not available")
-            val parts = speechSegments(current.text, locale, minOf(TextToSpeech.getMaxSpeechInputLength(), 700))
+            val parts = speechSegments(current.text, locale, minOf(TextToSpeech.getMaxSpeechInputLength(), 700), firstChunkMaxLength = 180)
             return withContext(Dispatchers.IO) {
                 SpeechWaveFile(audio).use { wave ->
-                    val timeline = mutableListOf<SpeechSegment>()
-                    for ((index, part) in parts.withIndex()) {
-                        val done = CompletableDeferred<Unit>()
-                        val id = UUID.randomUUID().toString()
-                        engine.setOnUtteranceProgressListener(
-                            object : UtteranceProgressListener() {
-                                override fun onStart(utteranceId: String?) = Unit
+                    var buffer: SpeechAudioBuffer? = null
+                    var finished = false
+                    try {
+                        val timeline = mutableListOf<SpeechSegment>()
+                        for ((index, part) in parts.withIndex()) {
+                            val done = CompletableDeferred<Unit>()
+                            val id = UUID.randomUUID().toString()
+                            engine.setOnUtteranceProgressListener(
+                                object : UtteranceProgressListener() {
+                                    override fun onStart(utteranceId: String?) = Unit
 
-                                override fun onDone(utteranceId: String?) {
-                                    if (utteranceId == id) done.complete(Unit)
-                                }
-
-                                @Deprecated("Platform compatibility")
-                                override fun onError(utteranceId: String?) {
-                                    if (utteranceId == id) done.completeExceptionally(IllegalStateException("Speech synthesis failed"))
-                                }
-
-                                override fun onBeginSynthesis(
-                                    utteranceId: String?,
-                                    sampleRateInHz: Int,
-                                    audioFormat: Int,
-                                    channelCount: Int,
-                                ) {
-                                    if (utteranceId != id || !done.isActive) return
-                                    try {
-                                        val bits =
-                                            when (audioFormat) {
-                                                AudioFormat.ENCODING_PCM_8BIT -> 8
-                                                AudioFormat.ENCODING_PCM_16BIT -> 16
-                                                AudioFormat.ENCODING_PCM_FLOAT -> 32
-                                                else -> error("Unsupported speech audio format")
-                                            }
-                                        wave.setFormat(sampleRateInHz, channelCount, bits, audioFormat == AudioFormat.ENCODING_PCM_FLOAT)
-                                    } catch (e: Exception) {
-                                        done.completeExceptionally(e)
+                                    override fun onDone(utteranceId: String?) {
+                                        if (utteranceId == id) done.complete(Unit)
                                     }
-                                }
 
-                                override fun onAudioAvailable(
-                                    utteranceId: String?,
-                                    bytes: ByteArray?,
-                                ) {
-                                    if (utteranceId != id || !done.isActive || bytes == null) return
-                                    try {
-                                        wave.append(bytes)
-                                    } catch (e: Exception) {
-                                        done.completeExceptionally(e)
+                                    @Deprecated("Platform compatibility")
+                                    override fun onError(utteranceId: String?) {
+                                        if (utteranceId == id) done.completeExceptionally(IllegalStateException("Speech synthesis failed"))
                                     }
+
+                                    override fun onBeginSynthesis(
+                                        utteranceId: String?,
+                                        sampleRateInHz: Int,
+                                        audioFormat: Int,
+                                        channelCount: Int,
+                                    ) {
+                                        if (utteranceId != id || !done.isActive) return
+                                        try {
+                                            val bits =
+                                                when (audioFormat) {
+                                                    AudioFormat.ENCODING_PCM_8BIT -> 8
+                                                    AudioFormat.ENCODING_PCM_16BIT -> 16
+                                                    AudioFormat.ENCODING_PCM_FLOAT -> 32
+                                                    else -> error("Unsupported speech audio format")
+                                                }
+                                            wave.setFormat(sampleRateInHz, channelCount, bits, audioFormat == AudioFormat.ENCODING_PCM_FLOAT)
+                                        } catch (e: Exception) {
+                                            done.completeExceptionally(e)
+                                        }
+                                    }
+
+                                    override fun onAudioAvailable(
+                                        utteranceId: String?,
+                                        bytes: ByteArray?,
+                                    ) {
+                                        if (utteranceId != id || !done.isActive || bytes == null) return
+                                        try {
+                                            wave.append(bytes)
+                                        } catch (e: Exception) {
+                                            done.completeExceptionally(e)
+                                        }
+                                    }
+                                },
+                            )
+                            val start = wave.durationMillis()
+                            val temporary = File(directory, "segment.wav")
+                            try {
+                                check(engine.synthesizeToFile(current.text.substring(part.start, part.end), Bundle(), temporary, id) == TextToSpeech.SUCCESS)
+                                withTimeout(45_000) { done.await() }
+                            } finally {
+                                done.cancel()
+                                temporary.delete()
+                            }
+                            val end = wave.durationMillis()
+                            check(end > start) { "Speech engine produced no audio" }
+                            timeline += part.copy(startMillis = start, endMillis = end)
+                            val streaming = buffer ?: SpeechAudioBuffer(audio, wave.audioFormat()).also { buffer = it }
+                            streaming.publish(wave.sizeBytes(), finished = index == parts.lastIndex)
+                            withContext(Dispatchers.Main.immediate) {
+                                if (request === current) {
+                                    segments = timeline.toList()
+                                    val fraction = part.end.toDouble() / current.text.length
+                                    _progress.value =
+                                        _progress.value.copy(
+                                            durationMillis = (end / fraction).toLong().coerceAtLeast(end),
+                                            generatedMillis = end,
+                                            isDurationEstimated = index != parts.lastIndex,
+                                        )
+                                    if (audioBuffer !== streaming) startProgressivePlayback(current, streaming)
                                 }
-                            },
-                        )
-                        val start = wave.durationMillis()
-                        val temporary = File(directory, "segment.wav")
-                        try {
-                            check(engine.synthesizeToFile(current.text.substring(part.start, part.end), Bundle(), temporary, id) == TextToSpeech.SUCCESS)
-                            withTimeout(45_000) { done.await() }
-                        } finally {
-                            done.cancel()
-                            temporary.delete()
+                            }
                         }
-                        val end = wave.durationMillis()
-                        check(end > start) { "Speech engine produced no audio" }
-                        timeline += part.copy(startMillis = start, endMillis = end)
-                        withContext(Dispatchers.Main.immediate) {
-                            if (request === current) _progress.value = _progress.value.copy(preparationProgress = (index + 1f) / parts.size)
-                        }
+                        wave.finish()
+                        finished = true
+                        timeline
+                    } finally {
+                        if (!finished) buffer?.abort()
                     }
-                    wave.finish()
-                    timeline
                 }
             }
         } finally {
@@ -362,7 +415,7 @@ class TTSStateHolder(
     fun seekTo(positionMillis: Long) {
         coroutineScope.launch(Dispatchers.Main.immediate) {
             if (_progress.value.preparationProgress == null) {
-                player?.seekTo(positionMillis.coerceIn(0, _progress.value.durationMillis))
+                player?.seekTo(positionMillis.coerceIn(0, _progress.value.generatedMillis))
                 updatePosition()
             }
         }
@@ -383,6 +436,8 @@ class TTSStateHolder(
     fun stop() {
         coroutineScope.launch(Dispatchers.Main.immediate) {
             val pending = preparation
+            audioBuffer?.abort()
+            audioBuffer = null
             pending?.cancel()
             pendingServiceStart = false
             request = null
@@ -413,6 +468,7 @@ class TTSStateHolder(
     }
 
     private fun fail(error: Exception) {
+        audioBuffer?.abort()
         Log.e(LOG_TAG, "Read-aloud failed", error)
         player?.pause()
         _ttsState.value = PlaybackStatus.PAUSED
@@ -421,6 +477,8 @@ class TTSStateHolder(
     }
 
     internal fun detach() {
+        audioBuffer?.abort()
+        audioBuffer = null
         ticker?.cancel()
         preparation?.cancel()
         player = null

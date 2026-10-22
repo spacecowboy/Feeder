@@ -25,6 +25,14 @@ class ReadAloudTimelineTest {
         assertTrue(speechSegments(" \n\t", Locale.ENGLISH, 50).isEmpty())
     }
 
+    @Test fun longOpeningSentenceUsedAShortStartupChunkWithoutLosingText() {
+        val text = "A long opening sentence ".repeat(100) + "."
+        val parts = speechSegments(text, Locale.ENGLISH, 700, firstChunkMaxLength = 180)
+        assertTrue(parts.first().end <= 180)
+        assertTrue(parts.drop(1).all { it.end - it.start <= 700 })
+        assertEquals(text, parts.joinToString("") { text.substring(it.start, it.end) })
+    }
+
     @Test fun seekingSelectedTheCorrectSentenceAtBoundaries() {
         val parts = listOf(SpeechSegment(0, 10, 0, 500), SpeechSegment(10, 20, 500, 1000))
         assertEquals(parts[0], parts.segmentAt(499))

@@ -18,8 +18,10 @@ internal fun speechSegments(
     text: String,
     locale: Locale,
     maxLength: Int,
+    firstChunkMaxLength: Int = maxLength,
 ): List<SpeechSegment> {
     require(maxLength >= 2)
+    require(firstChunkMaxLength >= 2)
     val iterator = BreakIterator.getSentenceInstance(locale).apply { setText(text) }
     return buildList {
         var start = iterator.first()
@@ -27,7 +29,8 @@ internal fun speechSegments(
         while (end != BreakIterator.DONE) {
             var cursor = start
             while (cursor < end) {
-                var limit = minOf(cursor + maxLength, end)
+                val chunkLength = if (isEmpty()) minOf(maxLength, firstChunkMaxLength) else maxLength
+                var limit = minOf(cursor + chunkLength, end)
                 if (limit < end) {
                     val space = text.lastIndexOf(' ', limit - 1)
                     if (space > cursor) limit = space + 1
@@ -58,6 +61,12 @@ internal class SpeechWaveFile(
     private var bits = 0
     private var format = 0
     private var dataSize = 0L
+
+    @Synchronized
+    fun audioFormat(): SpeechPcmFormat = SpeechPcmFormat(sampleRate, channels, bits, format == 3)
+
+    @Synchronized
+    fun sizeBytes(): Long = dataSize
 
     @Synchronized
     fun setFormat(

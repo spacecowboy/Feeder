@@ -88,10 +88,14 @@ class ArticleViewModel(
             .map { progress ->
                 progress.segment
                     ?.takeIf { progress.articleId == itemId && progress.error == null }
-                    ?.let { SpeechHighlight(progress.text, it) }
+                    ?.let { SpeechHighlight(progress.text, it, progress.focusRequestId, progress.followSpokenText) }
             }.distinctUntilChanged()
 
     fun ttsSeekTo(positionMillis: Long) = ttsStateHolder.seekTo(positionMillis)
+
+    fun ttsFocusSpokenText(): Long? = ttsStateHolder.requestSpokenTextFocus()
+
+    fun ttsStopFollowing() = ttsStateHolder.stopFollowingSpokenText()
 
     private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()

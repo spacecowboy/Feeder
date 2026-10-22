@@ -4,16 +4,23 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionResult
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.MainActivity
@@ -38,25 +45,44 @@ class ReadAloudService : MediaSessionService() {
                 .apply { setSmallIcon(R.drawable.ic_stat_f) },
         )
         val player =
-            ExoPlayer.Builder(this).build().apply {
-                setSeekBackIncrementMs(10_000)
-                setSeekForwardIncrementMs(10_000)
-                setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setUsage(C.USAGE_MEDIA)
-                        .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
-                        .build(),
-                    true,
-                )
-                setHandleAudioBecomingNoisy(true)
-                setWakeMode(C.WAKE_MODE_LOCAL)
-            }
+            ExoPlayer
+                .Builder(this)
+                .setLoadControl(DefaultLoadControl.Builder().setBufferDurationsMs(2000, 15000, 250, 500).build())
+                .build()
+                .apply {
+                    setSeekBackIncrementMs(10_000)
+                    setSeekForwardIncrementMs(10_000)
+                    setAudioAttributes(
+                        AudioAttributes
+                            .Builder()
+                            .setUsage(C.USAGE_MEDIA)
+                            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                            .build(),
+                        true,
+                    )
+                    setHandleAudioBecomingNoisy(true)
+                    setWakeMode(C.WAKE_MODE_LOCAL)
+                }
         val activity = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         session =
             MediaSession
-                .Builder(this, player)
-                .setSessionActivity(activity)
+                .Builder(
+                    this,
+                    object : ForwardingPlayer(player) {
+                        private fun bounded(positionMs: Long): Long = positionMs.coerceIn(0, holder.progress.value.generatedMillis)
+
+                        override fun seekTo(positionMs: Long) = player.seekTo(bounded(positionMs))
+
+                        override fun seekTo(
+                            mediaItemIndex: Int,
+                            positionMs: Long,
+                        ) = player.seekTo(mediaItemIndex, bounded(positionMs))
+
+                        override fun seekBack() = seekTo(player.currentPosition - 10_000)
+
+                        override fun seekForward() = seekTo(player.currentPosition + 10_000)
+                    },
+                ).setSessionActivity(activity)
                 .setMediaButtonPreferences(
                     listOf(
                         CommandButton
@@ -70,6 +96,12 @@ class ReadAloudService : MediaSessionService() {
                             .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
                             .setDisplayName(getString(R.string.skip_forward_10))
                             .setSlots(CommandButton.SLOT_FORWARD)
+                            .build(),
+                        CommandButton
+                            .Builder(CommandButton.ICON_STOP)
+                            .setSessionCommand(SessionCommand(ACTION_STOP, Bundle.EMPTY))
+                            .setDisplayName(getString(R.string.stop_reading))
+                            .setSlots(CommandButton.SLOT_FORWARD_SECONDARY, CommandButton.SLOT_OVERFLOW)
                             .build(),
                     ),
                 ).setCallback(
@@ -89,7 +121,25 @@ class ReadAloudService : MediaSessionService() {
                             return MediaSession.ConnectionResult
                                 .AcceptedResultBuilder(session)
                                 .setAvailablePlayerCommands(commands)
-                                .build()
+                                .setAvailableSessionCommands(
+                                    defaults.availableSessionCommands
+                                        .buildUpon()
+                                        .add(SessionCommand(ACTION_STOP, Bundle.EMPTY))
+                                        .build(),
+                                ).build()
+                        }
+
+                        override fun onCustomCommand(
+                            session: MediaSession,
+                            controller: MediaSession.ControllerInfo,
+                            customCommand: SessionCommand,
+                            args: Bundle,
+                        ): ListenableFuture<SessionResult> {
+                            if (customCommand.customAction == ACTION_STOP) {
+                                holder.stop()
+                                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+                            }
+                            return super.onCustomCommand(session, controller, customCommand, args)
                         }
                     },
                 ).build()

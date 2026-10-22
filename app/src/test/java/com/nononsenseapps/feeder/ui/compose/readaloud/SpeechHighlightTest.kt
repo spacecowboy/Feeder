@@ -6,6 +6,7 @@ import com.nononsenseapps.feeder.model.html.LinearText
 import com.nononsenseapps.feeder.model.html.LinearTextBlockStyle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -31,6 +32,17 @@ class SpeechHighlightTest {
     @Test fun unrelatedContentWasNotHighlighted() {
         val paragraph = text("Original article.")
         assertTrue(SpeechHighlightIndex(LinearArticle(listOf(paragraph)), "Translated article.").highlights(SpeechSegment(0, 19)).isEmpty())
+    }
+
+    @Test fun focusSelectedOnlyTheFirstMatchingTextInDocumentOrder() {
+        val first = text("First part of the sentence")
+        val second = text("and the second part.")
+        val source = first.text + "\n\n" + second.text
+        val index = SpeechHighlightIndex(LinearArticle(listOf(first, second)), source)
+        val focus = checkNotNull(index.focusTarget(SpeechSegment(0, source.length), 7))
+        assertSame(first, focus.text)
+        assertEquals(7L, focus.requestId)
+        assertEquals(first.text.indices, focus.range)
     }
 
     @Test fun formattedMinutesAndHours() {

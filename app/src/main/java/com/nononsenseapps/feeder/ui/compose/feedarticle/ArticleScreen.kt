@@ -83,7 +83,9 @@ import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechFollowViewport
 import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
+import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnUserScroll
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -109,6 +111,7 @@ fun ArticleScreen(
     viewModel: ArticleViewModel,
     mainActivityViewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
+    onNavigateToArticle: (Long) -> Unit = {},
 ) {
     BackHandler(onBack = onNavigateUp)
     val di = LocalDI.current
@@ -132,6 +135,7 @@ fun ArticleScreen(
 
     LaunchedEffect(Unit) {
         mavm.scrollCommand.collect { direction ->
+            viewModel.ttsStopFollowing()
             val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
             when (direction) {
                 ScrollDirection.UP -> {
@@ -202,6 +206,12 @@ fun ArticleScreen(
         readAloudProgress = readAloudProgress,
         speechHighlight = speechHighlight,
         ttsOnSeekTo = viewModel::ttsSeekTo,
+        ttsOnUserScroll = viewModel::ttsStopFollowing,
+        ttsOnGoToSpokenText = {
+            viewModel.ttsFocusSpokenText()?.let { articleId ->
+                if (articleId != viewState.articleId) onNavigateToArticle(articleId)
+            }
+        },
         podcastOnPlay = viewModel::podcastPlay,
         podcastOnPause = viewModel::podcastPause,
         podcastOnStop = viewModel::stopPodcastPlayback,
@@ -272,6 +282,8 @@ fun ArticleScreen(
     readAloudProgress: StateFlow<ReadAloudProgress>? = null,
     speechHighlight: SpeechHighlight? = null,
     ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
+    ttsOnUserScroll: () -> Unit = {},
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
 ) {
@@ -514,15 +526,19 @@ fun ArticleScreen(
                     onSelectLanguage = ttsOnSelectLanguage,
                     progress = readAloudProgress,
                     onSeekTo = ttsOnSeekTo,
+                    onGoToSpokenText = ttsOnGoToSpokenText,
+                    displayedArticleId = viewState.articleId,
                 )
             }
         },
     ) { padding ->
         // Box handles the dynamic padding so ArticleContent don't have to recompose on scroll
-        Box(
+        SpeechFollowViewport(
+            centerSpeech = speechHighlight?.followSpokenText == true,
             modifier =
                 Modifier
-                    .padding(padding),
+                    .padding(padding)
+                    .stopSpeechFollowingOnUserScroll(ttsOnUserScroll),
         ) {
             val coroutineScope = rememberCoroutineScope()
             ArticleContent(
@@ -555,6 +571,7 @@ fun ArticleScreen(
                                 ) {
                                     val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
                                     val target = (articleScrollState.value - scrollAmount).coerceAtLeast(0)
+                                    ttsOnUserScroll()
                                     coroutineScope.launch {
                                         if (isAnimatedPaging) {
                                             articleScrollState.animateScrollTo(target)
@@ -576,6 +593,7 @@ fun ArticleScreen(
                                 ) {
                                     val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
                                     val target = (articleScrollState.value + scrollAmount).coerceAtMost(articleScrollState.maxValue)
+                                    ttsOnUserScroll()
                                     coroutineScope.launch {
                                         if (isAnimatedPaging) {
                                             articleScrollState.animateScrollTo(target)

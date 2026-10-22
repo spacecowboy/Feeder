@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
@@ -27,6 +28,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -42,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,6 +77,8 @@ fun HideableTTSPlayer(
     floatingActionButton: @Composable (() -> Unit)? = null,
     progress: StateFlow<ReadAloudProgress>? = null,
     onSeekTo: (Long) -> Unit = {},
+    onGoToSpokenText: () -> Unit = {},
+    displayedArticleId: Long? = null,
 ) {
     AnimatedVisibility(
         modifier = modifier,
@@ -93,6 +98,8 @@ fun HideableTTSPlayer(
             floatingActionButton = floatingActionButton,
             progress = currentProgress,
             onSeekTo = onSeekTo,
+            onGoToSpokenText = onGoToSpokenText,
+            displayedArticleId = displayedArticleId,
         )
     }
 }
@@ -111,6 +118,8 @@ fun TTSPlayer(
     floatingActionButton: @Composable (() -> Unit)? = null,
     progress: ReadAloudProgress = ReadAloudProgress(),
     onSeekTo: (Long) -> Unit = {},
+    onGoToSpokenText: () -> Unit = {},
+    displayedArticleId: Long? = null,
 ) {
     var showMenu by remember {
         mutableStateOf(false)
@@ -126,9 +135,10 @@ fun TTSPlayer(
                     Text(stringResource(R.string.read_aloud_preparing), style = MaterialTheme.typography.labelMedium)
                     LinearProgressIndicator(progress = { preparing }, modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
                 } else {
+                    val seekableDuration = if (progress.isDurationEstimated) progress.generatedMillis else progress.durationMillis
                     Slider(
                         value = scrubPosition ?: progress.positionMillis.toFloat(),
-                        onValueChange = { scrubPosition = it },
+                        onValueChange = { scrubPosition = it.coerceAtMost(seekableDuration.toFloat()) },
                         onValueChangeFinished = {
                             scrubPosition?.let { onSeekTo(it.toLong()) }
                             scrubPosition = null
@@ -139,7 +149,17 @@ fun TTSPlayer(
                     )
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(formatSpeechTime(scrubPosition?.toLong() ?: progress.positionMillis), style = MaterialTheme.typography.labelMedium)
-                        Text(formatSpeechTime(progress.durationMillis), style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            if (progress.isDurationEstimated) {
+                                stringResource(
+                                    R.string.read_aloud_estimated_time,
+                                    formatSpeechTime(progress.durationMillis),
+                                )
+                            } else {
+                                formatSpeechTime(progress.durationMillis)
+                            },
+                            style = MaterialTheme.typography.labelMedium,
+                        )
                     }
                 }
                 progress.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelMedium) }
@@ -259,6 +279,25 @@ fun TTSPlayer(
                                 },
                             )
                         }
+                    }
+                }
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.go_to_spoken_text)) }) {
+                    val followingHere = progress.followSpokenText && progress.articleId != null && progress.articleId == displayedArticleId
+                    IconButton(
+                        onClick = onGoToSpokenText,
+                        enabled = progress.articleId != null,
+                        colors =
+                            if (followingHere) {
+                                IconButtonDefaults.iconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            } else {
+                                IconButtonDefaults.iconButtonColors()
+                            },
+                        modifier = Modifier.safeSemantics { selected = followingHere },
+                    ) {
+                        Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.go_to_spoken_text))
                     }
                 }
             },

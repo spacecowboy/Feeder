@@ -2,6 +2,8 @@
 <resources>
   <string name="read_aloud_preparing">Preparing audio\u2026</string>
   <string name="read_aloud_position">Read-aloud position</string>
+  <string name="go_to_spoken_text">Go to spoken text</string>
+  <string name="read_aloud_estimated_time">About %1$s</string>
 
   <string name="navigation_drawer_open">Open navigation drawer</string>
   <string name="navigation_drawer_close">Close navigation drawer</string>
