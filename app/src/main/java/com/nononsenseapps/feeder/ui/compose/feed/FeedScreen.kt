@@ -57,7 +57,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -65,11 +68,14 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -87,6 +93,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -134,6 +141,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.HideablePodcastPlayer
 import com.nononsenseapps.feeder.ui.compose.feedarticle.TranslatedFeedCards
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnread
 import com.nononsenseapps.feeder.ui.compose.feedarticle.onlyUnreadAndSaved
+import com.nononsenseapps.feeder.ui.compose.filter.ModalFilters
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerValue
 import com.nononsenseapps.feeder.ui.compose.material3.rememberDrawerState
@@ -614,6 +622,7 @@ fun FeedScreen(
         onDismissRenameTagDialog = onDismissRenameTagDialog,
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
+        onShowFilterMenu = onShowFilterMenu,
         toolbarActions = {
             if (viewState.searchBarVisible) {
                 SearchBar(
@@ -1133,6 +1142,7 @@ fun FeedScreen(
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable (RowScope.() -> Unit),
+    onShowFilterMenu: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -1159,6 +1169,62 @@ fun FeedScreen(
             delay(5_000L)
             manuallyTriggeredRefresh = false
         }
+    }
+
+    val exitAlwaysScrollBehavior =
+        FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
+    val vibrantColors = FloatingToolbarDefaults.vibrantFloatingToolbarColors()
+    val floatingToolbar: @Composable () -> Unit = {
+        HorizontalFloatingToolbar(
+            expanded = true,
+            floatingActionButton = {
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.mark_all_as_read)) }) {
+                    FloatingToolbarDefaults.VibrantFloatingActionButton(
+                        onClick = {
+                            onMarkAllAsRead()
+                            if (viewState.isOpenDrawerOnFab) {
+                                onOpenNavDrawer()
+                            }
+                        },
+                        modifier =
+                            Modifier
+                                .navigationBarsPadding(),
+                    ) {
+                        Icon(
+                            Icons.Default.DoneAll,
+                            contentDescription = stringResource(R.string.mark_all_as_read),
+                        )
+                    }
+                }
+            },
+            modifier =
+                Modifier
+                    .navigationBarsPadding(),
+//                    .align(Alignment.BottomEnd)
+//                    .offset(x = -ScreenOffset, y = -ScreenOffset)
+//                    .zIndex(1f),
+            colors = vibrantColors,
+            scrollBehavior = exitAlwaysScrollBehavior,
+            content = {
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.search_verb)) }) {
+                    IconButton(
+                        onClick = { /* doSomething() */ },
+                        Modifier.focusProperties { canFocus = true },
+                    ) {
+                        Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.search_verb))
+                    }
+                }
+
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.filters)) }) {
+                    IconButton(
+                        onClick = { onShowFilterMenu(!viewState.showFilterMenu) },
+                        Modifier.focusProperties { canFocus = true },
+                    ) {
+                        Icon(Icons.Filled.FilterList, contentDescription = stringResource(R.string.filters))
+                    }
+                }
+            },
+        )
     }
 
     val floatingActionButton: @Composable () -> Unit = {
@@ -1276,7 +1342,8 @@ fun FeedScreen(
                     enter = scaleIn(animationSpec = tween(256)),
                     exit = scaleOut(animationSpec = tween(256)),
                 ) {
-                    floatingActionButton()
+                    floatingToolbar()
+//                    floatingActionButton()
                 }
             }
         },
@@ -1285,6 +1352,7 @@ fun FeedScreen(
                 // The order is important! PullToRefresh MUST come first
                 .pullRefresh(state = pullRefreshState)
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(exitAlwaysScrollBehavior)
                 .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
@@ -1305,14 +1373,43 @@ fun FeedScreen(
                         .align(Alignment.TopCenter),
             )
 
-            viewState.translationModelDownloadProgress?.let { progress ->
-                TranslationModelDownloadProgress(
-                    progress = progress,
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxWidth(),
+            // TODO exactly where to place it?
+            // Remembering the state and toggling with an effect produces a nice animation on show
+            val sheetState = rememberBottomSheetState(initialValue = if (viewState.showFilterMenu) SheetValue.PartiallyExpanded else SheetValue.Hidden)
+            LaunchedEffect(viewState.showFilterMenu) {
+                if (viewState.showFilterMenu) {
+                    sheetState.partialExpand()
+                } else {
+                    sheetState.hide()
+                }
+            }
+            // TODO reuse existing scope?
+//            val scope = rememberCoroutineScope()
+            if (viewState.showFilterMenu) {
+                ModalFilters(
+                    sheetState = sheetState,
+                    onDismiss = {
+                        onShowFilterMenu(false)
+
+//                        scope.launch {
+//                            sheetState.hide()
+//                        }.invokeOnCompletion {
+//                            if (!sheetState.isVisible) {
+//                                onShowFilterMenu(false)
+//                            }
+//                        }
+                    },
                 )
+            } else {
+                viewState.translationModelDownloadProgress?.let { progress ->
+                    TranslationModelDownloadProgress(
+                        progress = progress,
+                        modifier =
+                            Modifier
+                                .align(Alignment.TopCenter)
+                                .fillMaxWidth(),
+                    )
+                }
             }
         }
 
@@ -1806,7 +1903,8 @@ fun FeedGridContent(
                                                 }
                                             }
                                         }
-                                    }.then(
+                                    }
+                                    .then(
                                         // Disable item animations during refresh to prevent scroll position issues
                                         if (!viewState.currentlySyncing) {
                                             Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
@@ -1913,7 +2011,10 @@ fun PlainTooltipBox(
     content: @Composable () -> Unit,
 ) {
     TooltipBox(
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        positionProvider =
+            TooltipDefaults.rememberTooltipPositionProvider(
+                TooltipAnchorPosition.Above,
+            ),
         state = rememberTooltipState(),
         tooltip = {
             PlainTooltip {
