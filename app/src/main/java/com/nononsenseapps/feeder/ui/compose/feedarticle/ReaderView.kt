@@ -137,8 +137,7 @@ fun ReaderView(
                                     ScreenType.SINGLE -> dimens.margin
                                 },
                             end = dimens.margin,
-                        )
-                        .focusGroup()
+                        ).focusGroup()
                         .safeSemantics {
                             testTag = "readerColumn"
                         },
@@ -196,8 +195,7 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clearAndSetSemantics {
                                                 contentDescription = feedTitle
-                                            }
-                                            .clickable {
+                                            }.clickable {
                                                 onFeedTitleClick()
                                             },
                                 )
@@ -311,8 +309,7 @@ fun ReaderView(
                                                         .indication(
                                                             interactionSource,
                                                             LocalIndication.current,
-                                                        )
-                                                        .focusableInNonTouchMode(interactionSource = interactionSource),
+                                                        ).focusableInNonTouchMode(interactionSource = interactionSource),
                                             )
                                         }
                                     }
@@ -346,8 +343,7 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clickable {
                                                 onEnclosureClick()
-                                            }
-                                            .clearAndSetSemantics {
+                                            }.clearAndSetSemantics {
                                                 try {
                                                     customActions =
                                                         listOf(
