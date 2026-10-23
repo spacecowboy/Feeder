@@ -465,6 +465,7 @@ fun SettingsList(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier =
             modifier
                 .padding(horizontal = dimens.margin)
@@ -987,7 +988,7 @@ fun SettingsGroup(
 fun GroupTitle(
     modifier: Modifier = Modifier,
     startingSpace: Boolean = true,
-    height: Dp = 64.dp,
+    height: Dp = 24.dp,
     title: @Composable (Modifier) -> Unit,
 ) {
     val dimens = LocalDimens.current
@@ -1098,13 +1099,18 @@ fun ExternalSetting(
                     overflow = TextOverflow.Ellipsis,
                 )
             },
-            subtitle = {
-                Text(
-                    currentValue,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
+            subtitle =
+                if (currentValue.isBlank()) {
+                    null
+                } else {
+                    {
+                        Text(
+                            currentValue,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                },
         )
     }
 }
@@ -1249,13 +1255,18 @@ fun ListDialogSetting(
             title = {
                 Text(title)
             },
-            subtitle = {
-                Text(
-                    text = currentValue.item.joinToString(" ", limit = 5),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
-            },
+            subtitle =
+                if (currentValue.item.isEmpty()) {
+                    null
+                } else {
+                    {
+                        Text(
+                            text = currentValue.item.joinToString(" ", limit = 5),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
+                    }
+                },
         )
 
         if (expanded) {
@@ -1327,7 +1338,8 @@ fun NotificationsSetting(
 
                         PermissionStatus.Granted -> expanded = true
                     }
-                }.semantics {
+                }
+                .semantics {
                     role = Role.Button
                 },
         verticalAlignment = Alignment.CenterVertically,
@@ -1345,24 +1357,24 @@ fun NotificationsSetting(
             title = {
                 Text(stringResource(id = R.string.notify_for_new_items))
             },
-            subtitle = {
-                Text(
-                    text =
-                        when (permissionDenied) {
-                            true -> stringResource(id = R.string.explanation_permission_notifications)
-                            false -> {
+            subtitle =
+                if (permissionDenied) {
+                    { Text(stringResource(id = R.string.explanation_permission_notifications)) }
+                } else if (items.item.count { it.notify } == 0) {
+                    null
+                } else {
+                    {
+                        Text(
+                            text =
                                 items.item
                                     .asSequence()
                                     .filter { it.notify }
-                                    .map { it.title }
-                                    .take(4)
-                                    .joinToString(", ", limit = 3)
-                            }
-                        },
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
-            },
+                                    .joinToString(", ", limit = 3, truncated = "…") { it.title },
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
+                    }
+                },
         )
 
         if (shouldShowExplanationForPermission && !permissionDismissed) {
@@ -1469,7 +1481,8 @@ fun SwitchSetting(
                 .clickable(
                     enabled = enabled,
                     onClick = { onCheckedChange(!checked) },
-                ).safeSemantics(mergeDescendants = true) {
+                )
+                .safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
                             true -> onString
