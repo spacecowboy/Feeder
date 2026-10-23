@@ -9,7 +9,7 @@ internal suspend fun <T> refreshConcurrently(
     items: List<T>,
     host: (T) -> String,
     concurrency: Int = 8,
-    perHost: Int = 2,
+    perHost: Int = 1,
     refresh: suspend (T) -> Unit,
 ): Unit =
     coroutineScope {
@@ -21,25 +21,25 @@ internal suspend fun <T> refreshConcurrently(
 
         while (pending.isNotEmpty() || running > 0) {
             while (running < concurrency) {
-                val entry = pending.entries.firstOrNull { (key, _) -> active.getOrDefault(key, 0) < perHost } ?: break
-                val key = entry.key
-                val item = entry.value.removeFirst()
+                val entry = pending.entries.firstOrNull { (host, _) -> active.getOrDefault(host, 0) < perHost } ?: break
+                val pendingHost = entry.key
+                val pendingFeed = entry.value.removeFirst()
                 // Rotate hosts so one large subscription group does not monopolize new slots.
-                pending.remove(key)
-                if (entry.value.isNotEmpty()) pending[key] = entry.value
-                active[key] = active.getOrDefault(key, 0) + 1
+                pending.remove(pendingHost)
+                if (entry.value.isNotEmpty()) pending[pendingHost] = entry.value
+                active[pendingHost] = active.getOrDefault(pendingHost, 0) + 1
                 running++
                 launch {
                     try {
-                        refresh(item)
+                        refresh(pendingFeed)
                     } finally {
-                        completed.trySend(key)
+                        completed.trySend(pendingHost)
                     }
                 }
             }
             if (running > 0) {
-                val key = completed.receive()
-                active[key] = active.getValue(key) - 1
+                val completedHost = completed.receive()
+                active[completedHost] = active.getValue(completedHost) - 1
                 running--
             }
         }

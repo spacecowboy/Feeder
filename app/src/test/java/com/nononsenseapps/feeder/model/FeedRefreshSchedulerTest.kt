@@ -15,6 +15,38 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeedRefreshSchedulerTest {
     @Test
+    fun defaultsToOneRefreshPerHost() =
+        runTest {
+            val feeds = (1..4).toList()
+            val refreshed = mutableListOf<Int>()
+            var active = 0
+            refreshConcurrently(feeds, host = { "same-host" }) { feed ->
+                active++
+                assertEquals(1, active)
+                delay(1_000)
+                refreshed += feed
+                active--
+            }
+            assertEquals(feeds, refreshed)
+            assertEquals(4_000L, testScheduler.currentTime)
+        }
+
+    @Test
+    fun honorsExplicitPerHostLimit() =
+        runTest {
+            var active = 0
+            var peak = 0
+            refreshConcurrently((1..4).toList(), host = { "same-host" }, perHost = 2) {
+                active++
+                peak = maxOf(peak, active)
+                delay(1_000)
+                active--
+            }
+            assertEquals(2, peak)
+            assertEquals(2_000L, testScheduler.currentTime)
+        }
+
+    @Test
     fun comparesNetworkBoundConcurrencyLimits() =
         runTest {
             val results = mutableMapOf<Int, Long>()
@@ -47,7 +79,7 @@ class FeedRefreshSchedulerTest {
                         total++
                         peak = maxOf(peak, total)
                         active[host] = active.getOrDefault(host, 0) + 1
-                        assertTrue(active.getValue(host) <= 2)
+                        assertEquals(1, active.getValue(host))
                         assertTrue(total <= 8)
                         delay(if (host == "slow") 10_000 else 100)
                         finished += host
