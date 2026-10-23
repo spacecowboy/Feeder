@@ -1338,8 +1338,7 @@ fun NotificationsSetting(
 
                         PermissionStatus.Granted -> expanded = true
                     }
-                }
-                .semantics {
+                }.semantics {
                     role = Role.Button
                 },
         verticalAlignment = Alignment.CenterVertically,
@@ -1481,8 +1480,7 @@ fun SwitchSetting(
                 .clickable(
                     enabled = enabled,
                     onClick = { onCheckedChange(!checked) },
-                )
-                .safeSemantics(mergeDescendants = true) {
+                ).safeSemantics(mergeDescendants = true) {
                     stateDescription =
                         when (checked) {
                             true -> onString
