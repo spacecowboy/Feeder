@@ -62,6 +62,12 @@ class FeedViewModel(
     FeedListFilterCallback {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    val readAloudProgress = ttsStateHolder.progress
+
+    fun ttsFocusSpokenText(): Long? = ttsStateHolder.requestSpokenTextFocus()
+
+    fun ttsSeekTo(positionMillis: Long) = ttsStateHolder.seekTo(positionMillis)
+
     private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val translationManager: TranslationManager by instance()
@@ -635,14 +641,12 @@ class FeedViewModel(
                     textArray = it,
                     useDetectLanguage = repository.useDetectLanguage.value,
                     articleId = article.id,
+                    title = article.plainTitle,
+                    author = article.author.orEmpty(),
+                    feedTitle = article.feedDisplayTitle,
                 )
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        ttsStateHolder.shutdown()
     }
 
     override fun setSaved(value: Boolean) {

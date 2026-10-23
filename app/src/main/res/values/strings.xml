@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="read_aloud_preparing">Preparing audio\u2026</string>
+  <string name="read_aloud_position">Read-aloud position</string>
+  <string name="go_to_spoken_text">Go to spoken text</string>
+  <string name="read_aloud_estimated_time">%1$d%% \u00b7 ~%2$s</string>
 
   <string name="navigation_drawer_open">Open navigation drawer</string>
   <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -50,6 +54,8 @@
   <string name="resume_reading">Resume reading</string>
   <string name="stop_reading">Stop reading</string>
   <string name="skip_to_next">Skip to next</string>
+  <string name="skip_back_10">Back 10 seconds</string>
+  <string name="skip_forward_10">Forward 10 seconds</string>
   <string name="set_language">Set language</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>

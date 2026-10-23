@@ -73,6 +73,7 @@ import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.model.ReadAloudProgress
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
 import com.nononsenseapps.feeder.ui.ScrollDirection
 import com.nononsenseapps.feeder.ui.compose.components.TranslationProgressContent
@@ -82,6 +83,10 @@ import com.nononsenseapps.feeder.ui.compose.html.ColumnArticleContent
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechFollowViewport
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
+import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnAccessibilityScroll
+import com.nononsenseapps.feeder.ui.compose.readaloud.stopSpeechFollowingOnUserScroll
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -89,6 +94,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.ActivityLauncher
 import com.nononsenseapps.feeder.util.stripTrackingParameters
 import com.nononsenseapps.feeder.util.unicodeWrap
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -107,6 +113,7 @@ fun ArticleScreen(
     viewModel: ArticleViewModel,
     mainActivityViewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
+    onNavigateToArticle: (Long) -> Unit = {},
 ) {
     BackHandler(onBack = onNavigateUp)
     val di = LocalDI.current
@@ -114,6 +121,8 @@ fun ArticleScreen(
 
     val mavm = remember { mainActivityViewModel }
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val readAloudProgress = viewModel.readAloudProgress
+    val speechHighlight by viewModel.speechHighlight.collectAsStateWithLifecycle(initialValue = null)
     val isPagingMode by mavm.isPagingMode.collectAsStateWithLifecycle()
     val isAnimatedPaging by mavm.isAnimatedPaging.collectAsStateWithLifecycle()
 
@@ -127,6 +136,7 @@ fun ArticleScreen(
 
     LaunchedEffect(Unit) {
         mavm.scrollCommand.collect { direction ->
+            viewModel.ttsStopFollowing()
             val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
             when (direction) {
                 ScrollDirection.UP -> {
@@ -194,6 +204,15 @@ fun ArticleScreen(
         ttsOnStop = viewModel::ttsStop,
         ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+        readAloudProgress = readAloudProgress,
+        speechHighlight = speechHighlight,
+        ttsOnSeekTo = viewModel::ttsSeekTo,
+        ttsOnUserScroll = viewModel::ttsStopFollowing,
+        ttsOnGoToSpokenText = {
+            viewModel.ttsFocusSpokenText()?.let { articleId ->
+                if (articleId != viewState.articleId) onNavigateToArticle(articleId)
+            }
+        },
         podcastOnPlay = viewModel::podcastPlay,
         podcastOnPause = viewModel::podcastPause,
         podcastOnStop = viewModel::stopPodcastPlayback,
@@ -261,6 +280,11 @@ fun ArticleScreen(
     onDownloadBergamotRuntime: () -> Unit,
     onDismissBergamotRuntimeDownload: () -> Unit,
     modifier: Modifier = Modifier,
+    readAloudProgress: StateFlow<ReadAloudProgress>? = null,
+    speechHighlight: SpeechHighlight? = null,
+    ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
+    ttsOnUserScroll: () -> Unit = {},
     isPagingMode: Boolean = false,
     isAnimatedPaging: Boolean = false,
 ) {
@@ -501,21 +525,29 @@ fun ArticleScreen(
                     onSkipNext = ttsOnSkipNext,
                     languages = ImmutableHolder(viewState.ttsLanguages),
                     onSelectLanguage = ttsOnSelectLanguage,
+                    progress = readAloudProgress,
+                    onSeekTo = ttsOnSeekTo,
+                    onGoToSpokenText = ttsOnGoToSpokenText,
+                    displayedArticleId = viewState.articleId,
                 )
             }
         },
     ) { padding ->
         // Box handles the dynamic padding so ArticleContent don't have to recompose on scroll
-        Box(
+        SpeechFollowViewport(
+            centerSpeech = speechHighlight?.followSpokenText == true,
             modifier =
                 Modifier
-                    .padding(padding),
+                    .padding(padding)
+                    .stopSpeechFollowingOnUserScroll(ttsOnUserScroll),
         ) {
             val coroutineScope = rememberCoroutineScope()
             ArticleContent(
                 viewState = viewState,
                 screenType = ScreenType.SINGLE,
+                speechHighlight = speechHighlight,
                 articleScrollState = articleScrollState,
+                onUserScroll = ttsOnUserScroll,
                 onFeedTitleClick = onFeedTitleClick,
                 onOpenAudioPlayer = onOpenAudioPlayer,
                 onOpenInCustomTab = onOpenInCustomTab,
@@ -543,6 +575,7 @@ fun ArticleScreen(
                                 ) {
                                     val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
                                     val target = (articleScrollState.value - scrollAmount).coerceAtLeast(0)
+                                    ttsOnUserScroll()
                                     coroutineScope.launch {
                                         if (isAnimatedPaging) {
                                             articleScrollState.animateScrollTo(target)
@@ -564,6 +597,7 @@ fun ArticleScreen(
                                 ) {
                                     val scrollAmount = (articleScrollState.viewportSize * 0.9f).toInt()
                                     val target = (articleScrollState.value + scrollAmount).coerceAtMost(articleScrollState.maxValue)
+                                    ttsOnUserScroll()
                                     coroutineScope.launch {
                                         if (isAnimatedPaging) {
                                             articleScrollState.animateScrollTo(target)
@@ -650,6 +684,8 @@ fun ArticleContent(
     onMarkAsUnread: () -> Unit,
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
+    speechHighlight: SpeechHighlight? = null,
+    onUserScroll: (() -> Unit)? = null,
 ) {
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -703,7 +739,7 @@ fun ArticleContent(
         image = viewState.image,
         showHeaderImage = viewState.textToDisplay == TextToDisplay.CONTENT,
         contentImageUrls = contentImageUrls,
-        modifier = modifier,
+        modifier = if (onUserScroll != null) modifier.stopSpeechFollowingOnAccessibilityScroll(articleScrollState, onUserScroll) else modifier,
         articleScrollState = articleScrollState,
     ) { indexOffset ->
         var offsetCounter = indexOffset
@@ -727,8 +763,10 @@ fun ArticleContent(
                 TextToDisplay.CONTENT -> {
                     ColumnArticleContent(
                         articleContent = viewState.articleContent,
+                        speechHighlight = speechHighlight,
                         onLinkClick = { link, index ->
                             if (index != null && elementPositions.containsKey(index)) {
+                                onUserScroll?.invoke()
                                 // Anchor link - scroll to the element position
                                 val yPosition = elementPositions[index]
                                 if (yPosition != null) {

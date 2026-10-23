@@ -1,389 +1,538 @@
 package com.nononsenseapps.feeder.model
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.media.AudioFormat
 import android.os.Build
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextLanguage
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
+import androidx.core.content.ContextCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.nononsenseapps.feeder.R
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.Locale
+import java.util.UUID
 
-/**
- * Any callers must call #shutdown when shutting down
- */
+@Immutable
+data class ReadAloudProgress(
+    val articleId: Long? = null,
+    val text: String = "",
+    val positionMillis: Long = 0,
+    val durationMillis: Long = 0,
+    val preparationProgress: Float? = null,
+    val segment: SpeechSegment? = null,
+    val error: String? = null,
+    val generatedMillis: Long = 0,
+    val isDurationEstimated: Boolean = false,
+    val synthesisProgress: Float = 0f,
+    val focusRequestId: Long = 0,
+    val followSpokenText: Boolean = false,
+)
+
+/** Application facade; the foreground service owns the player and its lifetime. */
 class TTSStateHolder(
     val context: Context,
     val coroutineScope: CoroutineScope,
-) : TextToSpeech.OnInitListener {
-    private val mutex: Mutex = Mutex()
-    private var textToSpeech: TextToSpeech? = null
-    private val speechListener: UtteranceProgressListener by lazy {
-        object : UtteranceProgressListener() {
-            override fun onDone(utteranceId: String) {
-                textToSpeechQueue.removeFirstOrNull()
-                if (textToSpeechQueue.isEmpty()) {
-                    coroutineScope.launch {
-                        delay(100)
-                        if (textToSpeechQueue.isEmpty()) {
-                            // If still empty after the delay
-                            _ttsState.value = PlaybackStatus.STOPPED
-                        }
-                    }
-                } else {
-                    speakNext()
-                }
-            }
-
-            override fun onStart(utteranceId: String) {
-            }
-
-            override fun onError(
-                utteranceId: String?,
-                errorCode: Int,
-            ) {
-                Log.e(LOG_TAG, "onError utteranceId $utteranceId, errorCode $errorCode")
-
-                if (utteranceId != null) {
-                    textToSpeechQueue.removeFirstOrNull()
-                }
-            }
-
-            @Deprecated(
-                "Deprecated in super class",
-                replaceWith = ReplaceWith("onError(utteranceId, errorCode)"),
-            )
-            override fun onError(utteranceId: String) {
-                Log.e(LOG_TAG, "onError utteranceId $utteranceId")
-                textToSpeechQueue.removeFirstOrNull()
-            }
-        }
-    }
-    private val textToSpeechQueue = mutableListOf<CharSequence>()
-    private var queuedArticleId: Long? = null
-    private var initializedState: Int? = null
-    private var startJob: Job? = null
-
-    private var useDetectLanguage: Boolean = true
-
+) {
     private val _ttsState = MutableStateFlow(PlaybackStatus.STOPPED)
-    val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
-
-    @Suppress("ktlint:standard:property-naming")
+    val ttsState = _ttsState.asStateFlow()
+    private val _progress = MutableStateFlow(ReadAloudProgress())
+    val progress = _progress.asStateFlow()
     private val _language = MutableStateFlow<LocaleOverride>(AppSetting)
     val language: StateFlow<LocaleOverride> = _language.asStateFlow()
-
     private val _availableLanguages = MutableStateFlow<List<Locale>>(emptyList())
-    val availableLanguages: StateFlow<List<Locale>> = _availableLanguages.asStateFlow()
+    val availableLanguages = _availableLanguages.asStateFlow()
+    private var request: SpeechRequest? = null
+    private var player: ExoPlayer? = null
+    private var preparation: Job? = null
+    private var ticker: Job? = null
+    private var segments = emptyList<SpeechSegment>()
+    private var playWhenReady = true
+    private var cacheDirectory: File? = null
+    private var service: ReadAloudService? = null
+    private var pendingServiceStart = false
+    private var audioBuffer: SpeechAudioBuffer? = null
+    private var focusSequence = 0L
 
-    private var allAvailableLanguages: Set<Locale> = emptySet()
-
-    private fun speakNext() {
-        textToSpeechQueue.firstOrNull()?.let { text ->
-            val lang = _language.value
-            val localesToUse: Sequence<Locale> =
-                when (lang) {
-                    is ForcedAuto -> {
-                        context
-                            .detectLocaleFromText(text)
-                            .sortedByDescending { it.confidence }
-                            .map { it.locale }
-                            .plus(_availableLanguages.value)
-                    }
-
-                    is ForcedLocale -> {
-                        sequenceOf(
-                            lang.locale,
-                        )
-                    }
-
-                    else -> {
-                        // Use app setting
-                        if (useDetectLanguage) {
-                            context
-                                .detectLocaleFromText(text)
-                                .sortedByDescending { it.confidence }
-                                .map { it.locale }
-                                .plus(_availableLanguages.value)
-                        } else {
-                            // User has requested un-dynamic so for context locales first
-                            context
-                                .getLocales()
-                                .plus(_availableLanguages.value)
-                        }
-                    }
-                }
-
-            setFirstBestLocale(localesToUse)
-
-            textToSpeech?.speak(
-                text,
-                TextToSpeech.QUEUE_ADD,
-                null,
-                "0",
+    fun requestSpokenTextFocus(): Long? {
+        val current = _progress.value
+        val articleId = current.articleId ?: return null
+        _progress.value =
+            current.copy(
+                focusRequestId = ++focusSequence,
+                followSpokenText = true,
+                segment = current.segment ?: segments.lastOrNull { it.startMillis <= current.positionMillis },
             )
-        }
+        return articleId
     }
 
-    /**
-     * Resumes the paused queue when it already holds [articleId], so pressing play on the
-     * article being read continues it instead of re-reading it from the top. Returns false
-     * when the caller still has to build a queue.
-     */
-    fun resumeIfPausedOn(articleId: Long): Boolean {
-        if (_ttsState.value != PlaybackStatus.PAUSED || queuedArticleId != articleId) {
-            return false
-        }
-        play()
-        return true
+    fun stopFollowingSpokenText() {
+        _progress.value = _progress.value.copy(followSpokenText = false)
+    }
+
+    private val artwork by lazy {
+        runCatching {
+            val size = 256
+            val drawable = context.packageManager.getApplicationIcon(context.packageName)
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            drawable.setBounds(0, 0, size, size)
+            drawable.draw(Canvas(bitmap))
+            ByteArrayOutputStream().use { output ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
+                output.toByteArray()
+            }
+        }.getOrNull()
     }
 
     fun tts(
         textArray: List<AnnotatedString>,
         useDetectLanguage: Boolean,
         articleId: Long,
+        title: String = "",
+        author: String = "",
+        feedTitle: String = "",
     ) {
-        this.useDetectLanguage = useDetectLanguage
-        startJob?.cancel()
-        textToSpeech?.stop()
-        textToSpeechQueue.clear()
-        queuedArticleId = articleId
-        for (text in textArray) {
-            if (text.isBlank()) {
-                continue
+        val text = textArray.filterNot { it.isBlank() }.joinToString("\n\n") { it.text }
+        if (text.isBlank()) return
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            request = SpeechRequest(articleId, text, useDetectLanguage, title, author, feedTitle)
+            playWhenReady = true
+            _ttsState.value = PlaybackStatus.PLAYING
+            _progress.value = ReadAloudProgress(articleId = articleId, text = text, preparationProgress = 0f, followSpokenText = true, focusRequestId = ++focusSequence)
+            try {
+                pendingServiceStart = true
+                ContextCompat.startForegroundService(context, Intent(context, ReadAloudService::class.java).setAction(ReadAloudService.ACTION_PREPARE))
+            } catch (e: Exception) {
+                pendingServiceStart = false
+                fail(e)
             }
-            textToSpeechQueue.add(text)
         }
-        play()
     }
 
-    fun play() {
-        startJob?.cancel()
-        startJob =
-            coroutineScope.launch {
-                if (mutex.isLocked) {
-                    // Oops, I was double clicked
-                    return@launch
+    internal fun attach(
+        service: ReadAloudService,
+        player: ExoPlayer,
+    ) {
+        ticker?.cancel()
+        this.service = service
+        this.player = player
+        player.addListener(
+            object : Player.Listener {
+                override fun onPlayWhenReadyChanged(
+                    playWhenReady: Boolean,
+                    reason: Int,
+                ) {
+                    if (_progress.value.preparationProgress != null && request != null) {
+                        this@TTSStateHolder.playWhenReady = playWhenReady
+                        _ttsState.value = if (playWhenReady) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
+                    }
                 }
-                mutex.withLock {
-                    if (textToSpeech == null) {
-                        initializedState = null
-                        textToSpeech =
-                            TextToSpeech(
-                                context,
-                                this@TTSStateHolder,
-                            )
-                    }
-                    while (initializedState == null) {
-                        delay(100)
-                    }
-                    if (initializedState != TextToSpeech.SUCCESS) {
-                        withContext(Dispatchers.Main) {
-                            Toast
-                                .makeText(
-                                    context,
-                                    R.string.failed_to_load_text_to_speech,
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                        }
-                        return@launch
-                    }
-                    _ttsState.value = PlaybackStatus.PLAYING
 
-                    // Can only set this once engine has been initialized
-                    textToSpeech?.setOnUtteranceProgressListener(speechListener)
+                override fun onEvents(
+                    player: Player,
+                    events: Player.Events,
+                ) {
+                    if (_progress.value.preparationProgress == null && _progress.value.error == null && request != null) {
+                        _ttsState.value =
+                            if (player.playWhenReady && player.playbackState != Player.STATE_ENDED && player.playbackState != Player.STATE_IDLE) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
+                        updatePosition()
+                    }
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    fail(error)
+                }
+            },
+        )
+        ticker =
+            coroutineScope.launch(Dispatchers.Main.immediate) {
+                while (isActive) {
+                    updatePosition()
+                    delay(100)
+                }
+            }
+    }
+
+    internal fun prepare() {
+        // Only a user request through tts() may start or replace synthesis.
+        if (!pendingServiceStart) {
+            if (request == null) service?.stopSelf()
+            return
+        }
+        pendingServiceStart = false
+        val current =
+            request ?: run {
+                service?.stopSelf()
+                return
+            }
+        val previous = preparation
+        audioBuffer?.abort()
+        audioBuffer = null
+        previous?.cancel()
+        service?.setArticle(current.articleId)
+        player?.stop()
+        player?.clearMediaItems()
+        player?.playWhenReady = playWhenReady
+        segments = emptyList()
+        preparation =
+            coroutineScope.launch(Dispatchers.Main.immediate) {
+                try {
+                    previous?.join()
+                    // Each job owns a separate engine and directory so stale callbacks cannot
+                    // corrupt a replacement article or language-change request.
+                    val directory =
+                        withContext(Dispatchers.IO) {
+                            File(context.cacheDir, "read-aloud").apply { mkdirs() }.let { root ->
+                                root.listFiles()?.forEach { it.deleteRecursively() }
+                                File(root, UUID.randomUUID().toString()).apply { mkdirs() }
+                            }
+                        }
+                    cacheDirectory = directory
+                    val audio = File(directory, "article.wav")
+                    val timeline = withTimeout(5 * 60_000L) { synthesize(current, directory, audio) }
+                    if (request !== current) return@launch
+                    segments = timeline
+                    val duration = timeline.lastOrNull()?.endMillis ?: error("No speech audio")
+                    _progress.value = _progress.value.copy(durationMillis = duration, generatedMillis = duration, isDurationEstimated = false)
+                } catch (e: TimeoutCancellationException) {
+                    if (request === current) fail(e)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    if (request === current) fail(e)
+                }
+            }
+    }
+
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+    private fun startProgressivePlayback(
+        current: SpeechRequest,
+        buffer: SpeechAudioBuffer,
+    ) {
+        audioBuffer = buffer
+        val item =
+            MediaItem
+                .Builder()
+                .setMediaId(current.articleId.toString())
+                .setUri(android.net.Uri.fromFile(buffer.file))
+                .setMediaMetadata(
+                    MediaMetadata
+                        .Builder()
+                        .setTitle(current.title.ifBlank { context.getString(R.string.read_article) })
+                        .setArtist(current.author.ifBlank { current.feedTitle }.ifBlank { context.getString(R.string.app_name) })
+                        .setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER)
+                        .build(),
+                ).build()
+        _progress.value = _progress.value.copy(preparationProgress = null)
+        player?.apply {
+            setMediaSource(speechMediaSource(buffer, item))
+            prepare()
+            playWhenReady = this@TTSStateHolder.playWhenReady
+        }
+    }
+
+    private suspend fun synthesize(
+        current: SpeechRequest,
+        directory: File,
+        audio: File,
+    ): List<SpeechSegment> {
+        val initialized = CompletableDeferred<Int>()
+        val engine = TextToSpeech(context) { initialized.complete(it) }
+        try {
+            check(withTimeout(15_000) { initialized.await() } == TextToSpeech.SUCCESS) { "Speech engine initialization failed" }
+            val available = engine.availableLanguages.orEmpty().sortedBy { it.getDisplayName(it) }
+            _availableLanguages.value = available
+            val preferredLocale =
+                when (val selected = _language.value) {
+                    is ForcedLocale -> selected.locale
+                    else ->
+                        if (selected is ForcedAuto || current.detectLanguage) {
+                            detectSpeechLocale(current.text)
+                                ?: context.getLocales().firstOrNull() ?: Locale.getDefault()
+                        } else {
+                            context.getLocales().firstOrNull() ?: Locale.getDefault()
+                        }
+                }
+            val candidates =
+                if (_language.value is ForcedLocale) {
+                    sequenceOf(preferredLocale, Locale.forLanguageTag(preferredLocale.language))
+                } else {
+                    sequenceOf(preferredLocale).plus(context.getLocales()).plus(available)
+                }
+            val locale =
+                candidates.firstOrNull { engine.setLanguage(it) >= TextToSpeech.LANG_AVAILABLE }
+                    ?: error("Speech language is not available")
+            val parts = speechSegments(current.text, locale, minOf(TextToSpeech.getMaxSpeechInputLength(), 700), firstChunkMaxLength = 180)
+            return withContext(Dispatchers.IO) {
+                SpeechWaveFile(audio).use { wave ->
+                    var buffer: SpeechAudioBuffer? = null
+                    var finished = false
                     try {
-                        updateAvailableLanguages()
-                        speakNext()
-                    } catch (e: ConcurrentModificationException) {
-                        Log.e(LOG_TAG, "User probably double clicked play", e)
-                        // State will be weird. But mutex should prevent it happening
-                    }
-                }
-            }
-    }
+                        val timeline = mutableListOf<SpeechSegment>()
+                        for ((index, part) in parts.withIndex()) {
+                            val done = CompletableDeferred<Unit>()
+                            val id = UUID.randomUUID().toString()
+                            engine.setOnUtteranceProgressListener(
+                                object : UtteranceProgressListener() {
+                                    override fun onStart(utteranceId: String?) = Unit
 
-    fun pause() {
-        startJob?.cancel()
-        textToSpeech?.stop()
-        _ttsState.value = PlaybackStatus.PAUSED
-    }
+                                    override fun onDone(utteranceId: String?) {
+                                        if (utteranceId == id) done.complete(Unit)
+                                    }
 
-    fun stop() {
-        startJob?.cancel()
-        textToSpeech?.stop()
-        textToSpeechQueue.clear()
-        queuedArticleId = null
-        _ttsState.value = PlaybackStatus.STOPPED
-        textToSpeech = null
-    }
+                                    @Deprecated("Platform compatibility")
+                                    override fun onError(utteranceId: String?) {
+                                        if (utteranceId == id) done.completeExceptionally(IllegalStateException("Speech synthesis failed"))
+                                    }
 
-    fun skipNext() {
-        coroutineScope.launch {
-            startJob?.cancel()
-            textToSpeech?.stop()
-            startJob?.join()
-            textToSpeechQueue.removeFirstOrNull()
-            when (textToSpeechQueue.isEmpty()) {
-                true -> stop()
-                false -> play()
-            }
-        }
-    }
+                                    override fun onBeginSynthesis(
+                                        utteranceId: String?,
+                                        sampleRateInHz: Int,
+                                        audioFormat: Int,
+                                        channelCount: Int,
+                                    ) {
+                                        if (utteranceId != id || !done.isActive) return
+                                        try {
+                                            val bits =
+                                                when (audioFormat) {
+                                                    AudioFormat.ENCODING_PCM_8BIT -> 8
+                                                    AudioFormat.ENCODING_PCM_16BIT -> 16
+                                                    AudioFormat.ENCODING_PCM_FLOAT -> 32
+                                                    else -> error("Unsupported speech audio format")
+                                                }
+                                            wave.setFormat(sampleRateInHz, channelCount, bits, audioFormat == AudioFormat.ENCODING_PCM_FLOAT)
+                                        } catch (e: Exception) {
+                                            done.completeExceptionally(e)
+                                        }
+                                    }
 
-    fun setLanguage(lang: LocaleOverride) {
-        coroutineScope.launch {
-            startJob?.cancel()
-            textToSpeech?.stop()
-            startJob?.join()
-            _language.update { lang }
-            play()
-        }
-    }
-
-    override fun onInit(status: Int) {
-        initializedState = status
-
-        if (status != TextToSpeech.SUCCESS) {
-            Log.e(LOG_TAG, "Failed to load TextToSpeech object: $status")
-        }
-    }
-
-    fun updateAvailableLanguages() {
-        allAvailableLanguages = textToSpeech?.availableLanguages ?: emptySet()
-
-        val sortedLanguages =
-            context
-                .detectLocaleFromText(
-                    textToSpeechQueue.joinToString("\n\n"),
-                    minConfidence = 0f,
-                ).sortedByDescending { it.confidence }
-                .map { it.locale }
-                .plus(
-                    context
-                        .getLocales()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                ).plus(
-                    allAvailableLanguages
-                        .asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) },
-                ).distinctBy { it.toLanguageTag() }
-                .toList()
-
-        _availableLanguages.update {
-            sortedLanguages
-        }
-    }
-
-    fun setFirstBestLocale(localesToUse: Sequence<Locale>) {
-        val selectedLocale =
-            localesToUse
-                .firstOrNull { locale ->
-                    when (textToSpeech?.setLanguage(locale)) {
-                        TextToSpeech.SUCCESS -> {
-                            true
-                        }
-
-                        else -> {
-                            // In this case, try without region because the TTS engine lies about
-                            // what locales are available
-                            when (textToSpeech?.setLanguage(Locale.forLanguageTag(locale.language))) {
-                                TextToSpeech.SUCCESS -> {
-                                    true
-                                }
-
-                                else -> {
-                                    Log.e(LOG_TAG, "${locale.toLanguageTag()} is not supported")
-                                    false
+                                    override fun onAudioAvailable(
+                                        utteranceId: String?,
+                                        bytes: ByteArray?,
+                                    ) {
+                                        if (utteranceId != id || !done.isActive || bytes == null) return
+                                        try {
+                                            wave.append(bytes)
+                                        } catch (e: Exception) {
+                                            done.completeExceptionally(e)
+                                        }
+                                    }
+                                },
+                            )
+                            val start = wave.durationMillis()
+                            val temporary = File(directory, "segment.wav")
+                            try {
+                                check(engine.synthesizeToFile(current.text.substring(part.start, part.end), Bundle(), temporary, id) == TextToSpeech.SUCCESS)
+                                withTimeout(45_000) { done.await() }
+                            } finally {
+                                done.cancel()
+                                temporary.delete()
+                            }
+                            val end = wave.durationMillis()
+                            check(end > start) { "Speech engine produced no audio" }
+                            timeline += part.copy(startMillis = start, endMillis = end)
+                            val streaming = buffer ?: SpeechAudioBuffer(audio, wave.audioFormat()).also { buffer = it }
+                            streaming.publish(wave.sizeBytes(), finished = index == parts.lastIndex)
+                            withContext(Dispatchers.Main.immediate) {
+                                if (request === current) {
+                                    segments = timeline.toList()
+                                    val fraction = part.end.toDouble() / current.text.length
+                                    _progress.value =
+                                        _progress.value.copy(
+                                            durationMillis = (end / fraction).toLong().coerceAtLeast(end),
+                                            generatedMillis = end,
+                                            isDurationEstimated = index != parts.lastIndex,
+                                            synthesisProgress = fraction.toFloat(),
+                                        )
+                                    if (audioBuffer !== streaming) startProgressivePlayback(current, streaming)
                                 }
                             }
                         }
+                        wave.finish()
+                        finished = true
+                        timeline
+                    } finally {
+                        if (!finished) buffer?.abort()
                     }
                 }
-
-        if (selectedLocale == null) {
-            Log.e(LOG_TAG, "None of the locales were supported by text to speech")
+            }
+        } finally {
+            engine.stop()
+            engine.shutdown()
         }
     }
 
-    fun shutdown() {
-        textToSpeech?.shutdown()
+    private suspend fun detectSpeechLocale(text: String): Locale? =
+        try {
+            withContext(Dispatchers.Default) { context.detectLocaleFromText(text.take(4000)).firstOrNull()?.locale }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(LOG_TAG, "Language detection unavailable; using device languages", e)
+            null
+        }
+
+    fun resumeIfPausedOn(articleId: Long): Boolean {
+        if (_ttsState.value != PlaybackStatus.PAUSED || _progress.value.articleId != articleId) return false
+        play()
+        return true
     }
 
+    fun play() {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            playWhenReady = true
+            if (_progress.value.error != null) {
+                request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title, it.author, it.feedTitle) }
+            } else {
+                player?.let {
+                    if (it.playbackState == Player.STATE_ENDED) it.seekTo(0)
+                    if (it.playbackState == Player.STATE_IDLE && it.mediaItemCount > 0) it.prepare()
+                    it.play()
+                }
+                if (request != null) _ttsState.value = PlaybackStatus.PLAYING
+            }
+        }
+    }
+
+    fun pause() {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            playWhenReady = false
+            player?.pause()
+            if (request != null) _ttsState.value = PlaybackStatus.PAUSED
+        }
+    }
+
+    fun seekTo(positionMillis: Long) {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            if (_progress.value.preparationProgress == null) {
+                player?.seekTo(positionMillis.coerceIn(0, _progress.value.generatedMillis))
+                updatePosition()
+            }
+        }
+    }
+
+    fun skipNext() {
+        val position = _progress.value.positionMillis
+        seekTo(segments.firstOrNull { it.startMillis > position + 50 }?.startMillis ?: _progress.value.durationMillis)
+    }
+
+    fun setLanguage(lang: LocaleOverride) {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            _language.value = lang
+            request?.let { tts(listOf(AnnotatedString(it.text)), it.detectLanguage, it.articleId, it.title, it.author, it.feedTitle) }
+        }
+    }
+
+    fun stop() {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            val pending = preparation
+            audioBuffer?.abort()
+            audioBuffer = null
+            pending?.cancel()
+            pendingServiceStart = false
+            request = null
+            player?.stop()
+            player?.clearMediaItems()
+            _ttsState.value = PlaybackStatus.STOPPED
+            _progress.value = ReadAloudProgress()
+            segments = emptyList()
+            val directory = cacheDirectory
+            cacheDirectory = null
+            coroutineScope.launch(Dispatchers.IO) {
+                pending?.join()
+                directory?.deleteRecursively()
+                withContext(Dispatchers.Main.immediate) {
+                    if (preparation === pending) preparation = null
+                }
+            }
+            service?.stopForeground(android.app.Service.STOP_FOREGROUND_REMOVE)
+            service?.stopSelf()
+        }
+    }
+
+    private fun updatePosition() {
+        val player = player ?: return
+        if (_progress.value.preparationProgress != null || _progress.value.error != null || request == null) return
+        val position = player.currentPosition.coerceAtLeast(0)
+        _progress.value = _progress.value.copy(positionMillis = position, segment = segments.segmentAt(position))
+    }
+
+    private fun fail(error: Exception) {
+        if (request == null) return
+        preparation?.cancel()
+        audioBuffer?.abort()
+        Log.e(LOG_TAG, "Read-aloud failed", error)
+        player?.pause()
+        _ttsState.value = PlaybackStatus.PAUSED
+        _progress.value = _progress.value.copy(preparationProgress = null, error = context.getString(R.string.audio_playback_failed), segment = null)
+        service?.stopForeground(android.app.Service.STOP_FOREGROUND_REMOVE)
+    }
+
+    internal fun detach(owner: ReadAloudService) {
+        if (service !== owner) return
+        audioBuffer?.abort()
+        audioBuffer = null
+        ticker?.cancel()
+        val pending = preparation
+        pending?.cancel()
+        player = null
+        service = null
+        segments = emptyList()
+        // A new user request may already be starting a replacement service instance.
+        if (!pendingServiceStart) {
+            request = null
+            _ttsState.value = PlaybackStatus.STOPPED
+            _progress.value = ReadAloudProgress()
+        }
+        val directory = cacheDirectory
+        cacheDirectory = null
+        coroutineScope.launch(Dispatchers.IO) {
+            pending?.join()
+            directory?.deleteRecursively()
+        }
+    }
+
+    fun shutdown() = stop()
+
+    private data class SpeechRequest(
+        val articleId: Long,
+        val text: String,
+        val detectLanguage: Boolean,
+        val title: String,
+        val author: String,
+        val feedTitle: String,
+    )
+
     companion object {
-        private const val LOG_TAG = "FEEDER_TTS"
-        private val PUNCTUATION =
-            arrayOf(
-                // New-lines
-                "\n",
-                // Very useful: https://unicodelookup.com/
-                // Full stop
-                ".",
-                "։",
-                "۔",
-                "܁",
-                "܂",
-                "。",
-                "︒",
-                "﹒",
-                "．",
-                "｡",
-                // Question mark
-                "?",
-                ";",
-                "՞",
-                "؟",
-                "⁇",
-                "⁈",
-                "⁉",
-                "︖",
-                "﹖",
-                "？",
-                // Exclamation mark
-                "!",
-                "՜",
-                "‼",
-                "︕",
-                "﹗",
-                "！",
-                // Colon and semi-colon
-                ":",
-                ";",
-                "؛",
-                "︓",
-                "︔",
-                "﹔",
-                "﹕",
-                "：",
-                "；",
-                // Ellipsis
-                "...",
-                "…",
-                "⋯",
-                "⋮",
-                "︙",
-                // Dash
-                "—",
-                "〜",
-                "〰",
-            )
+        private const val LOG_TAG = "FEEDER_READ_ALOUD"
     }
 }
 

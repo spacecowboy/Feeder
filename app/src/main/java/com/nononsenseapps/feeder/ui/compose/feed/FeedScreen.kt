@@ -117,6 +117,7 @@ import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.localtranslation.BergamotModelDownloadProgress
 import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.model.ReadAloudProgress
 import com.nononsenseapps.feeder.model.export.exportSavedArticles
 import com.nononsenseapps.feeder.model.export.importSavedArticles
 import com.nononsenseapps.feeder.model.opml.exportOpml
@@ -159,6 +160,7 @@ import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.stripTrackingParameters
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -181,6 +183,7 @@ fun FeedScreen(
 ) {
     val toastMaker: ToastMaker by instance()
     val viewState: FeedScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val readAloudProgress = viewModel.readAloudProgress
     val translatedFeedCards by viewModel.translatedFeedCards.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
     val pagedNavDrawerItems = viewModel.pagedNavDrawerItems.collectAsLazyPagingItems()
@@ -317,6 +320,11 @@ fun FeedScreen(
             ttsOnStop = viewModel::ttsStop,
             ttsOnSkipNext = viewModel::ttsSkipNext,
             ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+            readAloudProgress = readAloudProgress,
+            ttsOnSeekTo = viewModel::ttsSeekTo,
+            ttsOnGoToSpokenText = {
+                viewModel.ttsFocusSpokenText()?.let { ArticleDestination.navigate(navController, it) }
+            },
             podcastOnPlay = viewModel::podcastPlay,
             podcastOnPause = viewModel::podcastPause,
             podcastOnStop = viewModel::podcastStop,
@@ -571,6 +579,9 @@ fun FeedScreen(
     translatedFeedCards: TranslatedFeedCards,
     onTranslateFeedCard: (FeedListItem) -> Unit,
     modifier: Modifier = Modifier,
+    readAloudProgress: StateFlow<ReadAloudProgress>? = null,
+    ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -602,6 +613,9 @@ fun FeedScreen(
         ttsOnStop = ttsOnStop,
         ttsOnSkipNext = ttsOnSkipNext,
         ttsOnSelectLanguage = ttsOnSelectLanguage,
+        readAloudProgress = readAloudProgress,
+        ttsOnSeekTo = ttsOnSeekTo,
+        ttsOnGoToSpokenText = ttsOnGoToSpokenText,
         podcastOnPlay = podcastOnPlay,
         podcastOnPause = podcastOnPause,
         podcastOnStop = podcastOnStop,
@@ -1135,6 +1149,9 @@ fun FeedScreen(
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable (RowScope.() -> Unit),
     modifier: Modifier = Modifier,
+    readAloudProgress: StateFlow<ReadAloudProgress>? = null,
+    ttsOnSeekTo: (Long) -> Unit = {},
+    ttsOnGoToSpokenText: () -> Unit = {},
     content: @Composable (Modifier) -> Unit,
 ) {
     var manuallyTriggeredRefresh by rememberSaveable {
@@ -1262,6 +1279,9 @@ fun FeedScreen(
                     onSkipNext = ttsOnSkipNext,
                     languages = ImmutableHolder(viewState.ttsLanguages),
                     onSelectLanguage = ttsOnSelectLanguage,
+                    progress = readAloudProgress,
+                    onSeekTo = ttsOnSeekTo,
+                    onGoToSpokenText = ttsOnGoToSpokenText,
                     floatingActionButton =
                         when (viewState.showFab) {
                             true -> floatingActionButton

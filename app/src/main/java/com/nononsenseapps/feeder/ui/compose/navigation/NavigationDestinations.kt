@@ -488,6 +488,7 @@ data object ArticleDestination : NavigationDestination(
             },
             viewModel = backStackEntry.diAwareViewModel(),
             mainActivityViewModel = mainActivityViewModel,
+            onNavigateToArticle = { ArticleDestination.navigate(navController, it) },
         )
     }
 }

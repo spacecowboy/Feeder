@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.icons.Icons
@@ -28,13 +30,18 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -100,6 +107,10 @@ import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.layouts.Table
 import com.nononsenseapps.feeder.ui.compose.layouts.TableCell
 import com.nononsenseapps.feeder.ui.compose.layouts.TableData
+import com.nononsenseapps.feeder.ui.compose.readaloud.LocalSpeechFocusTarget
+import com.nononsenseapps.feeder.ui.compose.readaloud.LocalSpeechHighlights
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlightIndex
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.text.WithTooltipIfNotBlank
 import com.nononsenseapps.feeder.ui.compose.text.asFontFamily
@@ -157,32 +168,47 @@ fun ColumnArticleContent(
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
     onElementPosition: (index: Int, yPosition: Float) -> Unit = { _, _ -> },
+    speechHighlight: SpeechHighlight? = null,
 ) {
-    articleContent.elements.forEachIndexed { index, element ->
-        ProvideTextStyle(
-            MaterialTheme.typography.bodyLarge.merge(
-                TextStyle(color = MaterialTheme.colorScheme.onBackground),
-            ),
-        ) {
-            BoxWithConstraints(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .onGloballyPositioned { coordinates ->
-                            onElementPosition(index, coordinates.positionInRoot().y)
-                        },
-                contentAlignment = Alignment.Center,
+    val speechIndex =
+        remember(articleContent, speechHighlight?.text) {
+            speechHighlight?.let { SpeechHighlightIndex(articleContent, it.text) }
+        }
+    val highlights =
+        remember(speechIndex, speechHighlight?.segment) {
+            speechHighlight?.let { speechIndex?.highlights(it.segment) } ?: emptyMap()
+        }
+    val focusTarget =
+        remember(speechIndex, speechHighlight) {
+            speechHighlight?.takeIf { it.followSpokenText }?.let { speechIndex?.focusTarget(it.segment, it.focusRequestId) }
+        }
+    CompositionLocalProvider(LocalSpeechHighlights provides highlights, LocalSpeechFocusTarget provides focusTarget) {
+        articleContent.elements.forEachIndexed { index, element ->
+            ProvideTextStyle(
+                MaterialTheme.typography.bodyLarge.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                ),
             ) {
-                LinearElementContent(
-                    linearElement = element,
-                    idToIndex = articleContent.idToIndex,
-                    allowHorizontalScroll = true,
-                    onLinkClick = onLinkClick,
+                BoxWithConstraints(
                     modifier =
                         Modifier
-                            .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
-                            .fillMaxWidth(),
-                )
+                            .fillMaxWidth()
+                            .onGloballyPositioned { coordinates ->
+                                onElementPosition(index, coordinates.positionInRoot().y)
+                            },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    LinearElementContent(
+                        linearElement = element,
+                        idToIndex = articleContent.idToIndex,
+                        allowHorizontalScroll = true,
+                        onLinkClick = onLinkClick,
+                        modifier =
+                            Modifier
+                                .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
+                                .fillMaxWidth(),
+                    )
+                }
             }
         }
     }
@@ -625,11 +651,51 @@ fun LinearTextContent(
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
-            val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val original = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val range = LocalSpeechHighlights.current[linearText]
+            val focusTarget = LocalSpeechFocusTarget.current?.takeIf { it.text === linearText }
+            val bringIntoView = remember { BringIntoViewRequester() }
+            var speechLines by remember { mutableStateOf<List<Pair<Int, Rect>>>(emptyList()) }
+            var focusedRequest by remember { mutableStateOf<Triple<Long, IntRange, Rect>?>(null) }
+            LaunchedEffect(focusTarget, speechLines) {
+                val target = focusTarget ?: return@LaunchedEffect
+                val bounds = (speechLines.firstOrNull { target.range.first < it.first } ?: speechLines.lastOrNull())?.second ?: return@LaunchedEffect
+                val request = Triple(target.requestId, target.range, bounds)
+                if (focusedRequest != request && original.isNotEmpty()) {
+                    bringIntoView.bringIntoView(bounds)
+                    focusedRequest = request
+                }
+            }
+            val highlightColor =
+                com.nononsenseapps.feeder.ui.compose.readaloud.speechHighlightColor(
+                    MaterialTheme.colorScheme.surface,
+                    MaterialTheme.colorScheme.onSurface,
+                    MaterialTheme.colorScheme.primary,
+                )
+            val annotatedString =
+                remember(original, range, highlightColor) {
+                    if (range == null) {
+                        original
+                    } else {
+                        AnnotatedString
+                            .Builder(original)
+                            .apply {
+                                addStyle(SpanStyle(background = highlightColor), range.first, (range.last + 1).coerceAtMost(original.length))
+                            }.toAnnotatedString()
+                    }
+                }
             val typographySettings = LocalTypographySettings.current
 
             Text(
                 text = annotatedString,
+                onTextLayout = { layout ->
+                    // Link listeners are recreated during composition. Retain geometry only,
+                    // so changing listener identities cannot trigger a layout feedback loop.
+                    speechLines =
+                        List(layout.lineCount) { line ->
+                            layout.getLineEnd(line) to Rect(0f, layout.getLineTop(line), layout.size.width.toFloat(), layout.getLineBottom(line))
+                        }
+                },
                 softWrap = softWrap,
                 textAlign =
                     if (typographySettings.justifyText) {
@@ -639,6 +705,7 @@ fun LinearTextContent(
                     },
                 modifier =
                     modifier
+                        .bringIntoViewRequester(bringIntoView)
                         .indication(interactionSource, LocalIndication.current)
                         .focusableInNonTouchMode(interactionSource = interactionSource),
             )

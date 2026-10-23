@@ -49,6 +49,7 @@ import com.nononsenseapps.feeder.openai.OpenAIApi
 import com.nononsenseapps.feeder.openai.canSummarize
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isLocalTranslation
+import com.nononsenseapps.feeder.ui.compose.readaloud.SpeechHighlight
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.ui.text.MarkdownToHtmlConverter
 import com.nononsenseapps.feeder.util.Either
@@ -61,6 +62,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -80,6 +82,21 @@ class ArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    val readAloudProgress = ttsStateHolder.progress
+    val speechHighlight =
+        readAloudProgress
+            .map { progress ->
+                progress.segment
+                    ?.takeIf { progress.articleId == itemId && progress.error == null }
+                    ?.let { SpeechHighlight(progress.text, it, progress.focusRequestId, progress.followSpokenText) }
+            }.distinctUntilChanged()
+
+    fun ttsSeekTo(positionMillis: Long) = ttsStateHolder.seekTo(positionMillis)
+
+    fun ttsFocusSpokenText(): Long? = ttsStateHolder.requestSpokenTextFocus()
+
+    fun ttsStopFollowing() = ttsStateHolder.stopFollowingSpokenText()
+
     private val podcastPlayerStateHolder: PodcastPlayerStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
@@ -531,6 +548,9 @@ class ArticleViewModel(
                     textArray = it,
                     useDetectLanguage = repository.useDetectLanguage.value,
                     articleId = itemId,
+                    title = viewState.value.articleTitle,
+                    author = viewState.value.author.orEmpty(),
+                    feedTitle = viewState.value.feedDisplayTitle,
                 )
             }
         }
