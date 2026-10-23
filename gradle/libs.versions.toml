@@ -52,7 +52,7 @@ emoji2 = "1.7.0"
 icu4j = "78.3"
 activity = "1.12.1"
 constraintlayout = "2.1.4"
-media3 = "1.9.4"
+media3 = "1.11.1"
 
 [libraries]
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
