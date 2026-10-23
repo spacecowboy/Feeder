@@ -1,6 +1,11 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
@@ -16,19 +21,26 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BookmarkAdded
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material.icons.outlined.Timelapse
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -73,15 +85,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import my.nanihadesuka.compose.ColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 import kotlin.math.roundToInt
-
-val dateTimeFormat: DateTimeFormatter =
-    DateTimeFormatter
-        .ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
-        .withLocale(Locale.getDefault())
 
 @Composable
 fun ReaderView(
@@ -92,6 +96,10 @@ fun ReaderView(
     enclosure: Enclosure,
     articleTitle: String,
     feedTitle: String,
+    saved: Boolean,
+    onSaveClick: () -> Unit,
+    isUnread: Boolean,
+    onMarkAsUnread: () -> Unit,
     authorDate: String?,
     image: ThumbnailImage?,
     showHeaderImage: Boolean,
@@ -129,7 +137,8 @@ fun ReaderView(
                                     ScreenType.SINGLE -> dimens.margin
                                 },
                             end = dimens.margin,
-                        ).focusGroup()
+                        )
+                        .focusGroup()
                         .safeSemantics {
                             testTag = "readerColumn"
                         },
@@ -187,7 +196,8 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clearAndSetSemantics {
                                                 contentDescription = feedTitle
-                                            }.clickable {
+                                            }
+                                            .clickable {
                                                 onFeedTitleClick()
                                             },
                                 )
@@ -208,6 +218,66 @@ fun ReaderView(
                                         )
                                     }
                                 }
+                            }
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.width(dimens.maxReaderWidth),
+                        ) {
+                            FilterChip(
+                                selected = saved,
+                                leadingIcon =
+                                    {
+                                        // Filter chip only animates between null and non-null values by itself so animate manually
+                                        AnimatedContent(
+                                            targetState = saved,
+                                            transitionSpec = { fadeIn() togetherWith fadeOut() },
+                                        ) { target ->
+                                            Icon(
+                                                imageVector =
+                                                    if (target) {
+                                                        Icons.Outlined.BookmarkAdded
+                                                    } else {
+                                                        Icons.Outlined.BookmarkBorder
+                                                    },
+                                                contentDescription = null,
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                            )
+                                        }
+                                    },
+                                onClick = onSaveClick,
+                                label = {
+                                    AnimatedContent(
+                                        targetState = saved,
+                                    ) { target ->
+                                        Text(
+                                            if (target) {
+                                                stringResource(R.string.saved_adjective)
+                                            } else {
+                                                stringResource(R.string.save_article)
+                                            },
+                                        )
+                                    }
+                                },
+                            )
+                            AnimatedVisibility(
+                                visible = !isUnread,
+                                exit = fadeOut(),
+                            ) {
+                                SuggestionChip(
+                                    icon =
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Outlined.VisibilityOff,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                            )
+                                        },
+                                    onClick = onMarkAsUnread,
+                                    label = {
+                                        Text(stringResource(R.string.mark_as_unread))
+                                    },
+                                )
                             }
                         }
                         if (readTimeSecs > 0) {
@@ -241,7 +311,8 @@ fun ReaderView(
                                                         .indication(
                                                             interactionSource,
                                                             LocalIndication.current,
-                                                        ).focusableInNonTouchMode(interactionSource = interactionSource),
+                                                        )
+                                                        .focusableInNonTouchMode(interactionSource = interactionSource),
                                             )
                                         }
                                     }
@@ -275,7 +346,8 @@ fun ReaderView(
                                             .width(dimens.maxReaderWidth)
                                             .clickable {
                                                 onEnclosureClick()
-                                            }.clearAndSetSemantics {
+                                            }
+                                            .clearAndSetSemantics {
                                                 try {
                                                     customActions =
                                                         listOf(
@@ -383,6 +455,10 @@ private fun ReaderPreview() {
                 enclosure = Enclosure(),
                 articleTitle = "Article title on top",
                 feedTitle = "Feed Title is here",
+                saved = true,
+                onSaveClick = {},
+                isUnread = false,
+                onMarkAsUnread = {},
                 authorDate = "2018-01-02",
                 image = MediaImage("https://cowboyprogrammer.org/images/2017/10/gimp_image_mode_index.png"),
                 showHeaderImage = true,

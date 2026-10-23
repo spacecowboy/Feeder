@@ -216,6 +216,7 @@ class ArticleViewModel(
                 showToolbarMenu = toolbarVisible,
                 feedDisplayTitle = article?.feedDisplayTitle ?: "",
                 isBookmarked = article?.bookmarked == true,
+                isUnread = article?.isUnread == true,
                 wordCount =
                     if (isFullText) {
                         article?.wordCountFull ?: 0
@@ -923,6 +924,7 @@ private data class ArticleState(
     override val showToolbarMenu: Boolean = false,
     override val feedDisplayTitle: String = "",
     override val isBookmarked: Boolean = false,
+    override val isUnread: Boolean = true,
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
     override val wordCount: Int = 0,
     override val image: ThumbnailImage? = null,
@@ -959,6 +961,7 @@ interface ArticleScreenViewState {
     val showToolbarMenu: Boolean
     val feedDisplayTitle: String
     val isBookmarked: Boolean
+    val isUnread: Boolean
     val keyHolder: ArticleItemKeyHolder
     val wordCount: Int
     val image: ThumbnailImage?

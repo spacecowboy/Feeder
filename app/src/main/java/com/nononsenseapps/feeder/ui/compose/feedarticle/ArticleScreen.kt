@@ -98,6 +98,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Date
 import java.util.TimeZone
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun ArticleScreen(
@@ -117,11 +118,10 @@ fun ArticleScreen(
     val isAnimatedPaging by mavm.isAnimatedPaging.collectAsStateWithLifecycle()
 
     val articleScrollState = rememberScrollState(initial = viewModel.scrollPosition)
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(articleScrollState) {
         snapshotFlow { articleScrollState.value }
-            .debounce(500)
+            .debounce(500.milliseconds)
             .collect { viewModel.saveScrollPosition(it) }
     }
 
@@ -519,6 +519,8 @@ fun ArticleScreen(
                 onFeedTitleClick = onFeedTitleClick,
                 onOpenAudioPlayer = onOpenAudioPlayer,
                 onOpenInCustomTab = onOpenInCustomTab,
+                onBookmark = onToggleBookmark,
+                onMarkAsUnread = onMarkAsUnread,
                 modifier =
                     Modifier
                         .focusGroup()
@@ -644,6 +646,8 @@ fun ArticleContent(
     onFeedTitleClick: () -> Unit,
     onOpenAudioPlayer: (url: String) -> Unit,
     onOpenInCustomTab: () -> Unit,
+    onBookmark: () -> Unit,
+    onMarkAsUnread: () -> Unit,
     articleScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
@@ -673,6 +677,10 @@ fun ArticleContent(
         enclosure = viewState.enclosure,
         articleTitle = viewState.articleTitle,
         feedTitle = viewState.feedDisplayTitle,
+        saved = viewState.isBookmarked,
+        onSaveClick = onBookmark,
+        isUnread = viewState.isUnread,
+        onMarkAsUnread = onMarkAsUnread,
         authorDate =
             when {
                 viewState.author == null && viewState.pubDate != null ->
@@ -684,7 +692,7 @@ fun ArticleContent(
                 viewState.author != null && viewState.pubDate != null ->
                     stringResource(
                         R.string.by_author_on_date,
-                        // Must wrap author in unicode marks to ensure it formats
+                        // Must wrap author in Unicode marks to ensure it formats
                         // correctly in RTL
                         context.unicodeWrap(viewState.author ?: ""),
                         formatArticleDate(context, viewState.pubDate),

@@ -977,6 +977,7 @@ data class Article(
     val wordCount: Int = item?.wordCount ?: 0
     val wordCountFull: Int = item?.wordCountFull ?: 0
     val image: ThumbnailImage? = item?.thumbnailImage
+    val isUnread: Boolean = item?.readTime == null
 }
 
 enum class TextToDisplay {
