@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">第 %1$d 行: 只使用前面 %2$d 条规则。忽略后面的行。</string>
     <string name="justify_article_text">对齐文章文本</string>
     <string name="justify_article_text_description">将文章段落与左右边缘对齐</string>
+    <string name="read_aloud_preparing">正在准备音频…</string>
+    <string name="read_aloud_position">朗读位置</string>
+    <string name="go_to_spoken_text">转到已朗读的文本</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">后退 10 秒</string>
+    <string name="skip_forward_10">前进 10 秒</string>
 </resources>
