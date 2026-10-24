@@ -1918,14 +1918,27 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
     // After recreation, LazyPagingItems first return 0 items, then the cached items.
     // This behavior/issue is resetting the LazyListState scroll position.
     // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
-    return when (itemCount) {
-        // Return a different LazyListState instance.
-        0 -> remember(this) { LazyListState(0, 0) }
-        // Return rememberLazyListState (normal case).
-        else ->
-            androidx.compose.foundation.lazy
-                .rememberLazyListState()
+    //
+    // The fallback is latched: it applies only until items have been seen once and is never
+    // returned afterwards. Testing `itemCount == 0` on every recomposition meant that any event
+    // which momentarily empties the page also swapped in a brand new LazyListState - a paging
+    // invalidation (a sync landing, an entry being marked read) reports zero items before the new
+    // page arrives. Replacing the state instance mid-refresh makes the list lay itself out from
+    // scratch, which reads as a flicker and a jump back to the top. Latching keeps the re-creation
+    // workaround while removing that churn.
+    val realState =
+        androidx.compose.foundation.lazy
+            .rememberLazyListState()
+    val emptyState = remember(this) { LazyListState(0, 0) }
+    // Deliberately not snapshot state: it is read during composition only to choose an instance,
+    // and must not itself trigger a recomposition.
+    val hasHadItems = remember(this) { AtomicBoolean(itemCount > 0) }
+
+    if (itemCount > 0) {
+        hasHadItems.set(true)
     }
+
+    return if (hasHadItems.get()) realState else emptyState
 }
 
 private const val REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ = 500L
