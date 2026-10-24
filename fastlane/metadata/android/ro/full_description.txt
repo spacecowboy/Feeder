@@ -18,4 +18,4 @@
 <li>Design Material</li>
 </ul>
 
-Jurnalul complet al modificărilor este disponibil pe GitHub la <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md"></a>.
+Jurnalul complet al modificărilor este disponibil <a href="https://github.com/spacecowboy/Feeder/blob/master/CHANGELOG.md">pe GitHub</a>.
