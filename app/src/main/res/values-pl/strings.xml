@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Wiersz %1$d: tylko pierwsze %2$d reguł(y) są (jest) stosowane (stosowanych). Kolejne wiersze są ignorowane</string>
     <string name="justify_article_text">Justuj tekst artykułów</string>
     <string name="justify_article_text_description">Wyrównuj akapity artykułów zarówno do lewej, jak i prawej krawędzi</string>
+    <string name="read_aloud_preparing">Przygotowywanie dźwięku…</string>
+    <string name="read_aloud_position">Pozycja do czytania na głos</string>
+    <string name="go_to_spoken_text">Przejdź do tekstu mówionego</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Cofnij o 10 sekund</string>
+    <string name="skip_forward_10">Przewiń do przodu o 10 sekund</string>
 </resources>
