@@ -403,4 +403,10 @@
     <string name="article_rules_placeholder">Title=(?i)sponsored</string>
     <string name="justify_article_text">Joonda artikli tekst rööpselt</string>
     <string name="justify_article_text_description">Joonda artikli lõigud sirge joonega nii paremalt kui vasakult</string>
+    <string name="read_aloud_preparing">Valmistan heliriba ette…</string>
+    <string name="read_aloud_position">Ettelugemise järg</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="go_to_spoken_text">Ettelugemine</string>
+    <string name="skip_back_10">10 sekundit tagasi</string>
+    <string name="skip_forward_10">10 sekundit edasi</string>
 </resources>
