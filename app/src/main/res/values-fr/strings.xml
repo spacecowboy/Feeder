@@ -403,4 +403,10 @@
     <string name="article_filter_rules_desc">Une ligne par règle, écrite sous la forme Champs=Pattern. Les champs disponibles sont Title, URL, Author, Tag et Content. Le pattern est une expression régulière qui cherche n\'importe où dans le champs ; commencez par (?i) pour ignorer la casse. Les règles prennent effets à la prochaine récupération des articles et n\'affecte pas les articles déjà sauvegardés.</string>
     <string name="justify_article_text_description">Aligner les paragraphes d\'article aux bords gauche et droite</string>
     <string name="justify_article_text">Justification du texte des articles</string>
+    <string name="read_aloud_preparing">Préparation de l\'audio…</string>
+    <string name="read_aloud_position">Position de la lecture audio</string>
+    <string name="go_to_spoken_text">Aller au texte lu</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Saut arrière de 10 secondes</string>
+    <string name="skip_forward_10">Saut avant de 10 secondes</string>
 </resources>
