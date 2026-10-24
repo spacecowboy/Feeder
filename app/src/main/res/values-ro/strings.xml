@@ -20,8 +20,8 @@
     <string name="no_email_client">Nu s-a putut deschide clientul de e-mail</string>
     <string name="send_bug_report">Trimiteți un raport de eroare</string>
     <string name="sort">Sortează după</string>
-    <string name="sort_oldest_first">Ce este mai vechi mai întâi</string>
-    <string name="sort_newest_first">Ce este mai nou mai întâi</string>
+    <string name="sort_oldest_first">Ce este vechi mai întâi</string>
+    <string name="sort_newest_first">Ce este nou mai întâi</string>
     <string name="theme">Tema</string>
     <string name="theme_night">Noapte</string>
     <string name="theme_day">Zi</string>
@@ -125,9 +125,9 @@
     <string name="expanded_tag">Etichetă deschisă</string>
     <string name="stop_reading">Nu mai citiți</string>
     <string name="open_enclosed_media_file">Deschideți %1$s</string>
-    <string name="feed_item_style_super_compact">Super compactă</string>
-    <string name="feed_item_style_compact">Compactă</string>
-    <string name="feed_item_style_card">Cartelă</string>
+    <string name="feed_item_style_super_compact">Foarte compact</string>
+    <string name="feed_item_style_compact">Compact</string>
+    <string name="feed_item_style_card">Card</string>
     <string name="feed_item_style">Stilul articolului</string>
     <string name="dark_theme_preference">Tema întunecată preferată</string>
     <string name="dark_theme_preference_black">Negru</string>
@@ -248,7 +248,7 @@
     <string name="skip_duplicate_articles">Treceți peste articolele duplicate</string>
     <string name="touch_to_play_audio">Atingeți pentru a reda fișierul audio</string>
     <string name="skip_duplicate_articles_desc">Articolele cu linkuri sau titluri identice cu cele ale articolelor existente sunt ignorate</string>
-    <string name="feed_item_style_compact_card">Cartelă compactă</string>
+    <string name="feed_item_style_compact_card">Card compact</string>
     <string name="time_out">Timp de așteptare (secunde)</string>
     <string name="time_out_validation_error">Timpul de așteptare trebuie să fie cuprins între 30 și 600 de secunde</string>
     <string name="time_out_placeholder">Timp de așteptare pentru solicitările de AI</string>
@@ -261,7 +261,7 @@
     <string name="show_title_unread_count">Afișați numărul de articole necitite în titlu</string>
     <string name="unable_to_load_models">Nu se pot încărca modelele.</string>
     <string name="no_models_were_found">Nu s-au găsit modele</string>
-    <string name="azure_deployment_id">ID-ul implementării Azure</string>
+    <string name="azure_deployment_id">id-ul implementării Azure</string>
     <string name="list_of_available_models">Lista modelelor disponibile</string>
     <string name="show_message">Afișați mesajul</string>
     <string name="open_drawer_on_fab">Afișați fluxurile după ce le-ați marcat pe toate ca fiind citite</string>
@@ -341,11 +341,11 @@
     <string name="device_sync_beta_warning">ATENȚIE! Aceasta este o funcție în versiune beta. Înainte de a continua, exportați toate fluxurile în format OPML și salvați-le ca o copie de rezervă.</string>
     <string name="enter_api_key_before_saving">Introduceți o cheie API înainte să salvați.</string>
     <string name="enter_deepl_api_key_before_saving">Introduceți o cheie API DeepL înainte să salvați.</string>
-    <string name="enter_model_id_before_saving">Introduceți ID-ul unui model înainte să salvați.</string>
+    <string name="enter_model_id_before_saving">Introduceți id-ul unui model înainte să salvați.</string>
     <string name="verifying_api_settings">Se verifică setările API-ului…</string>
     <string name="api_settings_could_not_be_verified">Setările API-ului nu au putut fi verificate.</string>
     <string name="enter_azure_endpoint_before_saving">Introduceți adresa Azure înainte să salvați.</string>
-    <string name="enter_azure_deployment_id_before_saving">Introduceți ID-ul implementării dumeavoastră Azure înainte să salvați.</string>
+    <string name="enter_azure_deployment_id_before_saving">Introduceți id-ul implementării dumeavoastră Azure înainte să salvați.</string>
     <string name="enter_azure_api_version_before_saving">Introduceți versiunea API-ului dumneavoastră Azure înainte să salvați.</string>
     <string name="verifying_azure_openai_settings">Se verifică setările Azure OpenAI…</string>
     <string name="azure_openai_settings_could_not_be_verified">Setările Azure OpenAI nu au putut fi verificate.</string>
@@ -401,4 +401,12 @@
     <string name="cancel">Anulați</string>
     <string name="widget_refreshing">Actualizare</string>
     <string name="force_single_column">Forțați afișarea într-o singură coloană</string>
+    <string name="read_aloud_preparing">Se pregătește fișierul audio…</string>
+    <string name="read_aloud_position">Poziția de citire cu voce tare</string>
+    <string name="go_to_spoken_text">Navigați la textul vorbit</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Înapoi cu 10 secunde</string>
+    <string name="skip_forward_10">Înainte cu 10 secunde</string>
+    <string name="justify_article_text">Aliniere text articol</string>
+    <string name="justify_article_text_description">Aliniați paragrafele articolului cu ambele margini din stânga și din dreapta</string>
 </resources>

@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">%1$d. sor: Csak az első %2$d szabály van használatban. A további sorokat a rendszer figyelmen kívül hagyja.</string>
     <string name="justify_article_text">Cikk szövegének igazítása</string>
     <string name="justify_article_text_description">A cikk bekezdéseit igazítja a képernyő bal és jobb széléhez</string>
+    <string name="read_aloud_preparing">Hang előkészítése…</string>
+    <string name="read_aloud_position">Hangos felolvasás pozíciója</string>
+    <string name="go_to_spoken_text">Ugrás a felolvasott szövegre</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Visszatekerés 10 másodpercet</string>
+    <string name="skip_forward_10">Előretekerés 10 másodpercet</string>
 </resources>

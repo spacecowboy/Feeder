@@ -401,4 +401,6 @@
     <string name="rule_error_empty_pattern">Рядок %1$d: шаблон порожній, тому він відповідатиме всьому. Недійсні рядки ігноруються.</string>
     <string name="rule_error_invalid_regex">Рядок %1$d: некоректний регулярний вираз. Недійсні рядки ігноруються.</string>
     <string name="rule_error_too_many_rules">Рядок %1$d: використовуються лише перші %2$d правил. Наступні рядки ігноруються.</string>
+    <string name="justify_article_text">Вирівняти текст за шириною</string>
+    <string name="justify_article_text_description">Вирівнює абзаци статті за лівим і правим краями</string>
 </resources>

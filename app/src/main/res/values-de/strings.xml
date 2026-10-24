@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Zeile %1$d: Es werden nur die ersten %2$d Regeln angewendet. Nachfolgende Zeilen werden ignoriert.</string>
     <string name="justify_article_text">Artikeltext ausrichten</string>
     <string name="justify_article_text_description">Artikelabsätze sowohl am linken als auch am rechten Rand ausrichten</string>
+    <string name="read_aloud_preparing">Audio wird vorbereitet …</string>
+    <string name="read_aloud_position">Vorleseposition</string>
+    <string name="go_to_spoken_text">Zum gesprochenen Text gehen</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">10 Sekunden zurück</string>
+    <string name="skip_forward_10">10 Sekunden vor</string>
 </resources>
