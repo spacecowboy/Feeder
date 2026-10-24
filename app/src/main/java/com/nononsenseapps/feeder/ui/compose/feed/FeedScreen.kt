@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -1572,14 +1573,17 @@ fun FeedListContent(
                         },
                         modifier =
                             Modifier
-                                .then(
-                                    // Disable item animations during refresh to prevent scroll position issues
-                                    if (!viewState.currentlySyncing) {
-                                        Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
-                                    } else {
-                                        Modifier
-                                    },
-                                ).safeSemantics {
+                                // Deliberately not animateItem(). The list is not an animated
+                                // list: entries appear and disappear when the database says so
+                                // (opening an article, a sync landing, a filter changing), and
+                                // those transitions are not worth the cost here. Every frame
+                                // spent driving N item animations competes with the scroll
+                                // itself, and the animator places and clips each entry
+                                // separately - which is exactly how an entry and its separator
+                                // end up on different offsets. Weighting everything towards
+                                // scrolling being exact and cheap is the more responsive
+                                // behavior on a feed list of thousands of rows.
+                                .safeSemantics {
                                     collectionItemInfo =
                                         CollectionItemInfo(
                                             rowIndex = itemIndex,
@@ -1612,21 +1616,28 @@ fun FeedListContent(
                         swipeEnabled = !listState.isScrollInProgress,
                     )
 
+                    // Emitted inside the entry's own item, so the list positions it from the same
+                    // measurement that positions the row above it and the two cannot drift apart.
+                    //
+                    // A filled Box rather than HorizontalDivider: the divider draws through a Canvas
+                    // whose colour comes from DividerTokens, which resolved to nothing visible on this
+                    // surface. A background modifier has no token and no Canvas, so what is drawn is
+                    // exactly the colour written here.
                     if (viewState.feedItemStyle != FeedItemStyle.CARD &&
-                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD
+                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD &&
+                        itemIndex < pagedFeedItems.itemCount - 1
                     ) {
-                        if (itemIndex < pagedFeedItems.itemCount - 1) {
-                            HorizontalDivider(
-                                modifier =
-                                    Modifier
-                                        .height(1.dp)
-                                        .fillMaxWidth(),
-                            )
-                        }
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outlineVariant),
+                        )
                     }
                 }
                 /*
-                This item is provide padding for the FAB
+                This item is providing padding for the FAB
                  */
                 if (viewState.showFab && !viewState.isBottomBarVisible) {
                     item(
