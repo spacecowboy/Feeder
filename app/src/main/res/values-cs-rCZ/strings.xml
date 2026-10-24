@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Řádek %1$d: je použito pouze prvních %2$d pravidel. Další řádky jsou ignorovány.</string>
     <string name="justify_article_text">Zarovat text článku do bloku</string>
     <string name="justify_article_text_description">Zarovnat odstavce článku podél levého i pravého okraje</string>
+    <string name="read_aloud_preparing">Příprava zvuku…</string>
+    <string name="read_aloud_position">Pozice čtení nahlas</string>
+    <string name="go_to_spoken_text">Přejít na mluvený text</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Zpět o 10 sekund</string>
+    <string name="skip_forward_10">Vpřed o 10 sekund</string>
 </resources>
