@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -1572,14 +1573,17 @@ fun FeedListContent(
                         },
                         modifier =
                             Modifier
-                                .then(
-                                    // Disable item animations during refresh to prevent scroll position issues
-                                    if (!viewState.currentlySyncing) {
-                                        Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
-                                    } else {
-                                        Modifier
-                                    },
-                                ).safeSemantics {
+                                // Deliberately not animateItem(). The list is not an animated
+                                // list: entries appear and disappear when the database says so
+                                // (opening an article, a sync landing, a filter changing), and
+                                // those transitions are not worth the cost here. Every frame
+                                // spent driving N item animations competes with the scroll
+                                // itself, and the animator places and clips each entry
+                                // separately - which is exactly how an entry and its separator
+                                // end up on different offsets. Weighting everything towards
+                                // scrolling being exact and cheap is the more responsive
+                                // behavior on a feed list of thousands of rows.
+                                .safeSemantics {
                                     collectionItemInfo =
                                         CollectionItemInfo(
                                             rowIndex = itemIndex,
@@ -1612,21 +1616,28 @@ fun FeedListContent(
                         swipeEnabled = !listState.isScrollInProgress,
                     )
 
+                    // Emitted inside the entry's own item, so the list positions it from the same
+                    // measurement that positions the row above it and the two cannot drift apart.
+                    //
+                    // A filled Box rather than HorizontalDivider: the divider draws through a Canvas
+                    // whose colour comes from DividerTokens, which resolved to nothing visible on this
+                    // surface. A background modifier has no token and no Canvas, so what is drawn is
+                    // exactly the colour written here.
                     if (viewState.feedItemStyle != FeedItemStyle.CARD &&
-                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD
+                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD &&
+                        itemIndex < pagedFeedItems.itemCount - 1
                     ) {
-                        if (itemIndex < pagedFeedItems.itemCount - 1) {
-                            HorizontalDivider(
-                                modifier =
-                                    Modifier
-                                        .height(1.dp)
-                                        .fillMaxWidth(),
-                            )
-                        }
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outlineVariant),
+                        )
                     }
                 }
                 /*
-                This item is provide padding for the FAB
+                This item is providing padding for the FAB
                  */
                 if (viewState.showFab && !viewState.isBottomBarVisible) {
                     item(
@@ -1907,14 +1918,27 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
     // After recreation, LazyPagingItems first return 0 items, then the cached items.
     // This behavior/issue is resetting the LazyListState scroll position.
     // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
-    return when (itemCount) {
-        // Return a different LazyListState instance.
-        0 -> remember(this) { LazyListState(0, 0) }
-        // Return rememberLazyListState (normal case).
-        else ->
-            androidx.compose.foundation.lazy
-                .rememberLazyListState()
+    //
+    // The fallback is latched: it applies only until items have been seen once and is never
+    // returned afterwards. Testing `itemCount == 0` on every recomposition meant that any event
+    // which momentarily empties the page also swapped in a brand new LazyListState - a paging
+    // invalidation (a sync landing, an entry being marked read) reports zero items before the new
+    // page arrives. Replacing the state instance mid-refresh makes the list lay itself out from
+    // scratch, which reads as a flicker and a jump back to the top. Latching keeps the re-creation
+    // workaround while removing that churn.
+    val realState =
+        androidx.compose.foundation.lazy
+            .rememberLazyListState()
+    val emptyState = remember(this) { LazyListState(0, 0) }
+    // Deliberately not snapshot state: it is read during composition only to choose an instance,
+    // and must not itself trigger a recomposition.
+    val hasHadItems = remember(this) { AtomicBoolean(itemCount > 0) }
+
+    if (itemCount > 0) {
+        hasHadItems.set(true)
     }
+
+    return if (hasHadItems.get()) realState else emptyState
 }
 
 private const val REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ = 500L
