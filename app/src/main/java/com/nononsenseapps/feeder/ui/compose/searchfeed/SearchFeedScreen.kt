@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.searchfeed
 
-import android.Manifest
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
 import android.util.Log
@@ -176,7 +175,7 @@ fun SearchFeedView(
     var pendingSearchUrl by rememberSaveable { mutableStateOf("") }
     val localNetworkPermission =
         rememberApiPermissionState(
-            permission = Manifest.permission.ACCESS_LOCAL_NETWORK,
+            permission = "android.permission.ACCESS_LOCAL_NETWORK",
             minimumApiLevel = 37,
             onPermissionResult = {
                 permissionRequestInFlight = false
