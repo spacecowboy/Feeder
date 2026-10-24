@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -35,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
@@ -65,6 +65,22 @@ import kotlin.math.roundToInt
 private const val LOG_TAG = "FEEDER_SWIPEITEM"
 
 /**
+ * Corner radius for a dense row. Small on purpose: enough to take the hard edge off a row without
+ * turning it into a card. Applied via clip on the item root so it also rounds the swipe background
+ * revealed behind the row.
+ */
+private val ROW_CORNER_RADIUS = 5.dp
+
+/**
+ * Corner radius for the first row only.
+ *
+ * Deliberately well clear of [ROW_CORNER_RADIUS] rather than a small increment: at a few dp the
+ * difference between rows is not perceptible, so the first row reads as the top of the run only if
+ * the contrast is obvious.
+ */
+private val FIRST_ROW_CORNER_RADIUS = 15.dp
+
+/**
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
  * called multiple times by several DisposableEffects.
  */
@@ -90,6 +106,8 @@ fun SwipeableFeedItemPreview(
     onOpenFeedItemInBrowser: () -> Unit,
     modifier: Modifier = Modifier,
     swipeEnabled: Boolean = true,
+    /** Whether this is the first entry in the list. Dense styles give it a little more roundness. */
+    isFirst: Boolean = false,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -169,7 +187,21 @@ fun SwipeableFeedItemPreview(
                 .clip(
                     shape =
                         when (feedItemStyle) {
-                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> RectangleShape
+                            // The first row is visibly rounder than the run below it, but only on
+                            // its top corners. Its bottom edge meets the next row, so rounding it
+                            // there would lift the row out of the run and leave a notch against the
+                            // entry underneath.
+                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT ->
+                                if (isFirst) {
+                                    RoundedCornerShape(
+                                        topStart = FIRST_ROW_CORNER_RADIUS,
+                                        topEnd = FIRST_ROW_CORNER_RADIUS,
+                                        bottomStart = ROW_CORNER_RADIUS,
+                                        bottomEnd = ROW_CORNER_RADIUS,
+                                    )
+                                } else {
+                                    RoundedCornerShape(ROW_CORNER_RADIUS)
+                                }
                             else -> MaterialTheme.shapes.medium
                         },
                 ).combinedClickable(

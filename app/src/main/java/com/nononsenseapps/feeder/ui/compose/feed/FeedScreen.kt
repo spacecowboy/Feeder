@@ -1425,8 +1425,9 @@ fun FeedListContent(
             when (viewState.feedItemStyle) {
                 FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.margin)
                 FeedItemStyle.COMPACT_CARD -> Arrangement.spacedBy(LocalDimens.current.margin)
-                FeedItemStyle.COMPACT -> Arrangement.spacedBy(0.dp)
-                FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(0.dp)
+                // Dense styles are separated by a hairline of background rather than a drawn rule.
+                FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT ->
+                    Arrangement.spacedBy(COMPACT_ROW_GAP)
             }
 
         AnimatedVisibility(
@@ -1438,22 +1439,7 @@ fun FeedListContent(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = arrangement,
-                contentPadding =
-                    if (viewState.isBottomBarVisible) {
-                        PaddingValues(0.dp)
-                    } else {
-                        WindowInsets.navigationBars
-                            .only(
-                                WindowInsetsSides.Bottom,
-                            ).run {
-                                when (viewState.feedItemStyle) {
-                                    FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                                    FeedItemStyle.COMPACT_CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                                    // No margin since dividers
-                                    FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> this
-                                }
-                            }.asPaddingValues()
-                    },
+                contentPadding = feedListContentPadding(viewState.isBottomBarVisible),
                 modifier =
                     Modifier
                         .fillMaxSize()
@@ -1610,20 +1596,8 @@ fun FeedListContent(
                                     }
                                 },
                         swipeEnabled = !listState.isScrollInProgress,
+                        isFirst = itemIndex == 0,
                     )
-
-                    if (viewState.feedItemStyle != FeedItemStyle.CARD &&
-                        viewState.feedItemStyle != FeedItemStyle.COMPACT_CARD
-                    ) {
-                        if (itemIndex < pagedFeedItems.itemCount - 1) {
-                            HorizontalDivider(
-                                modifier =
-                                    Modifier
-                                        .height(1.dp)
-                                        .fillMaxWidth(),
-                            )
-                        }
-                    }
                 }
                 /*
                 This item is provide padding for the FAB
@@ -1918,6 +1892,47 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
 }
 
 private const val REQUIRED_VISIBLE_TIME_FOR_MARK_AS_READ = 500L
+
+/**
+ * The gap between dense entries.
+ */
+private val COMPACT_ROW_GAP = 2.dp
+
+/**
+ * Padding around the feed list.
+ *
+ * Rows are inset on both sides so the rounded corners have background to sit
+ * against. The scroll range stays edge to edge - only the rows are inset - so the list does not
+ * feel narrower than the screen.
+ *
+ * Slightly narrower than the page margin the rest of the app uses: the inset only needs to be
+ * enough to show the row's rounded corners against the list background, and taking the full
+ * margin costs a noticeable amount of text width.
+ */
+@Composable
+private fun feedListContentPadding(bottomBarVisible: Boolean): PaddingValues {
+    val inset = LocalDimens.current.margin * ROW_INSET_RATIO
+    return PaddingValues(
+        start = inset,
+        end = inset,
+        bottom =
+            if (bottomBarVisible) {
+                0.dp
+            } else {
+                WindowInsets.navigationBars
+                    .only(WindowInsetsSides.Bottom)
+                    .asPaddingValues()
+                    .calculateBottomPadding()
+            },
+    )
+}
+
+/**
+ * How much of the page margin the row inset uses. Below 1 so the side margins are a little
+ * tighter than the rest of the app, which buys back text width while still leaving room for the
+ * rounded corners to read.
+ */
+private const val ROW_INSET_RATIO = 0.5f
 
 private val PLACEHOLDER_ITEM =
     FeedListItem(
