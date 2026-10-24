@@ -17,6 +17,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.util.Consumer
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +36,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.TextSettingsDestination
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
+import com.nononsenseapps.feeder.util.isLanLocalAddress
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
@@ -43,6 +45,7 @@ class MainActivity : DIAwareComponentActivity() {
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
     private val repository: Repository by instance()
     private val preferences: SharedPreferences by instance()
+    private var localNetworkMigrationStarted = false
     private val localNetworkPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
@@ -68,6 +71,7 @@ class MainActivity : DIAwareComponentActivity() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
         maybeRequestSync()
+        maybeRequestLocalNetworkPermissionForExistingFeeds()
     }
 
     override fun onKeyDown(
@@ -118,11 +122,30 @@ class MainActivity : DIAwareComponentActivity() {
                 AppContent()
             }
         }
+    }
 
-        if (Build.VERSION.SDK_INT >= 37 &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_LOCAL_NETWORK) != PackageManager.PERMISSION_GRANTED &&
-            !preferences.getBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, false)
+    private fun maybeRequestLocalNetworkPermissionForExistingFeeds() {
+        if (localNetworkMigrationStarted ||
+            Build.VERSION.SDK_INT < 37 ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_LOCAL_NETWORK) == PackageManager.PERMISSION_GRANTED ||
+            preferences.getBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, false)
         ) {
+            return
+        }
+        localNetworkMigrationStarted = true
+        lifecycleScope.launch {
+            if (preferences.getBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, false)) {
+                return@launch
+            }
+            val hasLocalFeed = repository.getFeedsOrderedByUrl().any { it.url.isLanLocalAddress() }
+            if (!hasLocalFeed) {
+                preferences.edit { putBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, true) }
+                return@launch
+            }
+            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                localNetworkMigrationStarted = false
+                return@launch
+            }
             // Persist before launching so denial and activity recreation do not prompt again.
             preferences.edit { putBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, true) }
             localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)

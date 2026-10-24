@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.searchfeed
 
+import android.Manifest
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
 import android.util.Log
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,6 +65,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeedParserError
 import com.nononsenseapps.feeder.model.FetchError
@@ -88,16 +92,20 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSizeMetrics
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
+import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
+import com.nononsenseapps.feeder.util.isLanLocalAddress
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.Locale
 
 private const val LOG_TAG = "FEEDER_SEARCH"
 
@@ -151,6 +159,7 @@ fun SearchFeedScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SearchFeedView(
     screenType: ScreenType,
@@ -160,6 +169,42 @@ fun SearchFeedView(
     initialFeedUrl: String = "",
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var permissionRequestInFlight by remember { mutableStateOf(false) }
+    // Saved so a search queued behind the dialog survives activity recreation
+    var permissionResults by rememberSaveable { mutableIntStateOf(0) }
+    var handledPermissionResults by rememberSaveable { mutableIntStateOf(0) }
+    var pendingSearchUrl by rememberSaveable { mutableStateOf("") }
+    val localNetworkPermission =
+        rememberApiPermissionState(
+            permission = Manifest.permission.ACCESS_LOCAL_NETWORK,
+            minimumApiLevel = 37,
+            onPermissionResult = {
+                permissionRequestInFlight = false
+                permissionResults++
+            },
+        )
+    var requestedLanHost by rememberSaveable { mutableStateOf("") }
+
+    // Returns true while a permission dialog is showing, so a search can wait for its result
+    fun maybeRequestLocalNetworkPermission(
+        url: URL,
+        force: Boolean = false,
+    ): Boolean {
+        if (localNetworkPermission.status is PermissionStatus.Granted || !url.isLanLocalAddress()) {
+            return false
+        }
+        if (permissionRequestInFlight) {
+            return true
+        }
+        val host = url.host?.lowercase(Locale.ROOT).orEmpty()
+        if (host.isEmpty() || (!force && host == requestedLanHost)) {
+            return false
+        }
+        requestedLanHost = host
+        permissionRequestInFlight = true
+        localNetworkPermission.launchPermissionRequest()
+        return true
+    }
 
     var feedUrl by rememberSaveable {
         mutableStateOf(initialFeedUrl)
@@ -199,10 +244,51 @@ fun SearchFeedView(
     }
     var currentSearchJob by remember { mutableStateOf<Job?>(null) }
 
+    LaunchedEffect(feedUrl) {
+        delay(300)
+        maybeRequestLocalNetworkPermission(sloppyLinkToStrictURLNoThrows(feedUrl))
+    }
+
+    fun startSearch(url: URL) {
+        currentSearchJob?.cancel()
+        val job =
+            coroutineScope.launch {
+                searchFeedViewModel
+                    .searchForFeeds(url)
+                    .collect { result ->
+                        result
+                            .onLeft { e ->
+                                errors = errors + e
+                            }.onRight { r ->
+                                results = results + r
+                            }
+                    }
+            }
+        job.invokeOnCompletion {
+            if (currentSearchJob == job) {
+                currentlySearching = false
+            }
+        }
+        currentSearchJob = job
+    }
+
+    LaunchedEffect(permissionResults) {
+        if (permissionResults == handledPermissionResults) {
+            return@LaunchedEffect
+        }
+        handledPermissionResults = permissionResults
+        val url = pendingSearchUrl
+        if (url.isNotEmpty()) {
+            pendingSearchUrl = ""
+            startSearch(sloppyLinkToStrictURLNoThrows(url))
+        }
+    }
+
     SearchFeedView(
         screenType = screenType,
         onUrlChange = { newUrl ->
             feedUrl = newUrl
+            pendingSearchUrl = ""
             currentSearchJob?.cancel()
             currentSearchJob = null
             currentlySearching = false
@@ -214,25 +300,14 @@ fun SearchFeedView(
             errors = emptyList()
             currentlySearching = true
             currentSearchJob?.cancel()
-            val job =
-                coroutineScope.launch {
-                    searchFeedViewModel
-                        .searchForFeeds(url)
-                        .collect { result ->
-                            result
-                                .onLeft { e ->
-                                    errors = errors + e
-                                }.onRight { r ->
-                                    results = results + r
-                                }
-                        }
-                }
-            job.invokeOnCompletion {
-                if (currentSearchJob == job) {
-                    currentlySearching = false
-                }
+            currentSearchJob = null
+            if (maybeRequestLocalNetworkPermission(url, force = true)) {
+                // Search once the dialog is answered, so the first attempt does not race it
+                pendingSearchUrl = url.toString()
+            } else {
+                pendingSearchUrl = ""
+                startSearch(url)
             }
-            currentSearchJob = job
         },
         results = StableHolder(results),
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),

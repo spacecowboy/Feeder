@@ -47,6 +47,28 @@ class LinkUtilsKtTest {
     }
 
     @Test
+    fun lanLocalAddressMatchesPrivateIpsAndLanHostsOnly() {
+        assertTrue(URL("http://192.168.1.20/feed").isLanLocalAddress())
+        assertTrue(URL("http://10.1.2.3/a").isLanLocalAddress())
+        assertTrue(URL("http://172.16.0.1/").isLanLocalAddress())
+        assertTrue(URL("http://172.31.255.255/").isLanLocalAddress())
+        assertTrue(URL("http://127.0.0.1/").isLanLocalAddress())
+        assertTrue(URL("http://169.254.1.1/").isLanLocalAddress())
+        assertTrue(URL("http://100.64.1.2/").isLanLocalAddress())
+        assertTrue(URL("http://[fd12:3456::1]/x").isLanLocalAddress())
+        assertTrue(URL("http://[fe80::1]/feed").isLanLocalAddress())
+        assertTrue(URL("http://localhost:1313/feed").isLanLocalAddress())
+        assertTrue(URL("https://nas.local/rss").isLanLocalAddress())
+        assertTrue(URL("http://router.lan/feed.xml").isLanLocalAddress())
+        assertTrue(URL("http://homeassistant.home/rss").isLanLocalAddress())
+        assertFalse(URL("https://example.com/feed").isLanLocalAddress())
+        assertFalse(URL("http://8.8.8.8/").isLanLocalAddress())
+        assertFalse(URL("http://172.32.0.1/").isLanLocalAddress())
+        assertFalse(URL("http://100.128.0.1/").isLanLocalAddress())
+        assertFalse(URL("http://[2001:db8::1]/").isLanLocalAddress())
+    }
+
+    @Test
     fun testSloppyToStrictAddsRespectsUnknownProtocols() {
         assertFails {
             sloppyLinkToStrictURL("gemini://google.com")

@@ -1,9 +1,11 @@
 package com.nononsenseapps.feeder.util
 
+import java.net.InetAddress
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
+import java.util.Locale
 
 /**
  * Ensures a url is valid, having a scheme and everything. It turns 'google.com' into 'http://google.com' for example.
@@ -40,6 +42,47 @@ fun sloppyLinkToStrictURLOrNull(url: String): URL? =
     } catch (_: MalformedURLException) {
         null
     }
+
+private val LAN_HOST_SUFFIXES =
+    arrayOf(".local", ".localhost", ".localdomain", ".home.arpa", ".lan", ".home", ".internal")
+
+fun URL.isLanLocalAddress(): Boolean {
+    val host =
+        host
+            ?.lowercase(Locale.ROOT)
+            ?.removePrefix("[")
+            ?.removeSuffix("]")
+            ?.substringBefore('%')
+            ?.trim('.')
+            .orEmpty()
+    if (host.isEmpty()) {
+        return false
+    }
+    if (host == "localhost" || LAN_HOST_SUFFIXES.any { host.endsWith(it) }) {
+        return true
+    }
+    if (!host.isNumericIpLiteral()) {
+        return false
+    }
+    val address = runCatching { InetAddress.getByName(host) }.getOrNull() ?: return false
+    if (address.isLoopbackAddress || address.isLinkLocalAddress || address.isSiteLocalAddress) {
+        return true
+    }
+    val bytes = address.address
+    return when (bytes.size) {
+        4 -> (bytes[0].toInt() and 0xff) == 100 && (bytes[1].toInt() and 0xff) in 64..127
+        16 -> (bytes[0].toInt() and 0xfe) == 0xfc
+        else -> false
+    }
+}
+
+private fun String.isNumericIpLiteral(): Boolean {
+    val octets = split('.')
+    if (octets.size == 4 && octets.all { octet -> octet.toIntOrNull() in 0..255 }) {
+        return true
+    }
+    return contains(':') && all { char -> char.isDigit() || char in 'a'..'f' || char == ':' || char == '.' }
+}
 
 fun urlHasNoAuthParams(url: URL): Boolean = url.userInfo == null || url.userInfo.isEmpty()
 
