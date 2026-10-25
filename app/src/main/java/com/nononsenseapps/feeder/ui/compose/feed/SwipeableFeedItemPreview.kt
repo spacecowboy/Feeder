@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -36,6 +37,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
@@ -79,6 +84,27 @@ private val ROW_CORNER_RADIUS = 5.dp
  * the contrast is obvious.
  */
 private val FIRST_ROW_CORNER_RADIUS = 15.dp
+
+/** Single source of the row outline, applied once to the item root. */
+@Composable
+private fun itemShape(
+    feedItemStyle: FeedItemStyle,
+    isFirst: Boolean,
+): Shape =
+    when (feedItemStyle) {
+        FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT ->
+            if (isFirst) {
+                RoundedCornerShape(
+                    topStart = FIRST_ROW_CORNER_RADIUS,
+                    topEnd = FIRST_ROW_CORNER_RADIUS,
+                    bottomStart = ROW_CORNER_RADIUS,
+                    bottomEnd = ROW_CORNER_RADIUS,
+                )
+            } else {
+                RoundedCornerShape(ROW_CORNER_RADIUS)
+            }
+        else -> MaterialTheme.shapes.medium
+    }
 
 /**
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
@@ -184,27 +210,8 @@ fun SwipeableFeedItemPreview(
         modifier =
             modifier
                 .width(dimens.maxContentWidth)
-                .clip(
-                    shape =
-                        when (feedItemStyle) {
-                            // The first row is visibly rounder than the run below it, but only on
-                            // its top corners. Its bottom edge meets the next row, so rounding it
-                            // there would lift the row out of the run and leave a notch against the
-                            // entry underneath.
-                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT ->
-                                if (isFirst) {
-                                    RoundedCornerShape(
-                                        topStart = FIRST_ROW_CORNER_RADIUS,
-                                        topEnd = FIRST_ROW_CORNER_RADIUS,
-                                        bottomStart = ROW_CORNER_RADIUS,
-                                        bottomEnd = ROW_CORNER_RADIUS,
-                                    )
-                                } else {
-                                    RoundedCornerShape(ROW_CORNER_RADIUS)
-                                }
-                            else -> MaterialTheme.shapes.medium
-                        },
-                ).combinedClickable(
+                .clip(itemShape(feedItemStyle, isFirst))
+                .combinedClickable(
                     onLongClick = {
                         dropDownMenuExpanded = true
                     },
@@ -284,25 +291,22 @@ fun SwipeableFeedItemPreview(
             label = "alphaAnimation",
         )
 
-        Box(
-            contentAlignment = swipeIconAlignment,
-            modifier =
-                Modifier
-                    .matchParentSize()
-                    .graphicsLayer {
-                        this.alpha = alpha
-                    }.drawBehind {
-                        drawRect(color = color)
-                    }.padding(horizontal = 24.dp),
-        ) {
-            Icon(
-                when (item.unread) {
-                    true -> Icons.Default.VisibilityOff
-                    false -> Icons.Default.Visibility
-                },
-                contentDescription = null,
-            )
-        }
+        // Dense rows need the colour trimmed to the strip they vacate; card styles keep it full-bleed.
+        val trimToVacatedStrip =
+            feedItemStyle == FeedItemStyle.COMPACT || feedItemStyle == FeedItemStyle.SUPER_COMPACT
+
+        SwipeBackground(
+            color = color,
+            trimToVacatedStrip = trimToVacatedStrip,
+            swipeOffset = { anchoredDraggableState.offset },
+        )
+        SwipeAction(
+            iconAlpha = alpha,
+            iconAlignment = swipeIconAlignment,
+            unread = item.unread,
+            trimToVacatedStrip = trimToVacatedStrip,
+            swipeOffset = { anchoredDraggableState.offset },
+        )
 
         val compactLandscape = isCompactLandscape()
 
@@ -491,6 +495,99 @@ fun SwipeableFeedItemPreview(
                 }
             }
         }
+    }
+}
+
+/**
+ * Extent of the strip a row has vacated, given its drag [offset].
+ *
+ * Positive slides the row right, uncovering the left end; negative uncovers the right. Empty at rest,
+ * which also covers the unresolved-anchor case where the offset reads NaN.
+ */
+private fun revealedStrip(
+    offset: Float,
+    width: Float,
+): ClosedFloatingPointRange<Float> =
+    when {
+        offset.isNaN() || offset == 0f -> 0f..0f
+        offset > 0f -> 0f..offset.coerceAtMost(width)
+        else -> (width + offset).coerceAtLeast(0f)..width
+    }
+
+/**
+ * Colour revealed behind a row as it is swiped away.
+ *
+ * Square by design: the item root already clips to [itemShape], so drawing a rounded outline here
+ * too would put two antialiased edges a subpixel apart.
+ *
+ * With [trimToVacatedStrip] the colour is kept out from under the row. A clip antialiases each draw
+ * inside it rather than the flattened result, so colour painted beneath the row still tints
+ * partially-covered corner pixels - which is what leaves a hairline tracing the corner arcs.
+ */
+@Composable
+private fun BoxScope.SwipeBackground(
+    color: Color,
+    trimToVacatedStrip: Boolean,
+    swipeOffset: () -> Float,
+) {
+    Box(
+        modifier =
+            Modifier
+                .matchParentSize()
+                .drawBehind {
+                    if (!trimToVacatedStrip) {
+                        drawRect(color = color, size = size)
+                        return@drawBehind
+                    }
+
+                    val strip = revealedStrip(swipeOffset(), size.width)
+                    if (!strip.isEmpty()) {
+                        clipRect(left = strip.start, top = 0f, right = strip.endInclusive, bottom = size.height) {
+                            drawRect(color = color, size = size)
+                        }
+                    }
+                },
+    )
+}
+
+/** Read/unread action icon revealed alongside the swipe background. */
+@Composable
+private fun BoxScope.SwipeAction(
+    iconAlpha: Float,
+    iconAlignment: Alignment,
+    unread: Boolean,
+    trimToVacatedStrip: Boolean,
+    swipeOffset: () -> Float,
+) {
+    Box(
+        contentAlignment = iconAlignment,
+        modifier =
+            Modifier
+                .matchParentSize()
+                .graphicsLayer {
+                    alpha = iconAlpha
+                }.drawWithContent {
+                    // Same reason as [SwipeBackground]: keep the icon out from under the row.
+                    if (!trimToVacatedStrip) {
+                        drawContent()
+                        return@drawWithContent
+                    }
+
+                    val strip = revealedStrip(swipeOffset(), size.width)
+                    if (!strip.isEmpty()) {
+                        clipRect(left = strip.start, top = 0f, right = strip.endInclusive, bottom = size.height) {
+                            this@drawWithContent.drawContent()
+                        }
+                    }
+                }.padding(horizontal = 24.dp),
+    ) {
+        Icon(
+            when (unread) {
+                true -> Icons.Default.VisibilityOff
+                false -> Icons.Default.Visibility
+            },
+            contentDescription = null,
+        )
     }
 }
 
