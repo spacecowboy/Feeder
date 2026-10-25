@@ -37,6 +37,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.TextSettingsDestination
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import com.nononsenseapps.feeder.util.isLanLocalAddress
+import com.nononsenseapps.feeder.util.resolvesToLanLocalAddress
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
@@ -137,7 +138,11 @@ class MainActivity : DIAwareComponentActivity() {
             if (preferences.getBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, false)) {
                 return@launch
             }
-            val hasLocalFeed = repository.getFeedsOrderedByUrl().any { it.url.isLanLocalAddress() }
+            val feedUrls = repository.getFeedsOrderedByUrl().map { it.url }
+            // Literal LAN hosts first, so the DNS lookups only run when none of those match
+            val hasLocalFeed =
+                feedUrls.any { it.isLanLocalAddress() } ||
+                    feedUrls.distinctBy { it.host }.any { it.resolvesToLanLocalAddress() }
             if (!hasLocalFeed) {
                 preferences.edit { putBoolean(KEY_LOCAL_NETWORK_PERMISSION_REQUESTED, true) }
                 return@launch

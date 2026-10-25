@@ -1,5 +1,9 @@
 package com.nononsenseapps.feeder.util
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetAddress
 import java.net.MalformedURLException
 import java.net.URI
@@ -46,15 +50,23 @@ fun sloppyLinkToStrictURLOrNull(url: String): URL? =
 private val LAN_HOST_SUFFIXES =
     arrayOf(".local", ".localhost", ".localdomain", ".home.arpa", ".lan", ".home", ".internal")
 
+private const val LAN_DNS_TIMEOUT_MS = 2_000L
+
+private fun URL.normalizedHost(): String =
+    host
+        ?.lowercase(Locale.ROOT)
+        ?.removePrefix("[")
+        ?.removeSuffix("]")
+        ?.substringBefore('%')
+        ?.trim('.')
+        .orEmpty()
+
+/**
+ * True when the URL names a LAN-local host without a DNS lookup: localhost, a LAN suffix such as
+ * .local or .lan, or a private, link-local, loopback or CGNAT IP literal.
+ */
 fun URL.isLanLocalAddress(): Boolean {
-    val host =
-        host
-            ?.lowercase(Locale.ROOT)
-            ?.removePrefix("[")
-            ?.removeSuffix("]")
-            ?.substringBefore('%')
-            ?.trim('.')
-            .orEmpty()
+    val host = normalizedHost()
     if (host.isEmpty()) {
         return false
     }
@@ -65,10 +77,33 @@ fun URL.isLanLocalAddress(): Boolean {
         return false
     }
     val address = runCatching { InetAddress.getByName(host) }.getOrNull() ?: return false
-    if (address.isLoopbackAddress || address.isLinkLocalAddress || address.isSiteLocalAddress) {
+    return address.isLanLocal()
+}
+
+/**
+ * Like [isLanLocalAddress], but also resolves a hostname and is true when any of its addresses is
+ * LAN-local, so a bare name like `nas` or a DNS name pointing at a private address is caught.
+ * A lookup that fails or takes longer than two seconds counts as not local.
+ */
+suspend fun URL.resolvesToLanLocalAddress(resolve: (String) -> Array<InetAddress> = InetAddress::getAllByName): Boolean {
+    if (isLanLocalAddress()) {
         return true
     }
-    val bytes = address.address
+    val host = normalizedHost()
+    if (host.isEmpty() || host.isNumericIpLiteral()) {
+        return false
+    }
+    // Detached so a resolver stuck past the timeout does not hold up the caller
+    val lookup = CoroutineScope(Dispatchers.IO).async { runCatching { resolve(host) }.getOrNull() }
+    val addresses = withTimeoutOrNull(LAN_DNS_TIMEOUT_MS) { lookup.await() } ?: return false
+    return addresses.any { it.isLanLocal() }
+}
+
+private fun InetAddress.isLanLocal(): Boolean {
+    if (isLoopbackAddress || isLinkLocalAddress || isSiteLocalAddress) {
+        return true
+    }
+    val bytes = address
     return when (bytes.size) {
         4 -> (bytes[0].toInt() and 0xff) == 100 && (bytes[1].toInt() and 0xff) in 64..127
         16 -> (bytes[0].toInt() and 0xfe) == 0xfc

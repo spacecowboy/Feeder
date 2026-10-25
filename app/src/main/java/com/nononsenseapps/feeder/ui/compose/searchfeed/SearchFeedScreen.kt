@@ -93,7 +93,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
-import com.nononsenseapps.feeder.util.isLanLocalAddress
+import com.nononsenseapps.feeder.util.resolvesToLanLocalAddress
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -184,20 +184,28 @@ fun SearchFeedView(
         )
     var requestedLanHost by rememberSaveable { mutableStateOf("") }
 
-    // Returns true while a permission dialog is showing, so a search can wait for its result
-    fun maybeRequestLocalNetworkPermission(
+    // Returns true while a permission dialog is showing, so a search can wait for its result.
+    // Hostnames are resolved, so a name that points at a LAN address is caught too.
+    suspend fun maybeRequestLocalNetworkPermission(
         url: URL,
         force: Boolean = false,
     ): Boolean {
-        if (localNetworkPermission.status is PermissionStatus.Granted || !url.isLanLocalAddress()) {
+        if (localNetworkPermission.status is PermissionStatus.Granted) {
+            return false
+        }
+        val host = url.host?.lowercase(Locale.ROOT).orEmpty()
+        if (host.isEmpty() || (!permissionRequestInFlight && !force && host == requestedLanHost)) {
+            return false
+        }
+        if (!url.resolvesToLanLocalAddress()) {
+            return false
+        }
+        // The lookup can suspend, so check again before showing the dialog
+        if (localNetworkPermission.status is PermissionStatus.Granted) {
             return false
         }
         if (permissionRequestInFlight) {
             return true
-        }
-        val host = url.host?.lowercase(Locale.ROOT).orEmpty()
-        if (host.isEmpty() || (!force && host == requestedLanHost)) {
-            return false
         }
         requestedLanHost = host
         permissionRequestInFlight = true
@@ -242,6 +250,7 @@ fun SearchFeedView(
             }
     }
     var currentSearchJob by remember { mutableStateOf<Job?>(null) }
+    var permissionCheckJob by remember { mutableStateOf<Job?>(null) }
 
     LaunchedEffect(feedUrl) {
         delay(300)
@@ -288,6 +297,8 @@ fun SearchFeedView(
         onUrlChange = { newUrl ->
             feedUrl = newUrl
             pendingSearchUrl = ""
+            permissionCheckJob?.cancel()
+            permissionCheckJob = null
             currentSearchJob?.cancel()
             currentSearchJob = null
             currentlySearching = false
@@ -300,13 +311,17 @@ fun SearchFeedView(
             currentlySearching = true
             currentSearchJob?.cancel()
             currentSearchJob = null
-            if (maybeRequestLocalNetworkPermission(url, force = true)) {
-                // Search once the dialog is answered, so the first attempt does not race it
-                pendingSearchUrl = url.toString()
-            } else {
-                pendingSearchUrl = ""
-                startSearch(url)
-            }
+            permissionCheckJob?.cancel()
+            permissionCheckJob =
+                coroutineScope.launch {
+                    if (maybeRequestLocalNetworkPermission(url, force = true)) {
+                        // Search once the dialog is answered, so the first attempt does not race it
+                        pendingSearchUrl = url.toString()
+                    } else {
+                        pendingSearchUrl = ""
+                        startSearch(url)
+                    }
+                }
         },
         results = StableHolder(results),
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
