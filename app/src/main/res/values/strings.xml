@@ -424,4 +424,12 @@
   <string name="widget_title">Feeder</string>
   <string name="widget_refreshing">Refreshing</string>
   <string name="force_single_column">Force single column</string>
+  <string name="view_image">View image</string>
+  <string name="open_image_link">Open link</string>
+  <string name="image_zoom_in">Zoom in</string>
+  <string name="image_zoom_out">Zoom out</string>
+  <string name="image_reset_zoom">Reset zoom</string>
+  <string name="image_load_failed">Could not load image</string>
+  <string name="image_retry">Retry</string>
+  <string name="image_close">Close image</string>
 </resources>
