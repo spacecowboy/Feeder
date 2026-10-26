@@ -130,12 +130,7 @@ class FeedParserTest : DIAware {
 
                 val item = feed.getOrNull()?.items!!.first()
 
-                val expected =
-                    ImageFromHTML(
-                        url = "https://bucket.index.hr/b/index/8614caa6-f80f-4ee3-9f9a-abd0588407a1.png",
-                        width = 700,
-                        height = 350,
-                    )
+                val expected = ImageFromHTML(url = "https://bucket.index.hr/b/index/8614caa6-f80f-4ee3-9f9a-abd0588407a1.png")
 
                 assertEquals(
                     expected,
