@@ -119,6 +119,34 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun indexHrHasThumbnails() {
+        runBlocking {
+            readResource("rss_index_hr.xml") {
+                val feed =
+                    feedParser.parseFeedResponse(
+                        URL("https://www.index.hr/rss"),
+                        it,
+                    )
+
+                val item = feed.getOrNull()?.items!!.first()
+
+                val expected =
+                    ImageFromHTML(
+                        url = "https://bucket.index.hr/b/index/8614caa6-f80f-4ee3-9f9a-abd0588407a1.png",
+                        width = 700,
+                        height = 350,
+                    )
+
+                assertEquals(
+                    expected,
+                    item.image,
+                    "Thumbnail image was unexpected",
+                )
+            }
+        }
+    }
+
+    @Test
     fun dcCreatorEndsUpAsAuthor() =
         runBlocking {
             readResource("openstreetmap.xml") {
