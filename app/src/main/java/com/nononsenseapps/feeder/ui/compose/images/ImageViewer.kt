@@ -70,24 +70,40 @@ fun rememberImageViewer(
             onDismissRequest = { showChoice = false },
             title = { Text(stringResource(R.string.article_image)) },
             confirmButton = {
-                TextButton(onClick = {
-                    showChoice = false
-                    showViewer = true
-                }) { Text(stringResource(R.string.view_image)) }
+                TextButton(
+                    onClick = {
+                        showChoice = false
+                        showViewer = true
+                    },
+                ) {
+                    Text(stringResource(R.string.view_image))
+                }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showChoice = false
-                    onOpenLink?.invoke()
-                }) { Text(stringResource(R.string.open_image_link)) }
+                TextButton(
+                    onClick = {
+                        showChoice = false
+                        onOpenLink?.invoke()
+                    },
+                ) {
+                    Text(stringResource(R.string.open_image_link))
+                }
             },
         )
     }
     if (showViewer) {
-        ImageViewer(imageUrl, description, onDismiss = { showViewer = false })
+        ImageViewer(
+            imageUrl = imageUrl,
+            description = description,
+            onDismiss = { showViewer = false },
+        )
     }
     return {
-        if (onOpenLink == null) showViewer = true else showChoice = true
+        if (onOpenLink == null) {
+            showViewer = true
+        } else {
+            showChoice = true
+        }
     }
 }
 
@@ -117,11 +133,22 @@ internal fun ImageViewer(
         }
 
     fun zoom(factor: Float) {
-        transform = transform.transformed(factor, Offset.Zero, Offset(viewport.width / 2, viewport.height / 2), viewport, imageSize)
+        transform =
+            transform.transformed(
+                zoom = factor,
+                pan = Offset.Zero,
+                centroid = Offset(viewport.width / 2, viewport.height / 2),
+                viewport = viewport,
+                image = imageSize,
+            )
     }
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false,
+            ),
     ) {
         Scaffold(
             topBar = {
@@ -129,21 +156,49 @@ internal fun ImageViewer(
                     title = { Text(stringResource(R.string.article_image)) },
                     navigationIcon = {
                         IconButton(onClick = onDismiss) {
-                            Icon(Icons.Outlined.Close, stringResource(R.string.image_close))
+                            Icon(
+                                Icons.Outlined.Close,
+                                contentDescription = stringResource(R.string.image_close),
+                            )
                         }
                     },
                 )
             },
             bottomBar = {
-                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(8.dp)) {
-                    IconButton(onClick = { zoom(0.5f) }, enabled = imageSize != Size.Zero && transform.scale > 1f) {
-                        Icon(Icons.Outlined.ZoomOut, stringResource(R.string.image_zoom_out))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                            .padding(8.dp),
+                ) {
+                    IconButton(
+                        onClick = { zoom(0.5f) },
+                        enabled = imageSize != Size.Zero && transform.scale > 1f,
+                    ) {
+                        Icon(
+                            Icons.Outlined.ZoomOut,
+                            contentDescription = stringResource(R.string.image_zoom_out),
+                        )
                     }
-                    IconButton(onClick = { transform = ImageTransform() }, enabled = imageSize != Size.Zero) {
-                        Icon(Icons.Outlined.RestartAlt, stringResource(R.string.image_reset_zoom))
+                    IconButton(
+                        onClick = { transform = ImageTransform() },
+                        enabled = imageSize != Size.Zero,
+                    ) {
+                        Icon(
+                            Icons.Outlined.RestartAlt,
+                            contentDescription = stringResource(R.string.image_reset_zoom),
+                        )
                     }
-                    IconButton(onClick = { zoom(2f) }, enabled = imageSize != Size.Zero && transform.scale < 8f) {
-                        Icon(Icons.Outlined.ZoomIn, stringResource(R.string.image_zoom_in))
+                    IconButton(
+                        onClick = { zoom(2f) },
+                        enabled = imageSize != Size.Zero && transform.scale < 8f,
+                    ) {
+                        Icon(
+                            Icons.Outlined.ZoomIn,
+                            contentDescription = stringResource(R.string.image_zoom_in),
+                        )
                     }
                 }
             },
@@ -157,21 +212,44 @@ internal fun ImageViewer(
                         .clipToBounds()
                         .onSizeChanged {
                             viewport = Size(it.width.toFloat(), it.height.toFloat())
-                            transform = transform.transformed(1f, Offset.Zero, Offset.Zero, viewport, imageSize)
-                        }.semantics { stateDescription = "${(transform.scale * 100).toInt()}%" }
-                        .pointerInput(imageUrl, viewport, imageSize) {
+                            transform =
+                                transform.transformed(
+                                    zoom = 1f,
+                                    pan = Offset.Zero,
+                                    centroid = Offset.Zero,
+                                    viewport = viewport,
+                                    image = imageSize,
+                                )
+                        }.semantics {
+                            stateDescription = "${(transform.scale * 100).toInt()}%"
+                        }.pointerInput(imageUrl, viewport, imageSize) {
                             detectTransformGestures { centroid, pan, zoom, _ ->
-                                transform = transform.transformed(zoom, pan, centroid, viewport, imageSize)
+                                transform =
+                                    transform.transformed(
+                                        zoom = zoom,
+                                        pan = pan,
+                                        centroid = centroid,
+                                        viewport = viewport,
+                                        image = imageSize,
+                                    )
                             }
                         }.pointerInput(imageUrl, viewport, imageSize) {
-                            detectTapGestures(onDoubleTap = { position ->
-                                transform =
-                                    if (transform.scale > 1f) {
-                                        ImageTransform()
-                                    } else {
-                                        transform.transformed(3f, Offset.Zero, position, viewport, imageSize)
-                                    }
-                            })
+                            detectTapGestures(
+                                onDoubleTap = { position ->
+                                    transform =
+                                        if (transform.scale > 1f) {
+                                            ImageTransform()
+                                        } else {
+                                            transform.transformed(
+                                                zoom = 3f,
+                                                pan = Offset.Zero,
+                                                centroid = position,
+                                                viewport = viewport,
+                                                image = imageSize,
+                                            )
+                                        }
+                                },
+                            )
                         },
             ) {
                 key(attempt) {
@@ -180,21 +258,28 @@ internal fun ImageViewer(
                         contentDescription = description ?: stringResource(R.string.article_image),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.fillMaxSize(),
-                        loading = { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(Modifier.size(48.dp)) } },
+                        loading = {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                CircularProgressIndicator(Modifier.size(48.dp))
+                            }
+                        },
                         error = {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
                                 Text(stringResource(R.string.image_load_failed))
-                                TextButton(onClick = { attempt++ }) { Text(stringResource(R.string.image_retry)) }
+                                TextButton(onClick = { attempt++ }) {
+                                    Text(stringResource(R.string.image_retry))
+                                }
                             }
                         },
                         onSuccess = { state ->
-                            imageSize =
-                                Size(
-                                    state.result.image.width
-                                        .toFloat(),
-                                    state.result.image.height
-                                        .toFloat(),
-                                )
+                            val image = state.result.image
+                            imageSize = Size(image.width.toFloat(), image.height.toFloat())
                         },
                         success = { state ->
                             Image(
@@ -202,12 +287,14 @@ internal fun ImageViewer(
                                 contentDescription = description ?: stringResource(R.string.article_image),
                                 contentScale = ContentScale.Fit,
                                 modifier =
-                                    Modifier.fillMaxSize().graphicsLayer {
-                                        scaleX = transform.scale
-                                        scaleY = transform.scale
-                                        translationX = transform.offset.x
-                                        translationY = transform.offset.y
-                                    },
+                                    Modifier
+                                        .fillMaxSize()
+                                        .graphicsLayer {
+                                            scaleX = transform.scale
+                                            scaleY = transform.scale
+                                            translationX = transform.offset.x
+                                            translationY = transform.offset.y
+                                        },
                             )
                         },
                     )
@@ -229,15 +316,26 @@ internal data class ImageTransform(
         viewport: Size,
         image: Size,
     ): ImageTransform {
-        if (viewport.width <= 0 || viewport.height <= 0 || image.width <= 0 || image.height <= 0) return ImageTransform()
+        if (viewport.width <= 0 || viewport.height <= 0 || image.width <= 0 || image.height <= 0) {
+            return ImageTransform()
+        }
         val nextScale = (scale * zoom).coerceIn(1f, 8f)
-        if (nextScale == 1f) return ImageTransform()
+        if (nextScale == 1f) {
+            return ImageTransform()
+        }
         val ratio = nextScale / scale
         val center = Offset(viewport.width / 2, viewport.height / 2)
         val nextOffset = offset * ratio + (centroid - center) * (1 - ratio) + pan
         val fit = minOf(viewport.width / image.width, viewport.height / image.height)
         val maxX = ((image.width * fit * nextScale - viewport.width) / 2).coerceAtLeast(0f)
         val maxY = ((image.height * fit * nextScale - viewport.height) / 2).coerceAtLeast(0f)
-        return ImageTransform(nextScale, Offset(nextOffset.x.coerceIn(-maxX, maxX), nextOffset.y.coerceIn(-maxY, maxY)))
+        return ImageTransform(
+            scale = nextScale,
+            offset =
+                Offset(
+                    nextOffset.x.coerceIn(-maxX, maxX),
+                    nextOffset.y.coerceIn(-maxY, maxY),
+                ),
+        )
     }
 }

@@ -17,12 +17,25 @@ class ImageSourceTest {
 
     @Test
     fun declaredResolutionWinsOverUnknownFallback() {
-        assertEquals("large", image(source("fallback"), source("small", 400), source("large", 2400)).getViewerImageSource()?.imgUri)
+        val image =
+            image(
+                source("fallback"),
+                source("small", 400),
+                source("large", 2400),
+            )
+
+        assertEquals("large", image.getViewerImageSource()?.imgUri)
     }
 
     @Test
     fun densitySourcesUseHighestResolution() {
-        assertEquals("3x", image(source("1x", density = 1f), source("3x", density = 3f)).getViewerImageSource()?.imgUri)
+        val image =
+            image(
+                source("1x", density = 1f),
+                source("3x", density = 3f),
+            )
+
+        assertEquals("3x", image.getViewerImageSource()?.imgUri)
     }
 
     @Test

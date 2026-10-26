@@ -515,16 +515,23 @@ fun LinearImageContent(
     }
 
     val dimens = LocalDimens.current
-    val viewerImage = linearImage.getViewerImageSource()
+    val viewerImage =
+        linearImage.getViewerImageSource()
+            ?: return
     val openImage =
         rememberImageViewer(
-            imageUrl = viewerImage?.imgUri ?: return,
+            imageUrl = viewerImage.imgUri,
             description = linearImage.caption?.text,
             onOpenLink =
                 linearImage.link?.let { link ->
                     {
                         val hashSplit = link.split("#")
-                        onLinkClick(link, if (hashSplit.size > 1) idToIndex[hashSplit.last()] else null)
+                        val index =
+                            when {
+                                hashSplit.size > 1 -> idToIndex[hashSplit.last()]
+                                else -> null
+                            }
+                        onLinkClick(link, index)
                     }
                 },
         )
@@ -539,8 +546,10 @@ fun LinearImageContent(
                 modifier =
                     Modifier
                         .clip(RectangleShape)
-                        .clickable(onClickLabel = stringResource(R.string.view_image), onClick = openImage)
-                        .fillMaxWidth(),
+                        .clickable(
+                            onClickLabel = stringResource(R.string.view_image),
+                            onClick = openImage,
+                        ).fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
                 val pixelDensity = LocalDensity.current.density

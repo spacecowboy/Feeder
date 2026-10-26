@@ -391,7 +391,10 @@ fun ReaderView(
                                     Modifier
                                         .clip(RectangleShape)
                                         .width(dimens.maxReaderWidth)
-                                        .clickable(onClickLabel = stringResource(R.string.view_image), onClick = openImage),
+                                        .clickable(
+                                            onClickLabel = stringResource(R.string.view_image),
+                                            onClick = openImage,
+                                        ),
                             ) {
                                 WithTooltipIfNotBlank(tooltip = stringResource(id = R.string.article_image)) {
                                     val maxImageWidth by rememberMaxImageWidth()

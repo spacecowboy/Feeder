@@ -8,10 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.doubleClick
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasStateDescription
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -52,45 +55,70 @@ class ImageViewerTest {
         return file.toURI().toString()
     }
 
+    private fun linearImage(
+        url: String,
+        link: String?,
+    ) = LinearImage(
+        ids = emptySet(),
+        sources = listOf(LinearImageSource(url, 800, 800, null, null)),
+        caption = null,
+        link = link,
+    )
+
+    private fun saveScreenshot(name: String) {
+        val bitmap = rule.onRoot().captureToImage().asAndroidBitmap()
+        File(rule.activity.filesDir, name).outputStream().use {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+        }
+    }
+
     @Test
     fun imageOpensZoomsResetsAndCloses() {
         val url = fixture()
         rule.setContent {
             MaterialTheme {
                 Box(Modifier.fillMaxSize()) {
-                    LinearImageContent(LinearImage(emptySet(), listOf(LinearImageSource(url, 800, 800, null, null)), null, null), emptyMap(), { _, _ -> })
+                    LinearImageContent(
+                        linearImage = linearImage(url, link = null),
+                        idToIndex = emptyMap(),
+                        onLinkClick = { _, _ -> },
+                    )
                 }
             }
         }
         rule.onNodeWithContentDescription("Zoom in").assertDoesNotExist()
-        rule
-            .onNode(
-                androidx.compose.ui.test
-                    .hasClickAction(),
-            ).performClick()
+        rule.onNode(hasClickAction()).performClick()
         rule.onNodeWithContentDescription("Close image").assertIsDisplayed()
         rule.waitUntil(10_000) {
             runCatching {
-                rule.onNodeWithContentDescription("Zoom in").fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.Disabled]
+                rule
+                    .onNodeWithContentDescription("Zoom in")
+                    .fetchSemanticsNode()
+                    .config[SemanticsProperties.Disabled]
                 false
             }.getOrDefault(true)
         }
-        rule.onRoot().captureToImage().asAndroidBitmap().let { bitmap ->
-            File(rule.activity.filesDir, "image-viewer-fit.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        }
+        saveScreenshot("image-viewer-fit.png")
         rule.onNodeWithContentDescription("Zoom in").performClick()
         rule.onNode(hasStateDescription("200%")).assertExists()
-        rule.onNode(hasStateDescription("200%")).performTouchInput { swipe(center, center + Offset(80f, 50f)) }
-        rule.onNodeWithContentDescription("Reset zoom").performClick()
-        rule.onNode(hasStateDescription("100%")).assertExists()
-        rule.onNode(hasStateDescription("100%")).performTouchInput { doubleClick(center) }
-        rule.onNode(hasStateDescription("300%")).assertExists()
-        rule.onRoot().captureToImage().asAndroidBitmap().let { bitmap ->
-            File(rule.activity.filesDir, "image-viewer-zoom.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        rule.onNode(hasStateDescription("200%")).performTouchInput {
+            swipe(center, center + Offset(80f, 50f))
         }
         rule.onNodeWithContentDescription("Reset zoom").performClick()
+        rule.onNode(hasStateDescription("100%")).assertExists()
         rule.onNode(hasStateDescription("100%")).performTouchInput {
-            pinch(center - Offset(40f, 0f), center + Offset(40f, 0f), center - Offset(160f, 0f), center + Offset(160f, 0f))
+            doubleClick(center)
+        }
+        rule.onNode(hasStateDescription("300%")).assertExists()
+        saveScreenshot("image-viewer-zoom.png")
+        rule.onNodeWithContentDescription("Reset zoom").performClick()
+        rule.onNode(hasStateDescription("100%")).performTouchInput {
+            pinch(
+                center - Offset(40f, 0f),
+                center + Offset(40f, 0f),
+                center - Offset(160f, 0f),
+                center + Offset(160f, 0f),
+            )
         }
         rule.onNode(hasStateDescription("100%")).assertDoesNotExist()
         rule.onNodeWithContentDescription("Close image").performClick()
@@ -103,38 +131,41 @@ class ImageViewerTest {
         var opened: Pair<String, Int?>? = null
         rule.setContent {
             MaterialTheme {
-                LinearImageContent(LinearImage(emptySet(), listOf(LinearImageSource(url, 800, 800, null, null)), null, "https://example.com/#note"), mapOf("note" to 7), { link, index ->
-                    opened =
-                        link to index
-                })
+                LinearImageContent(
+                    linearImage = linearImage(url, link = "https://example.com/#note"),
+                    idToIndex = mapOf("note" to 7),
+                    onLinkClick = { link, index ->
+                        opened = link to index
+                    },
+                )
             }
         }
-        rule
-            .onNode(
-                androidx.compose.ui.test
-                    .hasClickAction(),
-            ).performClick()
+        rule.onNode(hasClickAction()).performClick()
         rule.onNodeWithText("View image").assertIsDisplayed()
         rule.onNodeWithText("Open link").performClick()
-        rule.runOnIdle { assertEquals("https://example.com/#note" to 7, opened) }
-        rule
-            .onNode(
-                androidx.compose.ui.test
-                    .hasClickAction(),
-            ).performClick()
+        rule.runOnIdle {
+            assertEquals("https://example.com/#note" to 7, opened)
+        }
+        rule.onNode(hasClickAction()).performClick()
         rule.onNodeWithText("View image").performClick()
         rule.onNodeWithContentDescription("Close image").assertIsDisplayed()
     }
 
     @Test
     fun brokenImageOffersRetryAndDismissal() {
-        rule.setContent { MaterialTheme { ImageViewer("file:///does-not-exist.png", null, {}) } }
+        rule.setContent {
+            MaterialTheme {
+                ImageViewer(
+                    imageUrl = "file:///does-not-exist.png",
+                    description = null,
+                    onDismiss = {},
+                )
+            }
+        }
         rule.waitUntil(10_000) {
             rule
-                .onAllNodes(
-                    androidx.compose.ui.test
-                        .hasText("Retry"),
-                ).fetchSemanticsNodes()
+                .onAllNodes(hasText("Retry"))
+                .fetchSemanticsNodes()
                 .isNotEmpty()
         }
         rule.onNodeWithText("Retry").performClick()
