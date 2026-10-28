@@ -116,6 +116,39 @@ class BergamotModelManagerTest {
         }
 
     @Test
+    fun prepareNormalizesQualifiedMozillaLanguageTags() =
+        runTest {
+            server.start()
+            val model = "chinese model".toByteArray()
+            val lex = "chinese lex".toByteArray()
+            val vocab = "chinese vocab".toByteArray()
+            server.enqueue(
+                MockResponse()
+                    .setResponseCode(200)
+                    .setBody(mozillaRegistry("en-US", "zh-Hans", model, lex, vocab)),
+            )
+            listOf(model, lex, vocab).forEach { content ->
+                server.enqueue(
+                    MockResponse()
+                        .setResponseCode(200)
+                        .setBody(okio.Buffer().write(content)),
+                )
+            }
+
+            val manager = modelManager()
+            assertEquals(
+                BergamotLanguagePairStatus.AvailableToDownload,
+                manager.languagePairStatus("en", "zh"),
+            )
+
+            val preparation = manager.prepare(sourceLanguage = "en", targetLanguage = "zh")
+
+            assertTrue(preparation.toString(), preparation is BergamotModelPreparation.Ready)
+            assertEquals(BergamotLanguagePairStatus.Downloaded, manager.languagePairStatus("en", "zh"))
+            assertEquals(listOf("en" to "zh"), (preparation as BergamotModelPreparation.Ready).modelRegistry.map { it.from to it.to })
+        }
+
+    @Test
     fun preparePrefersNewerStableMozillaModelVersion() =
         runTest {
             server.start()
