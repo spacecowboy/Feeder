@@ -67,6 +67,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import java.net.InetAddress
 import java.net.URL
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -136,7 +137,7 @@ class RssLocalSyncKtTest : DIAware {
 
     @Before
     fun setup() {
-        server.start()
+        server.start(InetAddress.getByName("127.0.0.1"), 0)
         settingsStore.setCurrentArticle(ID_UNSET)
     }
 
@@ -276,11 +277,25 @@ class RssLocalSyncKtTest : DIAware {
         }
 
     @Test
-    fun slowResponseBodyDoesNotHoldUpOtherFeeds() =
+    fun slowResponseBodyDoesNotHoldUpOtherHosts() =
         runBlocking {
-            val slowUrl = server.url("/slow.json").toUrl()
+            // Distinct loopback hosts exercise global concurrency without bypassing the per-host limit.
+            val slowUrl =
+                server
+                    .url("/slow.json")
+                    .newBuilder()
+                    .host("127.0.0.1")
+                    .build()
+                    .toUrl()
             val slowId = insertFeed("a-slow", slowUrl, cowboyJson)
-            val fastId = insertFeed("z-fast", server.url("/fast.json").toUrl(), cowboyJson)
+            val fastUrl =
+                server
+                    .url("/fast.json")
+                    .newBuilder()
+                    .host("localhost")
+                    .build()
+                    .toUrl()
+            val fastId = insertFeed("z-fast", fastUrl, cowboyJson)
             responses[slowUrl]!!.setBodyDelay(5, TimeUnit.SECONDS)
 
             val refresh = async { rssLocalSync.syncFeeds() }
