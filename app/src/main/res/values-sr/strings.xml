@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Линија %1$d: користи се само првох %2$d правила. Касније линије се игноришу.</string>
     <string name="justify_article_text">Обострано поравнај текст чланка</string>
     <string name="justify_article_text_description">Поравнава и леву и десну ивицу пасуса чланка</string>
+    <string name="read_aloud_preparing">Припрема се аудио…</string>
+    <string name="read_aloud_position">Позиција читања наглас</string>
+    <string name="go_to_spoken_text">Иди на изговарани текст</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Уназад 10 секунди</string>
+    <string name="skip_forward_10">Унапред 10 секунди</string>
 </resources>
