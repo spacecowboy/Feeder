@@ -720,6 +720,11 @@ class Repository(
         feedId: Long,
     ): FeedItem? = feedItemStore.loadFeedItem(guid = guid, feedId = feedId)
 
+    suspend fun loadFeedItems(
+        feedId: Long,
+        guids: List<String>,
+    ): List<FeedItem> = feedItemStore.loadFeedItems(feedId, guids)
+
     suspend fun upsertFeedItems(
         itemsWithText: List<Pair<FeedItem, String>>,
         block: suspend (FeedItem, String) -> Unit,

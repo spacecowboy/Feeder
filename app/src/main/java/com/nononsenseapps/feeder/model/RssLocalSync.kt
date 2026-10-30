@@ -6,6 +6,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.background.runOnceFullTextSync
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
+import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -21,9 +22,9 @@ import com.nononsenseapps.feeder.util.right
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.util.urlHasNoAuthParams
 import com.nononsenseapps.feeder.util.urlHasNoQueryParams
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -39,6 +40,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -47,7 +49,8 @@ val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatch
 val syncMutex = Mutex()
 
 /**
- * WARNING. DO NOT CHANGE THE DISPATCHER WITHIN THE LOGIC!
+ * Keep parsing and mutable sync state on the sync dispatcher. Only blocking network
+ * I/O may leave it; resume on the sync dispatcher before processing the result.
  */
 class RssLocalSync(
     override val di: DI,
@@ -125,6 +128,7 @@ class RssLocalSync(
                             syncClient.sendUpdatedFeeds()
                             syncClient.markAsRead()
                         } catch (e: Exception) {
+                            if (e is CancellationException) throw e
                             Log.e(LOG_TAG, "error with syncClient: ${e.message}", e)
                         }
 
@@ -138,37 +142,26 @@ class RssLocalSync(
                         // These coroutines are concurrent but on a single thread,
                         // so they are not truly parallel by design to ensure
                         // IO waits are minimized
-                        val concurrentJobs = 2
-                        val jobs =
-                            (0 until concurrentJobs)
-                                .map { jobIndex ->
-                                    launch {
-                                        feedsToFetch
-                                            .asSequence()
-                                            .filterIndexed { index, _ ->
-                                                index % concurrentJobs == jobIndex
-                                            }.forEach { feed ->
-                                                handleFeed(
-                                                    feed = feed,
-                                                    maxFeedItemCount = maxFeedItemCount,
-                                                    forceNetwork = forceNetwork,
-                                                    downloadTime = downloadTime,
-                                                )
-                                            }
-                                    }
-                                }
-
-                        jobs.joinAll()
+                        refreshConcurrently(feedsToFetch, host = { it.url.host.lowercase(Locale.ROOT) }) { feed ->
+                            handleFeed(
+                                feed = feed,
+                                maxFeedItemCount = maxFeedItemCount,
+                                forceNetwork = forceNetwork,
+                                downloadTime = downloadTime,
+                            )
+                        }
 
                         try {
                             repository.applyRemoteReadMarks()
                         } catch (e: Exception) {
+                            if (e is CancellationException) throw e
                             Log.e(LOG_TAG, "Error on final apply", e)
                         }
 
                         result = true
                     }
                 } catch (e: Throwable) {
+                    if (e is CancellationException) throw e
                     Log.e(LOG_TAG, "Outer error", e)
                 } finally {
                     if (needFullTextSync) {
@@ -222,16 +215,19 @@ class RssLocalSync(
                 repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
         } catch (e: Throwable) {
+            if (e is CancellationException) throw e
             Log.e(
                 LOG_TAG,
                 "Failed to sync ${feed.displayTitle}: ${feed.url}",
                 e,
             )
         } finally {
-            repository.setCurrentlySyncingOn(
-                feedId = feed.id,
-                syncing = false,
-            )
+            withContext(NonCancellable) {
+                repository.setCurrentlySyncingOn(
+                    feedId = feed.id,
+                    syncing = false,
+                )
+            }
         }
     }
 
@@ -264,10 +260,11 @@ class RssLocalSync(
         return Either
             .catching(
                 onCatch = { t ->
+                    if (t is CancellationException) throw t
                     FetchError(url = url.toString(), throwable = t)
                 },
             ) {
-                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
+                okHttpClient.getBufferedFeedResponse(feedSql.url, forceNetwork = forceNetwork)
             }.flatMap { response ->
                 response.use {
                     if (response.isSuccessful) {
@@ -294,6 +291,7 @@ class RssLocalSync(
             }.flatMap { feed ->
                 Either.catching(
                     onCatch = { t ->
+                        if (t is CancellationException) throw t
                         FetchError(url = url.toString(), throwable = t)
                     },
                 ) {
@@ -328,6 +326,18 @@ class RssLocalSync(
                             ?: emptyList()
 
                     val totalItems = itemsWithGuids.size
+                    val keepItems = itemsWithGuids.map { (item, _) -> ArticleFilterPolicy.shouldKeep(item, articleFilterRules) }
+
+                    val existingItems =
+                        repository
+                            .loadFeedItems(
+                                feedId = feedSql.id,
+                                guids =
+                                    itemsWithGuids
+                                        .filterIndexed { index, _ -> keepItems[index] }
+                                        .flatMap { (item, _) -> listOf(item.alternateId, item.id ?: item.alternateId) }
+                                        .distinct(),
+                            ).associateBy { it.guid }
 
                     val feedItemSqls =
                         itemsWithGuids
@@ -340,7 +350,7 @@ class RssLocalSync(
                                 // the guid scheme for the whole feed) and would renumber index/totalItems,
                                 // making the fallback clock of a kept item depend on how many other items
                                 // were filtered ahead of it.
-                                if (!ArticleFilterPolicy.shouldKeep(item, articleFilterRules)) {
+                                if (!keepItems[index]) {
                                     logDebug(LOG_TAG, "Filtered by feed rules: [${item.title}] [${feed.title}]")
                                     return@mapIndexedNotNull null
                                 }
@@ -357,13 +367,8 @@ class RssLocalSync(
                                 // Always attempt to load existing items using both id schemes
                                 // Id is rewritten to preferred on update
                                 val feedItemSql =
-                                    repository.loadFeedItem(
-                                        guid = item.alternateId,
-                                        feedId = feedSql.id,
-                                    ) ?: repository.loadFeedItem(
-                                        guid = item.id ?: item.alternateId,
-                                        feedId = feedSql.id,
-                                    ) ?: FeedItem(firstSyncedTime = downloadTime)
+                                    (existingItems[item.alternateId] ?: existingItems[item.id ?: item.alternateId])
+                                        ?.copy() ?: FeedItem(firstSyncedTime = downloadTime)
 
                                 // If new item, see if duplicates exist
                                 if (feedItemSql.id != ID_UNSET ||
@@ -399,7 +404,23 @@ class RssLocalSync(
                                 }
                             } ?: emptyList()
 
-                    repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
+                    val existingItemsById = existingItems.values.associateBy { it.id }
+                    // Repeated entries can target the same row; retain their original last-write order.
+                    val repeatedIds =
+                        feedItemSqls
+                            .groupingBy { it.first.id }
+                            .eachCount()
+                            .filterValues { it > 1 }
+                            .keys
+                    val changedItems =
+                        feedItemSqls.filter { (item, text) ->
+                            // Preserve the read-mark callback even when the article itself is unchanged.
+                            item.id in repeatedIds ||
+                                item.guid in alreadyReadGuids ||
+                                item != existingItemsById[item.id] ||
+                                !articleContentMatches(item.id, text)
+                        }
+                    repository.upsertFeedItems(changedItems) { feedItem, text ->
                         filePathProvider.articleDir.mkdirs()
                         blobOutputStream(feedItem.id, filePathProvider.articleDir)
                             .bufferedWriter()
@@ -556,6 +577,30 @@ class RssLocalSync(
                 }
         }
 
+    private fun articleContentMatches(
+        itemId: Long,
+        text: String,
+    ): Boolean {
+        try {
+            blobInputStream(itemId, filePathProvider.articleDir).bufferedReader().use { reader ->
+                val buffer = CharArray(DEFAULT_BUFFER_SIZE)
+                var offset = 0
+                while (true) {
+                    val count = reader.read(buffer)
+                    if (count == -1) return offset == text.length
+                    if (count > text.length - offset) return false
+                    for (index in 0 until count) {
+                        if (buffer[index] != text[offset + index]) return false
+                    }
+                    offset += count
+                }
+            }
+        } catch (_: IOException) {
+            // Missing or corrupt content must be repaired, even when metadata has not changed.
+            return false
+        }
+    }
+
     /**
      * Final thumbnail priority policy:
      * 1) Keep feed-provided thumbnail (media/enclosure/etc) when it's not body-derived.
@@ -574,6 +619,7 @@ class RssLocalSync(
             try {
                 okHttpClient.fetchOgImage(url)
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 logDebug(LOG_TAG, "Failed to fetch og:image for $url", e)
                 null
             }

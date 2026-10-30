@@ -322,6 +322,13 @@ class FeedItemStore(
         feedId: Long,
     ): FeedItem? = dao.loadFeedItem(guid = guid, feedId = feedId)
 
+    suspend fun loadFeedItems(
+        feedId: Long,
+        guids: List<String>,
+    ): List<FeedItem> =
+        // Stay below SQLite's bind limit, including the feed ID parameter.
+        guids.chunked(900).flatMap { dao.loadFeedItems(feedId, it) }
+
     suspend fun upsertFeedItems(
         itemsWithText: List<Pair<FeedItem, String>>,
         block: suspend (FeedItem, String) -> Unit,
