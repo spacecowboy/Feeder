@@ -12,7 +12,7 @@ import java.net.URL
 import java.util.Locale
 
 /**
- * Ensures a url is valid, having a scheme and everything. It turns 'google.com' into 'http://google.com' for example.
+ * Ensures a url is valid, having a scheme and everything. It turns 'google.com' into 'https://google.com' for example.
  */
 fun sloppyLinkToStrictURL(url: String): URL {
     if (url.isBlank()) {
@@ -29,7 +29,7 @@ fun sloppyLinkToStrictURL(url: String): URL {
             } else {
                 null
             }
-        } ?: URL("http://$url") // No scheme, assume http
+        } ?: URL("https://$url") // No scheme, assume https
     }
 }
 
