@@ -102,8 +102,18 @@ class LinkUtilsKtTest {
     }
 
     @Test
-    fun testSloppyToStrictAddsHttp() {
-        assertEquals(URL("http://google.com"), sloppyLinkToStrictURL("google.com"))
+    fun testSloppyToStrictAddsHttps() {
+        assertEquals(URL("https://google.com"), sloppyLinkToStrictURL("google.com"))
+    }
+
+    @Test
+    fun testSloppyToStrictPreservesExplicitHttp() {
+        assertEquals(URL("http://example.com/feed"), sloppyLinkToStrictURL("http://example.com/feed"))
+    }
+
+    @Test
+    fun testSloppyToStrictAddsHttpsWithPathAndQuery() {
+        assertEquals(URL("https://example.com/feed.xml?limit=10"), sloppyLinkToStrictURL("example.com/feed.xml?limit=10"))
     }
 
     @Test
@@ -116,6 +126,11 @@ class LinkUtilsKtTest {
         assertFailsWith<MalformedURLException> {
             sloppyLinkToStrictURL("")
         }
+    }
+
+    @Test
+    fun testSloppyToStrictNoThrowsKeepsInvalidUrlFallback() {
+        assertEquals(URL("http://"), sloppyLinkToStrictURLNoThrows(""))
     }
 
     @Test
