@@ -345,8 +345,8 @@
     <string name="play_audio">Riproduci audio</string>
     <string name="pause_audio">Metti in pausa l\'audio</string>
     <string name="stop_audio">Interrompi l\'audio</string>
-    <string name="seek_back_10_seconds">Vai indietro 10 secondi</string>
-    <string name="seek_forward_10_seconds">Vai avanti 10 secondi</string>
+    <string name="seek_back_10_seconds">Torna indietro di 10 secondi</string>
+    <string name="seek_forward_10_seconds">Avanza di 10 secondi</string>
     <string name="use_in_app_audio_player">Riproduci i link audio con il lettore integrato</string>
     <string name="use_in_app_audio_player_description">Se disattivato, i link audio si aprono con l\'app predefinita</string>
     <string name="preparing_offline_translation_model">Modello di traduzione offline %1$s a %2$s in preparazione…</string>
@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Riga %1$d: vengono utilizzate solo le prime %2$d regole. Le righe successive vengono ignorate.</string>
     <string name="justify_article_text">Giustifica il testo dell’articolo</string>
     <string name="justify_article_text_description">Allinea i paragrafi dell’articolo a entrambi i margini</string>
+    <string name="read_aloud_preparing">Preparazione dell\'audio…</string>
+    <string name="read_aloud_position">Posizione della lettura vocale</string>
+    <string name="go_to_spoken_text">Vai al testo parlato</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Salta indietro di 10 secondi</string>
+    <string name="skip_forward_10">Salta avanti di 10 secondi</string>
 </resources>
