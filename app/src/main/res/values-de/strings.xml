@@ -65,13 +65,13 @@
     <string name="updated_feeds">Aktualisierte Feeds</string>
     <string name="notification_channel_name">Ungelesene Feeds</string>
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
-    <string name="open_in_reader">Feedreader</string>
+    <string name="open_in_reader">Reader</string>
     <string name="open_in_webview">Webansicht</string>
     <string name="open_in_default_browser">Standardbrowser</string>
     <string name="open_in_custom_tab">In‑App‑Browser (Custom Tab)</string>
     <string name="open_item_by_default_with">Artikel standardmäßig öffnen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
-    <string name="reader_settings">Feedreader</string>
+    <string name="reader_settings">Reader</string>
     <string name="open_link_in_web_view">Link in Webansicht öffnen</string>
     <string name="open_in_web_view">In Webansicht öffnen</string>
     <string name="max_feed_items">Nachrichtenlimit pro Feed</string>
@@ -287,7 +287,7 @@
     <string name="open_article_in_reader">Im Reader öffnen</string>
     <string name="open_article_in_default_browser">Im Standardbrowser öffnen</string>
     <string name="open_article_in_custom_tab">Im In‑App‑Browser öffnen</string>
-    <string name="no_article_link_browser">Artikel kann im Browser nicht geöffnet werden</string>
+    <string name="no_article_link_browser">Artikel kann nicht im Browser geöffnet werden</string>
     <string name="no_article_link_custom_tab">Artikel kann nicht im In‑App‑Browser geöffnet werden</string>
     <string name="widget_title">Feeder</string>
     <string name="widget_refreshing">Aktualisierung</string>
