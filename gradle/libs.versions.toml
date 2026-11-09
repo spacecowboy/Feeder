@@ -3,7 +3,7 @@
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
 kotlin = "2.4.21"
 ksp = "2.3.12"
-kotlinxSerialization = "1.11.0"
+kotlinxSerialization = "1.12.0"
 androidPlugin = "9.4.1"
 # And SDK version is highly coupled to androidPlugin too
 compileSdk = "37"
