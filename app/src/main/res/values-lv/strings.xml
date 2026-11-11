@@ -71,7 +71,7 @@
     <string name="saved_adjective">Atzīmētie</string>
     <string name="show_only_title">Rādīt tikai virsrakstu</string>
     <string name="content_is_not_html">Saturs nav HTML</string>
-    <string name="add_anyway">Tik un tā pievienot</string>
+    <string name="add_anyway">Pievienot tik un tā</string>
     <string name="zero_words">%1$s vārdu</string>
     <string name="one_word">%1$s vārds</string>
     <string name="two_words">%1$s vārdi</string>
