@@ -403,4 +403,10 @@
     <string name="rule_error_too_many_rules">Рядок %1$d: використовуються лише перші %2$d правил. Наступні рядки ігноруються.</string>
     <string name="justify_article_text">Вирівняти текст за шириною</string>
     <string name="justify_article_text_description">Вирівнює абзаци статті за лівим і правим краями</string>
+    <string name="read_aloud_preparing">Підготовка аудіо…</string>
+    <string name="read_aloud_position">Позиція читання вголос</string>
+    <string name="go_to_spoken_text">Перейти до озвученого тексту</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Назад на 10 секунд</string>
+    <string name="skip_forward_10">Вперед на 10 секунд</string>
 </resources>
