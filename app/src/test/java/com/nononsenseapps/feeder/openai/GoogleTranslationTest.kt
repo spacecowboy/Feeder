@@ -56,7 +56,7 @@ class GoogleTranslationTest {
                     )
                 assertTrue(result is OpenAIApi.TranslationResult.Success)
                 val document = Jsoup.parseBodyFragment(result.content)
-                assertEquals(" Bonjour ", document.selectFirst("p")?.wholeText())
+                assertEquals("Bonjour", document.selectFirst("p")?.text())
                 assertEquals("code", document.selectFirst("pre span")?.text())
                 assertEquals(1, server.requestCount)
             }
