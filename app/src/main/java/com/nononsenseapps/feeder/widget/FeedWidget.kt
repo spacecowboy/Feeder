@@ -50,16 +50,17 @@ import coil3.toBitmap
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -142,24 +143,39 @@ private fun buildWidgetStateFlow(
 
     return combine(
         repository.syncWorkerRunning,
-        repository
-            .getCurrentWidgetFeedListItems()
-            .map { listItems ->
-                buildList {
-                    for (listItem in listItems) {
-                        val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                        add(listItem.toWidgetItem(bitmap))
-                    }
-                }
-            },
-    ) { syncWorkerRunning, items ->
+        repository.currentWidgetFeedAndTag,
+        repository.feedListFilter,
+        repository.getCurrentWidgetFeedListItems(),
+    ) { syncWorkerRunning, (widgetFeedId, _), filter, listItems ->
         if (syncWorkerRunning) {
             WidgetState.Syncing
         } else {
-            WidgetState.Ready(items)
+            WidgetState.Ready(
+                listItems
+                    .visibleInWidget(widgetFeedId, filter)
+                    .map { listItem ->
+                        listItem.toWidgetItem(loadImageBitmap(listItem.feedImageUrl?.toString() ?: ""))
+                    },
+            )
         }
     }.onStart { emit(WidgetState.Syncing) }
         .flowOn(Dispatchers.IO)
+}
+
+/**
+ * Applies the feed list filter to widget items so the widget hides read items
+ * when the app does. Saved articles are never filtered by read status in the app.
+ */
+private fun List<FeedListItem>.visibleInWidget(
+    feedId: Long,
+    listFilter: FeedListFilter,
+): List<FeedListItem> {
+    if (feedId == ID_SAVED_ARTICLES) return this
+
+    val hideReadItems = listFilter.unread && !listFilter.read
+    if (!hideReadItems) return this
+
+    return filter { item -> item.unread || (listFilter.saved && item.bookmarked) }
 }
 
 class FeedWidget : GlanceAppWidget() {
