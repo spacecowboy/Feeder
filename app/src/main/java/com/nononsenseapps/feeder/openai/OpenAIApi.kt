@@ -14,17 +14,28 @@ import io.ktor.http.takeFrom
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class OpenAIApi(
     private val appLang: String,
     private val openAIClientFactory: (OpenAISettings) -> OpenAIClient,
 ) {
+    internal var googleTranslationUrl: String = GOOGLE_TRANSLATION_PROVIDER_URL
+
     private val json =
         Json {
             ignoreUnknownKeys = true
@@ -123,7 +134,7 @@ class OpenAIApi(
             .build()
 
     suspend fun listModelIds(settings: OpenAISettings): ModelsResult {
-        if (settings.isLocalTranslation) {
+        if (settings.isLocalTranslation || settings.isGoogleTranslation) {
             return ModelsResult.Success(ids = emptyList())
         }
         if (settings.key.isEmpty()) {
@@ -182,7 +193,7 @@ class OpenAIApi(
         content: String,
         settings: OpenAISettings,
     ): SummaryResult {
-        if (settings.isDeepL) {
+        if (settings.isGoogleTranslation || settings.isDeepL) {
             return SummaryResult.Error(content = "Summarization is not supported for this translation-only provider")
         }
         if (settings.isLocalTranslation) {
@@ -222,6 +233,9 @@ class OpenAIApi(
         settings: OpenAISettings,
         preserveHtml: Boolean = false,
     ): TranslationResult {
+        if (settings.isGoogleTranslation) {
+            return translateWithGoogle(content, targetLanguage, settings, preserveHtml)
+        }
         if (settings.isDeepL) {
             return translateWithDeepL(
                 settings = settings,
@@ -235,6 +249,60 @@ class OpenAIApi(
         }
         return TranslationResult.Error(content = "Translation is not supported for this provider")
     }
+
+    private fun translateWithGoogle(
+        content: String,
+        targetLanguage: String,
+        settings: OpenAISettings,
+        preserveHtml: Boolean,
+    ): TranslationResult =
+        runCatching {
+            val target = googleLanguageCode(targetLanguage)
+            val client = okHttpClient(settings.timeoutSeconds)
+
+            fun translateText(text: String): String {
+                if (text.isBlank()) return text
+                return text.chunked(2000).joinToString("") { chunk ->
+                    val url =
+                        googleTranslationUrl
+                            .toHttpUrl()
+                            .newBuilder()
+                            .addQueryParameter("client", "dict-chrome-ex")
+                            .addQueryParameter("sl", "auto")
+                            .addQueryParameter("tl", target)
+                            .addQueryParameter("q", chunk)
+                            .build()
+                    client.newCall(Request.Builder().url(url).build()).execute().use { response ->
+                        if (!response.isSuccessful) throw httpFailure("Google translation failed", response)
+                        googleFirstTranslation(json.parseToJsonElement(response.body.string()))
+                            ?: throw IllegalStateException("Google returned no translation")
+                    }
+                }
+            }
+            val result =
+                if (preserveHtml) {
+                    val document = Jsoup.parseBodyFragment(content)
+
+                    fun visit(node: Node) {
+                        if (node.nodeName() in setOf("script", "style", "code", "pre")) return
+                        if (node is TextNode) {
+                            val text = node.wholeText
+                            if (text.isNotBlank()) {
+                                val leading = text.takeWhile(Char::isWhitespace)
+                                val trailing = text.takeLastWhile(Char::isWhitespace)
+                                node.text(leading + translateText(text.trim()) + trailing)
+                            }
+                        } else {
+                            node.childNodes().forEach(::visit)
+                        }
+                    }
+                    visit(document.body())
+                    document.body().html()
+                } else {
+                    translateText(content)
+                }
+            staticTranslationSuccess(content = result, detectedLanguage = "")
+        }.getOrElse { TranslationResult.Error(content = it.messageOrCause().orEmpty()) }
 
     private fun translateWithDeepL(
         settings: OpenAISettings,
@@ -373,12 +441,39 @@ val OpenAISettings.isPerplexity: Boolean
 val OpenAISettings.isDeepL: Boolean
     get() = baseUrl.contains("deepl.com", ignoreCase = true)
 
+const val GOOGLE_TRANSLATION_PROVIDER_URL = "https://translate.googleapis.com/translate_a/t"
+
+internal fun googleLanguageCode(language: String): String {
+    val value = language.trim().replace('_', '-')
+    val code =
+        Locale.getISOLanguages().firstOrNull {
+            Locale.forLanguageTag(it).getDisplayLanguage(Locale.ENGLISH).equals(value, ignoreCase = true)
+        } ?: value
+    return when (code.lowercase(Locale.ROOT)) {
+        "zh", "zh-cn", "zh-hans" -> "zh-CN"
+        "zh-tw", "zh-hk", "zh-hant" -> "zh-TW"
+        "he" -> "iw"
+        "jv" -> "jw"
+        else -> code
+    }
+}
+
+internal fun googleFirstTranslation(element: JsonElement): String? =
+    when (element) {
+        is JsonArray -> element.firstNotNullOfOrNull(::googleFirstTranslation)
+        is JsonPrimitive -> if (element.isString) element.contentOrNull else null
+        else -> null
+    }
+
+val OpenAISettings.isGoogleTranslation: Boolean
+    get() = baseUrl == GOOGLE_TRANSLATION_PROVIDER_URL
+
 val OpenAISettings.isLocalTranslation: Boolean
     get() = baseUrl == LOCAL_TRANSLATION_PROVIDER_URL
 
 val OpenAISettings.isValid: Boolean
     get() =
-        if (isLocalTranslation) {
+        if (isLocalTranslation || isGoogleTranslation) {
             true
         } else if (isDeepL) {
             key.isNotEmpty()
@@ -389,13 +484,13 @@ val OpenAISettings.isValid: Boolean
         }
 
 val OpenAISettings.canSummarize: Boolean
-    get() = isValid && !isDeepL && !isLocalTranslation
+    get() = isValid && !isDeepL && !isLocalTranslation && !isGoogleTranslation
 
 val OpenAISettings.canTranslate: Boolean
     get() = isValid
 
 val OpenAISettings.canUseAsTranslationApi: Boolean
-    get() = canTranslate && (isDeepL || isLocalTranslation)
+    get() = canTranslate && (isDeepL || isLocalTranslation || isGoogleTranslation)
 
 val OpenAISettings.isBlankConfiguration: Boolean
     get() =

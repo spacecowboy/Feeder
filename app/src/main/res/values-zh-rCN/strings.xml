@@ -310,6 +310,7 @@
     <string name="provider_none">无</string>
     <string name="provider_openai_compatible">OpenAI 或兼容</string>
     <string name="provider_azure_openai">Azure OpenAI</string>
+    <string name="provider_google_translation">谷歌翻译</string>
     <string name="provider_deepl">DeepL</string>
     <string name="base_url_optional">基础 URL（可选）</string>
     <string name="translation_endpoint">翻译端点</string>
