@@ -22,6 +22,7 @@ import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
@@ -254,6 +255,16 @@ class FeedWidget : GlanceAppWidget() {
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
                 modifier = GlanceModifier.padding(8.dp).clickable(runSync),
+            )
+
+            Image(
+                provider = ImageProvider(R.drawable.ic_done_all),
+                contentDescription = LocalContext.current.getString(R.string.mark_all_as_read),
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                modifier =
+                    GlanceModifier
+                        .padding(8.dp)
+                        .clickable(actionRunCallback<MarkAllAsReadAction>()),
             )
 
             Image(
