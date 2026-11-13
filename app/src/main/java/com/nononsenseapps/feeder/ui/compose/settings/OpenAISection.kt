@@ -60,10 +60,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.aallam.openai.client.OpenAIHost
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
+import com.nononsenseapps.feeder.openai.GOOGLE_TRANSLATION_PROVIDER_URL
 import com.nononsenseapps.feeder.openai.LOCAL_TRANSLATION_PROVIDER_URL
 import com.nononsenseapps.feeder.openai.canUseAsTranslationApi
 import com.nononsenseapps.feeder.openai.isBlankConfiguration
 import com.nononsenseapps.feeder.openai.isDeepL
+import com.nononsenseapps.feeder.openai.isGoogleTranslation
 import com.nononsenseapps.feeder.openai.isLocalTranslation
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.delay
@@ -295,7 +297,7 @@ private fun OpenAISectionEdit(
     val showsTranslationEndpoint = provider == AIProviderPreset.DEEPL
 
     LaunchedEffect(current, provider) {
-        if (provider != AIProviderPreset.NONE && provider != AIProviderPreset.LOCAL_TRANSLATION) {
+        if (provider != AIProviderPreset.NONE && provider != AIProviderPreset.LOCAL_TRANSLATION && provider != AIProviderPreset.GOOGLE_TRANSLATION) {
             delay(750)
             latestOnEvent(OpenAISettingsEvent.LoadModels(settings = current))
         }
@@ -1136,6 +1138,15 @@ private enum class AIProviderPreset(
         needsApiKey = true,
         endpoint = "https://api.deepl.com/v2/translate",
     ),
+    GOOGLE_TRANSLATION(
+        titleRes = R.string.provider_google_translation,
+        supportsSummary = false,
+        supportsTranslation = true,
+        isDeepL = false,
+        isTranslationOnly = true,
+        needsApiKey = false,
+        endpoint = GOOGLE_TRANSLATION_PROVIDER_URL,
+    ),
     LOCAL_TRANSLATION(
         titleRes = R.string.provider_local_translation,
         supportsSummary = false,
@@ -1178,6 +1189,15 @@ private enum class AIProviderPreset(
                     modelId = "",
                 )
 
+            GOOGLE_TRANSLATION ->
+                settings.copy(
+                    key = "",
+                    modelId = "",
+                    baseUrl = GOOGLE_TRANSLATION_PROVIDER_URL,
+                    azureApiVersion = "",
+                    azureDeploymentId = "",
+                )
+
             LOCAL_TRANSLATION ->
                 settings.copy(
                     key = "",
@@ -1201,6 +1221,7 @@ private enum class AIProviderPreset(
             when {
                 settings.isBlankConfiguration -> NONE
                 settings.baseUrl.contains("openai.azure.com", ignoreCase = true) -> AZURE_OPENAI
+                settings.isGoogleTranslation -> GOOGLE_TRANSLATION
                 settings.isLocalTranslation -> LOCAL_TRANSLATION
                 settings.isDeepL -> DEEPL
                 else -> OPENAI_COMPATIBLE
@@ -1318,7 +1339,7 @@ private fun OpenAISettings.validationMessage(
             }
         }
 
-        AIProviderPreset.LOCAL_TRANSLATION -> null
+        AIProviderPreset.LOCAL_TRANSLATION, AIProviderPreset.GOOGLE_TRANSLATION -> null
     }
 }
 
@@ -1335,14 +1356,14 @@ private fun OpenAISectionType.sanitizeSettings(settings: OpenAISettings): OpenAI
         OpenAISectionType.Summary ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isLocalTranslation -> OpenAISettings()
+                settings.isDeepL || settings.isLocalTranslation || settings.isGoogleTranslation -> OpenAISettings()
                 else -> settings
             }
 
         OpenAISectionType.Translation ->
             when {
                 settings.isBlankConfiguration -> settings
-                settings.isDeepL || settings.isLocalTranslation -> settings
+                settings.isDeepL || settings.isLocalTranslation || settings.isGoogleTranslation -> settings
                 else -> OpenAISettings()
             }
     }
