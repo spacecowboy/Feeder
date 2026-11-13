@@ -229,7 +229,7 @@ class FeedWidget : GlanceAppWidget() {
     @Composable
     private fun FeederTitleBar(runSync: () -> Unit) {
         Row(
-            modifier = GlanceModifier.fillMaxWidth().padding(8.dp),
+            modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
@@ -291,7 +291,7 @@ class FeedWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetReadyContent(items: List<FeedWidgetItem>) {
-        LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
+        LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
             items(
                 count = items.size,
                 itemId = { items[it].id },
