@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.jsoup.Jsoup
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -54,8 +55,9 @@ class GoogleTranslationTest {
                         preserveHtml = true,
                     )
                 assertTrue(result is OpenAIApi.TranslationResult.Success)
-                assertTrue(result.content.contains("<p> Bonjour </p>"))
-                assertTrue(result.content.contains("<pre><span>code</span></pre>"))
+                val document = Jsoup.parseBodyFragment(result.content)
+                assertEquals(" Bonjour ", document.selectFirst("p")?.wholeText())
+                assertEquals("code", document.selectFirst("pre span")?.text())
                 assertEquals(1, server.requestCount)
             }
         }
