@@ -104,6 +104,7 @@ import com.nononsenseapps.feeder.model.html.LinearVideo
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFillWidthScaling
 import com.nononsenseapps.feeder.ui.compose.coil.RestrainedFitScaling
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.images.rememberImageViewer
 import com.nononsenseapps.feeder.ui.compose.layouts.Table
 import com.nononsenseapps.feeder.ui.compose.layouts.TableCell
 import com.nononsenseapps.feeder.ui.compose.layouts.TableData
@@ -514,6 +515,26 @@ fun LinearImageContent(
     }
 
     val dimens = LocalDimens.current
+    val viewerImage =
+        linearImage.getViewerImageSource()
+            ?: return
+    val openImage =
+        rememberImageViewer(
+            imageUrl = viewerImage.imgUri,
+            description = linearImage.caption?.text,
+            onOpenLink =
+                linearImage.link?.let { link ->
+                    {
+                        val hashSplit = link.split("#")
+                        val index =
+                            when {
+                                hashSplit.size > 1 -> idToIndex[hashSplit.last()]
+                                else -> null
+                            }
+                        onLinkClick(link, index)
+                    }
+                },
+        )
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -526,18 +547,9 @@ fun LinearImageContent(
                     Modifier
                         .clip(RectangleShape)
                         .clickable(
-                            enabled = linearImage.link != null,
-                        ) {
-                            linearImage.link?.let {
-                                val hashSplit = it.split("#")
-                                val index =
-                                    when {
-                                        hashSplit.size > 1 -> idToIndex[hashSplit.last()]
-                                        else -> null
-                                    }
-                                onLinkClick(it, index)
-                            }
-                        }.fillMaxWidth(),
+                            onClickLabel = stringResource(R.string.view_image),
+                            onClick = openImage,
+                        ).fillMaxWidth(),
             ) {
                 val maxImageWidth by rememberMaxImageWidth()
                 val pixelDensity = LocalDensity.current.density
@@ -1609,3 +1621,12 @@ fun LinearTable.toTableData(): TableData =
                     )
                 }.toList(),
     )
+
+// Prefer declared resolutions over an unknown fallback when opening the dedicated viewer.
+internal fun LinearImage.getViewerImageSource(): LinearImageSource? {
+    val sized = sources.filter { it.widthPx != null || it.screenWidth != null }
+    if (sized.isNotEmpty()) {
+        return sized.minByOrNull { abs((it.widthPx ?: it.screenWidth!!).toFloat() / 2500f - 1f) }
+    }
+    return sources.maxByOrNull { it.pixelDensity ?: 1f }
+}
