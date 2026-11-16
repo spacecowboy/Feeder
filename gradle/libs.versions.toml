@@ -2,9 +2,9 @@
 # Compose compiler is highly coupled to Kotlin version
 # See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
 kotlin = "2.4.21"
-ksp = "2.3.12"
-kotlinxSerialization = "1.11.0"
-androidPlugin = "9.4.1"
+ksp = "2.3.13"
+kotlinxSerialization = "1.12.0"
+androidPlugin = "9.5.0"
 # And SDK version is highly coupled to androidPlugin too
 compileSdk = "37"
 # BEGIN These should be upgraded in unison. See https://square.github.io/okhttp/changelogs/changelog_4x/
