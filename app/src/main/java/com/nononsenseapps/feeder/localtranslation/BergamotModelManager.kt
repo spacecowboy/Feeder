@@ -270,8 +270,8 @@ class BergamotModelManager(
             .filter(MozillaModelRecord::isCompatibleWithAndroidRelease)
             .groupBy { record ->
                 MozillaModelSet(
-                    from = record.fromLang.lowercase(Locale.ROOT),
-                    to = record.toLang.lowercase(Locale.ROOT),
+                    from = normalizeLanguageCode(record.fromLang),
+                    to = normalizeLanguageCode(record.toLang),
                     version = record.version,
                 )
             }.mapNotNull { (modelSet, records) ->
