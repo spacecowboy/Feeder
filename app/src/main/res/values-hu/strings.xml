@@ -409,4 +409,12 @@
     <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
     <string name="skip_back_10">Visszatekerés 10 másodpercet</string>
     <string name="skip_forward_10">Előretekerés 10 másodpercet</string>
+    <string name="view_image">Kép megtekintése</string>
+    <string name="open_image_link">Hivatkozás megnyitása</string>
+    <string name="image_zoom_in">Nagyítás</string>
+    <string name="image_zoom_out">Kicsinyítés</string>
+    <string name="image_reset_zoom">Nagyítás visszaállítása</string>
+    <string name="image_load_failed">Nem sikerült betölteni a képet</string>
+    <string name="image_retry">Újra</string>
+    <string name="image_close">Kép bezárása</string>
 </resources>
