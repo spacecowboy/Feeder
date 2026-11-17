@@ -452,7 +452,13 @@ class HtmlLinearizer(
 
                             // Some sites put youtube iframes inside figures
                             val iframes = element.getElementsByTag("iframe")
-                            if (iframes.isNotEmpty() && iframes.first() != null) {
+                            if (element.getElementsByTag("figure").size > 1) {
+                                linearizeChildren(
+                                    nodes = element.childNodes(),
+                                    blockStyle = blockStyle,
+                                    baseUrl = baseUrl,
+                                )
+                            } else if (iframes.isNotEmpty() && iframes.first() != null) {
                                 iframes.first()?.let {
                                     parseIframeVideo(it)
                                 }

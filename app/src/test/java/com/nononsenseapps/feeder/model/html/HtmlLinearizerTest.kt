@@ -419,6 +419,44 @@ class HtmlLinearizerTest {
     }
 
     @Test
+    fun `nested gallery figures keep each image and caption separate`() {
+        val html =
+            """
+            <figure class="wp-block-gallery">
+                <figure><img src="/first.jpg"/><figcaption>First</figcaption></figure>
+                <figure><img src="/second.jpg"/><figcaption>Second</figcaption></figure>
+                <figure><img src="/third.jpg"/><figcaption>Third</figcaption></figure>
+            </figure>
+            """.trimIndent()
+
+        val images = linearizer.linearize(html, baseUrl).elements.filterIsInstance<LinearImage>()
+
+        assertEquals(3, images.size)
+        assertEquals(listOf("First", "Second", "Third"), images.map { it.caption?.text })
+        assertEquals(
+            listOf("https://example.com/first.jpg", "https://example.com/second.jpg", "https://example.com/third.jpg"),
+            images.map { it.sources.single().imgUri },
+        )
+    }
+
+    @Test
+    fun `gallery figures inside a wrapper keep responsive sources together`() {
+        val html =
+            """
+            <figure><div>
+                <figure><img src="/first.jpg" srcset="/first-2x.jpg 2x"/></figure>
+                <figure><img src="/second.jpg"/></figure>
+            </div></figure>
+            """.trimIndent()
+
+        val images = linearizer.linearize(html, baseUrl).elements.filterIsInstance<LinearImage>()
+
+        assertEquals(2, images.size)
+        assertEquals(setOf("https://example.com/first.jpg", "https://example.com/first-2x.jpg"), images[0].sources.map { it.imgUri }.toSet())
+        assertEquals("https://example.com/second.jpg", images[1].sources.single().imgUri)
+    }
+
+    @Test
     fun `p in a blockquote does not add newlines at end and cite is null`() {
         val html = "<html><body><blockquote><p>Quote</p></blockquote></body></html>"
 
