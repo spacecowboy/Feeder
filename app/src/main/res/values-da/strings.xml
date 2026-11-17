@@ -389,4 +389,12 @@
     <string name="delete_button_text">Slet</string>
     <string name="cancel">Annuller</string>
     <string name="force_single_column">Tving til én kolonne</string>
+    <string name="read_aloud_preparing">Forbereder lyd…</string>
+    <string name="read_aloud_position">Position til højtlæsning</string>
+    <string name="go_to_spoken_text">Gå til oplæst tekst</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">10 sekunder tilbage</string>
+    <string name="skip_forward_10">10 sekunder frem</string>
+    <string name="justify_article_text">Juster artikelteksten</string>
+    <string name="justify_article_text_description">Juster artiklens afsnit, så de flugter med både venstre og højre kant</string>
 </resources>
