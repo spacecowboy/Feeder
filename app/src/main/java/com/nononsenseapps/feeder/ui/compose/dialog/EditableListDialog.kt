@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.components.SwitchExpressive
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.LocalTypographySettings
@@ -130,7 +131,7 @@ fun EditableListDialog(
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f, fill = true),
                         )
-                        Switch(
+                        SwitchExpressive(
                             checked = toggleValue,
                             onCheckedChange = null,
                         )
