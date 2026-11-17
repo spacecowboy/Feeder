@@ -75,6 +75,12 @@ jobs:
       - run:
           name: Run Gradle Managed Emulator Tests
           command: ./gradlew pixel2api30FdroidDebugAndroidTest --parallel
+      - store_artifacts:
+          path: app/build/reports/androidTests/managedDevice
+          destination: emulator-test-reports
+      - store_artifacts:
+          path: app/build/outputs/androidTest-results/managedDevice
+          destination: emulator-test-results
       - save_gradle_cache
 
 # Orchestrate jobs using workflows

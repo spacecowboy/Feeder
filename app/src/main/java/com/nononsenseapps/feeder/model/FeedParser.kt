@@ -14,15 +14,20 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.asResponseBody
+import okio.Buffer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
@@ -34,6 +39,7 @@ import java.net.URL
 import java.net.URLDecoder
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
 
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -236,10 +242,8 @@ class FeedParser(
         url: URL,
         responseBody: ResponseBody,
     ): Either<FeedParserError, ParsedFeed> {
-        val primaryType = responseBody.contentType()?.type
-        val subType = responseBody.contentType()?.subtype ?: ""
         return when {
-            primaryType == null || primaryType == "text" || subType.contains("json") || subType.contains("xml") ->
+            responseBody.hasFeedContentType() ->
                 Either.catching(
                     onCatch = { t ->
                         RSSParseError(url = url.toString(), throwable = t)
@@ -333,10 +337,60 @@ private fun GoPerson.asParsedAuthor() =
         avatar = null,
     )
 
+internal fun ResponseBody.hasFeedContentType(): Boolean {
+    val type = contentType()
+    return type == null || type.type == "text" || type.subtype.contains("json") || type.subtype.contains("xml")
+}
+
 suspend fun OkHttpClient.getResponse(
     url: URL,
     forceNetwork: Boolean = false,
-): Response {
+): Response = withContext(IO) { newFeedCall(url, forceNetwork).execute() }
+
+/** Buffer on OkHttp's threads, keeping cancellation attached until the network body is closed. */
+internal suspend fun OkHttpClient.getBufferedFeedResponse(
+    url: URL,
+    forceNetwork: Boolean = false,
+): Response =
+    suspendCancellableCoroutine { continuation ->
+        val call = newFeedCall(url, forceNetwork)
+        // A peer sending occasional bytes must not occupy a refresh slot indefinitely.
+        if (call.timeout().timeoutNanos() == 0L) call.timeout().timeout(60, TimeUnit.SECONDS)
+        continuation.invokeOnCancellation { call.cancel() }
+        call.enqueue(
+            object : Callback {
+                override fun onFailure(
+                    call: Call,
+                    e: IOException,
+                ) {
+                    continuation.resumeWithException(e)
+                }
+
+                override fun onResponse(
+                    call: Call,
+                    response: Response,
+                ) {
+                    try {
+                        val buffered =
+                            response.use {
+                                val body = it.body
+                                val buffer = Buffer()
+                                if (it.isSuccessful && body.hasFeedContentType()) body.source().readAll(buffer)
+                                it.newBuilder().body(buffer.asResponseBody(body.contentType(), buffer.size)).build()
+                            }
+                        continuation.resume(buffered) { _, value, _ -> value.close() }
+                    } catch (e: Exception) {
+                        continuation.resumeWithException(e)
+                    }
+                }
+            },
+        )
+    }
+
+private fun OkHttpClient.newFeedCall(
+    url: URL,
+    forceNetwork: Boolean,
+): Call {
     val request =
         Request
             .Builder()
@@ -398,9 +452,7 @@ suspend fun OkHttpClient.getResponse(
             this
         }
 
-    return withContext(IO) {
-        clientToUse.newCall(request).execute()
-    }
+    return clientToUse.newCall(request)
 }
 
 suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
