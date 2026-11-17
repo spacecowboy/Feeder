@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.components.SwitchExpressive
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.settings.UIFeedSettings
@@ -121,7 +122,7 @@ fun FeedNotificationsDialog(
                                 )
                             }
 
-                            Switch(
+                            SwitchExpressive(
                                 checked = item.notify,
                                 onCheckedChange = {
                                     onToggleItem(

@@ -90,6 +90,7 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.localtranslation.LanguagePairInfo
+import com.nononsenseapps.feeder.ui.compose.components.SwitchExpressive
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
@@ -1513,7 +1514,7 @@ fun SwitchSetting(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Switch(
+        SwitchExpressive(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = Modifier.clearAndSetSemantics { },
