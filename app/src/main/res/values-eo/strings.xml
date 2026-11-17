@@ -403,4 +403,10 @@
     <string name="force_single_column">Devigi unuopan kolumnon</string>
     <string name="justify_article_text">Ĝisrandigi la tekston de artikoloj</string>
     <string name="justify_article_text_description">Ĝisrandigi la alineojn de artikoloj ĉe kaj la maldekstra kaj la dekstra marĝenoj</string>
+    <string name="read_aloud_preparing">Preparado de sono…</string>
+    <string name="read_aloud_position">Pozicio de la laŭtlegado</string>
+    <string name="go_to_spoken_text">Iri al la parolata teksto</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Salti malantaŭen 10 sekundojn</string>
+    <string name="skip_forward_10">Salti antaŭen 10 sekundojn</string>
 </resources>
