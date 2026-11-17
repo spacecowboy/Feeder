@@ -412,4 +412,9 @@
     <string name="view_image">查看图片</string>
     <string name="open_image_link">打开链接</string>
     <string name="image_zoom_in">放大</string>
+    <string name="image_zoom_out">缩小</string>
+    <string name="image_reset_zoom">重置缩放</string>
+    <string name="image_load_failed">无法加载图片</string>
+    <string name="image_retry">重试</string>
+    <string name="image_close">关闭图片</string>
 </resources>
