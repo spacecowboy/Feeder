@@ -403,4 +403,18 @@
     <string name="rule_error_too_many_rules">Рядок %1$d: використовуються лише перші %2$d правил. Наступні рядки ігноруються.</string>
     <string name="justify_article_text">Вирівняти текст за шириною</string>
     <string name="justify_article_text_description">Вирівнює абзаци статті за лівим і правим краями</string>
+    <string name="read_aloud_preparing">Підготовка аудіо…</string>
+    <string name="read_aloud_position">Позиція читання вголос</string>
+    <string name="go_to_spoken_text">Перейти до озвученого тексту</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">Назад на 10 секунд</string>
+    <string name="skip_forward_10">Вперед на 10 секунд</string>
+    <string name="view_image">Переглянути зображення</string>
+    <string name="open_image_link">Відкрити посилання</string>
+    <string name="image_zoom_in">Збільшити</string>
+    <string name="image_zoom_out">Зменшити</string>
+    <string name="image_reset_zoom">Скинути масштаб</string>
+    <string name="image_load_failed">Не вдалося завантажити зображення</string>
+    <string name="image_retry">Спробувати знову</string>
+    <string name="image_close">Закрити зображення</string>
 </resources>
