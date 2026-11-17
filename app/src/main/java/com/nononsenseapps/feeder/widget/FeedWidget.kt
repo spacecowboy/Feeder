@@ -22,6 +22,7 @@ import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
@@ -50,16 +51,17 @@ import coil3.toBitmap
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedListFilter
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -142,24 +144,39 @@ private fun buildWidgetStateFlow(
 
     return combine(
         repository.syncWorkerRunning,
-        repository
-            .getCurrentWidgetFeedListItems()
-            .map { listItems ->
-                buildList {
-                    for (listItem in listItems) {
-                        val bitmap = loadImageBitmap(listItem.feedImageUrl?.toString() ?: "")
-                        add(listItem.toWidgetItem(bitmap))
-                    }
-                }
-            },
-    ) { syncWorkerRunning, items ->
+        repository.currentWidgetFeedAndTag,
+        repository.feedListFilter,
+        repository.getCurrentWidgetFeedListItems(),
+    ) { syncWorkerRunning, (widgetFeedId, _), filter, listItems ->
         if (syncWorkerRunning) {
             WidgetState.Syncing
         } else {
-            WidgetState.Ready(items)
+            WidgetState.Ready(
+                listItems
+                    .visibleInWidget(widgetFeedId, filter)
+                    .map { listItem ->
+                        listItem.toWidgetItem(loadImageBitmap(listItem.feedImageUrl?.toString() ?: ""))
+                    },
+            )
         }
     }.onStart { emit(WidgetState.Syncing) }
         .flowOn(Dispatchers.IO)
+}
+
+/**
+ * Applies the feed list filter to widget items so the widget hides read items
+ * when the app does. Saved articles are never filtered by read status in the app.
+ */
+private fun List<FeedListItem>.visibleInWidget(
+    feedId: Long,
+    listFilter: FeedListFilter,
+): List<FeedListItem> {
+    if (feedId == ID_SAVED_ARTICLES) return this
+
+    val hideReadItems = listFilter.unread && !listFilter.read
+    if (!hideReadItems) return this
+
+    return filter { item -> item.unread || (listFilter.saved && item.bookmarked) }
 }
 
 class FeedWidget : GlanceAppWidget() {
@@ -212,7 +229,7 @@ class FeedWidget : GlanceAppWidget() {
     @Composable
     private fun FeederTitleBar(runSync: () -> Unit) {
         Row(
-            modifier = GlanceModifier.fillMaxWidth().padding(8.dp),
+            modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
@@ -241,6 +258,16 @@ class FeedWidget : GlanceAppWidget() {
             )
 
             Image(
+                provider = ImageProvider(R.drawable.ic_done_all),
+                contentDescription = LocalContext.current.getString(R.string.mark_all_as_read),
+                colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
+                modifier =
+                    GlanceModifier
+                        .padding(8.dp)
+                        .clickable(actionRunCallback<MarkAllAsReadAction>()),
+            )
+
+            Image(
                 provider = ImageProvider(R.drawable.ic_settings),
                 contentDescription = "",
                 colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface),
@@ -264,7 +291,7 @@ class FeedWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetReadyContent(items: List<FeedWidgetItem>) {
-        LazyColumn(modifier = GlanceModifier.padding(start = 12.dp)) {
+        LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
             items(
                 count = items.size,
                 itemId = { items[it].id },
