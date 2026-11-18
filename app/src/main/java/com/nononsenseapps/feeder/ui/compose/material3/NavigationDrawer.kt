@@ -276,7 +276,7 @@ fun ModalNavigationDrawer(
 ) {
     val scope = rememberCoroutineScope()
     val navigationMenu = getString(Strings.NavigationMenu)
-    val minValue = -with(LocalDensity.current) { getContainerWidth().toPx() }
+    val minValue = -with(LocalDensity.current) { getContainerWidth().roundToPx().toFloat() }
     val maxValue = 0f
 
     val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
@@ -366,8 +366,8 @@ fun DismissibleNavigationDrawer(
     content: @Composable () -> Unit,
 ) {
     val drawerWidth = getContainerWidth()
-    val drawerWidthPx = with(LocalDensity.current) { drawerWidth.toPx() }
-    val minValue = -drawerWidthPx
+    val drawerWidthPx = with(LocalDensity.current) { drawerWidth.roundToPx() }
+    val minValue = -drawerWidthPx.toFloat()
     val maxValue = 0f
 
     val scope = rememberCoroutineScope()
