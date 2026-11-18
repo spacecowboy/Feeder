@@ -409,4 +409,12 @@
     <string name="skip_forward_10">Înainte cu 10 secunde</string>
     <string name="justify_article_text">Aliniere text articol</string>
     <string name="justify_article_text_description">Aliniați paragrafele articolului cu ambele margini din stânga și din dreapta</string>
+    <string name="view_image">Vizualizați imaginea</string>
+    <string name="open_image_link">Deschideți linkul</string>
+    <string name="image_zoom_in">Măriți</string>
+    <string name="image_zoom_out">Micșorați</string>
+    <string name="image_reset_zoom">Resetați zoomul</string>
+    <string name="image_load_failed">Nu s-a putut încărca imaginea</string>
+    <string name="image_retry">Reîncercați</string>
+    <string name="image_close">Închideți imaginea</string>
 </resources>
