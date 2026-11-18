@@ -409,4 +409,12 @@
     <string name="go_to_spoken_text">Ettelugemine</string>
     <string name="skip_back_10">10 sekundit tagasi</string>
     <string name="skip_forward_10">10 sekundit edasi</string>
+    <string name="view_image">Vaata pilti</string>
+    <string name="open_image_link">Ava link</string>
+    <string name="image_zoom_in">Suumi sisse/suurenda</string>
+    <string name="image_zoom_out">Suumi välja/vähenda</string>
+    <string name="image_reset_zoom">Lähtesta suum</string>
+    <string name="image_load_failed">Pildi laadimine ei õnnestunud</string>
+    <string name="image_retry">Proovi uuesti</string>
+    <string name="image_close">Sulge pilt</string>
 </resources>
