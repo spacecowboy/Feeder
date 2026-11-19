@@ -329,7 +329,8 @@
   <string name="provider_none">None</string>
   <string name="provider_openai_compatible">OpenAI or compatible</string>
   <string name="provider_azure_openai">Azure OpenAI</string>
-  <string name="provider_deepl">DeepL</string>
+  <string name="provider_google_translation">Google Translate</string>
+    <string name="provider_deepl">DeepL</string>
   <string name="provider_local_translation">Local offline</string>
   <string name="base_url_optional">Base URL (optional)</string>
   <string name="translation_endpoint">Translation endpoint</string>
