@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.db.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
+import com.nononsenseapps.feeder.db.COL_ARTICLE_TAGS
 import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
@@ -47,7 +48,8 @@ const val FEED_ITEM_COLUMNS_WITH_FEED = """
     $COL_BOOKMARKED,
     $COL_PRIMARYSORTTIME,
     $COL_WORD_COUNT,
-    $COL_WORD_COUNT_FULL
+    $COL_WORD_COUNT_FULL,
+    $COL_ARTICLE_TAGS
 """
 
 data class FeedItemWithFeed
@@ -76,6 +78,7 @@ data class FeedItemWithFeed
         @ColumnInfo(name = COL_PRIMARYSORTTIME) var primarySortTime: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
         @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
+        @ColumnInfo(name = COL_ARTICLE_TAGS) var articleTags: String = "",
     ) : FeedItemForFetching {
         constructor() : this(id = ID_UNSET)
 

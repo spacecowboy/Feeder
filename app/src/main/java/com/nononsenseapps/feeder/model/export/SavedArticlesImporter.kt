@@ -157,6 +157,7 @@ private fun SavedArticleExportItem.toFeedItem(feedId: Long?): FeedItem {
         readTime = readTime.parseInstantOrNull(),
         wordCount = wordCount,
         wordCountFull = wordCountFull,
+        articleTags = articleTags,
     )
 }
 
