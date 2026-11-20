@@ -320,7 +320,7 @@ jobs:
     concurrency:
       # This name has nothing to do with the environment name
       group: deploy-play
-    runs-on: ubuntu-24.04 # fastlane remoed from 26 which is default for latest since Nov 19
+    runs-on: ubuntu-26.04 # fastlane remoed from 26 which is default for latest since Nov 19
     timeout-minutes: 30
     needs: [play-bundle]
     permissions:
@@ -372,7 +372,7 @@ jobs:
       group: deploy-play-beta
       # Cancel any waiting jobs if a new one is queued (there is a wait timer configured in protection rules)
       cancel-in-progress: true
-    runs-on: ubuntu-24.04 # fastlane remoed from 26 which is default for latest since Nov 19
+    runs-on: ubuntu-26.04 # fastlane remoed from 26 which is default for latest since Nov 19
     timeout-minutes: 30
     needs: [play-bundle]
     permissions:
