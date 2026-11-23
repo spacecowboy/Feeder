@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.COL_SKIP_DUPLICATES
 import com.nononsenseapps.feeder.db.COL_SUMMARIZE_ON_OPEN
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
+import com.nononsenseapps.feeder.db.COL_TRUST_ALL_CERTIFICATES
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.COL_WHEN_MODIFIED
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
@@ -67,6 +68,7 @@ data class Feed
         @ColumnInfo(name = COL_FETCH_OG_IMAGES) var fetchOgImages: Boolean = false,
         @ColumnInfo(name = COL_BLOCK_RULES) var blockRules: String = "",
         @ColumnInfo(name = COL_ALLOW_RULES) var allowRules: String = "",
+        @ColumnInfo(name = COL_TRUST_ALL_CERTIFICATES) var trustAllCertificates: Boolean = false,
     ) {
         constructor() : this(id = ID_UNSET)
 

@@ -50,6 +50,7 @@ class EditFeedScreenViewModel(
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var summarizeOnOpen: Boolean by mutableSavedStateOf(state, false)
     override var fetchOgImages: Boolean by mutableSavedStateOf(state, false)
+    override var trustAllCertificates: Boolean by mutableSavedStateOf(state, false)
 
     // Invalid rules deliberately do not block saving - a regex is invalid while being
     // typed, and the engine ignores invalid lines anyway.
@@ -129,6 +130,9 @@ class EditFeedScreenViewModel(
             if (!state.contains("fetchOgImages")) {
                 fetchOgImages = feed.fetchOgImages
             }
+            if (!state.contains("trustAllCertificates")) {
+                trustAllCertificates = feed.trustAllCertificates
+            }
             if (!state.contains("blockRules")) {
                 blockRules = feed.blockRules
             }
@@ -162,6 +166,7 @@ class EditFeedScreenViewModel(
                     alternateId = alternateId,
                     summarizeOnOpen = summarizeOnOpen,
                     fetchOgImages = fetchOgImages,
+                    trustAllCertificates = trustAllCertificates,
                     blockRules = blockRules,
                     allowRules = allowRules,
                 )
