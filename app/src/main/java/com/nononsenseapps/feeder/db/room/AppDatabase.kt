@@ -54,7 +54,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
     views = [
         FeedsWithItemsForNavDrawer::class,
     ],
-    version = 40,
+    version = 41,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -139,12 +139,24 @@ fun getAllMigrations(di: DI) =
         MigrationFrom37To38(di),
         MIGRATION_38_39,
         MIGRATION_39_40,
+        MIGRATION_40_41,
     )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+
+@Suppress("ClassName")
+object MIGRATION_40_41 : Migration(40, 41) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            ALTER TABLE feed_items ADD COLUMN article_tags TEXT
+            """.trimIndent(),
+        )
+    }
+}
 
 /**
  * Moving main articles back to data dir because of issues some have
