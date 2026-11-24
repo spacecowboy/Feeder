@@ -680,7 +680,10 @@ class Repository(
         feedIds: List<Long>,
         folderId: Long,
         whenModified: Instant = Instant.now(),
-    ) = feedStore.setFeedsFolderId(feedIds, folderId, whenModified)
+    ) {
+        feedStore.setFeedsFolderId(feedIds, folderId, whenModified)
+        setMinReadTime(Instant.now())
+    }
 
     val allFolders: Flow<List<SelectableFolder>> = folderStore.allFolders
 
@@ -722,6 +725,7 @@ class Repository(
         if (result > 0) {
             // Update feed modification time so the folder path is updated on synced devices
             feedStore.updateFeedsModDateInFolder(folderId, Instant.now())
+            setMinReadTime(Instant.now())
         }
         return result
     }
