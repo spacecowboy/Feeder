@@ -56,7 +56,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
         FeedsWithItemsForNavDrawer::class,
         FolderClosures::class,
     ],
-    version = 41,
+    version = 42,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -180,7 +180,7 @@ fun getAllMigrations(di: DI) =
         MIGRATION_38_39,
         MIGRATION_39_40,
         MIGRATION_40_41,
-        MigrationFrom40To41(di),
+        MigrationFrom41To42(di),
     )
 
 /*
@@ -188,9 +188,9 @@ fun getAllMigrations(di: DI) =
  * 7 represents new Room database
  */
 
-class MigrationFrom40To41(
+class MigrationFrom41To42(
     override val di: DI,
-) : Migration(40, 41),
+) : Migration(41, 42),
     DIAware {
     private val sharedPrefs: SharedPreferences by instance()
 
