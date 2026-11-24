@@ -417,4 +417,6 @@
     <string name="image_load_failed">Bild konnte nicht geladen werden</string>
     <string name="image_retry">Erneut versuchen</string>
     <string name="image_close">Bild schließen</string>
+    <string name="trust_all_certificates_desc">SSL-Zertifikatsprüfung für diesen Feed umgehen</string>
+    <string name="trust_all_certificates">Allen Zertifikaten vertrauen</string>
 </resources>
