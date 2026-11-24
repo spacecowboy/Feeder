@@ -340,7 +340,7 @@ interface FeedDao {
         UPDATE feeds
         SET folder_id = NULLIF(:folderId, $ID_UNSET),
             when_modified = :whenModified
-        WHERE id IN (:feedIds) AND folder_id <> NULLIF(:folderId, $ID_UNSET)
+        WHERE id IN (:feedIds) AND folder_id IS NOT NULLIF(:folderId, $ID_UNSET)
         """,
     )
     suspend fun setFeedsFolderId(
