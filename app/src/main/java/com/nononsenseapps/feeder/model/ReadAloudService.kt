@@ -108,12 +108,13 @@ class ReadAloudService : MediaSessionService() {
                     ),
                 ).setCallback(
                     object : MediaSession.Callback {
-                        override fun onConnect(
+                        override fun onConnectAsync(
                             session: MediaSession,
                             controller: MediaSession.ControllerInfo,
-                        ): MediaSession.ConnectionResult {
-                            if (!controller.isTrusted) return MediaSession.ConnectionResult.reject()
-                            val defaults = super.onConnect(session, controller)
+                        ): ListenableFuture<MediaSession.ConnectionResult> {
+                            if (!controller.isTrusted) return Futures.immediateFuture(MediaSession.ConnectionResult.reject())
+                            val result = MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller)
+                            val defaults = result.build()
                             // External controls can operate this article, not replace its local audio.
                             val commands =
                                 defaults.availablePlayerCommands
@@ -121,15 +122,16 @@ class ReadAloudService : MediaSessionService() {
                                     .remove(Player.COMMAND_SET_MEDIA_ITEM)
                                     .remove(Player.COMMAND_CHANGE_MEDIA_ITEMS)
                                     .build()
-                            return MediaSession.ConnectionResult
-                                .AcceptedResultBuilder(session)
-                                .setAvailablePlayerCommands(commands)
-                                .setAvailableSessionCommands(
-                                    defaults.availableSessionCommands
-                                        .buildUpon()
-                                        .add(SessionCommand(ACTION_STOP, Bundle.EMPTY))
-                                        .build(),
-                                ).build()
+                            return Futures.immediateFuture(
+                                result
+                                    .setAvailablePlayerCommands(commands)
+                                    .setAvailableSessionCommands(
+                                        defaults.availableSessionCommands
+                                            .buildUpon()
+                                            .add(SessionCommand(ACTION_STOP, Bundle.EMPTY))
+                                            .build(),
+                                    ).build(),
+                            )
                         }
 
                         override fun onCustomCommand(
