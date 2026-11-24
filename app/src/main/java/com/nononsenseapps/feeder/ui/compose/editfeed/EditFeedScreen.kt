@@ -531,6 +531,13 @@ fun ColumnScope.RightContent(
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         icon = null,
     )
+    SwitchSetting(
+        title = stringResource(id = R.string.trust_all_certificates),
+        checked = viewState.trustAllCertificates,
+        { viewState.trustAllCertificates = it },
+        description = stringResource(id = R.string.trust_all_certificates_desc),
+        icon = null,
+    )
     HorizontalDivider(modifier = Modifier.fillMaxWidth())
     GroupTitle(
         startingSpace = false,
@@ -689,6 +696,7 @@ interface EditFeedScreenState {
     var alternateId: Boolean
     var summarizeOnOpen: Boolean
     var fetchOgImages: Boolean
+    var trustAllCertificates: Boolean
     var blockRules: String
     var allowRules: String
     val blockRulesError: ArticleRuleError?
@@ -729,6 +737,7 @@ private class ScreenState(
     override var alternateId: Boolean by mutableStateOf(false)
     override var summarizeOnOpen: Boolean by mutableStateOf(false)
     override var fetchOgImages: Boolean by mutableStateOf(false)
+    override var trustAllCertificates: Boolean by mutableStateOf(false)
     override var blockRules: String by mutableStateOf("")
     override var allowRules: String by mutableStateOf("")
 }

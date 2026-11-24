@@ -302,6 +302,8 @@
   <string name="summarize_on_open">Summarize on open</string>
   <string name="fetch_og_images">Enhance thumbnails from article metadata</string>
   <string name="fetch_og_images_desc">Try to improve missing or low-quality thumbnails for this feed</string>
+  <string name="trust_all_certificates">Trust all certificates</string>
+  <string name="trust_all_certificates_desc">Bypass SSL certificate verification for this feed</string>
   <string name="article_filter_rules">Article filtering rules</string>
   <string name="article_filter_rules_desc">One rule per line, written as FieldName=pattern. Available fields are Title, URL, Author, Tag and Content. The pattern is a regular expression which matches anywhere in the field; start it with (?i) to ignore case. Rules take effect on the next fetch and do not affect already-saved articles.</string>
   <string name="block_rules">Block rules</string>

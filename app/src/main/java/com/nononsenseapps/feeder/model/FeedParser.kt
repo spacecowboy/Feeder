@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.util.flatMap
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
+import com.nononsenseapps.jsonfeed.trustAllCerts
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -52,8 +53,11 @@ class FeedParser(
     /**
      * Parses all relevant information from a main site so duplicate calls aren't needed
      */
-    suspend fun getSiteMetaData(url: URL): Either<FeedParserError, SiteMetaData> =
-        curl(url)
+    suspend fun getSiteMetaData(
+        url: URL,
+        trustAllCertificates: Boolean = false,
+    ): Either<FeedParserError, SiteMetaData> =
+        curl(url, trustAllCertificates = trustAllCertificates)
             .flatMap { html ->
                 getSiteMetaDataInHtml(url, html)
             }
@@ -209,11 +213,17 @@ class FeedParser(
     /**
      * @throws IOException if request fails due to network issue for example
      */
-    private suspend fun curl(url: URL) = client.curl(url)
+    private suspend fun curl(
+        url: URL,
+        trustAllCertificates: Boolean = false,
+    ) = client.curl(url, trustAllCertificates = trustAllCertificates)
 
-    suspend fun parseFeedUrl(url: URL): Either<FeedParserError, ParsedFeed> =
+    suspend fun parseFeedUrl(
+        url: URL,
+        trustAllCertificates: Boolean = false,
+    ): Either<FeedParserError, ParsedFeed> =
         client
-            .curlAndOnResponse(url) {
+            .curlAndOnResponse(url, trustAllCertificates = trustAllCertificates) {
                 parseFeedResponse(it)
             }.map {
                 // Preserve original URL to maintain authentication data and/or tokens in query params
@@ -345,15 +355,17 @@ internal fun ResponseBody.hasFeedContentType(): Boolean {
 suspend fun OkHttpClient.getResponse(
     url: URL,
     forceNetwork: Boolean = false,
-): Response = withContext(IO) { newFeedCall(url, forceNetwork).execute() }
+    trustAllCertificates: Boolean = false,
+): Response = withContext(IO) { newFeedCall(url, forceNetwork, trustAllCertificates).execute() }
 
 /** Buffer on OkHttp's threads, keeping cancellation attached until the network body is closed. */
 internal suspend fun OkHttpClient.getBufferedFeedResponse(
     url: URL,
     forceNetwork: Boolean = false,
+    trustAllCertificates: Boolean = false,
 ): Response =
     suspendCancellableCoroutine { continuation ->
-        val call = newFeedCall(url, forceNetwork)
+        val call = newFeedCall(url, forceNetwork, trustAllCertificates)
         // A peer sending occasional bytes must not occupy a refresh slot indefinitely.
         if (call.timeout().timeoutNanos() == 0L) call.timeout().timeout(60, TimeUnit.SECONDS)
         continuation.invokeOnCancellation { call.cancel() }
@@ -390,6 +402,7 @@ internal suspend fun OkHttpClient.getBufferedFeedResponse(
 private fun OkHttpClient.newFeedCall(
     url: URL,
     forceNetwork: Boolean,
+    trustAllCertificates: Boolean = false,
 ): Call {
     val request =
         Request
@@ -407,7 +420,7 @@ private fun OkHttpClient.newFeedCall(
             }.build()
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    val clientToUse =
+    val builder =
         if (url.userInfo?.isNotBlank() == true) {
             val parts = url.userInfo.split(':')
             val user = parts.first()
@@ -447,16 +460,23 @@ private fun OkHttpClient.newFeedCall(
                                 .build()
                         }
                     }
-                }.build()
+                }
         } else {
-            this
+            newBuilder()
         }
 
-    return clientToUse.newCall(request)
+    if (trustAllCertificates) {
+        builder.trustAllCerts()
+    }
+
+    return builder.build().newCall(request)
 }
 
-suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
-    curlAndOnResponse(url) {
+suspend fun OkHttpClient.curl(
+    url: URL,
+    trustAllCertificates: Boolean = false,
+): Either<FeedParserError, String> =
+    curlAndOnResponse(url, trustAllCertificates = trustAllCertificates) {
         val contentType = it.body?.contentType()
         when (contentType?.type) {
             "text" -> {
@@ -502,6 +522,7 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
 
 suspend fun <T> OkHttpClient.curlAndOnResponse(
     url: URL,
+    trustAllCertificates: Boolean = false,
     block: (suspend (Response) -> Either<FeedParserError, T>),
 ): Either<FeedParserError, T> =
     Either
@@ -510,7 +531,7 @@ suspend fun <T> OkHttpClient.curlAndOnResponse(
                 FetchError(url = url.toString(), throwable = t)
             },
         ) {
-            getResponse(url)
+            getResponse(url, trustAllCertificates = trustAllCertificates)
         }.flatMap { response ->
             if (response.isSuccessful) {
                 response.use {
