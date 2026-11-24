@@ -417,4 +417,6 @@
     <string name="image_load_failed">Nie udało się załadować obrazka</string>
     <string name="image_retry">Ponów</string>
     <string name="image_close">Zamknij obrazek</string>
+    <string name="trust_all_certificates">Ufaj wszystkim certyfikatom</string>
+    <string name="trust_all_certificates_desc">Pomijaj weryfikację certyfikatu SSL dla tego kanału</string>
 </resources>
