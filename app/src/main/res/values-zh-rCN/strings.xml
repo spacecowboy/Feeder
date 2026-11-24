@@ -417,4 +417,6 @@
     <string name="image_load_failed">无法加载图片</string>
     <string name="image_retry">重试</string>
     <string name="image_close">关闭图片</string>
+    <string name="trust_all_certificates">信任所有证书</string>
+    <string name="trust_all_certificates_desc">绕过此订阅源的 SSL 证书验证</string>
 </resources>
