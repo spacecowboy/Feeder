@@ -144,7 +144,7 @@ private fun buildWidgetStateFlow(
 
     return combine(
         repository.syncWorkerRunning,
-        repository.currentWidgetFeedAndTag,
+        repository.currentWidgetFeedAndFolder,
         repository.feedListFilter,
         repository.getCurrentWidgetFeedListItems(),
     ) { syncWorkerRunning, (widgetFeedId, _), filter, listItems ->

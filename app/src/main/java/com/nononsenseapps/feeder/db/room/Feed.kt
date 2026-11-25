@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.db.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -11,6 +12,7 @@ import com.nononsenseapps.feeder.db.COL_BLOCK_RULES
 import com.nononsenseapps.feeder.db.COL_CURRENTLY_SYNCING
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FETCH_OG_IMAGES
+import com.nononsenseapps.feeder.db.COL_FOLDER_ID
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -38,6 +40,15 @@ const val OPEN_ARTICLE_WITH_APPLICATION_DEFAULT = ""
     indices = [
         Index(value = [COL_URL], unique = true),
         Index(value = [COL_ID, COL_URL, COL_TITLE], unique = true),
+        Index(value = [COL_FOLDER_ID]),
+    ],
+    foreignKeys = [
+        ForeignKey(
+            entity = Folder::class,
+            parentColumns = [COL_ID],
+            childColumns = [COL_FOLDER_ID],
+            onDelete = ForeignKey.RESTRICT,
+        ),
     ],
 )
 data class Feed
@@ -49,7 +60,9 @@ data class Feed
         @ColumnInfo(name = COL_TITLE) var title: String = "",
         @ColumnInfo(name = COL_CUSTOM_TITLE) var customTitle: String = "",
         @ColumnInfo(name = COL_URL) var url: URL = URL("http://"),
-        @ColumnInfo(name = COL_TAG) var tag: String = "",
+        @ColumnInfo(name = COL_FOLDER_ID) var folderIdNullable: Long? = null,
+        @Deprecated("This column has been 'removed' but it is still used in legacy tests and for compatibility with syncing feeds to older app versions.")
+        @ColumnInfo(name = COL_TAG) var oldTag: String = "",
         @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
         @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
@@ -74,4 +87,7 @@ data class Feed
 
         val displayTitle: String
             get() = (customTitle.ifBlank { title })
+
+        val folderId: Long
+            get() = folderIdNullable ?: ID_UNSET
     }

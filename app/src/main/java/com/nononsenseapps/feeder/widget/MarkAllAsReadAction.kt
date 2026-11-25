@@ -9,7 +9,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import org.kodein.di.instance
 
 /**
- * Marks everything as read in the feed or tag which the widget is showing.
+ * Marks everything as read in the feed or folder which the widget is showing.
  * This matches the "mark all as read" action in the app.
  */
 class MarkAllAsReadAction : ActionCallback {
@@ -20,7 +20,7 @@ class MarkAllAsReadAction : ActionCallback {
     ) {
         val app = context.applicationContext as FeederApplication
         val repository: Repository by app.di.instance()
-        val (feedId, tag) = repository.currentWidgetFeedAndTag.value
-        repository.markAllAsReadInFeedOrTag(feedId, tag)
+        val (feedId, folderId) = repository.currentWidgetFeedAndFolder.value
+        repository.markAllAsReadInFeedOrFolder(feedId, folderId)
     }
 }

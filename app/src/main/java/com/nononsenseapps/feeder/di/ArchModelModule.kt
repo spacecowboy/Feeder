@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.di
 import android.app.Application
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.FolderStore
 import com.nononsenseapps.feeder.archmodel.FontStore
 import com.nononsenseapps.feeder.archmodel.OpenAISettings
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -29,6 +30,7 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedViewModel
+import com.nononsenseapps.feeder.ui.compose.folder.EditFoldersViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsViewModel
@@ -51,6 +53,7 @@ val archModelModule =
         bind<FontStore>() with singleton { FontStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
+        bind<FolderStore>() with singleton { FolderStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
         bind<BergamotModelManager>() with singleton { BergamotModelManager(di) }
         bind<BergamotWebTranslator>() with singleton { BergamotWebTranslator(di) }
@@ -82,4 +85,5 @@ val archModelModule =
         bindWithComposableViewModelScope<FeedViewModel>()
         bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
         bindWithComposableViewModelScope<TextSettingsViewModel>()
+        bindWithComposableViewModelScope<EditFoldersViewModel>()
     }

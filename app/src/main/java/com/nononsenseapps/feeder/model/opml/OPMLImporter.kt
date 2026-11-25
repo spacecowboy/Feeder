@@ -14,6 +14,8 @@ import com.nononsenseapps.feeder.archmodel.syncFrequencyFromString
 import com.nononsenseapps.feeder.archmodel.themeOptionsFromString
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FolderDao
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlinx.coroutines.flow.first
@@ -26,18 +28,28 @@ open class OPMLImporter(
 ) : OPMLParserHandler,
     DIAware {
     private val feedDao: FeedDao by instance()
+    private val folderDao: FolderDao by instance()
     private val settingsStore: SettingsStore by instance()
     private val filePathProvider: FilePathProvider by instance()
 
-    override suspend fun saveFeed(feed: Feed) {
+    override suspend fun saveFeed(
+        feed: Feed,
+        folderId: Long,
+    ) {
         val existing = feedDao.loadFeedWithUrl(feed.url)
+        val folderIdNullable = folderId.takeUnless { it == ID_UNSET }
         // Don't want to remove existing feed on OPML imports
         if (existing != null) {
-            feedDao.updateFeed(feed.copy(id = existing.id))
+            feedDao.updateFeed(feed.copy(id = existing.id, folderIdNullable = folderIdNullable))
         } else {
-            feedDao.insertFeed(feed)
+            feedDao.insertFeed(feed.copy(folderIdNullable = folderIdNullable))
         }
     }
+
+    override suspend fun saveFolder(
+        name: String,
+        parentId: Long,
+    ): Long = folderDao.insertOrGetFolder(name, parentId)
 
     override suspend fun saveSetting(
         key: String,

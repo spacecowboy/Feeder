@@ -131,15 +131,15 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
-    fun currentFeedAndTag() {
-        store.setCurrentFeedAndTag(8L, "bar")
+    fun currentFeedAndFolder() {
+        store.setCurrentFeedAndFolder(8L, 2L)
 
         verify {
             sp.edit().putLong(PREF_LAST_FEED_ID, 8L).apply()
-            sp.edit().putString(PREF_LAST_FEED_TAG, "bar").apply()
+            sp.edit().putLong(PREF_LAST_FOLDER_ID, 2L).apply()
         }
 
-        assertEquals(8L to "bar", store.currentFeedAndTag.value)
+        assertEquals(8L to 2L, store.currentFeedAndFolder.value)
     }
 
     @Test
@@ -372,7 +372,7 @@ class SettingsStoreTest : DIAware {
                 PREF_SHOW_FAB to false,
                 "Not a pref" to true,
                 // Not OK if imported on a fresh device
-                PREF_LAST_FEED_TAG to "foo",
+                PREF_LAST_FOLDER_ID to 5L,
                 PREF_LAST_FEED_ID to 1L,
                 PREF_LAST_ARTICLE_ID to 2L,
                 PREF_IS_ARTICLE_OPEN to true,

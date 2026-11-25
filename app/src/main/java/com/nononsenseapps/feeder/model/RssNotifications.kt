@@ -32,6 +32,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
@@ -39,7 +40,6 @@ import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.notificationManager
-import com.nononsenseapps.feeder.util.urlEncode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
@@ -279,10 +279,12 @@ internal fun getMarkAsReadIntent(
 /**
  * Use this on platforms older than 24 to bundle notifications together
  */
-private fun inboxNotification(
+private suspend fun inboxNotification(
     context: Context,
     feedItems: List<FeedItemWithFeed>,
 ): Notification {
+    val di by closestDI(context)
+    val folderDao: FolderDao by di.instance()
     val style = NotificationCompat.InboxStyle()
     val title = context.getString(R.string.updated_feeds)
     val text = feedItems.map { it.feedDisplayTitle }.toSet().joinToString(separator = ", ")
@@ -294,30 +296,29 @@ private fun inboxNotification(
 
     // We can be a little bit smart - if all items are from the same feed then go to that feed
     // Otherwise we should go to All feeds
-    val feedTags = feedItems.map { it.tag }.toSet()
+    val folderIds = feedItems.map { it.folderId }.toSet()
 
-    val deepLinkTag =
-        if (feedTags.size == 1) {
-            feedTags.first()
-        } else {
-            ""
-        }
+    val deepLinkFolderId =
+        folderIds
+            .takeIf { it.isNotEmpty() && !it.contains(ID_UNSET) }
+            ?.let { folderDao.getClosestAncestorContainingAllFolders(it) }
+            ?: ID_UNSET
 
     val feedIds = feedItems.map { it.feedId }.toSet()
 
-    val deepLinkId =
+    val deepLinkFeedId =
         if (feedIds.size == 1) {
             feedIds.first() ?: ID_UNSET
         } else {
-            if (deepLinkTag.isNotEmpty()) {
-                ID_ALL_FEEDS // Tag will take precedence
+            if (deepLinkFolderId > ID_UNSET) {
+                ID_ALL_FEEDS // Folder will take precedence
             } else {
-                ID_UNSET // Will default to last open when tag is empty too
+                ID_UNSET // Will default to last open when folder is empty too
             }
         }
 
     val deepLinkUri =
-        "$DEEP_LINK_BASE_URI/feed?id=$deepLinkId&tag=${deepLinkTag.urlEncode()}"
+        "$DEEP_LINK_BASE_URI/feed?feedId=$deepLinkFeedId&folderId=$deepLinkFolderId"
 
     val contentIntent =
         Intent(

@@ -15,7 +15,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.model.notify
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
-import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
+import com.nononsenseapps.feeder.ui.ARG_FOLDER_ID
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -41,13 +41,13 @@ class RssSyncJob(
     override suspend fun doWork() {
         try {
             val feedId = params.extras.getLong(ARG_FEED_ID, ID_UNSET)
-            val feedTag = params.extras.getString(ARG_FEED_TAG) ?: ""
+            val folderId = params.extras.getLong(ARG_FOLDER_ID, ID_UNSET)
             val forceNetwork = params.extras.getBoolean(ARG_FORCE_NETWORK, false)
             val minFeedAgeMinutes = params.extras.getInt(MIN_FEED_AGE_MINUTES, 5)
 
             rssLocalSync.syncFeeds(
                 feedId = feedId,
-                feedTag = feedTag,
+                folderId = folderId,
                 forceNetwork = forceNetwork,
                 minFeedAgeMinutes = minFeedAgeMinutes,
             )
@@ -67,7 +67,7 @@ class RssSyncJob(
 fun runOnceRssSync(
     di: DI,
     feedId: Long = ID_UNSET,
-    feedTag: String = "",
+    folderId: Long = ID_UNSET,
     forceNetwork: Boolean = false,
     triggeredByUser: Boolean,
 ) {
@@ -93,7 +93,7 @@ fun runOnceRssSync(
             ).setExtras(
                 PersistableBundle().apply {
                     putLong(ARG_FEED_ID, feedId)
-                    putString(ARG_FEED_TAG, feedTag)
+                    putLong(ARG_FOLDER_ID, folderId)
                     putBoolean(ARG_FORCE_NETWORK, forceNetwork)
                 },
             )

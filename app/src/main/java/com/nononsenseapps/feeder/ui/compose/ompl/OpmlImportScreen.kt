@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.model.opml.OpmlPullParser
 import com.nononsenseapps.feeder.model.opml.importOpml
@@ -83,13 +84,31 @@ fun OpmlImportScreen(
                 val parser =
                     OpmlPullParser(
                         object : OPMLParserHandler {
-                            override suspend fun saveFeed(feed: Feed) {
+                            override suspend fun saveFeed(
+                                feed: Feed,
+                                folderId: Long,
+                            ) {
                                 viewState =
                                     viewState.copy(
                                         initial = false,
                                         feeds = viewState.feeds + (feed.url to feed),
                                     )
                             }
+
+                            override suspend fun saveFolder(
+                                name: String,
+                                parentId: Long,
+                            ): Long =
+                                viewState.folders.getOrElse(parentId to name) {
+                                    val newFolderId = viewState.folders.size + 1L
+                                    val folderEntry = (parentId to name) to newFolderId
+                                    viewState =
+                                        viewState.copy(
+                                            initial = false,
+                                            folders = viewState.folders + folderEntry,
+                                        )
+                                    newFolderId
+                                }
 
                             override suspend fun saveSetting(
                                 key: String,
@@ -217,13 +236,13 @@ fun OpmlImportView(
                     viewState.feeds.isEmpty() -> stringResource(id = R.string.no_feeds)
                     else ->
                         stringResource(
-                            id = R.string.import_x_feeds_with_y_tags,
+                            id = R.string.import_x_feeds_with_y_folders,
                             pluralStringResource(
                                 id = R.plurals.n_feeds,
                                 count = viewState.feedCount,
                             ).format(viewState.feedCount),
-                            pluralStringResource(id = R.plurals.n_tags, count = viewState.tagCount).format(
-                                viewState.tagCount,
+                            pluralStringResource(id = R.plurals.n_folders, count = viewState.folderCount).format(
+                                viewState.folderCount,
                             ),
                         )
                 }
@@ -285,17 +304,13 @@ fun OpmlImportView(
 @Immutable
 data class ViewState(
     val feeds: Map<URL, Feed> = mutableMapOf(),
+    val folders: Map<Pair<Long, String>, Long> = mutableMapOf(),
     val error: Boolean = false,
     val initial: Boolean = true,
 ) {
     val okEnabled: Boolean = feeds.isNotEmpty()
     val feedCount: Int = feeds.size
-    val tagCount: Int =
-        feeds.values
-            .asSequence()
-            .map { it.tag }
-            .filterNot { it.isBlank() }
-            .count()
+    val folderCount: Int = folders.size
 }
 
 @PreviewThemes
@@ -312,8 +327,15 @@ private fun PreviewOpmlImportScreenSingle() {
                                     Feed(
                                         title = "Foo Feed",
                                         url = URL("https://example.com/foo"),
+                                        folderIdNullable = 3L,
                                     ),
                             ),
+                        folders =
+                            mapOf(
+                                (ID_UNSET to "Folder 1") to 2L,
+                                (2L to "Folder 2") to 3L,
+                            ),
+                        initial = false,
                     ),
                 onDismiss = {},
                 onOk = {},

@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.model.opml
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.UserSettings
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.Folder
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -26,26 +28,39 @@ class OpmlWriterKtTest {
     fun shouldEscapeStrings() =
         runBlocking {
             val bos = ByteArrayOutputStream()
-            writeOutputStream(bos, emptyMap(), emptyList(), listOf("quoted \"tag\"")) { tag ->
-                val result = mutableListOf<Feed>()
-                val feed =
-                    Feed(
-                        id = 1L,
-                        title = "A \"feeditem\" with id '9' > 0 & < 10",
-                        customTitle = "A custom \"title\" with id '9' > 0 & < 1e",
-                        url = URL("http://example.com/rss.xml?format=feed&type=rss"),
-                        tag = tag,
-                        notify = true,
-                        imageUrl = URL("https://example.com/feedImage"),
-                        fullTextByDefault = true,
-                        openArticlesWith = "reader",
-                        alternateId = true,
-                        fetchOgImages = false,
-                    )
-
-                result.add(feed)
-                result
-            }
+            writeOutputStream(
+                os = bos,
+                settings = emptyMap(),
+                blockedPatterns = emptyList(),
+                folders = { folderId ->
+                    if (folderId == ID_UNSET) {
+                        listOf(Folder(id = 1L, name = "quoted \"folder\""))
+                    } else {
+                        emptyList()
+                    }
+                },
+                feeds = { folderId ->
+                    if (folderId == 1L) {
+                        listOf(
+                            Feed(
+                                id = 1L,
+                                title = "A \"feeditem\" with id '9' > 0 & < 10",
+                                customTitle = "A custom \"title\" with id '9' > 0 & < 1e",
+                                url = URL("http://example.com/rss.xml?format=feed&type=rss"),
+                                folderIdNullable = folderId,
+                                notify = true,
+                                imageUrl = URL("https://example.com/feedImage"),
+                                fullTextByDefault = true,
+                                openArticlesWith = "reader",
+                                alternateId = true,
+                                fetchOgImages = false,
+                            ),
+                        )
+                    } else {
+                        emptyList()
+                    }
+                },
+            )
             val output = String(bos.toByteArray())
             assertEquals(expected, output.trimEnd())
         }
@@ -54,18 +69,34 @@ class OpmlWriterKtTest {
     fun writesRulesWithNewlinesEncodedAsCharacterReferences() =
         runBlocking {
             val bos = ByteArrayOutputStream()
-            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
-                listOf(
-                    Feed(
-                        id = 1L,
-                        title = "title",
-                        url = URL("http://example.com/rss.xml"),
-                        tag = tag,
-                        blockRules = "Title=(?i)sponsored\r\nURL=ads & \"tracking\"",
-                        allowRules = "Tag=(?i)linux",
-                    ),
-                )
-            }
+            writeOutputStream(
+                os = bos,
+                settings = emptyMap(),
+                blockedPatterns = emptyList(),
+                folders = { folderId ->
+                    if (folderId == ID_UNSET) {
+                        listOf(Folder(id = 1L, name = "news"))
+                    } else {
+                        emptyList()
+                    }
+                },
+                feeds = { folderId ->
+                    if (folderId == 1L) {
+                        listOf(
+                            Feed(
+                                id = 1L,
+                                title = "title",
+                                url = URL("http://example.com/rss.xml"),
+                                folderIdNullable = folderId,
+                                blockRules = "Title=(?i)sponsored\r\nURL=ads & \"tracking\"",
+                                allowRules = "Tag=(?i)linux",
+                            ),
+                        )
+                    } else {
+                        emptyList()
+                    }
+                },
+            )
             val output = String(bos.toByteArray())
 
             assertEquals(
@@ -82,17 +113,33 @@ class OpmlWriterKtTest {
     fun writesRulesWithTabsEncodedAsCharacterReferences() =
         runBlocking {
             val bos = ByteArrayOutputStream()
-            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
-                listOf(
-                    Feed(
-                        id = 1L,
-                        title = "title",
-                        url = URL("http://example.com/rss.xml"),
-                        tag = tag,
-                        blockRules = "Content=Price:\tfree",
-                    ),
-                )
-            }
+            writeOutputStream(
+                os = bos,
+                settings = emptyMap(),
+                blockedPatterns = emptyList(),
+                folders = { folderId ->
+                    if (folderId == ID_UNSET) {
+                        listOf(Folder(id = 1L, name = "news"))
+                    } else {
+                        emptyList()
+                    }
+                },
+                feeds = { folderId ->
+                    if (folderId == 1L) {
+                        listOf(
+                            Feed(
+                                id = 1L,
+                                title = "title",
+                                url = URL("http://example.com/rss.xml"),
+                                folderIdNullable = folderId,
+                                blockRules = "Content=Price:\tfree",
+                            ),
+                        )
+                    } else {
+                        emptyList()
+                    }
+                },
+            )
             val output = String(bos.toByteArray())
 
             assertEquals(
@@ -105,16 +152,32 @@ class OpmlWriterKtTest {
     fun doesNotWriteRuleAttributesWhenRulesAreEmpty() =
         runBlocking {
             val bos = ByteArrayOutputStream()
-            writeOutputStream(bos, emptyMap(), emptyList(), listOf("news")) { tag ->
-                listOf(
-                    Feed(
-                        id = 1L,
-                        title = "title",
-                        url = URL("http://example.com/rss.xml"),
-                        tag = tag,
-                    ),
-                )
-            }
+            writeOutputStream(
+                os = bos,
+                settings = emptyMap(),
+                blockedPatterns = emptyList(),
+                folders = { folderId ->
+                    if (folderId == ID_UNSET) {
+                        listOf(Folder(id = 1L, name = "news"))
+                    } else {
+                        emptyList()
+                    }
+                },
+                feeds = { folderId ->
+                    if (folderId == 1L) {
+                        listOf(
+                            Feed(
+                                id = 1L,
+                                title = "title",
+                                url = URL("http://example.com/rss.xml"),
+                                folderIdNullable = folderId,
+                            ),
+                        )
+                    } else {
+                        emptyList()
+                    }
+                },
+            )
             val output = String(bos.toByteArray())
 
             assertEquals(false, output.contains("feeder:blockRules"))
@@ -129,27 +192,35 @@ class OpmlWriterKtTest {
                 os = bos,
                 settings = ALL_SETTINGS_WITH_VALUES,
                 blockedPatterns = listOf("foo", "break \"xml id '9' > 0 & < 10"),
-                tags = listOf("news"),
-            ) { tag ->
-                val result = mutableListOf<Feed>()
-                val feed =
-                    Feed(
-                        id = 1L,
-                        title = "title",
-                        customTitle = "customTitle",
-                        url = URL("http://example.com/rss.xml?format=feed&type=rss"),
-                        tag = tag,
-                        notify = true,
-                        imageUrl = URL("https://example.com/feedImage"),
-                        fullTextByDefault = true,
-                        openArticlesWith = "reader",
-                        alternateId = true,
-                        fetchOgImages = false,
-                    )
-
-                result.add(feed)
-                result
-            }
+                folders = { folderId ->
+                    if (folderId == ID_UNSET) {
+                        listOf(Folder(id = 1L, name = "news"))
+                    } else {
+                        emptyList()
+                    }
+                },
+                feeds = { folderId ->
+                    if (folderId == 1L) {
+                        listOf(
+                            Feed(
+                                id = 1L,
+                                title = "title",
+                                customTitle = "customTitle",
+                                url = URL("http://example.com/rss.xml?format=feed&type=rss"),
+                                folderIdNullable = folderId,
+                                notify = true,
+                                imageUrl = URL("https://example.com/feedImage"),
+                                fullTextByDefault = true,
+                                openArticlesWith = "reader",
+                                alternateId = true,
+                                fetchOgImages = false,
+                            ),
+                        )
+                    } else {
+                        emptyList()
+                    }
+                },
+            )
             val output = String(bos.toByteArray())
             assertEquals(expectedWithSettings, output.trimEnd())
         }
@@ -164,7 +235,7 @@ class OpmlWriterKtTest {
             </title>
           </head>
           <body>
-            <outline title="quoted &quot;tag&quot;" text="quoted &quot;tag&quot;">
+            <outline title="quoted &quot;folder&quot;" text="quoted &quot;folder&quot;">
               <outline feeder:notify="true" feeder:imageUrl="https://example.com/feedImage" feeder:fullTextByDefault="true" feeder:openArticlesWith="reader" feeder:alternateId="true" feeder:fetchOgImages="false" title="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" text="A custom &quot;title&quot; with id &apos;9&apos; &gt; 0 &amp; &lt; 1e" type="rss" xmlUrl="http://example.com/rss.xml?format=feed&amp;type=rss"/>
             </outline>
           </body>

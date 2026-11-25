@@ -7,12 +7,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RoomWarnings
 import androidx.room.Update
 import androidx.room.Upsert
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
+import com.nononsenseapps.feeder.db.COL_FOLDER_ID
 import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import kotlinx.coroutines.flow.Flow
@@ -43,12 +42,6 @@ interface FeedDao {
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadFeedFlow(feedId: Long): Flow<Feed?>
 
-    @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
-    suspend fun loadTags(): List<String>
-
-    @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
-    fun loadAllTags(): Flow<List<String>>
-
     @Query("SELECT * FROM feeds WHERE id IS :feedId and retry_after < :retryAfter")
     suspend fun syncLoadFeed(
         feedId: Long,
@@ -58,8 +51,8 @@ interface FeedDao {
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     suspend fun getFeed(feedId: Long): Feed?
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag ORDER BY title")
-    suspend fun getFeedsByTitle(tag: String): List<Feed>
+    @Query("SELECT * FROM feeds WHERE folder_id IS NULLIF(:folderId, $ID_UNSET) ORDER BY title")
+    suspend fun getFeedsByTitle(folderId: Long): List<Feed>
 
     @Query(
         """
@@ -92,15 +85,28 @@ interface FeedDao {
         retryAfter: Instant,
     ): Feed?
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND retry_after < :retryAfter ORDER BY last_sync")
+    @Query(
+        """
+        SELECT * FROM feeds
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
+        AND retry_after < :retryAfter ORDER BY last_sync
+        """,
+    )
     suspend fun syncLoadFeeds(
-        tag: String,
+        folderId: Long,
         retryAfter: Instant,
     ): List<Feed>
 
-    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime AND retry_after < :retryAfter ORDER BY last_sync")
+    @Query(
+        """
+        SELECT * FROM feeds
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
+        AND last_sync < :staleTime AND retry_after < :retryAfter
+        ORDER BY last_sync
+        """,
+    )
     suspend fun syncLoadFeedsIfStale(
-        tag: String,
+        folderId: Long,
         staleTime: Long,
         retryAfter: Instant,
     ): List<Feed>
@@ -129,38 +135,61 @@ interface FeedDao {
     @Query("SELECT id FROM feeds WHERE notify IS 1")
     suspend fun loadFeedIdsToNotify(): List<Long>
 
-    // Suppressing sort fields
-    @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
+    /**
+     * This query uses depth-first search to sort the rows.
+     * Depth-first search in recursive CTEs is not part of the SQL standard, but it is intended behavior in sqlite as shown in the
+     * [official documentation](https://sqlite.org/lang_with.html#controlling_depth_first_versus_breadth_first_search_of_a_tree_using_order_by)
+     */
     @Query(
         """
-            -- wrap in select so we can collate in order
-            select * from (
-                -- all items
-                select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
-                from feeds_with_items_for_nav_drawer
-                -- starred
-                union
-                select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(bookmarked) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
-                from feeds_with_items_for_nav_drawer
-                where bookmarked
-                -- tags
-                union
-                select $ID_UNSET as id, tag as display_title, tag, '' as image_url, sum(unread) as unread_count, tag in (:expandedTags) as expanded, 2 as sort_section, 0 as sort_tag_or_feed
-                from feeds_with_items_for_nav_drawer
-                where tag is not ''
-                group by tag
-                -- feeds
-                union
-                select feed_id as id, display_title, tag, image_url, sum(unread) as unread_count, 0 as expanded, case when tag is '' then 3 else 2 end as sort_section, 1 as sort_tag_or_feed
-                from feeds_with_items_for_nav_drawer
-                where tag is '' or tag in (:expandedTags)
-                group by feed_id
-            )
-            -- sort them
-            order by sort_section, tag, sort_tag_or_feed, display_title collate nocase
+            WITH RECURSIVE
+                feeds_with_unread_count AS (
+                    SELECT feed_id, folder_id, display_title, image_url, SUM(unread) AS unread_count
+                    FROM feeds_with_items_for_nav_drawer
+                    GROUP BY feed_id
+                ),
+                folders_with_unread_count AS (
+                    SELECT folders.id AS folder_id, folders.parent_id, name, SUM(unread_count) AS unread_count, expanded
+                    FROM folders
+                    LEFT JOIN folder_closures
+                    ON folders.id = folder_closures.ancestor_id
+                    LEFT JOIN feeds_with_unread_count
+                    ON folder_closures.descendant_id = feeds_with_unread_count.folder_id
+                    GROUP BY folders.id
+                ),
+                feeds_and_folders AS (
+                    SELECT $ID_UNSET AS feed_id, folder_id, parent_id, name AS display_title, '' AS image_url, unread_count, expanded, 0 AS is_feed
+                    FROM folders_with_unread_count
+                    UNION ALL
+                    SELECT feed_id, $ID_UNSET AS folder_id, folder_id AS parent_id, display_title, image_url, unread_count, 0 AS expanded, 1 AS is_feed
+                    FROM feeds_with_unread_count
+                ),
+                nav_drawer_items AS (
+                    SELECT feed_id, folder_id, parent_id, display_title, image_url, unread_count, expanded, is_feed, 0 AS depth
+                    FROM feeds_and_folders
+                    WHERE parent_id IS NULL
+                    UNION ALL
+                    SELECT f.feed_id, f.folder_id, f.parent_id, f.display_title, f.image_url, f.unread_count, f.expanded, f.is_feed, p.depth + 1
+                    FROM feeds_and_folders f
+                    JOIN nav_drawer_items p
+                    ON p.expanded AND f.parent_id = p.folder_id
+                    ORDER BY depth DESC, is_feed, display_title COLLATE NOCASE
+                )
+            -- all items
+            SELECT $ID_ALL_FEEDS AS feed_id, $ID_UNSET AS folder_id, '' AS display_title, '' AS image_url, SUM(unread) AS unread_count, 0 AS expanded, 0 AS depth
+            FROM feeds_with_items_for_nav_drawer
+            -- starred
+            UNION ALL
+            SELECT $ID_SAVED_ARTICLES AS feed_id, $ID_UNSET AS folder_id, '' AS display_title, '' AS image_url, SUM(bookmarked) AS unread_count, 0 AS expanded, 0 AS depth
+            FROM feeds_with_items_for_nav_drawer
+            WHERE bookmarked
+            -- folders and feeds
+            UNION ALL
+            SELECT feed_id, folder_id, display_title, image_url, unread_count, expanded, depth
+            FROM nav_drawer_items
         """,
     )
-    fun getPagedNavDrawerItems(expandedTags: Set<String>): PagingSource<Int, FeedUnreadCount>
+    fun getPagedNavDrawerItems(): PagingSource<Int, FeedUnreadCount>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(
@@ -168,16 +197,10 @@ interface FeedDao {
         notify: Boolean,
     )
 
-    @Query("UPDATE feeds SET notify = :notify WHERE tag IS :tag")
-    suspend fun setNotify(
-        tag: String,
+    @Query("UPDATE feeds SET notify = :notify WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)")
+    suspend fun setNotifyInFolder(
+        folderId: Long,
         notify: Boolean,
-    )
-
-    @Query("UPDATE feeds SET tag = :newTag WHERE tag IS :oldTag")
-    suspend fun renameTag(
-        oldTag: String,
-        newTag: String,
     )
 
     @Query("UPDATE feeds SET notify = :notify")
@@ -185,6 +208,9 @@ interface FeedDao {
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
     suspend fun getFeedTitle(feedId: Long): FeedTitle?
+
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
+    fun getFeedTitleFlow(feedId: Long): Flow<FeedTitle?>
 
     @Query("SELECT $COL_ID FROM feeds where url is :url")
     suspend fun getFeedIdForUrl(url: URL): Long?
@@ -196,11 +222,21 @@ interface FeedDao {
         """
         SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
         FROM feeds
-        WHERE $COL_TAG IS :feedTag
+        WHERE $COL_FOLDER_ID IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
         ORDER BY $COL_TITLE COLLATE NOCASE
         """,
     )
-    fun getFeedTitlesWithTag(feedTag: String): Flow<List<FeedTitle>>
+    fun getFeedTitlesInFolder(folderId: Long): Flow<List<FeedTitle>>
+
+    @Query(
+        """
+        SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
+        FROM feeds
+        WHERE $COL_FOLDER_ID IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id IN (:folderIds))
+        ORDER BY $COL_TITLE COLLATE NOCASE
+        """,
+    )
+    fun getFeedTitlesInFolders(folderIds: List<Long>): Flow<List<FeedTitle>>
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
     fun getAllFeedTitles(): Flow<List<FeedTitle>>
@@ -284,5 +320,44 @@ interface FeedDao {
     suspend fun setRetryAfterForFeedsWithBaseUrl(
         host: String,
         retryAfter: Instant,
+    )
+
+    @Query("SELECT COALESCE(folder_id, $ID_UNSET) FROM feeds WHERE id = :feedId")
+    fun getFolderIdFlow(feedId: Long): Flow<Long?>
+
+    @Query(
+        """
+        SELECT id, COALESCE(NULLIF(custom_title, ''), title) AS display_title, image_url
+        FROM feeds
+        WHERE folder_id IS NULLIF(:folderId, $ID_UNSET)
+        ORDER BY COALESCE(NULLIF(custom_title, ''), title) COLLATE NOCASE
+        """,
+    )
+    fun getFeedDisplayItemsInFolder(folderId: Long): Flow<List<FeedDisplayItem>>
+
+    @Query(
+        """
+        UPDATE feeds
+        SET folder_id = NULLIF(:folderId, $ID_UNSET),
+            when_modified = :whenModified
+        WHERE id IN (:feedIds) AND folder_id IS NOT NULLIF(:folderId, $ID_UNSET)
+        """,
+    )
+    suspend fun setFeedsFolderId(
+        feedIds: List<Long>,
+        folderId: Long,
+        whenModified: Instant,
+    )
+
+    @Query(
+        """
+        UPDATE feeds
+        SET when_modified = :whenModified
+        WHERE folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = :folderId)
+        """,
+    )
+    suspend fun updateFeedsModDateInFolder(
+        folderId: Long,
+        whenModified: Instant,
     )
 }

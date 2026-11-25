@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.background.runOnceRssSync
 import com.nononsenseapps.feeder.background.runOnceSyncChainSendRead
 import com.nononsenseapps.feeder.background.schedulePeriodicRssSync
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedDisplayItem
 import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemCursor
@@ -18,10 +19,13 @@ import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.FeedTitle
+import com.nononsenseapps.feeder.db.room.Folder
+import com.nononsenseapps.feeder.db.room.FolderDisplayItem
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteFeed
+import com.nononsenseapps.feeder.db.room.SelectableFolder
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -43,6 +47,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -68,6 +73,7 @@ class Repository(
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
     private val fontStore: FontStore by instance()
+    private val folderStore: FolderStore by instance()
 
     init {
         addFeederNewsIfInitialStart()
@@ -97,24 +103,24 @@ class Repository(
 
     fun setMinReadTime(value: Instant) = settingsStore.setMinReadTime(value)
 
-    val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
+    val currentFeedAndFolder: StateFlow<Pair<Long, Long>> = settingsStore.currentFeedAndFolder
 
-    val currentWidgetFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentWidgetFeedAndTag
+    val currentWidgetFeedAndFolder: StateFlow<Pair<Long, Long>> = settingsStore.currentWidgetFeedAndFolder
 
     fun getUnreadCount(
         feedId: Long,
-        tag: String = "",
+        folderId: Long = ID_UNSET,
     ) = feedItemStore.getFeedItemCountRaw(
         feedId = feedId,
-        tag = tag,
+        folderId = folderId,
         minReadTime = Instant.now(),
         filter = emptyFeedListFilter,
         search = "",
     )
 
-    fun setCurrentFeedAndTag(
+    fun setCurrentFeedAndFolder(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
         if (feedId > ID_UNSET) {
             applicationCoroutineScope.launch {
@@ -129,27 +135,16 @@ class Repository(
                 }
             }
         }
-        if (settingsStore.setCurrentFeedAndTag(feedId, tag)) {
+        if (settingsStore.setCurrentFeedAndFolder(feedId, folderId)) {
             setMinReadTime(Instant.now())
         }
     }
 
-    fun setCurrentWidgetFeedAndTag(
+    fun setCurrentWidgetFeedAndFolder(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
-        settingsStore.setCurrentWidgetFeedAndTag(feedId, tag)
-    }
-
-    suspend fun renameTag(
-        oldTag: String,
-        newTag: String,
-    ) {
-        feedStore.renameTag(oldTag, newTag)
-        val (currentFeedId, currentTag) = currentFeedAndTag.value
-        if (currentFeedId == ID_UNSET && currentTag == oldTag) {
-            setCurrentFeedAndTag(ID_UNSET, newTag)
-        }
+        settingsStore.setCurrentWidgetFeedAndFolder(feedId, folderId)
     }
 
     val isArticleOpen: StateFlow<Boolean> = settingsStore.isArticleOpen
@@ -415,16 +410,16 @@ class Repository(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> =
         combine(
-            currentFeedAndTag,
+            currentFeedAndFolder,
             minReadTime,
             currentSorting,
             feedListFilter,
             search,
-        ) { feedAndTag, minReadTime, currentSorting, feedListFilter, search ->
-            val (feedId, tag) = feedAndTag
+        ) { feedAndFolder, minReadTime, currentSorting, feedListFilter, search ->
+            val (feedId, folderId) = feedAndFolder
             FeedListArgs(
                 feedId = feedId,
-                tag = tag,
+                folderId = folderId,
                 minReadTime =
                     when (feedId) {
                         ID_SAVED_ARTICLES -> Instant.EPOCH
@@ -437,7 +432,7 @@ class Repository(
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
                 feedId = it.feedId,
-                tag = it.tag,
+                folderId = it.folderId,
                 minReadTime = it.minReadTime,
                 newestFirst = it.newestFirst,
                 filter = it.filter,
@@ -447,22 +442,22 @@ class Repository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentWidgetFeedListItems(): Flow<List<FeedListItem>> =
-        currentWidgetFeedAndTag.flatMapLatest { (feedId, tag) ->
-            feedItemStore.getWidgetFeedListItems(feedId = feedId, tag = tag)
+        currentWidgetFeedAndFolder.flatMapLatest { (feedId, folderId) ->
+            feedItemStore.getWidgetFeedListItems(feedId = feedId, folderId = folderId)
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListVisibleItemCount(): Flow<Int> =
         combine(
-            currentFeedAndTag,
+            currentFeedAndFolder,
             minReadTime,
             feedListFilter,
             search,
-        ) { feedAndTag, minReadTime, feedListFilter, search ->
-            val (feedId, tag) = feedAndTag
+        ) { feedAndFolder, minReadTime, feedListFilter, search ->
+            val (feedId, folderId) = feedAndFolder
             FeedListArgs(
                 feedId = feedId,
-                tag = tag,
+                folderId = folderId,
                 minReadTime =
                     when (feedId) {
                         ID_SAVED_ARTICLES -> Instant.EPOCH
@@ -475,7 +470,7 @@ class Repository(
         }.flatMapLatest {
             feedItemStore.getFeedItemCountRaw(
                 feedId = it.feedId,
-                tag = it.tag,
+                folderId = it.folderId,
                 minReadTime = it.minReadTime,
                 filter = it.filter,
                 search = it.search,
@@ -545,20 +540,22 @@ class Repository(
             else -> itemOpener.value // Global default
         }
 
-    fun getScreenTitleForFeedOrTag(
+    fun getScreenTitleForFeedOrFolder(
         feedId: Long,
-        tag: String,
-    ) = getUnreadCount(feedId, tag).mapLatest { unreadCount ->
+        folderId: Long,
+    ) = combine(
+        getUnreadCount(feedId, folderId),
+        when {
+            feedId > ID_UNSET -> feedStore.getDisplayTitleFlow(feedId)
+            folderId > ID_UNSET -> folderStore.getFolderNameFlow(folderId)
+            else -> flowOf(null)
+        },
+    ) { unreadCount, title ->
         ScreenTitle(
-            title =
-                when {
-                    feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                    tag.isNotBlank() -> tag
-                    else -> null
-                },
+            title = title,
             type =
                 when (feedId) {
-                    ID_UNSET -> FeedType.TAG
+                    ID_UNSET -> FeedType.FOLDER
                     ID_ALL_FEEDS -> FeedType.ALL_FEEDS
                     ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
                     else -> FeedType.FEED
@@ -568,19 +565,21 @@ class Repository(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getScreenTitleForCurrentFeedOrTag(): Flow<ScreenTitle> =
-        currentFeedAndTag.flatMapLatest { (feedId, tag) ->
-            getUnreadCount(feedId, tag).mapLatest { unreadCount ->
+    fun getScreenTitleForCurrentFeedOrFolder(): Flow<ScreenTitle> =
+        currentFeedAndFolder.flatMapLatest { (feedId, folderId) ->
+            combine(
+                getUnreadCount(feedId, folderId),
+                when {
+                    feedId > ID_UNSET -> feedStore.getDisplayTitleFlow(feedId)
+                    folderId > ID_UNSET -> folderStore.getFolderNameFlow(folderId)
+                    else -> flowOf(null)
+                },
+            ) { unreadCount, title ->
                 ScreenTitle(
-                    title =
-                        when {
-                            feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
-                            tag.isNotBlank() -> tag
-                            else -> null
-                        },
+                    title = title,
                     type =
                         when {
-                            tag.isNotBlank() -> FeedType.TAG
+                            folderId > ID_UNSET -> FeedType.FOLDER
                             feedId == ID_UNSET || feedId == ID_ALL_FEEDS -> FeedType.ALL_FEEDS
                             feedId == ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
                             else -> FeedType.FEED
@@ -593,18 +592,18 @@ class Repository(
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedStore.deleteFeeds(feedIds)
         androidSystemStore.removeDynamicShortcuts(feedIds)
-        if (currentFeedAndTag.value.first in feedIds) {
-            setCurrentFeedAndTag(ID_ALL_FEEDS, "")
+        if (currentFeedAndFolder.value.first in feedIds) {
+            setCurrentFeedAndFolder(ID_ALL_FEEDS, ID_UNSET)
         }
     }
 
-    suspend fun markAllAsReadInFeedOrTag(
+    suspend fun markAllAsReadInFeedOrFolder(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
         when {
             feedId > ID_UNSET -> feedItemStore.markAllAsReadInFeed(feedId)
-            tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
+            folderId > ID_UNSET -> feedItemStore.markAllAsReadInFolder(folderId)
             else -> feedItemStore.markAllAsRead()
         }
         runOnceSyncChainSendRead(di)
@@ -614,11 +613,11 @@ class Repository(
     suspend fun markBeforeAsRead(
         cursor: FeedItemCursor,
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
         feedItemStore.markAsReadRaw(
             feedId = feedId,
-            tag = tag,
+            folderId = folderId,
             filter = feedListFilter.value,
             search = search.value,
             minReadTime = minReadTime.value,
@@ -631,11 +630,11 @@ class Repository(
     suspend fun markAfterAsRead(
         cursor: FeedItemCursor,
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
         feedItemStore.markAsReadRaw(
             feedId = feedId,
-            tag = tag,
+            folderId = folderId,
             filter = feedListFilter.value,
             search = search.value,
             minReadTime = minReadTime.value,
@@ -645,18 +644,13 @@ class Repository(
         runOnceSyncChainSendRead(di)
     }
 
-    val allTags: Flow<List<String>> = feedStore.allTags
-
-    fun getPagedNavDrawerItems(): Flow<PagingData<FeedUnreadCount>> =
-        expandedTags.flatMapLatest {
-            feedStore.getPagedNavDrawerItems(it)
-        }
+    fun getPagedNavDrawerItems(): Flow<PagingData<FeedUnreadCount>> = feedStore.getPagedNavDrawerItems()
 
     val getUnreadBookmarksCount
         get() =
             feedItemStore.getFeedItemCountRaw(
                 feedId = ID_SAVED_ARTICLES,
-                tag = "",
+                folderId = ID_UNSET,
                 minReadTime = Instant.EPOCH,
                 filter = emptyFeedListFilter,
                 search = "",
@@ -664,13 +658,91 @@ class Repository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentlyVisibleFeedTitles(): Flow<List<FeedTitle>> =
-        currentFeedAndTag.flatMapLatest { (feedId, tag) ->
-            feedStore.getFeedTitles(feedId, tag)
+        currentFeedAndFolder.flatMapLatest { (feedId, folderId) ->
+            feedStore.getFeedTitles(feedId, folderId)
         }
 
-    val expandedTags: StateFlow<Set<String>> = sessionStore.expandedTags
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentFolderId(): Flow<Long?> =
+        currentFeedAndFolder.flatMapLatest { (feedId, folderId) ->
+            when {
+                feedId > ID_UNSET -> feedStore.getFolderIdFlow(feedId)
+                folderId > ID_UNSET -> flowOf(folderId)
+                else -> flowOf(ID_UNSET)
+            }
+        }
 
-    fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
+    fun getFeedTitlesInFolders(folderIds: List<Long>): Flow<List<FeedTitle>> = feedStore.getFeedTitlesInFolders(folderIds)
+
+    fun getFeedDisplayItemsInFolder(folderId: Long): Flow<List<FeedDisplayItem>> = feedStore.getFeedDisplayItemsInFolder(folderId)
+
+    suspend fun setFeedsFolderId(
+        feedIds: List<Long>,
+        folderId: Long,
+        whenModified: Instant = Instant.now(),
+    ) {
+        feedStore.setFeedsFolderId(feedIds, folderId, whenModified)
+        setMinReadTime(Instant.now())
+    }
+
+    val allFolders: Flow<List<SelectableFolder>> = folderStore.allFolders
+
+    suspend fun deleteFolder(folderId: Long): Int {
+        val subfolders = folderStore.getAllSubfolderIds(folderId)
+        val result = folderStore.deleteFolder(folderId)
+        if (result > 0 && currentFeedAndFolder.value.second in subfolders) {
+            setCurrentFeedAndFolder(ID_ALL_FEEDS, ID_UNSET)
+        }
+        return result
+    }
+
+    suspend fun getFolder(folderId: Long): Folder? = folderStore.getFolder(folderId)
+
+    suspend fun insertOrIgnoreFolder(
+        name: String,
+        parentId: Long,
+    ): Long? = folderStore.insertOrIgnoreFolder(name, parentId)
+
+    fun getFolderNameFlow(folderId: Long): Flow<String?> = folderStore.getFolderNameFlow(folderId)
+
+    suspend fun renameFolder(
+        folderId: Long,
+        name: String,
+    ): Int {
+        val result = folderStore.renameFolder(folderId, name)
+        if (result > 0) {
+            // Update feed modification time so the folder path is updated on synced devices
+            feedStore.updateFeedsModDateInFolder(folderId, Instant.now())
+        }
+        return result
+    }
+
+    suspend fun moveFolder(
+        folderId: Long,
+        targetFolderId: Long,
+    ): Int {
+        val result = folderStore.moveFolder(folderId, targetFolderId)
+        if (result > 0) {
+            // Update feed modification time so the folder path is updated on synced devices
+            feedStore.updateFeedsModDateInFolder(folderId, Instant.now())
+            setMinReadTime(Instant.now())
+        }
+        return result
+    }
+
+    suspend fun toggleFolderExpansion(folderId: Long) = folderStore.toggleFolderExpansion(folderId)
+
+    suspend fun getFolderPathStringList(folderId: Long): List<String> = folderStore.getFolderPathStringList(folderId)
+
+    suspend fun folderPathStringToFolderId(folderPath: List<String>): Long = folderStore.folderPathStringToFolderId(folderPath)
+
+    fun getFolderDisplayItemsPath(folderId: Long): Flow<List<FolderDisplayItem>> = folderStore.getFolderDisplayItemsPath(folderId)
+
+    fun getFolderDisplayItemsInFolder(folderId: Long): Flow<List<FolderDisplayItem>> = folderStore.getFolderDisplayItemsInFolder(folderId)
+
+    fun getFolderNamesFolderCannotBeRenamedTo(folderId: Long): Flow<List<String>> = folderStore.getFolderNamesFolderCannotBeRenamedTo(folderId)
+
+    fun getFolderIdsFoldersCannotBeMovedInto(folderIds: List<Long>): Flow<List<Long>> = folderStore.getFolderIdsFoldersCannotBeMovedInto(folderIds)
 
     fun ensurePeriodicSyncConfigured() {
         schedulePeriodicRssSync(di = di, replace = false)
@@ -831,10 +903,10 @@ class Repository(
     ): Feed? = feedStore.syncLoadFeed(feedId = feedId, retryAfter = retryAfter)
 
     suspend fun syncLoadFeedsIfStale(
-        tag: String,
+        folderId: Long,
         staleTime: Long,
         retryAfter: Instant,
-    ) = feedStore.syncLoadFeedsIfStale(tag = tag, staleTime = staleTime, retryAfter = retryAfter)
+    ) = feedStore.syncLoadFeedsIfStale(folderId = folderId, staleTime = staleTime, retryAfter = retryAfter)
 
     suspend fun syncLoadFeedsIfStale(
         staleTime: Long,
@@ -842,9 +914,9 @@ class Repository(
     ) = feedStore.syncLoadFeedsIfStale(staleTime = staleTime, retryAfter = retryAfter)
 
     suspend fun syncLoadFeeds(
-        tag: String,
+        folderId: Long,
         retryAfter: Instant,
-    ): List<Feed> = feedStore.syncLoadFeeds(tag = tag, retryAfter = retryAfter)
+    ): List<Feed> = feedStore.syncLoadFeeds(folderId = folderId, retryAfter = retryAfter)
 
     suspend fun syncLoadFeeds(retryAfter: Instant): List<Feed> = feedStore.syncLoadFeeds(retryAfter = retryAfter)
 
@@ -920,7 +992,7 @@ class Repository(
 
 private data class FeedListArgs(
     val feedId: Long,
-    val tag: String,
+    val folderId: Long,
     val newestFirst: Boolean,
     val minReadTime: Instant,
     val filter: FeedListFilter,
@@ -937,7 +1009,7 @@ data class ScreenTitle(
 
 enum class FeedType {
     FEED,
-    TAG,
+    FOLDER,
     SAVED_ARTICLES,
     ALL_FEEDS,
 }

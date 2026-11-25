@@ -13,7 +13,9 @@ import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
+import com.nononsenseapps.feeder.ui.compose.folder.EditFoldersScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.EditFoldersDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 
@@ -69,10 +71,33 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             onNavigateUp = {
                                 navController.popBackStack()
                             },
+                            onNavigateToEditFoldersScreen = { folderId ->
+                                EditFoldersDestination.navigate(
+                                    navController,
+                                    folderId,
+                                )
+                            },
                             createFeedScreenViewModel = backStackEntry.diAwareViewModel(),
                         ) {
                             finish()
                         }
+                    }
+                    composable(
+                        route = EditFoldersDestination.route,
+                        arguments = EditFoldersDestination.arguments,
+                        deepLinks = EditFoldersDestination.deepLinks,
+                        enterTransition = { fadeIn() },
+                        exitTransition = { fadeOut() },
+                        popEnterTransition = { fadeIn() },
+                        popExitTransition = { fadeOut() },
+                    ) { backStackEntry ->
+                        EditFoldersScreen(
+                            onNavigateUp = {
+                                navController.popBackStack()
+                            },
+                            onNavigateToFeed = {},
+                            viewModel = backStackEntry.diAwareViewModel(),
+                        )
                     }
                 }
             }

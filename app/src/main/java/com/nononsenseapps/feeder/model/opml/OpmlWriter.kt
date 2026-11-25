@@ -2,6 +2,8 @@ package com.nononsenseapps.feeder.model.opml
 
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.Folder
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.FileOutputStream
@@ -12,16 +14,16 @@ suspend fun writeFile(
     path: String,
     settings: Map<String, String>,
     blockedPatterns: List<String>,
-    tags: Iterable<String>,
-    feedsWithTag: suspend (String) -> Iterable<Feed>,
+    folders: suspend (Long) -> Iterable<Folder>,
+    feeds: suspend (Long) -> Iterable<Feed>,
 ) {
     withContext(Dispatchers.IO) {
         writeOutputStream(
             os = FileOutputStream(path),
             settings = settings,
             blockedPatterns = blockedPatterns,
-            tags = tags,
-            feedsWithTag = feedsWithTag,
+            folders = folders,
+            feeds = feeds,
         )
     }
 }
@@ -30,8 +32,8 @@ suspend fun writeOutputStream(
     os: OutputStream,
     settings: Map<String, String>,
     blockedPatterns: List<String>,
-    tags: Iterable<String>,
-    feedsWithTag: suspend (String) -> Iterable<Feed>,
+    folders: suspend (Long) -> Iterable<Folder>,
+    feeds: suspend (Long) -> Iterable<Feed>,
 ) = withContext(Dispatchers.IO) {
     try {
         os.bufferedWriter().use { bw ->
@@ -42,19 +44,10 @@ suspend fun writeOutputStream(
                         title { +"Feeder" }
                     }
                     body {
-                        tags.forEach { tag ->
-                            if (tag.isEmpty()) {
-                                feedsWithTag(tag).forEach { feed ->
-                                    feed.toOutline()
-                                }
-                            } else {
-                                outline(title = escape(tag)) {
-                                    feedsWithTag(tag).forEach { feed ->
-                                        feed.toOutline()
-                                    }
-                                }
-                            }
-                        }
+                        folderToOutlineRecursive(
+                            folders = folders,
+                            feeds = feeds,
+                        )
                         if (settings.isNotEmpty() || blockedPatterns.isNotEmpty()) {
                             feederSettings {
                                 settings.forEach { (prefKey, prefValue) ->
@@ -241,6 +234,26 @@ abstract class BodyTag(
         }
         if (xmlUrl != null) {
             o.xmlUrl = xmlUrl
+        }
+    }
+
+    suspend fun folderToOutlineRecursive(
+        folderId: Long = ID_UNSET,
+        folders: suspend (Long) -> Iterable<Folder>,
+        feeds: suspend (Long) -> Iterable<Feed>,
+    ) {
+        folders(folderId)
+            .forEach { childFolder ->
+                outline(title = escape(childFolder.name)) {
+                    folderToOutlineRecursive(
+                        folderId = childFolder.id,
+                        folders = folders,
+                        feeds = feeds,
+                    )
+                }
+            }
+        feeds(folderId).forEach { feed ->
+            feed.toOutline()
         }
     }
 

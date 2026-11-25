@@ -57,7 +57,7 @@ class FeedItemStore(
 
     fun getFeedItemCountRaw(
         feedId: Long,
-        tag: String,
+        folderId: Long,
         minReadTime: Instant,
         filter: FeedListFilter,
         search: String,
@@ -70,7 +70,7 @@ class FeedItemStore(
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
 
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, folderId)
         }
 
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
@@ -78,18 +78,18 @@ class FeedItemStore(
 
     fun getWidgetFeedListItems(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ): Flow<List<FeedListItem>> =
         when {
             feedId == ID_SAVED_ARTICLES -> dao.widgetPreviewsSaved()
             feedId > ID_UNSET -> dao.widgetPreviewsByFeed(feedId)
-            tag.isNotEmpty() -> dao.widgetPreviewsByTag(tag)
+            folderId > ID_UNSET -> dao.widgetPreviewsByFolder(folderId)
             else -> dao.widgetPreviewsAllFeeds()
         }.map { list -> list.map { it.toFeedListItem(application) } }
 
     fun getPagedFeedItemsRaw(
         feedId: Long,
-        tag: String,
+        folderId: Long,
         minReadTime: Instant,
         newestFirst: Boolean,
         filter: FeedListFilter,
@@ -112,7 +112,7 @@ class FeedItemStore(
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
-                rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+                rawQueryFilter(filter, search, args, minReadTime, feedId, folderId)
 
                 when (newestFirst) {
                     true -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC\n")
@@ -133,7 +133,7 @@ class FeedItemStore(
         args: MutableList<Any?>,
         minReadTime: Instant,
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ) {
         val onlySavedArticles = feedId == ID_SAVED_ARTICLES
 
@@ -175,13 +175,15 @@ class FeedItemStore(
             }
             onlySavedArticles -> append("AND bookmarked = 1\n")
             feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
-            tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }
+            folderId > ID_UNSET ->
+                append("AND folder_id IN (SELECT descendant_id FROM folder_closures WHERE ancestor_id = ?)\n")
+                    .also { args.add(folderId) }
         }
     }
 
     suspend fun markAsReadRaw(
         feedId: Long,
-        tag: String,
+        folderId: Long,
         filter: FeedListFilter,
         search: String,
         minReadTime: Instant,
@@ -200,7 +202,7 @@ class FeedItemStore(
             append("SELECT feed_items.id FROM feed_items\n")
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, folderId)
             // this version of sqlite doesn't seem to support tuple comparisons
             append("and (\n")
 
@@ -303,8 +305,8 @@ class FeedItemStore(
         dao.markAllAsRead(feedId)
     }
 
-    suspend fun markAllAsReadInTag(tag: String) {
-        dao.markAllAsRead(tag)
+    suspend fun markAllAsReadInFolder(folderId: Long) {
+        dao.markAllAsReadInFolder(folderId)
     }
 
     suspend fun markAllAsRead() {

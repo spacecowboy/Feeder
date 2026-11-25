@@ -2,7 +2,9 @@ package com.nononsenseapps.feeder.archmodel
 
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedDisplayItem
 import com.nononsenseapps.feeder.db.room.FeedTitle
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -66,14 +68,15 @@ class FeedStoreTest : DIAware {
     }
 
     @Test
-    fun renameTag() {
-        runBlocking {
-            store.renameTag("oldTag", "newTag")
-        }
+    fun getDisplayTitleFlow() {
+        every { dao.getFeedTitleFlow(5L) } returns flowOf(FeedTitle(customTitle = "bob"))
 
-        coVerify {
-            dao.renameTag("oldTag", "newTag")
-        }
+        assertEquals(
+            "bob",
+            runBlocking {
+                store.getDisplayTitleFlow(5L).toList().first()
+            },
+        )
     }
 
     @Test
@@ -85,21 +88,6 @@ class FeedStoreTest : DIAware {
         coVerify {
             dao.deleteFeeds(listOf(3L, 5L))
         }
-    }
-
-    @Test
-    fun allTags() {
-        every { dao.loadAllTags() } returns flowOf(listOf("one", "two"))
-
-        val tags =
-            runBlocking {
-                store.allTags.toList().first()
-            }
-
-        assertEquals(
-            listOf("one", "two"),
-            tags,
-        )
     }
 
     @Test
@@ -139,7 +127,7 @@ class FeedStoreTest : DIAware {
                     FeedTitle(5L, "fejd"),
                 ),
             )
-        every { dao.getFeedTitlesWithTag("foo") } returns
+        every { dao.getFeedTitlesInFolder(2L) } returns
             flowOf(
                 listOf(
                     FeedTitle(5L, "fejd"),
@@ -157,7 +145,7 @@ class FeedStoreTest : DIAware {
 
         assertEquals(
             listOf(FeedTitle(5L, "fejd")),
-            runBlocking { store.getFeedTitles(5L, "flopp").toList().first() },
+            runBlocking { store.getFeedTitles(5L, 3L).toList().first() },
         )
 
         assertEquals(
@@ -165,7 +153,7 @@ class FeedStoreTest : DIAware {
                 FeedTitle(5L, "fejd"),
                 FeedTitle(7L, "axv"),
             ),
-            runBlocking { store.getFeedTitles(-1L, "foo").toList().first() },
+            runBlocking { store.getFeedTitles(-1L, 2L).toList().first() },
         )
 
         assertEquals(
@@ -174,7 +162,27 @@ class FeedStoreTest : DIAware {
                 FeedTitle(7L, "axv"),
                 FeedTitle(8L, "zzz"),
             ),
-            runBlocking { store.getFeedTitles(-1L, "").toList().first() },
+            runBlocking { store.getFeedTitles(-1L, ID_UNSET).toList().first() },
+        )
+    }
+
+    @Test
+    fun getFeedTitlesInFolders() {
+        every { dao.getFeedTitlesInFolders(listOf(2L)) } returns
+            flowOf(
+                listOf(
+                    FeedTitle(5L, "fejd"),
+                ),
+            )
+
+        val result =
+            runBlocking {
+                store.getFeedTitlesInFolders(listOf(2L)).toList()
+            }
+
+        assertEquals(
+            listOf(FeedTitle(5L, "fejd")),
+            result.first(),
         )
     }
 
@@ -219,6 +227,69 @@ class FeedStoreTest : DIAware {
 
         coVerify {
             dao.upsert(Feed())
+        }
+    }
+
+    @Test
+    fun getFolderIdFlow() {
+        every { dao.getFolderIdFlow(5L) } returns flowOf(2L)
+
+        val result =
+            runBlocking {
+                store.getFolderIdFlow(5L).toList()
+            }
+
+        assertEquals(
+            2L,
+            result.first(),
+        )
+    }
+
+    @Test
+    fun getFeedDisplayItemsInFolder() {
+        every { dao.getFeedDisplayItemsInFolder(2L) } returns
+            flowOf(
+                listOf(
+                    FeedDisplayItem(5L, "fejd", null),
+                    FeedDisplayItem(7L, "axv", null),
+                ),
+            )
+
+        val result =
+            runBlocking {
+                store.getFeedDisplayItemsInFolder(2L).toList()
+            }
+
+        assertEquals(
+            listOf(
+                FeedDisplayItem(5L, "fejd", null),
+                FeedDisplayItem(7L, "axv", null),
+            ),
+            result.first(),
+        )
+    }
+
+    @Test
+    fun setFeedsFolderId() {
+        val now = Instant.now()
+        runBlocking {
+            store.setFeedsFolderId(listOf(3L, 5L), 2L, now)
+        }
+
+        coVerify {
+            dao.setFeedsFolderId(listOf(3L, 5L), 2L, now)
+        }
+    }
+
+    @Test
+    fun updateFeedsModDateInFolder() {
+        val now = Instant.now()
+        runBlocking {
+            store.updateFeedsModDateInFolder(2L, now)
+        }
+
+        coVerify {
+            dao.updateFeedsModDateInFolder(2L, now)
         }
     }
 }

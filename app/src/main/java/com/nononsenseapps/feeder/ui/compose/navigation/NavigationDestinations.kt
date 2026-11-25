@@ -30,6 +30,8 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
+import com.nononsenseapps.feeder.ui.compose.folder.EditFoldersScreen
+import com.nononsenseapps.feeder.ui.compose.folder.EditFoldersViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.settings.TextSettingsScreen
@@ -266,6 +268,12 @@ data object AddFeedDestination : NavigationDestination(
             onNavigateUp = {
                 navController.popBackStack()
             },
+            onNavigateToEditFoldersScreen = { folderId ->
+                EditFoldersDestination.navigate(
+                    navController,
+                    folderId,
+                )
+            },
             createFeedScreenViewModel = createFeedScreenViewModel,
         ) { feedId ->
             FeedDestination.navigate(navController, feedId = feedId)
@@ -280,14 +288,24 @@ data object EditFeedDestination : NavigationDestination(
             PathParamArgument("feedId") {
                 type = NavType.LongType
             },
+            QueryParamArgument("navigateFromEditFolders") {
+                type = NavType.BoolType
+                defaultValue = false
+            },
         ),
     deepLinks = emptyList(),
 ) {
     fun navigate(
         navController: NavController,
         feedId: Long,
+        navigateFromEditFolders: Boolean = false,
     ) {
-        navController.navigate("$path/$feedId") {
+        val params =
+            queryParams {
+                +("navigateFromEditFolders" to "$navigateFromEditFolders")
+            }
+
+        navController.navigate("$path/$feedId$params") {
             launchSingleTop = true
         }
     }
@@ -300,13 +318,29 @@ data object EditFeedDestination : NavigationDestination(
         mainActivityViewModel: MainActivityViewModel,
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.diAwareViewModel()
+        val navigateFromEditFolders =
+            remember {
+                backStackEntry.arguments?.getBoolean("navigateFromEditFolders") ?: false
+            }
+
         EditFeedScreen(
             onNavigateUp = {
                 navController.popBackStack()
             },
+            onNavigateToEditFoldersScreen = { folderId ->
+                EditFoldersDestination.navigate(
+                    navController,
+                    folderId,
+                )
+            },
+            navigateFromEditFolders = navigateFromEditFolders,
             editFeedScreenViewModel = editFeedScreenViewModel,
         ) { feedId ->
-            FeedDestination.navigate(navController, feedId = feedId)
+            if (!navigateFromEditFolders) {
+                FeedDestination.navigate(navController, feedId = feedId)
+            } else {
+                navController.popBackStack()
+            }
         }
     }
 }
@@ -354,33 +388,35 @@ data object FeedDestination : NavigationDestination(
     path = "feed",
     navArguments =
         listOf(
-            QueryParamArgument("id") {
+            QueryParamArgument("feedId") {
                 type = NavType.LongType
                 defaultValue = ID_UNSET
             },
-            QueryParamArgument("tag") {
-                type = NavType.StringType
-                defaultValue = ""
+            QueryParamArgument("folderId") {
+                type = NavType.LongType
+                defaultValue = ID_UNSET
             },
         ),
     deepLinks =
         listOf(
             navDeepLink {
-                uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
+                uriPattern = "$DEEP_LINK_BASE_URI/feed?feedId={feedId}&folderId={folderId}"
             },
         ),
 ) {
     fun navigate(
         navController: NavController,
         feedId: Long = ID_UNSET,
-        tag: String = "",
+        folderId: Long = ID_UNSET,
     ) {
         val params =
             queryParams {
                 if (feedId != ID_UNSET) {
-                    +("id" to "$feedId")
+                    +("feedId" to "$feedId")
                 }
-                +("tag" to tag)
+                if (folderId != ID_UNSET) {
+                    +("folderId" to "$folderId")
+                }
             }
 
         logDebug(LOG_TAG, "Navigate to $path$params. Current: ${navController.currentDestination?.route}")
@@ -407,22 +443,22 @@ data object FeedDestination : NavigationDestination(
     ) {
         val feedId =
             remember {
-                backStackEntry.arguments?.getLong("id")
+                backStackEntry.arguments?.getLong("feedId")
                     ?: ID_UNSET
             }
-        val tag =
+        val folderId =
             remember {
-                backStackEntry.arguments?.getString("tag")
-                    ?: ""
+                backStackEntry.arguments?.getLong("folderId")
+                    ?: ID_UNSET
             }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.diAwareViewModel()
 
-        LaunchedEffect(feedId, tag) {
-            logDebug(LOG_TAG, "FeedDestinationScreen setCurrent: $feedId, $tag")
-            if (feedId != ID_UNSET || tag.isNotBlank()) {
-                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+        LaunchedEffect(feedId, folderId) {
+            logDebug(LOG_TAG, "FeedDestinationScreen setCurrent: $feedId, $folderId")
+            if (feedId != ID_UNSET || folderId != ID_UNSET) {
+                navigationDeepLinkViewModel.setCurrentFeedAndFolder(feedId = feedId, folderId = folderId)
             }
         }
         FeedScreen(
@@ -549,6 +585,53 @@ data object SyncScreenDestination : NavigationDestination(
                 }
             },
             viewModel = syncRemoteViewModel,
+        )
+    }
+}
+
+data object EditFoldersDestination : NavigationDestination(
+    path = "folder",
+    navArguments =
+        listOf(
+            PathParamArgument("folderId") {
+                type = NavType.LongType
+                defaultValue = ID_UNSET
+            },
+        ),
+    deepLinks = emptyList(),
+) {
+    fun navigate(
+        navController: NavController,
+        folderId: Long = ID_UNSET,
+    ) {
+        navController.navigate("$path/$folderId") {
+            launchSingleTop = true
+        }
+    }
+
+    @Composable
+    override fun RegisterScreen(
+        navController: NavController,
+        backStackEntry: NavBackStackEntry,
+        navDrawerListState: LazyListState,
+        mainActivityViewModel: MainActivityViewModel,
+    ) {
+        val editFoldersScreenViewModel = backStackEntry.diAwareViewModel<EditFoldersViewModel>()
+
+        EditFoldersScreen(
+            onNavigateUp = {
+                if (!navController.popBackStack()) {
+                    FeedDestination.navigate(navController)
+                }
+            },
+            onNavigateToFeed = { feedId ->
+                EditFeedDestination.navigate(
+                    navController,
+                    feedId,
+                    navigateFromEditFolders = true,
+                )
+            },
+            viewModel = editFoldersScreenViewModel,
         )
     }
 }

@@ -1,17 +1,14 @@
 package com.nononsenseapps.feeder.ui.compose.editfeed
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -23,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,13 +39,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
@@ -60,6 +51,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -70,14 +62,17 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.SelectableFolder
 import com.nononsenseapps.feeder.model.ArticleRuleError
-import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteResults
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
+import com.nononsenseapps.feeder.ui.compose.folder.SelectFolderDialog
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
+import com.nononsenseapps.feeder.ui.compose.settings.TitleAndSubtitle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.PreviewTheme
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
@@ -90,6 +85,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 @Composable
 fun CreateFeedScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToEditFoldersScreen: (Long) -> Unit,
     createFeedScreenViewModel: CreateFeedScreenViewModel,
     onOk: (Long) -> Unit,
 ) {
@@ -104,6 +100,7 @@ fun CreateFeedScreen(
     @Suppress("ktlint:compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
+        onNavigateToEditFoldersScreen = onNavigateToEditFoldersScreen,
         viewState = createFeedScreenViewModel,
         screenType = screenType,
         onOk = {
@@ -120,6 +117,8 @@ fun CreateFeedScreen(
 @Composable
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToEditFoldersScreen: (Long) -> Unit,
+    navigateFromEditFolders: Boolean,
     editFeedScreenViewModel: EditFeedScreenViewModel,
     onOk: (Long) -> Unit,
 ) {
@@ -134,6 +133,8 @@ fun EditFeedScreen(
     @Suppress("ktlint:compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
+        onNavigateToEditFoldersScreen = onNavigateToEditFoldersScreen,
+        navigateFromEditFolders = navigateFromEditFolders,
         viewState = editFeedScreenViewModel,
         screenType = screenType,
         onOk = {
@@ -147,15 +148,17 @@ fun EditFeedScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToEditFoldersScreen: (Long) -> Unit,
     viewState: EditFeedScreenState,
     screenType: ScreenType,
     onOk: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    navigateFromEditFolders: Boolean = false,
 ) {
     val notificationsPermissionState =
         rememberApiPermissionState(
@@ -229,6 +232,9 @@ fun EditFeedScreen(
             viewState = screenState,
             onOk = onOk,
             onCancel = onCancel,
+            onShowFolderDialog = {
+                viewState.showFolderDialog = true
+            },
             modifier = Modifier.padding(padding),
         )
 
@@ -242,22 +248,38 @@ fun EditFeedScreen(
                 notificationsPermissionState.launchPermissionRequest()
             }
         }
+
+        if (viewState.showFolderDialog) {
+            SelectFolderDialog(
+                folders = ImmutableHolder(viewState.allFolders),
+                initialFolderId = viewState.folderId,
+                showEditButton = !navigateFromEditFolders,
+                onDismiss = {
+                    viewState.showFolderDialog = false
+                },
+                onConfirm = { folderId ->
+                    viewState.folderId = folderId
+                    viewState.showFolderDialog = false
+                },
+                onEdit = {
+                    // onNavigateToEditFoldersScreen(viewState.folderId)
+                    onNavigateToEditFoldersScreen(ID_UNSET)
+                },
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditFeedView(
     screenType: ScreenType,
     viewState: EditFeedScreenState,
     onOk: () -> Unit,
     onCancel: () -> Unit,
+    onShowFolderDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
-
-    val leftFocusRequester = remember { FocusRequester() }
-    val rightFocusRequester = remember { FocusRequester() }
 
     OkCancelWithContent(
         onOk = {
@@ -282,7 +304,7 @@ fun EditFeedView(
                 ) {
                     LeftContent(
                         viewState = viewState,
-                        rightFocusRequester = rightFocusRequester,
+                        onShowFolderDialog = onShowFolderDialog,
                     )
                 }
 
@@ -295,8 +317,6 @@ fun EditFeedView(
                 ) {
                     RightContent(
                         viewState = viewState,
-                        leftFocusRequester = leftFocusRequester,
-                        rightFocusRequester = rightFocusRequester,
                     )
                 }
             }
@@ -307,15 +327,13 @@ fun EditFeedView(
             ) {
                 LeftContent(
                     viewState = viewState,
-                    rightFocusRequester = rightFocusRequester,
+                    onShowFolderDialog = onShowFolderDialog,
                 )
 
                 HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
                 RightContent(
                     viewState = viewState,
-                    leftFocusRequester = leftFocusRequester,
-                    rightFocusRequester = rightFocusRequester,
                 )
             }
         }
@@ -323,29 +341,19 @@ fun EditFeedView(
 }
 
 @Suppress("ktlint:compose:modifier-missing-check")
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalFoundationApi::class,
-)
 @Composable
 fun ColumnScope.LeftContent(
     viewState: EditFeedScreenState,
-    rightFocusRequester: FocusRequester,
+    onShowFolderDialog: () -> Unit,
 ) {
-    val filteredTags by remember(viewState.allTags, viewState.feedTag) {
-        derivedStateOf {
-            ImmutableHolder(
-                viewState.allTags.filter { tag ->
-                    tag.isNotBlank() && tag.startsWith(viewState.feedTag, ignoreCase = true)
-                },
-            )
-        }
-    }
-
+    val dimens = LocalDimens.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    var showTagSuggestions by rememberSaveable { mutableStateOf(false) }
+    val folderLabel =
+        when {
+            viewState.folderId > ID_UNSET -> viewState.folderName
+            else -> stringResource(id = R.string.no_folder)
+        }
 
     TextField(
         value = viewState.feedUrl,
@@ -398,104 +406,52 @@ fun ColumnScope.LeftContent(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrectEnabled = true,
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next,
+                imeAction = ImeAction.Done,
             ),
         keyboardActions =
             KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                onDone = {
+                    keyboardController?.hide()
                 },
             ),
         modifier =
             Modifier
                 .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .interceptKey(Key.Enter) {
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
+                .heightIn(min = 64.dp),
     )
 
-    AutoCompleteResults(
+    Row(
         modifier =
             Modifier
-                .focusGroup()
-                .onFocusChanged {
-                    // Someone in hierarchy has focus - different from isFocused
-                    showTagSuggestions = it.hasFocus
+                .width(dimens.maxContentWidth)
+                .heightIn(min = 64.dp)
+                .clickable {
+                    onShowFolderDialog()
                 },
-        displaySuggestions = showTagSuggestions,
-        suggestions = filteredTags,
-        onSuggestionClick = { tag ->
-            viewState.feedTag = tag
-            rightFocusRequester.requestFocus()
-            showTagSuggestions = false
-        },
-        suggestionContent = {
-            Box(
-                contentAlignment = Alignment.CenterStart,
-                modifier =
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .height(48.dp)
-                        .fillMaxWidth(),
-            ) {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        },
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        OutlinedTextField(
-            value = viewState.feedTag,
-            onValueChange = { viewState.feedTag = it },
-            label = {
-                Text(stringResource(id = R.string.tag))
+        TitleAndSubtitle(
+            title = {
+                Text(stringResource(id = R.string.folder))
             },
-            singleLine = true,
-            keyboardOptions =
-                KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    autoCorrectEnabled = true,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-            keyboardActions =
-                KeyboardActions(
-                    onDone = {
-                        showTagSuggestions = false
-                        keyboardController?.hide()
-                        rightFocusRequester.requestFocus()
-                    },
-                ),
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
-                    .interceptKey(Key.Enter) {
-                        rightFocusRequester.requestFocus()
-                    },
+            subtitle = {
+                Text(
+                    text = folderLabel,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
         )
     }
 }
 
 @Suppress("ktlint:compose:modifier-missing-check", "UnusedReceiverParameter")
 @Composable
-fun ColumnScope.RightContent(
-    viewState: EditFeedScreenState,
-    leftFocusRequester: FocusRequester,
-    rightFocusRequester: FocusRequester,
-) {
+fun ColumnScope.RightContent(viewState: EditFeedScreenState) {
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
         { viewState.fullTextByDefault = it },
-        modifier =
-            Modifier
-                .focusRequester(rightFocusRequester)
-                .focusProperties {
-                    previous = leftFocusRequester
-                },
         icon = null,
     )
     SwitchSetting(
@@ -688,7 +644,8 @@ private fun ruleErrorText(error: ArticleRuleError?): String? =
 interface EditFeedScreenState {
     var feedUrl: String
     var feedTitle: String
-    var feedTag: String
+    var folderId: Long
+    var folderName: String
     var fullTextByDefault: Boolean
     var notify: Boolean
     var skipDuplicates: Boolean
@@ -701,13 +658,14 @@ interface EditFeedScreenState {
     var allowRules: String
     val blockRulesError: ArticleRuleError?
     val allowRulesError: ArticleRuleError?
+    var showFolderDialog: Boolean
     val isOkToSave: Boolean
     val isNotValidUrl: Boolean
     val isOpenItemWithBrowser: Boolean
     val isOpenItemWithCustomTab: Boolean
     val isOpenItemWithReader: Boolean
     val isOpenItemWithAppDefault: Boolean
-    val allTags: List<String>
+    val allFolders: List<SelectableFolder>
     val defaultTitle: String
     val feedImage: String
 }
@@ -721,7 +679,7 @@ private class ScreenState(
     override val isOpenItemWithCustomTab: Boolean = false,
     override val isOpenItemWithReader: Boolean = false,
     override val isOpenItemWithAppDefault: Boolean = false,
-    override val allTags: List<String> = emptyList(),
+    override val allFolders: List<SelectableFolder> = emptyList(),
     override val defaultTitle: String = "",
     override val feedImage: String = "",
     override val blockRulesError: ArticleRuleError? = null,
@@ -729,7 +687,8 @@ private class ScreenState(
 ) : EditFeedScreenState {
     override var feedUrl: String by mutableStateOf("")
     override var feedTitle: String by mutableStateOf("")
-    override var feedTag: String by mutableStateOf("")
+    override var folderId: Long by mutableStateOf(ID_UNSET)
+    override var folderName: String by mutableStateOf("")
     override var fullTextByDefault: Boolean by mutableStateOf(false)
     override var notify: Boolean by mutableStateOf(false)
     override var skipDuplicates: Boolean by mutableStateOf(false)
@@ -740,6 +699,7 @@ private class ScreenState(
     override var trustAllCertificates: Boolean by mutableStateOf(false)
     override var blockRules: String by mutableStateOf("")
     override var allowRules: String by mutableStateOf("")
+    override var showFolderDialog: Boolean by mutableStateOf(false)
 }
 
 @Preview("Edit Feed Phone")
@@ -749,6 +709,7 @@ private fun PreviewEditFeedScreenPhone() {
         EditFeedScreen(
             screenType = ScreenType.SINGLE,
             onNavigateUp = {},
+            onNavigateToEditFoldersScreen = {},
             onOk = {},
             onCancel = {},
             viewState = EditFeedScreenState(),
@@ -764,6 +725,7 @@ private fun PreviewEditFeedScreenLarge() {
         EditFeedScreen(
             screenType = ScreenType.DUAL,
             onNavigateUp = {},
+            onNavigateToEditFoldersScreen = {},
             onOk = {},
             onCancel = {},
             viewState = EditFeedScreenState(),

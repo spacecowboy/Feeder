@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ImageFromHTML
 import com.nononsenseapps.feeder.ui.MainActivity
 import kotlinx.coroutines.runBlocking
@@ -46,7 +47,7 @@ class ThumbnailsAreDisplayedTest : BaseComposeTest {
                     ),
                 )
 
-            repository.setCurrentFeedAndTag(feedId, "")
+            repository.setCurrentFeedAndFolder(feedId, ID_UNSET)
 
             repository.upsertFeedItems(
                 listOf(

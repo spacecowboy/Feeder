@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.ui
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -12,11 +14,17 @@ class NavigationDeepLinkViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
 
-    fun setCurrentFeedAndTag(
+    fun setCurrentFeedAndFolder(
         feedId: Long,
-        tag: String,
-    ) {
-        repository.setCurrentFeedAndTag(feedId, tag)
+        folderId: Long,
+    ) = viewModelScope.launch {
+        if ((feedId > ID_UNSET && repository.getFeed(feedId) == null) ||
+            (folderId > ID_UNSET && repository.getFolder(folderId) == null)
+        ) {
+            repository.setCurrentFeedAndFolder(ID_ALL_FEEDS, ID_UNSET)
+        } else {
+            repository.setCurrentFeedAndFolder(feedId, folderId)
+        }
         // Should open feed in portrait
         repository.setIsArticleOpen(false)
     }

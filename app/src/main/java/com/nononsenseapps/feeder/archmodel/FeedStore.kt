@@ -6,11 +6,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedDisplayItem
 import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapLatest
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -21,18 +24,6 @@ class FeedStore(
     override val di: DI,
 ) : DIAware {
     private val feedDao: FeedDao by instance()
-
-    // Need only be internally consistent within the composition
-    // this object outlives all compositions
-    private var nextTagUiId: Long = -1000
-
-    // But IDs need to be consistent even if tags come and go
-    private val tagUiIds = mutableMapOf<String, Long>()
-
-    private fun getTagUiId(tag: String): Long =
-        tagUiIds.getOrPut(tag) {
-            --nextTagUiId
-        }
 
     suspend fun getFeed(feedId: Long): Feed? = feedDao.getFeed(feedId = feedId)
 
@@ -53,22 +44,19 @@ class FeedStore(
 
     suspend fun getDisplayTitle(feedId: Long): String? = feedDao.getFeedTitle(feedId)?.displayTitle
 
-    suspend fun renameTag(
-        oldTag: String,
-        newTag: String,
-    ) {
-        feedDao.renameTag(oldTag, newTag)
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getDisplayTitleFlow(feedId: Long): Flow<String?> =
+        feedDao.getFeedTitleFlow(feedId).mapLatest {
+            it?.displayTitle
+        }
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedDao.deleteFeeds(feedIds)
     }
 
-    val allTags: Flow<List<String>> = feedDao.loadAllTags()
-
     val feedForSettings: Flow<List<FeedForSettings>> = feedDao.loadFlowOfFeedsForSettings()
 
-    fun getPagedNavDrawerItems(expandedTags: Set<String>): Flow<PagingData<FeedUnreadCount>> =
+    fun getPagedNavDrawerItems(): Flow<PagingData<FeedUnreadCount>> =
         Pager(
             config =
                 PagingConfig(
@@ -78,18 +66,20 @@ class FeedStore(
                     jumpThreshold = 50,
                 ),
         ) {
-            feedDao.getPagedNavDrawerItems(expandedTags)
+            feedDao.getPagedNavDrawerItems()
         }.flow
 
     fun getFeedTitles(
         feedId: Long,
-        tag: String,
+        folderId: Long,
     ): Flow<List<FeedTitle>> =
         when {
             feedId > ID_UNSET -> feedDao.getFeedTitlesWithId(feedId)
-            tag.isNotBlank() -> feedDao.getFeedTitlesWithTag(tag)
+            folderId > ID_UNSET -> feedDao.getFeedTitlesInFolder(folderId)
             else -> feedDao.getAllFeedTitles()
         }
+
+    fun getFeedTitlesInFolders(folderIds: List<Long>): Flow<List<FeedTitle>> = feedDao.getFeedTitlesInFolders(folderIds)
 
     fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?> = feedDao.getCurrentlySyncingLatestTimestamp()
 
@@ -141,10 +131,10 @@ class FeedStore(
     ): Feed? = feedDao.syncLoadFeed(feedId = feedId, retryAfter = retryAfter)
 
     suspend fun syncLoadFeedsIfStale(
-        tag: String,
+        folderId: Long,
         staleTime: Long,
         retryAfter: Instant,
-    ) = feedDao.syncLoadFeedsIfStale(tag = tag, staleTime = staleTime, retryAfter = retryAfter)
+    ) = feedDao.syncLoadFeedsIfStale(folderId = folderId, staleTime = staleTime, retryAfter = retryAfter)
 
     suspend fun syncLoadFeedsIfStale(
         staleTime: Long,
@@ -152,9 +142,9 @@ class FeedStore(
     ) = feedDao.syncLoadFeedsIfStale(staleTime = staleTime, retryAfter = retryAfter)
 
     suspend fun syncLoadFeeds(
-        tag: String,
+        folderId: Long,
         retryAfter: Instant,
-    ) = feedDao.syncLoadFeeds(tag = tag, retryAfter = retryAfter)
+    ) = feedDao.syncLoadFeeds(folderId = folderId, retryAfter = retryAfter)
 
     suspend fun syncLoadFeeds(retryAfter: Instant) = feedDao.syncLoadFeeds(retryAfter = retryAfter)
 
@@ -164,4 +154,19 @@ class FeedStore(
     ) {
         feedDao.setRetryAfterForFeedsWithBaseUrl(host = host, retryAfter = retryAfter)
     }
+
+    fun getFolderIdFlow(folderId: Long): Flow<Long?> = feedDao.getFolderIdFlow(folderId)
+
+    fun getFeedDisplayItemsInFolder(folderId: Long): Flow<List<FeedDisplayItem>> = feedDao.getFeedDisplayItemsInFolder(folderId)
+
+    suspend fun setFeedsFolderId(
+        feedIds: List<Long>,
+        folderId: Long,
+        whenModified: Instant,
+    ) = feedDao.setFeedsFolderId(feedIds, folderId, whenModified)
+
+    suspend fun updateFeedsModDateInFolder(
+        folderId: Long,
+        whenModified: Instant,
+    ) = feedDao.updateFeedsModDateInFolder(folderId, whenModified)
 }

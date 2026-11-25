@@ -8,6 +8,8 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FolderDao
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.Either
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.logDebug
@@ -51,6 +53,7 @@ suspend fun importSavedArticles(
                     val contentResolver: ContentResolver by di.instance()
                     val feedItemDao: FeedItemDao by di.instance()
                     val feedDao: FeedDao by di.instance()
+                    val folderDao: FolderDao by di.instance()
                     val content =
                         contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
                             reader.readText()
@@ -60,6 +63,7 @@ suspend fun importSavedArticles(
                         importSavedArticlesExport(
                             feedDao = feedDao,
                             feedItemDao = feedItemDao,
+                            folderDao = folderDao,
                             export = savedArticlesImportJson.decodeFromString(SavedArticlesExport.serializer(), content),
                         )
                     } else {
@@ -73,17 +77,18 @@ suspend fun importSavedArticles(
 private suspend fun importSavedArticlesExport(
     feedDao: FeedDao,
     feedItemDao: FeedItemDao,
+    folderDao: FolderDao,
     export: SavedArticlesExport,
 ) {
     require(export.format == SAVED_ARTICLES_EXPORT_FORMAT) {
         "Unsupported saved articles export format: ${export.format}"
     }
-    require(export.version == SAVED_ARTICLES_EXPORT_VERSION) {
+    require(export.version <= SAVED_ARTICLES_EXPORT_VERSION) {
         "Unsupported saved articles export version: ${export.version}"
     }
 
     export.articles.forEach { article ->
-        val feedId = feedDao.resolveFeedId(article.feed)
+        val feedId = article.feed.toFeed(feedDao, folderDao)
         val existingItem =
             feedId?.let { id ->
                 feedItemDao.loadFeedItem(
@@ -117,17 +122,25 @@ private suspend fun importLegacySavedArticleLinks(
     }
 }
 
-private suspend fun FeedDao.resolveFeedId(feed: SavedArticleFeedExportItem): Long? {
-    val feedUrl = runCatching { URL(feed.url) }.getOrNull() ?: return null
+private suspend fun SavedArticleFeedExportItem.toFeed(
+    feedDao: FeedDao,
+    folderDao: FolderDao,
+): Long? {
+    val feedUrl = runCatching { URL(url) }.getOrNull() ?: return null
 
-    return getFeedIdForUrl(feedUrl)
-        ?: insertFeed(
+    return feedDao.getFeedIdForUrl(feedUrl)
+        ?: feedDao.insertFeed(
             Feed(
-                title = feed.title,
-                customTitle = feed.customTitle,
+                title = title,
+                customTitle = customTitle,
                 url = feedUrl,
-                tag = feed.tag,
-                fullTextByDefault = feed.fullTextByDefault,
+                folderIdNullable =
+                    when {
+                        folderPath != null -> folderDao.folderPathStringToFolderId(folderPath)
+                        !tag.isNullOrEmpty() -> folderDao.insertOrGetFolder(tag, ID_UNSET)
+                        else -> ID_UNSET
+                    }.takeUnless { it == ID_UNSET },
+                fullTextByDefault = fullTextByDefault,
             ),
         )
 }

@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.RssNotificationBroadcastReceiver
 import com.nononsenseapps.feeder.model.getDeleteIntent
 import com.nononsenseapps.feeder.model.notify
@@ -32,12 +33,15 @@ class NotificationClearingTest {
     @Test
     fun clearingNotificationMarksAsNotified() =
         runBlocking {
+            val folderId =
+                testDb.db.folderDao().insertFolder("testFolder", ID_UNSET)
+
             val feedId =
                 testDb.db.feedDao().insertFeed(
                     Feed(
                         title = "testFeed",
                         url = URL("http://testfeed"),
-                        tag = "testTag",
+                        folderIdNullable = folderId,
                     ),
                 )
 
@@ -78,12 +82,15 @@ class NotificationClearingTest {
     @Test
     fun notifyWorksOnMainThread() =
         runBlocking {
+            val folderId =
+                testDb.db.folderDao().insertFolder("testFolder", ID_UNSET)
+
             val feedId =
                 testDb.db.feedDao().insertFeed(
                     Feed(
                         title = "testFeed",
                         url = URL("http://testfeed"),
-                        tag = "testTag",
+                        folderIdNullable = folderId,
                     ),
                 )
 

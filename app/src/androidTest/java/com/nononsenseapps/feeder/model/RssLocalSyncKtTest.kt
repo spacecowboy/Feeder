@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.FeedItemStore
 import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.FolderStore
 import com.nononsenseapps.feeder.archmodel.FontStore
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SessionStore
@@ -22,6 +23,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FolderDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
 import com.nononsenseapps.feeder.db.room.RemoteReadMark
@@ -91,6 +93,7 @@ class RssLocalSyncKtTest : DIAware {
         bind<RemoteReadMarkDao>() with singleton { testDb.db.remoteReadMarkDao() }
         bind<ReadStatusSyncedDao>() with singleton { testDb.db.readStatusSyncedDao() }
         bind<SyncRemoteDao>() with singleton { testDb.db.syncRemoteDao() }
+        bind<FolderDao>() with singleton { testDb.db.folderDao() }
         bind<FeedStore>() with singleton { FeedStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SettingsStore>() with
@@ -102,6 +105,7 @@ class RssLocalSyncKtTest : DIAware {
         bind<FontStore>() with singleton { FontStore(di) }
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
+        bind<FolderStore>() with singleton { FolderStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
         bind<SharedPreferences>() with
@@ -156,7 +160,7 @@ class RssLocalSyncKtTest : DIAware {
                 Feed(
                     title = title,
                     url = url,
-                    tag = "",
+                    folderIdNullable = null,
                     alternateId = useAlternateId,
                     skipDuplicates = skipDuplicates,
                     blockRules = blockRules,
@@ -562,7 +566,7 @@ class RssLocalSyncKtTest : DIAware {
                     Feed(
                         title = "feed1",
                         url = server.url("/feed.json").toUrl(),
-                        tag = "",
+                        folderIdNullable = null,
                     ),
                 )
 
@@ -571,7 +575,7 @@ class RssLocalSyncKtTest : DIAware {
                     Feed(
                         title = "feed2",
                         url = server.url("/feed2.json").toUrl(),
-                        tag = "",
+                        folderIdNullable = null,
                     ),
                 )
 
@@ -657,7 +661,7 @@ class RssLocalSyncKtTest : DIAware {
                     Feed(
                         title = "failJson",
                         url = URL("$url"),
-                        tag = "",
+                        folderIdNullable = null,
                     ),
                 )
 
@@ -696,7 +700,7 @@ class RssLocalSyncKtTest : DIAware {
                     Feed(
                         title = "NixOS",
                         url = URL("$url"),
-                        tag = "",
+                        folderIdNullable = null,
                     ),
                 )
 
