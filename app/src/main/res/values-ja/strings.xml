@@ -283,7 +283,7 @@
     <string name="fetch_og_images">記事のメタデータでサムネイルを向上</string>
     <string name="fetch_og_images_desc">このフィードの設定されていないまたは低解像度のサムネイルを改善する</string>
     <string name="openai_settings">AIと翻訳</string>
-    <string name="openai_settings_info">多くのAIプロバイダーと互換性がありますが、すべてではありません。</string>
+    <string name="openai_settings_info">多くのAIプロバイダーと互換性がありますが、すべてではありません</string>
     <string name="summary_api_settings">要約API</string>
     <string name="summary_api_settings_info">記事のサマリーを使用する。</string>
     <string name="translation_api_settings">翻訳API</string>
@@ -352,7 +352,7 @@
     <string name="local_translation_failed">ローカル翻訳に失敗しました。</string>
     <string name="local_translation_empty_result">ローカル翻訳が空のテキストを返しました。</string>
     <string name="local_translator_not_ready">ローカル翻訳の準備ができていません。デバイスの翻訳設定を確認して、もう一度お試しください。</string>
-    <string name="no_bergamot_translation_model">%1$s -&gt; %2$s に対応するベルガモットモデルがありません。システム翻訳言語を確認してください。</string>
+    <string name="no_bergamot_translation_model">%1$s -&gt; %2$s に対応するベルガモットモデルがありません。システム翻訳言語を確認してください</string>
     <string name="bergamot_translation_timed_out">ベルガモットモデルがタイムアウトしました。</string>
     <string name="bergamot_translation_failed">ベルガモットモデルの翻訳に失敗しました。</string>
     <string name="bergamot_model_registry_unavailable">接続してモデルリストをダウンロードします。</string>
@@ -401,4 +401,20 @@
     <string name="rule_error_invalid_regex">行 %1$d: 無効な正規表現です。無効な行は無視されます。</string>
     <string name="rule_error_too_many_rules">行 %1$d: 最初の %2$d 個のルールが使用されます。このあとの行は無視されます。</string>
     <string name="download">ダウンロード</string>
+    <string name="read_aloud_preparing">音声を準備しています…</string>
+    <string name="read_aloud_position">読み上げ位置</string>
+    <string name="go_to_spoken_text">音声テキストへ移動</string>
+    <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
+    <string name="skip_back_10">10秒戻す</string>
+    <string name="skip_forward_10">10秒進む</string>
+    <string name="justify_article_text">記事本文を両端揃えにする</string>
+    <string name="justify_article_text_description">記事の段落を左右の端に揃える</string>
+    <string name="view_image">画像を表示</string>
+    <string name="open_image_link">リンクを開く</string>
+    <string name="image_zoom_in">拡大</string>
+    <string name="image_zoom_out">縮小</string>
+    <string name="image_reset_zoom">倍率を戻す</string>
+    <string name="image_load_failed">画像を読み込めません</string>
+    <string name="image_retry">リトライ</string>
+    <string name="image_close">画像を閉じる</string>
 </resources>
