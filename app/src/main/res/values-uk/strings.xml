@@ -417,4 +417,6 @@
     <string name="image_load_failed">Не вдалося завантажити зображення</string>
     <string name="image_retry">Спробувати знову</string>
     <string name="image_close">Закрити зображення</string>
+    <string name="trust_all_certificates">Довіряти всім сертифікатам</string>
+    <string name="trust_all_certificates_desc">Ігнорувати перевірку SSL-сертифіката для цієї стрічки</string>
 </resources>
