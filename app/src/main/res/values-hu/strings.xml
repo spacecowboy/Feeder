@@ -417,4 +417,6 @@
     <string name="image_load_failed">Nem sikerült betölteni a képet</string>
     <string name="image_retry">Újra</string>
     <string name="image_close">Kép bezárása</string>
+    <string name="trust_all_certificates">Megbízás az összes tanúsítványban</string>
+    <string name="trust_all_certificates_desc">SSL-tanúsítvány-ellenőrzés megkerülése ennél a hírforrásnál</string>
 </resources>
