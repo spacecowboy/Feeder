@@ -417,4 +417,6 @@
     <string name="image_load_failed">Échec du chargement de l\'image</string>
     <string name="image_retry">Réessayer</string>
     <string name="image_close">Fermer l\'image</string>
+    <string name="trust_all_certificates_desc">Ignorer la vérification du certificat SSL pour ce flux</string>
+    <string name="trust_all_certificates">Faire confiance à tous les certificats</string>
 </resources>
