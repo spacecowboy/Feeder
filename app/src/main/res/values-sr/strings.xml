@@ -409,4 +409,14 @@
     <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
     <string name="skip_back_10">Уназад 10 секунди</string>
     <string name="skip_forward_10">Унапред 10 секунди</string>
+    <string name="view_image">Прикажи слику</string>
+    <string name="open_image_link">Отвори линк</string>
+    <string name="image_zoom_in">Увећај</string>
+    <string name="image_zoom_out">Умањи</string>
+    <string name="image_reset_zoom">Ресетуј зумирање</string>
+    <string name="image_load_failed">Слика није могла да се учита</string>
+    <string name="image_retry">Покушај поново</string>
+    <string name="image_close">Затвори слику</string>
+    <string name="trust_all_certificates">Веруј свим сертификатима</string>
+    <string name="trust_all_certificates_desc">Заобиђи потврђивање SSL сертификата за овај довод</string>
 </resources>
