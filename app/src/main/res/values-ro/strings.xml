@@ -417,4 +417,6 @@
     <string name="image_load_failed">Nu s-a putut încărca imaginea</string>
     <string name="image_retry">Reîncercați</string>
     <string name="image_close">Închideți imaginea</string>
+    <string name="trust_all_certificates">Acceptați toate certificatele</string>
+    <string name="trust_all_certificates_desc">Ocoliți verificarea certificatului SSL pentru acest flux</string>
 </resources>
