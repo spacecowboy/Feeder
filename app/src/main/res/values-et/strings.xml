@@ -417,4 +417,6 @@
     <string name="image_load_failed">Pildi laadimine ei õnnestunud</string>
     <string name="image_retry">Proovi uuesti</string>
     <string name="image_close">Sulge pilt</string>
+    <string name="trust_all_certificates">Usalda kõiki sertifikaate</string>
+    <string name="trust_all_certificates_desc">Jäta selle uudisvoo võrguaadressi SSL/TLS-sertifikaadi õigsuse kontroll vahele</string>
 </resources>
