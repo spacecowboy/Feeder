@@ -409,4 +409,14 @@
     <string name="read_aloud_estimated_time">%1$d%% · ~%2$s</string>
     <string name="skip_back_10">Zpět o 10 sekund</string>
     <string name="skip_forward_10">Vpřed o 10 sekund</string>
+    <string name="trust_all_certificates">Důvěřovat všem certifikátům</string>
+    <string name="trust_all_certificates_desc">Obejít ověření certifikátu SSL u tohoto kanálu</string>
+    <string name="view_image">Zobrazit obrázek</string>
+    <string name="open_image_link">Otevřít odkaz</string>
+    <string name="image_zoom_in">Přiblížit</string>
+    <string name="image_zoom_out">Oddálit</string>
+    <string name="image_reset_zoom">Resetovat přiblížení</string>
+    <string name="image_load_failed">Nepodařilo se načíst obrázek</string>
+    <string name="image_retry">Opakovat</string>
+    <string name="image_close">Zavřít obrázek</string>
 </resources>
