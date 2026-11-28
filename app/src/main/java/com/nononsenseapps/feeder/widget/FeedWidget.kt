@@ -310,7 +310,14 @@ class FeedWidget : GlanceAppWidget() {
                         .fillMaxWidth()
                         .clickable(
                             actionStartActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse("$DEEP_LINK_BASE_URI/article/${item.id}")),
+                                // Explicit, so the article opens in Feeder even when Android
+                                // hasn't verified the app link and would send it to the browser
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("$DEEP_LINK_BASE_URI/article/${item.id}"),
+                                    LocalContext.current,
+                                    MainActivity::class.java,
+                                ),
                             ),
                         ).background(GlanceTheme.colors.surfaceVariant)
                         .padding(8.dp),
