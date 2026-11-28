@@ -19,9 +19,16 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -145,6 +152,7 @@ fun FeedItemCompact(
                                 contentScale = scale,
                                 modifier =
                                     Modifier
+                                        .limitIntrinsicHeight(imageWidth)
                                         .width(imageWidth)
                                         .fillMaxHeight(),
                             )
@@ -157,6 +165,36 @@ fun FeedItemCompact(
             }
         }
     }
+}
+
+/**
+ * Lets the thumbnail fill the height of the item without making the item taller than the
+ * thumbnail is wide. Otherwise a tall image stretches the item to the image's scaled height.
+ */
+private fun Modifier.limitIntrinsicHeight(max: Dp): Modifier = this then LimitIntrinsicHeight(max)
+
+private data class LimitIntrinsicHeight(
+    val max: Dp,
+) : LayoutModifier {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints,
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int,
+    ): Int = measurable.minIntrinsicHeight(width).coerceAtMost(max.roundToPx())
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int,
+    ): Int = measurable.maxIntrinsicHeight(width).coerceAtMost(max.roundToPx())
 }
 
 @Immutable
